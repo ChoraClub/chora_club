@@ -1,4 +1,4 @@
-![ALT IMAGE](https://ipfs.io/ipfs/QmYBrxnwxWYebdxRC5ZtbHobSJniG9QzgS1tZXUwsievzg?filename=Approaches.png)
+![ALT IMAGE](./approaches.png)
 
 # Chora Club - NFT Distribution Documentation
 
