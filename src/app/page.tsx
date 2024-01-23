@@ -1,9 +1,9 @@
-import Image from 'next/image'
+import ExploreDAOs from "@/components/DAOs/ExploreDAOs";
 
 export default function Home() {
   return (
-    <main className="text-2xl" >
-      Welcome to ChoraClub!
+    <main>
+      <ExploreDAOs />
     </main>
-  )
+  );
 }

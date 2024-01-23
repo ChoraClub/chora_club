@@ -33,7 +33,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${quanty.variable} ${poppins.variable}`}>
         <div className="grid grid-cols-12">
-          <div className="col-span-1 bg-blue-shade-100 h-screen mr-8">
+          <div className="col-span-1 bg-blue-shade-100 h-screen mr-4 lg:mr-8">
             {/* <NextUIProvider> */}
             <Sidebar />
             {/* </NextUIProvider> */}

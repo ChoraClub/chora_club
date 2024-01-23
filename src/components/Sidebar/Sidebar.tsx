@@ -25,14 +25,14 @@ function Sidebar() {
             alt={"image"}
             width={40}
             className={`cursor-pointer `}
-            // onClick={() => router.push("/")}
+            onClick={() => router.push("/")}
           ></Image>
           <Image
             src={office}
             alt={"image"}
             width={40}
             className={`cursor-pointer `}
-            // onClick={() => router.push("/office-hours")}
+            onClick={() => router.push("/office-hours")}
           ></Image>
         </div>
 
