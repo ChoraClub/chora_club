@@ -1,5 +1,5 @@
 "use client";
-import Image from "next/image";
+import Image, { StaticImageData } from "next/image";
 import React, { useState } from "react";
 import search from "@/assets/images/daos/search.png";
 import op_logo from "@/assets/images/daos/op.png";
@@ -28,16 +28,15 @@ function ExploreDAOs() {
 
   const router = useRouter();
 
-  const handleClick = (name: string) => {
-    // const formattedDaoName = name.replace(/\s+/g, "-").toLowerCase();
-    // const savedData = JSON.parse(localStorage.getItem("clickedDaoName") || '{}');
-    // console.log("saved data: ", savedData);
-    // localStorage.setItem(
-    //   "clickedDaoName",
-    //   JSON.stringify({ ...savedData, [formattedDaoName]: name })
-    // );
+  const handleClick = (name: string, img: StaticImageData) => {
     const formatted = name.toLowerCase();
-    router.push(`/${formatted}`);
+    const localData = JSON.parse(localStorage.getItem("visitedDao") || "{}");
+    // console.log("saved data: ", localData);
+    localStorage.setItem(
+      "visitedDao",
+      JSON.stringify({ ...localData, [formatted]: [formatted, img] })
+    );
+    router.push(`/daos/${formatted}`);
   };
 
   return (
@@ -70,7 +69,7 @@ function ExploreDAOs() {
               key={daos.name}
               style={{ boxShadow: "0px 4px 50.8px 0px rgba(0, 0, 0, 0.11)" }}
               className="px-5 py-7 rounded-2xl cursor-pointer"
-              onClick={() => handleClick(daos.name)}
+              onClick={() => handleClick(daos.name, daos.img)}
             >
               <div className="flex justify-center">
                 <Image
@@ -91,7 +90,7 @@ function ExploreDAOs() {
             </div>
           ))
         ) : (
-          <div>No such Dao available</div>
+          <div className="pl-3 text-xl font-semibold">No such Dao available</div>
         )}
       </div>
     </div>

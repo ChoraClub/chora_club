@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import logo from "@/assets/images/sidebar/favicon.png";
 import rocket from "@/assets/images/sidebar/rocket.png";
 import office from "@/assets/images/sidebar/office.png";
@@ -10,10 +10,62 @@ import user from "@/assets/images/sidebar/user.png";
 import op from "@/assets/images/daos/op.png";
 import arb from "@/assets/images/daos/arbitrum.jpg";
 import styles from "./sidebar.module.css";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { Badge, Tooltip } from "@nextui-org/react";
+import { IoClose } from "react-icons/io5";
 
 function Sidebar() {
   const router = useRouter();
+  const [storedDao, setStoredDao] = useState<string[]>([]);
+  const pathname = usePathname();
+  const [badgeVisiblity, setBadgeVisibility] = useState<boolean[]>(
+    new Array(storedDao.length).fill(true)
+  );
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      const localJsonData = JSON.parse(
+        localStorage.getItem("visitedDao") || "{}"
+      );
+
+      const localStorageArr: string[] = Object.values(localJsonData);
+      // console.log("Values: ", localStorageArr);
+
+      setStoredDao(localStorageArr);
+    }, 500);
+    return () => clearInterval(intervalId);
+  }, []);
+
+  const handleBadgeClick = (name: string) => {
+    // Remove the item from local storage
+
+    const localData = JSON.parse(localStorage.getItem("visitedDao") || "{}");
+
+    delete localData[name];
+    localStorage.setItem("visitedDao", JSON.stringify(localData));
+
+    // Update state to reflect the change
+    setStoredDao((prevState) => prevState.filter((item) => item[0] !== name));
+    setBadgeVisibility(new Array(storedDao.length).fill(false));
+
+    router.push(`/daos`);
+  };
+
+  const handleMouseOver = (index: number) => {
+    const updatedVisibility = [...badgeVisiblity];
+    updatedVisibility[index] = true;
+    setBadgeVisibility(updatedVisibility);
+  };
+
+  const handleMouseOut = (index: number) => {
+    const updatedVisibility = [...badgeVisiblity];
+    updatedVisibility[index] = false;
+    setBadgeVisibility(updatedVisibility);
+  };
+
+  // const handleImageClick = (name: string) => {
+  //   router.push(`/all-daos/${name}`);
+  // };
 
   return (
     <div className="py-6 h-full">
@@ -25,7 +77,7 @@ function Sidebar() {
             alt={"image"}
             width={40}
             className={`cursor-pointer `}
-            onClick={() => router.push("/")}
+            onClick={() => router.push("/daos")}
           ></Image>
           <Image
             src={office}
@@ -39,16 +91,51 @@ function Sidebar() {
         <div
           className={`flex flex-col items-center gap-y-4 py-7 bg-blue-shade-300 rounded-2xl h-svh overflow-y-auto ${styles.scrollbar}`}
         >
-          <Image
-            src={op}
-            alt="image"
-            className="w-10 h-10 rounded-full cursor-pointer"
-          ></Image>
-          <Image
+          {storedDao ? (
+            storedDao.map((data, index) => (
+              <div
+                key={index}
+                className="flex flex-col items-center"
+                onMouseOver={() => handleMouseOver(index)}
+                onMouseOut={() => handleMouseOut(index)}
+              >
+                <Badge
+                  isInvisible={!badgeVisiblity[index]}
+                  content={<IoClose />}
+                  className="p-[0.1rem] cursor-pointer border-blue-shade-300"
+                  color="danger"
+                  size="sm"
+                  onClick={() => handleBadgeClick(data[0])}
+                >
+                  <Tooltip
+                    content={<div className="capitalize">{data[0]}</div>}
+                    placement="right"
+                    className="rounded-md bg-opacity-90"
+                  >
+                    <Image
+                      key={index}
+                      src={data[1]}
+                      alt="image"
+                      className={`w-10 h-10 rounded-full cursor-pointer ${
+                        pathname.includes(`/daos/${data[0]}`)
+                          ? "border-white border-[2.5px]"
+                          : ""
+                      }`}
+                      priority={true}
+                      onClick={() => router.push(`/daos/${data[0]}`)}
+                    ></Image>
+                  </Tooltip>
+                </Badge>
+              </div>
+            ))
+          ) : (
+            <></>
+          )}
+          {/* <Image
             src={arb}
             alt="image"
             className="w-10 h-10 rounded-full cursor-pointer"
-          ></Image>
+          ></Image> */}
         </div>
 
         <div className="flex flex-col items-center gap-y-4 pt-5">

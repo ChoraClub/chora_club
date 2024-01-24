@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import localFonts from "next/font/local";
 import "./globals.css";
-import Sidebar from "@/components/Sidebar/Sidebar";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -32,14 +31,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${quanty.variable} ${poppins.variable}`}>
-        <div className="grid grid-cols-12">
-          <div className="col-span-1 bg-blue-shade-100 h-screen mr-4 lg:mr-8">
-            {/* <NextUIProvider> */}
-            <Sidebar />
-            {/* </NextUIProvider> */}
-          </div>
-          <div className="col-span-11 p-6">{children}</div>
-        </div>
+        {children}
       </body>
     </html>
   );
