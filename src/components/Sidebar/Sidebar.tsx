@@ -7,8 +7,6 @@ import rocket from "@/assets/images/sidebar/rocket.png";
 import office from "@/assets/images/sidebar/office.png";
 import wallet from "@/assets/images/sidebar/wallet.png";
 import user from "@/assets/images/sidebar/user.png";
-import op from "@/assets/images/daos/op.png";
-import arb from "@/assets/images/daos/arbitrum.jpg";
 import styles from "./sidebar.module.css";
 import { usePathname, useRouter } from "next/navigation";
 import { Badge, Tooltip } from "@nextui-org/react";
@@ -37,14 +35,11 @@ function Sidebar() {
   }, []);
 
   const handleBadgeClick = (name: string) => {
-    // Remove the item from local storage
-
     const localData = JSON.parse(localStorage.getItem("visitedDao") || "{}");
 
     delete localData[name];
     localStorage.setItem("visitedDao", JSON.stringify(localData));
 
-    // Update state to reflect the change
     setStoredDao((prevState) => prevState.filter((item) => item[0] !== name));
     setBadgeVisibility(new Array(storedDao.length).fill(false));
 
@@ -63,29 +58,39 @@ function Sidebar() {
     setBadgeVisibility(updatedVisibility);
   };
 
-  // const handleImageClick = (name: string) => {
-  //   router.push(`/all-daos/${name}`);
-  // };
-
   return (
     <div className="py-6 h-full">
       <div className="flex flex-col h-full justify-between">
         <div className="flex flex-col items-center gap-y-4 pb-5">
           <Image src={logo} alt={"image"} width={40}></Image>
-          <Image
-            src={rocket}
-            alt={"image"}
-            width={40}
-            className={`cursor-pointer `}
-            onClick={() => router.push("/daos")}
-          ></Image>
-          <Image
-            src={office}
-            alt={"image"}
-            width={40}
-            className={`cursor-pointer `}
-            onClick={() => router.push("/office-hours")}
-          ></Image>
+          <Tooltip
+            content="Daos"
+            placement="right"
+            className="rounded-md bg-opacity-90"
+            closeDelay={1}
+          >
+            <Image
+              src={rocket}
+              alt={"image"}
+              width={40}
+              className={`cursor-pointer `}
+              onClick={() => router.push("/daos")}
+            ></Image>
+          </Tooltip>
+          <Tooltip
+            content="Office Hours"
+            placement="right"
+            className="rounded-md bg-opacity-90"
+            closeDelay={1}
+          >
+            <Image
+              src={office}
+              alt={"image"}
+              width={40}
+              className={`cursor-pointer `}
+              onClick={() => router.push("/office-hours")}
+            ></Image>
+          </Tooltip>
         </div>
 
         <div
@@ -111,6 +116,7 @@ function Sidebar() {
                     content={<div className="capitalize">{data[0]}</div>}
                     placement="right"
                     className="rounded-md bg-opacity-90"
+                    closeDelay={1}
                   >
                     <Image
                       key={index}
@@ -131,11 +137,6 @@ function Sidebar() {
           ) : (
             <></>
           )}
-          {/* <Image
-            src={arb}
-            alt="image"
-            className="w-10 h-10 rounded-full cursor-pointer"
-          ></Image> */}
         </div>
 
         <div className="flex flex-col items-center gap-y-4 pt-5">

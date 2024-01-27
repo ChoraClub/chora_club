@@ -40,7 +40,7 @@ function ExploreDAOs() {
   };
 
   return (
-    <div>
+    <div className="p-6">
       <div className="text-blue-shade-200 font-medium text-4xl font-quanty py-4">
         Explore DAOs
       </div>
