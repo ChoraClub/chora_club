@@ -324,7 +324,7 @@ function DelegatesList() {
                     </div>
                     <span className="text-sm border border-[#D9D9D9] py-2 px-2 rounded-lg mt-3">
                       <span className="text-blue-shade-200 font-semibold">
-                        {daos.value}
+                        {daos.value} &nbsp;
                       </span>
                       Tokens Delegated
                     </span>

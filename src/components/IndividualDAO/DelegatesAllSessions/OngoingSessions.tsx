@@ -50,7 +50,7 @@ function OngoingSessions({ params }: { params: string }) {
             <Image
               src={data.img}
               alt="image"
-              className="w-44 rounded-3xl border border-[#D9D9D9]"
+              className="w-44 h-44 rounded-3xl border border-[#D9D9D9]"
             />
 
             <div className="ps-6 pe-12 py-1">

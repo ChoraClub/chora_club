@@ -19,7 +19,8 @@ function SpecificDAO({ params }: { params: { daoDelegates: string } }) {
   };
 
   useEffect(() => {
-    console.log(searchParams.get("active"));
+    const query = searchParams.get("active");
+    router.push(path + "?active=delegatesList");
   }, []);
 
   return (
