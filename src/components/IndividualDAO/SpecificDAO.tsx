@@ -43,7 +43,7 @@ function SpecificDAO({ params }: { params: { daoDelegates: string } }) {
           }`}
           onClick={() => setActiveSection("delegatesSession")}
         >
-          Delegates Session
+          Delegate's Session
         </button>
         <button
           className={`border-b-2 py-4 ${

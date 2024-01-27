@@ -191,7 +191,7 @@ function DelegatesList() {
 
   const [daoInfo, setDaoInfo] = useState<Array<Type>>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const pageSize = 5;
+  const pageSize = 10;
   const [page, setPage] = useState(2);
   const [dataLoading, setDataLoading] = useState(true);
   const [isPageLoading, setPageLoading] = useState(true);
@@ -263,7 +263,7 @@ function DelegatesList() {
           value={searchQuery}
           onChange={(e) => handleSearchChange(e.target.value)}
         ></input>
-        <span className="flex items-center bg-black rounded-full px-6 py-3">
+        <span className="flex items-center bg-black rounded-full px-5 py-2">
           <Image src={search} alt="search" width={20} />
         </span>
       </div>
