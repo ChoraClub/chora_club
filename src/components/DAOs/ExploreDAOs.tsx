@@ -36,7 +36,7 @@ function ExploreDAOs() {
       "visitedDao",
       JSON.stringify({ ...localData, [formatted]: [formatted, img] })
     );
-    router.push(`/daos/${formatted}`);
+    router.push(`/daos/${formatted}?active=delegatesList`);
   };
 
   return (
@@ -90,7 +90,9 @@ function ExploreDAOs() {
             </div>
           ))
         ) : (
-          <div className="pl-3 text-xl font-semibold">No such Dao available</div>
+          <div className="pl-3 text-xl font-semibold">
+            No such Dao available
+          </div>
         )}
       </div>
     </div>

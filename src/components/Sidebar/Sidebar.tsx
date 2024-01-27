@@ -128,7 +128,7 @@ function Sidebar() {
                           : ""
                       }`}
                       priority={true}
-                      onClick={() => router.push(`/daos/${data[0]}`)}
+                      onClick={() => router.push(`/daos/${data[0]}?active=delegatesList`)}
                     ></Image>
                   </Tooltip>
                 </Badge>

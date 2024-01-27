@@ -4,7 +4,7 @@ import { Bars } from "react-loader-spinner";
 
 function loading() {
   return (
-    <div className="flex justify-center items-center">
+    <div className="flex h-screen justify-center items-center">
       <Bars
         height="150"
         width="150"

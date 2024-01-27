@@ -1,6 +1,6 @@
 import React from 'react'
 
-function RecordedSessions() {
+function RecordedSessions({ params }: { params: string }) {
   return (
     <div>RecordedSessions</div>
   )

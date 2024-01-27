@@ -1,12 +1,26 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import DelegatesList from "./DelegatesList";
 import DelegatesSession from "./DelegatesSession";
 import OfficeHours from "./OfficeHours";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 
 function SpecificDAO({ params }: { params: { daoDelegates: string } }) {
   const [activeSection, setActiveSection] = useState("delegatesList");
+  const router = useRouter();
+  const path = usePathname();
+  const searchParams = useSearchParams();
+
+  const handleActivity = (state: string) => {
+    router.push(path + "?active=" + state);
+    setActiveSection(state);
+    console.log("Search params: ", searchParams.get("active"));
+  };
+
+  useEffect(() => {
+    console.log(searchParams.get("active"));
+  }, []);
 
   return (
     <div className="font-poppins py-6">
@@ -27,40 +41,48 @@ function SpecificDAO({ params }: { params: { daoDelegates: string } }) {
       <div className="flex gap-16 bg-[#D9D9D945] pl-16">
         <button
           className={`border-b-2 py-4  ${
-            activeSection === "delegatesList"
+            activeSection === "delegatesList" &&
+            searchParams.get("active") === "delegatesList"
               ? " border-blue-shade-200 text-blue-shade-200 font-semibold"
               : "border-transparent"
           }`}
-          onClick={() => setActiveSection("delegatesList")}
+          onClick={() => handleActivity("delegatesList")}
         >
           Delegates List
         </button>
         <button
           className={`border-b-2 py-4 ${
-            activeSection === "delegatesSession"
+            activeSection === "delegatesSession" &&
+            searchParams.get("active") === "delegatesSession"
               ? "text-blue-shade-200 font-semibold border-blue-shade-200"
               : "border-transparent"
           }`}
-          onClick={() => setActiveSection("delegatesSession")}
+          onClick={() => handleActivity("delegatesSession")}
         >
           Delegate's Session
         </button>
         <button
           className={`border-b-2 py-4 ${
-            activeSection === "officeHours"
+            activeSection === "officeHours" &&
+            searchParams.get("active") === "officeHours"
               ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
               : "border-transparent"
           }`}
-          onClick={() => setActiveSection("officeHours")}
+          onClick={() => handleActivity("officeHours")}
         >
           Office hours
         </button>
       </div>
 
       <div className="py-6 ps-16">
-        {activeSection === "delegatesList" && <DelegatesList />}
-        {activeSection === "delegatesSession" && <DelegatesSession />}
-        {activeSection === "officeHours" && <OfficeHours />}
+        {activeSection === "delegatesList" &&
+          searchParams.get("active") === "delegatesList" && <DelegatesList />}
+        {activeSection === "delegatesSession" &&
+          searchParams.get("active") === "delegatesSession" && (
+            <DelegatesSession />
+          )}
+        {activeSection === "officeHours" &&
+          searchParams.get("active") === "officeHours" && <OfficeHours />}
       </div>
     </div>
   );

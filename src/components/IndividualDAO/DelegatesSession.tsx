@@ -69,8 +69,8 @@ function DelegatesSession() {
 
         <div className="py-10">
         {activeSection === "ongoing" && <OngoingSessions params={searchQuery}/>}
-        {activeSection === "upcoming" && <UpcomingSessions />}
-        {activeSection === "recorded" && <RecordedSessions />}
+        {activeSection === "upcoming" && <UpcomingSessions params={searchQuery}/>}
+        {activeSection === "recorded" && <RecordedSessions params={searchQuery}/>}
       </div>
       </div>
     </div>
