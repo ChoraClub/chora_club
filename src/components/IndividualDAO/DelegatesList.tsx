@@ -334,7 +334,12 @@ function DelegatesList() {
             ))
           )
         ) : (
-          <div className="pl-3 text-lg font-medium">No such user available</div>
+          <div className="col-span-12 flex flex-col justify-center items-center">
+            <div className="text-5xl">☹️</div>{" "}
+            <div className="pt-4 font-semibold text-lg">
+              Oops, no such result available!
+            </div>
+          </div>
         )}
       </div>
     </div>

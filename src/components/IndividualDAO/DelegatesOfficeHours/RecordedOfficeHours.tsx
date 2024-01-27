@@ -3,12 +3,12 @@ import text1 from "@/assets/images/daos/texture1.png";
 import text2 from "@/assets/images/daos/texture2.png";
 import Image from "next/image";
 
-function UpcomingSessions({ params }: { params: string }) {
+function RecordedOfficeHours({ params }: { params: string }) {
   const details = [
     {
       img: text1,
       title:
-        "Upcoming Optimism Open Forum: Governance, Applications",
+        "Recorded Optimism Open Forum: Governance, Applications, and Beyond",
       dao: "Optimism",
       participant: 12,
       attendee: "olimpio.eth",
@@ -64,7 +64,7 @@ function UpcomingSessions({ params }: { params: string }) {
                   {data.dao}
                 </div>
                 <div className="border border-[#1E1E1E] rounded-md text-[#1E1E1E] text-xs px-5 py-1">
-                  {data.participant} Participants
+                  {data.participant} Views
                 </div>
               </div>
 
@@ -102,4 +102,4 @@ function UpcomingSessions({ params }: { params: string }) {
   );
 }
 
-export default UpcomingSessions;
+export default RecordedOfficeHours;

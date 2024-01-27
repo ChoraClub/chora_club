@@ -12,13 +12,13 @@ function DelegatesSession() {
 
   return (
     <div className="font-poppins">
-      <div className="font-semibold text-xl text-blue-shade-200">
+      {/* <div className="font-semibold text-xl text-blue-shade-200">
         Delegate's Session
-      </div>
+      </div> */}
 
       <div
         style={{ background: "rgba(238, 237, 237, 0.36)" }}
-        className="flex border-[0.5px] border-black w-fit rounded-full my-6 font-poppins"
+        className="flex border-[0.5px] border-black w-fit rounded-full my-4 font-poppins"
       >
         <input
           type="text"
@@ -33,7 +33,7 @@ function DelegatesSession() {
         </span>
       </div>
 
-      <div className="pr-36">
+      <div className="pr-36 pt-3">
         <div className="flex gap-16 border-1 border-[#7C7C7C] pl-6 rounded-xl text-sm">
           <button
             className={`py-2  ${

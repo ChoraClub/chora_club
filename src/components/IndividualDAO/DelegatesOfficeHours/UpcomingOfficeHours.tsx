@@ -3,12 +3,11 @@ import text1 from "@/assets/images/daos/texture1.png";
 import text2 from "@/assets/images/daos/texture2.png";
 import Image from "next/image";
 
-function UpcomingSessions({ params }: { params: string }) {
+function UpcomingOfficeHours({ params }: { params: string }) {
   const details = [
     {
       img: text1,
-      title:
-        "Upcoming Optimism Open Forum: Governance, Applications",
+      title: "Upcoming Optimism Open Forum: Governance, Applications",
       dao: "Optimism",
       participant: 12,
       attendee: "olimpio.eth",
@@ -102,4 +101,4 @@ function UpcomingSessions({ params }: { params: string }) {
   );
 }
 
-export default UpcomingSessions;
+export default UpcomingOfficeHours;
