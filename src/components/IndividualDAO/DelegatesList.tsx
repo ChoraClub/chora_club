@@ -9,6 +9,7 @@ import { IoCopy } from "react-icons/io5";
 import copy from "copy-to-clipboard";
 import { Tooltip } from "@nextui-org/react";
 import { Oval } from "react-loader-spinner";
+import { useRouter } from "next/navigation";
 
 interface Type {
   name: string;
@@ -195,6 +196,7 @@ function DelegatesList() {
   const [page, setPage] = useState(2);
   const [dataLoading, setDataLoading] = useState(true);
   const [isPageLoading, setPageLoading] = useState(true);
+  const router = useRouter()
 
   const handleSearchChange = (query: string) => {
     // setDaoInfo(daoInfo);
@@ -294,7 +296,7 @@ function DelegatesList() {
                 key={daos.name}
                 style={{ boxShadow: "0px 4px 50.8px 0px rgba(0, 0, 0, 0.11)" }}
                 className="px-5 py-7 rounded-2xl cursor-pointer"
-                // onClick={() => handleClick(daos.name, daos.img)}
+                onClick={() => router.push(`/daos/optimism/${daos.name}`) }
               >
                 <div className="flex justify-center">
                   <Image
