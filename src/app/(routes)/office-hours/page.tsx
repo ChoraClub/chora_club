@@ -1,9 +1,12 @@
-import React from 'react'
+import DaoOfficeHours from "@/components/OfficeHours/DaoOfficeHours";
+import React from "react";
 
 function page() {
   return (
-    <div>Office Hours</div>
-  )
+    <div>
+      <DaoOfficeHours />
+    </div>
+  );
 }
 
-export default page
+export default page;
