@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import search from "@/assets/images/daos/search.png";
 import Image from "next/image";
-import OngoingOfficeHours from "./DelegatesOfficeHours/OngoingOfficeHours";
-import UpcomingOfficeHours from "./DelegatesOfficeHours/UpcomingOfficeHours";
-import RecordedOfficeHours from "./DelegatesOfficeHours/RecordedOfficeHours";
+import OngoingOfficeHours from "./AllDelegatesOfficeHours/OngoingOfficeHours";
+import UpcomingOfficeHours from "./AllDelegatesOfficeHours/UpcomingOfficeHours";
+import RecordedOfficeHours from "./AllDelegatesOfficeHours/RecordedOfficeHours";
 
 function OfficeHours() {
   const [activeSection, setActiveSection] = useState("ongoing");

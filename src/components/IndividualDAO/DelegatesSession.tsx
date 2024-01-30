@@ -2,9 +2,9 @@
 import Image from "next/image";
 import React, { useState } from "react";
 import search from "@/assets/images/daos/search.png";
-import OngoingSessions from "./DelegatesAllSessions/OngoingSessions";
-import UpcomingSessions from "./DelegatesAllSessions/UpcomingSessions";
-import RecordedSessions from "./DelegatesAllSessions/RecordedSessions";
+import OngoingSessions from "./AllDelegatesSessions/OngoingSessions";
+import UpcomingSessions from "./AllDelegatesSessions/UpcomingSessions";
+import RecordedSessions from "./AllDelegatesSessions/RecordedSessions";
 
 function DelegatesSession() {
   const [activeSection, setActiveSection] = useState("ongoing");
@@ -68,10 +68,16 @@ function DelegatesSession() {
         </div>
 
         <div className="py-10">
-        {activeSection === "ongoing" && <OngoingSessions params={searchQuery}/>}
-        {activeSection === "upcoming" && <UpcomingSessions params={searchQuery}/>}
-        {activeSection === "recorded" && <RecordedSessions params={searchQuery}/>}
-      </div>
+          {activeSection === "ongoing" && (
+            <OngoingSessions params={searchQuery} />
+          )}
+          {activeSection === "upcoming" && (
+            <UpcomingSessions params={searchQuery} />
+          )}
+          {activeSection === "recorded" && (
+            <RecordedSessions params={searchQuery} />
+          )}
+        </div>
       </div>
     </div>
   );
