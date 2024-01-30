@@ -5,13 +5,19 @@ import user from "@/assets/images/daos/user3.png";
 import { FaXTwitter, FaDiscord } from "react-icons/fa6";
 import { BiLogoInstagramAlt } from "react-icons/bi";
 import { IoCopy } from "react-icons/io5";
+import DelegateInfo from "./DelegateInfo";
+import DelegateVotes from "./DelegateVotes";
+import DelegateSessions from "./DelegateSessions";
+import DelegateOfficeHrs from "./DelegateOfficeHrs";
+import copy from "copy-to-clipboard";
+import { Tooltip } from "@nextui-org/react";
 
 interface Type {
   daoDelegates: string;
   individualDelegate: string;
 }
 
-function SpecificDelegate({ params }: { params: Array<Type> }) {
+function SpecificDelegate({ params }: { params: Array<Type>[] }) {
   const [activeSection, setActiveSection] = useState("info");
 
   return (
@@ -26,19 +32,19 @@ function SpecificDelegate({ params }: { params: Array<Type> }) {
             </div>
             <div className="flex gap-3">
               <span
-                className="border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1"
+                className="border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 cursor-pointer"
                 style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
               >
                 <FaXTwitter color="#7C7C7C" size={12} />
               </span>
               <span
-                className="border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1"
+                className="border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 cursor-pointer"
                 style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
               >
                 <BiLogoInstagramAlt color="#7C7C7C" size={12} />
               </span>
               <span
-                className="border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1"
+                className="border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 cursor-pointer"
                 style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
               >
                 <FaDiscord color="#7C7C7C" size={12} />
@@ -47,10 +53,22 @@ function SpecificDelegate({ params }: { params: Array<Type> }) {
           </div>
 
           <div className="flex items-center py-1">
-            <div>0xB351a70dD6E5282A8c84edCbCd5A955469b9b032</div>
-            <span className="px-2" color="#3E3D3D">
-              <IoCopy />
-            </span>
+            <div>
+              {"0xB351a70dD6E5282A8c84edCbCd5A955469b9b032".substring(0, 6)} ...{" "}
+              {"0xB351a70dD6E5282A8c84edCbCd5A955469b9b032".substring(
+                "0xB351a70dD6E5282A8c84edCbCd5A955469b9b032".length - 4
+              )}
+            </div>
+
+            <Tooltip content="Copy" placement="right" closeDelay={1} showArrow>
+              <span className="px-2 cursor-pointer" color="#3E3D3D">
+                <IoCopy
+                  onClick={() =>
+                    copy("0xB351a70dD6E5282A8c84edCbCd5A955469b9b032")
+                  }
+                />
+              </span>
+            </Tooltip>
           </div>
 
           <div className="flex gap-4 py-1">
@@ -73,47 +91,54 @@ function SpecificDelegate({ params }: { params: Array<Type> }) {
         </div>
       </div>
 
-      <div className="flex gap-16 bg-[#D9D9D945] pl-16">
+      <div className="flex gap-12 bg-[#D9D9D945] pl-16">
         <button
-          className={`border-b-2 py-4  ${
+          className={`border-b-2 py-4 px-2  ${
             activeSection === "info"
               ? " border-blue-shade-200 text-blue-shade-200 font-semibold"
               : "border-transparent"
           }`}
-          // onClick={() => handleActivity("delegatesList")}
+          onClick={() => setActiveSection("info")}
         >
           Info
         </button>
         <button
-          className={`border-b-2 py-4 ${
+          className={`border-b-2 py-4 px-2 ${
             activeSection === "pastVotes"
               ? "text-blue-shade-200 font-semibold border-blue-shade-200"
               : "border-transparent"
           }`}
-          // onClick={() => handleActivity("delegatesSession")}
+          onClick={() => setActiveSection("pastVotes")}
         >
           Past Votes
         </button>
         <button
-          className={`border-b-2 py-4 ${
+          className={`border-b-2 py-4 px-2 ${
             activeSection === "sessions"
               ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
               : "border-transparent"
           }`}
-          // onClick={() => handleActivity("officeHours")}
+          onClick={() => setActiveSection("sessions")}
         >
           Sessions
         </button>
         <button
-          className={`border-b-2 py-4 ${
+          className={`border-b-2 py-4 px-2 ${
             activeSection === "officeHours"
               ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
               : "border-transparent"
           }`}
-          // onClick={() => handleActivity("officeHours")}
+          onClick={() => setActiveSection("officeHours")}
         >
           Office Hours
         </button>
+      </div>
+
+      <div className="py-6 ps-16">
+        {activeSection === "info" && <DelegateInfo />}
+        {activeSection === "pastVotes" && <DelegateVotes />}
+        {activeSection === "sessions" && <DelegateSessions />}
+        {activeSection === "officeHours" && <DelegateOfficeHrs />}
       </div>
     </div>
   );
