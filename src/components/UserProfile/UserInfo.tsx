@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-function DelegateInfo() {
+function UserInfo() {
   const details = [
     {
       number: 10,
@@ -53,4 +53,4 @@ function DelegateInfo() {
   );
 }
 
-export default DelegateInfo;
+export default UserInfo;

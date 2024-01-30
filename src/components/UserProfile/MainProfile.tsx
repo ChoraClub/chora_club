@@ -1,23 +1,20 @@
 "use client";
+
 import Image from "next/image";
 import React, { useState } from "react";
+import copy from "copy-to-clipboard";
+import { Tooltip } from "@nextui-org/react";
 import user from "@/assets/images/daos/user3.png";
 import { FaXTwitter, FaDiscord } from "react-icons/fa6";
 import { BiLogoInstagramAlt } from "react-icons/bi";
 import { IoCopy } from "react-icons/io5";
-import DelegateInfo from "./DelegateInfo";
-import DelegateVotes from "./DelegateVotes";
-import DelegateSessions from "./DelegateSessions";
-import DelegateOfficeHrs from "./DelegateOfficeHrs";
-import copy from "copy-to-clipboard";
-import { Tooltip } from "@nextui-org/react";
+import UserInfo from "./UserInfo";
+import UserVotes from "./UserVotes";
+import UserSessions from "./UserSessions";
+import UserOfficeHours from "./UserOfficeHours";
+import ClaimNFTs from "./ClaimNFTs";
 
-interface Type {
-  daoDelegates: string;
-  individualDelegate: string;
-}
-
-function SpecificDelegate({ params }: { params: Type }) {
+function MainProfile() {
   const [activeSection, setActiveSection] = useState("info");
 
   return (
@@ -27,9 +24,7 @@ function SpecificDelegate({ params }: { params: Type }) {
 
         <div className="px-4">
           <div className=" flex items-center py-1">
-            <div className="font-bold text-lg pr-4">
-              {params.individualDelegate}
-            </div>
+            <div className="font-bold text-lg pr-4">lindaxie.eth</div>
             <div className="flex gap-3">
               <span
                 className="border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 cursor-pointer"
@@ -93,9 +88,9 @@ function SpecificDelegate({ params }: { params: Type }) {
 
       <div className="flex gap-12 bg-[#D9D9D945] pl-16">
         <button
-          className={`border-b-2 py-4 px-2  ${
+          className={`border-b-2 py-4 px-2 ${
             activeSection === "info"
-              ? " border-blue-shade-200 text-blue-shade-200 font-semibold"
+              ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
               : "border-transparent"
           }`}
           onClick={() => setActiveSection("info")}
@@ -105,7 +100,7 @@ function SpecificDelegate({ params }: { params: Type }) {
         <button
           className={`border-b-2 py-4 px-2 ${
             activeSection === "pastVotes"
-              ? "text-blue-shade-200 font-semibold border-blue-shade-200"
+              ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
               : "border-transparent"
           }`}
           onClick={() => setActiveSection("pastVotes")}
@@ -132,16 +127,27 @@ function SpecificDelegate({ params }: { params: Type }) {
         >
           Office Hours
         </button>
+        <button
+          className={`border-b-2 py-4 px-2 ${
+            activeSection === "claimNft"
+              ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
+              : "border-transparent"
+          }`}
+          onClick={() => setActiveSection("claimNft")}
+        >
+          Claim NFTs
+        </button>
       </div>
 
       <div className="py-6 ps-16">
-        {activeSection === "info" && <DelegateInfo />}
-        {activeSection === "pastVotes" && <DelegateVotes />}
-        {activeSection === "sessions" && <DelegateSessions />}
-        {activeSection === "officeHours" && <DelegateOfficeHrs />}
+        {activeSection === "info" && <UserInfo />}
+        {activeSection === "pastVotes" && <UserVotes />}
+        {activeSection === "sessions" && <UserSessions />}
+        {activeSection === "officeHours" && <UserOfficeHours />}
+        {activeSection === "claimNft" && <ClaimNFTs />}
       </div>
     </div>
   );
 }
 
-export default SpecificDelegate;
+export default MainProfile;
