@@ -30,7 +30,7 @@ function Sidebar() {
       // console.log("Values: ", localStorageArr);
 
       setStoredDao(localStorageArr);
-    }, 500);
+    }, 100);
     return () => clearInterval(intervalId);
   }, []);
 
@@ -43,7 +43,7 @@ function Sidebar() {
     setStoredDao((prevState) => prevState.filter((item) => item[0] !== name));
     setBadgeVisibility(new Array(storedDao.length).fill(false));
 
-    router.push(`/daos`);
+    router.push(`/`);
   };
 
   const handleMouseOver = (index: number) => {
@@ -74,7 +74,7 @@ function Sidebar() {
               alt={"image"}
               width={40}
               className={`cursor-pointer `}
-              onClick={() => router.push("/daos")}
+              onClick={() => router.push("/")}
             ></Image>
           </Tooltip>
           <Tooltip
