@@ -112,14 +112,14 @@ function DelegateVotes() {
         <div className="flex bg-[#3E3D3D] text-white py-6 px-10 rounded-xl">
           <div>
             <div className="font-semibold text-xl">14</div>
-            <div className="text-sm"> Proposal's Voted</div>
+            <div className="text-sm"> Proposal&apos;s Voted</div>
           </div>
           <div className="border-[0.5px] border-[#8E8E8E] mx-4 my-1"></div>
           <div>
             <div className="font-semibold text-xl">
               2.56k <span className="text-sm font-normal">delegates</span>
             </div>
-            <div className="text-sm"> Proposal's Voted</div>
+            <div className="text-sm"> Proposal&apos;s Voted</div>
           </div>
         </div>
 
@@ -149,7 +149,7 @@ function DelegateVotes() {
         <div className="h-[23rem]">
           {allProposals.length > 0 ? (
             allProposals.map((proposal, index) => (
-              <div className="flex justify-between border border-[#7C7C7C] text-sm px-3 py-2 rounded-lg items-center my-3">
+              <div key={index} className="flex justify-between border border-[#7C7C7C] text-sm px-3 py-2 rounded-lg items-center my-3">
                 <div className="flex items-center">
                   <div className={`${styles.desc}`}>{proposal.title}</div>
                   <div className="text-xs px-5 text-blue-shade-100 underline cursor-pointer">

@@ -60,7 +60,7 @@ function SpecificDAO({ params }: { params: { daoDelegates: string } }) {
           }`}
           onClick={() => handleActivity("delegatesSession")}
         >
-          Delegate's Session
+          Delegate&apos;s Session
         </button>
         <button
           className={`border-b-2 py-4 ${
