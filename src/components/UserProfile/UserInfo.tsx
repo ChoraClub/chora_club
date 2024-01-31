@@ -27,8 +27,7 @@ function UserInfo() {
   const [data, setData] = useState(details);
 
   return (
-    <div>
-      
+    <div className="pt-4">
       <div className="grid grid-cols-5 pe-32 gap-7">
         {data.length > 0 ? (
           data.map((key, index) => (

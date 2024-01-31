@@ -106,7 +106,7 @@ function UserVotes() {
   }, [currentPage, proposals, dataPerPage]);
 
   return (
-    <div>
+    <div className="pt-4">
       <div className="grid grid-cols-5 pe-5 gap-4">
         <div className="col-span-2 space-y-4">
           <div className="flex bg-[#3E3D3D] text-white py-6 px-10 rounded-xl">
