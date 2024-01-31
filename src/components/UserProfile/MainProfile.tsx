@@ -19,8 +19,8 @@ function MainProfile() {
 
   return (
     <div className="font-poppins">
-      <div className="flex ps-14 py-5">
-        <Image src={user} alt="user" className="w-40" />
+      <div className="flex ps-14 py-5 pe-10">
+        <Image src={user} alt="user" className="w-40 h-40" />
 
         <div className="px-4">
           <div className=" flex items-center py-1">
@@ -78,17 +78,23 @@ function MainProfile() {
             </div>
           </div>
 
-          <div className="pt-2">
+          <div className="pt-2 flex gap-5">
             <button className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]">
               Delegate
             </button>
+            <div className="">
+              <select className="outline-none border border-blue-shade-200 text-blue-shade-200 rounded-full py-2 px-3">
+                <option className="text-gray-700">Optimism</option>
+                <option className="text-gray-700">Arbitrum</option>
+              </select>
+            </div>
           </div>
         </div>
       </div>
 
       <div className="flex gap-12 bg-[#D9D9D945] pl-16">
         <button
-          className={`border-b-2 py-4 px-2 ${
+          className={`border-b-2 py-4 px-2 outline-none ${
             activeSection === "info"
               ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
               : "border-transparent"
@@ -98,7 +104,7 @@ function MainProfile() {
           Info
         </button>
         <button
-          className={`border-b-2 py-4 px-2 ${
+          className={`border-b-2 py-4 px-2 outline-none ${
             activeSection === "pastVotes"
               ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
               : "border-transparent"
@@ -108,7 +114,7 @@ function MainProfile() {
           Past Votes
         </button>
         <button
-          className={`border-b-2 py-4 px-2 ${
+          className={`border-b-2 py-4 px-2 outline-none ${
             activeSection === "sessions"
               ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
               : "border-transparent"
@@ -118,7 +124,7 @@ function MainProfile() {
           Sessions
         </button>
         <button
-          className={`border-b-2 py-4 px-2 ${
+          className={`border-b-2 py-4 px-2 outline-none ${
             activeSection === "officeHours"
               ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
               : "border-transparent"
@@ -128,7 +134,7 @@ function MainProfile() {
           Office Hours
         </button>
         <button
-          className={`border-b-2 py-4 px-2 ${
+          className={`border-b-2 py-4 px-2 outline-none ${
             activeSection === "claimNft"
               ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
               : "border-transparent"

@@ -14,70 +14,69 @@ function DelegateVotes() {
       status: "For",
     },
     {
-      title: "Proposal Description",
+      title: "Proposal Description2",
       status: "Against",
     },
     {
-      title: "Proposal Description",
+      title: "Proposal Description3",
       status: "For",
     },
     {
-      title: "Proposal Description",
+      title: "Proposal Description4",
       status: "Abstain",
     },
     {
-      title: "Proposal Description",
+      title: "Proposal Description5",
       status: "Against",
     },
     {
-      title: "Proposal Description",
+      title: "Proposal Description6",
       status: "Abstain",
     },
     {
-      title: "Proposal Description",
+      title: "Proposal Description7",
       status: "For",
     },
     {
-      title: "Proposal Description",
+      title: "Proposal Description8",
       status: "For",
     },
     {
-      title: "Proposal Description",
+      title: "Proposal Description9",
       status: "Against",
     },
     {
-      title: "Proposal Description",
+      title: "Proposal Description10",
       status: "For",
     },
     {
-      title: "Proposal Description",
+      title: "Proposal Description11",
       status: "Abstain",
     },
     {
-      title: "Proposal Description",
+      title: "Proposal Description12",
       status: "Against",
     },
     {
-      title: "Proposal Description",
+      title: "Proposal Description13",
       status: "Abstain",
     },
     {
-      title: "Proposal Description",
+      title: "Proposal Description14",
       status: "For",
     },
     {
-      title: "Proposal Description",
+      title: "Proposal Description15",
       status: "Abstain",
     },
     {
-      title: "Proposal Description",
+      title: "Proposal Description16",
       status: "Against",
     },
     {
-      title: "Proposal Description",
+      title: "Proposal Description17",
       status: "Abstain",
     },
-    
   ];
 
   const data = {
@@ -115,7 +114,7 @@ function DelegateVotes() {
             <div className="text-sm"> Proposal's Voted</div>
           </div>
           <div className="border-[0.5px] border-[#8E8E8E] mx-4 my-1"></div>
-          <div>
+          <div className="ps-2">
             <div className="font-semibold text-xl">
               2.56k <span className="text-sm font-normal">delegates</span>
             </div>
