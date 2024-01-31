@@ -17,7 +17,7 @@ interface Type {
   individualDelegate: string;
 }
 
-function SpecificDelegate({ params }: { params: Array<Type>[] }) {
+function SpecificDelegate({ params }: { params: Type }) {
   const [activeSection, setActiveSection] = useState("info");
 
   return (

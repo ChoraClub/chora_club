@@ -6,7 +6,7 @@ interface Type {
   individualDelegate: string;
 }
 
-function page({ params }: { params: Array<Type> }) {
+function page({ params }: { params: Type }) {
   return (
     <div>
       <SpecificDelegate params={params} />
