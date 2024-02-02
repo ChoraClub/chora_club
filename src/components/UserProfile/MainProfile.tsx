@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { ChangeEvent, useRef, useState } from "react";
 import copy from "copy-to-clipboard";
 import { Tooltip } from "@nextui-org/react";
 import user from "@/assets/images/daos/user3.png";
@@ -13,14 +13,50 @@ import UserVotes from "./UserVotes";
 import UserSessions from "./UserSessions";
 import UserOfficeHours from "./UserOfficeHours";
 import ClaimNFTs from "./ClaimNFTs";
+import { FaPencil } from "react-icons/fa6";
 
 function MainProfile() {
   const [activeSection, setActiveSection] = useState("info");
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [img, setImg] = useState<File | undefined>();
+  const [hovered, setHovered] = useState(false);
+
+  const handleLogoClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>): void => {
+    const selectedFile = e.target.files?.[0];
+
+    if (selectedFile) {
+      setImg(selectedFile);
+    }
+  };
 
   return (
     <div className="font-poppins">
       <div className="flex ps-14 py-5 pe-10">
-        <Image src={user} alt="user" className="w-40 h-40" />
+        <div
+          className="relative"
+          onMouseEnter={() => setHovered(true)}
+          onMouseLeave={() => setHovered(false)}
+        >
+          <Image src={user} alt="user" className="w-40 h-40" />
+          <div
+            className={`absolute top-3 right-3 cursor-pointer  ${
+              hovered ? "bg-gray-50 rounded-full p-1" : "hidden"
+            } `}
+            onClick={handleLogoClick}
+          >
+            <FaPencil className="opacity-100" size={12} />
+            <input
+              type="file"
+              ref={fileInputRef}
+              hidden
+              onChange={handleFileChange}
+            />
+          </div>
+        </div>
 
         <div className="px-4">
           <div className=" flex items-center py-1">

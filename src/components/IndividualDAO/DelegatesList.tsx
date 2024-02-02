@@ -7,9 +7,10 @@ import user1 from "@/assets/images/daos/user1.png";
 import user2 from "@/assets/images/daos/user2.png";
 import { IoCopy } from "react-icons/io5";
 import copy from "copy-to-clipboard";
-import { Tooltip } from "@nextui-org/react";
+import { Pagination, Tooltip } from "@nextui-org/react";
 import { Oval } from "react-loader-spinner";
 import { useRouter } from "next/navigation";
+import toast, { Toaster } from "react-hot-toast";
 
 interface Type {
   name: string;
@@ -192,11 +193,20 @@ function DelegatesList() {
 
   const [daoInfo, setDaoInfo] = useState<Array<Type>>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const pageSize = 10;
-  const [page, setPage] = useState(2);
-  const [dataLoading, setDataLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [dataLoading, setDataLoading] = useState(false);
   const [isPageLoading, setPageLoading] = useState(true);
-  const router = useRouter()
+  const router = useRouter();
+  const totalData: number = dao_info.length;
+  const dataPerPage: number = 10;
+  const totalPages: number = Math.ceil(totalData / dataPerPage);
+
+  const fetchData = () => {
+    const offset = (currentPage - 1) * dataPerPage;
+    const end = offset + dataPerPage;
+    const initialData = dao_info.slice(offset, end);
+    setDaoInfo(initialData);
+  };
 
   const handleSearchChange = (query: string) => {
     // setDaoInfo(daoInfo);
@@ -208,66 +218,54 @@ function DelegatesList() {
         item.address.startsWith(query)
     );
 
-    console.log("Filtered Data: ", filtered);
+    // console.log("Filtered Data: ", filtered);
 
-    setDaoInfo(filtered);
-    window.removeEventListener("scroll", handleScroll);
-  };
-
-  const fetchData = () => {
-    setDataLoading(false);
-    const start = (page - 1) * pageSize;
-    const end = start + pageSize;
-
-    if (start < dao_info.length) {
-      console.log("Start: " + start + "End: " + end);
-
-      const additionalData = dao_info.slice(start, end);
-      setPage(page + 1);
-      console.log("additionalData: ", additionalData);
-      setDaoInfo((prevData) => [...prevData, ...additionalData]);
-    }
-  };
-
-  const handleScroll = () => {
-    const { scrollTop, clientHeight, scrollHeight } = document.documentElement;
-
-    if (scrollTop + clientHeight >= scrollHeight - 10) {
+    if (query.length > 0 && filtered.length > 0) {
+      setDaoInfo(filtered);
+    } else {
       fetchData();
     }
   };
 
   useEffect(() => {
-    window.addEventListener("scroll", handleScroll);
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, [page]);
-
-  useEffect(() => {
-    setDataLoading(false);
+    fetchData();
     setPageLoading(false);
-    setDaoInfo(dao_info.slice(0, pageSize));
-  }, []);
+  }, [currentPage, dataPerPage]);
+
+  const handleCopy = (addr: string) => {
+    copy(addr);
+    toast("Copied");
+  };
 
   return (
     <div>
-      <div
-        style={{ background: "rgba(238, 237, 237, 0.36)" }}
-        className="flex border-[0.5px] border-black w-fit rounded-full my-3 font-poppins"
-      >
-        <input
-          type="text"
-          placeholder="Search"
+      <div className="flex items-center justify-between">
+        <div
           style={{ background: "rgba(238, 237, 237, 0.36)" }}
-          className="pl-5 rounded-full outline-none"
-          value={searchQuery}
-          onChange={(e) => handleSearchChange(e.target.value)}
-        ></input>
-        <span className="flex items-center bg-black rounded-full px-5 py-2">
-          <Image src={search} alt="search" width={20} />
-        </span>
+          className="flex border-[0.5px] border-black w-fit rounded-full my-3 font-poppins"
+        >
+          <input
+            type="text"
+            placeholder="Search"
+            style={{ background: "rgba(238, 237, 237, 0.36)" }}
+            className="pl-5 rounded-full outline-none"
+            value={searchQuery}
+            onChange={(e) => handleSearchChange(e.target.value)}
+          ></input>
+          <span className="flex items-center bg-black rounded-full px-5 py-2">
+            <Image src={search} alt="search" width={20} />
+          </span>
+        </div>
+
+        <div className="pe-10">
+          <Pagination
+            total={totalPages}
+            initialPage={1}
+            page={currentPage}
+            onChange={setCurrentPage}
+            showControls
+          />
+        </div>
       </div>
 
       <div className="grid min-[475px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-10 py-8 pe-10 font-poppins">
@@ -295,10 +293,9 @@ function DelegatesList() {
               <div
                 key={daos.name}
                 style={{ boxShadow: "0px 4px 50.8px 0px rgba(0, 0, 0, 0.11)" }}
-                className="px-5 py-7 rounded-2xl cursor-pointer"
-                onClick={() => router.push(`/daos/optimism/${daos.name}`) }
+                className="px-5 py-7 rounded-2xl"
               >
-                <div className="flex justify-center">
+                <div className="flex justify-center cursor-pointer" onClick={() => router.push(`/daos/optimism/${daos.name}`)}>
                   <Image
                     src={daos.img}
                     alt="Image not found"
@@ -309,7 +306,12 @@ function DelegatesList() {
 
                 <div className="text-center">
                   <div className="py-3">
-                    <div className="font-semibold">{daos.name}</div>
+                    <div
+                      className="font-semibold cursor-pointer"
+                      onClick={() => router.push(`/daos/optimism/${daos.name}`)}
+                    >
+                      {daos.name}
+                    </div>
                     <div className="flex justify-center items-center gap-2 pb-4 pt-2">
                       {daos.address.substring(0, 5)}...
                       {daos.address.substring(daos.address.length - 4)}
@@ -319,8 +321,8 @@ function DelegatesList() {
                         closeDelay={1}
                         showArrow
                       >
-                        <span>
-                          <IoCopy onClick={() => copy(daos.address)} />
+                        <span className="cursor-pointer">
+                          <IoCopy onClick={() => handleCopy(daos.address)} />
                         </span>
                       </Tooltip>
                     </div>
@@ -332,6 +334,18 @@ function DelegatesList() {
                     </div>
                   </div>
                 </div>
+                <Toaster
+                  toastOptions={{
+                    style: {
+                      fontSize: "14px",
+                      backgroundColor: "#0238B3",
+                      color: "#fff",
+                      boxShadow: "none",
+                      borderRadius: "50px",
+                      padding: "3px 5px",
+                    },
+                  }}
+                />
               </div>
             ))
           )

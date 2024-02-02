@@ -14,13 +14,13 @@ function SpecificDAO({ params }: { params: { daoDelegates: string } }) {
 
   const handleActivity = (state: string) => {
     router.push(path + "?active=" + state);
-    setActiveSection(state);
+    // setActiveSection(state);
     console.log("Search params: ", searchParams.get("active"));
   };
 
   useEffect(() => {
     const query = searchParams.get("active");
-    router.push(path + "?active=delegatesList");
+    // router.push(path + "?active=delegatesList");
   }, []);
 
   return (
@@ -42,7 +42,6 @@ function SpecificDAO({ params }: { params: { daoDelegates: string } }) {
       <div className="flex gap-16 bg-[#D9D9D945] pl-16">
         <button
           className={`border-b-2 py-4  ${
-            activeSection === "delegatesList" &&
             searchParams.get("active") === "delegatesList"
               ? " border-blue-shade-200 text-blue-shade-200 font-semibold"
               : "border-transparent"
@@ -53,8 +52,7 @@ function SpecificDAO({ params }: { params: { daoDelegates: string } }) {
         </button>
         <button
           className={`border-b-2 py-4 ${
-            activeSection === "delegatesSession" &&
-            searchParams.get("active") === "delegatesSession"
+            searchParams.get("active") == "delegatesSession"
               ? "text-blue-shade-200 font-semibold border-blue-shade-200"
               : "border-transparent"
           }`}
@@ -64,8 +62,7 @@ function SpecificDAO({ params }: { params: { daoDelegates: string } }) {
         </button>
         <button
           className={`border-b-2 py-4 ${
-            activeSection === "officeHours" &&
-            searchParams.get("active") === "officeHours"
+            searchParams.get("active") == "officeHours"
               ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
               : "border-transparent"
           }`}
@@ -76,14 +73,17 @@ function SpecificDAO({ params }: { params: { daoDelegates: string } }) {
       </div>
 
       <div className="py-6 ps-16">
-        {activeSection === "delegatesList" &&
-          searchParams.get("active") === "delegatesList" && <DelegatesList />}
-        {activeSection === "delegatesSession" &&
-          searchParams.get("active") === "delegatesSession" && (
-            <DelegatesSession />
-          )}
-        {activeSection === "officeHours" &&
-          searchParams.get("active") === "officeHours" && <OfficeHours />}
+        {searchParams.get("active") === "delegatesList" ? (
+          <DelegatesList />
+        ) : (
+          ""
+        )}
+        {searchParams.get("active") === "delegatesSession" ? (
+          <DelegatesSession />
+        ) : (
+          ""
+        )}
+        {searchParams.get("active") === "officeHours" ? <OfficeHours /> : ""}
       </div>
     </div>
   );
