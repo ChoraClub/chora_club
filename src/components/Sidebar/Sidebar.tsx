@@ -123,12 +123,12 @@ function Sidebar() {
                       src={data[1]}
                       alt="image"
                       className={`w-10 h-10 rounded-full cursor-pointer ${
-                        pathname.includes(`/daos/${data[0]}`)
+                        pathname.includes(`/${data[0]}`)
                           ? "border-white border-[2.5px]"
                           : ""
                       }`}
                       priority={true}
-                      onClick={() => router.push(`/daos/${data[0]}?active=delegatesList`)}
+                      onClick={() => router.push(`/${data[0]}?active=delegatesList`)}
                     ></Image>
                   </Tooltip>
                 </Badge>

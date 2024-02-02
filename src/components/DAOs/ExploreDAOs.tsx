@@ -36,7 +36,7 @@ function ExploreDAOs() {
       "visitedDao",
       JSON.stringify({ ...localData, [formatted]: [formatted, img] })
     );
-    router.push(`/daos/${formatted}?active=delegatesList`);
+    router.push(`/${formatted}?active=delegatesList`);
   };
 
   return (

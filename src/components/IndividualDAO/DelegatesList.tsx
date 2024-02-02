@@ -296,7 +296,7 @@ function DelegatesList() {
                 key={daos.name}
                 style={{ boxShadow: "0px 4px 50.8px 0px rgba(0, 0, 0, 0.11)" }}
                 className="px-5 py-7 rounded-2xl cursor-pointer"
-                onClick={() => router.push(`/daos/optimism/${daos.name}`) }
+                onClick={() => router.push(`/optimism/${daos.name}`) }
               >
                 <div className="flex justify-center">
                   <Image
