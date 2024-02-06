@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import React, { ChangeEvent, useRef, useState } from "react";
+import React, { ChangeEvent, useEffect, useRef, useState } from "react";
 import copy from "copy-to-clipboard";
 import { Tooltip } from "@nextui-org/react";
 import user from "@/assets/images/daos/user3.png";
@@ -14,12 +14,32 @@ import UserSessions from "./UserSessions";
 import UserOfficeHours from "./UserOfficeHours";
 import ClaimNFTs from "./ClaimNFTs";
 import { FaPencil } from "react-icons/fa6";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import toast, { Toaster } from "react-hot-toast";
+import Link from "next/link";
+import {
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Button,
+  useDisclosure,
+} from "@nextui-org/react";
 
 function MainProfile() {
-  const [activeSection, setActiveSection] = useState("info");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [img, setImg] = useState<File | undefined>();
   const [hovered, setHovered] = useState(false);
+  const router = useRouter();
+  const path = usePathname();
+  const searchParams = useSearchParams();
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const [socials, setSocials] = useState({
+    twitter: "https://twitter.com/",
+    insta: "https://instagram.com/",
+    discord: "https://discord.com/",
+  });
 
   const handleLogoClick = () => {
     fileInputRef.current?.click();
@@ -31,6 +51,18 @@ function MainProfile() {
     if (selectedFile) {
       setImg(selectedFile);
     }
+  };
+
+  const handleCopy = (addr: string) => {
+    copy(addr);
+    toast("Address Copied");
+  };
+
+  const handleInputChange = (fieldName: string, value: string) => {
+    setSocials({
+      ...socials,
+      [fieldName]: value,
+    });
   };
 
   return (
@@ -48,7 +80,7 @@ function MainProfile() {
             } `}
             onClick={handleLogoClick}
           >
-            <FaPencil className="opacity-100" size={12} />
+            <FaPencil className="opacity-100 backdrop-blur-sm" size={12} />
             <input
               type="file"
               ref={fileInputRef}
@@ -62,24 +94,96 @@ function MainProfile() {
           <div className=" flex items-center py-1">
             <div className="font-bold text-lg pr-4">lindaxie.eth</div>
             <div className="flex gap-3">
-              <span
+              <Link
+                href={socials.twitter}
+                target="_blank"
                 className="border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 cursor-pointer"
                 style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
               >
                 <FaXTwitter color="#7C7C7C" size={12} />
-              </span>
-              <span
+              </Link>
+              <Link
+                href={socials.insta}
+                target="_blank"
                 className="border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 cursor-pointer"
                 style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
               >
                 <BiLogoInstagramAlt color="#7C7C7C" size={12} />
-              </span>
-              <span
+              </Link>
+              <Link
+                href={socials.discord}
+                target="_blank"
                 className="border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 cursor-pointer"
                 style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
               >
                 <FaDiscord color="#7C7C7C" size={12} />
-              </span>
+              </Link>
+              <Tooltip content="Edit social links" placement="right" showArrow>
+                <span
+                  className="border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 cursor-pointer"
+                  style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
+                  onClick={onOpen}
+                >
+                  <FaPencil color="#3e3d3d" size={12} />
+                </span>
+              </Tooltip>
+              <Modal
+                isOpen={isOpen}
+                onOpenChange={onOpenChange}
+                className="font-poppins"
+              >
+                <ModalContent>
+                  {(onClose) => (
+                    <>
+                      <ModalHeader className="flex flex-col gap-1">
+                        Edit Socials
+                      </ModalHeader>
+                      <ModalBody>
+                        <div className="px-1 font-medium">Twitter ID:</div>
+                        <input
+                          type="url"
+                          value={socials.twitter}
+                          placeholder="https://twitter.com/"
+                          className="outline-none bg-[#D9D9D945] rounded-md px-2 py-1 text-sm"
+                          onChange={(e) =>
+                            handleInputChange("twitter", e.target.value)
+                          }
+                        />
+
+                        <div className="px-1 font-medium">Instagram ID:</div>
+                        <input
+                          type="url"
+                          value={socials.insta}
+                          placeholder="https://instagram.com/"
+                          className="outline-none bg-[#D9D9D945] rounded-md px-2 py-1 text-sm"
+                          onChange={(e) =>
+                            handleInputChange("insta", e.target.value)
+                          }
+                        />
+
+                        <div className="px-1 font-medium">Discord ID:</div>
+                        <input
+                          type="url"
+                          value={socials.discord}
+                          placeholder="https://discord.com/"
+                          className="outline-none bg-[#D9D9D945] rounded-md px-2 py-1 text-sm"
+                          onChange={(e) =>
+                            handleInputChange("discord", e.target.value)
+                          }
+                        />
+                      </ModalBody>
+                      <ModalFooter>
+                        <Button color="default" onPress={onClose}>
+                          Close
+                        </Button>
+                        <Button color="primary" onPress={onClose}>
+                          Save
+                        </Button>
+                      </ModalFooter>
+                    </>
+                  )}
+                </ModalContent>
+              </Modal>
             </div>
           </div>
 
@@ -95,11 +199,23 @@ function MainProfile() {
               <span className="px-2 cursor-pointer" color="#3E3D3D">
                 <IoCopy
                   onClick={() =>
-                    copy("0xB351a70dD6E5282A8c84edCbCd5A955469b9b032")
+                    handleCopy("0xB351a70dD6E5282A8c84edCbCd5A955469b9b032")
                   }
                 />
               </span>
             </Tooltip>
+            <Toaster
+              toastOptions={{
+                style: {
+                  fontSize: "14px",
+                  backgroundColor: "#3E3D3D",
+                  color: "#fff",
+                  boxShadow: "none",
+                  borderRadius: "50px",
+                  padding: "3px 5px",
+                },
+              }}
+            />
           </div>
 
           <div className="flex gap-4 py-1">
@@ -131,62 +247,70 @@ function MainProfile() {
       <div className="flex gap-12 bg-[#D9D9D945] pl-16">
         <button
           className={`border-b-2 py-4 px-2 outline-none ${
-            activeSection === "info"
+            searchParams.get("active") === "info"
               ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
               : "border-transparent"
           }`}
-          onClick={() => setActiveSection("info")}
+          onClick={() => router.push(path + "?active=info")}
         >
           Info
         </button>
         <button
           className={`border-b-2 py-4 px-2 outline-none ${
-            activeSection === "pastVotes"
+            searchParams.get("active") === "votes"
               ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
               : "border-transparent"
           }`}
-          onClick={() => setActiveSection("pastVotes")}
+          onClick={() => router.push(path + "?active=votes")}
         >
           Past Votes
         </button>
         <button
           className={`border-b-2 py-4 px-2 outline-none ${
-            activeSection === "sessions"
+            searchParams.get("active") === "sessions"
               ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
               : "border-transparent"
           }`}
-          onClick={() => setActiveSection("sessions")}
+          onClick={() =>
+            router.push(path + "?active=sessions&session=schedule")
+          }
         >
           Sessions
         </button>
         <button
           className={`border-b-2 py-4 px-2 outline-none ${
-            activeSection === "officeHours"
+            searchParams.get("active") === "officeHours"
               ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
               : "border-transparent"
           }`}
-          onClick={() => setActiveSection("officeHours")}
+          onClick={() =>
+            router.push(path + "?active=officeHours&hours=schedule")
+          }
         >
           Office Hours
         </button>
         <button
           className={`border-b-2 py-4 px-2 outline-none ${
-            activeSection === "claimNft"
+            searchParams.get("active") === "claimNft"
               ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
               : "border-transparent"
           }`}
-          onClick={() => setActiveSection("claimNft")}
+          onClick={() => router.push(path + "?active=claimNft")}
         >
           Claim NFTs
         </button>
       </div>
 
       <div className="py-6 ps-16">
-        {activeSection === "info" && <UserInfo />}
-        {activeSection === "pastVotes" && <UserVotes />}
-        {activeSection === "sessions" && <UserSessions />}
-        {activeSection === "officeHours" && <UserOfficeHours />}
-        {activeSection === "claimNft" && <ClaimNFTs />}
+        {searchParams.get("active") === "info" ? <UserInfo /> : ""}
+        {searchParams.get("active") === "votes" ? <UserVotes /> : ""}
+        {searchParams.get("active") === "sessions" ? <UserSessions /> : ""}
+        {searchParams.get("active") === "officeHours" ? (
+          <UserOfficeHours />
+        ) : (
+          ""
+        )}
+        {searchParams.get("active") === "claimNft" ? <ClaimNFTs /> : ""}
       </div>
     </div>
   );

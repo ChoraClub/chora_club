@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { ChangeEvent, useState } from "react";
 
 function UserInfo() {
   const details = [
@@ -25,6 +25,20 @@ function UserInfo() {
   ];
 
   const [data, setData] = useState(details);
+  const [description, setDescription] = useState(
+    "Type your description here..."
+  );
+  const [isEditing, setEditing] = useState(false);
+  const [tempDesc, setTempDesc] = useState("");
+
+  const handleDescChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setTempDesc(event.target.innerText);
+  };
+
+  const handleSaveClick = () => {
+    setDescription(tempDesc);
+    setEditing(false);
+  };
 
   return (
     <div className="pt-4">
@@ -45,9 +59,35 @@ function UserInfo() {
 
       <div
         style={{ boxShadow: "0px 4px 30.9px 0px rgba(0, 0, 0, 0.12)" }}
-        className="min-h-48 rounded-xl my-7 me-32 p-3"
+        className={`flex flex-col justify-between min-h-48 rounded-xl my-7 me-32 p-3 ${
+          isEditing ? "outline" : ""
+        }`}
       >
-        Description
+        <div
+          contentEditable={isEditing}
+          className="outline-none"
+          onInput={handleDescChange}
+        >
+          {description || "Type your description here..."}
+        </div>
+        <div className="flex justify-end">
+          {isEditing && (
+            <button
+              className="bg-blue-shade-100 text-white text-sm py-1 px-3 rounded-full font-semibold"
+              onClick={handleSaveClick}
+            >
+              Save
+            </button>
+          )}
+          {!isEditing && (
+            <button
+              className="bg-blue-shade-100 text-white text-sm py-1 px-4 rounded-full font-semibold"
+              onClick={() => setEditing(true)}
+            >
+              Edit
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

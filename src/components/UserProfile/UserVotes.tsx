@@ -14,19 +14,21 @@ function UserVotes() {
       status: "For",
     },
     {
-      title: "Proposal Description2",
+      title:
+        "Proposal Description2 Proposal Description2 Proposal Description2",
       status: "Against",
     },
     {
-      title: "Proposal Description3",
+      title:
+        "Proposal Description3 Proposal Description2 Proposal Description2",
       status: "For",
     },
     {
-      title: "Proposal Description4",
+      title: "Proposal Description4 Proposal Desc Proposal123 Description2",
       status: "Abstain",
     },
     {
-      title: "Proposal Description5",
+      title: "Proposal Description5 Proposal123 Description2 Proposal Desc",
       status: "Against",
     },
     {
@@ -103,7 +105,7 @@ function UserVotes() {
     const end = offset + dataPerPage;
     const initialData = proposals.slice(offset, end);
     setAllProposal(initialData);
-  }, [currentPage, proposals, dataPerPage]);
+  }, [currentPage, dataPerPage]);
 
   return (
     <div className="pt-4">
@@ -133,7 +135,6 @@ function UserVotes() {
               height={350}
               options={{
                 maintainAspectRatio: false,
-                animation: false,
               }}
             />
           </div>
@@ -150,10 +151,8 @@ function UserVotes() {
             {allProposals.length > 0 ? (
               allProposals.map((proposal, index) => (
                 <div className="flex justify-between border border-[#7C7C7C] text-sm px-3 py-2 rounded-lg items-center my-3">
-                  <div className="">
-                    <div className={`w-96 ${styles.desc}`}>
-                      {proposal.title}
-                    </div>
+                  <div className="w-3/4">
+                    <div className={` ${styles.desc}`}>{proposal.title}</div>
                     <span className="text-xs text-blue-shade-100 underline cursor-pointer">
                       View
                     </span>

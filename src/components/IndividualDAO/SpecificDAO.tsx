@@ -7,21 +7,9 @@ import OfficeHours from "./OfficeHours";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 
 function SpecificDAO({ params }: { params: { daoDelegates: string } }) {
-  const [activeSection, setActiveSection] = useState("delegatesList");
   const router = useRouter();
   const path = usePathname();
   const searchParams = useSearchParams();
-
-  const handleActivity = (state: string) => {
-    router.push(path + "?active=" + state);
-    // setActiveSection(state);
-    console.log("Search params: ", searchParams.get("active"));
-  };
-
-  useEffect(() => {
-    const query = searchParams.get("active");
-    // router.push(path + "?active=delegatesList");
-  }, []);
 
   return (
     <div className="font-poppins py-6">
@@ -39,34 +27,38 @@ function SpecificDAO({ params }: { params: { daoDelegates: string } }) {
         </div>
       </div>
 
-      <div className="flex gap-16 bg-[#D9D9D945] pl-16">
+      <div className="flex gap-12 bg-[#D9D9D945] pl-16">
         <button
-          className={`border-b-2 py-4  ${
+          className={`border-b-2 py-4 px-2 ${
             searchParams.get("active") === "delegatesList"
               ? " border-blue-shade-200 text-blue-shade-200 font-semibold"
               : "border-transparent"
           }`}
-          onClick={() => handleActivity("delegatesList")}
+          onClick={() => router.push(path + "?active=delegatesList&page=1")}
         >
           Delegates List
         </button>
         <button
-          className={`border-b-2 py-4 ${
-            searchParams.get("active") == "delegatesSession"
+          className={`border-b-2 py-4 px-2 ${
+            searchParams.get("active") === "delegatesSession"
               ? "text-blue-shade-200 font-semibold border-blue-shade-200"
               : "border-transparent"
           }`}
-          onClick={() => handleActivity("delegatesSession")}
+          onClick={() =>
+            router.push(path + "?active=delegatesSession&session=ongoing")
+          }
         >
           Delegate's Session
         </button>
         <button
-          className={`border-b-2 py-4 ${
-            searchParams.get("active") == "officeHours"
+          className={`border-b-2 py-4 px-2 ${
+            searchParams.get("active") === "officeHours"
               ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
               : "border-transparent"
           }`}
-          onClick={() => handleActivity("officeHours")}
+          onClick={() =>
+            router.push(path + "?active=officeHours&hours=ongoing")
+          }
         >
           Office hours
         </button>

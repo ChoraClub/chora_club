@@ -9,7 +9,7 @@ import { IoCopy } from "react-icons/io5";
 import copy from "copy-to-clipboard";
 import { Pagination, Tooltip } from "@nextui-org/react";
 import { Oval } from "react-loader-spinner";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import toast, { Toaster } from "react-hot-toast";
 
 interface Type {
@@ -197,6 +197,9 @@ function DelegatesList() {
   const [dataLoading, setDataLoading] = useState(false);
   const [isPageLoading, setPageLoading] = useState(true);
   const router = useRouter();
+  const path = usePathname();
+  const searchParams = useSearchParams();
+
   const totalData: number = dao_info.length;
   const dataPerPage: number = 10;
   const totalPages: number = Math.ceil(totalData / dataPerPage);
@@ -228,13 +231,14 @@ function DelegatesList() {
   };
 
   useEffect(() => {
+    router.push(`${path}?active=delegatesList&page=${currentPage}`);
     fetchData();
     setPageLoading(false);
   }, [currentPage, dataPerPage]);
 
   const handleCopy = (addr: string) => {
     copy(addr);
-    toast("Copied");
+    toast("Address Copied");
   };
 
   return (
@@ -295,7 +299,10 @@ function DelegatesList() {
                 style={{ boxShadow: "0px 4px 50.8px 0px rgba(0, 0, 0, 0.11)" }}
                 className="px-5 py-7 rounded-2xl"
               >
-                <div className="flex justify-center cursor-pointer" onClick={() => router.push(`/daos/optimism/${daos.name}`)}>
+                <div
+                  className="flex justify-center cursor-pointer"
+                  onClick={() => router.push(`/daos/optimism/${daos.name}`)}
+                >
                   <Image
                     src={daos.img}
                     alt="Image not found"
@@ -338,7 +345,7 @@ function DelegatesList() {
                   toastOptions={{
                     style: {
                       fontSize: "14px",
-                      backgroundColor: "#0238B3",
+                      backgroundColor: "#3E3D3D",
                       color: "#fff",
                       boxShadow: "none",
                       borderRadius: "50px",
