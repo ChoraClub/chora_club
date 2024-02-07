@@ -6,7 +6,6 @@ import BookSession from "./AllSessions/BookSession";
 
 function DelegateSessions() {
   const [activeSection, setActiveSection] = useState("book");
-  const [searchQuery, setSearchQuery] = useState("");
 
   return (
     <div>

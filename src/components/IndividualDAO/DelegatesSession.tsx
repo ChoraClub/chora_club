@@ -5,10 +5,13 @@ import search from "@/assets/images/daos/search.png";
 import OngoingSessions from "./AllDelegatesSessions/OngoingSessions";
 import UpcomingSessions from "./AllDelegatesSessions/UpcomingSessions";
 import RecordedSessions from "./AllDelegatesSessions/RecordedSessions";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 function DelegatesSession() {
-  const [activeSection, setActiveSection] = useState("ongoing");
   const [searchQuery, setSearchQuery] = useState("");
+  const router = useRouter();
+  const path = usePathname();
+  const searchParams = useSearchParams();
 
   return (
     <div className="font-poppins">
@@ -37,44 +40,50 @@ function DelegatesSession() {
         <div className="flex gap-16 border-1 border-[#7C7C7C] pl-6 rounded-xl text-sm">
           <button
             className={`py-2  ${
-              activeSection === "ongoing"
+              searchParams.get("session") === "ongoing"
                 ? "text-[#3E3D3D] font-bold"
                 : "text-[#7C7C7C]"
             }`}
-            onClick={() => setActiveSection("ongoing")}
+            onClick={() =>
+              router.push(path + "?active=delegatesSession&session=ongoing")
+            }
           >
             Ongoing
           </button>
           <button
             className={`py-2 ${
-              activeSection === "upcoming"
+              searchParams.get("session") === "upcoming"
                 ? "text-[#3E3D3D] font-bold"
                 : "text-[#7C7C7C]"
             }`}
-            onClick={() => setActiveSection("upcoming")}
+            onClick={() =>
+              router.push(path + "?active=delegatesSession&session=upcoming")
+            }
           >
             Upcoming
           </button>
           <button
             className={`py-2 ${
-              activeSection === "recorded"
+              searchParams.get("session") === "recorded"
                 ? "text-[#3E3D3D] font-bold"
                 : "text-[#7C7C7C]"
             }`}
-            onClick={() => setActiveSection("recorded")}
+            onClick={() =>
+              router.push(path + "?active=delegatesSession&session=recorded")
+            }
           >
             Recorded
           </button>
         </div>
 
         <div className="py-10">
-          {activeSection === "ongoing" && (
+          {searchParams.get("session") === "ongoing" && (
             <OngoingSessions params={searchQuery} />
           )}
-          {activeSection === "upcoming" && (
+          {searchParams.get("session") === "upcoming" && (
             <UpcomingSessions params={searchQuery} />
           )}
-          {activeSection === "recorded" && (
+          {searchParams.get("session") === "recorded" && (
             <RecordedSessions params={searchQuery} />
           )}
         </div>

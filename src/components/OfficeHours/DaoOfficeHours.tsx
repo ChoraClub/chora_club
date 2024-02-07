@@ -17,7 +17,7 @@ function DaoOfficeHours() {
         Office Hours
       </div>
 
-      <div className="pr-32 pt-4">
+      <div className="pr-32 pt-4 font-poppins">
         <div className="flex gap-16 border-1 border-[#7C7C7C] pl-6 rounded-xl">
           <button
             className={`py-2  ${

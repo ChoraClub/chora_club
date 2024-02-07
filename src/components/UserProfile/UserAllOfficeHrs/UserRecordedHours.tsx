@@ -1,25 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import text1 from "@/assets/images/daos/texture1.png";
 import text2 from "@/assets/images/daos/texture2.png";
-import Image, { StaticImageData } from "next/image";
-import { Oval } from "react-loader-spinner";
+import Image from "next/image";
 
-interface Type {
-  img: StaticImageData;
-  title: string;
-  dao: string;
-  participant: number;
-  attendee: string;
-  host: string;
-  started: string;
-  desc: string;
-}
-
-function OngoingDaoOfficeHours({ params }: { params: string }) {
+function UserRecordedHours() {
   const details = [
     {
       img: text1,
-      title: "Optimism Open Forum: Governance, Applications, and Beyond",
+      title:
+        "Recorded Optimism Open Forum: Governance, Applications, and Beyond",
       dao: "Optimism",
       participant: 12,
       attendee: "olimpio.eth",
@@ -30,7 +19,7 @@ function OngoingDaoOfficeHours({ params }: { params: string }) {
     {
       img: text2,
       title: "Open Forum: Governance, Applications, and Beyond",
-      dao: "Arbitrum",
+      dao: "Optimism",
       participant: 5,
       attendee: "olimpio.eth",
       host: "hexagon.eth",
@@ -39,38 +28,12 @@ function OngoingDaoOfficeHours({ params }: { params: string }) {
     },
   ];
 
-  const [sessionDetails, setSessionDetails] = useState<Array<Type>>([]);
-  const [dataLoading, setDataLoading] = useState(true);
-
-  useEffect(() => {
-    setSessionDetails(details);
-    setDataLoading(false);
-  }, []);
-
-  useEffect(() => {
-    setDataLoading(true);
-    const filtered = details.filter(
-      (item) =>
-        item.title.toLowerCase().includes(params.toLowerCase()) ||
-        item.host.toLowerCase().includes(params.toLowerCase())
-    );
-    setSessionDetails(filtered);
-    setDataLoading(false);
-  }, [params]);
+  const [sessionDetails, setSessionDetails] = useState(details);
 
   return (
-    <div className="space-y-6">
-      {sessionDetails.length > 0 ? (
-        dataLoading ? (
-          <Oval
-            visible={true}
-            height="50"
-            width="50"
-            color="#0500FF"
-            secondaryColor="#cdccff"
-            ariaLabel="oval-loading"
-          />
-        ) : (
+    <div>
+      <div className="space-y-6">
+        {sessionDetails.length > 0 ? (
           sessionDetails.map((data, index) => (
             <div
               key={index}
@@ -84,7 +47,7 @@ function OngoingDaoOfficeHours({ params }: { params: string }) {
               />
 
               <div className="ps-6 pe-12 py-1">
-                <div className="font-semibold text-blue-shade-200 text-xl">
+                <div className="font-semibold text-blue-shade-200 text-lg">
                   {data.title}
                 </div>
 
@@ -92,16 +55,20 @@ function OngoingDaoOfficeHours({ params }: { params: string }) {
                   <div className="bg-[#1E1E1E] border border-[#1E1E1E] text-white rounded-md text-xs px-5 py-1 font-semibold">
                     {data.dao}
                   </div>
-                  <div className="border border-[#1E1E1E] rounded-md text-[#1E1E1E] text-xs px-5 py-1 font-medium">
-                    {data.participant} Participants
+                  <div className="border border-[#1E1E1E] rounded-md text-[#1E1E1E] text-xs px-5 py-1">
+                    {data.participant} Views
                   </div>
                 </div>
 
-                <div className="pt-2 pe-10">
+                <div className="pt-1 pe-10">
                   <hr />
                 </div>
 
                 <div className="flex gap-x-16 text-sm py-3">
+                  <div className="text-[#3E3D3D]">
+                    <span className="font-semibold">Attendee:</span>{" "}
+                    {data.attendee}
+                  </div>
                   <div className="text-[#3E3D3D]">
                     <span className="font-semibold">Host:</span> {data.host}
                   </div>
@@ -115,17 +82,17 @@ function OngoingDaoOfficeHours({ params }: { params: string }) {
               </div>
             </div>
           ))
-        )
-      ) : (
-        <div className="flex flex-col justify-center items-center">
-          <div className="text-5xl">☹️</div>{" "}
-          <div className="pt-4 font-semibold text-lg">
-            Oops, no such result available!
+        ) : (
+          <div className="flex flex-col justify-center items-center">
+            <div className="text-5xl">☹️</div>{" "}
+            <div className="pt-4 font-semibold text-lg">
+              Oops, no such result available!
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
 
-export default OngoingDaoOfficeHours;
+export default UserRecordedHours;

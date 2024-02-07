@@ -13,7 +13,7 @@ function DelegateRecordedSession() {
       participant: 12,
       attendee: "olimpio.eth",
       host: "lindaxie.eth",
-      started: "07/09/2023 12:1 SPM 1ST",
+      started: "2 hours ago",
       desc: "Join the conversation about the future of Optimism. Discuss governance proposals, dApp adoption, and technical developments.",
     },
     {
@@ -23,7 +23,7 @@ function DelegateRecordedSession() {
       participant: 5,
       attendee: "olimpio.eth",
       host: "hexagon.eth",
-      started: "07/09/2023 12:1 SPM 1ST",
+      started: "4 hours ago",
       desc: "Join the conversation about the future of Optimism. Discuss governance proposals, dApp adoption, and technical developments.",
     },
   ];
@@ -71,8 +71,7 @@ function DelegateRecordedSession() {
                 <div className="text-[#3E3D3D]">
                   <span className="font-semibold">Host:</span> {data.host}
                 </div>
-                <div className="text-[#3E3D3D]">
-                  <span className="font-semibold">Started at:</span>{" "}
+                <div className="text-[#3E3D3D] font-semibold">
                   {data.started}
                 </div>
               </div>

@@ -2,14 +2,16 @@ import React, { useState } from "react";
 import text1 from "@/assets/images/daos/texture1.png";
 import text2 from "@/assets/images/daos/texture2.png";
 import Image from "next/image";
+import { FaCircleCheck, FaCircleXmark, FaCirclePlay } from "react-icons/fa6";
+import { Tooltip } from "@nextui-org/react";
 
-function DelegateUpcomingSession() {
+function AttendingUserSessions() {
   const details = [
     {
       img: text1,
-      title: "Upcoming Optimism Open Forum: Governance, Applications",
+      title: "Optimism Open Forum: Governance, Applications, and Beyond",
       dao: "Optimism",
-      participant: 12,
+      status: "Approved",
       attendee: "olimpio.eth",
       host: "lindaxie.eth",
       started: "07/09/2023 12:1 SPM 1ST",
@@ -19,7 +21,17 @@ function DelegateUpcomingSession() {
       img: text2,
       title: "Open Forum: Governance, Applications, and Beyond",
       dao: "Optimism",
-      participant: 5,
+      status: "Pending",
+      attendee: "olimpio.eth",
+      host: "hexagon.eth",
+      started: "07/09/2023 12:1 SPM 1ST",
+      desc: "Join the conversation about the future of Optimism. Discuss governance proposals, dApp adoption, and technical developments.",
+    },
+    {
+      img: text2,
+      title: "Open Forum: Governance, Applications, and Beyond",
+      dao: "Optimism",
+      status: "Rejected",
       attendee: "olimpio.eth",
       host: "hexagon.eth",
       started: "07/09/2023 12:1 SPM 1ST",
@@ -44,17 +56,14 @@ function DelegateUpcomingSession() {
               className="w-44 h-44 rounded-3xl border border-[#D9D9D9]"
             />
 
-            <div className="ps-6 pe-12 py-1">
+            <div className="ps-6 pe-8 py-1">
               <div className="font-semibold text-blue-shade-200 text-lg">
                 {data.title}
               </div>
 
-              <div className="flex space-x-4 py-2">
+              <div className="flex py-2">
                 <div className="bg-[#1E1E1E] border border-[#1E1E1E] text-white rounded-md text-xs px-5 py-1 font-semibold">
                   {data.dao}
-                </div>
-                <div className="border border-[#1E1E1E] rounded-md text-[#1E1E1E] text-xs px-5 py-1">
-                  {data.participant} Participants
                 </div>
               </div>
 
@@ -71,12 +80,35 @@ function DelegateUpcomingSession() {
                   <span className="font-semibold">Host:</span> {data.host}
                 </div>
                 <div className="text-[#3E3D3D]">
-                  <span className="font-semibold">Starts at:</span>{" "}
+                  <span className="font-semibold">Started at:</span>{" "}
                   {data.started}
                 </div>
               </div>
 
               <div className="text-[#1E1E1E] text-sm">{data.desc}</div>
+            </div>
+
+            <div className={`flex flex-col justify-between text-xs py-2`}>
+              <div
+                className={`rounded-md px-3 py-1 ${
+                  data.status === "Approved"
+                    ? "border border-lime-600 text-lime-600"
+                    : data.status === "Rejected"
+                    ? "border border-red-600 text-red-600"
+                    : "border border-yellow-500 text-yellow-500"
+                }`}
+              >
+                {data.status}
+              </div>
+
+              {data.status === "Approved" ? (
+                <div className="text-center bg-blue-shade-100 rounded-full font-bold text-white py-2 text-xs cursor-pointer">
+                  Join
+                </div>
+                
+              ) : (
+                <></>
+              )}
             </div>
           </div>
         ))
@@ -92,4 +124,4 @@ function DelegateUpcomingSession() {
   );
 }
 
-export default DelegateUpcomingSession;
+export default AttendingUserSessions;

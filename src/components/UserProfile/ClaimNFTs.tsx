@@ -3,11 +3,12 @@ import text1 from "@/assets/images/daos/texture1.png";
 import text2 from "@/assets/images/daos/texture2.png";
 import Image from "next/image";
 
-function DelegateUpcomingSession() {
+function ClaimNFTs() {
   const details = [
     {
       img: text1,
-      title: "Upcoming Optimism Open Forum: Governance, Applications",
+      title:
+        "Recorded Optimism Open Forum: Governance, Applications, and Beyond",
       dao: "Optimism",
       participant: 12,
       attendee: "olimpio.eth",
@@ -30,7 +31,7 @@ function DelegateUpcomingSession() {
   const [sessionDetails, setSessionDetails] = useState(details);
 
   return (
-    <div className="space-y-6">
+    <div className="pr-32 space-y-6 pt-4">
       {sessionDetails.length > 0 ? (
         sessionDetails.map((data, index) => (
           <div
@@ -44,7 +45,7 @@ function DelegateUpcomingSession() {
               className="w-44 h-44 rounded-3xl border border-[#D9D9D9]"
             />
 
-            <div className="ps-6 pe-12 py-1">
+            <div className="px-6 py-1">
               <div className="font-semibold text-blue-shade-200 text-lg">
                 {data.title}
               </div>
@@ -54,7 +55,7 @@ function DelegateUpcomingSession() {
                   {data.dao}
                 </div>
                 <div className="border border-[#1E1E1E] rounded-md text-[#1E1E1E] text-xs px-5 py-1">
-                  {data.participant} Participants
+                  {data.participant} Views
                 </div>
               </div>
 
@@ -71,12 +72,16 @@ function DelegateUpcomingSession() {
                   <span className="font-semibold">Host:</span> {data.host}
                 </div>
                 <div className="text-[#3E3D3D]">
-                  <span className="font-semibold">Starts at:</span>{" "}
+                  <span className="font-semibold">Started at:</span>{" "}
                   {data.started}
                 </div>
               </div>
 
               <div className="text-[#1E1E1E] text-sm">{data.desc}</div>
+            </div>
+
+            <div className="flex items-end">
+              <button className="bg-blue-shade-100 text-white text-sm py-1 px-3 rounded-full font-semibold outline-none">Claim</button>
             </div>
           </div>
         ))
@@ -92,4 +97,4 @@ function DelegateUpcomingSession() {
   );
 }
 
-export default DelegateUpcomingSession;
+export default ClaimNFTs;
