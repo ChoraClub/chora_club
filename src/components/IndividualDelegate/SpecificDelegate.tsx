@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import user from "@/assets/images/daos/user3.png";
 import { FaXTwitter, FaDiscord } from "react-icons/fa6";
 import { BiLogoInstagramAlt } from "react-icons/bi";
@@ -17,8 +17,23 @@ interface Type {
   individualDelegate: string;
 }
 
-function SpecificDelegate({ params }: { params: Type }) {
+function SpecificDelegate({ props }: { props: Type }) {
   const [activeSection, setActiveSection] = useState("info");
+  const [delegateInfo, setDelegateInfo] = useState<any>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await fetch(`https://api.karmahq.xyz/api/user/${props}`);
+        const details = await res.json().then((delegates) => delegates.data);
+        setDelegateInfo(details);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   return (
     <div className="font-poppins">
@@ -28,7 +43,7 @@ function SpecificDelegate({ params }: { params: Type }) {
         <div className="px-4">
           <div className=" flex items-center py-1">
             <div className="font-bold text-lg pr-4">
-              {params.individualDelegate}
+              {props.individualDelegate}
             </div>
             <div className="flex gap-3">
               <span

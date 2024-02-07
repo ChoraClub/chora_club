@@ -15,7 +15,7 @@ function DelegatesList({ props }: { props: string }) {
   const [delegateData, setDelegateData] = useState<any>([]);
   const [tempData, setTempData] = useState<any>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(0);
   const [isPageLoading, setPageLoading] = useState(true);
   const router = useRouter();
   const path = usePathname();
@@ -25,9 +25,7 @@ function DelegatesList({ props }: { props: string }) {
     const fetchData = async () => {
       try {
         const res = await fetch(
-          `https://api.karmahq.xyz/api/dao/delegates?name=${props}&offset=${
-            currentPage - 1
-          }&order=desc&field=delegatedVotes&period=lifetime&pageSize=20&statuses=active,inactive,withdrawn,recognized`
+          `https://api.karmahq.xyz/api/dao/delegates?name=${props}&offset=${currentPage}&order=desc&field=delegatedVotes&period=lifetime&pageSize=20&statuses=active,inactive,withdrawn,recognized`
         );
         const daoInfo = await res.json().then((delegates) => delegates.data);
         setDelegateData(daoInfo);
@@ -217,7 +215,7 @@ function DelegatesList({ props }: { props: string }) {
               <button
                 className="bg-blue-shade-100 text-white px-4 py-1 rounded-md font-semibold"
                 onClick={() =>
-                  setCurrentPage((prev) => (prev > 1 ? prev - 1 : prev))
+                  setCurrentPage((prev) => (prev > 0 ? prev - 1 : prev))
                 }
               >
                 Previous

@@ -4,7 +4,7 @@ import React from "react";
 function page({ params }: { params: { daoDelegates: string } }) {
   return (
     <div>
-      <IndividualDAO params={params} />
+      <IndividualDAO props={params} />
     </div>
   );
 }

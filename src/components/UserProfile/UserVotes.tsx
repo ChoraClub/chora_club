@@ -150,7 +150,7 @@ function UserVotes() {
           <div className="h-[23rem]">
             {allProposals.length > 0 ? (
               allProposals.map((proposal, index) => (
-                <div className="flex justify-between border border-[#7C7C7C] text-sm px-3 py-2 rounded-lg items-center my-3">
+                <div key={index} className="flex justify-between border border-[#7C7C7C] text-sm px-3 py-2 rounded-lg items-center my-3">
                   <div className="w-3/4">
                     <div className={` ${styles.desc}`}>{proposal.title}</div>
                     <span className="text-xs text-blue-shade-100 underline cursor-pointer">

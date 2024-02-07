@@ -7,21 +7,10 @@ interface Type {
   individualDelegate: string;
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Type;
-}): Promise<Metadata> {
-  return {
-    title: params.individualDelegate,
-    description: `This is description for ${params.individualDelegate}`,
-  };
-}
-
 function page({ params }: { params: Type }) {
   return (
     <div>
-      <SpecificDelegate params={params} />
+      <SpecificDelegate props={params} />
     </div>
   );
 }

@@ -14,7 +14,7 @@ const desc = {
     "The Arbitrum DAO is a decentralized autonomous organization (DAO) built on the Ethereum blockchain. At its core, the Arbitrum DAO is a community-driven governance mechanism that allows $ARB token holders to propose and vote on changes to the organization and the technologies it governs.",
 };
 
-function SpecificDAO({ params }: { params: { daoDelegates: string } }) {
+function SpecificDAO({ props }: { props: { daoDelegates: string } }) {
   const router = useRouter();
   const path = usePathname();
   const searchParams = useSearchParams();
@@ -23,10 +23,10 @@ function SpecificDAO({ params }: { params: { daoDelegates: string } }) {
     <div className="font-poppins py-6">
       <div className="px-8 pb-5">
         <div className="capitalize text-4xl text-blue-shade-100">
-          {params.daoDelegates}
+          {props.daoDelegates}
         </div>
         <div className="py-5 pr-8">
-          {params.daoDelegates === "optimism" ? desc.optimism : desc.arbitrum}
+          {props.daoDelegates === "optimism" ? desc.optimism : desc.arbitrum}
         </div>
       </div>
 
@@ -69,7 +69,7 @@ function SpecificDAO({ params }: { params: { daoDelegates: string } }) {
 
       <div className="py-6 ps-16">
         {searchParams.get("active") === "delegatesList" ? (
-          <DelegatesList props={params.daoDelegates} />
+          <DelegatesList props={props.daoDelegates} />
         ) : (
           ""
         )}
