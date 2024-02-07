@@ -16,7 +16,6 @@ function DelegatesList({ props }: { props: string }) {
   const [tempData, setTempData] = useState<any>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [dataLoading, setDataLoading] = useState(false);
   const [isPageLoading, setPageLoading] = useState(true);
   const router = useRouter();
   const path = usePathname();
@@ -44,18 +43,13 @@ function DelegatesList({ props }: { props: string }) {
     router.push(`${path}?active=delegatesList&page=${currentPage}`);
   }, [currentPage]);
 
+  useEffect(() => {
+    if (Number(searchParams.get("page")) >= 0) {
+      setCurrentPage(Number(searchParams.get("page")));
+    }
+  }, []);
+
   console.log("dao-info: ", delegateData.delegates);
-
-  // const totalData: number = delegateData ? delegateData.delegates.length : 0;
-  // const dataPerPage: number = 10;
-  // const totalPages: number = Math.ceil(totalData / dataPerPage);
-
-  // const fetchData = () => {
-  //   const offset = (currentPage - 1) * dataPerPage;
-  //   const end = offset + dataPerPage;
-  //   const initialData = delegateData.delegates[0].slice(offset, end);
-  //   setDelegateData(initialData);
-  // };
 
   const handleSearchChange = (query: string) => {
     console.log("query: ", query);
@@ -76,14 +70,6 @@ function DelegatesList({ props }: { props: string }) {
       setDelegateData(newData);
     }
   };
-
-  // useEffect(() => {
-  //   // router.push(`${path}?active=delegatesList&page=${currentPage}`);
-  //   // fetchData();
-  //   console.log("Delegate data: ", delegateData);
-
-  //   setPageLoading(false);
-  // }, [currentPage]);
 
   const handleCopy = (addr: string) => {
     copy(addr);

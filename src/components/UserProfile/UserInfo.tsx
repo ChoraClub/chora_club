@@ -45,7 +45,10 @@ function UserInfo() {
       <div className="grid grid-cols-5 pe-32 gap-7">
         {data.length > 0 ? (
           data.map((key, index) => (
-            <div className="bg-[#3E3D3D] text-white rounded-2xl px-3 py-7">
+            <div
+              key={index}
+              className="bg-[#3E3D3D] text-white rounded-2xl px-3 py-7"
+            >
               <div className="font-semibold text-3xl text-center">
                 {key.number}
               </div>

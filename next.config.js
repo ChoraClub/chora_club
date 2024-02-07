@@ -7,6 +7,9 @@ const nextConfig = {
       "pbs.twimg.com",
       "cdn.stamp.fyi",
       "ltdfoto.ru",
+      "cdn.discordapp.com",
+      "i.ibb.co",
+      "img.redbull.com",
     ],
   },
 };
