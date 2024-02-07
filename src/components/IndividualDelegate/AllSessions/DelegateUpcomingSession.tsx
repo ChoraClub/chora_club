@@ -71,7 +71,7 @@ function DelegateUpcomingSession() {
                   <span className="font-semibold">Host:</span> {data.host}
                 </div>
                 <div className="text-[#3E3D3D]">
-                  <span className="font-semibold">Started at:</span>{" "}
+                  <span className="font-semibold">Starts at:</span>{" "}
                   {data.started}
                 </div>
               </div>

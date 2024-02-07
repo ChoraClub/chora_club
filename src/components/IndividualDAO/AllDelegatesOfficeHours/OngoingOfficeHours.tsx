@@ -73,10 +73,6 @@ function OngoingOfficeHours({ params }: { params: string }) {
 
               <div className="flex gap-x-16 text-sm py-3">
                 <div className="text-[#3E3D3D]">
-                  <span className="font-semibold">Attendee:</span>{" "}
-                  {data.attendee}
-                </div>
-                <div className="text-[#3E3D3D]">
                   <span className="font-semibold">Host:</span> {data.host}
                 </div>
                 <div className="text-[#3E3D3D]">

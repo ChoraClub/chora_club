@@ -114,14 +114,14 @@ function UserVotes() {
           <div className="flex bg-[#3E3D3D] text-white py-6 px-10 rounded-xl">
             <div>
               <div className="font-semibold text-xl">14</div>
-              <div className="text-sm"> Proposal's Voted</div>
+              <div className="text-sm"> Proposals Voted</div>
             </div>
             <div className="border-[0.5px] border-[#8E8E8E] mx-4 my-1"></div>
             <div className="ps-2">
               <div className="font-semibold text-xl">
                 2.56k <span className="text-sm font-normal">delegates</span>
               </div>
-              <div className="text-sm"> Proposal's Voted</div>
+              <div className="text-sm"> Proposals Voted</div>
             </div>
           </div>
 

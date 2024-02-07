@@ -13,7 +13,7 @@ function RecordedDelegateOfficeHrs() {
       participant: 12,
       attendee: "olimpio.eth",
       host: "lindaxie.eth",
-      started: "07/09/2023 12:1 SPM 1ST",
+      started: "2 hours ago",
       desc: "Join the conversation about the future of Optimism. Discuss governance proposals, dApp adoption, and technical developments.",
     },
     {
@@ -23,7 +23,7 @@ function RecordedDelegateOfficeHrs() {
       participant: 5,
       attendee: "olimpio.eth",
       host: "hexagon.eth",
-      started: "07/09/2023 12:1 SPM 1ST",
+      started: "2 hours ago",
       desc: "Join the conversation about the future of Optimism. Discuss governance proposals, dApp adoption, and technical developments.",
     },
   ];
@@ -65,14 +65,9 @@ function RecordedDelegateOfficeHrs() {
 
               <div className="flex gap-x-16 text-sm py-3">
                 <div className="text-[#3E3D3D]">
-                  <span className="font-semibold">Attendee:</span>{" "}
-                  {data.attendee}
-                </div>
-                <div className="text-[#3E3D3D]">
                   <span className="font-semibold">Host:</span> {data.host}
                 </div>
-                <div className="text-[#3E3D3D]">
-                  <span className="font-semibold">Started at:</span>{" "}
+                <div className="text-[#3E3D3D] font-semibold">
                   {data.started}
                 </div>
               </div>

@@ -6,6 +6,14 @@ import DelegatesSession from "./DelegatesSession";
 import OfficeHours from "./OfficeHours";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 
+const desc = {
+  optimism:
+    "Optimism DAO is the heart of the Optimism network, an innovative layer 2 solution for faster, cheaper transactions on Ethereum. Think of it as a community-driven engine, where token holders govern upgrades, fees, and the overall direction of the Optimism ecosystem. With a focus on scaling Ethereum effectively and sustainably, Optimism DAO is building a brighter future for blockchain technology.",
+
+  arbitrum:
+    "The Arbitrum DAO is a decentralized autonomous organization (DAO) built on the Ethereum blockchain. At its core, the Arbitrum DAO is a community-driven governance mechanism that allows $ARB token holders to propose and vote on changes to the organization and the technologies it governs.",
+};
+
 function SpecificDAO({ params }: { params: { daoDelegates: string } }) {
   const router = useRouter();
   const path = usePathname();
@@ -18,12 +26,7 @@ function SpecificDAO({ params }: { params: { daoDelegates: string } }) {
           {params.daoDelegates}
         </div>
         <div className="py-5 pr-8">
-          Optimism DAO is the heart of the Optimism network, an innovative layer
-          2 solution for faster, cheaper transactions on Ethereum. Think of it
-          as a community-driven engine, where token holders govern upgrades,
-          fees, and the overall direction of the Optimism ecosystem. With a
-          focus on scaling Ethereum effectively and sustainably, Optimism DAO is
-          building a brighter future for blockchain technology.
+          {params.daoDelegates === "optimism" ? desc.optimism : desc.arbitrum}
         </div>
       </div>
 
@@ -66,7 +69,7 @@ function SpecificDAO({ params }: { params: { daoDelegates: string } }) {
 
       <div className="py-6 ps-16">
         {searchParams.get("active") === "delegatesList" ? (
-          <DelegatesList />
+          <DelegatesList props={params.daoDelegates} />
         ) : (
           ""
         )}
