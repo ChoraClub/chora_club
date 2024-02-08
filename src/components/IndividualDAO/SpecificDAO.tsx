@@ -51,7 +51,7 @@ function SpecificDAO({ props }: { props: { daoDelegates: string } }) {
             router.push(path + "?active=delegatesSession&session=ongoing")
           }
         >
-          Delegate&apos;s Session
+          Delegates Sessions
         </button>
         <button
           className={`border-b-2 py-4 px-2 ${

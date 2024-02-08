@@ -3,6 +3,7 @@ const nextConfig = {
   images: {
     domains: [
       "l2beat.com",
+      "s3.amazonaws.com",
       "raw.githubusercontent.com",
       "pbs.twimg.com",
       "cdn.stamp.fyi",

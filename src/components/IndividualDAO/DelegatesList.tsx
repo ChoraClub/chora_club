@@ -12,7 +12,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import toast, { Toaster } from "react-hot-toast";
 
 function DelegatesList({ props }: { props: string }) {
-  const [delegateData, setDelegateData] = useState<any>([]);
+  const [delegateData, setDelegateData] = useState<any>();
   const [tempData, setTempData] = useState<any>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(0);
@@ -47,7 +47,7 @@ function DelegatesList({ props }: { props: string }) {
     }
   }, []);
 
-  console.log("dao-info: ", delegateData.delegates);
+  // console.log("dao-info: ", delegateData.delegates);
 
   const handleSearchChange = (query: string) => {
     console.log("query: ", query);
@@ -74,7 +74,7 @@ function DelegatesList({ props }: { props: string }) {
     toast("Address Copied");
   };
 
-  function formatNumber(number: number) {
+  const formatNumber = (number: number) => {
     if (number >= 1000000) {
       return (number / 1000000).toFixed(2) + "m";
     } else if (number >= 1000) {
@@ -82,7 +82,7 @@ function DelegatesList({ props }: { props: string }) {
     } else {
       return number.toString();
     }
-  }
+  };
 
   return (
     <div>
@@ -131,7 +131,7 @@ function DelegatesList({ props }: { props: string }) {
                   <div
                     className="flex justify-center cursor-pointer"
                     onClick={() =>
-                      router.push(`/${props}/${daos.publicAddress}`)
+                      router.push(`/${props}/${daos.publicAddress}?active=info`)
                     }
                   >
                     <Image
@@ -152,7 +152,9 @@ function DelegatesList({ props }: { props: string }) {
                       <div
                         className="font-semibold cursor-pointer"
                         onClick={() =>
-                          router.push(`/${props}/${daos.publicAddress}`)
+                          router.push(
+                            `/${props}/${daos.publicAddress}?active=info  `
+                          )
                         }
                       >
                         {daos.ensName == null ? (
@@ -188,7 +190,7 @@ function DelegatesList({ props }: { props: string }) {
                         <span className="text-blue-shade-200 font-semibold">
                           {formatNumber(daos.delegatedVotes)} &nbsp;
                         </span>
-                        Tokens Delegated
+                        delegated tokens
                       </div>
                     </div>
                   </div>
@@ -213,7 +215,8 @@ function DelegatesList({ props }: { props: string }) {
               } `}
             >
               <button
-                className="bg-blue-shade-100 text-white px-4 py-1 rounded-md font-semibold"
+                disabled={currentPage == 0}
+                className={`bg-blue-shade-100 text-white px-4 py-1 rounded-md font-semibold`}
                 onClick={() =>
                   setCurrentPage((prev) => (prev > 0 ? prev - 1 : prev))
                 }

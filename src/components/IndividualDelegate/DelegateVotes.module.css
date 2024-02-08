@@ -4,3 +4,21 @@
   -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
 }
+
+.scrollbar::-webkit-scrollbar {
+  width: 6px;
+  /* padding: 5px; */
+}
+
+/* Track */
+.scrollbar::-webkit-scrollbar-track {
+  background: rgba(201, 201, 201, 0.25);
+  border-radius: 5px;
+  margin: 10px;
+}
+
+/* Handle */
+.scrollbar::-webkit-scrollbar-thumb {
+  background: #000;
+  border-radius: 5px;
+}

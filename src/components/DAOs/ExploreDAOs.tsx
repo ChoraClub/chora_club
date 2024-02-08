@@ -8,8 +8,8 @@ import { useRouter } from "next/navigation";
 
 function ExploreDAOs() {
   const dao_info = [
-    { name: "Optimism", value: "108.76k", img: op_logo },
-    { name: "Arbitrum", value: "205k", img: arb_logo },
+    { name: "Optimism", value: "193K", img: op_logo },
+    { name: "Arbitrum", value: "294k", img: arb_logo },
   ];
 
   const [daoInfo, setDaoInfo] = useState(dao_info);
