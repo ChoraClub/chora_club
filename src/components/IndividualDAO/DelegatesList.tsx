@@ -29,7 +29,7 @@ function DelegatesList({ props }: { props: string }) {
         );
         const daoInfo = await res.json().then((delegates) => delegates.data);
         setDelegateData(daoInfo);
-        setTempData(daoInfo);
+        setTempData(daoInfo.delegates);
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -51,21 +51,23 @@ function DelegatesList({ props }: { props: string }) {
 
   const handleSearchChange = (query: string) => {
     console.log("query: ", query);
-    setSearchQuery(query);
-    setDelegateData(tempData);
-    console.log("Delegate data: ", query, delegateData);
 
-    const filtered = delegateData.delegates.filter(
-      (item: any) =>
-        (item.ensName !== null &&
-          item.ensName.startsWith(query.toLowerCase())) ||
-        item.publicAddress.startsWith(query)
-      // console.log(item.ensName)
-    );
-    console.log("Filtered Data: ", filtered);
+    setSearchQuery(query);
+
     if (query.length > 0) {
+      console.log("Delegate data: ", query, delegateData);
+      console.log(delegateData);
+      const filtered = tempData.filter(
+        (item: any) =>
+          (item.ensName !== null &&
+            item.ensName.startsWith(query.toLowerCase())) ||
+          item.publicAddress.startsWith(query)
+      );
+      console.log("Filtered Data: ", filtered);
       const newData = { ...delegateData, delegates: filtered };
       setDelegateData(newData);
+    } else {
+      setDelegateData({ ...delegateData, delegates: tempData });
     }
   };
 
@@ -80,7 +82,7 @@ function DelegatesList({ props }: { props: string }) {
     } else if (number >= 1000) {
       return (number / 1000).toFixed(2) + "k";
     } else {
-      return number.toString();
+      return 0;
     }
   };
 
@@ -128,12 +130,7 @@ function DelegatesList({ props }: { props: string }) {
                   }}
                   className="px-5 py-7 rounded-2xl"
                 >
-                  <div
-                    className="flex justify-center cursor-pointer"
-                    onClick={() =>
-                      router.push(`/${props}/${daos.publicAddress}?active=info`)
-                    }
-                  >
+                  <div className="flex justify-center">
                     <Image
                       src={
                         daos.profilePicture == null
@@ -149,14 +146,7 @@ function DelegatesList({ props }: { props: string }) {
 
                   <div className="text-center">
                     <div className="py-3">
-                      <div
-                        className="font-semibold cursor-pointer"
-                        onClick={() =>
-                          router.push(
-                            `/${props}/${daos.publicAddress}?active=info  `
-                          )
-                        }
-                      >
+                      <div className="font-semibold">
                         {daos.ensName == null ? (
                           <span>
                             {daos.publicAddress.substring(0, 5)}...
@@ -168,7 +158,7 @@ function DelegatesList({ props }: { props: string }) {
                           daos.ensName
                         )}
                       </div>
-                      <div className="flex justify-center items-center gap-2 pb-4 pt-2">
+                      <div className="flex justify-center items-center gap-2 pb-2 pt-1">
                         {daos.publicAddress.substring(0, 5)}...
                         {daos.publicAddress.substring(
                           daos.publicAddress.length - 4
@@ -179,20 +169,32 @@ function DelegatesList({ props }: { props: string }) {
                           closeDelay={1}
                           showArrow
                         >
-                          <span className="cursor-pointer">
+                          <span className="cursor-pointer text-sm">
                             <IoCopy
                               onClick={() => handleCopy(daos.publicAddress)}
                             />
                           </span>
                         </Tooltip>
                       </div>
-                      <div className="text-sm border border-[#D9D9D9] py-2 px-2 rounded-lg">
+                      <div className="text-sm border border-[#D9D9D9] py-2 px-1 rounded-lg w-full">
                         <span className="text-blue-shade-200 font-semibold">
-                          {formatNumber(daos.delegatedVotes)} &nbsp;
+                          {formatNumber(daos.delegatedVotes)}&nbsp;
                         </span>
                         delegated tokens
                       </div>
                     </div>
+                  </div>
+                  <div>
+                    <button
+                      className="bg-blue-shade-100 text-white font-poppins w-full rounded-[4px] text-sm py-1 font-medium"
+                      onClick={() =>
+                        router.push(
+                          `/${props}/${daos.publicAddress}?active=info  `
+                        )
+                      }
+                    >
+                      View Profile
+                    </button>
                   </div>
                   <Toaster
                     toastOptions={{
@@ -216,7 +218,9 @@ function DelegatesList({ props }: { props: string }) {
             >
               <button
                 disabled={currentPage == 0}
-                className={`bg-blue-shade-100 text-white px-4 py-1 rounded-md font-semibold`}
+                className={`text-white px-4 py-1 rounded-md font-semibold ${
+                  currentPage == 0 ? "bg-[#6B98FF]" : "bg-blue-shade-100"
+                }`}
                 onClick={() =>
                   setCurrentPage((prev) => (prev > 0 ? prev - 1 : prev))
                 }

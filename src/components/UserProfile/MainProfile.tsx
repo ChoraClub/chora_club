@@ -65,6 +65,22 @@ function MainProfile() {
     });
   };
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await fetch(
+          `https://api.karmahq.xyz/api/user/0xB351a70dD6E5282A8c84edCbCd5A955469b9b032`
+        );
+        const details = await res.json();
+        // setDelegateInfo(details.data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   return (
     <div className="font-poppins">
       <div className="flex ps-14 py-5 pe-10">

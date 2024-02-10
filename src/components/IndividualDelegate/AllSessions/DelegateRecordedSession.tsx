@@ -3,27 +3,16 @@ import text1 from "@/assets/images/daos/texture1.png";
 import text2 from "@/assets/images/daos/texture2.png";
 import Image from "next/image";
 
-function DelegateRecordedSession() {
+function DelegateRecordedSession({ props }: { props: string }) {
   const details = [
     {
       img: text1,
-      title:
-        "Recorded Optimism Open Forum: Governance, Applications, and Beyond",
+      title: "Optimism Open Forum: Governance, Applications, and Beyond",
       dao: "Optimism",
       participant: 12,
       attendee: "olimpio.eth",
       host: "lindaxie.eth",
       started: "2 hours ago",
-      desc: "Join the conversation about the future of Optimism. Discuss governance proposals, dApp adoption, and technical developments.",
-    },
-    {
-      img: text2,
-      title: "Open Forum: Governance, Applications, and Beyond",
-      dao: "Optimism",
-      participant: 5,
-      attendee: "olimpio.eth",
-      host: "hexagon.eth",
-      started: "4 hours ago",
       desc: "Join the conversation about the future of Optimism. Discuss governance proposals, dApp adoption, and technical developments.",
     },
   ];
@@ -69,7 +58,8 @@ function DelegateRecordedSession() {
                   {data.attendee}
                 </div>
                 <div className="text-[#3E3D3D]">
-                  <span className="font-semibold">Host:</span> {data.host}
+                  <span className="font-semibold">Host:</span>{" "}
+                  {props.substring(0, 14)}...
                 </div>
                 <div className="text-[#3E3D3D] font-semibold">
                   {data.started}

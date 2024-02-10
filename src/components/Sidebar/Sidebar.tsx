@@ -6,11 +6,13 @@ import logo from "@/assets/images/sidebar/favicon.png";
 import rocket from "@/assets/images/sidebar/rocket.png";
 import office from "@/assets/images/sidebar/office.png";
 import wallet from "@/assets/images/sidebar/wallet.png";
+import gitbook from "@/assets/images/sidebar/gitbook.png";
 import user from "@/assets/images/sidebar/user.png";
 import styles from "./sidebar.module.css";
 import { usePathname, useRouter } from "next/navigation";
 import { Badge, Tooltip } from "@nextui-org/react";
 import { IoClose } from "react-icons/io5";
+import Link from "next/link";
 
 function Sidebar() {
   const router = useRouter();
@@ -128,7 +130,9 @@ function Sidebar() {
                           : ""
                       }`}
                       priority={true}
-                      onClick={() => router.push(`/${data[0]}?active=delegatesList`)}
+                      onClick={() =>
+                        router.push(`/${data[0]}?active=delegatesList`)
+                      }
                     ></Image>
                   </Tooltip>
                 </Badge>
@@ -140,6 +144,10 @@ function Sidebar() {
         </div>
 
         <div className="flex flex-col items-center gap-y-4 pt-5">
+          <Link href={"https://docs.chora.club/"} target="_blank">
+            <Image src={gitbook} alt={"image"} width={40} />
+          </Link>
+
           <Image src={wallet} alt={"image"} width={40}></Image>
           <Image src={user} alt={"image"} width={40}></Image>
         </div>

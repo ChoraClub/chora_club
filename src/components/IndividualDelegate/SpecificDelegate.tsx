@@ -1,9 +1,9 @@
 "use client";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
-import user from "@/assets/images/daos/user3.png";
-import { FaXTwitter, FaDiscord } from "react-icons/fa6";
-import { BiLogoInstagramAlt } from "react-icons/bi";
+import user from "@/assets/images/daos/profile.png";
+import { FaXTwitter, FaDiscord, FaGithub } from "react-icons/fa6";
+import { BiSolidMessageRoundedDetail } from "react-icons/bi";
 import { IoCopy } from "react-icons/io5";
 import DelegateInfo from "./DelegateInfo";
 import DelegateVotes from "./DelegateVotes";
@@ -13,98 +13,65 @@ import copy from "copy-to-clipboard";
 import { Tooltip } from "@nextui-org/react";
 import { StaticImport } from "next/dist/shared/lib/get-img-props";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
+import toast, { Toaster } from "react-hot-toast";
+import { Provider, cacheExchange, createClient, fetchExchange } from "urql";
 
 interface Type {
   daoDelegates: string;
   individualDelegate: string;
 }
 
-interface Delegate {
-  logoUrl: string;
-  name: string;
-  daoName: string;
-  isForumVerified: boolean;
-  forumTopicURL: string;
-  twitterHandle: string | null;
-  socialLinks: {
-    discord: string;
-    discordGuildId: string;
-    forum: string;
-    logoUrl: string;
-    snapshot: string;
-    tally: string;
-    twitter: string;
-  };
-  score: number;
-  snapshotId: string[];
-  onChainId: string;
-  address: string;
-  stats: {
-    period: string;
-    karmaScore: number;
-    karmaRank: number;
-    forumActivityScore: number | null;
-    forumLikesReceived: number | null;
-    forumPostsReadCount: number | null;
-    proposalsInitiated: number | null;
-    proposalsDiscussed: number | null;
-    forumTopicCount: number | null;
-    forumPostCount: number | null;
-    offChainVotesPct: number;
-    onChainVotesPct: number;
-    updatedAt: string;
-    createdAt: string;
-    percentile: number;
-    gitcoinHealthScore: number | null;
-    deworkTasksCompleted: number | null;
-    deworkPoints: number | null;
-    proposalsOnSnapshot: number;
-    discordScore: number | null;
-    proposalsOnAragon: number | null;
-    aragonVotesPct: number | null;
-  }[];
-  workstreams: any[];
-  delegatorCount: number;
-  delegatedVotes: number;
-  githubScorePercentile: number | null;
-  snapshotDelegatedVotes: number | null;
-  voteWeight: string;
-  firstTokenDelegatedAt: string;
-  discordHandle: string | null;
-  discordUsername: string | null;
-  acceptedTOS: boolean;
-  discussionThread: string | null;
-}
-
-interface Data {
-  ensName: string | null;
-  githubHandle: string | null;
-  address: string;
-  id: number;
-  delegates: Delegate[];
-  accomplishments: any[];
-  nfts: any[];
-  githubStats: any[];
-  createdAt: string;
-  realName: string | null;
-  profilePictureUrl: string | StaticImport | null;
-}
-
 function SpecificDelegate({ props }: { props: Type }) {
-  const [activeSection, setActiveSection] = useState("info");
-  const [delegateInfo, setDelegateInfo] = useState<Data | null>();
+  const [delegateInfo, setDelegateInfo] = useState<any>();
   const router = useRouter();
   const path = usePathname();
   const searchParams = useSearchParams();
+  const [twitter, setTwitter] = useState("");
+  const [discord, setDiscord] = useState("");
+  const [discourse, setDiscourse] = useState("");
+  const [github, setGithub] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const res = await fetch(
-          `https://api.karmahq.xyz/api/user/${props.individualDelegate}`
+          `https://api.karmahq.xyz/api/dao/find-delegate?dao=${props.daoDelegates}&user=${props.individualDelegate}`
         );
         const details = await res.json();
-        setDelegateInfo(details.data);
+        console.log("Socials: ", details.data.delegate);
+        setDelegateInfo(details.data.delegate);
+
+        if (details.data.delegate.twitterHandle != null) {
+          setTwitter(
+            `https://twitter.com/${details.data.delegate.twitterHandle}`
+          );
+        }
+
+        if (details.data.delegate.discourseHandle != null) {
+          if (props.daoDelegates === "optimism") {
+            setDiscourse(
+              `https://gov.optimism.io/u/${details.data.delegate.discourseHandle}`
+            );
+          }
+          if (props.daoDelegates === "arbitrum") {
+            setDiscourse(
+              `https://forum.arbitrum.foundation/u/${details.data.delegate.discourseHandle}`
+            );
+          }
+        }
+
+        if (details.data.delegate.discordHandle != null) {
+          setDiscord(
+            `https://discord.com/${details.data.delegate.discordHandle}`
+          );
+        }
+
+        if (details.data.delegate.githubHandle != null) {
+          setGithub(
+            `https://discord.com/${details.data.delegate.githubHandle}`
+          );
+        }
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -119,16 +86,25 @@ function SpecificDelegate({ props }: { props: Type }) {
     } else if (number >= 1000) {
       return (number / 1000).toFixed(2) + "k";
     } else {
-      return number.toString();
+      return number;
     }
   };
 
-  console.log("Path: ", path);
+  const handleCopy = (addr: string) => {
+    copy(addr);
+    toast("Address Copied");
+  };
 
   return (
     <div className="font-poppins">
       <div className="flex ps-14 py-5">
-        <Image src={user} alt="user" className="w-40" />
+        <Image
+          src={delegateInfo?.profilePicture || user}
+          alt="user"
+          width={40}
+          height={40}
+          className="w-40 rounded-3xl"
+        />
 
         <div className="px-4">
           <div className=" flex items-center py-1">
@@ -140,24 +116,46 @@ function SpecificDelegate({ props }: { props: Type }) {
               )}
             </div>
             <div className="flex gap-3">
-              <span
-                className="border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 cursor-pointer"
+              <Link
+                href={twitter}
+                className={`border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 ${
+                  twitter == "" ? "hidden" : ""
+                }`}
                 style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
+                target="_blank"
               >
                 <FaXTwitter color="#7C7C7C" size={12} />
-              </span>
-              <span
-                className="border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 cursor-pointer"
+              </Link>
+              <Link
+                href={discourse}
+                className={`border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1  ${
+                  discourse == "" ? "hidden" : ""
+                }`}
                 style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
+                target="_blank"
               >
-                <BiLogoInstagramAlt color="#7C7C7C" size={12} />
-              </span>
-              <span
-                className="border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 cursor-pointer"
+                <BiSolidMessageRoundedDetail color="#7C7C7C" size={12} />
+              </Link>
+              <Link
+                href={discord}
+                className={`border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 ${
+                  discord == "" ? "hidden" : ""
+                }`}
                 style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
+                target="_blank"
               >
                 <FaDiscord color="#7C7C7C" size={12} />
-              </span>
+              </Link>
+              <Link
+                href={github}
+                className={`border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 ${
+                  github == "" ? "hidden" : ""
+                }`}
+                style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
+                target="_blank"
+              >
+                <FaGithub color="#7C7C7C" size={12} />
+              </Link>
             </div>
           </div>
 
@@ -171,21 +169,27 @@ function SpecificDelegate({ props }: { props: Type }) {
 
             <Tooltip content="Copy" placement="right" closeDelay={1} showArrow>
               <span className="px-2 cursor-pointer" color="#3E3D3D">
-                <IoCopy
-                  onClick={() =>
-                    copy("0xB351a70dD6E5282A8c84edCbCd5A955469b9b032")
-                  }
-                />
+                <IoCopy onClick={() => handleCopy(props.individualDelegate)} />
               </span>
             </Tooltip>
+            <Toaster
+              toastOptions={{
+                style: {
+                  fontSize: "14px",
+                  backgroundColor: "#3E3D3D",
+                  color: "#fff",
+                  boxShadow: "none",
+                  borderRadius: "50px",
+                  padding: "3px 5px",
+                },
+              }}
+            />
           </div>
 
           <div className="flex gap-4 py-1">
             <div className="text-[#4F4F4F] border-[0.5px] border-[#D9D9D9] rounded-md px-3 py-1">
               <span className="text-blue-shade-200 font-semibold">
-                {formatNumber(
-                  Number(delegateInfo?.delegates[0].delegatedVotes)
-                )}{" "}
+                {formatNumber(Number(delegateInfo?.delegatedVotes))}
                 &nbsp;
               </span>
               delegated tokens
@@ -193,10 +197,7 @@ function SpecificDelegate({ props }: { props: Type }) {
             <div className="text-[#4F4F4F] border-[0.5px] border-[#D9D9D9] rounded-md px-3 py-1">
               Delegated from
               <span className="text-blue-shade-200 font-semibold">
-                {" "}
-                {formatNumber(
-                  Number(delegateInfo?.delegates[0].delegatorCount)
-                )}{" "}
+                &nbsp;{formatNumber(delegateInfo?.delegatorCount)}&nbsp;
               </span>
               Addresses
             </div>
@@ -238,7 +239,7 @@ function SpecificDelegate({ props }: { props: Type }) {
               : "border-transparent"
           }`}
           onClick={() =>
-            router.push(path + "?active=delegatesSession&session=ongoing")
+            router.push(path + "?active=delegatesSession&session=book")
           }
         >
           Sessions
@@ -258,14 +259,18 @@ function SpecificDelegate({ props }: { props: Type }) {
       </div>
 
       <div className="py-6 ps-16">
-        {searchParams.get("active") === "info" && <DelegateInfo />}
+        {searchParams.get("active") === "info" && (
+          <DelegateInfo props={props} />
+        )}
         {searchParams.get("active") === "pastVotes" && (
-          <DelegateVotes props={props.individualDelegate} />
+          <DelegateVotes props={props} />
         )}
         {searchParams.get("active") === "delegatesSession" && (
-          <DelegateSessions />
+          <DelegateSessions props={props.individualDelegate} />
         )}
-        {searchParams.get("active") === "officeHours" && <DelegateOfficeHrs />}
+        {searchParams.get("active") === "officeHours" && (
+          <DelegateOfficeHrs props={props.individualDelegate} />
+        )}
       </div>
     </div>
   );
