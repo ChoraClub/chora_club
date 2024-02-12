@@ -12,8 +12,7 @@ function RecordedDelegateOfficeHrs({ props }: { props: Type }) {
   const details = [
     {
       img: text1,
-      title:
-        "Recorded Optimism Open Forum: Governance, Applications, and Beyond",
+      title: "Open Forum: Governance, Applications, and Beyond",
       dao: props.daoDelegates,
       participant: 12,
       attendee: "olimpio.eth",

@@ -12,7 +12,7 @@ function UpcomingDelegateOfficeHrs({ props }: { props: Type }) {
   const details = [
     {
       img: text1,
-      title: "Upcoming Optimism Open Forum: Governance, Applications",
+      title: "Open Forum: Governance, Applications",
       dao: props.daoDelegates,
       participant: 12,
       attendee: "olimpio.eth",

@@ -5,41 +5,9 @@ import search from "@/assets/images/daos/search.png";
 import op_logo from "@/assets/images/daos/op.png";
 import arb_logo from "@/assets/images/daos/arbitrum.jpg";
 import { useRouter } from "next/navigation";
-import toast, { Toaster } from "react-hot-toast";
 import { ImCross } from "react-icons/im";
 
 function ExploreDAOs() {
-  const [toastDisplayed, setToastDisplayed] = useState(false);
-  useEffect(() => {
-    const notify = () =>
-      toast.custom((t) => (
-        <div
-          className={`${
-            t.visible ? "animate-enter" : "animate-leave"
-          } max-w-lg w-full bg-white shadow-lg rounded-lg pointer-events-auto flex ring-1 ring-black ring-opacity-5`}
-        >
-          <div className="flex-1 w-0 p-4 items-start ml-3">
-            <p className="text-sm font-medium text-gray-900">
-              To ensure optimal user experience, please note that our site is
-              designed to be responsive on desktop devices.
-            </p>
-          </div>
-          <div className="flex border-l border-gray-200">
-            <button
-              onClick={() => toast.dismiss(t.id)}
-              className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center text-sm font-medium outline-none "
-            >
-              <span className="bg-red-600 hover:bg-red-700 p-2 rounded-full">
-                <ImCross color="#fff" size={10} />
-              </span>
-            </button>
-          </div>
-        </div>
-      ));
-    setToastDisplayed(true);
-    notify();
-  }, []);
-
   const dao_info = [
     { name: "Optimism", value: "193K", img: op_logo },
     { name: "Arbitrum", value: "294k", img: arb_logo },

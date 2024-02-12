@@ -92,7 +92,7 @@ function DelegateInfo({ props }: { props: Type }) {
           description
         ) : (
           <div className="font-semibold text-base flex justify-center">
-            No contributer&apos;s description
+            Delegate has not provided a description
           </div>
         )}
       </div>
