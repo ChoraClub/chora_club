@@ -31,6 +31,7 @@ function MainProfile() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [img, setImg] = useState<File | undefined>();
   const [hovered, setHovered] = useState(false);
+  const [profileDetails, setProfileDetails] = useState<any>();
   const router = useRouter();
   const path = usePathname();
   const searchParams = useSearchParams();
@@ -69,10 +70,43 @@ function MainProfile() {
     const fetchData = async () => {
       try {
         const res = await fetch(
-          `https://api.karmahq.xyz/api/user/0xB351a70dD6E5282A8c84edCbCd5A955469b9b032`
+          `https://api.karmahq.xyz/api/dao/find-delegate?dao=optimism&user=0xB351a70dD6E5282A8c84edCbCd5A955469b9b032`
         );
         const details = await res.json();
-        // setDelegateInfo(details.data);
+        console.log("Socials: ", details.data.delegate);
+        setProfileDetails(details.data.delegate);
+
+        if (details.data.delegate.twitterHandle != null) {
+          setSocials({
+            ...socials,
+            twitter: `https://twitter.com/${details.data.delegate.twitterHandle}`,
+          });
+        }
+
+        // if (details.data.delegate.discourseHandle != null) {
+        //   if (props.daoDelegates === "optimism") {
+        //     setDiscourse(
+        //       `https://gov.optimism.io/u/${details.data.delegate.discourseHandle}`
+        //     );
+        //   }
+        //   if (props.daoDelegates === "arbitrum") {
+        //     setDiscourse(
+        //       `https://forum.arbitrum.foundation/u/${details.data.delegate.discourseHandle}`
+        //     );
+        //   }
+        // }
+
+        // if (details.data.delegate.discordHandle != null) {
+        //   setDiscord(
+        //     `https://discord.com/${details.data.delegate.discordHandle}`
+        //   );
+        // }
+
+        // if (details.data.delegate.githubHandle != null) {
+        //   setGithub(
+        //     `https://discord.com/${details.data.delegate.githubHandle}`
+        //   );
+        // }
       } catch (error) {
         console.error("Error fetching data:", error);
       }

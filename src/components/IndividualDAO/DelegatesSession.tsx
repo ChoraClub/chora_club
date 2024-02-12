@@ -7,7 +7,7 @@ import UpcomingSessions from "./AllDelegatesSessions/UpcomingSessions";
 import RecordedSessions from "./AllDelegatesSessions/RecordedSessions";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
-function DelegatesSession() {
+function DelegatesSession({ props }: { props: string }) {
   const [searchQuery, setSearchQuery] = useState("");
   const router = useRouter();
   const path = usePathname();
@@ -78,13 +78,13 @@ function DelegatesSession() {
 
         <div className="py-10">
           {searchParams.get("session") === "ongoing" && (
-            <OngoingSessions params={searchQuery} />
+            <OngoingSessions params={searchQuery} props={props} />
           )}
           {searchParams.get("session") === "upcoming" && (
-            <UpcomingSessions params={searchQuery} />
+            <UpcomingSessions params={searchQuery} props={props} />
           )}
           {searchParams.get("session") === "recorded" && (
-            <RecordedSessions params={searchQuery} />
+            <RecordedSessions params={searchQuery} props={props} />
           )}
         </div>
       </div>

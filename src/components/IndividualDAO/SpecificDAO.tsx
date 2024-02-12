@@ -74,11 +74,15 @@ function SpecificDAO({ props }: { props: { daoDelegates: string } }) {
           ""
         )}
         {searchParams.get("active") === "delegatesSession" ? (
-          <DelegatesSession />
+          <DelegatesSession props={props.daoDelegates} />
         ) : (
           ""
         )}
-        {searchParams.get("active") === "officeHours" ? <OfficeHours /> : ""}
+        {searchParams.get("active") === "officeHours" ? (
+          <OfficeHours props={props.daoDelegates} />
+        ) : (
+          ""
+        )}
       </div>
     </div>
   );

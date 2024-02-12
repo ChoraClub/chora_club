@@ -217,7 +217,7 @@ function DelegateVotes({ props }: { props: Type }) {
                 className={`flex justify-between border border-[#7C7C7C] text-sm px-3 py-2 rounded-lg items-center my-3 `}
               >
                 <div className="w-4/5">
-                  <div className={` ${openDesc[index] ? "" : styles.desc}`}>
+                  <div className={`${openDesc[index] ? "" : styles.desc}`}>
                     {proposal.proposal.description}
                   </div>
                   <span

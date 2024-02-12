@@ -23,6 +23,9 @@ const quanty = localFonts({
 export const metadata: Metadata = {
   title: "Chora Club",
   description: "Discover. Learn. Engage.",
+  icons: {
+    icon: ["/favicon.png"],
+  },
 };
 
 export default function RootLayout({

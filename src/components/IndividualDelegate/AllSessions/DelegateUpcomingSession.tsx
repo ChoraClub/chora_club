@@ -3,7 +3,12 @@ import text1 from "@/assets/images/daos/texture1.png";
 import text2 from "@/assets/images/daos/texture2.png";
 import Image from "next/image";
 
-function DelegateUpcomingSession({ props }: { props: string }) {
+interface Type {
+  daoDelegates: string;
+  individualDelegate: string;
+}
+
+function DelegateUpcomingSession({ props }: { props: Type }) {
   const details = [
     {
       img: text1,
@@ -59,7 +64,7 @@ function DelegateUpcomingSession({ props }: { props: string }) {
                 </div>
                 <div className="text-[#3E3D3D]">
                   <span className="font-semibold">Host:</span>{" "}
-                  {props.substring(0, 14)}...
+                  {props.individualDelegate.substring(0, 14)}...
                 </div>
                 <div className="text-[#3E3D3D]">
                   <span className="font-semibold">Starts at:</span>{" "}

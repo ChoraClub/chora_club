@@ -13,6 +13,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { Badge, Tooltip } from "@nextui-org/react";
 import { IoClose } from "react-icons/io5";
 import Link from "next/link";
+import toast, { Toaster } from "react-hot-toast";
 
 function Sidebar() {
   const router = useRouter();
@@ -90,7 +91,7 @@ function Sidebar() {
               alt={"image"}
               width={40}
               className={`cursor-pointer `}
-              onClick={() => router.push("/office-hours")}
+              onClick={() => router.push("/office-hours?hours=ongoing")}
             ></Image>
           </Tooltip>
         </div>
@@ -144,14 +145,58 @@ function Sidebar() {
         </div>
 
         <div className="flex flex-col items-center gap-y-4 pt-5">
-          <Link href={"https://docs.chora.club/"} target="_blank">
-            <Image src={gitbook} alt={"image"} width={40} />
-          </Link>
+          <Tooltip
+            content={<div className="capitalize">Git Book</div>}
+            placement="right"
+            className="rounded-md bg-opacity-90"
+            closeDelay={1}
+          >
+            <Link href={"https://docs.chora.club/"} target="_blank">
+              <Image src={gitbook} alt={"image"} width={40} />
+            </Link>
+          </Tooltip>
 
-          <Image src={wallet} alt={"image"} width={40}></Image>
-          <Image src={user} alt={"image"} width={40}></Image>
+          <Tooltip
+            content={<div className="capitalize">Connect Wallet</div>}
+            placement="right"
+            className="rounded-md bg-opacity-90"
+            closeDelay={1}
+          >
+            <Image
+              src={wallet}
+              alt={"image"}
+              width={40}
+              onClick={() => toast("Coming Soon 🚀")}
+            ></Image>
+          </Tooltip>
+
+          <Tooltip
+            content={<div className="capitalize">User Profile</div>}
+            placement="right"
+            className="rounded-md bg-opacity-90"
+            closeDelay={1}
+          >
+            <Image
+              src={user}
+              alt={"image"}
+              width={40}
+              onClick={() => toast("Coming Soon 🚀")}
+            ></Image>
+          </Tooltip>
         </div>
       </div>
+      <Toaster
+        toastOptions={{
+          style: {
+            fontSize: "14px",
+            backgroundColor: "#3E3D3D",
+            color: "#fff",
+            boxShadow: "none",
+            borderRadius: "50px",
+            padding: "3px 5px",
+          },
+        }}
+      />
     </div>
   );
 }

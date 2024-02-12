@@ -5,7 +5,12 @@ import DelegateRecordedSession from "./AllSessions/DelegateRecordedSession";
 import BookSession from "./AllSessions/BookSession";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
-function DelegateSessions({ props }: { props: string }) {
+interface Type {
+  daoDelegates: string;
+  individualDelegate: string;
+}
+
+function DelegateSessions({ props }: { props: Type }) {
   const router = useRouter();
   const path = usePathname();
   const searchParams = useSearchParams();

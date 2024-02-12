@@ -204,7 +204,10 @@ function SpecificDelegate({ props }: { props: Type }) {
           </div>
 
           <div className="pt-2">
-            <button className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]">
+            <button
+              className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
+              onClick={() => toast("Coming Soon 🚀")}
+            >
               Delegate
             </button>
           </div>
@@ -260,16 +263,16 @@ function SpecificDelegate({ props }: { props: Type }) {
 
       <div className="py-6 ps-16">
         {searchParams.get("active") === "info" && (
-          <DelegateInfo props={props} />
+          <DelegateInfo props={props}  />
         )}
         {searchParams.get("active") === "pastVotes" && (
           <DelegateVotes props={props} />
         )}
         {searchParams.get("active") === "delegatesSession" && (
-          <DelegateSessions props={props.individualDelegate} />
+          <DelegateSessions props={props} />
         )}
         {searchParams.get("active") === "officeHours" && (
-          <DelegateOfficeHrs props={props.individualDelegate} />
+          <DelegateOfficeHrs props={props} />
         )}
       </div>
     </div>

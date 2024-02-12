@@ -6,7 +6,7 @@ import UpcomingOfficeHours from "./AllDelegatesOfficeHours/UpcomingOfficeHours";
 import RecordedOfficeHours from "./AllDelegatesOfficeHours/RecordedOfficeHours";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
-function OfficeHours() {
+function OfficeHours({ props }: { props: string }) {
   const [activeSection, setActiveSection] = useState("ongoing");
   const [searchQuery, setSearchQuery] = useState("");
   const router = useRouter();
@@ -74,13 +74,13 @@ function OfficeHours() {
 
         <div className="py-10">
           {searchParams.get("hours") === "ongoing" && (
-            <OngoingOfficeHours params={searchQuery} />
+            <OngoingOfficeHours params={searchQuery} props={props} />
           )}
           {searchParams.get("hours") === "upcoming" && (
-            <UpcomingOfficeHours params={searchQuery} />
+            <UpcomingOfficeHours params={searchQuery} props={props} />
           )}
           {searchParams.get("hours") === "recorded" && (
-            <RecordedOfficeHours params={searchQuery} />
+            <RecordedOfficeHours params={searchQuery} props={props} />
           )}
         </div>
       </div>

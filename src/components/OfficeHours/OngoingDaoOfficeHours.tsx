@@ -24,7 +24,7 @@ function OngoingDaoOfficeHours({ params }: { params: string }) {
       participant: 12,
       attendee: "olimpio.eth",
       host: "lindaxie.eth",
-      started: "07/09/2023 12:1 SPM 1ST",
+      started: "07/09/2023 12:15 PM IST",
       desc: "Join the conversation about the future of Optimism. Discuss governance proposals, dApp adoption, and technical developments.",
     },
     {
@@ -33,9 +33,9 @@ function OngoingDaoOfficeHours({ params }: { params: string }) {
       dao: "Arbitrum",
       participant: 5,
       attendee: "olimpio.eth",
-      host: "hexagon.eth",
-      started: "07/09/2023 12:1 SPM 1ST",
-      desc: "Join the conversation about the future of Optimism. Discuss governance proposals, dApp adoption, and technical developments.",
+      host: "l2beatcom.eth",
+      started: "07/09/2023 12:15 PM IST",
+      desc: "Join the conversation about the future of Arbitrum. Discuss governance proposals, dApp adoption, and technical developments.",
     },
   ];
 

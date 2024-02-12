@@ -3,17 +3,22 @@ import text1 from "@/assets/images/daos/texture1.png";
 import text2 from "@/assets/images/daos/texture2.png";
 import Image from "next/image";
 
-function OngoingDelegateOfficeHrs({ props }: { props: string }) {
+interface Type {
+  daoDelegates: string;
+  individualDelegate: string;
+}
+
+function OngoingDelegateOfficeHrs({ props }: { props: Type }) {
   const details = [
     {
       img: text1,
       title: "Optimism Open Forum: Governance, Applications, and Beyond",
-      dao: "Optimism",
+      dao: props.daoDelegates,
       participant: 12,
       attendee: "olimpio.eth",
       host: "lindaxie.eth",
       started: "07/09/2023 12:15 PM IST",
-      desc: "Join the conversation about the future of Optimism. Discuss governance proposals, dApp adoption, and technical developments.",
+      desc: `Join the conversation about the future of ${props.daoDelegates}. Discuss governance proposals, dApp adoption, and technical developments.`,
     },
   ];
 
@@ -40,7 +45,7 @@ function OngoingDelegateOfficeHrs({ props }: { props: string }) {
               </div>
 
               <div className="flex space-x-4 py-2">
-                <div className="bg-[#1E1E1E] border border-[#1E1E1E] text-white rounded-md text-xs px-5 py-1 font-semibold">
+                <div className="bg-[#1E1E1E] border border-[#1E1E1E] text-white rounded-md text-xs px-5 py-1 font-semibold capitalize">
                   {data.dao}
                 </div>
                 <div className="border border-[#1E1E1E] rounded-md text-[#1E1E1E] text-xs px-5 py-1">
@@ -55,7 +60,7 @@ function OngoingDelegateOfficeHrs({ props }: { props: string }) {
               <div className="flex gap-x-16 text-sm py-3">
                 <div className="text-[#3E3D3D]">
                   <span className="font-semibold">Host:</span>{" "}
-                  {props.substring(0, 14)}...
+                  {props.individualDelegate.substring(0, 14)}...
                 </div>
                 <div className="text-[#3E3D3D]">
                   <span className="font-semibold">Started at:</span>{" "}

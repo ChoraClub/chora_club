@@ -3,17 +3,22 @@ import React, { useState } from "react";
 import text1 from "@/assets/images/daos/texture1.png";
 import text2 from "@/assets/images/daos/texture2.png";
 
-function DegelateOngoingSession({ props }: { props: string }) {
+interface Type {
+  daoDelegates: string;
+  individualDelegate: string;
+}
+
+function DegelateOngoingSession({ props }: { props: Type }) {
   const details = [
     {
       img: text1,
-      title: "Optimism Open Forum: Governance, Applications, and Beyond",
-      dao: "Optimism",
+      title: "Open Forum: Governance, Applications, and Beyond",
+      dao: props.daoDelegates,
       participant: 12,
-      attendee: "olimpio.eth",
-      host: "lindaxie.eth",
+      attendee: "0xf4b0556b9b6f53e00a1fdd2b0478ce841991d8fa",
+      host: "0x1b686ee8e31c5959d9f5bbd8122a58682788eead",
       started: "07/09/2023 12:15 PM IST",
-      desc: "Join the conversation about the future of Optimism. Discuss governance proposals, dApp adoption, and technical developments.",
+      desc: `Join the conversation about the future of ${props.daoDelegates}. Discuss governance proposals, dApp adoption, and technical developments.`,
     },
     // {
     //   img: text2,
@@ -50,7 +55,7 @@ function DegelateOngoingSession({ props }: { props: string }) {
               </div>
 
               <div className="flex space-x-4 py-2">
-                <div className="bg-[#1E1E1E] border border-[#1E1E1E] text-white rounded-md text-xs px-5 py-1 font-semibold">
+                <div className="bg-[#1E1E1E] border border-[#1E1E1E] text-white rounded-md text-xs px-5 py-1 font-semibold capitalize">
                   {data.dao}
                 </div>
                 <div className="border border-[#1E1E1E] rounded-md text-[#1E1E1E] text-xs px-5 py-1">
@@ -65,11 +70,11 @@ function DegelateOngoingSession({ props }: { props: string }) {
               <div className="flex gap-x-16 text-sm py-3">
                 <div className="text-[#3E3D3D]">
                   <span className="font-semibold">Attendee:</span>{" "}
-                  {data.attendee}
+                  {data.attendee.substring(0, 10)}...
                 </div>
                 <div className="text-[#3E3D3D]">
                   <span className="font-semibold">Host:</span>{" "}
-                  {props.substring(0, 14)}..
+                  {props.individualDelegate.substring(0, 14)}...
                 </div>
                 <div className="text-[#3E3D3D]">
                   <span className="font-semibold">Started at:</span>{" "}

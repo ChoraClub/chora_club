@@ -33,9 +33,9 @@ function RecordedDaoOfficeHours({ params }: { params: string }) {
       dao: "Arbitrum",
       participant: 5,
       attendee: "olimpio.eth",
-      host: "hexagon.eth",
+      host: "l2beatcom.eth",
       started: "6 hours ago",
-      desc: "Join the conversation about the future of Optimism. Discuss governance proposals, dApp adoption, and technical developments.",
+      desc: "Join the conversation about the future of Arbitrum. Discuss governance proposals, dApp adoption, and technical developments.",
     },
   ];
 

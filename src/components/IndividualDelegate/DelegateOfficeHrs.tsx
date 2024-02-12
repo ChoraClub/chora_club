@@ -4,7 +4,12 @@ import UpcomingDelegateOfficeHrs from "./DelegateOfficeHours/UpcomingDelegateOff
 import RecordedDelegateOfficeHrs from "./DelegateOfficeHours/RecordedDelegateOfficeHrs";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
-function DelegateOfficeHrs({ props }: { props: string }) {
+interface Type {
+  daoDelegates: string;
+  individualDelegate: string;
+}
+
+function DelegateOfficeHrs({ props }: { props: Type }) {
   const [activeSection, setActiveSection] = useState("ongoing");
   const [searchQuery, setSearchQuery] = useState("");
   const router = useRouter();

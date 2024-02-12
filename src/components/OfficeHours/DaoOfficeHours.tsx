@@ -6,10 +6,14 @@ import UpcomingDaoOfficeHours from "./UpcomingDaoOfficeHours";
 import RecordedDaoOfficeHours from "./RecordedDaoOfficeHours";
 import search from "@/assets/images/daos/search.png";
 import Image from "next/image";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 function DaoOfficeHours() {
   const [activeSection, setActiveSection] = useState("ongoing");
   const [searchQuery, setSearchQuery] = useState("");
+  const router = useRouter();
+  const path = usePathname();
+  const searchParams = useSearchParams();
 
   return (
     <div className="p-6">
@@ -21,31 +25,31 @@ function DaoOfficeHours() {
         <div className="flex gap-16 border-1 border-[#7C7C7C] pl-6 rounded-xl">
           <button
             className={`py-2  ${
-              activeSection === "ongoing"
+              searchParams.get("hours") === "ongoing"
                 ? "text-[#3E3D3D] font-bold"
                 : "text-[#7C7C7C]"
             }`}
-            onClick={() => setActiveSection("ongoing")}
+            onClick={() => router.push(path + "?hours=ongoing")}
           >
             Ongoing
           </button>
           <button
             className={`py-2 ${
-              activeSection === "upcoming"
+              searchParams.get("hours") === "upcoming"
                 ? "text-[#3E3D3D] font-bold"
                 : "text-[#7C7C7C]"
             }`}
-            onClick={() => setActiveSection("upcoming")}
+            onClick={() => router.push(path + "?hours=upcoming")}
           >
             Upcoming
           </button>
           <button
             className={`py-2 ${
-              activeSection === "recorded"
+              searchParams.get("hours") === "recorded"
                 ? "text-[#3E3D3D] font-bold"
                 : "text-[#7C7C7C]"
             }`}
-            onClick={() => setActiveSection("recorded")}
+            onClick={() => router.push(path + "?hours=recorded")}
           >
             Recorded
           </button>
@@ -69,13 +73,13 @@ function DaoOfficeHours() {
         </div>
 
         <div className="py-5">
-          {activeSection === "ongoing" && (
+          {searchParams.get("hours") === "ongoing" && (
             <OngoingDaoOfficeHours params={searchQuery} />
           )}
-          {activeSection === "upcoming" && (
+          {searchParams.get("hours") === "upcoming" && (
             <UpcomingDaoOfficeHours params={searchQuery} />
           )}
-          {activeSection === "recorded" && (
+          {searchParams.get("hours") === "recorded" && (
             <RecordedDaoOfficeHours params={searchQuery} />
           )}
         </div>

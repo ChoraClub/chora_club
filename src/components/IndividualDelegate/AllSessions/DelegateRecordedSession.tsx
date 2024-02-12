@@ -3,17 +3,22 @@ import text1 from "@/assets/images/daos/texture1.png";
 import text2 from "@/assets/images/daos/texture2.png";
 import Image from "next/image";
 
-function DelegateRecordedSession({ props }: { props: string }) {
+interface Type {
+  daoDelegates: string;
+  individualDelegate: string;
+}
+
+function DelegateRecordedSession({ props }: { props: Type }) {
   const details = [
     {
       img: text1,
-      title: "Optimism Open Forum: Governance, Applications, and Beyond",
-      dao: "Optimism",
+      title: "Open Forum: Governance, Applications, and Beyond",
+      dao: props.daoDelegates,
       participant: 12,
-      attendee: "olimpio.eth",
+      attendee: "0xf4b0556b9b6f53e00a1fdd2b0478ce841991d8fa",
       host: "lindaxie.eth",
       started: "2 hours ago",
-      desc: "Join the conversation about the future of Optimism. Discuss governance proposals, dApp adoption, and technical developments.",
+      desc: `Join the conversation about the future of ${props.daoDelegates}. Discuss governance proposals, dApp adoption, and technical developments.`,
     },
   ];
 
@@ -55,11 +60,11 @@ function DelegateRecordedSession({ props }: { props: string }) {
               <div className="flex gap-x-16 text-sm py-3">
                 <div className="text-[#3E3D3D]">
                   <span className="font-semibold">Attendee:</span>{" "}
-                  {data.attendee}
+                  {data.attendee.substring(0, 10)}...
                 </div>
                 <div className="text-[#3E3D3D]">
                   <span className="font-semibold">Host:</span>{" "}
-                  {props.substring(0, 14)}...
+                  {props.individualDelegate.substring(0, 14)}...
                 </div>
                 <div className="text-[#3E3D3D] font-semibold">
                   {data.started}

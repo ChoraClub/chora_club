@@ -47,6 +47,7 @@ function ExploreDAOs() {
 
   const [daoInfo, setDaoInfo] = useState(dao_info);
   const [searchQuery, setSearchQuery] = useState("");
+  const [status, setStatus] = useState(true);
 
   const router = useRouter();
 
@@ -74,6 +75,23 @@ function ExploreDAOs() {
 
   return (
     <div className="p-6">
+      <div
+        style={{ boxShadow: "0px 4px 50.8px 0px rgba(0, 0, 0, 0.11)" }}
+        className={`flex absolute items-center justify-center z-30 bottom-5  rounded-full px-6 font-poppins text-sm font-medium ${
+          status ? "" : "hidden"
+        }`}
+      >
+        <div className="py-3">
+          To ensure optimal user experience, please note that our site is
+          designed to be responsive on desktop devices.
+        </div>
+        <div
+          className="bg-red-600 hover:bg-red-700 p-2 rounded-full cursor-pointer ml-3"
+          onClick={() => setStatus(false)}
+        >
+          <ImCross color="#fff" size={10} />
+        </div>
+      </div>
       <div className="text-blue-shade-200 font-medium text-4xl font-quanty pb-4">
         Explore DAOs
       </div>
@@ -128,7 +146,6 @@ function ExploreDAOs() {
           </div>
         )}
       </div>
-      <Toaster />
     </div>
   );
 }
