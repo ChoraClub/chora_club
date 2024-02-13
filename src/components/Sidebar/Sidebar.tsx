@@ -14,6 +14,7 @@ import { Badge, Tooltip } from "@nextui-org/react";
 import { IoClose } from "react-icons/io5";
 import Link from "next/link";
 import toast, { Toaster } from "react-hot-toast";
+import { ConnectWallet } from "../ConnectWallet/ConnectWallet";
 
 function Sidebar() {
   const router = useRouter();
@@ -156,33 +157,9 @@ function Sidebar() {
             </Link>
           </Tooltip>
 
-          <Tooltip
-            content={<div className="capitalize">Connect Wallet</div>}
-            placement="right"
-            className="rounded-md bg-opacity-90"
-            closeDelay={1}
-          >
-            <Image
-              src={wallet}
-              alt={"image"}
-              width={40}
-              onClick={() => toast("Coming Soon 🚀")}
-            ></Image>
-          </Tooltip>
-
-          <Tooltip
-            content={<div className="capitalize">User Profile</div>}
-            placement="right"
-            className="rounded-md bg-opacity-90"
-            closeDelay={1}
-          >
-            <Image
-              src={user}
-              alt={"image"}
-              width={40}
-              onClick={() => toast("Coming Soon 🚀")}
-            ></Image>
-          </Tooltip>
+          {/* <Image src={wallet} alt={"image"} width={40}></Image> */}
+          <ConnectWallet />
+          <Image src={user} alt={"image"} width={40}></Image>
         </div>
       </div>
       <Toaster
