@@ -40,7 +40,7 @@ export const ConnectWallet = () => {
                   <button onClick={openConnectModal} type="button">
                     <Image
                       src={wallet}
-                      alt=""
+                      alt="image"
                       style={{ width: "40px", height: "40px" }}
                     />
                   </button>

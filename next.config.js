@@ -13,7 +13,6 @@ const nextConfig = {
       "img.redbull.com",
     ],
   },
-  reactStrictMode: false,
 };
 
 module.exports = nextConfig;

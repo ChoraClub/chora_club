@@ -142,6 +142,7 @@ function DelegateVotes({ props }: { props: Type }) {
     if (first) {
       fetchPageData();
     }
+    setOpenDesc(new Array(pageData.length).fill(false));
   }, [currentPage, graphData]);
 
   const chartData = {

@@ -15,6 +15,8 @@ import { IoClose } from "react-icons/io5";
 import Link from "next/link";
 import toast, { Toaster } from "react-hot-toast";
 import { ConnectWallet } from "../ConnectWallet/ConnectWallet";
+import { useSession } from "next-auth/react";
+import { useAccount } from "wagmi";
 
 function Sidebar() {
   const router = useRouter();
@@ -23,6 +25,14 @@ function Sidebar() {
   const [badgeVisiblity, setBadgeVisibility] = useState<boolean[]>(
     new Array(storedDao.length).fill(true)
   );
+  const [isPageLoading, setIsPageLoading] = useState<boolean>(true);
+  const { address, isConnected } = useAccount();
+  const { data: session, status } = useSession();
+  const sessionLoading = status === "loading";
+
+  useEffect(() => {
+    console.log(session, sessionLoading, isConnected);
+  }, [session, sessionLoading, isConnected]);
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -35,6 +45,7 @@ function Sidebar() {
 
       setStoredDao(localStorageArr);
     }, 100);
+    setIsPageLoading(false);
     return () => clearInterval(intervalId);
   }, []);
 
@@ -157,9 +168,36 @@ function Sidebar() {
             </Link>
           </Tooltip>
 
-          {/* <Image src={wallet} alt={"image"} width={40}></Image> */}
-          <ConnectWallet />
-          <Image src={user} alt={"image"} width={40}></Image>
+          {!isConnected && !session && address == null ? (
+            <Tooltip
+              content={<div className="capitalize">Wallet</div>}
+              placement="right"
+              className="rounded-md bg-opacity-90"
+              closeDelay={1}
+            >
+              {isPageLoading && !isConnected && sessionLoading ? (
+                <Image src={user} alt={"image"} width={40}></Image>
+              ) : (
+                <div>
+                  <ConnectWallet />
+                </div>
+              )}
+            </Tooltip>
+          ) : (
+            <Tooltip
+              content={<div className="capitalize">Profile</div>}
+              placement="right"
+              className="rounded-md bg-opacity-90"
+              closeDelay={1}
+            >
+              <Image
+                src={user}
+                alt={"image"}
+                width={40}
+                onClick={() => router.push(`/profile/${address}?active=info`)}
+              />
+            </Tooltip>
+          )}
         </div>
       </div>
       <Toaster

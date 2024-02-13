@@ -27,8 +27,10 @@ import {
   useDisclosure,
 } from "@nextui-org/react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { useAccount } from "wagmi";
 
 function MainProfile() {
+  const { address } = useAccount();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [img, setImg] = useState<File | undefined>();
   const [hovered, setHovered] = useState(false);
@@ -71,7 +73,7 @@ function MainProfile() {
     const fetchData = async () => {
       try {
         const res = await fetch(
-          `https://api.karmahq.xyz/api/dao/find-delegate?dao=optimism&user=0xB351a70dD6E5282A8c84edCbCd5A955469b9b032`
+          `https://api.karmahq.xyz/api/dao/find-delegate?dao=optimism&user=${address}`
         );
         const details = await res.json();
         console.log("Socials: ", details.data.delegate);
@@ -245,11 +247,8 @@ function MainProfile() {
 
             <div className="flex items-center py-1">
               <div>
-                {"0xB351a70dD6E5282A8c84edCbCd5A955469b9b032".substring(0, 6)}{" "}
-                ...{" "}
-                {"0xB351a70dD6E5282A8c84edCbCd5A955469b9b032".substring(
-                  "0xB351a70dD6E5282A8c84edCbCd5A955469b9b032".length - 4
-                )}
+                {`${address}`.substring(0, 6)} ...{" "}
+                {`${address}`.substring(`${address}`.length - 4)}
               </div>
 
               <Tooltip
@@ -259,11 +258,7 @@ function MainProfile() {
                 showArrow
               >
                 <span className="px-2 cursor-pointer" color="#3E3D3D">
-                  <IoCopy
-                    onClick={() =>
-                      handleCopy("0xB351a70dD6E5282A8c84edCbCd5A955469b9b032")
-                    }
-                  />
+                  <IoCopy onClick={() => handleCopy(`${address}`)} />
                 </span>
               </Tooltip>
               <Toaster
@@ -301,12 +296,12 @@ function MainProfile() {
               <button className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]">
                 Delegate
               </button>
-              <div className="">
+              {/* <div className="">
                 <select className="outline-none border border-blue-shade-200 text-blue-shade-200 rounded-full py-2 px-3">
                   <option className="text-gray-700">Optimism</option>
                   <option className="text-gray-700">Arbitrum</option>
                 </select>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
