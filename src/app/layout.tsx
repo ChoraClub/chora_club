@@ -4,6 +4,7 @@ import localFonts from "next/font/local";
 import "./globals.css";
 import { NextUIProvider } from "@nextui-org/react";
 import Sidebar from "@/components/Sidebar/Sidebar";
+import RootProviders from "./providers/root-providers";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -33,12 +34,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${quanty.variable} ${poppins.variable}`}>
-        <div className="flex">
-          <div className="fixed w-[6%] bg-blue-shade-100 h-screen mr-4 lg:mr-8 ">
-            <Sidebar />
+        <RootProviders>
+          <div className="flex">
+            <div className="fixed w-[6%] bg-blue-shade-100 h-screen mr-4 lg:mr-8 ">
+              <Sidebar />
+            </div>
+            <div className="w-[92%] ml-auto py-4">{children}</div>
           </div>
-          <div className="w-[92%] ml-auto py-4">{children}</div>
-        </div>
+        </RootProviders>
       </body>
     </html>
   );

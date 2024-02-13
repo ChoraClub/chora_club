@@ -13,6 +13,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { Badge, Tooltip } from "@nextui-org/react";
 import { IoClose } from "react-icons/io5";
 import Link from "next/link";
+import { ConnectWallet } from "../ConnectWallet/ConnectWallet";
 
 function Sidebar() {
   const router = useRouter();
@@ -148,7 +149,8 @@ function Sidebar() {
             <Image src={gitbook} alt={"image"} width={40} />
           </Link>
 
-          <Image src={wallet} alt={"image"} width={40}></Image>
+          {/* <Image src={wallet} alt={"image"} width={40}></Image> */}
+          <ConnectWallet />
           <Image src={user} alt={"image"} width={40}></Image>
         </div>
       </div>
