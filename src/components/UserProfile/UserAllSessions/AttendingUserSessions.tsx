@@ -14,7 +14,7 @@ function AttendingUserSessions() {
       status: "Approved",
       attendee: "olimpio.eth",
       host: "lindaxie.eth",
-      started: "07/09/2023 12:1 SPM 1ST",
+      started: "18/09/2023 03:15 PM EST",
       desc: "Join the conversation about the future of Optimism. Discuss governance proposals, dApp adoption, and technical developments.",
     },
     {
@@ -24,7 +24,7 @@ function AttendingUserSessions() {
       status: "Pending",
       attendee: "olimpio.eth",
       host: "hexagon.eth",
-      started: "07/09/2023 12:1 SPM 1ST",
+      started: "20/09/2023 04:15 PM EST",
       desc: "Join the conversation about the future of Optimism. Discuss governance proposals, dApp adoption, and technical developments.",
     },
     {
@@ -34,7 +34,7 @@ function AttendingUserSessions() {
       status: "Rejected",
       attendee: "olimpio.eth",
       host: "hexagon.eth",
-      started: "07/09/2023 12:1 SPM 1ST",
+      started: "21/09/2023 03:15 PM EST",
       desc: "Join the conversation about the future of Optimism. Discuss governance proposals, dApp adoption, and technical developments.",
     },
   ];

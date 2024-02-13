@@ -18,7 +18,7 @@ function UpcomingSessions({
       participant: 12,
       attendee: "0xf4b0556b9b6f53e00a1fdd2b0478ce841991d8fa",
       host: "0x1b686ee8e31c5959d9f5bbd8122a58682788eead",
-      started: "07/09/2023 12:15 PM IST",
+      started: "18/09/2023 12:15 PM EST",
       desc: `Join the conversation about the future of ${props}. Discuss governance proposals, dApp adoption, and technical developments.`,
     },
     {
@@ -28,7 +28,7 @@ function UpcomingSessions({
       participant: 5,
       attendee: "0xf4b0556b9b6f53e00a1fdd2b0478ce841991d8fa",
       host: "0x1b686ee8e31c5959d9f5bbd8122a58682788eead",
-      started: "07/09/2023 12:15 PM IST",
+      started: "18/09/2023 03:15 PM EST",
       desc: `Join the conversation about the future of ${props}. Discuss governance proposals, dApp adoption, and technical developments.`,
     },
   ];

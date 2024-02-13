@@ -14,7 +14,7 @@ function RecordedUserSessions() {
       participant: 12,
       attendee: "olimpio.eth",
       host: "lindaxie.eth",
-      started: "07/09/2023 12:1 SPM 1ST",
+      started: "2 hours ago",
       desc: "Join the conversation about the future of Optimism. Discuss governance proposals, dApp adoption, and technical developments.",
     },
     {
@@ -24,7 +24,7 @@ function RecordedUserSessions() {
       participant: 5,
       attendee: "olimpio.eth",
       host: "hexagon.eth",
-      started: "07/09/2023 12:1 SPM 1ST",
+      started: "3 days ago",
       desc: "Join the conversation about the future of Optimism. Discuss governance proposals, dApp adoption, and technical developments.",
     },
   ];
@@ -104,8 +104,8 @@ function RecordedUserSessions() {
                     <span className="font-semibold">Host:</span> {data.host}
                   </div>
                   <div className="text-[#3E3D3D]">
-                    <span className="font-semibold">Started at:</span>{" "}
-                    {data.started}
+                    <span className="font-semibold">{data.started}</span>{" "}
+                    
                   </div>
                 </div>
 

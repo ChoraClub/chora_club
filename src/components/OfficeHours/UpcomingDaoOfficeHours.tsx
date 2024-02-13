@@ -24,7 +24,7 @@ function UpcomingDaoOfficeHours({ params }: { params: string }) {
       participant: 12,
       attendee: "olimpio.eth",
       host: "lindaxie.eth",
-      started: "07/09/2023 12:15 PM IST",
+      started: "10/09/2023 11:30 PM EST",
       desc: "Join the conversation about the future of Arbitrum. Discuss governance proposals, dApp adoption, and technical developments.",
     },
     {
@@ -34,7 +34,7 @@ function UpcomingDaoOfficeHours({ params }: { params: string }) {
       participant: 5,
       attendee: "olimpio.eth",
       host: "l2beatcom.eth",
-      started: "07/09/2023 12:15 PM IST",
+      started: "11/09/2023 12:30 PM EST",
       desc: "Join the conversation about the future of Optimism. Discuss governance proposals, dApp adoption, and technical developments.",
     },
   ];
@@ -80,6 +80,7 @@ function UpcomingDaoOfficeHours({ params }: { params: string }) {
                 alt="image"
                 className="w-44 h-44 rounded-3xl border border-[#D9D9D9]"
               />
+              
 
               <div className="ps-6 pe-12 py-1">
                 <div className="font-semibold text-blue-shade-200 text-xl">
