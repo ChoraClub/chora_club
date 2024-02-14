@@ -9,6 +9,9 @@ import { useAccount} from "wagmi";
 import { useNetwork } from 'wagmi'
 Chart.register(ArcElement, Tooltip, Legend);
 
+
+
+
 const op_client = createClient({
   url: "https://api.thegraph.com/subgraphs/name/show-karma/dao-onchain-voting-optimism",
   exchanges: [cacheExchange, fetchExchange],
@@ -19,8 +22,8 @@ const arb_client = createClient({
   exchanges: [cacheExchange, fetchExchange],
 });
 function UserVotes() {
-  const {address} = useAccount()
-  const { chain, chains } = useNetwork()
+  const {address} = useAccount();
+  const { chain, chains } = useNetwork();
   const [first, setfirst] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [graphData, setGraphData] = useState<any>([]);
@@ -118,7 +121,7 @@ function UserVotes() {
     };
 
     fetchGraphData();
-  }, [chain.name, address]);
+  }, [chain?.name, address]);
 
   const totalData: number = graphData.length;
   const dataPerPage: number = 5;
