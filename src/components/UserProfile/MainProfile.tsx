@@ -7,7 +7,6 @@ import { Tooltip } from "@nextui-org/react";
 import user from "@/assets/images/daos/user3.png";
 import { FaXTwitter, FaDiscord, FaGithub } from "react-icons/fa6";
 import { BiSolidMessageRoundedDetail } from "react-icons/bi";
-import { BiLogoInstagramAlt } from "react-icons/bi";
 import { IoCopy } from "react-icons/io5";
 import UserInfo from "./UserInfo";
 import UserVotes from "./UserVotes";
@@ -32,8 +31,7 @@ import { useAccount} from "wagmi";
 import { useNetwork } from 'wagmi'
 
 function MainProfile() {
-  // const { address } = useAccount();
-  const address  = "0x5e349eca2dc61abcd9dd99ce94d04136151a09ee";
+  const { address } = useAccount();
   const { chain, chains } = useNetwork();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [img, setImg] = useState<File | undefined>();
@@ -183,7 +181,10 @@ function MainProfile() {
               {profileDetails?.ensName ? (
                 profileDetails?.ensName
               ) : (
-                <>{address.substring(0, 12)}... </>
+                <>
+                {`${address}`.substring(0, 6)} ...{" "}
+                {`${address}`.substring(`${address}`.length - 4)}
+              </>
               )}
             </div>
               <div className="flex gap-3">
