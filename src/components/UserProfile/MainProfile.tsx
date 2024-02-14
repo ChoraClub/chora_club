@@ -154,7 +154,13 @@ function MainProfile() {
             onMouseEnter={() => setHovered(true)}
             onMouseLeave={() => setHovered(false)}
           >
-            <Image src={user} alt="user" className="w-40 h-40" />
+              <Image
+                src={profileDetails?.profilePicture || user}
+                alt="user"
+                width={40}
+                height={40}
+                className="w-40 rounded-3xl"
+              />
             <div
               className={`absolute top-3 right-3 cursor-pointer  ${
                 hovered ? "bg-gray-50 rounded-full p-1" : "hidden"
