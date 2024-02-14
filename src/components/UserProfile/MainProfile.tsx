@@ -27,7 +27,7 @@ import {
   useDisclosure,
 } from "@nextui-org/react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { useAccount } from "wagmi";
+import { useAccount} from "wagmi";
 
 function MainProfile() {
   const { address } = useAccount();
@@ -48,7 +48,6 @@ function MainProfile() {
   const handleLogoClick = () => {
     fileInputRef.current?.click();
   };
-
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>): void => {
     const selectedFile = e.target.files?.[0];
 

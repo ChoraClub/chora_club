@@ -2,181 +2,266 @@ import React, { useEffect, useState } from "react";
 import { Doughnut } from "react-chartjs-2";
 import { Chart, ArcElement, Tooltip, Legend } from "chart.js";
 import { Pagination } from "@nextui-org/react";
+import { cacheExchange, createClient, fetchExchange, gql } from "urql/core";
 import styles from "../IndividualDelegate/DelegateVotes.module.css";
-
+import { Oval } from "react-loader-spinner";
+import { useAccount} from "wagmi";
+import { useNetwork } from 'wagmi'
 Chart.register(ArcElement, Tooltip, Legend);
 
-function UserVotes() {
-  const proposals = [
-    {
-      title:
-        "Proposal Description Proposal Description Proposal Description Proposal Description",
-      status: "For",
-    },
-    {
-      title:
-        "Proposal Description2 Proposal Description2 Proposal Description2",
-      status: "Against",
-    },
-    {
-      title:
-        "Proposal Description3 Proposal Description2 Proposal Description2",
-      status: "For",
-    },
-    {
-      title: "Proposal Description4 Proposal Desc Proposal123 Description2",
-      status: "Abstain",
-    },
-    {
-      title: "Proposal Description5 Proposal123 Description2 Proposal Desc",
-      status: "Against",
-    },
-    {
-      title: "Proposal Description6",
-      status: "Abstain",
-    },
-    {
-      title: "Proposal Description7",
-      status: "For",
-    },
-    {
-      title: "Proposal Description8",
-      status: "For",
-    },
-    {
-      title: "Proposal Description9",
-      status: "Against",
-    },
-    {
-      title: "Proposal Description10",
-      status: "For",
-    },
-    {
-      title: "Proposal Description11",
-      status: "Abstain",
-    },
-    {
-      title: "Proposal Description12",
-      status: "Against",
-    },
-    {
-      title: "Proposal Description13",
-      status: "Abstain",
-    },
-    {
-      title: "Proposal Description14",
-      status: "For",
-    },
-    {
-      title: "Proposal Description15",
-      status: "Abstain",
-    },
-    {
-      title: "Proposal Description16",
-      status: "Against",
-    },
-    {
-      title: "Proposal Description17",
-      status: "Abstain",
-    },
-  ];
+const op_client = createClient({
+  url: "https://api.thegraph.com/subgraphs/name/show-karma/dao-onchain-voting-optimism",
+  exchanges: [cacheExchange, fetchExchange],
+});
 
-  const data = {
-    labels: ["For", "Against", "Abstain"],
+const arb_client = createClient({
+  url: "https://api.thegraph.com/subgraphs/name/show-karma/onchain-voting-arbitrum",
+  exchanges: [cacheExchange, fetchExchange],
+});
+function UserVotes() {
+  const {address} = useAccount()
+  const { chain, chains } = useNetwork()
+  const [first, setfirst] = useState<boolean>(false);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [graphData, setGraphData] = useState<any>([]);
+  const [pageData, setPageData] = useState<any>([]);
+  const [isPageLoading, setIsPageLoading] = useState(true);
+  const [openDesc, setOpenDesc] = useState<boolean[]>([]);
+  const [supportCounts, setSupportCounts] = useState({ 0: 0, 1: 0, 2: 0 });
+
+  const opQuery = gql`
+    query Votes($address: String!) {
+      votes(
+        orderBy: timestamp
+        orderDirection: desc
+        where: { user: $address, organization: "optimism.eth" }
+      ) {
+        id
+        proposal {
+          id
+          description
+          timestamp
+        }
+        organization {
+          id
+        }
+        solution
+        timestamp
+        support
+      }
+    }
+  `;
+
+  const arbQuery = gql`
+    query Votes($address: String!) {
+      votes(
+        orderBy: timestamp
+        orderDirection: desc
+        where: { user: $address, organization: "arbitrum.eth" }
+      ) {
+        id
+        proposal {
+          id
+          description
+          timestamp
+        }
+        organization {
+          id
+        }
+        solution
+        timestamp
+        support
+      }
+    }
+  `;
+
+  useEffect(() => {
+    const fetchGraphData = async () => {
+      if (chain && chain.name == "Optimism") {
+        const op_gqdata: any = await op_client.query(opQuery, {
+          address: address
+        });
+        console.log("Urql: ", op_gqdata.data.votes);
+        setGraphData(op_gqdata.data.votes);
+
+        const op_counts = op_gqdata.data.votes.reduce(
+          (acc: any, curr: any) => {
+            const support = curr.support;
+            acc[support] = (acc[support] || 0) + 1;
+            return acc;
+          },
+          { 0: 0, 1: 0, 2: 0 }
+        );
+        setSupportCounts(op_counts);
+        setfirst(true);
+      } else if (chain && chain.name == "Arbitrum One") {
+        const arb_gqdata: any = await arb_client.query(arbQuery, {
+          address: address,
+        });
+        console.log("Arb gq data: ", arb_gqdata);
+        setGraphData(arb_gqdata.data.votes);
+
+        const arb_counts = arb_gqdata.data.votes.reduce(
+          (acc: any, curr: any) => {
+            const support = curr.support;
+            acc[support] = (acc[support] || 0) + 1;
+            return acc;
+          },
+          { 0: 0, 1: 0, 2: 0 }
+        );
+        setSupportCounts(arb_counts);
+        setfirst(true);
+      } else {
+        setGraphData([]);
+        setfirst(false);
+      }
+    };
+
+    fetchGraphData();
+  }, [chain.name, address]);
+
+  const totalData: number = graphData.length;
+  const dataPerPage: number = 5;
+  const totalPages: number = Math.ceil(totalData / dataPerPage);
+
+  useEffect(() => {
+    const fetchPageData = async () => {
+      const offset = (currentPage - 1) * dataPerPage;
+      const end = offset + dataPerPage;
+      const initialData = await graphData.slice(offset, end);
+      // console.log("initial data: ", initialData);
+      setPageData(initialData);
+      // if (initialData) {
+      setIsPageLoading(false);
+      // }
+    };
+    if (first) {
+      fetchPageData();
+    }
+    setOpenDesc(new Array(pageData.length).fill(false));
+  }, [currentPage, graphData]);
+
+  const chartData = {
+    labels: ["For", "Against", "Other"],
     datasets: [
       {
         label: "# of Votes",
-        data: [12, 19, 9],
+        data: [supportCounts[1], supportCounts[0], supportCounts[2]],
         backgroundColor: ["#0033A8", "#6B98FF", "#004DFF"],
         borderWidth: 1,
       },
     ],
   };
 
-  const [allProposals, setAllProposal] = useState(proposals);
-  const [currentPage, setCurrentPage] = useState(1);
-
-  const totalData: number = proposals.length;
-  const dataPerPage: number = 5;
-  const totalPages: number = Math.ceil(totalData / dataPerPage);
-
-  useEffect(() => {
-    const offset = (currentPage - 1) * dataPerPage;
-    const end = offset + dataPerPage;
-    const initialData = proposals.slice(offset, end);
-    setAllProposal(initialData);
-  }, [currentPage, dataPerPage]);
-
   return (
     <div className="pt-4">
-      <div className="grid grid-cols-5 pe-5 gap-4">
-        <div className="col-span-2 space-y-4">
-          <div className="flex bg-[#3E3D3D] text-white py-6 px-10 rounded-xl">
-            <div>
-              <div className="font-semibold text-xl">14</div>
-              <div className="text-sm"> Proposals Voted</div>
-            </div>
-            <div className="border-[0.5px] border-[#8E8E8E] mx-4 my-1"></div>
-            <div className="ps-2">
-              <div className="font-semibold text-xl">
-                2.56k <span className="text-sm font-normal">delegates</span>
-              </div>
-              <div className="text-sm"> Proposals Voted</div>
-            </div>
-          </div>
-
-          <div
-            style={{ boxShadow: "0px 4px 15.1px 0px rgba(0, 0, 0, 0.17)" }}
-            className="p-10 rounded-xl"
-          >
-            <Doughnut
-              data={data}
-              width={700}
-              height={350}
-              options={{
-                maintainAspectRatio: false,
-              }}
+       <div className="grid grid-cols-5 pe-5 gap-4 pb-6">
+      <div
+        style={{ boxShadow: "0px 4px 15.1px 0px rgba(0, 0, 0, 0.17)" }}
+        className="col-span-2 space-y-4 p-10 rounded-xl"
+      >
+        {isPageLoading ? (
+          <div className="flex pt-6 justify-center">
+            <Oval
+              visible={true}
+              height="40"
+              width="40"
+              color="#0500FF"
+              secondaryColor="#cdccff"
+              ariaLabel="oval-loading"
             />
           </div>
+        ) : first && !isPageLoading && pageData.length > 0 ? (
+          <Doughnut
+            data={chartData}
+            width={700}
+            height={350}
+            options={{
+              maintainAspectRatio: false,
+            }}
+          />
+        ) : (
+          <div className="flex text-center font-semibold h-full">
+            Sorry, you have not submitted any on chain votes!
+          </div>
+        )}
+      </div>
+      <div
+        style={{ boxShadow: "0px 4px 11.8px 0px rgba(0, 0, 0, 0.21)" }}
+        className="min-h-10 rounded-xl col-span-3 p-7"
+      >
+        <div className="font-semibold text-blue-shade-200 text-2xl py-2 ">
+          List of Proposals
         </div>
-        <div
-          style={{ boxShadow: "0px 4px 11.8px 0px rgba(0, 0, 0, 0.21)" }}
-          className="min-h-10 border border-[#D9D9D9] rounded-xl col-span-3 p-7"
-        >
-          <div className="font-semibold text-blue-shade-200 text-2xl py-2">
-            List of Proposals
-          </div>
 
-          <div className="h-[23rem]">
-            {allProposals.length > 0 ? (
-              allProposals.map((proposal, index) => (
-                <div key={index} className="flex justify-between border border-[#7C7C7C] text-sm px-3 py-2 rounded-lg items-center my-3">
-                  <div className="w-3/4">
-                    <div className={` ${styles.desc}`}>{proposal.title}</div>
-                    <span className="text-xs text-blue-shade-100 underline cursor-pointer">
-                      View
-                    </span>
+        <div className={`h-[23rem] overflow-y-auto ${styles.scrollbar}`}>
+          {isPageLoading ? (
+            <div className="flex pt-6 justify-center">
+              <Oval
+                visible={true}
+                height="40"
+                width="40"
+                color="#0500FF"
+                secondaryColor="#cdccff"
+                ariaLabel="oval-loading"
+              />
+            </div>
+          ) : first && !isPageLoading && pageData.length > 0 ? (
+            pageData.map((proposal: any, index: number) => (
+              <div
+                key={index}
+                className={`flex justify-between border border-[#7C7C7C] text-sm px-3 py-2 rounded-lg items-center my-3 `}
+              >
+                <div className="w-4/5">
+                  <div className={`${openDesc[index] ? "" : styles.desc}`}>
+                    {proposal.proposal.description}
                   </div>
-                  <div
-                    className={`text-white rounded-full px-3 py-[2px] ${
-                      proposal.status === "For"
-                        ? "bg-[#0033A8]"
-                        : proposal.status === "Against"
-                        ? "bg-[#6B98FF]"
-                        : "bg-[#004DFF]"
-                    }`}
+                  <span
+                    className="text-xs text-blue-shade-100 underline cursor-pointer"
+                    onClick={() => {
+                      const newOpenDesc = [...openDesc];
+                      newOpenDesc[index] = !newOpenDesc[index];
+                      setOpenDesc(newOpenDesc);
+                    }}
                   >
-                    {proposal.status}
-                  </div>
+                    {openDesc[index] ? "Close" : "View"}
+                  </span>
                 </div>
-              ))
-            ) : (
-              <div>No data</div>
-            )}
-          </div>
+                <div
+                  className={`text-white rounded-full px-3 py-[2px] ${
+                    proposal.support === 1
+                      ? "bg-[#0033A8]"
+                      : proposal.support === 0
+                      ? "bg-[#6B98FF]"
+                      : "bg-[#004DFF]"
+                  }`}
+                >
+                  {proposal.support === 1
+                    ? "For"
+                    : proposal.support === 0
+                    ? "Against"
+                    : "Other"}
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="pt-4 flex items-center flex-col justify-center">
+              <div className="text-3xl">☹️</div>
+              <div>Oops, no data available</div>
+            </div>
+          )}
+        </div>
 
-          <div className="pt-4 flex items-end bottom-0 justify-center">
+        {isPageLoading ? (
+          ""
+        ) : (
+          <div
+            className={`pt-4 flex items-end bottom-0 justify-center ${
+              graphData.length == 0 ? "hidden" : ""
+            }`}
+          >
             <Pagination
+              color="primary"
               total={totalPages}
               initialPage={1}
               page={currentPage}
@@ -184,8 +269,10 @@ function UserVotes() {
               showControls
             />
           </div>
-        </div>
+        )}
       </div>
+    </div>
+
     </div>
   );
 }
