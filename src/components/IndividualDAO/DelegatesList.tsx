@@ -20,6 +20,11 @@ function DelegatesList({ props }: { props: string }) {
   const router = useRouter();
   const path = usePathname();
   const searchParams = useSearchParams();
+  const [isShowing, setIsShowing] = useState(true);
+
+  const handleClose = () => {
+    setIsShowing(false);
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -88,6 +93,18 @@ function DelegatesList({ props }: { props: string }) {
 
   return (
     <div>
+      {isShowing && (
+      <div className="bg-yellow-200 border border-gray-300 rounded-md shadow-md text-gray-700 flex items-center p-3 w-70 mb-4" style={{width:"80%"}}>
+        <span>Data of the Delegates is retrieved from Karma API. Find out how they empower communities.</span> &nbsp; 
+        <a href="http://karmahq.xyz" target="_blank" rel="noopener noreferrer" className="text-blue-500 font-medium hover:underline">Click Here!🚀</a>
+        <button
+          className="flex ml-auto items-center justify-center p-1 text-gray-500 hover:text-red-500 bg-white border border-gray-300 rounded-md"
+          onClick={handleClose}
+        >
+          Close
+        </button>
+      </div>
+    )}
       <div className="flex items-center justify-between">
         <div
           style={{ background: "rgba(238, 237, 237, 0.36)" }}
@@ -106,6 +123,7 @@ function DelegatesList({ props }: { props: string }) {
           </span>
         </div>
       </div>
+      
 
       <div className="py-8 pe-10 font-poppins">
         {isPageLoading ? (

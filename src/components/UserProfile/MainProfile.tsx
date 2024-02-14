@@ -421,7 +421,7 @@ function MainProfile() {
         >
           Office Hours
         </button>
-        <button
+        {/* <button
           className={`border-b-2 py-4 px-2 outline-none ${
             searchParams.get("active") === "claimNft"
               ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
@@ -430,7 +430,7 @@ function MainProfile() {
           onClick={() => router.push(path + "?active=claimNft")}
         >
           Claim NFTs
-        </button>
+        </button> */}
       </div>
 
       <div className="py-6 ps-16">
@@ -442,7 +442,7 @@ function MainProfile() {
         ) : (
           ""
         )}
-        {searchParams.get("active") === "claimNft" ? <ClaimNFTs /> : ""}
+        {/* {searchParams.get("active") === "claimNft" ? <ClaimNFTs /> : ""} */}
       </div>
     </div>
   );

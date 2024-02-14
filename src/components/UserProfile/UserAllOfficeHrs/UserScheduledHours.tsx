@@ -2,7 +2,9 @@ import React from 'react'
 
 function UserScheduledHours() {
   return (
-    <div>UserScheduledHours</div>
+    <div>
+      <b>Coming Soon 🚀</b>
+    </div>
   )
 }
 
