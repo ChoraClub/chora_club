@@ -4,6 +4,7 @@ import { NextResponse, NextRequest } from "next/server";
 
 // Define the request body type
 interface StoreAvailabilityRequestBody {
+  dao_name: string;
   userAddress: string;
   timeSlotSizeMinutes: number;
   allowedDates: string[];
@@ -22,6 +23,7 @@ interface StoreAvailabilityResponseBody {
   success: boolean;
   data?: {
     _id: string;
+    dao_name: string;
     userAddress: string;
     timeSlotSizeMinutes: number;
     allowedDates: string[];
@@ -44,6 +46,7 @@ export async function POST(
   res: NextApiResponse<StoreAvailabilityResponseBody>
 ) {
   const {
+    dao_name,
     userAddress,
     timeSlotSizeMinutes,
     allowedDates,
@@ -65,6 +68,7 @@ export async function POST(
     // Insert the new availability document
     console.log("Inserting availability document...");
     const result = await collection.insertOne({
+      dao_name,
       userAddress,
       timeSlotSizeMinutes,
       allowedDates,
