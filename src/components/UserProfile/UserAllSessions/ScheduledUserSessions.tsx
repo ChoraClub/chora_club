@@ -252,6 +252,10 @@ function ScheduledUserSessions() {
           </div>
           <button onClick={handleApplyButtonClick}>Apply</button>
         </div>
+        <br></br>
+        <div>
+          <b>Development in Progress🚀 </b>
+        </div>
       </div>
     </>
   );

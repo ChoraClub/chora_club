@@ -82,6 +82,7 @@ function DelegateVotes({ props }: { props: Type }) {
   useEffect(() => {
     const fetchGraphData = async () => {
       if (props.daoDelegates == "optimism") {
+       
         const op_gqdata: any = await op_client.query(opQuery, {
           address: props.individualDelegate,
         });
