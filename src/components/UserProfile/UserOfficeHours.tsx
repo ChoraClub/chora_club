@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import UserScheduledHours from "./UserAllOfficeHrs/UserScheduledHours";
 import UserRecordedHours from "./UserAllOfficeHrs/UserRecordedHours";
+import UserUpcomingHours from "./UserAllOfficeHrs/UserUpcomingHours";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 function UserOfficeHours() {
@@ -25,6 +26,18 @@ function UserOfficeHours() {
             Schedule
           </button>
           <button
+            className={`py-2  ${
+              searchParams.get("hours") === "upcoming"
+                ? "text-[#3E3D3D] font-bold"
+                : "text-[#7C7C7C]"
+            }`}
+            onClick={() =>
+              router.push(path + "?active=officeHours&hours=upcoming")
+            }
+          >
+            Upcoming
+          </button>
+          <button
             className={`py-2 ${
               searchParams.get("hours") === "recorded"
                 ? "text-[#3E3D3D] font-bold"
@@ -40,6 +53,8 @@ function UserOfficeHours() {
 
         <div className="py-10 pr-32 ">
           {searchParams.get("hours") === "schedule" && <UserScheduledHours />}
+          {searchParams.get("hours") === "upcoming" && <UserUpcomingHours />}
+
           {searchParams.get("hours") === "recorded" && <UserRecordedHours />}
         </div>
       </div>
