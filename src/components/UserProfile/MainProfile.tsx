@@ -27,8 +27,11 @@ import {
   useDisclosure,
 } from "@nextui-org/react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { useAccount} from "wagmi";
-import { useNetwork } from 'wagmi'
+import { useAccount } from "wagmi";
+import { useNetwork } from "wagmi";
+import { walletClient } from "@/helpers/signer";
+import dao_abi from "../../artifacts/Dao.sol/GovernanceToken.json";
+import axios from "axios";
 
 function MainProfile() {
   const { address } = useAccount();
@@ -45,7 +48,7 @@ function MainProfile() {
     twitter: "https://twitter.com/",
     discourse: "https://google.com/",
     discord: "https://discord.com/",
-    github:"https://github.com/"
+    github: "https://github.com/",
   });
   const [twitter, setTwitter] = useState("");
   const [discord, setDiscord] = useState("");
@@ -63,6 +66,48 @@ function MainProfile() {
     }
   };
 
+  const handleAttestation = async () => {
+    const data = {
+      recipient: "0xbFc4A28D8F1003Bec33f4Fdb7024ad6ad1605AA8",
+      meetingId: "abc-def-ggi",
+      meetingType: 1,
+      startTime: 16452456, // Example start time (in UNIX timestamp format)
+      endTime: 16452492, // Example end time (in UNIX timestamp format)
+    };
+
+    console.log(window.location.origin);
+    const headers = {
+      "Content-Type": "application/json",
+      //   Origin: window.location.origin, // Set the Origin header to your frontend URL
+    };
+
+    try {
+      const response = await axios.post("/api/attest-offchain", data, {
+        headers,
+      });
+      console.log(response.data);
+      // Handle response as needed
+    } catch (error) {
+      console.error("Error:", error);
+      // Handle error
+    }
+  };
+
+  // Pass the address of whom you want to delegate the voting power to
+  const handleDelegateVotes = async (to: string) => {
+    const address = await walletClient.getAddresses();
+    const address1 = address[0];
+
+    console.log(walletClient);
+    const delegateTx = await walletClient.writeContract({
+      address: "0x4200000000000000000000000000000000000042",
+      abi: dao_abi.abi,
+      functionName: "delegate",
+      args: [to],
+      account: address1,
+    });
+    console.log(delegateTx);
+  };
   const handleCopy = (addr: string) => {
     copy(addr);
     toast("Address Copied");
@@ -130,13 +175,10 @@ function MainProfile() {
         }
 
         if (details.data.delegate.githubHandle != null) {
-          setGithub(
-            `https://github.com/${details.data.delegate.githubHandle}`
-          );
+          setGithub(`https://github.com/${details.data.delegate.githubHandle}`);
         }
       } catch (error) {
         console.error("Error fetching data:", error);
-  
       }
     };
 
@@ -152,13 +194,13 @@ function MainProfile() {
             onMouseEnter={() => setHovered(true)}
             onMouseLeave={() => setHovered(false)}
           >
-              <Image
-                src={profileDetails?.profilePicture || user}
-                alt="user"
-                width={40}
-                height={40}
-                className="w-40 rounded-3xl"
-              />
+            <Image
+              src={profileDetails?.profilePicture || user}
+              alt="user"
+              width={40}
+              height={40}
+              className="w-40 rounded-3xl"
+            />
             <div
               className={`absolute top-3 right-3 cursor-pointer  ${
                 hovered ? "bg-gray-50 rounded-full p-1" : "hidden"
@@ -177,57 +219,57 @@ function MainProfile() {
 
           <div className="px-4">
             <div className=" flex items-center py-1">
-            <div className="font-bold text-lg pr-4">
-              {profileDetails?.ensName ? (
-                profileDetails?.ensName
-              ) : (
-                <>
-                {`${address}`.substring(0, 6)} ...{" "}
-                {`${address}`.substring(`${address}`.length - 4)}
-              </>
-              )}
-            </div>
+              <div className="font-bold text-lg pr-4">
+                {profileDetails?.ensName ? (
+                  profileDetails?.ensName
+                ) : (
+                  <>
+                    {`${address}`.substring(0, 6)} ...{" "}
+                    {`${address}`.substring(`${address}`.length - 4)}
+                  </>
+                )}
+              </div>
               <div className="flex gap-3">
-              <Link
-                href={twitter}
-                className={`border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 ${
-                  twitter == "" ? "hidden" : ""
-                }`}
-                style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                target="_blank"
-              >
-                <FaXTwitter color="#7C7C7C" size={12} />
-              </Link>
-              <Link
-                href={discourse}
-                className={`border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1  ${
-                  discourse == "" ? "hidden" : ""
-                }`}
-                style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                target="_blank"
-              >
-                <BiSolidMessageRoundedDetail color="#7C7C7C" size={12} />
-              </Link>
-              <Link
-                href={discord}
-                className={`border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 ${
-                  discord == "" ? "hidden" : ""
-                }`}
-                style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                target="_blank"
-              >
-                <FaDiscord color="#7C7C7C" size={12} />
-              </Link>
-              <Link
-                href={github}
-                className={`border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 ${
-                  github == "" ? "hidden" : ""
-                }`}
-                style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                target="_blank"
-              >
-                <FaGithub color="#7C7C7C" size={12} />
-              </Link>
+                <Link
+                  href={twitter}
+                  className={`border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 ${
+                    twitter == "" ? "hidden" : ""
+                  }`}
+                  style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
+                  target="_blank"
+                >
+                  <FaXTwitter color="#7C7C7C" size={12} />
+                </Link>
+                <Link
+                  href={discourse}
+                  className={`border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1  ${
+                    discourse == "" ? "hidden" : ""
+                  }`}
+                  style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
+                  target="_blank"
+                >
+                  <BiSolidMessageRoundedDetail color="#7C7C7C" size={12} />
+                </Link>
+                <Link
+                  href={discord}
+                  className={`border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 ${
+                    discord == "" ? "hidden" : ""
+                  }`}
+                  style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
+                  target="_blank"
+                >
+                  <FaDiscord color="#7C7C7C" size={12} />
+                </Link>
+                <Link
+                  href={github}
+                  className={`border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 ${
+                    github == "" ? "hidden" : ""
+                  }`}
+                  style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
+                  target="_blank"
+                >
+                  <FaGithub color="#7C7C7C" size={12} />
+                </Link>
                 <Tooltip
                   content="Edit social links"
                   placement="right"
@@ -343,11 +385,11 @@ function MainProfile() {
 
             <div className="flex gap-4 py-1">
               <div className="text-[#4F4F4F] border-[0.5px] border-[#D9D9D9] rounded-md px-3 py-1">
-              <span className="text-blue-shade-200 font-semibold">
-                {formatNumber(Number(profileDetails?.delegatedVotes))}
-                &nbsp;
-              </span>
-              delegated tokens
+                <span className="text-blue-shade-200 font-semibold">
+                  {formatNumber(Number(profileDetails?.delegatedVotes))}
+                  &nbsp;
+                </span>
+                delegated tokens
               </div>
               <div className="text-[#4F4F4F] border-[0.5px] border-[#D9D9D9] rounded-md px-3 py-1">
                 Delegated from
@@ -359,8 +401,22 @@ function MainProfile() {
             </div>
 
             <div className="pt-2 flex gap-5">
-              <button className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]">
-                Delegate
+              {/* pass address of whom you want to delegate the voting power to */}
+              <button
+                className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
+                onClick={() =>
+                  handleDelegateVotes(
+                    "0x51ff9c7A199eA95a6E75Dc0f7f2bE516cEb8297b"
+                  )
+                }
+              >
+                Delegatee
+              </button>
+              <button
+                className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
+                onClick={() => handleAttestation()}
+              >
+                Attest
               </button>
               {/* <div className="">
                 <select className="outline-none border border-blue-shade-200 text-blue-shade-200 rounded-full py-2 px-3">
