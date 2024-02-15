@@ -1,10 +1,15 @@
 import React, { useState } from "react";
 import ScheduledUserSessions from "./UserAllSessions/ScheduledUserSessions";
 import BookedUserSessions from "./UserAllSessions/BookedUserSessions";
-import AttendingUserSessions from "./UserAllSessions/AttendingUserSessions";
+// import AttendingUserSessions from "./UserAllSessions/AttendingUserSessions";
 import RecordedUserSessions from "./UserAllSessions/RecordedUserSessions";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-
+import text1 from "@/assets/images/daos/texture1.png";
+import text2 from "@/assets/images/daos/texture2.png";
+import EventTile from "../utils/EventTile";
+import AttendingUserSessions from "./UserAllSessions/AttendingUserSessions";
+import HostedUserSessions from "./UserAllSessions/HostedUserSessions";
+import AttendedUserSessions from "./UserAllSessions/AttendedUserSessions";
 function UserSessions() {
   const router = useRouter();
   const path = usePathname();
@@ -50,15 +55,27 @@ function UserSessions() {
           </button>
           <button
             className={`py-2 ${
-              searchParams.get("session") === "recorded"
+              searchParams.get("session") === "hosted"
                 ? "text-[#3E3D3D] font-bold"
                 : "text-[#7C7C7C]"
             }`}
             onClick={() =>
-              router.push(path + "?active=sessions&session=recorded")
+              router.push(path + "?active=sessions&session=hosted")
             }
           >
-            Recorded
+            Hosted
+          </button>
+          <button
+            className={`py-2 ${
+              searchParams.get("session") === "attended"
+                ? "text-[#3E3D3D] font-bold"
+                : "text-[#7C7C7C]"
+            }`}
+            onClick={() =>
+              router.push(path + "?active=sessions&session=attended")
+            }
+          >
+            Attended
           </button>
         </div>
 
@@ -66,12 +83,18 @@ function UserSessions() {
           {searchParams.get("session") === "schedule" && (
             <ScheduledUserSessions />
           )}
-          {searchParams.get("session") === "book" && <BookedUserSessions />}
-          {searchParams.get("session") === "attending" && (
-            <AttendingUserSessions />
+          {searchParams.get("session") === "book" &&  
+          (
+            <BookedUserSessions />
           )}
-          {searchParams.get("session") === "recorded" && (
-            <RecordedUserSessions />
+          {searchParams.get("session") === "attending" && (
+            <AttendingUserSessions/>
+          )}
+          {searchParams.get("session") === "hosted" && (
+            <HostedUserSessions />
+          )}
+          {searchParams.get("session") === "attended" && (
+            <AttendedUserSessions />
           )}
         </div>
       </div>

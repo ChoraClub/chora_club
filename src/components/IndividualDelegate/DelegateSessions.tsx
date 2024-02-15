@@ -4,6 +4,7 @@ import DelegateUpcomingSession from "./AllSessions/DelegateUpcomingSession";
 import DelegateRecordedSession from "./AllSessions/DelegateRecordedSession";
 import BookSession from "./AllSessions/BookSession";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import DelegateHostedSessions from "./AllSessions/DelegateHostedSessions";
 
 interface Type {
   daoDelegates: string;
@@ -57,15 +58,27 @@ function DelegateSessions({ props }: { props: Type }) {
           </button>
           <button
             className={`py-2 ${
-              searchParams.get("session") === "recorded"
+              searchParams.get("session") === "hosted"
                 ? "text-[#3E3D3D] font-bold"
                 : "text-[#7C7C7C]"
             }`}
             onClick={() =>
-              router.push(path + "?active=delegatesSession&session=recorded")
+              router.push(path + "?active=delegatesSession&session=hosted")
             }
           >
-            Recorded
+            Hosted
+          </button>
+          <button
+            className={`py-2 ${
+              searchParams.get("session") === "attended"
+                ? "text-[#3E3D3D] font-bold"
+                : "text-[#7C7C7C]"
+            }`}
+            onClick={() =>
+              router.push(path + "?active=delegatesSession&session=attended")
+            }
+          >
+            Attended
           </button>
         </div>
 
@@ -77,8 +90,11 @@ function DelegateSessions({ props }: { props: Type }) {
           {searchParams.get("session") === "upcoming" && (
             <DelegateUpcomingSession props={props} />
           )}
-          {searchParams.get("session") === "recorded" && (
-            <DelegateRecordedSession props={props} />
+          {searchParams.get("session") === "hosted" && (
+            <DelegateHostedSessions props={props} />
+          )}
+          {searchParams.get("session") === "attended" && (
+            <DelegateHostedSessions props={props} />
           )}
         </div>
       </div>

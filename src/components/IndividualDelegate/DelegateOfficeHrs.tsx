@@ -3,6 +3,8 @@ import OngoingDelegateOfficeHrs from "./DelegateOfficeHours/OngoingDelegateOffic
 import UpcomingDelegateOfficeHrs from "./DelegateOfficeHours/UpcomingDelegateOfficeHrs";
 import RecordedDelegateOfficeHrs from "./DelegateOfficeHours/RecordedDelegateOfficeHrs";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import HostedDelegateOfficeHrs from "./DelegateOfficeHours/HostedDelegateOfficeHrs";
+import AttendedDelegateOfficeHrs from "./DelegateOfficeHours/AttendedDelegateOfficeHrs";
 
 interface Type {
   daoDelegates: string;
@@ -46,15 +48,27 @@ function DelegateOfficeHrs({ props }: { props: Type }) {
           </button>
           <button
             className={`py-2 ${
-              searchParams.get("hours") === "recorded"
+              searchParams.get("hours") === "hosted"
                 ? "text-[#3E3D3D] font-bold"
                 : "text-[#7C7C7C]"
             }`}
             onClick={() =>
-              router.push(path + "?active=officeHours&hours=recorded")
+              router.push(path + "?active=officeHours&hours=hosted")
             }
           >
-            Recorded
+            Hosted
+          </button>
+          <button
+            className={`py-2 ${
+              searchParams.get("hours") === "attended"
+                ? "text-[#3E3D3D] font-bold"
+                : "text-[#7C7C7C]"
+            }`}
+            onClick={() =>
+              router.push(path + "?active=officeHours&hours=attended")
+            }
+          >
+            Attended
           </button>
         </div>
 
@@ -65,9 +79,13 @@ function DelegateOfficeHrs({ props }: { props: Type }) {
           {searchParams.get("hours") === "upcoming" && (
             <UpcomingDelegateOfficeHrs props={props} />
           )}
-          {searchParams.get("hours") === "recorded" && (
-            <RecordedDelegateOfficeHrs props={props} />
+          {searchParams.get("hours") === "hosted" && (
+            <HostedDelegateOfficeHrs props={props} />
           )}
+          {searchParams.get("hours") === "attended" && (
+            <AttendedDelegateOfficeHrs props={props} />
+          )}
+         
         </div>
       </div>
     </div>

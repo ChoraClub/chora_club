@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import text1 from "@/assets/images/daos/texture1.png";
-import text2 from "@/assets/images/daos/texture2.png";
 import Tile from "@/components/utils/Tile";
 
 interface Type {
@@ -8,17 +7,17 @@ interface Type {
   individualDelegate: string;
 }
 
-function DelegateUpcomingSession({ props }: { props: Type }) {
+function HostedDelegateOfficeHrs({ props }: { props: Type }) {
   const details = [
     {
       img: text1,
-      title: "Optimism Open Forum: Governance, Applications",
-      dao: "Optimism",
+      title: "Open Forum: Governance, Applications, and Beyond",
+      dao: props.daoDelegates,
       participant: 12,
       attendee: "olimpio.eth",
       host: "lindaxie.eth",
-      started: "07/09/2023 12:15 PM IST",
-      desc: "Join the conversation about the future of Optimism. Discuss governance proposals, dApp adoption, and technical developments.",
+      started: "22/09/2023 12:15 PM IST",
+      desc: `Join the conversation about the future of ${props.daoDelegates}. Discuss governance proposals, dApp adoption, and technical developments.`,
     },
   ];
 
@@ -29,11 +28,11 @@ function DelegateUpcomingSession({ props }: { props: Type }) {
     setSessionDetails(details);
     setDataLoading(false);
   }, []);
+
+
   return (
-    <>
-      <Tile sessionDetails={sessionDetails} dataLoading={dataLoading} isEvent="Upcoming" isOfficeHour={false} />
-    </>
+    <Tile sessionDetails={sessionDetails} dataLoading={dataLoading} isEvent="Recorded" isOfficeHour={true} />
   );
 }
 
-export default DelegateUpcomingSession;
+export default HostedDelegateOfficeHrs;
