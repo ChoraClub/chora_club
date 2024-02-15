@@ -28,6 +28,8 @@ import {
 } from "@nextui-org/react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useAccount } from "wagmi";
+import { walletClient } from "@/helpers/signer";
+import dao_abi from "../../artifacts/Dao.sol/GovernanceToken.json";
 
 function MainProfile() {
   const { address } = useAccount();
@@ -57,6 +59,20 @@ function MainProfile() {
     }
   };
 
+  const handleDelegateVotes = async () => {
+    const address = await walletClient.getAddresses();
+    const address1 = address[0];
+
+    console.log(walletClient);
+    const delegateTx = await walletClient.writeContract({
+      address: "0x4200000000000000000000000000000000000042",
+      abi: dao_abi.abi,
+      functionName: "delegate",
+      args: ["0x51ff9c7A199eA95a6E75Dc0f7f2bE516cEb8297b"],
+      account: address1,
+    });
+    console.log(delegateTx);
+  };
   const handleCopy = (addr: string) => {
     copy(addr);
     toast("Address Copied");
@@ -293,8 +309,11 @@ function MainProfile() {
             </div>
 
             <div className="pt-2 flex gap-5">
-              <button className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]">
-                Delegate
+              <button
+                className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
+                onClick={() => handleDelegateVotes()}
+              >
+                Delegatee
               </button>
               {/* <div className="">
                 <select className="outline-none border border-blue-shade-200 text-blue-shade-200 rounded-full py-2 px-3">
