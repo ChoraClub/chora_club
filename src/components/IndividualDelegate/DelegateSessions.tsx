@@ -104,7 +104,9 @@ function DelegateSessions({ props }: { props: Type }) {
         </div>
 
         <div className="py-10">
-          {searchParams.get("session") === "book" && <BookSession />}
+          {searchParams.get("session") === "book" && (
+            <BookSession props={props} />
+          )}
           {searchParams.get("session") === "ongoing" && (
             <>
             <Tile sessionDetails={sessionDetails} dataLoading={dataLoading} isEvent="Ongoing" isOfficeHour={false} />

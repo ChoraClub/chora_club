@@ -9,8 +9,8 @@ declare global {
   }
 }
 
-let publicClient;
-let walletClient;
+let publicClient: any;
+let walletClient: any;
 
 if (typeof window !== "undefined" && window.ethereum) {
   // Instantiate public client and wallet client
