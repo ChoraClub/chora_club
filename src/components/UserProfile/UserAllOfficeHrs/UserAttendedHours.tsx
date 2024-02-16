@@ -13,7 +13,7 @@
 //           participant: 12,
 //           attendee: "0xf4b0556b9b6f53e00a1fdd2b0478ce841991d8fa",
 //           host: "lindaxie.eth",
-//           started: "07/09/2023 12:15 PM IST",
+//           started: "07/09/2023 12:15 PM EST",
 //           desc: `Join the conversation about the future of ${chain && chain.name}. Discuss governance proposals, dApp adoption, and technical developments.`,
 //         },
 //       ];

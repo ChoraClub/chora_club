@@ -22,7 +22,7 @@ function DelegateOfficeHrs({ props }: { props: Type }) {
       participant: 12,
       attendee: "olimpio.eth",
       host: "lindaxie.eth",
-      started: "22/09/2023 12:15 PM IST",
+      started: "22/09/2023 12:15 PM EST",
       desc: `Join the conversation about the future of ${props.daoDelegates}. Discuss governance proposals, dApp adoption, and technical developments.`,
     },
   ];
