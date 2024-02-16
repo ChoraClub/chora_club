@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import search from "@/assets/images/daos/search.png";
 import Image from "next/image";
-import OngoingOfficeHours from "./AllDelegatesOfficeHours/OngoingOfficeHours";
-import UpcomingOfficeHours from "./AllDelegatesOfficeHours/UpcomingOfficeHours";
-import RecordedOfficeHours from "./AllDelegatesOfficeHours/RecordedOfficeHours";
+import text1 from "@/assets/images/daos/texture1.png";
+import text2 from "@/assets/images/daos/texture2.png";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import Tile from "../utils/Tile";
 
 function OfficeHours({ props }: { props: string }) {
   const [activeSection, setActiveSection] = useState("ongoing");
@@ -12,6 +12,46 @@ function OfficeHours({ props }: { props: string }) {
   const router = useRouter();
   const path = usePathname();
   const searchParams = useSearchParams();
+  const details = [
+    {
+      img: text1,
+      title: "Open Forum: Governance, Applications, and Beyond",
+      dao: props,
+      participant: 12,
+      attendee: "olimpio.eth",
+      host: "0xf4b0556b9b6f53e00a1fdd2b0478ce841991d8fa",
+      started: "15/09/2023 12:15 PM EST",
+      desc: `Join the conversation about the future of ${props}. Discuss governance proposals, dApp adoption, and technical developments.`,
+    },
+    {
+      img: text2,
+      title: "Open Forum: Governance, Applications, and Beyond",
+      dao: props,
+      participant: 5,
+      attendee: "olimpio.eth",
+      host: "0x1b686ee8e31c5959d9f5bbd8122a58682788eead",
+      started: "15/09/2023 12:15 PM EST",
+      desc: `Join the conversation about the future of ${props}. Discuss governance proposals, dApp adoption, and technical developments.`,
+    },
+  ];
+
+  const [sessionDetails, setSessionDetails] = useState(details);
+  const [dataLoading, setDataLoading] = useState(true);
+
+  useEffect(() => {
+    setSessionDetails(details);
+    setDataLoading(false);
+  }, []);
+  useEffect(() => {
+
+    const filtered = details.filter(
+      (item) =>
+        item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.host.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    console.log("Filteres", filtered)
+    setSessionDetails(filtered);
+  }, [searchQuery]);
 
   return (
     <div>
@@ -74,13 +114,15 @@ function OfficeHours({ props }: { props: string }) {
 
         <div className="py-10">
           {searchParams.get("hours") === "ongoing" && (
-            <OngoingOfficeHours params={searchQuery} props={props} />
+            <Tile sessionDetails={sessionDetails} dataLoading={dataLoading} isEvent="Ongoing" isOfficeHour={true} />
           )}
           {searchParams.get("hours") === "upcoming" && (
-            <UpcomingOfficeHours params={searchQuery} props={props} />
+            <Tile sessionDetails={sessionDetails} dataLoading={dataLoading} isEvent="Upcoming" isOfficeHour={true} />
           )}
           {searchParams.get("hours") === "recorded" && (
-            <RecordedOfficeHours params={searchQuery} props={props} />
+           <div> Hello
+            <Tile sessionDetails={sessionDetails} dataLoading={dataLoading} isEvent="Recorded" isOfficeHour={true} />
+            </div>
           )}
         </div>
       </div>

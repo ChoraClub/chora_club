@@ -1,10 +1,7 @@
-import React, { useState } from "react";
-import OngoingDelegateOfficeHrs from "./DelegateOfficeHours/OngoingDelegateOfficeHrs";
-import UpcomingDelegateOfficeHrs from "./DelegateOfficeHours/UpcomingDelegateOfficeHrs";
-import RecordedDelegateOfficeHrs from "./DelegateOfficeHours/RecordedDelegateOfficeHrs";
+import React, { useState, useEffect } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import HostedDelegateOfficeHrs from "./DelegateOfficeHours/HostedDelegateOfficeHrs";
-import AttendedDelegateOfficeHrs from "./DelegateOfficeHours/AttendedDelegateOfficeHrs";
+import text1 from "@/assets/images/daos/texture1.png";
+import Tile from "../utils/Tile";
 
 interface Type {
   daoDelegates: string;
@@ -17,6 +14,26 @@ function DelegateOfficeHrs({ props }: { props: Type }) {
   const router = useRouter();
   const path = usePathname();
   const searchParams = useSearchParams();
+  const details = [
+    {
+      img: text1,
+      title: "Open Forum: Governance, Applications, and Beyond",
+      dao: props.daoDelegates,
+      participant: 12,
+      attendee: "olimpio.eth",
+      host: "lindaxie.eth",
+      started: "22/09/2023 12:15 PM IST",
+      desc: `Join the conversation about the future of ${props.daoDelegates}. Discuss governance proposals, dApp adoption, and technical developments.`,
+    },
+  ];
+
+  const [sessionDetails, setSessionDetails] = useState(details);
+  const [dataLoading, setDataLoading] = useState(true);
+
+  useEffect(() => {
+    setSessionDetails(details);
+    setDataLoading(false);
+  }, []);
 
   return (
     <div>
@@ -74,16 +91,16 @@ function DelegateOfficeHrs({ props }: { props: Type }) {
 
         <div className="py-10">
           {searchParams.get("hours") === "ongoing" && (
-            <OngoingDelegateOfficeHrs props={props} />
+            <Tile sessionDetails={sessionDetails} dataLoading={dataLoading} isEvent="Ongoing" isOfficeHour={true} />
           )}
           {searchParams.get("hours") === "upcoming" && (
-            <UpcomingDelegateOfficeHrs props={props} />
+            <Tile sessionDetails={sessionDetails} dataLoading={dataLoading} isEvent="Upcoming" isOfficeHour={true} />
           )}
           {searchParams.get("hours") === "hosted" && (
-            <HostedDelegateOfficeHrs props={props} />
+             <Tile sessionDetails={sessionDetails} dataLoading={dataLoading} isEvent="Recorded" isOfficeHour={true} />
           )}
           {searchParams.get("hours") === "attended" && (
-            <AttendedDelegateOfficeHrs props={props} />
+             <Tile sessionDetails={sessionDetails} dataLoading={dataLoading} isEvent="Recorded" isOfficeHour={true} />
           )}
          
         </div>
