@@ -1,6 +1,7 @@
-import React from "react";
+import React,{useState} from "react";
 import Image, { StaticImageData } from "next/image";
 import { Oval } from "react-loader-spinner";
+import IndividualTileModal from "./IndividualTileModal";
 
 interface Type {
   img: StaticImageData;
@@ -11,6 +12,7 @@ interface Type {
   started: string;
   desc: string;
   attendee:string;
+  videoUrl?: string;
 }
 
 interface TileProps {
@@ -21,6 +23,15 @@ interface TileProps {
 }
 
 function Tile({ sessionDetails, dataLoading, isEvent, isOfficeHour }: TileProps) {
+  const [selectedTileIndex, setSelectedTileIndex] = useState<number | null>(null);
+
+  const openModal = (index: number) => {
+    setSelectedTileIndex(index);
+  };
+
+  const closeModal = () => {
+    setSelectedTileIndex(null);
+  };
   return (
     <div className="space-y-6">
       {sessionDetails.length > 0 ? (
@@ -37,8 +48,9 @@ function Tile({ sessionDetails, dataLoading, isEvent, isOfficeHour }: TileProps)
           sessionDetails.map((data, index) => (
             <div
               key={index}
-              className="flex p-5 rounded-[2rem]"
+              className="flex p-5 rounded-[2rem] cursor-pointer"
               style={{ boxShadow: "0px 4px 26.7px 0px rgba(0, 0, 0, 0.10)" }}
+              onClick={() => openModal(index)}
             >
               <Image
                 src={data.img}
@@ -104,10 +116,6 @@ function Tile({ sessionDetails, dataLoading, isEvent, isOfficeHour }: TileProps)
                     </div>
                   </div>)
                 }
-               
-
-
-             
 
                 <div className="text-[#1E1E1E] text-sm">{data.desc}</div>
               </div>
@@ -122,6 +130,19 @@ function Tile({ sessionDetails, dataLoading, isEvent, isOfficeHour }: TileProps)
           </div>
         </div>
       )}
+      
+      {selectedTileIndex !== null && isEvent === "Recorded" ?(
+        <IndividualTileModal
+          title={sessionDetails[selectedTileIndex].title}
+          description={sessionDetails[selectedTileIndex].desc}
+          videoUrl={sessionDetails[selectedTileIndex].videoUrl || ""}
+          date={sessionDetails[selectedTileIndex].started}
+          host={sessionDetails[selectedTileIndex].host}
+          attendee={sessionDetails[selectedTileIndex].attendee}
+          dao={sessionDetails[selectedTileIndex].dao}
+          onClose={closeModal}
+        />
+      ): null}
     </div>
   );
 }
