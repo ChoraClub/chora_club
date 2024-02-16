@@ -120,7 +120,7 @@ function OfficeHours({ props }: { props: string }) {
             <Tile sessionDetails={sessionDetails} dataLoading={dataLoading} isEvent="Upcoming" isOfficeHour={true} />
           )}
           {searchParams.get("hours") === "recorded" && (
-           <div> Hello
+           <div> 
             <Tile sessionDetails={sessionDetails} dataLoading={dataLoading} isEvent="Recorded" isOfficeHour={true} />
             </div>
           )}
