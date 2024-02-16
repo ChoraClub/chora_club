@@ -1,6 +1,7 @@
 "use client";
-import Image, { StaticImageData } from "next/image";
-import React, { useEffect, useState } from "react";
+
+import React, { useState, useEffect } from "react";
+import Image,{StaticImageData} from "next/image";
 import search from "@/assets/images/daos/search.png";
 import op_logo from "@/assets/images/daos/op.png";
 import arb_logo from "@/assets/images/daos/arbitrum.jpg";
@@ -18,22 +19,29 @@ function ExploreDAOs() {
   const [status, setStatus] = useState(true);
 
   const router = useRouter();
+  const [showNotification, setShowNotification] = useState(true);
+
+  useEffect(() => {
+    const storedStatus = sessionStorage.getItem("notificationStatus");
+    setShowNotification(storedStatus !== "closed");
+  }, []);
+
+  const handleCloseNotification = () => {
+    sessionStorage.setItem("notificationStatus", "closed");
+    setShowNotification(false);
+  };
 
   const handleSearchChange = (query: string) => {
-    setDaoInfo(daoInfo);
     setSearchQuery(query);
-
     const filtered = dao_info.filter((item) =>
       item.name.toLowerCase().startsWith(query.toLowerCase())
     );
-
     setDaoInfo(filtered);
   };
 
   const handleClick = (name: string, img: StaticImageData) => {
     const formatted = name.toLowerCase();
     const localData = JSON.parse(localStorage.getItem("visitedDao") || "{}");
-    // console.log("saved data: ", localData);
     localStorage.setItem(
       "visitedDao",
       JSON.stringify({ ...localData, [formatted]: [formatted, img] })
@@ -41,8 +49,32 @@ function ExploreDAOs() {
     router.push(`/${formatted}?active=delegatesList&page=0`);
   };
 
+  const handleClose = () => {
+    setStatus(false);
+    localStorage.setItem("hasSeenNotification", "true"); 
+  };
+
   return (
     <div className="p-6">
+      {showNotification && ( 
+        <div
+        className={`flex absolute items-center justify-center top-4 rounded-full font-poppins text-sm font-medium left-[34%] w-[32rem] ${
+          status ? "" : "hidden"
+        }`}
+      >
+        <div className="py-2 bg-blue-shade-100 text-white rounded-full px-7">
+          To ensure optimal user experience, please note that our site is
+          designed to be responsive on desktop devices.
+        </div>
+        <div
+          className="bg-red-600 hover:bg-red-700 p-2 rounded-full cursor-pointer ml-3"
+          onClick={handleCloseNotification}
+        >
+          <ImCross color="#fff" size={10} />
+        </div>
+      </div>
+      )}
+
       <div className="">
         <div className="text-blue-shade-200 font-medium text-4xl font-quanty pb-4">
           Explore DAOs
@@ -97,23 +129,6 @@ function ExploreDAOs() {
               No such Dao available
             </div>
           )}
-        </div>
-      </div>
-
-      <div
-        className={`flex absolute items-center justify-center top-4 rounded-full font-poppins text-sm font-medium left-[34%] w-[32rem] ${
-          status ? "" : "hidden"
-        }`}
-      >
-        <div className="py-2 bg-blue-shade-100 text-white rounded-full px-7">
-          To ensure optimal user experience, please note that our site is
-          designed to be responsive on desktop devices.
-        </div>
-        <div
-          className="bg-red-600 hover:bg-red-700 p-2 rounded-full cursor-pointer ml-3"
-          onClick={() => setStatus(false)}
-        >
-          <ImCross color="#fff" size={10} />
         </div>
       </div>
     </div>
