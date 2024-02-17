@@ -31,6 +31,7 @@ import { useAccount } from "wagmi";
 import { useNetwork } from "wagmi";
 import { walletClient } from "@/helpers/signer";
 import dao_abi from "../../artifacts/Dao.sol/GovernanceToken.json";
+import axios from "axios";
 
 function MainProfile() {
   const { address } = useAccount();
@@ -65,7 +66,35 @@ function MainProfile() {
     }
   };
 
-  const handleDelegateVotes = async () => {
+  const handleAttestation = async () => {
+    const data = {
+      recipient: "0xbFc4A28D8F1003Bec33f4Fdb7024ad6ad1605AA8",
+      meetingId: "abc-def-ggi",
+      meetingType: 1,
+      startTime: 16452456, // Example start time (in UNIX timestamp format)
+      endTime: 16452492, // Example end time (in UNIX timestamp format)
+    };
+
+    console.log(window.location.origin);
+    const headers = {
+      "Content-Type": "application/json",
+      //   Origin: window.location.origin, // Set the Origin header to your frontend URL
+    };
+
+    try {
+      const response = await axios.post("/api/attest-offchain", data, {
+        headers,
+      });
+      console.log(response.data);
+      // Handle response as needed
+    } catch (error) {
+      console.error("Error:", error);
+      // Handle error
+    }
+  };
+
+  // Pass the address of whom you want to delegate the voting power to
+  const handleDelegateVotes = async (to: string) => {
     const address = await walletClient.getAddresses();
     const address1 = address[0];
 
@@ -74,7 +103,7 @@ function MainProfile() {
       address: "0x4200000000000000000000000000000000000042",
       abi: dao_abi.abi,
       functionName: "delegate",
-      args: ["0x51ff9c7A199eA95a6E75Dc0f7f2bE516cEb8297b"],
+      args: [to],
       account: address1,
     });
     console.log(delegateTx);
@@ -372,11 +401,22 @@ function MainProfile() {
             </div>
 
             <div className="pt-2 flex gap-5">
+              {/* pass address of whom you want to delegate the voting power to */}
               <button
                 className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
-                onClick={() => handleDelegateVotes()}
+                onClick={() =>
+                  handleDelegateVotes(
+                    "0x51ff9c7A199eA95a6E75Dc0f7f2bE516cEb8297b"
+                  )
+                }
               >
                 Delegatee
+              </button>
+              <button
+                className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
+                onClick={() => handleAttestation()}
+              >
+                Attest
               </button>
               {/* <div className="">
                 <select className="outline-none border border-blue-shade-200 text-blue-shade-200 rounded-full py-2 px-3">

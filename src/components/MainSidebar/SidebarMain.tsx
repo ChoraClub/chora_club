@@ -31,7 +31,7 @@ function Sidebar() {
   const sessionLoading = status === "loading";
 
   useEffect(() => {
-    console.log(session, sessionLoading, isConnected);
+    // console.log(session, sessionLoading, isConnected);
   }, [session, sessionLoading, isConnected]);
 
   useEffect(() => {
@@ -194,6 +194,7 @@ function Sidebar() {
                 src={user}
                 alt={"image"}
                 width={40}
+                className={`cursor-pointer`}
                 onClick={() => router.push(`/profile/${address}?active=info`)}
               />
             </Tooltip>

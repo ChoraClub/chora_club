@@ -1,12 +1,23 @@
 "use client";
 
-import React, { useState } from "react";
-import OngoingDaoOfficeHours from "./OngoingDaoOfficeHours";
-import UpcomingDaoOfficeHours from "./UpcomingDaoOfficeHours";
-import RecordedDaoOfficeHours from "./RecordedDaoOfficeHours";
+import React, { useState, useEffect } from "react";
 import search from "@/assets/images/daos/search.png";
 import Image from "next/image";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import text1 from "@/assets/images/daos/texture1.png";
+import text2 from "@/assets/images/daos/texture2.png";
+import { StaticImageData } from "next/image";
+import Tile from "../utils/Tile";
+interface Type {
+  img: StaticImageData;
+  title: string;
+  dao: string;
+  participant: number;
+  attendee: string;
+  host: string;
+  started: string;
+  desc: string;
+}
 
 function DaoOfficeHours() {
   const [activeSection, setActiveSection] = useState("ongoing");
@@ -14,6 +25,51 @@ function DaoOfficeHours() {
   const router = useRouter();
   const path = usePathname();
   const searchParams = useSearchParams();
+
+  const details: Type[] = [
+    {
+      img: text1,
+      title: "Optimism Open Forum: Governance, Applications, and Beyond",
+      dao: "Optimism",
+      participant: 12,
+      attendee: "olimpio.eth",
+      host: "lindaxie.eth",
+      started: "07/09/2023 12:15 PM EST",
+      desc:
+        "Join the conversation about the future of Optimism. Discuss governance proposals, dApp adoption, and technical developments.",
+    },
+    {
+      img: text2,
+      title: "Open Forum: Governance, Applications, and Beyond",
+      dao: "Arbitrum",
+      participant: 5,
+      attendee: "olimpio.eth",
+      host: "l2beatcom.eth",
+      started: "08/09/2023 01:15 PM EST",
+      desc:
+        "Join the conversation about the future of Arbitrum. Discuss governance proposals, dApp adoption, and technical developments.",
+    },
+  ];
+
+  const [sessionDetails, setSessionDetails] = useState<Type[]>([]);
+  const [dataLoading, setDataLoading] = useState(true);
+
+  useEffect(() => {
+    setSessionDetails(details);
+    setDataLoading(false);
+  }, []);
+
+  useEffect(() => {
+    setDataLoading(true);
+    const filtered = details.filter(
+      (item) =>
+        item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.host.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    setSessionDetails(filtered);
+    setDataLoading(false);
+  }, [searchQuery]);
+
 
   return (
     <div className="p-6">
@@ -74,13 +130,13 @@ function DaoOfficeHours() {
 
         <div className="py-5">
           {searchParams.get("hours") === "ongoing" && (
-            <OngoingDaoOfficeHours params={searchQuery} />
+            <Tile sessionDetails={sessionDetails} dataLoading={dataLoading} isEvent="Ongoing" isOfficeHour={true}/>
           )}
           {searchParams.get("hours") === "upcoming" && (
-            <UpcomingDaoOfficeHours params={searchQuery} />
+            <Tile sessionDetails={sessionDetails} dataLoading={dataLoading} isEvent="Upcoming" isOfficeHour={true}/>
           )}
           {searchParams.get("hours") === "recorded" && (
-            <RecordedDaoOfficeHours params={searchQuery} />
+            <Tile sessionDetails={sessionDetails} dataLoading={dataLoading} isEvent="Recorded" isOfficeHour={true}/>
           )}
         </div>
       </div>
