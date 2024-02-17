@@ -95,7 +95,7 @@ const BottomBar: React.FC<BottomBarProps> = () => {
   };
 
   return (
-    <div className="w-full flex items-center px-10 justify-between pb-6">
+    <div className="w-full flex items-center px-10 justify-between pb-6 font-poppins">
       {/* Bottom Bar Left */}
       <div>
         {role === "host" || role === "coHost" || role === "speaker" ? (

@@ -61,7 +61,7 @@ const EmojiTray: React.FC<Props> = ({ onClick, onClose }) => {
   return (
     <div>
       <div className="relative">
-        <div className=" border-b border-slate-700 py-3 text-center text-base font-semibold text-slate-100">
+        <div className=" border-b border-slate-700 py-3 text-center text-base font-semibold text-gray-800">
           Reactions
           <span
             className="absolute right-2 cursor-pointer"
@@ -83,8 +83,10 @@ const EmojiTray: React.FC<Props> = ({ onClick, onClose }) => {
             } as peerMetaData);
           }}
           className={cn(
-            " w-full text-sm text-slate-100 py-2 rounded-lg font-inter flex items-center justify-center font-medium",
-            metadata?.isHandRaised ? "bg-custom-1" : "bg-custom-8"
+            " w-full text-sm border text-gray-700 py-2 rounded-lg font-inter flex items-center justify-center font-medium",
+            metadata?.isHandRaised
+              ? "bg-gray-500 text-gray-100"
+              : "border-gray-500"
           )}
         >
           ✋ {metadata?.isHandRaised ? "Lower Hand" : "Raise Hand"}

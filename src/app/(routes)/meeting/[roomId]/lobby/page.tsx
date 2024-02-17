@@ -70,7 +70,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
   }, [state]);
 
   return (
-    <main className="flex h-screen flex-col items-center justify-center bg-lobby text-slate-100">
+    <main className="flex h-screen flex-col items-center justify-center bg-lobby text-slate-100 font-poppins">
       <div className="flex flex-col items-center justify-center gap-4 w-[26.25rem]">
         <div className="relative text-center flex items-center justify-center w-fit mx-auto">
           <Image
@@ -105,9 +105,10 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
             }
           >
             <div className="relative mt-5">
-              <div className="grid-cols-3  grid h-full w-full  place-items-center   gap-6  px-6 ">
+              <div className="grid-cols-3 grid h-full w-full place-items-center gap-6  px-6 ">
                 {Array.from({ length: 20 }).map((_, i) => {
                   const url = `/avatars/avatars/${i}.png`;
+                  console.log("img url::::::: ", url);
 
                   return (
                     <AvatarWrapper
@@ -133,7 +134,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
           </FeatCommon>
         </div>
         <div className="flex items-center w-full flex-col">
-          <div className="flex flex-col justify-center w-full gap-1">
+          <div className="flex flex-col justify-center w-full gap-1 text-black">
             Set a display name
             <div className="flex w-full items-center rounded-[10px] border px-3 text-slate-300 outline-none border-zinc-800 backdrop-blur-[400px] focus-within:border-slate-600 gap-">
               <div className="mr-2">
@@ -152,14 +153,14 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
                 }}
                 type="text"
                 placeholder="Enter your name"
-                className="flex-1 bg-transparent py-3 outline-none"
+                className="flex-1 bg-transparent py-3 outline-none text-black"
               />
             </div>
           </div>
         </div>
         <div className="flex items-center w-full">
           <button
-            className="flex items-center justify-center bg-[#246BFD] text-slate-100 rounded-md p-2 mt-2 w-full"
+            className="flex items-center justify-center bg-blue-shade-100 text-slate-100 rounded-md p-2 mt-2 w-full"
             onClick={handleStartSpaces}
           >
             {isJoining ? "Joining Spaces..." : "Start Spaces"}

@@ -66,7 +66,7 @@ const Chat = () => {
   });
 
   return (
-    <aside className="flex flex-col text-gray-700 w-1/4 p-2 mr-2 mt-2 bg-gray-100 rounded-lg">
+    <aside className="flex flex-col text-gray-700 w-2/6 p-2 mr-2 mt-2 bg-gray-100 rounded-lg font-poppins">
       <div className="flex flex-col h-full">
         <Header
           title="Chat"

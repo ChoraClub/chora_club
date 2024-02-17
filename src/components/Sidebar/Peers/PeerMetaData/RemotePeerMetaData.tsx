@@ -90,7 +90,7 @@ const PeerMetaData: React.FC<PeerMetaDatProps> = ({
             align="end"
           >
             {role && RoleData[role as keyof typeof RoleData]}
-          </Dropdown>{" "}
+          </Dropdown>
         </div>
       )}
     </div>

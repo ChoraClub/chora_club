@@ -21,13 +21,13 @@ const FeatCommon = ({ onClose, children, className }: Props) => {
     <div
       ref={menuRef}
       className={
-        "bg-custom-2  absolute top-1/2 -right-5  z-50 h-fit w-[16rem] lg:w-[28rem] -translate-y-[30%] translate-x-full rounded-3xl border  border-slate-700 py-4 text-center text-white shadow-xl " +
+        "bg-gray-100 absolute top-1/2 -right-5  z-50 h-fit w-[16rem] lg:w-[28rem] -translate-y-[30%] translate-x-full rounded-3xl border  border-slate-700 py-4 text-center text-white shadow-xl font-poppins" +
         className
       }
     >
       <div className="flex justify-between items-center border-b border-b-slate-700 px-8 pb-2.5">
         <div className="flex items-center">
-          <div className="ml-2  font-medium text-slate-300">
+          <div className="ml-2  font-medium text-gray-800">
             Select your Avatar
           </div>
         </div>

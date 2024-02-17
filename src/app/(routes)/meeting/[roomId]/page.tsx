@@ -21,13 +21,12 @@ import useStore from "@/components/store/slices";
 import { toast } from "react-hot-toast";
 import { Role } from "@huddle01/server-sdk/auth";
 import Chat from "@/components/Chat/Chat";
-import { metadata } from "../../layout";
 // import Chat from '@/components/Chat/Chat';
 
 const Home = ({ params }: { params: { roomId: string } }) => {
   const { state } = useRoom({
     onLeave: () => {
-      push(`meeting/${params.roomId}/lobby`);
+      push(`/meeting/${params.roomId}/lobby`);
     },
   });
   const { push } = useRouter();
@@ -52,7 +51,7 @@ const Home = ({ params }: { params: { roomId: string } }) => {
 
   useEffect(() => {
     if (state === "idle") {
-      push(`meeting/${params.roomId}/lobby`);
+      push(`/meeting/${params.roomId}/lobby`);
       return;
     } else {
       console.log("length", peerIds.length);

@@ -44,7 +44,7 @@ export default function RootLayout({
               <div className="fixed w-[6%] bg-blue-shade-100 h-screen mr-4 lg:mr-8 ">
                 <SidebarMain />
               </div>
-              <div className="w-[92%] ml-auto py-4">{children}</div>
+              <div className="w-[92%] ml-auto">{children}</div>
             </div>
           </HuddleContextProvider>
         </RootProviders>

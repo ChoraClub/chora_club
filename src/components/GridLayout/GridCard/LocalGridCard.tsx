@@ -86,7 +86,7 @@ const LocalGridCard: FC = () => {
           )}
 
           {metadata?.isHandRaised && (
-            <div className="absolute flex right-2 w-8 h-8 -top-1 rounded-full justify-center items-center bg-custom-8 text-xl border-custom-1 border-2">
+            <div className="absolute flex bottom-12 right-0 w-8 h-8 rounded-full justify-center items-center bg-gray-600 text-xl border-gray-600 border-2">
               ✋
             </div>
           )}

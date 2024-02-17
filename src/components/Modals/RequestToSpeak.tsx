@@ -34,13 +34,13 @@ const RequestToSpeak: React.FC<RequestToSpeakProps> = () => {
   };
 
   return (
-    <div className="">
+    <div className="font-poppins">
       <div>{NestedBasicIcons.active.mic}</div>
       <div className="mt-4 mb-8">
-        <div className="text-xl font-medium text-custom-7">
+        <div className="text-xl font-medium text-gray-800">
           Request to speak
         </div>
-        <div className="max-w-[20rem] text-custom-6 text-sm">
+        <div className="max-w-[20rem] text-gray-800 text-sm">
           You will become a speaker once your request is accepted by the Host or
           Co-host
         </div>
@@ -48,14 +48,14 @@ const RequestToSpeak: React.FC<RequestToSpeakProps> = () => {
       <div className="flex items-center gap-4 justify-center">
         <Button
           type="button"
-          className="bg-custom-3 w-36 text-custom-6"
+          className="bg-red-400 w-36 text-white"
           onClick={() => setPromptView("close")}
         >
           Cancel
         </Button>
         <Button
           type="button"
-          className="w-36 bg-custom-8"
+          className="w-36 bg-blue-shade-100"
           onClick={sendSpeakerRequest}
         >
           Send Request

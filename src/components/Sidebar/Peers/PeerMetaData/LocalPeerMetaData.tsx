@@ -55,7 +55,7 @@ const PeerMetaData: React.FC<PeerMetaDatProps> = ({
           className="object-contain rounded-full"
         />
         <div className="text-slate-400 tex-sm font-normal">
-          {metadata?.displayName}
+          {metadata?.displayName} (You)
         </div>
       </div>
       {isRequested ? (

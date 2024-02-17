@@ -1,6 +1,11 @@
 import React from "react";
 import Strip from "./Strip";
-import { useRoom, useHuddle01, useLocalPeer, useRemotePeer } from "@huddle01/react/hooks";
+import {
+  useRoom,
+  useHuddle01,
+  useLocalPeer,
+  useRemotePeer,
+} from "@huddle01/react/hooks";
 import { Role } from "@huddle01/server-sdk/auth";
 
 type ListenersDataProps = {
@@ -8,10 +13,10 @@ type ListenersDataProps = {
 };
 
 const ListenersData: React.FC<ListenersDataProps> = ({ peerId }) => {
-  
   const { leaveRoom } = useRoom();
   const { updateRole } = useRemotePeer({ peerId });
   const me = useLocalPeer();
+  console.log("Local peer id>>>>>>>> ", me);
 
   return (
     <>
@@ -27,37 +32,27 @@ const ListenersData: React.FC<ListenersDataProps> = ({ peerId }) => {
           />
         </div>
       )}
-      {me.role === "coHost" || me.role === "host" ? (
-        <div>
-          <Strip
-            type="personSpeaker"
-            title="Invite as Speaker"
-            variant="normal"
-            onClick={() => {
-              updateRole(Role.SPEAKER);
-            }}
-          />
-          <Strip
-            type="leave"
-            title="Remove from spaces"
-            variant="danger"
-            onClick={() => {
-              // kickPeer(peerId);
-            }}
-          />
-        </div>
-      ) : (
-        <div>
-          <Strip
-            type="leave"
-            title="Leave the spaces"
-            variant="danger"
-            onClick={() => {
-              leaveRoom();
-            }}
-          />
-        </div>
-      )}
+      {me.role === "coHost" ||
+        (me.role === "host" && (
+          <div>
+            <Strip
+              type="personSpeaker"
+              title="Invite as Speaker"
+              variant="normal"
+              onClick={() => {
+                updateRole(Role.SPEAKER);
+              }}
+            />
+            <Strip
+              type="leave"
+              title="Remove from spaces"
+              variant="danger"
+              onClick={() => {
+                // kickPeer(peerId);
+              }}
+            />
+          </div>
+        ))}
     </>
   );
 };

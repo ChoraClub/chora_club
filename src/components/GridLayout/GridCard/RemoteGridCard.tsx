@@ -83,11 +83,13 @@ const GridCard: React.FC<GridCardProps> = ({ peerId }) => {
     <div className="flex justify-center items-center flex-col p-4 rounded-lg shadow-md">
       <div className="grid grid-cols-2 gap-4 w-full">
         {screenShareVideoStream && (
-          <div className={!videoStream ? "col-span-2 h-96" : "col-span-1"}>
+          <div
+            className={!videoStream ? "col-span-2 h-96" : "col-span-1 w-full"}
+          >
             <video
               autoPlay
               playsInline
-              className="w-full mt-6 h-[23rem]"
+              className="aspect-video w-full mt-6 h-[23rem]"
               ref={(screenRef) =>
                 screenRef && (screenRef.srcObject = screenShareVideoStream)
               }
@@ -97,14 +99,14 @@ const GridCard: React.FC<GridCardProps> = ({ peerId }) => {
         {videoStream && (
           <div
             className={
-              !screenShareVideoStream ? "col-span-2 h-96" : "col-span-1"
+              !screenShareVideoStream ? "col-span-2 h-96" : "col-span-1 w-full"
             }
           >
             <video
               ref={vidRef}
               autoPlay
               playsInline
-              className="w-full mt-6 h-[23rem]"
+              className="aspect-video w-full mt-6 h-[23rem]"
             />
           </div>
         )}
@@ -123,19 +125,19 @@ const GridCard: React.FC<GridCardProps> = ({ peerId }) => {
           />
 
           <div className="mt-1 text-center">
-            <div className="text-custom-5 text-base font-medium">
+            <div className="text-gray-800 text-base font-medium">
               {metadata?.displayName}
             </div>
-            <div className="text-custom-6 text-sm font-normal">{role}</div>
+            <div className="text-gray-800 text-sm font-normal">{role}</div>
           </div>
           <div className="absolute left-1/2 bottom-1/2 -translate-x-1/2 mb-2 text-4xl">
             {reaction}
           </div>
           {role && ["host", "coHost", "speaker"].includes(role) && (
-            <div className="absolute right-0">{BasicIcons.audio}</div>
+            <div className="absolute top-0 right-0">{BasicIcons.audio}</div>
           )}
           {metadata?.isHandRaised && (
-            <div className="absolute flex right-2 w-8 h-8 -top-1 rounded-full justify-center items-center bg-custom-8 text-xl border-custom-1 border-2">
+            <div className="absolute flex bottom-12 w-8 h-8 right-0 rounded-full justify-center items-center bg-gray-600 text-xl border-gray-600 border-2">
               ✋
             </div>
           )}

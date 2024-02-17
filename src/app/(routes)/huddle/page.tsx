@@ -1,5 +1,6 @@
 import React from "react";
 import IntroPage from "@/components/IntroPage/IntroPage";
+
 interface RoomDetails {
   message: string;
   data: {
