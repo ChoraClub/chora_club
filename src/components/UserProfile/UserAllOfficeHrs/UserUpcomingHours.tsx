@@ -14,6 +14,8 @@ import {
 } from "@nextui-org/react";
 import { Tooltip } from "@nextui-org/react";
 import { FaPencil } from "react-icons/fa6"; // Importing the pencil icon
+
+import { MdDeleteForever } from "react-icons/md";
 import { FaSpinner } from "react-icons/fa"; // Importing the spinner icon
 interface SessionDetail {
   img: any;
@@ -122,6 +124,22 @@ function UserUpcomingHours() {
       .catch((error) => console.log("error", error));
   };
 
+  const handleDelete = (index: number) => {
+    const session = sessionDetails[index];
+    const requestOptions = {
+      method: "DELETE",
+    };
+    fetch(`/api/edit-office-hours/${address}`, requestOptions)
+      .then((response) => response.text())
+      .then((result) => {
+        console.log(result);
+        const updatedSessions = [...sessionDetails];
+        updatedSessions.splice(index, 1);
+        setSessionDetails(updatedSessions);
+      })
+      .catch((error) => console.error(error));
+  };
+
   return (
     <div>
       <div className="space-y-6">
@@ -177,6 +195,18 @@ function UserUpcomingHours() {
                   onClick={onOpen}
                 >
                   <FaPencil color="#3e3d3d" size={12} />
+                </span>
+              </Tooltip>
+
+              <Tooltip content="Edit social links" placement="right" showArrow>
+                <span
+                  className="border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 cursor-pointer"
+                  style={{
+                    backgroundColor: "rgba(217, 217, 217, 0.42)",
+                  }}
+                  onClick={() => handleDelete(index)}
+                >
+                  <MdDeleteForever color="#3e3d3d" size={12} />
                 </span>
               </Tooltip>
               <Modal
