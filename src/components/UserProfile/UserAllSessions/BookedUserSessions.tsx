@@ -8,6 +8,7 @@ import { FaCircleCheck, FaCircleXmark, FaCirclePlay } from "react-icons/fa6";
 import { Tooltip } from "@nextui-org/react";
 import EventTile from "../../utils/EventTile";
 import { useAccount } from "wagmi";
+import toast, { Toaster } from "react-hot-toast";
 
 function BookedUserSessions() {
   const { address } = useAccount();
@@ -21,7 +22,6 @@ function BookedUserSessions() {
           "Content-Type": "application/json",
         },
       });
-
       const result = await response.json();
       console.log("result in get meeting", result);
       if (result.success) {
@@ -34,23 +34,30 @@ function BookedUserSessions() {
 
   useEffect(() => {
     getMeetingData();
-  }, []);
+  }, [address, sessionDetails]);
 
   return (
-    <div className="space-y-6">
-      {sessionDetails.length > 0 ? (
-        sessionDetails.map((data, index) => (
-          <EventTile key={index} tileIndex={index} data={data} isEvent="Book" />
-        ))
-      ) : (
-        <div className="flex flex-col justify-center items-center">
-          <div className="text-5xl">☹️</div>{" "}
-          <div className="pt-4 font-semibold text-lg">
-            Oops, no such result available!
+    <>
+      <div className="space-y-6">
+        {sessionDetails.length > 0 ? (
+          sessionDetails.map((data, index) => (
+            <EventTile
+              key={index}
+              tileIndex={index}
+              data={data}
+              isEvent="Book"
+            />
+          ))
+        ) : (
+          <div className="flex flex-col justify-center items-center">
+            <div className="text-5xl">☹️</div>{" "}
+            <div className="pt-4 font-semibold text-lg">
+              Oops, no such result available!
+            </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </>
   );
 }
 
