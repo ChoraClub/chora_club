@@ -61,7 +61,7 @@ const LocalGridCard: FC = () => {
       {(!stream || !shareStream) && (
         <div className="relative flex flex-col mx-10">
           <Image
-            src={metadata?.avatarUrl || "/avatar/avatar/0.png"}
+            src={metadata?.avatarUrl || "/avatars/avatars/0.png"}
             alt="default-avatar"
             width={100}
             height={100}

@@ -115,7 +115,7 @@ const GridCard: React.FC<GridCardProps> = ({ peerId }) => {
         <div className="relative mt-4">
           {audioStream && <AudioElem peerId={peerId} />}
           <Image
-            src={metadata?.avatarUrl || "/avatar/avatar/0.png"}
+            src={metadata?.avatarUrl || "/avatars/avatars/0.png"}
             alt="default-avatar"
             width={100}
             height={100}

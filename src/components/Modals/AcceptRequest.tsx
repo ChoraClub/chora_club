@@ -20,7 +20,7 @@ const AcceptRequest: React.FC<AcceptRequestProps> = ({ peerId }) => {
     <div className="inline-flex p-4 flex-col justify-center items-center rounded-lg bg-slate-100 font-poppins">
       <div className="flex flex-col justify-center items-start gap-2">
         <Image
-          src={metadata?.avatarUrl ?? "/avatar/avatars/0.png"}
+          src={metadata?.avatarUrl ?? "/avatars/avatars/0.png"}
           alt="avatar"
           width={50}
           height={50}
