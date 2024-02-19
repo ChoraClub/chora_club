@@ -21,6 +21,7 @@ interface DelegateResponseBody {
     address: string;
     image: string;
     description: string;
+    daoName: string;
     isDelegate: boolean;
     socialHandles: {
       twitter: string;

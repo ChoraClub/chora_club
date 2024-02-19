@@ -7,6 +7,7 @@ interface DelegateRequestBody {
   address: string;
   image: string;
   description: string;
+  daoName:string;
   isDelegate: boolean;
   socialHandles: {
     twitter: string;
@@ -23,6 +24,7 @@ interface DelegateResponseBody {
     id: string;
     address: string;
     image: string;
+    daoName:string;
     description: string;
     isDelegate: boolean;
     socialHandles: {
@@ -43,6 +45,7 @@ export async function POST(
     address,
     image,
     description,
+    daoName,
     isDelegate,
     socialHandles,
   }: DelegateRequestBody = await req.json();
@@ -65,6 +68,7 @@ export async function POST(
       address,
       image,
       description,
+      daoName,
       isDelegate,
       socialHandles,
     });

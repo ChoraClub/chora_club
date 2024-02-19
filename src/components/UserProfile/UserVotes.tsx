@@ -22,7 +22,8 @@ const arb_client = createClient({
   exchanges: [cacheExchange, fetchExchange],
 });
 function UserVotes() {
-  const {address} = useAccount();
+  // const {address} = useAccount();
+  const address = "0x5e349eca2dc61abcd9dd99ce94d04136151a09ee";
   const { chain, chains } = useNetwork();
   const [first, setfirst] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(1);

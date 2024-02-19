@@ -17,6 +17,7 @@ import { FaPencil } from "react-icons/fa6";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import toast, { Toaster } from "react-hot-toast";
 import Link from "next/link";
+import user1 from "@/assets/images/daos/profile.png";
 import {
   Modal,
   ModalContent,
@@ -34,7 +35,8 @@ import dao_abi from "../../artifacts/Dao.sol/GovernanceToken.json";
 import axios from "axios";
 
 function MainProfile() {
-  const { address } = useAccount();
+  // const { address } = useAccount();
+  const address = "0x5e349eca2dc61abcd9dd99ce94d04136151a09ee";
   const { chain, chains } = useNetwork();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [img, setImg] = useState<File | undefined>();
@@ -44,25 +46,30 @@ function MainProfile() {
   const path = usePathname();
   const searchParams = useSearchParams();
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const [socials, setSocials] = useState({
-    twitter: "https://twitter.com/",
-    discourse: "https://google.com/",
-    discord: "https://discord.com/",
-    github: "https://github.com/",
-  });
   const [twitter, setTwitter] = useState("");
   const [discord, setDiscord] = useState("");
   const [discourse, setDiscourse] = useState("");
   const [github, setGithub] = useState("");
-
+  const [description, setDescription] = useState("");
+  const [isDelegate, setIsDelegate] = useState<any>();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [responseFromDB, setResponseFromDB] = useState<boolean>(false);
+  const [karmaImage, setKarmaImage] = useState<File | undefined>();
+  const [ensName, setEnsName] = useState("");
+  const [karmaDesc, setKarmaDesc] = useState("");
+  const [votes, setVotes] = useState<any>();
+  const [descAvailable, setDescAvailable] = useState<boolean>(true)
   const handleLogoClick = () => {
     fileInputRef.current?.click();
   };
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>): void => {
     const selectedFile = e.target.files?.[0];
-
+    console.log(selectedFile)
+    console.log("Selected File", selectedFile)
     if (selectedFile) {
       setImg(selectedFile);
+      console.log("Set Image", img)
+      // handleSubmit();
     }
   };
 
@@ -114,10 +121,22 @@ function MainProfile() {
   };
 
   const handleInputChange = (fieldName: string, value: string) => {
-    setSocials({
-      ...socials,
-      [fieldName]: value,
-    });
+    switch (fieldName) {
+      case "twitter":
+        setTwitter(value);
+        break;
+      case "discord":
+        setDiscord(value);
+        break;
+      case "discourse":
+        setDiscourse(value);
+        break;
+      case "github":
+        setGithub(value);
+        break;
+      default:
+        break;
+    }
   };
 
   const formatNumber = (number: number) => {
@@ -129,9 +148,261 @@ function MainProfile() {
       return number;
     }
   };
-
   useEffect(() => {
     const fetchData = async () => {
+      try {
+        // Fetch data from your backend API to check if the address exists
+        let dao = "";
+        if (chain && chain.name === "Optimism") {
+          dao = "optimism";
+        } else if (chain && chain.name === "Arbitrum One") {
+          dao = "arbitrum";
+        } else {
+          return;
+        }
+        console.log("Fetching from DB");
+        const dbResponse = await axios.get(`/api/profile/${address}`);
+        if (
+          dbResponse &&
+          Array.isArray(dbResponse.data.data) &&
+          dbResponse.data.data.length > 0
+        ) {
+          // Iterate over each item in the response data array
+          for (const item of dbResponse.data.data) {
+            // Check if address and daoName match
+            if (item.daoName === dao && item.address === address) {
+              console.log("Data found in the database");
+              // Data found in the database, set the state accordingly
+              setResponseFromDB(true);
+              setImg(item.image);
+              setDescription(item.description);
+              setTwitter(item.socialHandles.twitter);
+              setDiscord(item.socialHandles.discord);
+              setDiscourse(item.socialHandles.discourse);
+              setGithub(item.socialHandles.github);
+              // Exit the loop since we found a match
+              break;
+            }
+          }
+        } else {
+          console.log("Data not found in the database, fetching from third-party API");
+          // Data not found in the database, fetch data from the third-party API
+          let dao = "";
+          if (chain && chain.name === "Optimism") {
+            dao = "optimism";
+          } else if (chain && chain.name === "Arbitrum One") {
+            dao = "arbitrum";
+          } else {
+            return;
+          }
+  
+          const res = await fetch(
+            `https://api.karmahq.xyz/api/dao/find-delegate?dao=${dao}&user=${address}`
+          );
+          if(responseFromDB === false && description==""){
+            setDescAvailable(false);
+          }
+
+          const details = await res.json();
+          if (res.ok) {
+            // Check if delegate data is present in the response
+            console.log("Response Success----")
+            if (details && details.data && details.data.delegate) {
+              // If delegate data is present, set isDelegate to true
+              console.log("Setting Up Karma's Data---")
+              setIsDelegate(true);
+              setProfileDetails(details.data.delegate);
+              setDescription(details.data.delegate.delegatePitch.customFields[1].value);
+              setDescAvailable(true)
+              if (details.data.delegate.twitterHandle != null) {
+                setTwitter(`https://twitter.com/${details.data.delegate.twitterHandle}`);
+              }
+  
+              if (details.data.delegate.discourseHandle != null) {
+                if (dao === "optimism") {
+                  setDiscourse(`https://gov.optimism.io/u/${details.data.delegate.discourseHandle}`);
+                  console.log("Discourse", discourse)
+                }
+                if (dao === "arbitrum") {
+                  setDiscourse(`https://forum.arbitrum.foundation/u/${details.data.delegate.discourseHandle}`);
+                }
+              }
+  
+              if (details.data.delegate.discordHandle != null) {
+                setDiscord(`https://discord.com/${details.data.delegate.discordHandle}`);
+              }
+  
+              if (details.data.delegate.githubHandle != null) {
+                setGithub(`https://github.com/${details.data.delegate.githubHandle}`);
+              }
+            } else {
+              // If delegate data is not present, set isDelegate to false
+              setIsDelegate(false);
+            }
+          } else {
+            // If response status is not ok, set isDelegate to false
+            setIsDelegate(false);
+          }
+        }
+
+       
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+  
+    fetchData();
+  }, [chain, address]);
+  
+const handleDelegate = () => {
+  console.log("IsDelegate Status", isDelegate)
+}
+const handleSubmit = async (newDescription?:string) => {
+    try {
+      // Check if the delegate already exists in the database
+      if(newDescription){
+        setDescription(newDescription)
+        console.log("New Description", description)
+      }
+      setIsLoading(true);
+      const isExisting = await checkDelegateExists(address);
+  
+      if (isExisting) {
+        // If delegate exists, update the delegate
+        await handleUpdate(newDescription);
+        setIsLoading(false)
+        console.log("Existing True")
+      } else {
+        // If delegate doesn't exist, add a new delegate
+        await handleAdd(newDescription);
+        setIsLoading(false)
+        console.log("Sorry! Doesnt exist")
+      }
+
+      toast.success("Saved");
+    } catch (error) {
+      console.error("Error handling delegate:", error);
+      toast.error("Error saving");
+      setIsLoading(false);
+    }
+  };
+
+  const checkDelegateExists = async (address:any) => {
+    try {
+      // Make a request to your backend API to check if the address exists
+      let dao = "";
+      if (chain && chain.name === "Optimism") {
+        dao = "optimism";
+      } else if (chain && chain.name === "Arbitrum One") {
+        dao = "arbitrum";
+      } else {
+        return;
+      }
+      console.log("Checking")
+      const response = await axios.get(`/api/profile/${address}`);
+      if (Array.isArray(response.data.data) && response.data.data.length > 0) {
+        // Iterate over each item in the response data array
+        for (const item of response.data.data) {
+          // Check if address and daoName match
+          if (item.address === address && item.daoName === dao) {
+            return true; // Return true if match found
+          }
+        }
+      }
+      
+      return false;
+    // Assuming the API returns whether the delegate exists
+    } catch (error) {
+      console.error("Error checking delegate existence:", error);
+      return false;
+    }
+  };
+
+  const handleAdd = async (newDescription?:string) => {
+    try {
+      // Call the POST API function for adding a new delegate
+      let dao = "";
+      if (chain && chain.name === "Optimism") {
+        dao = "optimism";
+      } else if (chain && chain.name === "Arbitrum One") {
+        dao = "arbitrum";
+      } else {
+        return;
+      }
+      console.log("Adding the delegate..")
+      const response = await axios.post('/api/profile', {
+        address: address,
+        image: img,
+        daoName:dao,
+        description: newDescription,
+        isDelegate: true,
+        socialHandles: {
+          twitter: twitter,
+          discord: discord,
+          discourse: discourse,
+          github: github,
+        },
+      });
+  
+      console.log("Response Add", response);
+  
+      if (response.status === 200) {
+        // Delegate added successfully
+        console.log("Delegate added successfully:", response.data);
+        setIsLoading(false);
+      } else {
+        // Handle error response
+        console.error("Failed to add delegate:", response.statusText);
+        setIsLoading(false);
+      }
+    } catch (error) {
+      // Handle API call error
+      console.error("Error calling POST API:", error);
+      setIsLoading(false);
+    }
+  };
+  
+  
+  // Function to handle updating an existing delegate
+  const handleUpdate = async (newDescription?:string) => {
+    try {
+      // Call the PUT API function for updating an existing delegate
+     
+      console.log("Updating")
+      console.log("Inside Updating Description", newDescription)
+      const response:any = await axios.put('/api/profile',{
+        address: address,
+        image: img,
+        description: newDescription,
+        isDelegate: true,
+        socialHandles: {
+          twitter: twitter,
+          discord: discord,
+          discourse: discourse,
+          github: github,
+        },
+      });
+  
+      // Handle response from the PUT API function
+      if (response.success) {
+        // Delegate updated successfully
+        console.log("Delegate updated successfully");
+        setIsLoading(false);
+      } else {
+        // Handle error response
+        console.error("Failed to update delegate:", response.error);
+        setIsLoading(false);
+      }
+    } catch (error) {
+      // Handle API call error
+      console.error("Error calling PUT API:", error);
+      setIsLoading(false);
+    }
+  };
+  useEffect(() => {
+    
+    const fetchData = async () => {
+      console.log("Description", description)
       try {
         let dao = "";
         if (chain && chain.name === "Optimism") {
@@ -141,51 +412,51 @@ function MainProfile() {
         } else {
           return;
         }
-
+        console.log("Fetching Data...")
         const res = await fetch(
           `https://api.karmahq.xyz/api/dao/find-delegate?dao=${dao}&user=${address}`
         );
-        const details = await res.json();
-        console.log("Socials: ", details.data.delegate);
-        setProfileDetails(details.data.delegate);
+        console.log("Response",res)
+       
+        // console.log("Desc.", description)
+        if (res.ok) {
+          const details = await res.json();
+          console.log("Data Fetched...", details.data.delegate.ensName)
+          setEnsName(details.data.delegate.ensName);
+          setKarmaImage(details.data.delegate.profilePicture);
+          setKarmaDesc(details.data.delegate.delegatePitch.customFields[1].value);
+          setVotes(details.data.delegate)
+          console.log("Votes", votes)
+          // setProfileDetails(details.data.delegate);
 
-        if (details.data.delegate.twitterHandle != null) {
-          setTwitter(
-            `https://twitter.com/${details.data.delegate.twitterHandle}`
-          );
-        }
-
-        if (details.data.delegate.discourseHandle != null) {
-          if (dao === "optimism") {
-            setDiscourse(
-              `https://gov.optimism.io/u/${details.data.delegate.discourseHandle}`
-            );
+          // Check if delegate data is present in the response
+          if (details && details.data && details.data.delegate) {
+            // If delegate data is present, set isDelegate to true
+            setIsDelegate(true);
+          } else {
+            // If delegate data is not present, set isDelegate to false
+            setIsDelegate(false);
           }
-          if (dao === "arbitrum") {
-            setDiscourse(
-              `https://forum.arbitrum.foundation/u/${details.data.delegate.discourseHandle}`
-            );
-          }
+        } else if (res.status === 404) {
+          // If response status is 404, set isDelegate to false
+          setIsDelegate(false);
+        } else {
+          // Handle other error cases
+          setIsDelegate(false)
         }
-
-        if (details.data.delegate.discordHandle != null) {
-          setDiscord(
-            `https://discord.com/${details.data.delegate.discordHandle}`
-          );
-        }
-
-        if (details.data.delegate.githubHandle != null) {
-          setGithub(`https://github.com/${details.data.delegate.githubHandle}`);
-        }
-      } catch (error) {
-        console.error("Error fetching data:", error);
+      } catch (err) {
+        console.error("Error fetching data:", err);
       }
     };
-
+  
     fetchData();
   }, [chain, address]);
+  
 
+  
   return (
+    <>
+    {isDelegate !== undefined ? (
     <div className="font-poppins">
       <div className="flex ps-14 py-5 pe-10 justify-between">
         <div className="flex">
@@ -195,13 +466,13 @@ function MainProfile() {
             onMouseLeave={() => setHovered(false)}
           >
             <Image
-              src={profileDetails?.profilePicture || user}
+              src={karmaImage || profileDetails?.profilePicture || user1}
               alt="user"
               width={40}
               height={40}
               className="w-40 rounded-3xl"
             />
-            <div
+            {/* <div
               className={`absolute top-3 right-3 cursor-pointer  ${
                 hovered ? "bg-gray-50 rounded-full p-1" : "hidden"
               } `}
@@ -214,20 +485,21 @@ function MainProfile() {
                 hidden
                 onChange={handleFileChange}
               />
-            </div>
+            </div> */}
           </div>
 
           <div className="px-4">
             <div className=" flex items-center py-1">
               <div className="font-bold text-lg pr-4">
-                {profileDetails?.ensName ? (
-                  profileDetails?.ensName
+                {ensName || profileDetails?.ensName ? (
+                 ensName || profileDetails?.ensName
                 ) : (
                   <>
                     {`${address}`.substring(0, 6)} ...{" "}
                     {`${address}`.substring(`${address}`.length - 4)}
                   </>
                 )}
+
               </div>
               <div className="flex gap-3">
                 <Link
@@ -289,7 +561,7 @@ function MainProfile() {
                   className="font-poppins"
                 >
                   <ModalContent>
-                    {(onClose) => (
+                    {(onClose:any) => (
                       <>
                         <ModalHeader className="flex flex-col gap-1">
                           Edit Socials
@@ -342,8 +614,8 @@ function MainProfile() {
                           <Button color="default" onPress={onClose}>
                             Close
                           </Button>
-                          <Button color="primary" onPress={onClose}>
-                            Save
+                          <Button color="primary"  onClick={() => handleSubmit()}>
+                            {isLoading ? "Saving":"Save"}
                           </Button>
                         </ModalFooter>
                       </>
@@ -382,36 +654,40 @@ function MainProfile() {
                 }}
               />
             </div>
-
-            <div className="flex gap-4 py-1">
+            {votes ?
+            ( isDelegate ===true &&( <div className="flex gap-4 py-1">
               <div className="text-[#4F4F4F] border-[0.5px] border-[#D9D9D9] rounded-md px-3 py-1">
                 <span className="text-blue-shade-200 font-semibold">
-                  {formatNumber(Number(profileDetails?.delegatedVotes))}
+                  {votes.delegatedVotes ? formatNumber(Number(votes.delegatedVotes) ):"Fetching "}
                   &nbsp;
                 </span>
                 delegated tokens
               </div>
               <div className="text-[#4F4F4F] border-[0.5px] border-[#D9D9D9] rounded-md px-3 py-1">
-                Delegated from
+              <span className="text-blue-shade-200 font-semibold">{formatNumber(votes.delegatorCount) ? null : "Fetching "}</span>
+              Delegated from
                 <span className="text-blue-shade-200 font-semibold">
-                  &nbsp;{formatNumber(profileDetails?.delegatorCount)}&nbsp;
+                  &nbsp;{formatNumber(votes.delegatorCount) ? formatNumber(votes.delegatorCount) : "number of "}&nbsp;
                 </span>
                 Addresses
               </div>
-            </div>
+            </div>)):null}
 
-            <div className="pt-2 flex gap-5">
+            {isDelegate === false ? 
+           ( <div className="pt-2 flex gap-5">
               {/* pass address of whom you want to delegate the voting power to */}
               <button
                 className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
                 onClick={() =>
                   handleDelegateVotes(
-                    "0x51ff9c7A199eA95a6E75Dc0f7f2bE516cEb8297b"
+                    `${address}`
                   )
                 }
               >
-                Delegatee
+                Become Delegate
               </button>
+
+             
               <button
                 className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
                 onClick={() => handleAttestation()}
@@ -424,7 +700,7 @@ function MainProfile() {
                   <option className="text-gray-700">Arbitrum</option>
                 </select>
               </div> */}
-            </div>
+            </div>):null}
           </div>
         </div>
         <div>
@@ -443,6 +719,7 @@ function MainProfile() {
         >
           Info
         </button>
+        {isDelegate === true && (
         <button
           className={`border-b-2 py-4 px-2 outline-none ${
             searchParams.get("active") === "votes"
@@ -452,7 +729,7 @@ function MainProfile() {
           onClick={() => router.push(path + "?active=votes")}
         >
           Past Votes
-        </button>
+        </button>)}
         <button
           className={`border-b-2 py-4 px-2 outline-none ${
             searchParams.get("active") === "sessions"
@@ -490,17 +767,19 @@ function MainProfile() {
       </div>
 
       <div className="py-6 ps-16">
-        {searchParams.get("active") === "info" ? <UserInfo /> : ""}
-        {searchParams.get("active") === "votes" ? <UserVotes /> : ""}
-        {searchParams.get("active") === "sessions" ? <UserSessions /> : ""}
+        {searchParams.get("active") === "info" ? <UserInfo karmaDesc={karmaDesc} description={description} descAvailable={descAvailable} onSaveButtonClick={(newDescription?: string) => handleSubmit(newDescription)} isLoading={isLoading} /> : ""}
+        {isDelegate === true && searchParams.get("active") === "votes" ? <UserVotes /> : ""}
+        {searchParams.get("active") === "sessions" ? <UserSessions isDelegate={isDelegate} /> : ""}
         {searchParams.get("active") === "officeHours" ? (
-          <UserOfficeHours />
+          <UserOfficeHours isDelegate={isDelegate} />
         ) : (
           ""
         )}
         {/* {searchParams.get("active") === "claimNft" ? <ClaimNFTs /> : ""} */}
       </div>
     </div>
+    ): (<><button onClick={handleDelegate}>Loading...</button></>)}
+    </>
   );
 }
 

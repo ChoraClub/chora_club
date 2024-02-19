@@ -6,7 +6,11 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Tile from "../utils/Tile";
 import { useNetwork } from "wagmi";
 import text1 from "@/assets/images/daos/texture1.png";
-function UserOfficeHours() {
+
+interface UserOfficeHoursProps {
+  isDelegate: boolean | undefined;
+}
+function UserOfficeHours({isDelegate}:UserOfficeHoursProps) {
   const router = useRouter();
   const path = usePathname();
   const searchParams = useSearchParams();
@@ -37,6 +41,7 @@ function UserOfficeHours() {
     <div>
       <div className="pt-3">
         <div className="flex w-fit gap-14 border-1 border-[#7C7C7C] px-6 rounded-xl text-sm">
+          {isDelegate === true &&(
           <button
             className={`py-2  ${
               searchParams.get("hours") === "schedule"
@@ -49,6 +54,9 @@ function UserOfficeHours() {
           >
             Schedule
           </button>
+          )}
+
+          {isDelegate === true &&(
           <button
             className={`py-2  ${
               searchParams.get("hours") === "upcoming"
@@ -61,6 +69,7 @@ function UserOfficeHours() {
           >
             Upcoming
           </button>
+          )}
           <button
             className={`py-2 ${
               searchParams.get("hours") === "hosted"
@@ -88,8 +97,8 @@ function UserOfficeHours() {
         </div>
 
         <div className="py-10 pr-32 ">
-          {searchParams.get("hours") === "schedule" && <UserScheduledHours />}
-          {searchParams.get("hours") === "upcoming" && <UserUpcomingHours />}
+          {isDelegate === true && searchParams.get("hours") === "schedule" && <UserScheduledHours />}
+          {isDelegate === true && searchParams.get("hours") === "upcoming" && <UserUpcomingHours />}
 
           {searchParams.get("hours") === "hosted" && 
             <Tile sessionDetails={sessionDetails} dataLoading={dataLoading} isEvent="Recorded" isOfficeHour={true} />

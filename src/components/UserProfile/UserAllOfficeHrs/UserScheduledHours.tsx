@@ -55,7 +55,7 @@ const UserScheduledHours: React.FC = () => {
 
   return (
     <div className="p-4">
-      <h1 className="text-xl font-bold mb-2">User Scheduled Hours</h1>
+      <h1 className="text-xl font-bold mb-2">Schedule Office Hours</h1>
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
           <label

@@ -10,7 +10,11 @@ import EventTile from "../utils/EventTile";
 // import AttendedUserSessions from "./UserAllSessions/AttendedUserSessions";
 import { useNetwork } from "wagmi";
 import Tile from "../utils/Tile";
-function UserSessions() {
+interface UserSessionsProps {
+  isDelegate: boolean | undefined;
+}
+
+function UserSessions({isDelegate}:UserSessionsProps) {
   const router = useRouter();
   const path = usePathname();
   const searchParams = useSearchParams();
@@ -35,11 +39,17 @@ function UserSessions() {
         setSessionDetails(details);
         setDataLoading(false);
     }, []);
-
+    useEffect(() => {
+   
+      if (!isDelegate && searchParams.get("session") === "schedule") {
+        router.replace(path + "?active=sessions&session=attending");
+      }
+    }, [isDelegate]);
   return (
     <div>
       <div className="pr-32 pt-3">
         <div className="flex gap-16 border-1 border-[#7C7C7C] pl-6 rounded-xl text-sm">
+          {isDelegate === true &&(
           <button
             className={`py-2  ${
               searchParams.get("session") === "schedule"
@@ -52,6 +62,9 @@ function UserSessions() {
           >
             Schedule
           </button>
+          )}
+
+          {isDelegate === true &&(
           <button
             className={`py-2  ${
               searchParams.get("session") === "book"
@@ -62,6 +75,7 @@ function UserSessions() {
           >
             Booked
           </button>
+          )}
           <button
             className={`py-2 ${
               searchParams.get("session") === "attending"
@@ -74,6 +88,7 @@ function UserSessions() {
           >
             Attending
           </button>
+          {/* {isDelegate === true &&( */}
           <button
             className={`py-2 ${
               searchParams.get("session") === "hosted"
@@ -86,6 +101,7 @@ function UserSessions() {
           >
             Hosted
           </button>
+          {/* )} */}
           <button
             className={`py-2 ${
               searchParams.get("session") === "attended"
@@ -101,10 +117,10 @@ function UserSessions() {
         </div>
 
         <div className="py-10">
-          {searchParams.get("session") === "schedule" && (
+          {isDelegate === true && searchParams.get("session") === "schedule" && (
             <ScheduledUserSessions />
           )}
-          {searchParams.get("session") === "book" &&  
+          {isDelegate === true && searchParams.get("session") === "book" &&  
           (
             <BookedUserSessions />
           )}
