@@ -16,30 +16,31 @@ function UserOfficeHours({isDelegate}:UserOfficeHoursProps) {
   const searchParams = useSearchParams();
   const { chain, chains } = useNetwork();
   const details = [
-      {
-        img: text1,
-        title: "Open Forum: Governance, Applications, and Beyond",
-        dao: `${chain && chain.name}`,
-        participant: 12,
-        attendee: "0xf4b0556b9b6f53e00a1fdd2b0478ce841991d8fa",
-        host: "lindaxie.eth",
-        started: "07/09/2023 12:15 PM EST",
-        desc: `Join the conversation about the future of ${chain && chain.name}. Discuss governance proposals, dApp adoption, and technical developments.`,
-      },
-    ];
-  
-    const [sessionDetails, setSessionDetails] = useState(details);
-    const [dataLoading, setDataLoading] = useState(true);
+    {
+      img: text1,
+      title: "Open Forum: Governance, Applications, and Beyond",
+      dao: `${chain && chain.name}`,
+      participant: 12,
+      attendee: "0xf4b0556b9b6f53e00a1fdd2b0478ce841991d8fa",
+      host: "lindaxie.eth",
+      started: "07/09/2023 12:15 PM EST",
+      desc: `Join the conversation about the future of ${
+        chain && chain.name
+      }. Discuss governance proposals, dApp adoption, and technical developments.`,
+    },
+  ];
 
-    useEffect(() => {
-        setSessionDetails(details);
-        setDataLoading(false);
-    }, []);
+  const [sessionDetails, setSessionDetails] = useState(details);
+  const [dataLoading, setDataLoading] = useState(true);
 
+  useEffect(() => {
+    setSessionDetails(details);
+    setDataLoading(false);
+  }, []);
 
   return (
     <div>
-      <div className="pt-3">
+      <div className="pt-3 pr-32">
         <div className="flex w-fit gap-14 border-1 border-[#7C7C7C] px-6 rounded-xl text-sm">
           {isDelegate === true &&(
           <button
@@ -96,16 +97,26 @@ function UserOfficeHours({isDelegate}:UserOfficeHoursProps) {
           </button>
         </div>
 
-        <div className="py-10 pr-32 ">
+        <div className="py-10">
           {isDelegate === true && searchParams.get("hours") === "schedule" && <UserScheduledHours />}
           {isDelegate === true && searchParams.get("hours") === "upcoming" && <UserUpcomingHours />}
 
-          {searchParams.get("hours") === "hosted" && 
-            <Tile sessionDetails={sessionDetails} dataLoading={dataLoading} isEvent="Recorded" isOfficeHour={true} />
-          }
-          {searchParams.get("hours") === "attended" && 
-            <Tile sessionDetails={sessionDetails} dataLoading={dataLoading} isEvent="Recorded" isOfficeHour={true} />
-          }
+          {searchParams.get("hours") === "hosted" && (
+            <Tile
+              sessionDetails={sessionDetails}
+              dataLoading={dataLoading}
+              isEvent="Recorded"
+              isOfficeHour={true}
+            />
+          )}
+          {searchParams.get("hours") === "attended" && (
+            <Tile
+              sessionDetails={sessionDetails}
+              dataLoading={dataLoading}
+              isEvent="Recorded"
+              isOfficeHour={true}
+            />
+          )}
         </div>
       </div>
     </div>
