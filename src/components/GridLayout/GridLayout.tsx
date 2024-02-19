@@ -47,9 +47,6 @@ const GridLayout: React.FC<GridLayoutProps> = () => {
     },
   });
 
-  console.log("screenShareVideoStream:::: ", screenShareVideoStream);
-  console.log("videoStream::: ", videoStream);
-
   return (
     <div className="w-full flex items-center justify-center flex-col h-full font-poppins">
       <div className="flex-wrap flex items-center justify-center gap-4">

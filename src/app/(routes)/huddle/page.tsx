@@ -9,7 +9,7 @@ interface RoomDetails {
 }
 
 const createRandomRoom = async () => {
-  const res = await fetch("https://api.huddle01.com/api/v1/create-room", {
+  const res = await fetch("https://iriko.huddle01.media/api/v1/create-room", {
     method: "POST",
     body: JSON.stringify({
       title: "Test Room",

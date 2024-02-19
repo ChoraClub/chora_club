@@ -6,13 +6,21 @@ import { FaCircleCheck, FaCircleXmark, FaCirclePlay } from "react-icons/fa6";
 import { Tooltip } from "@nextui-org/react";
 import toast, { Toaster } from "react-hot-toast";
 import { Oval } from "react-loader-spinner";
-
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+interface RoomDetails {
+  message: string;
+  data: {
+    roomId: string;
+  };
+}
 interface TileProps {
   tileIndex: number;
   data: {
     _id: string;
     img: StaticImageData;
     title: string;
+    meetingId: string;
     dao_name: string;
     booking_status: string;
     user_address: string;
@@ -23,9 +31,27 @@ interface TileProps {
   isEvent: string;
 }
 
+const createRandomRoom = async () => {
+  const res = await fetch("https://iriko.huddle01.media/api/v1/create-room", {
+    method: "POST",
+    body: JSON.stringify({
+      title: "Test Room",
+    }),
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": process.env.NEXT_PUBLIC_API_KEY ?? "",
+    },
+    cache: "no-store",
+  });
+  const data: RoomDetails = await res.json();
+  const { roomId } = data.data;
+  return roomId;
+};
+
 function EventTile({ tileIndex, data, isEvent }: TileProps) {
   const [isPageLoading, setIsPageLoading] = useState(true);
   const [isConfirmSlotLoading, setIsConfirmSlotLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     setIsPageLoading(false);
@@ -48,12 +74,18 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
     console.log("status:", status);
     try {
       setIsConfirmSlotLoading(true);
+      let roomId = null; // Initialize roomId as null
+      if (status === "Approved") {
+        roomId = await createRandomRoom(); // Call createRandomRoom only if status is Approved
+      }
+
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
 
       const raw = JSON.stringify({
         id: id,
         booking_status: status,
+        meetingId: roomId, // Pass roomId to the PUT request body
       });
 
       const requestOptions = {
@@ -151,7 +183,11 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
                   showArrow
                 >
                   <span className="cursor-pointer">
-                    <FaCirclePlay size={35} color="#004DFF" />
+                    <FaCirclePlay
+                      size={35}
+                      color="#004DFF"
+                      onClick={() => router.push(`/meeting/${data.meetingId}`)}
+                    />
                   </span>
                 </Tooltip>
               </div>
