@@ -13,7 +13,6 @@ import { usePathname, useRouter } from "next/navigation";
 import { Badge, Tooltip } from "@nextui-org/react";
 import { IoClose } from "react-icons/io5";
 import Link from "next/link";
-import toast, { Toaster } from "react-hot-toast";
 import { ConnectWallet } from "../ConnectWallet/ConnectWallet";
 import { useSession } from "next-auth/react";
 import { useAccount } from "wagmi";
@@ -79,7 +78,7 @@ function Sidebar() {
         <div className="flex flex-col items-center gap-y-4 pb-5">
           <Image src={logo} alt={"image"} width={40}></Image>
           <Tooltip
-            content="Daos"
+            content="DAOs"
             placement="right"
             className="rounded-md bg-opacity-90"
             closeDelay={1}
@@ -176,7 +175,12 @@ function Sidebar() {
               closeDelay={1}
             >
               {isPageLoading && !isConnected && sessionLoading ? (
-                <Image src={user} alt={"image"} width={40}></Image>
+                <Image
+                  src={user}
+                  alt={"image"}
+                  width={40}
+                  className="cursor-pointer"
+                ></Image>
               ) : (
                 <div>
                   <ConnectWallet />
@@ -201,18 +205,6 @@ function Sidebar() {
           )}
         </div>
       </div>
-      <Toaster
-        toastOptions={{
-          style: {
-            fontSize: "14px",
-            backgroundColor: "#3E3D3D",
-            color: "#fff",
-            boxShadow: "none",
-            borderRadius: "50px",
-            padding: "3px 5px",
-          },
-        }}
-      />
     </div>
   );
 }

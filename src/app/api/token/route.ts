@@ -4,7 +4,7 @@ export const dynamic = "force-dynamic";
 
 const createToken = async (roomId: string, role: string) => {
   const accessToken = new AccessToken({
-    apiKey: process.env.API_KEY!,
+    apiKey: process.env.NEXT_PUBLIC_API_KEY!,
     roomId: roomId as string,
     role: role,
     permissions: {
@@ -43,7 +43,7 @@ export async function GET(request: Request) {
       `https://api.huddle01.com/api/v1/live-meeting/preview-peers?roomId=${roomId}`,
       {
         headers: {
-          "x-api-key": process.env.API_KEY ?? "",
+          "x-api-key": process.env.NEXT_PUBLIC_API_KEY ?? "",
         },
       }
     );
