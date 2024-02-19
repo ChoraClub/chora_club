@@ -28,7 +28,7 @@ const BottomBar: React.FC<BottomBarProps> = () => {
   const [isRecording, setIsRecording] = useState<boolean>(false);
   const params = useParams();
   const roomId = params.roomId as string | undefined;
-  console.log(roomId);
+  // console.log(roomId);
 
   const { peerIds } = usePeerIds();
 

@@ -53,8 +53,8 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
       toast.error("Display name is required!");
       return;
     } else {
-      console.log("token from lobby", { token });
-      console.log("roomId from loby", params.roomId);
+      // console.log("token from lobby", { token });
+      // console.log("roomId from loby", params.roomId);
       await joinRoom({
         roomId: params.roomId,
         token,
@@ -108,7 +108,6 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
               <div className="grid-cols-3 grid h-full w-full place-items-center gap-6  px-6 ">
                 {Array.from({ length: 20 }).map((_, i) => {
                   const url = `/avatars/avatars/${i}.png`;
-                  console.log("img url::::::: ", url);
 
                   return (
                     <AvatarWrapper

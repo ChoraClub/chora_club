@@ -23,8 +23,8 @@ const GridLayout: React.FC<GridLayoutProps> = () => {
   // const { peerIds } = usePeerIds({ roles: [Role.LISTENER] });
   const { peerId: localPeerId, role: localPeerRole } = useLocalPeer();
   const { peerIds } = usePeerIds({ roles: [Role.HOST, Role.LISTENER] });
-  console.log("peerIds----- ", peerIds);
-  console.log("Peer id: ", peerIds[0]);
+  // console.log("peerIds----- ", peerIds);
+  // console.log("Peer id: ", peerIds[0]);
   const hostId = peerIds[0];
   const { stream: videoStream, state } = useRemoteVideo({ peerId: hostId });
   const { startScreenShare, stopScreenShare, shareStream, videoTrack } =
@@ -46,9 +46,6 @@ const GridLayout: React.FC<GridLayoutProps> = () => {
       // your code here
     },
   });
-
-  console.log("screenShareVideoStream:::: ", screenShareVideoStream);
-  console.log("videoStream::: ", videoStream);
 
   return (
     <div className="w-full flex items-center justify-center flex-col h-full font-poppins">

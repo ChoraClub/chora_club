@@ -8,7 +8,7 @@ const Speakers = () => {
   const { peerIds } = usePeerIds({ roles: [Role.LISTENER] });
   const { peerId: localPeerId, role: localPeerRole } = useLocalPeer();
 
-  console.log("Peer ids: ", peerIds);
+  // console.log("Peer ids: ", peerIds);
 
   return (
     <>

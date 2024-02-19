@@ -23,6 +23,13 @@ interface TileProps {
   isEvent: string;
 }
 
+interface RoomDetails {
+  message: string;
+  data: {
+    roomId: string;
+  };
+}
+
 function EventTile({ tileIndex, data, isEvent }: TileProps) {
   const [isPageLoading, setIsPageLoading] = useState(true);
   const [isConfirmSlotLoading, setIsConfirmSlotLoading] = useState(true);
@@ -78,6 +85,23 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
       setIsConfirmSlotLoading(false);
       console.error(error);
     }
+  };
+
+  const createRandomRoom = async () => {
+    const res = await fetch("https://api.huddle01.com/api/v1/create-room", {
+      method: "POST",
+      body: JSON.stringify({
+        title: "Test Room",
+      }),
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": process.env.NEXT_PUBLIC_API_KEY ?? "",
+      },
+      cache: "no-store",
+    });
+    const data: RoomDetails = await res.json();
+    const { roomId } = data.data;
+    console.log("Room id: ", roomId);
   };
 
   return (
@@ -151,7 +175,11 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
                   showArrow
                 >
                   <span className="cursor-pointer">
-                    <FaCirclePlay size={35} color="#004DFF" />
+                    <FaCirclePlay
+                      size={35}
+                      color="#004DFF"
+                      onClick={() => createRandomRoom()}
+                    />
                   </span>
                 </Tooltip>
               </div>
