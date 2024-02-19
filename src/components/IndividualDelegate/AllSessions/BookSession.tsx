@@ -27,8 +27,8 @@ const StyledTimePickerContainer = styled.div`
   }
 `;
 function BookSession({ props }: { props: Type }) {
+  // const host_address = "0x3013bb4E03a7B81106D69C10710EaE148C8410E1";
   const host_address = props.individualDelegate;
-  // const address = "0x3013bb4E03a7B81106D69C10710EaE148C8410E1";
   const { isConnected, address } = useAccount();
   const { data: session, status } = useSession();
   const loading = status === "loading";
@@ -59,7 +59,7 @@ function BookSession({ props }: { props: Type }) {
     if (isConnected) {
       setTimeout(() => {
         getAvailability();
-        getSlotAvailability();
+        getSlotTimeAvailability();
       }, 3000);
     }
     setIsPageLoading(false);
@@ -89,7 +89,7 @@ function BookSession({ props }: { props: Type }) {
     }
   };
 
-  const getSlotAvailability = async () => {
+  const getSlotTimeAvailability = async () => {
     try {
       const response = await fetch(`/api/get-meeting/${host_address}`, {
         method: "GET",
@@ -159,6 +159,7 @@ function BookSession({ props }: { props: Type }) {
       description: modalData.description,
       host_address: host_address,
       user_address: address,
+      booking_status: "Pending",
     };
     console.log("requestData", requestData);
 
