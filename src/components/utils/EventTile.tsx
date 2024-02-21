@@ -8,6 +8,8 @@ import toast, { Toaster } from "react-hot-toast";
 import { Oval } from "react-loader-spinner";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import text1 from "@/assets/images/daos/texture1.png";
+import text2 from "@/assets/images/daos/texture2.png";
 interface RoomDetails {
   message: string;
   data: {
@@ -74,18 +76,25 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
     console.log("status:", status);
     try {
       setIsConfirmSlotLoading(true);
-      let roomId = null; // Initialize roomId as null
+      let roomId = null;
+      let meeting_status = null;
       if (status === "Approved") {
-        roomId = await createRandomRoom(); // Call createRandomRoom only if status is Approved
+        roomId = await createRandomRoom();
+        meeting_status = "Upcoming";
+      }
+      if (status === "Rejected") {
+        meeting_status = "Denied";
       }
 
+      console.log(meeting_status);
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
 
-      const raw = JSON.stringify({
+      const raw = await JSON.stringify({
         id: id,
+        meeting_status: meeting_status,
         booking_status: status,
-        meetingId: roomId, // Pass roomId to the PUT request body
+        meetingId: roomId,
       });
 
       const requestOptions = {
@@ -121,7 +130,7 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
       >
         <div className="flex">
           <Image
-            src={data.img}
+            src={data.img || text1}
             alt="image"
             className="w-44 h-44 rounded-3xl border border-[#D9D9D9]"
           />
@@ -132,7 +141,7 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
             </div>
 
             <div className="flex py-2">
-              <div className="bg-[#1E1E1E] border border-[#1E1E1E] text-white rounded-md text-xs px-5 py-1 font-semibold">
+              <div className="capitalize bg-[#1E1E1E] border border-[#1E1E1E] text-white rounded-md text-xs px-5 py-1 font-semibold">
                 {data.dao_name}
               </div>
             </div>
@@ -186,7 +195,9 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
                     <FaCirclePlay
                       size={35}
                       color="#004DFF"
-                      onClick={() => router.push(`/meeting/${data.meetingId}`)}
+                      onClick={() =>
+                        router.push(`/meeting/session/${data.meetingId}`)
+                      }
                     />
                   </span>
                 </Tooltip>

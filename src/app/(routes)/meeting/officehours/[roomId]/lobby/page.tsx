@@ -65,7 +65,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
 
   useEffect(() => {
     if (state === "connected") {
-      push(`/meeting/${params.roomId}`);
+      push(`/meeting/officehours/${params.roomId}`);
     }
   }, [state]);
 

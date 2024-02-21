@@ -29,7 +29,7 @@ const url =
 const provider = new ethers.JsonRpcProvider(url, undefined, {
   staticNetwork: true,
 });
-const privateKey = process.env.PVT_KEY;
+const privateKey = process.env.PVT_KEY ?? "";
 const signer = new ethers.Wallet(privateKey, provider);
 const eas = new EAS("0x4200000000000000000000000000000000000021");
 eas.connect(signer);

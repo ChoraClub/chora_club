@@ -20,6 +20,7 @@ import {
 } from "@huddle01/react/hooks";
 import toast from "react-hot-toast";
 import { useParams } from "next/navigation";
+import axios from "axios";
 
 type BottomBarProps = {};
 
@@ -91,6 +92,45 @@ const BottomBar: React.FC<BottomBarProps> = () => {
         error
       );
       toast.error(`Error during ${isRecording ? "stop" : "start"} recording`);
+    }
+  };
+
+  const handleAttestation = async () => {
+
+    const response = await fetch(
+      "https://api.huddle01.com/api/v1/rooms/meetings?roomId={roomId}",
+      {
+        method: "GET",
+        headers: {
+          "Content-type": "application/json",
+          "x-api-key": process.env.NEXT_PUBLIC_API_KEY ?? "",
+        },
+      }
+    );
+
+    const data = {
+      recipient: "0xbFc4A28D8F1003Bec33f4Fdb7024ad6ad1605AA8",
+      meetingId: "abc-def-ggi",
+      meetingType: 1,
+      startTime: 16452456, // Example start time (in UNIX timestamp format)
+      endTime: 16452492, // Example end time (in UNIX timestamp format)
+    };
+
+    console.log(window.location.origin);
+    const headers = {
+      "Content-Type": "application/json",
+      //   Origin: window.location.origin, // Set the Origin header to your frontend URL
+    };
+
+    try {
+      const response = await axios.post("/api/attest-offchain", data, {
+        headers,
+      });
+      console.log(response.data);
+      // Handle response as needed
+    } catch (error) {
+      console.error("Error:", error);
+      // Handle error
     }
   };
 

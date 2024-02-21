@@ -9,10 +9,13 @@ import { Tooltip } from "@nextui-org/react";
 import EventTile from "../../utils/EventTile";
 import { useAccount } from "wagmi";
 import toast, { Toaster } from "react-hot-toast";
+import { Oval } from "react-loader-spinner";
 
 function BookedUserSessions() {
   const { address } = useAccount();
+  // const address = "0x5e349eca2dc61abcd9dd99ce94d04136151a09ee";
   const [sessionDetails, setSessionDetails] = useState([]);
+  const [pageLoading, setPageLoading] = useState(true);
 
   const getMeetingData = async () => {
     try {
@@ -23,7 +26,7 @@ function BookedUserSessions() {
         },
       });
       const result = await response.json();
-      console.log("result in get meeting", result);
+      // console.log("result in get meeting", result);
       if (result.success) {
         setSessionDetails(result.data);
       }
@@ -34,12 +37,24 @@ function BookedUserSessions() {
 
   useEffect(() => {
     getMeetingData();
+    setPageLoading(false);
   }, [address, sessionDetails]);
 
   return (
     <>
       <div className="space-y-6">
-        {sessionDetails.length > 0 ? (
+        {pageLoading ? (
+          <div className="flex items-center justify-center">
+            <Oval
+              visible={true}
+              height="40"
+              width="40"
+              color="#0500FF"
+              secondaryColor="#cdccff"
+              ariaLabel="oval-loading"
+            />
+          </div>
+        ) : sessionDetails.length > 0 ? (
           sessionDetails.map((data, index) => (
             <EventTile
               key={index}

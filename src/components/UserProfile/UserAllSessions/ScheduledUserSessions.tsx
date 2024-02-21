@@ -187,7 +187,10 @@ function ScheduledUserSessions() {
     setEndTime("");
   };
   return (
-    <div className="max-w-lg mx-auto mt-2 p-8 bg-white rounded shadow-lg">
+    <div
+      style={{ boxShadow: "0px 4px 50.8px 0px rgba(0, 0, 0, 0.11)" }}
+      className="max-w-lg mx-auto mt-2 p-8 bg-white rounded-2xl"
+    >
       <div className="mb-4">
         <label className="block text-gray-700">Select DAO Name:</label>
         <select
@@ -258,7 +261,7 @@ function ScheduledUserSessions() {
 
       <button
         onClick={handleAddSelectedDate}
-        className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+        className="bg-blue-shade-100 hover:bg-blue-shade-200 text-white font-bold py-2 px-4 rounded"
       >
         Add Date
       </button>
@@ -288,7 +291,7 @@ function ScheduledUserSessions() {
 
       <button
         onClick={handleApplyWithCheck}
-        className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded mt-4"
+        className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-4"
       >
         Apply
       </button>

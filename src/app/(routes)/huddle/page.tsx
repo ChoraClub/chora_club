@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import IntroPage from "@/components/IntroPage/IntroPage";
 
@@ -9,6 +10,7 @@ interface RoomDetails {
 }
 
 const createRandomRoom = async () => {
+ 
   const res = await fetch("https://iriko.huddle01.media/api/v1/create-room", {
     method: "POST",
     body: JSON.stringify({
@@ -28,7 +30,7 @@ const createRandomRoom = async () => {
 export default async function Home() {
   const roomId = await createRandomRoom();
 
-  console.log({ roomId });
+  // console.log({ roomId });
 
   return <IntroPage roomId={roomId} />;
 }
