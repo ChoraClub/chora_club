@@ -22,7 +22,7 @@ function AttendingUserSessions() {
       });
 
       const result = await response.json();
-      console.log("result in get session data", result);
+      // console.log("result in get session data", result);
       if (result.success) {
         setSessionDetails(result.data);
       }

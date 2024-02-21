@@ -13,6 +13,7 @@ import { Oval } from "react-loader-spinner";
 
 function BookedUserSessions() {
   const { address } = useAccount();
+  // const address = "0x5e349eca2dc61abcd9dd99ce94d04136151a09ee";
   const [sessionDetails, setSessionDetails] = useState([]);
   const [pageLoading, setPageLoading] = useState(true);
 
@@ -25,7 +26,7 @@ function BookedUserSessions() {
         },
       });
       const result = await response.json();
-      console.log("result in get meeting", result);
+      // console.log("result in get meeting", result);
       if (result.success) {
         setSessionDetails(result.data);
       }

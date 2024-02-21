@@ -33,11 +33,10 @@ import { useNetwork } from "wagmi";
 import { walletClient } from "@/helpers/signer";
 import dao_abi from "../../artifacts/Dao.sol/GovernanceToken.json";
 import axios from "axios";
-import { Oval } from "react-loader-spinner";
 
 function MainProfile() {
-  // const { address } = useAccount();
-  const address = "0x5e349eca2dc61abcd9dd99ce94d04136151a09ee";
+  const { address } = useAccount();
+  // const address = "0x5e349eca2dc61abcd9dd99ce94d04136151a09ee";
   const { chain, chains } = useNetwork();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [img, setImg] = useState<File | undefined>();
@@ -104,7 +103,6 @@ function MainProfile() {
   // Pass the address of whom you want to delegate the voting power to
   const handleDelegateVotes = async (to: string) => {
     const address = await walletClient.getAddresses();
-    console.log(address);
     const address1 = address[0];
 
     console.log(walletClient);
@@ -695,7 +693,7 @@ function MainProfile() {
                           Delegated from
                           <span className="text-blue-shade-200 font-semibold">
                             &nbsp;
-                            {votes.delegatorCount
+                            {formatNumber(votes.delegatorCount)
                               ? formatNumber(votes.delegatorCount)
                               : "number of "}
                             &nbsp;
@@ -830,16 +828,7 @@ function MainProfile() {
         </div>
       ) : (
         <>
-          <div className="flex items-center justify-center pt-10">
-            <Oval
-              visible={true}
-              height="40"
-              width="40"
-              color="#0500FF"
-              secondaryColor="#cdccff"
-              ariaLabel="oval-loading"
-            />
-          </div>
+          <button onClick={handleDelegate}>Loading...</button>
         </>
       )}
     </>

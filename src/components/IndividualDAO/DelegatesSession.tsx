@@ -6,58 +6,79 @@ import text2 from "@/assets/images/daos/texture2.png";
 import search from "@/assets/images/daos/search.png";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Tile from "../utils/Tile";
+import SessionTile from "../utils/SessionTiles";
 
-function DelegatesSession({  props }: { props: string }) {
+interface Session {
+  booking_status: string;
+  dao_name: string;
+  description: string;
+  host_address: string;
+  joined_status: string;
+  meetingId: string;
+  meeting_status: "Upcoming" | "Recorded" | "Denied";
+  slot_time: string;
+  title: string;
+  user_address: string;
+  _id: string;
+}
+
+function DelegatesSession({ props }: { props: string }) {
   const [searchQuery, setSearchQuery] = useState("");
   const router = useRouter();
   const path = usePathname();
   const searchParams = useSearchParams();
-  const details = [
-    {
-      img: text1,
-      title: "Open Forum: Governance, Applications, and Beyond",
-      dao: "Optimism",
-      participant: 12,
-      attendee: "0xf4b0556b9b6f53e00a1fdd2b0478ce841991d8fa",
-      host: "0x1b686ee8e31c5959d9f5bbd8122a58682788eead",
-      started: "15/09/2023 12:15 PM EST",
-      desc: `Join the conversation about the future of ${props}. Discuss governance proposals, dApp adoption, and technical developments.`,
-    },
-    {
-      img: text2,
-      title: "Open Forum: Governance, Applications, and Beyond",
-      dao: "Optimism",
-      participant: 5,
-      attendee: "0xf4b0556b9b6f53e00a1fdd2b0478ce841991d8fa",
-      host: "0x1b686ee8e31c5959d9f5bbd8122a58682788eead",
-      started: "15/09/2023 12:15 PM EST",
-      desc: `Join the conversation about the future of ${props}. Discuss governance proposals, dApp adoption, and technical developments.`,
-    },
-  ];
+  const dao_name = props.charAt(0).toUpperCase() + props.slice(1);
 
-  const [sessionDetails, setSessionDetails] = useState(details);
+  const [sessionDetails, setSessionDetails] = useState([]);
   const [dataLoading, setDataLoading] = useState(true);
 
-  useEffect(() => {
-    setSessionDetails(details);
-    setDataLoading(false);
-  }, []);
+  // console.log("propspropsprops", dao_name);
 
   useEffect(() => {
-    const filtered = details.filter(
-      (item) =>
-        item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.host.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-    setSessionDetails(filtered);
-  }, [searchQuery]);
+    const fetchData = async () => {
+      try {
+        const requestOptions: any = {
+          method: "GET",
+          redirect: "follow",
+        };
+
+        const response = await fetch(
+          `/api/get-dao-sessions/${dao_name}`,
+          requestOptions
+        );
+        const result = await response.json();
+        console.log("resultt:", result);
+        const resultData = await result.data;
+        console.log("resultData", resultData);
+        if (Array.isArray(resultData)) {
+          const filtered: any = resultData.filter((session: Session) => {
+            if (searchParams.get("session") === "upcoming") {
+              return session.meeting_status === "Upcoming";
+            } else if (searchParams.get("session") === "recorded") {
+              return session.meeting_status === "Recorded";
+            }
+          });
+          console.log("filtered", filtered);
+          setSessionDetails(filtered);
+        } else {
+          console.error("API response is not an array:", result);
+        }
+        // setSessionDetails(filtered);
+        // console.log("filtered", filtered);
+      } catch (error) {
+        console.error("Error fetching data", error);
+      }
+    };
+    fetchData();
+  }, [searchParams.get("session")]);
+
+  useEffect(() => {
+    setSessionDetails([]);
+    setDataLoading(false);
+  }, [props]);
 
   return (
     <div className="font-poppins">
-      {/* <div className="font-semibold text-xl text-blue-shade-200">
-        Delegate's Session
-      </div> */}
-
       <div
         style={{ background: "rgba(238, 237, 237, 0.36)" }}
         className="flex border-[0.5px] border-black w-fit rounded-full my-4 font-poppins"
@@ -77,18 +98,6 @@ function DelegatesSession({  props }: { props: string }) {
 
       <div className="pr-36 pt-3">
         <div className="flex gap-16 border-1 border-[#7C7C7C] pl-6 rounded-xl text-sm">
-          <button
-            className={`py-2  ${
-              searchParams.get("session") === "ongoing"
-                ? "text-[#3E3D3D] font-bold"
-                : "text-[#7C7C7C]"
-            }`}
-            onClick={() =>
-              router.push(path + "?active=delegatesSession&session=ongoing")
-            }
-          >
-            Ongoing
-          </button>
           <button
             className={`py-2 ${
               searchParams.get("session") === "upcoming"
@@ -116,14 +125,21 @@ function DelegatesSession({  props }: { props: string }) {
         </div>
 
         <div className="py-10">
-          {searchParams.get("session") === "ongoing" && (
-             <Tile sessionDetails={sessionDetails} dataLoading={dataLoading} isEvent="Ongoing" isOfficeHour={false} />
-          )}
           {searchParams.get("session") === "upcoming" && (
-             <Tile sessionDetails={sessionDetails} dataLoading={dataLoading} isEvent="Upcoming" isOfficeHour={false} />
+            <SessionTile
+              sessionDetails={sessionDetails}
+              dataLoading={dataLoading}
+              isEvent="Upcoming"
+              isOfficeHour={false}
+            />
           )}
           {searchParams.get("session") === "recorded" && (
-             <Tile sessionDetails={sessionDetails} dataLoading={dataLoading} isEvent="Recorded" isOfficeHour={false} />
+            <SessionTile
+              sessionDetails={sessionDetails}
+              dataLoading={dataLoading}
+              isEvent="Recorded"
+              isOfficeHour={false}
+            />
           )}
         </div>
       </div>

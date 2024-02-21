@@ -1,11 +1,23 @@
 import React, { useState, useEffect } from "react";
-// import DegelateOngoingSession from "./AllSessions/DegelateOngoingSession";
-// import DelegateUpcomingSession from "./AllSessions/DelegateUpcomingSession";
 import Tile from "../utils/Tile";
 import BookSession from "./AllSessions/BookSession";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-// import DelegateHostedSessions from "./AllSessions/DelegateHostedSessions";
 import text1 from "@/assets/images/daos/texture1.png";
+import SessionTile from "../utils/SessionTiles";
+
+interface Session {
+  booking_status: string;
+  dao_name: string;
+  description: string;
+  host_address: string;
+  joined_status: string;
+  meetingId: string;
+  meeting_status: "Upcoming" | "Recorded" | "Denied";
+  slot_time: string;
+  title: string;
+  user_address: string;
+  _id: string;
+}
 
 interface Type {
   daoDelegates: string;
@@ -16,26 +28,59 @@ function DelegateSessions({ props }: { props: Type }) {
   const router = useRouter();
   const path = usePathname();
   const searchParams = useSearchParams();
-  const details = [
-    {
-      img: text1,
-      title: "Open Forum: Governance, Applications, and Beyond",
-      dao: props.daoDelegates,
-      participant: 12,
-      attendee: "0xf4b0556b9b6f53e00a1fdd2b0478ce841991d8fa",
-      host: "0x1b686ee8e31c5959d9f5bbd8122a58682788eead",
-      started: "07/09/2023 12:15 PM EST",
-      desc: `Join the conversation about the future of ${props.daoDelegates}. Discuss governance proposals, dApp adoption, and technical developments.`,
-    },
-  ];
 
-  const [sessionDetails, setSessionDetails] = useState(details);
   const [dataLoading, setDataLoading] = useState(true);
+  const [sessionDetails, setSessionDetails] = useState([]);
+  const daoName = props.daoDelegates;
+
+  const dao_name = daoName.charAt(0).toUpperCase() + daoName.slice(1);
+
+  const getMeetingData = async () => {
+    try {
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+
+      const raw = await JSON.stringify({
+        dao_name: dao_name,
+        host_address: props.individualDelegate,
+      });
+      console.log("raw", raw);
+      const requestOptions: any = {
+        method: "POST",
+        headers: myHeaders,
+        body: raw,
+        redirect: "follow",
+      };
+      const response = await fetch("/api/get-specific-session", requestOptions);
+      const result = await response.json();
+      console.log("result in get meetinggggg", result);
+      if (result) {
+        const resultData = await result;
+        console.log("resultData", resultData);
+        if (Array.isArray(resultData)) {
+          const filtered: any = resultData.filter((session: Session) => {
+            if (searchParams.get("session") === "upcoming") {
+              return session.meeting_status === "Upcoming";
+            }
+          });
+          console.log("filtered", filtered);
+          setSessionDetails(filtered);
+        }
+      }
+    } catch (error) {
+      console.log("error in catch", error);
+    }
+  };
 
   useEffect(() => {
-    setSessionDetails(details);
+    getMeetingData();
     setDataLoading(false);
-  }, []);
+  }, [
+    props.daoDelegates,
+    props.individualDelegate,
+    sessionDetails,
+    searchParams.get("session"),
+  ]);
 
   return (
     <div>
@@ -53,7 +98,7 @@ function DelegateSessions({ props }: { props: Type }) {
           >
             Book
           </button>
-          <button
+          {/* <button
             className={`py-2  ${
               searchParams.get("session") === "ongoing"
                 ? "text-[#3E3D3D] font-bold"
@@ -64,7 +109,7 @@ function DelegateSessions({ props }: { props: Type }) {
             }
           >
             Ongoing
-          </button>
+          </button> */}
           <button
             className={`py-2 ${
               searchParams.get("session") === "upcoming"
@@ -107,19 +152,34 @@ function DelegateSessions({ props }: { props: Type }) {
           {searchParams.get("session") === "book" && (
             <BookSession props={props} />
           )}
-          {searchParams.get("session") === "ongoing" && (
+          {/* {searchParams.get("session") === "ongoing" && (
             <>
             <Tile sessionDetails={sessionDetails} dataLoading={dataLoading} isEvent="Ongoing" isOfficeHour={false} />
             </>
-          )}
+          )} */}
           {searchParams.get("session") === "upcoming" && (
-            <Tile sessionDetails={sessionDetails} dataLoading={dataLoading} isEvent="upcoming" isOfficeHour={false} />
+            <SessionTile
+              sessionDetails={sessionDetails}
+              dataLoading={dataLoading}
+              isEvent="Upcoming"
+              isOfficeHour={false}
+            />
           )}
           {searchParams.get("session") === "hosted" && (
-            <Tile sessionDetails={sessionDetails} dataLoading={dataLoading} isEvent="Recorded" isOfficeHour={false} />
+            <SessionTile
+              sessionDetails={sessionDetails}
+              dataLoading={dataLoading}
+              isEvent="Recorded"
+              isOfficeHour={false}
+            />
           )}
           {searchParams.get("session") === "attended" && (
-            <Tile sessionDetails={sessionDetails} dataLoading={dataLoading} isEvent="Recorded" isOfficeHour={false} />
+            <SessionTile
+              sessionDetails={sessionDetails}
+              dataLoading={dataLoading}
+              isEvent="Recorded"
+              isOfficeHour={false}
+            />
           )}
         </div>
       </div>

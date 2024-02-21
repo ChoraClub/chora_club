@@ -12,7 +12,7 @@ export async function PUT(
   res: NextResponse<UpdateBookingStatusResponse>
 ) {
   try {
-    const { id, booking_status, meetingId } = await req.json();
+    const { id, meeting_status, booking_status, meetingId } = await req.json();
 
     // Validate the ID and booking_status
     if (
@@ -42,7 +42,7 @@ export async function PUT(
     console.log(`Updating booking status for meeting with ID ${id}...`);
     const updateResult = await collection.updateOne(
       { _id: new ObjectId(id) },
-      { $set: { booking_status, meetingId } }
+      { $set: { meeting_status, booking_status, meetingId } }
     );
 
     console.log("Meeting booking status updated:", updateResult);
