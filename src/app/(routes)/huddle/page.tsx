@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import IntroPage from "@/components/IntroPage/IntroPage";
 import { useAccount } from "wagmi";
@@ -9,14 +10,13 @@ interface RoomDetails {
   };
 }
 
-const address = useAccount();
-
 const createRandomRoom = async () => {
+  const { address } = useAccount();
   const res = await fetch("https://iriko.huddle01.media/api/v1/create-room", {
     method: "POST",
     body: JSON.stringify({
       title: "Test Room",
-      hostWallets: [address],
+      hostWallets: [`${address}`],
     }),
     headers: {
       "Content-Type": "application/json",
@@ -32,7 +32,7 @@ const createRandomRoom = async () => {
 export default async function Home() {
   const roomId = await createRandomRoom();
 
-  console.log({ roomId });
+  // console.log({ roomId });
 
   return <IntroPage roomId={roomId} />;
 }

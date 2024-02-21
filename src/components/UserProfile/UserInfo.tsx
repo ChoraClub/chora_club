@@ -2,15 +2,21 @@ import React, { ChangeEvent, useState, useEffect } from "react";
 import { useAccount } from "wagmi";
 import { useNetwork } from "wagmi";
 
-interface userInfoProps{
+interface userInfoProps {
   description: string;
-  onSaveButtonClick: (description?:string) => Promise<void>;
+  onSaveButtonClick: (description?: string) => Promise<void>;
   isLoading: boolean;
-  descAvailable:boolean;
-  karmaDesc:string;
+  descAvailable: boolean;
+  karmaDesc: string;
 }
 
-function UserInfo({description, onSaveButtonClick, isLoading, descAvailable, karmaDesc}:userInfoProps) {
+function UserInfo({
+  description,
+  onSaveButtonClick,
+  isLoading,
+  descAvailable,
+  karmaDesc,
+}: userInfoProps) {
   const details = [
     {
       number: 10,
@@ -45,7 +51,6 @@ function UserInfo({description, onSaveButtonClick, isLoading, descAvailable, kar
   const [tempDesc, setTempDesc] = useState("");
   const [desc, setDesc] = useState<string>();
   const [loading, setLoading] = useState(false);
-  
 
   const handleDescChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
     setTempDesc(event.target.value);
@@ -53,17 +58,15 @@ function UserInfo({description, onSaveButtonClick, isLoading, descAvailable, kar
   };
 
   const handleSaveClick = async () => {
-    setLoading(true)
-    console.log("Desc", tempDesc)
+    setLoading(true);
+    console.log("Desc", tempDesc);
     await onSaveButtonClick(tempDesc);
     setEditing(false);
-    setLoading(false)
+    setLoading(false);
   };
 
- 
   return (
     <div className="pt-4">
-      
       <div className="grid grid-cols-5 pe-32 gap-7">
         {data.length > 0 ? (
           data.map((key, index) => (
@@ -81,16 +84,13 @@ function UserInfo({description, onSaveButtonClick, isLoading, descAvailable, kar
           <div>No data available</div>
         )}
       </div>
-      
+
       <div
         style={{ boxShadow: "0px 4px 30.9px 0px rgba(0, 0, 0, 0.12)" }}
         className={`flex flex-col justify-between min-h-48 rounded-xl my-7 me-32 p-3 
-        ${isEditing ? "outline" : ""
-        }`
-        
-      }
+        ${isEditing ? "outline" : ""}`}
       >
-       <textarea
+        <textarea
           readOnly={!isEditing}
           className="outline-none min-h-48"
           onChange={handleDescChange}
@@ -98,21 +98,20 @@ function UserInfo({description, onSaveButtonClick, isLoading, descAvailable, kar
           placeholder={"Type your description here..."}
           // style={{height:"200px",width:"250px"}}
         />
-        
 
         <div className="flex justify-end">
           {isEditing && (
             <button
               className="bg-blue-shade-100 text-white text-sm py-1 px-3 rounded-full font-semibold"
-              onClick={handleSaveClick} 
+              onClick={handleSaveClick}
             >
               {loading ? "Saving" : "Save"}
             </button>
           )}
-         
-         {!isEditing && (
+
+          {!isEditing && (
             <button
-              className="bg-blue-shade-100 text-white text-sm py-1 px-4 rounded-full font-semibold"
+              className="bg-blue-shade-100 text-white text-sm py-1 px-4 mt-3 rounded-full font-semibold"
               onClick={() => setEditing(true)}
             >
               Edit
@@ -120,7 +119,6 @@ function UserInfo({description, onSaveButtonClick, isLoading, descAvailable, kar
           )}
         </div>
       </div>
-     
     </div>
   );
 }

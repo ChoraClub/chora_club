@@ -186,7 +186,9 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
                     <FaCirclePlay
                       size={35}
                       color="#004DFF"
-                      onClick={() => router.push(`/meeting/${data.meetingId}`)}
+                      onClick={() =>
+                        router.push(`/meeting/session/${data.meetingId}`)
+                      }
                     />
                   </span>
                 </Tooltip>

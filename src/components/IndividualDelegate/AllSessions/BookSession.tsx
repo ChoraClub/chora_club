@@ -23,9 +23,10 @@ interface Type {
 }
 const StyledTimePickerContainer = styled.div`
   div > ul {
-    height: 444px;
+    height: 400px;
   }
 `;
+
 function BookSession({ props }: { props: Type }) {
   // const host_address = "0x3013bb4E03a7B81106D69C10710EaE148C8410E1";
   const host_address = props.individualDelegate;
@@ -300,10 +301,11 @@ function BookSession({ props }: { props: Type }) {
       ) : (
         <div className="flex justify-center">
           <div
+            className="rounded-2xl"
             style={{
               margin: "0 auto",
               marginTop: "2rem",
-              boxShadow: "0px 0px 4px -1px black",
+              boxShadow: "0px 4px 50.8px 0px rgba(0, 0, 0, 0.11)",
               width: "fit-content",
             }}
           >

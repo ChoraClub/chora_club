@@ -33,6 +33,7 @@ import { useNetwork } from "wagmi";
 import { walletClient } from "@/helpers/signer";
 import dao_abi from "../../artifacts/Dao.sol/GovernanceToken.json";
 import axios from "axios";
+import { Oval } from "react-loader-spinner";
 
 function MainProfile() {
   // const { address } = useAccount();
@@ -58,17 +59,17 @@ function MainProfile() {
   const [ensName, setEnsName] = useState("");
   const [karmaDesc, setKarmaDesc] = useState("");
   const [votes, setVotes] = useState<any>();
-  const [descAvailable, setDescAvailable] = useState<boolean>(true)
+  const [descAvailable, setDescAvailable] = useState<boolean>(true);
   const handleLogoClick = () => {
     fileInputRef.current?.click();
   };
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>): void => {
     const selectedFile = e.target.files?.[0];
-    console.log(selectedFile)
-    console.log("Selected File", selectedFile)
+    console.log(selectedFile);
+    console.log("Selected File", selectedFile);
     if (selectedFile) {
       setImg(selectedFile);
-      console.log("Set Image", img)
+      console.log("Set Image", img);
       // handleSubmit();
     }
   };
@@ -103,6 +104,7 @@ function MainProfile() {
   // Pass the address of whom you want to delegate the voting power to
   const handleDelegateVotes = async (to: string) => {
     const address = await walletClient.getAddresses();
+    console.log(address);
     const address1 = address[0];
 
     console.log(walletClient);
@@ -185,7 +187,9 @@ function MainProfile() {
             }
           }
         } else {
-          console.log("Data not found in the database, fetching from third-party API");
+          console.log(
+            "Data not found in the database, fetching from third-party API"
+          );
           // Data not found in the database, fetch data from the third-party API
           let dao = "";
           if (chain && chain.name === "Optimism") {
@@ -195,45 +199,57 @@ function MainProfile() {
           } else {
             return;
           }
-  
+
           const res = await fetch(
             `https://api.karmahq.xyz/api/dao/find-delegate?dao=${dao}&user=${address}`
           );
-          if(responseFromDB === false && description==""){
+          if (responseFromDB === false && description == "") {
             setDescAvailable(false);
           }
 
           const details = await res.json();
           if (res.ok) {
             // Check if delegate data is present in the response
-            console.log("Response Success----")
+            console.log("Response Success----");
             if (details && details.data && details.data.delegate) {
               // If delegate data is present, set isDelegate to true
-              console.log("Setting Up Karma's Data---")
+              console.log("Setting Up Karma's Data---");
               setIsDelegate(true);
               setProfileDetails(details.data.delegate);
-              setDescription(details.data.delegate.delegatePitch.customFields[1].value);
-              setDescAvailable(true)
+              setDescription(
+                details.data.delegate.delegatePitch.customFields[1].value
+              );
+              setDescAvailable(true);
               if (details.data.delegate.twitterHandle != null) {
-                setTwitter(`https://twitter.com/${details.data.delegate.twitterHandle}`);
+                setTwitter(
+                  `https://twitter.com/${details.data.delegate.twitterHandle}`
+                );
               }
-  
+
               if (details.data.delegate.discourseHandle != null) {
                 if (dao === "optimism") {
-                  setDiscourse(`https://gov.optimism.io/u/${details.data.delegate.discourseHandle}`);
-                  console.log("Discourse", discourse)
+                  setDiscourse(
+                    `https://gov.optimism.io/u/${details.data.delegate.discourseHandle}`
+                  );
+                  console.log("Discourse", discourse);
                 }
                 if (dao === "arbitrum") {
-                  setDiscourse(`https://forum.arbitrum.foundation/u/${details.data.delegate.discourseHandle}`);
+                  setDiscourse(
+                    `https://forum.arbitrum.foundation/u/${details.data.delegate.discourseHandle}`
+                  );
                 }
               }
-  
+
               if (details.data.delegate.discordHandle != null) {
-                setDiscord(`https://discord.com/${details.data.delegate.discordHandle}`);
+                setDiscord(
+                  `https://discord.com/${details.data.delegate.discordHandle}`
+                );
               }
-  
+
               if (details.data.delegate.githubHandle != null) {
-                setGithub(`https://github.com/${details.data.delegate.githubHandle}`);
+                setGithub(
+                  `https://github.com/${details.data.delegate.githubHandle}`
+                );
               }
             } else {
               // If delegate data is not present, set isDelegate to false
@@ -244,39 +260,37 @@ function MainProfile() {
             setIsDelegate(false);
           }
         }
-
-       
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
-  
+
     fetchData();
   }, [chain, address]);
-  
-const handleDelegate = () => {
-  console.log("IsDelegate Status", isDelegate)
-}
-const handleSubmit = async (newDescription?:string) => {
+
+  const handleDelegate = () => {
+    console.log("IsDelegate Status", isDelegate);
+  };
+  const handleSubmit = async (newDescription?: string) => {
     try {
       // Check if the delegate already exists in the database
-      if(newDescription){
-        setDescription(newDescription)
-        console.log("New Description", description)
+      if (newDescription) {
+        setDescription(newDescription);
+        console.log("New Description", description);
       }
       setIsLoading(true);
       const isExisting = await checkDelegateExists(address);
-  
+
       if (isExisting) {
         // If delegate exists, update the delegate
         await handleUpdate(newDescription);
-        setIsLoading(false)
-        console.log("Existing True")
+        setIsLoading(false);
+        console.log("Existing True");
       } else {
         // If delegate doesn't exist, add a new delegate
         await handleAdd(newDescription);
-        setIsLoading(false)
-        console.log("Sorry! Doesnt exist")
+        setIsLoading(false);
+        console.log("Sorry! Doesnt exist");
       }
 
       toast.success("Saved");
@@ -287,7 +301,7 @@ const handleSubmit = async (newDescription?:string) => {
     }
   };
 
-  const checkDelegateExists = async (address:any) => {
+  const checkDelegateExists = async (address: any) => {
     try {
       // Make a request to your backend API to check if the address exists
       let dao = "";
@@ -298,7 +312,7 @@ const handleSubmit = async (newDescription?:string) => {
       } else {
         return;
       }
-      console.log("Checking")
+      console.log("Checking");
       const response = await axios.get(`/api/profile/${address}`);
       if (Array.isArray(response.data.data) && response.data.data.length > 0) {
         // Iterate over each item in the response data array
@@ -309,16 +323,16 @@ const handleSubmit = async (newDescription?:string) => {
           }
         }
       }
-      
+
       return false;
-    // Assuming the API returns whether the delegate exists
+      // Assuming the API returns whether the delegate exists
     } catch (error) {
       console.error("Error checking delegate existence:", error);
       return false;
     }
   };
 
-  const handleAdd = async (newDescription?:string) => {
+  const handleAdd = async (newDescription?: string) => {
     try {
       // Call the POST API function for adding a new delegate
       let dao = "";
@@ -329,11 +343,11 @@ const handleSubmit = async (newDescription?:string) => {
       } else {
         return;
       }
-      console.log("Adding the delegate..")
-      const response = await axios.post('/api/profile', {
+      console.log("Adding the delegate..");
+      const response = await axios.post("/api/profile", {
         address: address,
         image: img,
-        daoName:dao,
+        daoName: dao,
         description: newDescription,
         isDelegate: true,
         socialHandles: {
@@ -343,9 +357,9 @@ const handleSubmit = async (newDescription?:string) => {
           github: github,
         },
       });
-  
+
       console.log("Response Add", response);
-  
+
       if (response.status === 200) {
         // Delegate added successfully
         console.log("Delegate added successfully:", response.data);
@@ -361,16 +375,15 @@ const handleSubmit = async (newDescription?:string) => {
       setIsLoading(false);
     }
   };
-  
-  
+
   // Function to handle updating an existing delegate
-  const handleUpdate = async (newDescription?:string) => {
+  const handleUpdate = async (newDescription?: string) => {
     try {
       // Call the PUT API function for updating an existing delegate
-     
-      console.log("Updating")
-      console.log("Inside Updating Description", newDescription)
-      const response:any = await axios.put('/api/profile',{
+
+      console.log("Updating");
+      console.log("Inside Updating Description", newDescription);
+      const response: any = await axios.put("/api/profile", {
         address: address,
         image: img,
         description: newDescription,
@@ -382,7 +395,7 @@ const handleSubmit = async (newDescription?:string) => {
           github: github,
         },
       });
-  
+
       // Handle response from the PUT API function
       if (response.success) {
         // Delegate updated successfully
@@ -400,9 +413,8 @@ const handleSubmit = async (newDescription?:string) => {
     }
   };
   useEffect(() => {
-    
     const fetchData = async () => {
-      console.log("Description", description)
+      console.log("Description", description);
       try {
         let dao = "";
         if (chain && chain.name === "Optimism") {
@@ -412,21 +424,23 @@ const handleSubmit = async (newDescription?:string) => {
         } else {
           return;
         }
-        console.log("Fetching Data...")
+        console.log("Fetching Data...");
         const res = await fetch(
           `https://api.karmahq.xyz/api/dao/find-delegate?dao=${dao}&user=${address}`
         );
-        console.log("Response",res)
-       
+        console.log("Response", res);
+
         // console.log("Desc.", description)
         if (res.ok) {
           const details = await res.json();
-          console.log("Data Fetched...", details.data.delegate.ensName)
+          console.log("Data Fetched...", details.data.delegate.ensName);
           setEnsName(details.data.delegate.ensName);
           setKarmaImage(details.data.delegate.profilePicture);
-          setKarmaDesc(details.data.delegate.delegatePitch.customFields[1].value);
-          setVotes(details.data.delegate)
-          console.log("Votes", votes)
+          setKarmaDesc(
+            details.data.delegate.delegatePitch.customFields[1].value
+          );
+          setVotes(details.data.delegate);
+          console.log("Votes", votes);
           // setProfileDetails(details.data.delegate);
 
           // Check if delegate data is present in the response
@@ -442,37 +456,35 @@ const handleSubmit = async (newDescription?:string) => {
           setIsDelegate(false);
         } else {
           // Handle other error cases
-          setIsDelegate(false)
+          setIsDelegate(false);
         }
       } catch (err) {
         console.error("Error fetching data:", err);
       }
     };
-  
+
     fetchData();
   }, [chain, address]);
-  
 
-  
   return (
     <>
-    {isDelegate !== undefined ? (
-    <div className="font-poppins">
-      <div className="flex ps-14 py-5 pe-10 justify-between">
-        <div className="flex">
-          <div
-            className="relative"
-            onMouseEnter={() => setHovered(true)}
-            onMouseLeave={() => setHovered(false)}
-          >
-            <Image
-              src={karmaImage || profileDetails?.profilePicture || user1}
-              alt="user"
-              width={40}
-              height={40}
-              className="w-40 rounded-3xl"
-            />
-            {/* <div
+      {isDelegate !== undefined ? (
+        <div className="font-poppins">
+          <div className="flex ps-14 py-5 pe-10 justify-between">
+            <div className="flex">
+              <div
+                className="relative"
+                onMouseEnter={() => setHovered(true)}
+                onMouseLeave={() => setHovered(false)}
+              >
+                <Image
+                  src={karmaImage || profileDetails?.profilePicture || user1}
+                  alt="user"
+                  width={40}
+                  height={40}
+                  className="w-40 rounded-3xl"
+                />
+                {/* <div
               className={`absolute top-3 right-3 cursor-pointer  ${
                 hovered ? "bg-gray-50 rounded-full p-1" : "hidden"
               } `}
@@ -486,275 +498,293 @@ const handleSubmit = async (newDescription?:string) => {
                 onChange={handleFileChange}
               />
             </div> */}
-          </div>
-
-          <div className="px-4">
-            <div className=" flex items-center py-1">
-              <div className="font-bold text-lg pr-4">
-                {ensName || profileDetails?.ensName ? (
-                 ensName || profileDetails?.ensName
-                ) : (
-                  <>
-                    {`${address}`.substring(0, 6)} ...{" "}
-                    {`${address}`.substring(`${address}`.length - 4)}
-                  </>
-                )}
-
               </div>
-              <div className="flex gap-3">
-                <Link
-                  href={twitter}
-                  className={`border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 ${
-                    twitter == "" ? "hidden" : ""
-                  }`}
-                  style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                  target="_blank"
-                >
-                  <FaXTwitter color="#7C7C7C" size={12} />
-                </Link>
-                <Link
-                  href={discourse}
-                  className={`border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1  ${
-                    discourse == "" ? "hidden" : ""
-                  }`}
-                  style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                  target="_blank"
-                >
-                  <BiSolidMessageRoundedDetail color="#7C7C7C" size={12} />
-                </Link>
-                <Link
-                  href={discord}
-                  className={`border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 ${
-                    discord == "" ? "hidden" : ""
-                  }`}
-                  style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                  target="_blank"
-                >
-                  <FaDiscord color="#7C7C7C" size={12} />
-                </Link>
-                <Link
-                  href={github}
-                  className={`border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 ${
-                    github == "" ? "hidden" : ""
-                  }`}
-                  style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                  target="_blank"
-                >
-                  <FaGithub color="#7C7C7C" size={12} />
-                </Link>
-                <Tooltip
-                  content="Edit social links"
-                  placement="right"
-                  showArrow
-                >
-                  <span
-                    className="border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 cursor-pointer"
-                    style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                    onClick={onOpen}
-                  >
-                    <FaPencil color="#3e3d3d" size={12} />
-                  </span>
-                </Tooltip>
-                <Modal
-                  isOpen={isOpen}
-                  onOpenChange={onOpenChange}
-                  className="font-poppins"
-                >
-                  <ModalContent>
-                    {(onClose:any) => (
+
+              <div className="px-4">
+                <div className=" flex items-center py-1">
+                  <div className="font-bold text-lg pr-4">
+                    {ensName || profileDetails?.ensName ? (
+                      ensName || profileDetails?.ensName
+                    ) : (
                       <>
-                        <ModalHeader className="flex flex-col gap-1">
-                          Edit Socials
-                        </ModalHeader>
-                        <ModalBody>
-                          <div className="px-1 font-medium">Twitter ID:</div>
-                          <input
-                            type="url"
-                            value={twitter}
-                            placeholder="https://twitter.com/"
-                            className="outline-none bg-[#D9D9D945] rounded-md px-2 py-1 text-sm"
-                            onChange={(e) =>
-                              handleInputChange("twitter", e.target.value)
-                            }
-                          />
-
-                          <div className="px-1 font-medium">Discourse ID:</div>
-                          <input
-                            type="url"
-                            value={discourse}
-                            placeholder="https://discourse.com/"
-                            className="outline-none bg-[#D9D9D945] rounded-md px-2 py-1 text-sm"
-                            onChange={(e) =>
-                              handleInputChange("discourse", e.target.value)
-                            }
-                          />
-
-                          <div className="px-1 font-medium">Discord ID:</div>
-                          <input
-                            type="url"
-                            value={discord}
-                            placeholder="https://discord.com/"
-                            className="outline-none bg-[#D9D9D945] rounded-md px-2 py-1 text-sm"
-                            onChange={(e) =>
-                              handleInputChange("discord", e.target.value)
-                            }
-                          />
-                          <div className="px-1 font-medium">Github ID:</div>
-                          <input
-                            type="url"
-                            value={github}
-                            placeholder="https://github.com/"
-                            className="outline-none bg-[#D9D9D945] rounded-md px-2 py-1 text-sm"
-                            onChange={(e) =>
-                              handleInputChange("github", e.target.value)
-                            }
-                          />
-                        </ModalBody>
-                        <ModalFooter>
-                          <Button color="default" onPress={onClose}>
-                            Close
-                          </Button>
-                          <Button color="primary"  onClick={() => handleSubmit()}>
-                            {isLoading ? "Saving":"Save"}
-                          </Button>
-                        </ModalFooter>
+                        {`${address}`.substring(0, 6)} ...{" "}
+                        {`${address}`.substring(`${address}`.length - 4)}
                       </>
                     )}
-                  </ModalContent>
-                </Modal>
-              </div>
-            </div>
+                  </div>
+                  <div className="flex gap-3">
+                    <Link
+                      href={twitter}
+                      className={`border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 ${
+                        twitter == "" ? "hidden" : ""
+                      }`}
+                      style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
+                      target="_blank"
+                    >
+                      <FaXTwitter color="#7C7C7C" size={12} />
+                    </Link>
+                    <Link
+                      href={discourse}
+                      className={`border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1  ${
+                        discourse == "" ? "hidden" : ""
+                      }`}
+                      style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
+                      target="_blank"
+                    >
+                      <BiSolidMessageRoundedDetail color="#7C7C7C" size={12} />
+                    </Link>
+                    <Link
+                      href={discord}
+                      className={`border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 ${
+                        discord == "" ? "hidden" : ""
+                      }`}
+                      style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
+                      target="_blank"
+                    >
+                      <FaDiscord color="#7C7C7C" size={12} />
+                    </Link>
+                    <Link
+                      href={github}
+                      className={`border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 ${
+                        github == "" ? "hidden" : ""
+                      }`}
+                      style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
+                      target="_blank"
+                    >
+                      <FaGithub color="#7C7C7C" size={12} />
+                    </Link>
+                    <Tooltip
+                      content="Edit social links"
+                      placement="right"
+                      showArrow
+                    >
+                      <span
+                        className="border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 cursor-pointer"
+                        style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
+                        onClick={onOpen}
+                      >
+                        <FaPencil color="#3e3d3d" size={12} />
+                      </span>
+                    </Tooltip>
+                    <Modal
+                      isOpen={isOpen}
+                      onOpenChange={onOpenChange}
+                      className="font-poppins"
+                    >
+                      <ModalContent>
+                        {(onClose: any) => (
+                          <>
+                            <ModalHeader className="flex flex-col gap-1">
+                              Edit Socials
+                            </ModalHeader>
+                            <ModalBody>
+                              <div className="px-1 font-medium">
+                                Twitter ID:
+                              </div>
+                              <input
+                                type="url"
+                                value={twitter}
+                                placeholder="https://twitter.com/"
+                                className="outline-none bg-[#D9D9D945] rounded-md px-2 py-1 text-sm"
+                                onChange={(e) =>
+                                  handleInputChange("twitter", e.target.value)
+                                }
+                              />
 
-            <div className="flex items-center py-1">
-              <div>
-                {`${address}`.substring(0, 6)} ...{" "}
-                {`${address}`.substring(`${address}`.length - 4)}
-              </div>
+                              <div className="px-1 font-medium">
+                                Discourse ID:
+                              </div>
+                              <input
+                                type="url"
+                                value={discourse}
+                                placeholder="https://discourse.com/"
+                                className="outline-none bg-[#D9D9D945] rounded-md px-2 py-1 text-sm"
+                                onChange={(e) =>
+                                  handleInputChange("discourse", e.target.value)
+                                }
+                              />
 
-              <Tooltip
-                content="Copy"
-                placement="right"
-                closeDelay={1}
-                showArrow
-              >
-                <span className="px-2 cursor-pointer" color="#3E3D3D">
-                  <IoCopy onClick={() => handleCopy(`${address}`)} />
-                </span>
-              </Tooltip>
-              <Toaster
-                toastOptions={{
-                  style: {
-                    fontSize: "14px",
-                    backgroundColor: "#3E3D3D",
-                    color: "#fff",
-                    boxShadow: "none",
-                    borderRadius: "50px",
-                    padding: "3px 5px",
-                  },
-                }}
-              />
-            </div>
-            {votes ?
-            ( isDelegate ===true &&( <div className="flex gap-4 py-1">
-              <div className="text-[#4F4F4F] border-[0.5px] border-[#D9D9D9] rounded-md px-3 py-1">
-                <span className="text-blue-shade-200 font-semibold">
-                  {votes.delegatedVotes ? formatNumber(Number(votes.delegatedVotes) ):"Fetching "}
-                  &nbsp;
-                </span>
-                delegated tokens
-              </div>
-              <div className="text-[#4F4F4F] border-[0.5px] border-[#D9D9D9] rounded-md px-3 py-1">
-              <span className="text-blue-shade-200 font-semibold">{formatNumber(votes.delegatorCount) ? null : "Fetching "}</span>
-              Delegated from
-                <span className="text-blue-shade-200 font-semibold">
-                  &nbsp;{formatNumber(votes.delegatorCount) ? formatNumber(votes.delegatorCount) : "number of "}&nbsp;
-                </span>
-                Addresses
-              </div>
-            </div>)):null}
+                              <div className="px-1 font-medium">
+                                Discord ID:
+                              </div>
+                              <input
+                                type="url"
+                                value={discord}
+                                placeholder="https://discord.com/"
+                                className="outline-none bg-[#D9D9D945] rounded-md px-2 py-1 text-sm"
+                                onChange={(e) =>
+                                  handleInputChange("discord", e.target.value)
+                                }
+                              />
+                              <div className="px-1 font-medium">Github ID:</div>
+                              <input
+                                type="url"
+                                value={github}
+                                placeholder="https://github.com/"
+                                className="outline-none bg-[#D9D9D945] rounded-md px-2 py-1 text-sm"
+                                onChange={(e) =>
+                                  handleInputChange("github", e.target.value)
+                                }
+                              />
+                            </ModalBody>
+                            <ModalFooter>
+                              <Button color="default" onPress={onClose}>
+                                Close
+                              </Button>
+                              <Button
+                                color="primary"
+                                onClick={() => handleSubmit()}
+                              >
+                                {isLoading ? "Saving" : "Save"}
+                              </Button>
+                            </ModalFooter>
+                          </>
+                        )}
+                      </ModalContent>
+                    </Modal>
+                  </div>
+                </div>
 
-            {isDelegate === false ? 
-           ( <div className="pt-2 flex gap-5">
-              {/* pass address of whom you want to delegate the voting power to */}
-              <button
-                className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
-                onClick={() =>
-                  handleDelegateVotes(
-                    `${address}`
-                  )
-                }
-              >
-                Become Delegate
-              </button>
+                <div className="flex items-center py-1">
+                  <div>
+                    {`${address}`.substring(0, 6)} ...{" "}
+                    {`${address}`.substring(`${address}`.length - 4)}
+                  </div>
 
-             
-              <button
-                className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
-                onClick={() => handleAttestation()}
-              >
-                Attest
-              </button>
-              {/* <div className="">
+                  <Tooltip
+                    content="Copy"
+                    placement="right"
+                    closeDelay={1}
+                    showArrow
+                  >
+                    <span className="px-2 cursor-pointer" color="#3E3D3D">
+                      <IoCopy onClick={() => handleCopy(`${address}`)} />
+                    </span>
+                  </Tooltip>
+                  <Toaster
+                    toastOptions={{
+                      style: {
+                        fontSize: "14px",
+                        backgroundColor: "#3E3D3D",
+                        color: "#fff",
+                        boxShadow: "none",
+                        borderRadius: "50px",
+                        padding: "3px 5px",
+                      },
+                    }}
+                  />
+                </div>
+                {votes
+                  ? isDelegate === true && (
+                      <div className="flex gap-4 py-1">
+                        <div className="text-[#4F4F4F] border-[0.5px] border-[#D9D9D9] rounded-md px-3 py-1">
+                          <span className="text-blue-shade-200 font-semibold">
+                            {votes.delegatedVotes
+                              ? formatNumber(Number(votes.delegatedVotes))
+                              : "Fetching "}
+                            &nbsp;
+                          </span>
+                          delegated tokens
+                        </div>
+                        <div className="text-[#4F4F4F] border-[0.5px] border-[#D9D9D9] rounded-md px-3 py-1">
+                          <span className="text-blue-shade-200 font-semibold">
+                            {formatNumber(votes.delegatorCount)
+                              ? null
+                              : "Fetching "}
+                          </span>
+                          Delegated from
+                          <span className="text-blue-shade-200 font-semibold">
+                            &nbsp;
+                            {votes.delegatorCount
+                              ? formatNumber(votes.delegatorCount)
+                              : "number of "}
+                            &nbsp;
+                          </span>
+                          Addresses
+                        </div>
+                      </div>
+                    )
+                  : null}
+
+                {isDelegate === false ? (
+                  <div className="pt-2 flex gap-5">
+                    {/* pass address of whom you want to delegate the voting power to */}
+                    <button
+                      className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
+                      onClick={() => handleDelegateVotes(`${address}`)}
+                    >
+                      Become Delegate
+                    </button>
+
+                    <button
+                      className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
+                      onClick={() => handleAttestation()}
+                    >
+                      Attest
+                    </button>
+                    {/* <div className="">
                 <select className="outline-none border border-blue-shade-200 text-blue-shade-200 rounded-full py-2 px-3">
                   <option className="text-gray-700">Optimism</option>
                   <option className="text-gray-700">Arbitrum</option>
                 </select>
               </div> */}
-            </div>):null}
+                  </div>
+                ) : null}
+              </div>
+            </div>
+            <div>
+              <ConnectButton />
+            </div>
           </div>
-        </div>
-        <div>
-          <ConnectButton />
-        </div>
-      </div>
 
-      <div className="flex gap-12 bg-[#D9D9D945] pl-16">
-        <button
-          className={`border-b-2 py-4 px-2 outline-none ${
-            searchParams.get("active") === "info"
-              ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
-              : "border-transparent"
-          }`}
-          onClick={() => router.push(path + "?active=info")}
-        >
-          Info
-        </button>
-        {isDelegate === true && (
-        <button
-          className={`border-b-2 py-4 px-2 outline-none ${
-            searchParams.get("active") === "votes"
-              ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
-              : "border-transparent"
-          }`}
-          onClick={() => router.push(path + "?active=votes")}
-        >
-          Past Votes
-        </button>)}
-        <button
-          className={`border-b-2 py-4 px-2 outline-none ${
-            searchParams.get("active") === "sessions"
-              ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
-              : "border-transparent"
-          }`}
-          onClick={() =>
-            router.push(path + "?active=sessions&session=schedule")
-          }
-        >
-          Sessions
-        </button>
-        <button
-          className={`border-b-2 py-4 px-2 outline-none ${
-            searchParams.get("active") === "officeHours"
-              ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
-              : "border-transparent"
-          }`}
-          onClick={() =>
-            router.push(path + "?active=officeHours&hours=schedule")
-          }
-        >
-          Office Hours
-        </button>
-        {/* <button
+          <div className="flex gap-12 bg-[#D9D9D945] pl-16">
+            <button
+              className={`border-b-2 py-4 px-2 outline-none ${
+                searchParams.get("active") === "info"
+                  ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
+                  : "border-transparent"
+              }`}
+              onClick={() => router.push(path + "?active=info")}
+            >
+              Info
+            </button>
+            {isDelegate === true && (
+              <button
+                className={`border-b-2 py-4 px-2 outline-none ${
+                  searchParams.get("active") === "votes"
+                    ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
+                    : "border-transparent"
+                }`}
+                onClick={() => router.push(path + "?active=votes")}
+              >
+                Past Votes
+              </button>
+            )}
+            <button
+              className={`border-b-2 py-4 px-2 outline-none ${
+                searchParams.get("active") === "sessions"
+                  ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
+                  : "border-transparent"
+              }`}
+              onClick={() =>
+                router.push(path + "?active=sessions&session=schedule")
+              }
+            >
+              Sessions
+            </button>
+            <button
+              className={`border-b-2 py-4 px-2 outline-none ${
+                searchParams.get("active") === "officeHours"
+                  ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
+                  : "border-transparent"
+              }`}
+              onClick={() =>
+                router.push(path + "?active=officeHours&hours=schedule")
+              }
+            >
+              Office Hours
+            </button>
+            {/* <button
           className={`border-b-2 py-4 px-2 outline-none ${
             searchParams.get("active") === "claimNft"
               ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
@@ -764,21 +794,54 @@ const handleSubmit = async (newDescription?:string) => {
         >
           Claim NFTs
         </button> */}
-      </div>
+          </div>
 
-      <div className="py-6 ps-16">
-        {searchParams.get("active") === "info" ? <UserInfo karmaDesc={karmaDesc} description={description} descAvailable={descAvailable} onSaveButtonClick={(newDescription?: string) => handleSubmit(newDescription)} isLoading={isLoading} /> : ""}
-        {isDelegate === true && searchParams.get("active") === "votes" ? <UserVotes /> : ""}
-        {searchParams.get("active") === "sessions" ? <UserSessions isDelegate={isDelegate} /> : ""}
-        {searchParams.get("active") === "officeHours" ? (
-          <UserOfficeHours isDelegate={isDelegate} />
-        ) : (
-          ""
-        )}
-        {/* {searchParams.get("active") === "claimNft" ? <ClaimNFTs /> : ""} */}
-      </div>
-    </div>
-    ): (<><button onClick={handleDelegate}>Loading...</button></>)}
+          <div className="py-6 ps-16">
+            {searchParams.get("active") === "info" ? (
+              <UserInfo
+                karmaDesc={karmaDesc}
+                description={description}
+                descAvailable={descAvailable}
+                onSaveButtonClick={(newDescription?: string) =>
+                  handleSubmit(newDescription)
+                }
+                isLoading={isLoading}
+              />
+            ) : (
+              ""
+            )}
+            {isDelegate === true && searchParams.get("active") === "votes" ? (
+              <UserVotes />
+            ) : (
+              ""
+            )}
+            {searchParams.get("active") === "sessions" ? (
+              <UserSessions isDelegate={isDelegate} />
+            ) : (
+              ""
+            )}
+            {searchParams.get("active") === "officeHours" ? (
+              <UserOfficeHours isDelegate={isDelegate} />
+            ) : (
+              ""
+            )}
+            {/* {searchParams.get("active") === "claimNft" ? <ClaimNFTs /> : ""} */}
+          </div>
+        </div>
+      ) : (
+        <>
+          <div className="flex items-center justify-center pt-10">
+            <Oval
+              visible={true}
+              height="40"
+              width="40"
+              color="#0500FF"
+              secondaryColor="#cdccff"
+              ariaLabel="oval-loading"
+            />
+          </div>
+        </>
+      )}
     </>
   );
 }

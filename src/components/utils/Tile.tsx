@@ -1,4 +1,4 @@
-import React,{useState} from "react";
+import React, { useState } from "react";
 import Image, { StaticImageData } from "next/image";
 import { Oval } from "react-loader-spinner";
 import IndividualTileModal from "./IndividualTileModal";
@@ -11,19 +11,26 @@ interface Type {
   host: string;
   started: string;
   desc: string;
-  attendee:string;
+  attendee: string;
   videoUrl?: string;
 }
 
 interface TileProps {
   sessionDetails: Type[];
   dataLoading: boolean;
-  isEvent:string;
-  isOfficeHour:boolean;
+  isEvent: string;
+  isOfficeHour: boolean;
 }
 
-function Tile({ sessionDetails, dataLoading, isEvent, isOfficeHour }: TileProps) {
-  const [selectedTileIndex, setSelectedTileIndex] = useState<number | null>(null);
+function Tile({
+  sessionDetails,
+  dataLoading,
+  isEvent,
+  isOfficeHour,
+}: TileProps) {
+  const [selectedTileIndex, setSelectedTileIndex] = useState<number | null>(
+    null
+  );
 
   const openModal = (index: number) => {
     setSelectedTileIndex(index);
@@ -64,7 +71,7 @@ function Tile({ sessionDetails, dataLoading, isEvent, isOfficeHour }: TileProps)
                 </div>
 
                 <div className="flex space-x-4 py-2">
-                  <div className="bg-[#1E1E1E] border border-[#1E1E1E] text-white rounded-md text-xs px-5 py-1 font-semibold">
+                  <div className="bg-[#1E1E1E] border border-[#1E1E1E] text-white rounded-md text-xs px-5 py-1 font-semibold capitalize">
                     {data.dao}
                   </div>
                   <div className="border border-[#1E1E1E] rounded-md text-[#1E1E1E] text-xs px-5 py-1 font-medium">
@@ -76,25 +83,24 @@ function Tile({ sessionDetails, dataLoading, isEvent, isOfficeHour }: TileProps)
                   <hr />
                 </div>
 
-                {
-                    isOfficeHour ? (
-                        <div className="flex gap-x-16 text-sm py-3">
-                        <div className="text-[#3E3D3D]">
-                          <span className="font-semibold">Host:</span> {data.host}
-                        </div>
-                        <div className="text-[#3E3D3D]">
-                          {isEvent === "Upcoming" ? (
-                                  <span className="font-semibold">Starts at:</span>
-                              ) : isEvent === "Ongoing" ? (
-                                  <span className="font-semibold">Started at:</span>
-                              ) : isEvent === "Recorded" ? (
-                                  <span className="font-semibold">Started at:</span>
-                              ) : null
-                          }
-                          {data.started}
-                        </div>
-                      </div>
-                    ) : (   <div className="flex gap-x-16 text-sm py-3">
+                {isOfficeHour ? (
+                  <div className="flex gap-x-16 text-sm py-3">
+                    <div className="text-[#3E3D3D]">
+                      <span className="font-semibold">Host:</span> {data.host}
+                    </div>
+                    <div className="text-[#3E3D3D]">
+                      {isEvent === "Upcoming" ? (
+                        <span className="font-semibold">Starts at:</span>
+                      ) : isEvent === "Ongoing" ? (
+                        <span className="font-semibold">Started at:</span>
+                      ) : isEvent === "Recorded" ? (
+                        <span className="font-semibold">Started at:</span>
+                      ) : null}
+                      {data.started}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex gap-x-16 text-sm py-3">
                     <div className="text-[#3E3D3D]">
                       <span className="font-semibold">Attendee:</span>{" "}
                       {data.attendee.substring(0, 10)}...
@@ -104,18 +110,17 @@ function Tile({ sessionDetails, dataLoading, isEvent, isOfficeHour }: TileProps)
                       {data.host.substring(0, 10)}...
                     </div>
                     <div className="text-[#3E3D3D]">
-                        {isEvent === "Upcoming" ? (
-                                  <span className="font-semibold">Starts at:</span>
-                              ) : isEvent === "Ongoing" ? (
-                                  <span className="font-semibold">Started at:</span>
-                              ) : isEvent === "Recorded" ? (
-                                  <span className="font-semibold">Started at:</span>
-                              ) : null
-                          }
+                      {isEvent === "Upcoming" ? (
+                        <span className="font-semibold">Starts at:</span>
+                      ) : isEvent === "Ongoing" ? (
+                        <span className="font-semibold">Started at:</span>
+                      ) : isEvent === "Recorded" ? (
+                        <span className="font-semibold">Started at:</span>
+                      ) : null}
                       {data.started}
                     </div>
-                  </div>)
-                }
+                  </div>
+                )}
 
                 <div className="text-[#1E1E1E] text-sm">{data.desc}</div>
               </div>
@@ -130,8 +135,8 @@ function Tile({ sessionDetails, dataLoading, isEvent, isOfficeHour }: TileProps)
           </div>
         </div>
       )}
-      
-      {selectedTileIndex !== null && isEvent === "Recorded" ?(
+
+      {selectedTileIndex !== null && isEvent === "Recorded" ? (
         <IndividualTileModal
           title={sessionDetails[selectedTileIndex].title}
           description={sessionDetails[selectedTileIndex].desc}
@@ -142,7 +147,7 @@ function Tile({ sessionDetails, dataLoading, isEvent, isOfficeHour }: TileProps)
           dao={sessionDetails[selectedTileIndex].dao}
           onClose={closeModal}
         />
-      ): null}
+      ) : null}
     </div>
   );
 }
