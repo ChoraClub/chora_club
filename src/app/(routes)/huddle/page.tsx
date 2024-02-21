@@ -1,6 +1,5 @@
 import React from "react";
 import IntroPage from "@/components/IntroPage/IntroPage";
-import { useAccount } from "wagmi";
 
 interface RoomDetails {
   message: string;
@@ -9,14 +8,11 @@ interface RoomDetails {
   };
 }
 
-const address = useAccount();
-
 const createRandomRoom = async () => {
   const res = await fetch("https://iriko.huddle01.media/api/v1/create-room", {
     method: "POST",
     body: JSON.stringify({
       title: "Test Room",
-      hostWallets: [address],
     }),
     headers: {
       "Content-Type": "application/json",

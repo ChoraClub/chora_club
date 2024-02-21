@@ -1,10 +1,18 @@
 import React, { useState, useEffect } from "react";
 import search from "@/assets/images/daos/search.png";
 import Image from "next/image";
-import text1 from "@/assets/images/daos/texture1.png";
-import text2 from "@/assets/images/daos/texture2.png";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Tile from "../utils/Tile";
+
+interface Session {
+  _id: string;
+  address: string;
+  office_hours_slot: string;
+  title: string;
+  description: string;
+  status: "ongoing" | "active" | "inactive"; // Define the possible statuses
+  chain_name: string;
+}
 
 function OfficeHours({ props }: { props: string }) {
   const [activeSection, setActiveSection] = useState("ongoing");
@@ -12,46 +20,60 @@ function OfficeHours({ props }: { props: string }) {
   const router = useRouter();
   const path = usePathname();
   const searchParams = useSearchParams();
-  const details = [
-    {
-      img: text1,
-      title: "Open Forum: Governance, Applications, and Beyond",
-      dao: props,
-      participant: 12,
-      attendee: "olimpio.eth",
-      host: "0xf4b0556b9b6f53e00a1fdd2b0478ce841991d8fa",
-      started: "15/09/2023 12:15 PM EST",
-      desc: `Join the conversation about the future of ${props}. Discuss governance proposals, dApp adoption, and technical developments.`,
-    },
-    {
-      img: text2,
-      title: "Open Forum: Governance, Applications, and Beyond",
-      dao: props,
-      participant: 5,
-      attendee: "olimpio.eth",
-      host: "0x1b686ee8e31c5959d9f5bbd8122a58682788eead",
-      started: "15/09/2023 12:15 PM EST",
-      desc: `Join the conversation about the future of ${props}. Discuss governance proposals, dApp adoption, and technical developments.`,
-    },
-  ];
+  const dao_name = props.charAt(0).toUpperCase() + props.slice(1);
 
-  const [sessionDetails, setSessionDetails] = useState(details);
+  const [sessionDetails, setSessionDetails] = useState([]);
   const [dataLoading, setDataLoading] = useState(true);
 
   useEffect(() => {
-    setSessionDetails(details);
-    setDataLoading(false);
-  }, []);
-  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
 
-    const filtered = details.filter(
-      (item) =>
-        item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.host.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-    console.log("Filteres", filtered)
-    setSessionDetails(filtered);
-  }, [searchQuery]);
+        const raw = JSON.stringify({
+          chain_name: dao_name,
+        });
+
+        const requestOptions: RequestInit = {
+          method: "POST",
+          headers: myHeaders,
+          body: raw,
+        };
+
+        const response = await fetch(
+          "/api/get-specific-officehours",
+          requestOptions
+        );
+        const result = await response.json();
+        console.log(result);
+
+        // Filter sessions based on status
+        const filteredSessions = result.filter((session: Session) => {
+          if (searchParams.get("hours") === "ongoing") {
+            return session.status === "ongoing";
+          } else if (searchParams.get("hours") === "upcoming") {
+            return session.status === "active";
+          } else if (searchParams.get("hours") === "recorded") {
+            return session.status === "inactive";
+          }
+        });
+
+        setSessionDetails(filteredSessions);
+        setDataLoading(false);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchData();
+  }, [searchParams.get("hours")]); // Re-fetch data when filter changes
+
+  useEffect(() => {
+    // Set initial session details
+    setSessionDetails([]);
+    setDataLoading(true);
+  }, [props]);
 
   return (
     <div>
@@ -114,14 +136,29 @@ function OfficeHours({ props }: { props: string }) {
 
         <div className="py-10">
           {searchParams.get("hours") === "ongoing" && (
-            <Tile sessionDetails={sessionDetails} dataLoading={dataLoading} isEvent="Ongoing" isOfficeHour={true} />
+            <Tile
+              sessionDetails={sessionDetails}
+              dataLoading={dataLoading}
+              isEvent="Ongoing"
+              isOfficeHour={true}
+            />
           )}
           {searchParams.get("hours") === "upcoming" && (
-            <Tile sessionDetails={sessionDetails} dataLoading={dataLoading} isEvent="Upcoming" isOfficeHour={true} />
+            <Tile
+              sessionDetails={sessionDetails}
+              dataLoading={dataLoading}
+              isEvent="Upcoming"
+              isOfficeHour={true}
+            />
           )}
           {searchParams.get("hours") === "recorded" && (
-           <div> 
-            <Tile sessionDetails={sessionDetails} dataLoading={dataLoading} isEvent="Recorded" isOfficeHour={true} />
+            <div>
+              <Tile
+                sessionDetails={sessionDetails}
+                dataLoading={dataLoading}
+                isEvent="Recorded"
+                isOfficeHour={true}
+              />
             </div>
           )}
         </div>
