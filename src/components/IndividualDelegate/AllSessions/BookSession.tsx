@@ -23,7 +23,7 @@ interface Type {
 }
 const StyledTimePickerContainer = styled.div`
   div > ul {
-    height: 444px;
+    height: 400px;
   }
 `;
 function BookSession({ props }: { props: Type }) {

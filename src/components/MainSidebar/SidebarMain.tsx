@@ -31,7 +31,7 @@ function Sidebar() {
 
   useEffect(() => {
     // console.log(session, sessionLoading, isConnected);
-  }, [session, sessionLoading, isConnected]);
+  }, [session, sessionLoading, isConnected, isPageLoading]);
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -167,14 +167,14 @@ function Sidebar() {
             </Link>
           </Tooltip>
 
-          {!isConnected && !session && address == null ? (
+          {!isConnected && !session ? (
             <Tooltip
               content={<div className="capitalize">Wallet</div>}
               placement="right"
               className="rounded-md bg-opacity-90"
               closeDelay={1}
             >
-              {isPageLoading && !isConnected && sessionLoading ? (
+              {isPageLoading && sessionLoading ? (
                 <Image
                   src={user}
                   alt={"image"}

@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import dynamic from 'next/dynamic';
-import React from 'react';
-import { HuddleClient, HuddleProvider } from '@huddle01/react';
+import dynamic from "next/dynamic";
+import React from "react";
+import { HuddleClient, HuddleProvider } from "@huddle01/react";
 
 const Toaster = dynamic(
-  () => import('react-hot-toast').then((m) => m.Toaster),
+  () => import("react-hot-toast").then((m) => m.Toaster),
   {
     ssr: false,
   }
@@ -16,13 +16,14 @@ type ToasterProps = {
 };
 
 const HuddleContextProvider: React.FC<ToasterProps> = ({ children }) => {
-
-  const huddleClient = new HuddleClient({ projectId: process.env.NEXT_PUBLIC_PROJECT_ID ?? '' });
+  const huddleClient = new HuddleClient({
+    projectId: process.env.NEXT_PUBLIC_PROJECT_ID ?? "",
+  });
 
   return (
     <HuddleProvider client={huddleClient}>
       {children}
-      <Toaster
+      {/* <Toaster
         position="bottom-right"
         containerStyle={{
           bottom: '70px',
@@ -49,7 +50,7 @@ const HuddleContextProvider: React.FC<ToasterProps> = ({ children }) => {
             },
           },
         }}
-      />
+      /> */}
     </HuddleProvider>
   );
 };
