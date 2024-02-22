@@ -9,8 +9,9 @@ import text1 from "@/assets/images/daos/texture1.png";
 
 interface UserOfficeHoursProps {
   isDelegate: boolean | undefined;
+  selfDelegate:boolean;
 }
-function UserOfficeHours({isDelegate}:UserOfficeHoursProps) {
+function UserOfficeHours({isDelegate, selfDelegate}:UserOfficeHoursProps) {
   const router = useRouter();
   const path = usePathname();
   const searchParams = useSearchParams();
@@ -42,7 +43,7 @@ function UserOfficeHours({isDelegate}:UserOfficeHoursProps) {
     <div>
       <div className="pt-3 pr-32">
         <div className="flex w-fit gap-14 border-1 border-[#7C7C7C] px-6 rounded-xl text-sm">
-          {isDelegate === true &&(
+          {(selfDelegate===true || isDelegate === true) &&(
           <button
             className={`py-2  ${
               searchParams.get("hours") === "schedule"
@@ -57,7 +58,7 @@ function UserOfficeHours({isDelegate}:UserOfficeHoursProps) {
           </button>
           )}
 
-          {isDelegate === true &&(
+          {(selfDelegate===true || isDelegate === true) &&(
           <button
             className={`py-2  ${
               searchParams.get("hours") === "upcoming"
@@ -71,6 +72,7 @@ function UserOfficeHours({isDelegate}:UserOfficeHoursProps) {
             Upcoming
           </button>
           )}
+          {(selfDelegate===true || isDelegate === true) &&(
           <button
             className={`py-2 ${
               searchParams.get("hours") === "hosted"
@@ -83,6 +85,7 @@ function UserOfficeHours({isDelegate}:UserOfficeHoursProps) {
           >
             Hosted
           </button>
+          )}
           <button
             className={`py-2 ${
               searchParams.get("hours") === "attended"

@@ -7,6 +7,7 @@ import op_logo from "@/assets/images/daos/op.png";
 import arb_logo from "@/assets/images/daos/arbitrum.jpg";
 import { useRouter } from "next/navigation";
 import { ImCross } from "react-icons/im";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 function ExploreDAOs() {
   const dao_info = [
@@ -76,9 +77,14 @@ function ExploreDAOs() {
       )}
 
       <div className="">
+      <div className="flex justify-between pe-10">
         <div className="text-blue-shade-200 font-medium text-4xl font-quanty pb-4">
           Explore DAOs
         </div>
+        <div>
+          <ConnectButton />
+        </div>
+      </div>
 
         <div
           style={{ background: "rgba(238, 237, 237, 0.36)" }}

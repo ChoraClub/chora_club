@@ -5,6 +5,7 @@ import DelegatesList from "./DelegatesList";
 import DelegatesSession from "./DelegatesSession";
 import OfficeHours from "./OfficeHours";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 const desc = {
   optimism:
@@ -22,9 +23,15 @@ function SpecificDAO({ props }: { props: { daoDelegates: string } }) {
   return (
     <div className="font-poppins py-6">
       <div className="px-8 pb-5">
-        <div className="capitalize text-4xl text-blue-shade-100">
-          {props.daoDelegates}
+        <div className="flex justify-between pe-10">
+          <div className="capitalize text-4xl text-blue-shade-100">
+            {props.daoDelegates}
+          </div>
+          <div>
+            <ConnectButton />
+          </div>
         </div>
+
         <div className="py-5 pr-8">
           {props.daoDelegates === "optimism" ? desc.optimism : desc.arbitrum}
         </div>
