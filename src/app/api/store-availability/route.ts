@@ -55,18 +55,18 @@ export async function POST(
 
   try {
     // Connect to your MongoDB database
-    console.log("Connecting to MongoDB...");
+    // console.log("Connecting to MongoDB...");
     const client = await MongoClient.connect(process.env.MONGODB_URI!, {
       dbName: `chora-club`,
     } as MongoClientOptions);
-    console.log("Connected to MongoDB");
+    // console.log("Connected to MongoDB");
 
     // Access the collection
     const db = client.db();
     const collection = db.collection("scheduling");
 
     // Insert the new availability document
-    console.log("Inserting availability document...");
+    // console.log("Inserting availability document...");
     const result = await collection.insertOne({
       dao_name,
       userAddress,
@@ -76,18 +76,18 @@ export async function POST(
       createdAt: new Date(),
       updatedAt: new Date(),
     });
-    console.log("Availability document inserted:", result);
+    // console.log("Availability document inserted:", result);
 
     client.close();
-    console.log("MongoDB connection closed");
+    // console.log("MongoDB connection closed");
 
     if (result.insertedId) {
       // Retrieve the inserted document using the insertedId
-      console.log("Retrieving inserted document...");
+      // console.log("Retrieving inserted document...");
       const insertedDocument = await collection.findOne({
         _id: result.insertedId,
       });
-      console.log("Inserted document retrieved");
+      // console.log("Inserted document retrieved");
       return NextResponse.json({ result: insertedDocument }, { status: 200 });
     } else {
       return NextResponse.json(
@@ -108,14 +108,14 @@ export async function GET(
   req: Request,
   res: NextResponse<StoreAvailabilityResponseBody>
 ) {
-  console.log("GET req call");
+  // console.log("GET req call");
   try {
     // Connect to MongoDB
-    console.log("Connecting to MongoDB...");
+    // console.log("Connecting to MongoDB...");
     const client = await MongoClient.connect(process.env.MONGODB_URI!, {
       dbName: `chora-club`,
     } as MongoClientOptions);
-    console.log("Connected to MongoDB");
+    // console.log("Connected to MongoDB");
 
     // Access the collection
     const db = client.db();
@@ -125,12 +125,12 @@ export async function GET(
     const userAddress = req.body;
 
     // Find documents based on userAddress
-    console.log("Finding documents for user:", userAddress);
+    // console.log("Finding documents for user:", userAddress);
     const documents = await collection.find({ userAddress }).toArray();
-    console.log("Documents found:", documents);
+    // console.log("Documents found:", documents);
 
     client.close();
-    console.log("MongoDB connection closed");
+    // console.log("MongoDB connection closed");
 
     // Return the found documents
     return NextResponse.json(
