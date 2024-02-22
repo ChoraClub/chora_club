@@ -33,6 +33,7 @@ import { useNetwork } from "wagmi";
 import { walletClient } from "@/helpers/signer";
 import dao_abi from "../../artifacts/Dao.sol/GovernanceToken.json";
 import axios from "axios";
+import { Oval } from "react-loader-spinner";
 
 function MainProfile() {
   const { address } = useAccount();
@@ -59,6 +60,7 @@ function MainProfile() {
   const [karmaDesc, setKarmaDesc] = useState("");
   const [votes, setVotes] = useState<any>();
   const [descAvailable, setDescAvailable] = useState<boolean>(true);
+  const [isPageLoading, setIsPageLoading] = useState(true);
   const handleLogoClick = () => {
     fileInputRef.current?.click();
   };
@@ -266,6 +268,10 @@ function MainProfile() {
     fetchData();
   }, [chain, address]);
 
+  useEffect(() => {
+    setIsPageLoading(false);
+  }, [isPageLoading]);
+
   const handleDelegate = () => {
     console.log("IsDelegate Status", isDelegate);
   };
@@ -466,7 +472,7 @@ function MainProfile() {
 
   return (
     <>
-      {isDelegate !== undefined ? (
+      {!isPageLoading ? (
         <div className="font-poppins">
           <div className="flex ps-14 py-5 pe-10 justify-between">
             <div className="flex">
@@ -828,7 +834,16 @@ function MainProfile() {
         </div>
       ) : (
         <>
-          <button onClick={handleDelegate}>Loading...</button>
+          <div className="flex items-center justify-center pt-10">
+            <Oval
+              visible={true}
+              height="40"
+              width="40"
+              color="#0500FF"
+              secondaryColor="#cdccff"
+              ariaLabel="oval-loading"
+            />
+          </div>
         </>
       )}
     </>

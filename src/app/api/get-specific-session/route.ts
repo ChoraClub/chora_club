@@ -23,11 +23,11 @@ export async function POST(req: NextRequest, res: NextResponse<Session[]>) {
     const { dao_name, host_address } = await req.json();
 
     // Connect to MongoDB database
-    console.log("Connecting to MongoDB...");
+    // console.log("Connecting to MongoDB...");
     const client = await MongoClient.connect(process.env.MONGODB_URI!, {
       dbName: `chora-club`,
     } as MongoClientOptions);
-    console.log("Connected to MongoDB");
+    // console.log("Connected to MongoDB");
 
     // Access the collection
     const db = client.db();
@@ -38,7 +38,7 @@ export async function POST(req: NextRequest, res: NextResponse<Session[]>) {
       .toArray();
 
     client.close();
-    console.log("MongoDB connection closed");
+    // console.log("MongoDB connection closed");
 
     return NextResponse.json(SessionData, { status: 200 });
   } catch (error) {

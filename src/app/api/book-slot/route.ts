@@ -54,18 +54,18 @@ export async function POST(
 
   try {
     // Connect to your MongoDB database
-    console.log("Connecting to MongoDB...");
+    // console.log("Connecting to MongoDB...");
     const client = await MongoClient.connect(process.env.MONGODB_URI!, {
       dbName: `chora-club`,
     } as MongoClientOptions);
-    console.log("Connected to MongoDB");
+    // console.log("Connected to MongoDB");
 
     // Access the collection
     const db = client.db();
     const collection = db.collection("meetings");
 
     // Insert the new meeting document
-    console.log("Inserting meeting document...");
+    // console.log("Inserting meeting document...");
     const result = await collection.insertOne({
       host_address,
       user_address,
@@ -78,18 +78,18 @@ export async function POST(
       title,
       description,
     });
-    console.log("Meeting document inserted:", result);
+    // console.log("Meeting document inserted:", result);
 
     client.close();
-    console.log("MongoDB connection closed");
+    // console.log("MongoDB connection closed");
 
     if (result.insertedId) {
       // Retrieve the inserted document using the insertedId
-      console.log("Retrieving inserted document...");
+      // console.log("Retrieving inserted document...");
       const insertedDocument = await collection.findOne({
         _id: result.insertedId,
       });
-      console.log("Inserted document retrieved");
+      // console.log("Inserted document retrieved");
       return NextResponse.json(
         { success: true, result: insertedDocument },
         { status: 200 }
