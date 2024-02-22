@@ -8,39 +8,79 @@ import text2 from "@/assets/images/daos/texture2.png";
 import EventTile from "../utils/EventTile";
 // import HostedUserSessions from "./UserAllSessions/HostedUserSessions";
 // import AttendedUserSessions from "./UserAllSessions/AttendedUserSessions";
-import { useNetwork } from "wagmi";
+import { useNetwork, useAccount } from "wagmi";
 import Tile from "../utils/Tile";
+import SessionTile from "../utils/SessionTiles";
 interface UserSessionsProps {
   isDelegate: boolean | undefined;
 }
 
+interface Session {
+  booking_status: string;
+  dao_name: string;
+  description: string;
+  host_address: string;
+  joined_status: string;
+  meetingId: string;
+  meeting_status: "Upcoming" | "Recorded" | "Denied";
+  slot_time: string;
+  title: string;
+  user_address: string;
+  _id: string;
+}
+
 function UserSessions({ isDelegate }: UserSessionsProps) {
+  const { address } = useAccount();
   const router = useRouter();
   const path = usePathname();
   const searchParams = useSearchParams();
   const { chain, chains } = useNetwork();
-  const details = [
-    {
-      img: text1,
-      title: "Open Forum: Governance, Applications, and Beyond",
-      dao: `${chain && chain.name}`,
-      participant: 12,
-      attendee: "0xf4b0556b9b6f53e00a1fdd2b0478ce841991d8fa",
-      host: "lindaxie.eth",
-      started: "07/09/2023 12:15 PM EST",
-      desc: `Join the conversation about the future of ${
-        chain && chain.name
-      }. Discuss governance proposals, dApp adoption, and technical developments.`,
-    },
-  ];
-
-  const [sessionDetails, setSessionDetails] = useState(details);
+  const [sessionDetails, setSessionDetails] = useState([]);
   const [dataLoading, setDataLoading] = useState(true);
 
+  const getUserMeetingData = async () => {
+    try {
+      const response = await fetch(`/api/get-session-data/${address}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const result = await response.json();
+      // console.log("result in get session data", result);
+      if (result.success) {
+        // setSessionDetails(result.data);
+        const resultData = await result.data;
+        console.log("resultData", resultData);
+        if (Array.isArray(resultData)) {
+          let filteredData: any = resultData;
+          if (searchParams.get("session") === "hosted") {
+            filteredData = resultData.filter((session: Session) => {
+              return session.meeting_status === "Recorded";
+            });
+          } else if (searchParams.get("session") === "attended") {
+            filteredData = resultData.filter((session: Session) => {
+              return session.user_address === address;
+            });
+          }
+          console.log("filtered", filteredData);
+          setSessionDetails(filteredData);
+        }
+      }
+    } catch (error) {
+      console.log("error in catch", error);
+    }
+  };
+
   useEffect(() => {
-    setSessionDetails(details);
+    getUserMeetingData();
+  }, [address, sessionDetails, searchParams.get("session")]);
+
+  useEffect(() => {
     setDataLoading(false);
   }, []);
+
   useEffect(() => {
     if (!isDelegate && searchParams.get("session") === "schedule") {
       router.replace(path + "?active=sessions&session=attending");
@@ -131,7 +171,7 @@ function UserSessions({ isDelegate }: UserSessionsProps) {
             <AttendingUserSessions />
           )}
           {isDelegate === true && searchParams.get("session") === "hosted" && (
-            <Tile
+            <SessionTile
               sessionDetails={sessionDetails}
               dataLoading={dataLoading}
               isEvent="Recorded"
@@ -139,7 +179,7 @@ function UserSessions({ isDelegate }: UserSessionsProps) {
             />
           )}
           {searchParams.get("session") === "attended" && (
-            <Tile
+            <SessionTile
               sessionDetails={sessionDetails}
               dataLoading={dataLoading}
               isEvent="Recorded"

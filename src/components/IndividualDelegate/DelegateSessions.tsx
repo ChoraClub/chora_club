@@ -44,7 +44,7 @@ function DelegateSessions({ props }: { props: Type }) {
         dao_name: dao_name,
         host_address: props.individualDelegate,
       });
-      console.log("raw", raw);
+      // console.log("raw", raw);
       const requestOptions: any = {
         method: "POST",
         headers: myHeaders,
@@ -53,18 +53,27 @@ function DelegateSessions({ props }: { props: Type }) {
       };
       const response = await fetch("/api/get-specific-session", requestOptions);
       const result = await response.json();
-      console.log("result in get meetinggggg", result);
+      // console.log("result in get meetinggggg", result);
       if (result) {
         const resultData = await result;
         console.log("resultData", resultData);
         if (Array.isArray(resultData)) {
-          const filtered: any = resultData.filter((session: Session) => {
-            if (searchParams.get("session") === "upcoming") {
+          let filteredData: any = resultData;
+          if (searchParams.get("session") === "upcoming") {
+            filteredData = resultData.filter((session: Session) => {
               return session.meeting_status === "Upcoming";
-            }
-          });
-          console.log("filtered", filtered);
-          setSessionDetails(filtered);
+            });
+          } else if (searchParams.get("session") === "hosted") {
+            filteredData = resultData.filter((session: Session) => {
+              return session.meeting_status === "Recorded";
+            });
+          } else if (searchParams.get("session") === "attended") {
+            filteredData = resultData.filter((session: Session) => {
+              return session.user_address === props.individualDelegate;
+            });
+          }
+          console.log("filtered", filteredData);
+          setSessionDetails(filteredData);
         }
       }
     } catch (error) {
