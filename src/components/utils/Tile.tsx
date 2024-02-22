@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Image, { StaticImageData } from "next/image";
 import { Oval } from "react-loader-spinner";
 import IndividualTileModal from "./IndividualTileModal";
+import staticImg from "@/assets/images/daos/texture1.png";
 
 interface Type {
   img: StaticImageData;
@@ -12,7 +13,11 @@ interface Type {
   started: string;
   desc: string;
   attendee: string;
-  videoUrl?: string;
+  video_uri?: string;
+  chain_name: string;
+  address: string;
+  office_hours_slot: string;
+  description: string;
 }
 
 interface TileProps {
@@ -60,7 +65,7 @@ function Tile({
               onClick={() => openModal(index)}
             >
               <Image
-                src={data.img}
+                src={staticImg}
                 alt="image"
                 className="w-44 h-44 rounded-3xl border border-[#D9D9D9]"
               />
@@ -71,8 +76,8 @@ function Tile({
                 </div>
 
                 <div className="flex space-x-4 py-2">
-                  <div className="bg-[#1E1E1E] border border-[#1E1E1E] text-white rounded-md text-xs px-5 py-1 font-semibold capitalize">
-                    {data.dao}
+                  <div className="bg-[#1E1E1E] border border-[#1E1E1E] text-white rounded-md text-xs px-5 py-1 font-semibold">
+                    {data.chain_name}
                   </div>
                   <div className="border border-[#1E1E1E] rounded-md text-[#1E1E1E] text-xs px-5 py-1 font-medium">
                     {data.participant} Participants
@@ -86,7 +91,8 @@ function Tile({
                 {isOfficeHour ? (
                   <div className="flex gap-x-16 text-sm py-3">
                     <div className="text-[#3E3D3D]">
-                      <span className="font-semibold">Host:</span> {data.host}
+                      <span className="font-semibold">Host:</span>{" "}
+                      {data.address}
                     </div>
                     <div className="text-[#3E3D3D]">
                       {isEvent === "Upcoming" ? (
@@ -96,7 +102,7 @@ function Tile({
                       ) : isEvent === "Recorded" ? (
                         <span className="font-semibold">Started at:</span>
                       ) : null}
-                      {data.started}
+                      {new Date(data.office_hours_slot).toLocaleDateString()}
                     </div>
                   </div>
                 ) : (
@@ -122,7 +128,7 @@ function Tile({
                   </div>
                 )}
 
-                <div className="text-[#1E1E1E] text-sm">{data.desc}</div>
+                <div className="text-[#1E1E1E] text-sm">{data.description}</div>
               </div>
             </div>
           ))
@@ -139,12 +145,12 @@ function Tile({
       {selectedTileIndex !== null && isEvent === "Recorded" ? (
         <IndividualTileModal
           title={sessionDetails[selectedTileIndex].title}
-          description={sessionDetails[selectedTileIndex].desc}
-          videoUrl={sessionDetails[selectedTileIndex].videoUrl || ""}
-          date={sessionDetails[selectedTileIndex].started}
-          host={sessionDetails[selectedTileIndex].host}
+          description={sessionDetails[selectedTileIndex].description}
+          videoUrl={sessionDetails[selectedTileIndex].video_uri || ""}
+          date={sessionDetails[selectedTileIndex].office_hours_slot}
+          host={sessionDetails[selectedTileIndex].address}
           attendee={sessionDetails[selectedTileIndex].attendee}
-          dao={sessionDetails[selectedTileIndex].dao}
+          dao={sessionDetails[selectedTileIndex].chain_name}
           onClose={closeModal}
         />
       ) : null}
