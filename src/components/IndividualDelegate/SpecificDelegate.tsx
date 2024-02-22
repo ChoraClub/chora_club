@@ -16,6 +16,8 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import toast, { Toaster } from "react-hot-toast";
 import { Provider, cacheExchange, createClient, fetchExchange } from "urql";
+import { walletClient } from "@/helpers/signer";
+import dao_abi from "../../artifacts/Dao.sol/GovernanceToken.json";
 
 interface Type {
   daoDelegates: string;
@@ -93,6 +95,31 @@ function SpecificDelegate({ props }: { props: Type }) {
   const handleCopy = (addr: string) => {
     copy(addr);
     toast("Address Copied");
+  };
+
+  const handleDelegateVotes = async (to: string) => {
+    const address = await walletClient.getAddresses();
+    const address1 = address[0];
+
+    let chainAddress;
+
+    if (props.daoDelegates === "optimism") {
+      chainAddress = "0x4200000000000000000000000000000000000042";
+    } else if (props.daoDelegates === "arbitrum") {
+      chainAddress = " 0x912CE59144191C1204E64559FE8253a0e49E6548";
+    } else {
+      return;
+    }
+
+    console.log(walletClient);
+    const delegateTx = await walletClient.writeContract({
+      address: chainAddress,
+      abi: dao_abi.abi,
+      functionName: "delegate",
+      args: [to],
+      account: address1,
+    });
+    console.log(delegateTx);
   };
 
   return (
@@ -206,7 +233,7 @@ function SpecificDelegate({ props }: { props: Type }) {
           <div className="pt-2">
             <button
               className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
-              onClick={() => toast("Coming Soon 🚀")}
+              onClick={() => handleDelegateVotes(`${props.individualDelegate}`)}
             >
               Delegate
             </button>
@@ -263,7 +290,7 @@ function SpecificDelegate({ props }: { props: Type }) {
 
       <div className="py-6 ps-16">
         {searchParams.get("active") === "info" && (
-          <DelegateInfo props={props}  />
+          <DelegateInfo props={props} />
         )}
         {searchParams.get("active") === "pastVotes" && (
           <DelegateVotes props={props} />
