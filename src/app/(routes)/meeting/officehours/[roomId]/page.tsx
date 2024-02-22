@@ -51,7 +51,7 @@ const Home = ({ params }: { params: { roomId: string } }) => {
 
   useEffect(() => {
     if (state === "idle") {
-      push(`/meeting/${params.roomId}/lobby`);
+      push(`/meeting/officehours/${params.roomId}/lobby`);
       return;
     } else {
       console.log("length", peerIds.length);

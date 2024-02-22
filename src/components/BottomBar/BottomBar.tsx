@@ -19,7 +19,7 @@ import {
   useLocalScreenShare,
 } from "@huddle01/react/hooks";
 import toast from "react-hot-toast";
-import { useParams } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import axios from "axios";
 
 type BottomBarProps = {};
@@ -28,8 +28,10 @@ const BottomBar: React.FC<BottomBarProps> = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isRecording, setIsRecording] = useState<boolean>(false);
   const params = useParams();
+  const meetingCategory = usePathname().split("/")[2];
   const roomId = params.roomId as string | undefined;
   // console.log(roomId);
+  console.log("Value: ", meetingCategory);
 
   const { peerIds } = usePeerIds();
 
@@ -95,10 +97,42 @@ const BottomBar: React.FC<BottomBarProps> = () => {
     }
   };
 
-  const handleAttestation = async () => {
+  const getSessionData = async () => {
+    try {
+      const response = await fetch(`/api/meeting-session-data/${roomId}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const result = await response.json();
+      console.log("result in get meeting", result);
+      return result;
+    } catch (error) {
+      console.log("error in catch", error);
+    }
+  };
+
+  const handleAttestation = async (endMeet: string) => {
+    if (endMeet == "leave") {
+      leaveRoom();
+    } else if (endMeet == "close") {
+      closeRoom();
+    } else {
+      return;
+    }
+
+    let sessionData;
+    if (meetingCategory === "session") {
+      const data = await getSessionData();
+      console.log("session data: ", data.data[0]);
+      sessionData = data.data[0];
+    } else {
+      console.log("error");
+    }
 
     const response = await fetch(
-      "https://api.huddle01.com/api/v1/rooms/meetings?roomId={roomId}",
+      `https://api.huddle01.com/api/v1/rooms/meetings?roomId=${roomId}`,
       {
         method: "GET",
         headers: {
@@ -107,10 +141,12 @@ const BottomBar: React.FC<BottomBarProps> = () => {
         },
       }
     );
+    const result = await response.json();
+    console.log("meeting details: ", result);
 
-    const data = {
-      recipient: "0xbFc4A28D8F1003Bec33f4Fdb7024ad6ad1605AA8",
-      meetingId: "abc-def-ggi",
+    const hostData = {
+      recipient: sessionData.host_address,
+      meetingId: roomId,
       meetingType: 1,
       startTime: 16452456, // Example start time (in UNIX timestamp format)
       endTime: 16452492, // Example end time (in UNIX timestamp format)
@@ -122,8 +158,27 @@ const BottomBar: React.FC<BottomBarProps> = () => {
       //   Origin: window.location.origin, // Set the Origin header to your frontend URL
     };
 
+    const userData = {
+      recipient: sessionData.user_address,
+      meetingId: roomId,
+      meetingType: 2,
+      startTime: 16452456, // Example start time (in UNIX timestamp format)
+      endTime: 16452492,
+    };
+
     try {
-      const response = await axios.post("/api/attest-offchain", data, {
+      const response = await axios.post("/api/attest-offchain", hostData, {
+        headers,
+      });
+      console.log(response.data);
+      // Handle response as needed
+    } catch (error) {
+      console.error("Error:", error);
+      // Handle error
+    }
+
+    try {
+      const response = await axios.post("/api/attest-offchain", userData, {
         headers,
       });
       console.log(response.data);
@@ -248,18 +303,14 @@ const BottomBar: React.FC<BottomBarProps> = () => {
                 type="close"
                 title="End spaces for all"
                 variant="danger"
-                onClick={() => {
-                  closeRoom();
-                }}
+                onClick={() => handleAttestation("close")}
               />
             )}
             <Strip
               type="leave"
               title="Leave the spaces"
               variant="danger"
-              onClick={() => {
-                leaveRoom();
-              }}
+              onClick={() => handleAttestation("leave")}
             />
           </Dropdown>
         </div>

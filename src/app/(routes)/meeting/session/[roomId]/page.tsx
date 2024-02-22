@@ -26,7 +26,7 @@ import Chat from "@/components/Chat/Chat";
 const Home = ({ params }: { params: { roomId: string } }) => {
   const { state } = useRoom({
     onLeave: () => {
-      push(`/meeting/${params.roomId}/lobby`);
+      push(`/meeting/session/${params.roomId}/lobby`);
     },
   });
   const { push } = useRouter();
