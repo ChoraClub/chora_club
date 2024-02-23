@@ -8,6 +8,7 @@ import text1 from "@/assets/images/daos/texture1.png";
 import text2 from "@/assets/images/daos/texture2.png";
 import { StaticImageData } from "next/image";
 import Tile from "../utils/Tile";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 interface Type {
   img: StaticImageData;
   title: string;
@@ -73,8 +74,13 @@ function DaoOfficeHours() {
 
   return (
     <div className="p-6">
-      <div className="font-quanty font-medium text-4xl text-blue-shade-200 pb-4">
-        Office Hours
+      <div className="flex justify-between pe-10">
+        <div className="font-quanty font-medium text-4xl text-blue-shade-200 pb-4">
+          Office Hours
+        </div>
+        <div>
+            <ConnectButton />
+        </div>
       </div>
 
       <div className="pr-32 pt-4 font-poppins">

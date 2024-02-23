@@ -30,13 +30,13 @@ import {
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useAccount } from "wagmi";
 import { useNetwork } from "wagmi";
-import { walletClient } from "@/helpers/signer";
+import { publicClient, walletClient } from "@/helpers/signer";
 import dao_abi from "../../artifacts/Dao.sol/GovernanceToken.json";
 import axios from "axios";
+import { Oval } from "react-loader-spinner";
 
 function MainProfile() {
-  // const { address } = useAccount();
-  const address = "0x5e349eca2dc61abcd9dd99ce94d04136151a09ee";
+  const { address } = useAccount();
   const { chain, chains } = useNetwork();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [img, setImg] = useState<File | undefined>();
@@ -59,6 +59,9 @@ function MainProfile() {
   const [karmaDesc, setKarmaDesc] = useState("");
   const [votes, setVotes] = useState<any>();
   const [descAvailable, setDescAvailable] = useState<boolean>(true);
+  const [isPageLoading, setIsPageLoading] = useState(true);
+  const [selfDelegate, setSelfDelegate] = useState(false);
+
   const handleLogoClick = () => {
     fileInputRef.current?.click();
   };
@@ -100,10 +103,35 @@ function MainProfile() {
     }
   };
 
+  useEffect(() => {
+    const checkDelegateStatus = async () => {
+      const addr = await walletClient.getAddresses();
+      const address1 = addr[0];
+      let delegateTxAddr = "";
+
+      console.log(walletClient);
+      const delegateTx = await publicClient.readContract({
+        address: "0x4200000000000000000000000000000000000042",
+        abi: dao_abi.abi,
+        functionName: "delegates",
+        args: [address],
+        // account: address1,
+      });
+      console.log("Delegate tx", delegateTx);
+      delegateTxAddr = delegateTx;
+
+      if (delegateTxAddr.toLowerCase() === address?.toLowerCase()) {
+        console.log("Delegate comparison: ", delegateTx, address);
+        setSelfDelegate(true);
+      }
+    };
+    checkDelegateStatus();
+  }, []);
+
   // Pass the address of whom you want to delegate the voting power to
   const handleDelegateVotes = async (to: string) => {
-    const address = await walletClient.getAddresses();
-    const address1 = address[0];
+    const addr = await walletClient.getAddresses();
+    const address1 = addr[0];
 
     console.log(walletClient);
     const delegateTx = await walletClient.writeContract({
@@ -115,6 +143,25 @@ function MainProfile() {
     });
     console.log(delegateTx);
   };
+
+// useEffect(()=>{
+//   const getDelegatesVotes = async (address: string) => {
+//     const addr = await walletClient.getAddresses();
+//     const address1 = addr[0];
+//     console.log("Get Votes addr", address1);
+  
+//     console.log(walletClient);
+//     const votingPower = await publicClient.readContract({
+//       address: "0x4200000000000000000000000000000000000042",
+//       abi: dao_abi.abi,
+//       functionName: "getVotes", 
+//       args: [address],
+//     });
+//     console.log("Delegates Votes:", votingPower);
+//   };
+//   getDelegatesVotes(`${address}`);
+// }, [address])
+ 
   const handleCopy = (addr: string) => {
     copy(addr);
     toast("Address Copied");
@@ -265,6 +312,10 @@ function MainProfile() {
 
     fetchData();
   }, [chain, address]);
+
+  useEffect(() => {
+    setIsPageLoading(false);
+  }, [isPageLoading]);
 
   const handleDelegate = () => {
     console.log("IsDelegate Status", isDelegate);
@@ -466,7 +517,7 @@ function MainProfile() {
 
   return (
     <>
-      {/* {isDelegate !== undefined ? ( */}
+      {!isPageLoading ? (
         <div className="font-poppins">
           <div className="flex ps-14 py-5 pe-10 justify-between">
             <div className="flex">
@@ -704,7 +755,9 @@ function MainProfile() {
                     )
                   : null}
 
-                {isDelegate === false ? (
+              
+
+                {selfDelegate === false ? (
                   <div className="pt-2 flex gap-5">
                     {/* pass address of whom you want to delegate the voting power to */}
                     <button
@@ -713,13 +766,14 @@ function MainProfile() {
                     >
                       Become Delegate
                     </button>
-
+{/* 
                     <button
                       className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
                       onClick={() => handleAttestation()}
                     >
                       Attest
-                    </button>
+                    </button> */}
+                    
                     {/* <div className="">
                 <select className="outline-none border border-blue-shade-200 text-blue-shade-200 rounded-full py-2 px-3">
                   <option className="text-gray-700">Optimism</option>
@@ -746,7 +800,7 @@ function MainProfile() {
             >
               Info
             </button>
-            {isDelegate === true && (
+            {(selfDelegate=== true || isDelegate === true) && (
               <button
                 className={`border-b-2 py-4 px-2 outline-none ${
                   searchParams.get("active") === "votes"
@@ -808,29 +862,39 @@ function MainProfile() {
             ) : (
               ""
             )}
-            {isDelegate === true && searchParams.get("active") === "votes" ? (
+            {(selfDelegate === true || isDelegate === true) &&
+            searchParams.get("active") === "votes" ? (
               <UserVotes />
             ) : (
               ""
             )}
             {searchParams.get("active") === "sessions" ? (
-              <UserSessions isDelegate={isDelegate} />
+              <UserSessions isDelegate={isDelegate} selfDelegate={selfDelegate} />
             ) : (
               ""
             )}
             {searchParams.get("active") === "officeHours" ? (
-              <UserOfficeHours isDelegate={isDelegate} />
+              <UserOfficeHours isDelegate={isDelegate} selfDelegate={selfDelegate}/>
             ) : (
               ""
             )}
             {/* {searchParams.get("active") === "claimNft" ? <ClaimNFTs /> : ""} */}
           </div>
         </div>
-      {/* ) : (
+       ) : (
         <>
-          <button onClick={handleDelegate}>Loading...</button>
+          <div className="flex items-center justify-center pt-10">
+            <Oval
+              visible={true}
+              height="40"
+              width="40"
+              color="#0500FF"
+              secondaryColor="#cdccff"
+              ariaLabel="oval-loading"
+            />
+          </div>
         </>
-      )} */}
+      )} 
     </>
   );
 }

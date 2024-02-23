@@ -47,9 +47,9 @@ function DelegatesSession({ props }: { props: string }) {
           requestOptions
         );
         const result = await response.json();
-        console.log("resultt:", result);
+        // console.log("resultt:", result);
         const resultData = await result.data;
-        console.log("resultData", resultData);
+        // console.log("resultData", resultData);
         if (Array.isArray(resultData)) {
           const filtered: any = resultData.filter((session: Session) => {
             if (searchParams.get("session") === "upcoming") {
@@ -58,7 +58,7 @@ function DelegatesSession({ props }: { props: string }) {
               return session.meeting_status === "Recorded";
             }
           });
-          console.log("filtered", filtered);
+          // console.log("filtered", filtered);
           setSessionDetails(filtered);
         } else {
           console.error("API response is not an array:", result);

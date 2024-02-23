@@ -24,32 +24,32 @@ export async function PUT(
   console.log("calling.......");
   const address = req.url.split("update-office-hours/")[1];
 
-  console.log("address", address);
+  // console.log("address", address);
 
   try {
     // Connect to your MongoDB database
-    console.log("Connecting to MongoDB...");
+    // console.log("Connecting to MongoDB...");
     const client = await MongoClient.connect(process.env.MONGODB_URI!, {
       dbName: `chora-club`,
     } as MongoClientOptions);
-    console.log("Connected to MongoDB");
+    // console.log("Connected to MongoDB");
 
     // Access the collection
     const db = client.db();
     const collection = db.collection("office_hours");
 
     // Find the last active office hours document with the provided address
-    console.log("Finding last active office hours document...");
+    // console.log("Finding last active office hours document...");
     const lastActiveOfficeHours = await collection.findOneAndUpdate(
       { address, status: "active" },
       { $set: { status: "inactive" } },
       { sort: { office_hours_slot: -1 } }
     );
 
-    console.log(
-      "Last active office hours document found:",
-      lastActiveOfficeHours
-    );
+    // console.log(
+    //   "Last active office hours document found:",
+    //   lastActiveOfficeHours
+    // );
 
     if (!lastActiveOfficeHours) {
       throw new Error("No active office hours found for the provided address");
@@ -60,7 +60,7 @@ export async function PUT(
     currentSlotDate.setDate(currentSlotDate.getDate() + 1);
 
     // Create new document with status set to active, new slot time, title, and description
-    console.log("Creating new office hours document...");
+    // console.log("Creating new office hours document...");
     const createResult = await collection.insertOne({
       address,
       office_hours_slot: currentSlotDate,
@@ -69,10 +69,10 @@ export async function PUT(
       chain_name: lastActiveOfficeHours.chain_name,
       status: "active",
     });
-    console.log("New office hours document created:", createResult);
+    // console.log("New office hours document created:", createResult);
 
     client.close();
-    console.log("MongoDB connection closed");
+    // console.log("MongoDB connection closed");
 
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (error) {
@@ -98,26 +98,26 @@ export async function GET(req: NextRequest, res: NextResponse<OfficeHours[]>) {
     }
 
     // Connect to your MongoDB database
-    console.log("Connecting to MongoDB...");
+    // console.log("Connecting to MongoDB...");
     const client = await MongoClient.connect(process.env.MONGODB_URI!, {
       dbName: `chora-club`,
     } as MongoClientOptions);
-    console.log("Connected to MongoDB");
+    // console.log("Connected to MongoDB");
 
     // Access the collection
     const db = client.db();
     const collection = db.collection("office_hours");
 
     // Find active office hours documents for the specified address
-    console.log("Fetching active office hours documents for address:", address);
+    // console.log("Fetching active office hours documents for address:", address);
     const activeOfficeHours = await collection
       .find({ address, status: "active" })
       .toArray();
 
-    console.log("Active office hours documents found:", activeOfficeHours);
+    // console.log("Active office hours documents found:", activeOfficeHours);
 
     client.close();
-    console.log("MongoDB connection closed");
+    // console.log("MongoDB connection closed");
 
     return NextResponse.json(activeOfficeHours, { status: 200 });
   } catch (error) {

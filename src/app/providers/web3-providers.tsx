@@ -22,7 +22,7 @@ interface RainbowKitProviderProps {
 }
 
 const { chains, publicClient, webSocketPublicClient } = configureChains(
-  [mainnet, optimism, arbitrum],
+  [optimism, arbitrum],
   [publicProvider()]
 );
 
@@ -44,7 +44,6 @@ const getSiweMessageOptions: GetSiweMessageOptions = () => ({
 });
 
 export default function Web3Provider(props: RainbowKitProviderProps) {
-
   return (
     <WagmiConfig config={wagmiConfig}>
       <SessionProvider>

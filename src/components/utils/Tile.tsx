@@ -21,7 +21,7 @@ interface Type {
 }
 
 interface TileProps {
-  sessionDetails: Type[];
+  sessionDetails: any;
   dataLoading: boolean;
   isEvent: string;
   isOfficeHour: boolean;
@@ -57,7 +57,7 @@ function Tile({
             ariaLabel="oval-loading"
           />
         ) : (
-          sessionDetails.map((data, index) => (
+          sessionDetails.map((data:any, index:any) => (
             <div
               key={index}
               className="flex p-5 rounded-[2rem] cursor-pointer"

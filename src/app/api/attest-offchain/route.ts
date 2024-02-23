@@ -8,6 +8,22 @@ import {
 import { ethers } from "ethers";
 import { stringToBytes, bytesToHex } from "viem";
 import axios from "axios";
+import { MongoClient, MongoClientOptions } from "mongodb";
+
+interface MeetingRequestBody {
+  host_address: string;
+  user_address: string;
+  slot_time: string;
+  meetingId: string;
+  meeting_status: boolean;
+  joined_status: boolean;
+  booking_status: boolean;
+  dao_name: string;
+  title: string;
+  description: string;
+  uid_host: string;
+  uid_user: string;
+}
 
 interface AttestOffchainRequestBody {
   recipient: string;
@@ -16,6 +32,7 @@ interface AttestOffchainRequestBody {
   startTime: number;
   endTime: number;
 }
+
 interface MyError {
   message: string;
   code?: number; // Optionally, you can include a code for specific error types
@@ -117,6 +134,36 @@ export async function POST(req: NextRequest, res: NextResponse) {
         uploadstatus = true;
       }
       console.log(response.data);
+
+      if (requestData.meetingType === 1) {
+        const client = await MongoClient.connect(process.env.MONGODB_URI!, {
+          dbName: `chora-club`,
+        } as MongoClientOptions);
+
+        const db = client.db();
+        const collection = db.collection("meetings");
+
+        await collection.findOneAndUpdate(
+          { meetingId: requestData.meetingId },
+          { $set: { uid_host: response.data.offchainAttestationId } }
+        );
+
+        client.close();
+      } else if (requestData.meetingType === 2) {
+        const client = await MongoClient.connect(process.env.MONGODB_URI!, {
+          dbName: `chora-club`,
+        } as MongoClientOptions);
+
+        const db = client.db();
+        const collection = db.collection("meetings");
+
+        await collection.findOneAndUpdate(
+          { meetingId: requestData.meetingId },
+          { $set: { uid_attendee: response.data.offchainAttestationId } }
+        );
+
+        client.close();
+      }
     } catch (error) {
       console.error("Error submitting signed attestation: ", error);
 

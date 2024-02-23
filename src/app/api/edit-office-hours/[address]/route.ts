@@ -16,9 +16,9 @@ export async function PUT(
   req: Request,
   res: NextResponse<UpdateOfficeHoursResponse>
 ) {
-  console.log("calling.......");
+  // console.log("calling.......");
   const address = req.url.split("edit-office-hours/")[1];
-  console.log(address);
+  // console.log(address);
   const { title, description, office_hours_slot, status } = await req.json();
 
   //   // Validate request body
@@ -33,23 +33,23 @@ export async function PUT(
 
   try {
     // Connect to your MongoDB database
-    console.log("Connecting to MongoDB...");
+    // console.log("Connecting to MongoDB...");
     const client = await MongoClient.connect(process.env.MONGODB_URI!, {
       dbName: `chora-club`,
     } as MongoClientOptions);
-    console.log("Connected to MongoDB");
+    // console.log("Connected to MongoDB");
 
     // Access the collection
     const db = client.db();
     const collection = db.collection("office_hours");
 
     // Find the office hours document to update
-    console.log("Finding office hours document to update...");
+    // console.log("Finding office hours document to update...");
     const officeHoursToUpdate = await collection.find({
       address,
       status: "active",
     });
-    console.log("office hour to update", officeHoursToUpdate);
+    // console.log("office hour to update", officeHoursToUpdate);
 
     if (!officeHoursToUpdate) {
       return NextResponse.json(
@@ -59,7 +59,7 @@ export async function PUT(
     }
 
     // Update the office hours document
-    console.log("Updating office hours document...");
+    // console.log("Updating office hours document...");
     await collection.updateMany(
       { address, status: "active" },
       {
@@ -72,7 +72,7 @@ export async function PUT(
     );
 
     client.close();
-    console.log("MongoDB connection closed");
+    // console.log("MongoDB connection closed");
 
     return NextResponse.json({ success: true });
   } catch (error) {

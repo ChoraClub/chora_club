@@ -28,24 +28,24 @@ export async function PUT(
     }
 
     // Connect to MongoDB database
-    console.log("Connecting to MongoDB...");
+    // console.log("Connecting to MongoDB...");
     const client = await MongoClient.connect(process.env.MONGODB_URI!, {
       dbName: `chora-club`,
     } as MongoClientOptions);
-    console.log("Connected to MongoDB");
+    // console.log("Connected to MongoDB");
 
     // Access the collection
     const db = client.db();
     const collection = db.collection("meetings");
 
     // Update the booking status of the meeting with the provided ID
-    console.log(`Updating booking status for meeting with ID ${id}...`);
+    // console.log(`Updating booking status for meeting with ID ${id}...`);
     const updateResult = await collection.updateOne(
       { _id: new ObjectId(id) },
       { $set: { meeting_status, booking_status, meetingId } }
     );
 
-    console.log("Meeting booking status updated:", updateResult);
+    // console.log("Meeting booking status updated:", updateResult);
 
     // Check if the document was successfully updated
     if (updateResult.modifiedCount === 0) {
@@ -53,7 +53,7 @@ export async function PUT(
     }
 
     client.close();
-    console.log("MongoDB connection closed");
+    // console.log("MongoDB connection closed");
 
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (error) {
