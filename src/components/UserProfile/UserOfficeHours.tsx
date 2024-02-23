@@ -42,7 +42,7 @@ function UserOfficeHours({isDelegate}:UserOfficeHoursProps) {
     <div>
       <div className="pt-3 pr-32">
         <div className="flex w-fit gap-14 border-1 border-[#7C7C7C] px-6 rounded-xl text-sm">
-          {isDelegate === true &&(
+          {/* {isDelegate === true &&( */}
           <button
             className={`py-2  ${
               searchParams.get("hours") === "schedule"
@@ -55,7 +55,7 @@ function UserOfficeHours({isDelegate}:UserOfficeHoursProps) {
           >
             Schedule
           </button>
-          )}
+          {/* )} */}
 
           {isDelegate === true &&(
           <button
@@ -98,7 +98,7 @@ function UserOfficeHours({isDelegate}:UserOfficeHoursProps) {
         </div>
 
         <div className="py-10">
-          {isDelegate === true && searchParams.get("hours") === "schedule" && <UserScheduledHours />}
+          {searchParams.get("hours") === "schedule" && <UserScheduledHours />}
           {isDelegate === true && searchParams.get("hours") === "upcoming" && <UserUpcomingHours />}
 
           {searchParams.get("hours") === "hosted" && (

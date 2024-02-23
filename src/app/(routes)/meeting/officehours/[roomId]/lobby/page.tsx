@@ -4,6 +4,8 @@ import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
+import { useAccount } from "wagmi";
+
 // Assets
 import { toast } from "react-hot-toast";
 import { BasicIcons } from "@/assets/BasicIcons";
@@ -21,6 +23,7 @@ import {
   useLobby,
   usePeerIds,
   useRoom,
+  useLocalPeer,
 } from "@huddle01/react/hooks";
 
 type lobbyProps = {};
@@ -34,33 +37,57 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
   const userDisplayName = useStore((state) => state.userDisplayName);
   const [token, setToken] = useState<string>("");
   const [isJoining, setIsJoining] = useState<boolean>(false);
+  const { updateMetadata, metadata, peerId, role } = useLocalPeer<{
+    displayName: string;
+    avatarUrl: string;
+    isHandRaised: boolean;
+  }>();
+
+  const { address } = useAccount();
 
   const { push } = useRouter();
 
   // Huddle Hooks
   const { joinRoom, state, room } = useRoom();
+  console.log("role from startspace", role);
+
+ 
 
   const handleStartSpaces = async () => {
     setIsJoining(true);
     let token = "";
     if (state !== "connected") {
-      const response = await fetch(`/api/token?roomId=${params.roomId}`);
-      token = await response.text();
-      console.log(response);
+      try {
+        const response = await fetch(`/api/token?roomId=${params.roomId}`);
+        token = await response.text();
+        console.log(response);
+      } catch (error) {
+        console.error("Error fetching token:", error);
+        toast.error("Error fetching token. Please try again.");
+        setIsJoining(false); // Reset joining state
+        return;
+      }
     }
 
     if (!userDisplayName.length) {
       toast.error("Display name is required!");
+      setIsJoining(false); // Reset joining state
       return;
-    } else {
-      // console.log("token from lobby", { token });
-      // console.log("roomId from loby", params.roomId);
+    }
+
+    try {
       await joinRoom({
         roomId: params.roomId,
         token,
       });
+
+
+      setIsJoining(false); // Reset joining state
+    } catch (error) {
+      console.error("Error starting spaces:", error);
+      toast.error("Error starting spaces. Please try again.");
+      setIsJoining(false); // Reset joining state
     }
-    setIsJoining(false);
   };
 
   useEffect(() => {
@@ -160,7 +187,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
         <div className="flex items-center w-full">
           <button
             className="flex items-center justify-center bg-blue-shade-100 text-slate-100 rounded-md p-2 mt-2 w-full"
-            onClick={handleStartSpaces}
+            onClick={() => handleStartSpaces()}
           >
             {isJoining ? "Joining Spaces..." : "Start Spaces"}
             {!isJoining && (

@@ -21,6 +21,8 @@ import useStore from "@/components/store/slices";
 import { toast } from "react-hot-toast";
 import { Role } from "@huddle01/server-sdk/auth";
 import Chat from "@/components/Chat/Chat";
+import { useAccount } from "wagmi";
+
 // import Chat from '@/components/Chat/Chat';
 
 const Home = ({ params }: { params: { roomId: string } }) => {
@@ -49,6 +51,8 @@ const Home = ({ params }: { params: { roomId: string } }) => {
 
   const { huddleClient } = useHuddle01();
 
+  const { address } = useAccount();
+
   useEffect(() => {
     if (state === "idle") {
       push(`/meeting/officehours/${params.roomId}/lobby`);
@@ -60,8 +64,40 @@ const Home = ({ params }: { params: { roomId: string } }) => {
         avatarUrl: avatarUrl,
         isHandRaised: metadata?.isHandRaised || false,
       });
+
+      // Check if the role is "listener" or "speaker"
+      if (role === "listener" || role === "speaker") {
+        // Get the attendee address based on the role
+        const attendeeAddress = role === "listener" ? address : peerId;
+
+        // Construct the request body
+        let attendees = [];
+
+        // Add the attendee dynamically one by one
+        attendees.push({
+          attendee_address: attendeeAddress,
+        });
+
+        const raw = JSON.stringify({
+          meetingId: params.roomId,
+          attendees: attendees,
+        });
+
+        // Make the API request
+        const requestOptions = {
+          method: "PUT",
+          body: raw,
+        };
+
+        fetch("/api/update-attendee", requestOptions)
+          .then((response) => response.text())
+          .then((result) => console.log(result))
+          .catch((error) => console.error(error));
+      }
     }
-  }, []);
+  }, []); // empty dependency array
+
+  console.log("role from office hours", role);
 
   useDataMessage({
     onMessage(payload, from, label) {

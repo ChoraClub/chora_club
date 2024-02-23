@@ -35,8 +35,8 @@ import dao_abi from "../../artifacts/Dao.sol/GovernanceToken.json";
 import axios from "axios";
 
 function MainProfile() {
-  const { address } = useAccount();
-  // const address = "0x5e349eca2dc61abcd9dd99ce94d04136151a09ee";
+  // const { address } = useAccount();
+  const address = "0x5e349eca2dc61abcd9dd99ce94d04136151a09ee";
   const { chain, chains } = useNetwork();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [img, setImg] = useState<File | undefined>();
@@ -466,7 +466,7 @@ function MainProfile() {
 
   return (
     <>
-      {isDelegate !== undefined ? (
+      {/* {isDelegate !== undefined ? ( */}
         <div className="font-poppins">
           <div className="flex ps-14 py-5 pe-10 justify-between">
             <div className="flex">
@@ -826,11 +826,11 @@ function MainProfile() {
             {/* {searchParams.get("active") === "claimNft" ? <ClaimNFTs /> : ""} */}
           </div>
         </div>
-      ) : (
+      {/* ) : (
         <>
           <button onClick={handleDelegate}>Loading...</button>
         </>
-      )}
+      )} */}
     </>
   );
 }

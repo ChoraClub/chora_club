@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-
 import { useAccount, useNetwork } from "wagmi";
 
 const UserScheduledHours: React.FC = () => {
@@ -11,11 +10,29 @@ const UserScheduledHours: React.FC = () => {
   const { address } = useAccount();
   const { chain } = useNetwork();
 
+  const createRandomRoom = async () => {
+    const res = await fetch("https://iriko.huddle01.media/api/v1/create-room", {
+      method: "POST",
+      body: JSON.stringify({
+        title: "Test Room",
+      }),
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": process.env.NEXT_PUBLIC_API_KEY ?? "",
+      },
+      cache: "no-store",
+    });
+    const data = await res.json();
+    return data.data.roomId;
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     try {
       setIsSubmitting(true);
+
+      const roomId = await createRandomRoom();
 
       // Convert the selected date to UTC
       const selectedDateUTC = new Date(selectedDate);
@@ -27,12 +44,13 @@ const UserScheduledHours: React.FC = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          address: address, // Replace with the actual address
+          address: address,
           office_hours_slot: utcFormattedDate,
           title,
           description,
           status: "active",
           chain_name: chain?.name,
+          meetingId: roomId, // Pass the roomId as meetingId
         }),
       });
 

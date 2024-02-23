@@ -10,6 +10,8 @@ interface OfficeHoursRequestBody {
   description: string;
   status: string;
   chain_name: string;
+  video_uri: string;
+  meetingId: string;
 }
 
 // Define the response body type
@@ -23,6 +25,8 @@ interface OfficeHoursResponseBody {
     description: string;
     chain_name: string;
     status: string;
+    video_uri: string;
+    meetingId: string;
   } | null;
   error?: string;
 }
@@ -38,6 +42,8 @@ export async function POST(
     description,
     status,
     chain_name,
+    video_uri,
+    meetingId,
   }: OfficeHoursRequestBody = await req.json();
 
   try {
@@ -60,7 +66,9 @@ export async function POST(
       title,
       description,
       status,
-      chain_name
+      chain_name,
+      video_uri,
+      meetingId,
     });
     console.log("Office hours document inserted:", result);
 
