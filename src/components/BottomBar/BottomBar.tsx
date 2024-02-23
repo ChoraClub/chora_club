@@ -113,87 +113,149 @@ const BottomBar: React.FC<BottomBarProps> = () => {
     }
   };
 
-const handleAttestation = async (endMeet: string) => {
-  if (endMeet == "leave") {
-    leaveRoom();
-  } else if (endMeet == "close") {
-    closeRoom();
-  } else {
-    return;
-  }
-
-  let sessionData;
-  if (meetingCategory === "session") {
-    const data = await getSessionData();
-    console.log("session data: ", data.data[0]);
-    sessionData = data.data[0];
-  } else {
-    console.log("error");
-  }
-
-  const response = await fetch(
-    `https://api.huddle01.com/api/v1/rooms/meetings?roomId=${roomId}`,
-    {
-      method: "GET",
-      headers: {
-        "Content-type": "application/json",
-        "x-api-key": process.env.NEXT_PUBLIC_API_KEY ?? "",
-      },
+  const getOfficehoursData = async () => {
+    try {
+      const response = await fetch(`/api/meeting-officehours-data/${roomId}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const result = await response.json();
+      console.log("result in get meeting", result);
+      return result;
+    } catch (error) {
+      console.log("error in catch", error);
     }
-  );
-  const result = await response.json();
-  console.log("meeting details: ", result);
-
-  const slotTimeUnix = Math.floor(
-    new Date(sessionData.slot_time).getTime() / 1000
-  );
-  const endTimeUnix = Math.floor(Date.now() / 1000); // Current time in Unix timestamp format
-
-  const hostData = {
-    recipient: sessionData.host_address,
-    meetingId: roomId,
-    meetingType: 1,
-    startTime: slotTimeUnix, 
-    endTime: endTimeUnix, 
   };
 
-  console.log(window.location.origin);
-  const headers = {
-    "Content-Type": "application/json",
-    //   Origin: window.location.origin, // Set the Origin header to your frontend URL
+  const handleAttestation = async (endMeet: string) => {
+    if (endMeet == "leave") {
+      leaveRoom();
+    } else if (endMeet == "close") {
+      closeRoom();
+    } else {
+      return;
+    }
+
+    let meetingData;
+    if (meetingCategory === "session") {
+      const data = await getSessionData();
+      console.log("session data: ", data.data[0]);
+      meetingData = data.data[0];
+
+      const slotTimeUnix = Math.floor(
+        new Date(meetingData.slot_time).getTime() / 1000
+      );
+      const endTimeUnix = Math.floor(Date.now() / 1000); // Current time in Unix timestamp format
+
+      console.log(window.location.origin);
+      const headers = {
+        "Content-Type": "application/json",
+        //   Origin: window.location.origin, // Set the Origin header to your frontend URL
+      };
+
+      const hostData = {
+        recipient: meetingData.host_address,
+        meetingId: roomId,
+        meetingType: 1,
+        startTime: slotTimeUnix,
+        endTime: endTimeUnix,
+      };
+
+      try {
+        const response = await axios.post("/api/attest-offchain", hostData, {
+          headers,
+        });
+        console.log(response.data);
+        // Handle response as needed
+      } catch (error) {
+        console.error("Error:", error);
+        // Handle error
+      }
+
+      const userData = {
+        recipient: meetingData.user_address,
+        meetingId: roomId,
+        meetingType: 2,
+        startTime: slotTimeUnix,
+        endTime: endTimeUnix,
+      };
+
+      try {
+        const response = await axios.post("/api/attest-offchain", userData, {
+          headers,
+        });
+        console.log(response.data);
+        // Handle response as needed
+      } catch (error) {
+        console.error("Error:", error);
+        // Handle error
+      }
+    } else if (meetingCategory === "officehours") {
+      const data = await getOfficehoursData();
+      console.log("session data: ", data);
+      meetingData = data[0];
+
+      const slotTimeUnix = Math.floor(
+        new Date(meetingData.office_hours_slot).getTime() / 1000
+      );
+      const endTimeUnix = Math.floor(Date.now() / 1000);
+
+      console.log(window.location.origin);
+      const headers = {
+        "Content-Type": "application/json",
+        //   Origin: window.location.origin, // Set the Origin header to your frontend URL
+      };
+
+      console.log("attendees: ", meetingData.attendees.length);
+
+      const hostData = {
+        recipient: meetingData.address,
+        meetingId: roomId,
+        meetingType: 3,
+        startTime: slotTimeUnix,
+        endTime: endTimeUnix,
+      };
+
+      try {
+        const response = await axios.post("/api/attest-offchain", hostData, {
+          headers,
+        });
+        console.log(response.data);
+        // Handle response as needed
+      } catch (error) {
+        console.error("Error:", error);
+        // Handle error
+      }
+
+      for (let len = 0; len < meetingData.attendees.length; len++) {
+        const attendeeData = {
+          recipient: meetingData.attendees[len].attendee_address,
+          meetingId: roomId,
+          meetingType: 4,
+          startTime: slotTimeUnix,
+          endTime: endTimeUnix,
+        };
+        try {
+          const response = await axios.post(
+            "/api/attest-offchain",
+            attendeeData,
+            {
+              headers,
+            }
+          );
+          console.log(response.data);
+          // Handle response as needed
+        } catch (error) {
+          console.error("Error:", error);
+          // Handle error
+        }
+      }
+    } else {
+      console.log("error");
+    }
   };
-
-  const userData = {
-    recipient: sessionData.user_address,
-    meetingId: roomId,
-    meetingType: 2,
-    startTime: slotTimeUnix, 
-    endTime: endTimeUnix, 
-  };
-
-  try {
-    const response = await axios.post("/api/attest-offchain", hostData, {
-      headers,
-    });
-    console.log(response.data);
-    // Handle response as needed
-  } catch (error) {
-    console.error("Error:", error);
-    // Handle error
-  }
-
-  try {
-    const response = await axios.post("/api/attest-offchain", userData, {
-      headers,
-    });
-    console.log(response.data);
-    // Handle response as needed
-  } catch (error) {
-    console.error("Error:", error);
-    // Handle error
-  }
-};
-
 
   return (
     <div className="w-full flex items-center px-10 justify-between pb-6 font-poppins">
@@ -375,7 +437,3 @@ const OutlineButton: React.FC<OutlineButtonProps> = ({
     {children}
   </button>
 );
-
-
-
-
