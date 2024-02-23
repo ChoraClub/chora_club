@@ -91,18 +91,37 @@ function DelegateOfficeHrs({ props }: { props: Type }) {
 
         <div className="py-10">
           {searchParams.get("hours") === "ongoing" && (
-            <Tile sessionDetails={sessionDetails} dataLoading={dataLoading} isEvent="Ongoing" isOfficeHour={true} />
+            <Tile
+              sessionDetails={sessionDetails}
+              dataLoading={dataLoading}
+              isEvent="Ongoing"
+              isOfficeHour={true}
+            />
           )}
           {searchParams.get("hours") === "upcoming" && (
-            <Tile sessionDetails={sessionDetails} dataLoading={dataLoading} isEvent="Upcoming" isOfficeHour={true} />
+            <Tile
+              sessionDetails={sessionDetails}
+              dataLoading={dataLoading}
+              isEvent="Upcoming"
+              isOfficeHour={true}
+            />
           )}
           {searchParams.get("hours") === "hosted" && (
-             <Tile sessionDetails={sessionDetails} dataLoading={dataLoading} isEvent="Recorded" isOfficeHour={true} />
+            <Tile
+              sessionDetails={sessionDetails}
+              dataLoading={dataLoading}
+              isEvent="Recorded"
+              isOfficeHour={true}
+            />
           )}
           {searchParams.get("hours") === "attended" && (
-             <Tile sessionDetails={sessionDetails} dataLoading={dataLoading} isEvent="Recorded" isOfficeHour={true} />
+            <Tile
+              sessionDetails={sessionDetails}
+              dataLoading={dataLoading}
+              isEvent="Recorded"
+              isOfficeHour={true}
+            />
           )}
-         
         </div>
       </div>
     </div>
