@@ -101,7 +101,7 @@ function UserOfficeHours({isDelegate, selfDelegate}:UserOfficeHoursProps) {
         </div>
 
         <div className="py-10">
-          {isDelegate === true && searchParams.get("hours") === "schedule" && <UserScheduledHours />}
+          {searchParams.get("hours") === "schedule" && <UserScheduledHours />}
           {isDelegate === true && searchParams.get("hours") === "upcoming" && <UserUpcomingHours />}
 
           {searchParams.get("hours") === "hosted" && (

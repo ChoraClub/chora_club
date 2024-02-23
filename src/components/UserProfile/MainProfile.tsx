@@ -881,7 +881,7 @@ function MainProfile() {
             {/* {searchParams.get("active") === "claimNft" ? <ClaimNFTs /> : ""} */}
           </div>
         </div>
-      ) : (
+       ) : (
         <>
           <div className="flex items-center justify-center pt-10">
             <Oval
@@ -894,7 +894,7 @@ function MainProfile() {
             />
           </div>
         </>
-      )}
+      )} 
     </>
   );
 }
