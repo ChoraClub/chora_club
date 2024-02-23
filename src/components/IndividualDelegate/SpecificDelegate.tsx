@@ -16,6 +16,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import toast, { Toaster } from "react-hot-toast";
 import { Provider, cacheExchange, createClient, fetchExchange } from "urql";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 interface Type {
   daoDelegates: string;
@@ -97,120 +98,132 @@ function SpecificDelegate({ props }: { props: Type }) {
 
   return (
     <div className="font-poppins">
-      <div className="flex ps-14 py-5">
-        <Image
-          src={delegateInfo?.profilePicture || user}
-          alt="user"
-          width={40}
-          height={40}
-          className="w-40 rounded-3xl"
-        />
+      <div className="flex ps-14 py-5 justify-between">
+        <div className="flex ">
+          <Image
+            src={delegateInfo?.profilePicture || user}
+            alt="user"
+            width={40}
+            height={40}
+            className="w-40 rounded-3xl"
+          />
 
-        <div className="px-4">
-          <div className=" flex items-center py-1">
-            <div className="font-bold text-lg pr-4">
-              {delegateInfo?.ensName ? (
-                delegateInfo?.ensName
-              ) : (
-                <>{props.individualDelegate.substring(0, 12)}... </>
-              )}
+          <div className="px-4">
+            <div className=" flex items-center py-1">
+              <div className="font-bold text-lg pr-4">
+                {delegateInfo?.ensName ? (
+                  delegateInfo?.ensName
+                ) : (
+                  <>{props.individualDelegate.substring(0, 12)}... </>
+                )}
+              </div>
+              <div className="flex gap-3">
+                <Link
+                  href={twitter}
+                  className={`border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 ${
+                    twitter == "" ? "hidden" : ""
+                  }`}
+                  style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
+                  target="_blank"
+                >
+                  <FaXTwitter color="#7C7C7C" size={12} />
+                </Link>
+                <Link
+                  href={discourse}
+                  className={`border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1  ${
+                    discourse == "" ? "hidden" : ""
+                  }`}
+                  style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
+                  target="_blank"
+                >
+                  <BiSolidMessageRoundedDetail color="#7C7C7C" size={12} />
+                </Link>
+                <Link
+                  href={discord}
+                  className={`border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 ${
+                    discord == "" ? "hidden" : ""
+                  }`}
+                  style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
+                  target="_blank"
+                >
+                  <FaDiscord color="#7C7C7C" size={12} />
+                </Link>
+                <Link
+                  href={github}
+                  className={`border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 ${
+                    github == "" ? "hidden" : ""
+                  }`}
+                  style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
+                  target="_blank"
+                >
+                  <FaGithub color="#7C7C7C" size={12} />
+                </Link>
+              </div>
             </div>
-            <div className="flex gap-3">
-              <Link
-                href={twitter}
-                className={`border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 ${
-                  twitter == "" ? "hidden" : ""
-                }`}
-                style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                target="_blank"
+
+            <div className="flex items-center py-1">
+              <div>
+                {props.individualDelegate.substring(0, 6)} ...{" "}
+                {props.individualDelegate.substring(
+                  props.individualDelegate.length - 4
+                )}
+              </div>
+
+              <Tooltip
+                content="Copy"
+                placement="right"
+                closeDelay={1}
+                showArrow
               >
-                <FaXTwitter color="#7C7C7C" size={12} />
-              </Link>
-              <Link
-                href={discourse}
-                className={`border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1  ${
-                  discourse == "" ? "hidden" : ""
-                }`}
-                style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                target="_blank"
+                <span className="px-2 cursor-pointer" color="#3E3D3D">
+                  <IoCopy
+                    onClick={() => handleCopy(props.individualDelegate)}
+                  />
+                </span>
+              </Tooltip>
+              <Toaster
+                toastOptions={{
+                  style: {
+                    fontSize: "14px",
+                    backgroundColor: "#3E3D3D",
+                    color: "#fff",
+                    boxShadow: "none",
+                    borderRadius: "50px",
+                    padding: "3px 5px",
+                  },
+                }}
+              />
+            </div>
+
+            <div className="flex gap-4 py-1">
+              <div className="text-[#4F4F4F] border-[0.5px] border-[#D9D9D9] rounded-md px-3 py-1">
+                <span className="text-blue-shade-200 font-semibold">
+                  {formatNumber(Number(delegateInfo?.delegatedVotes))}
+                  &nbsp;
+                </span>
+                delegated tokens
+              </div>
+              <div className="text-[#4F4F4F] border-[0.5px] border-[#D9D9D9] rounded-md px-3 py-1">
+                Delegated from
+                <span className="text-blue-shade-200 font-semibold">
+                  &nbsp;{formatNumber(delegateInfo?.delegatorCount)}&nbsp;
+                </span>
+                Addresses
+              </div>
+            </div>
+
+            <div className="pt-2">
+              <button
+                className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
+                onClick={() => toast("Coming Soon 🚀")}
               >
-                <BiSolidMessageRoundedDetail color="#7C7C7C" size={12} />
-              </Link>
-              <Link
-                href={discord}
-                className={`border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 ${
-                  discord == "" ? "hidden" : ""
-                }`}
-                style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                target="_blank"
-              >
-                <FaDiscord color="#7C7C7C" size={12} />
-              </Link>
-              <Link
-                href={github}
-                className={`border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 ${
-                  github == "" ? "hidden" : ""
-                }`}
-                style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                target="_blank"
-              >
-                <FaGithub color="#7C7C7C" size={12} />
-              </Link>
+                Delegate
+              </button>
             </div>
           </div>
-
-          <div className="flex items-center py-1">
-            <div>
-              {props.individualDelegate.substring(0, 6)} ...{" "}
-              {props.individualDelegate.substring(
-                props.individualDelegate.length - 4
-              )}
-            </div>
-
-            <Tooltip content="Copy" placement="right" closeDelay={1} showArrow>
-              <span className="px-2 cursor-pointer" color="#3E3D3D">
-                <IoCopy onClick={() => handleCopy(props.individualDelegate)} />
-              </span>
-            </Tooltip>
-            <Toaster
-              toastOptions={{
-                style: {
-                  fontSize: "14px",
-                  backgroundColor: "#3E3D3D",
-                  color: "#fff",
-                  boxShadow: "none",
-                  borderRadius: "50px",
-                  padding: "3px 5px",
-                },
-              }}
-            />
-          </div>
-
-          <div className="flex gap-4 py-1">
-            <div className="text-[#4F4F4F] border-[0.5px] border-[#D9D9D9] rounded-md px-3 py-1">
-              <span className="text-blue-shade-200 font-semibold">
-                {formatNumber(Number(delegateInfo?.delegatedVotes))}
-                &nbsp;
-              </span>
-              delegated tokens
-            </div>
-            <div className="text-[#4F4F4F] border-[0.5px] border-[#D9D9D9] rounded-md px-3 py-1">
-              Delegated from
-              <span className="text-blue-shade-200 font-semibold">
-                &nbsp;{formatNumber(delegateInfo?.delegatorCount)}&nbsp;
-              </span>
-              Addresses
-            </div>
-          </div>
-
-          <div className="pt-2">
-            <button
-              className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
-              onClick={() => toast("Coming Soon 🚀")}
-            >
-              Delegate
-            </button>
-          </div>
+        </div>
+        <div className="pr-[2.2rem]">
+          <ConnectButton />
         </div>
       </div>
 
@@ -263,7 +276,7 @@ function SpecificDelegate({ props }: { props: Type }) {
 
       <div className="py-6 ps-16">
         {searchParams.get("active") === "info" && (
-          <DelegateInfo props={props}  />
+          <DelegateInfo props={props} />
         )}
         {searchParams.get("active") === "pastVotes" && (
           <DelegateVotes props={props} />
