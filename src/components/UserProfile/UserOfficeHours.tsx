@@ -4,87 +4,161 @@ import UserRecordedHours from "./UserAllOfficeHrs/UserRecordedHours";
 import UserUpcomingHours from "./UserAllOfficeHrs/UserUpcomingHours";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Tile from "../utils/Tile";
-import { useNetwork } from "wagmi";
+import { useNetwork, useAccount } from "wagmi";
 import text1 from "@/assets/images/daos/texture1.png";
 
 interface UserOfficeHoursProps {
   isDelegate: boolean | undefined;
-  selfDelegate:boolean;
+  selfDelegate: boolean;
 }
-function UserOfficeHours({isDelegate, selfDelegate}:UserOfficeHoursProps) {
+
+interface Session {
+  _id: string;
+  address: string;
+  office_hours_slot: string;
+  title: string;
+  description: string;
+  status: "ongoing" | "active" | "inactive"; // Define the possible statuses
+  chain_name: string;
+  attendees: any[];
+}
+
+function UserOfficeHours({ isDelegate, selfDelegate }: UserOfficeHoursProps) {
+  const { address } = useAccount();
   const router = useRouter();
   const path = usePathname();
   const searchParams = useSearchParams();
   const { chain, chains } = useNetwork();
-  const details = [
-    {
-      img: text1,
-      title: "Open Forum: Governance, Applications, and Beyond",
-      dao: `${chain && chain.name}`,
-      participant: 12,
-      attendee: "0xf4b0556b9b6f53e00a1fdd2b0478ce841991d8fa",
-      host: "lindaxie.eth",
-      started: "07/09/2023 12:15 PM EST",
-      desc: `Join the conversation about the future of ${
-        chain && chain.name
-      }. Discuss governance proposals, dApp adoption, and technical developments.`,
-    },
-  ];
 
-  const [sessionDetails, setSessionDetails] = useState(details);
+  const [sessionDetails, setSessionDetails] = useState([]);
   const [dataLoading, setDataLoading] = useState(true);
 
   useEffect(() => {
-    setSessionDetails(details);
-    setDataLoading(false);
-  }, []);
+    const fetchData = async () => {
+      try {
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+
+        const raw = JSON.stringify({
+          address: address,
+        });
+
+        const requestOptions: RequestInit = {
+          method: "POST",
+          headers: myHeaders,
+          body: raw,
+        };
+
+        const response = await fetch(
+          "/api/get-officehours-address",
+          requestOptions
+        );
+        const result = await response.json();
+        console.log(result);
+
+        //api for individual attendees
+        const rawData = JSON.stringify({
+          attendee_address: address,
+        });
+
+        const requestOption: RequestInit = {
+          method: "POST",
+          headers: myHeaders,
+          body: rawData,
+        };
+
+        const responseData = await fetch(
+          "/api/get-attendee-individual",
+          requestOption
+        );
+        const resultData = await responseData.json();
+        console.log(resultData);
+
+        if (
+          searchParams.get("hours") === "ongoing" ||
+          searchParams.get("hours") === "upcoming" ||
+          searchParams.get("hours") === "hosted"
+        ) {
+          const filteredSessions = result.filter((session: Session) => {
+            if (searchParams.get("hours") === "ongoing") {
+              return session.status === "ongoing";
+            } else if (searchParams.get("hours") === "upcoming") {
+              return session.status === "active";
+            } else if (searchParams.get("hours") === "hosted") {
+              return session.status === "inactive";
+            }
+          });
+          setSessionDetails(filteredSessions);
+        } else if (searchParams.get("hours") === "attended") {
+          const filteredSessions = resultData.filter((session: Session) => {
+            return session.attendees.some(
+              (attendee: any) => attendee.attendee_address === address
+            );
+          });
+          setSessionDetails(filteredSessions);
+        }
+
+        setDataLoading(false);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchData();
+  }, [searchParams.get("hours")]); // Re-fetch data when filter changes
+
+  useEffect(() => {
+    // Set initial session details
+    setSessionDetails([]);
+    setDataLoading(true);
+  }, [address]);
 
   return (
     <div>
       <div className="pt-3 pr-32">
         <div className="flex w-fit gap-14 border-1 border-[#7C7C7C] px-6 rounded-xl text-sm">
-          {(selfDelegate===true || isDelegate === true) &&(
-          <button
-            className={`py-2  ${
-              searchParams.get("hours") === "schedule"
-                ? "text-[#3E3D3D] font-bold"
-                : "text-[#7C7C7C]"
-            }`}
-            onClick={() =>
-              router.push(path + "?active=officeHours&hours=schedule")
-            }
-          >
-            Schedule
-          </button>
+          {(selfDelegate === true || isDelegate === true) && (
+            <button
+              className={`py-2  ${
+                searchParams.get("hours") === "schedule"
+                  ? "text-[#3E3D3D] font-bold"
+                  : "text-[#7C7C7C]"
+              }`}
+              onClick={() =>
+                router.push(path + "?active=officeHours&hours=schedule")
+              }
+            >
+              Schedule
+            </button>
           )}
 
-          {(selfDelegate===true || isDelegate === true) &&(
-          <button
-            className={`py-2  ${
-              searchParams.get("hours") === "upcoming"
-                ? "text-[#3E3D3D] font-bold"
-                : "text-[#7C7C7C]"
-            }`}
-            onClick={() =>
-              router.push(path + "?active=officeHours&hours=upcoming")
-            }
-          >
-            Upcoming
-          </button>
+          {(selfDelegate === true || isDelegate === true) && (
+            <button
+              className={`py-2  ${
+                searchParams.get("hours") === "upcoming"
+                  ? "text-[#3E3D3D] font-bold"
+                  : "text-[#7C7C7C]"
+              }`}
+              onClick={() =>
+                router.push(path + "?active=officeHours&hours=upcoming")
+              }
+            >
+              Upcoming
+            </button>
           )}
-          {(selfDelegate===true || isDelegate === true) &&(
-          <button
-            className={`py-2 ${
-              searchParams.get("hours") === "hosted"
-                ? "text-[#3E3D3D] font-bold"
-                : "text-[#7C7C7C]"
-            }`}
-            onClick={() =>
-              router.push(path + "?active=officeHours&hours=hosted")
-            }
-          >
-            Hosted
-          </button>
+          {(selfDelegate === true || isDelegate === true) && (
+            <button
+              className={`py-2 ${
+                searchParams.get("hours") === "hosted"
+                  ? "text-[#3E3D3D] font-bold"
+                  : "text-[#7C7C7C]"
+              }`}
+              onClick={() =>
+                router.push(path + "?active=officeHours&hours=hosted")
+              }
+            >
+              Hosted
+            </button>
           )}
           <button
             className={`py-2 ${
@@ -102,7 +176,9 @@ function UserOfficeHours({isDelegate, selfDelegate}:UserOfficeHoursProps) {
 
         <div className="py-10">
           {searchParams.get("hours") === "schedule" && <UserScheduledHours />}
-          {isDelegate === true && searchParams.get("hours") === "upcoming" && <UserUpcomingHours />}
+          {isDelegate === true && searchParams.get("hours") === "upcoming" && (
+            <UserUpcomingHours />
+          )}
 
           {searchParams.get("hours") === "hosted" && (
             <Tile

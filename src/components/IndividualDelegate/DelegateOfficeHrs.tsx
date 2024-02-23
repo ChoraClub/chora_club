@@ -7,6 +7,16 @@ interface Type {
   daoDelegates: string;
   individualDelegate: string;
 }
+interface Session {
+  _id: string;
+  address: string;
+  office_hours_slot: string;
+  title: string;
+  description: string;
+  status: "ongoing" | "active" | "inactive"; // Define the possible statuses
+  chain_name: string;
+  attendees: any[];
+}
 
 function DelegateOfficeHrs({ props }: { props: Type }) {
   const [activeSection, setActiveSection] = useState("ongoing");
@@ -14,26 +24,92 @@ function DelegateOfficeHrs({ props }: { props: Type }) {
   const router = useRouter();
   const path = usePathname();
   const searchParams = useSearchParams();
-  const details = [
-    {
-      img: text1,
-      title: "Open Forum: Governance, Applications, and Beyond",
-      dao: props.daoDelegates,
-      participant: 12,
-      attendee: "olimpio.eth",
-      host: "lindaxie.eth",
-      started: "22/09/2023 12:15 PM EST",
-      desc: `Join the conversation about the future of ${props.daoDelegates}. Discuss governance proposals, dApp adoption, and technical developments.`,
-    },
-  ];
 
-  const [sessionDetails, setSessionDetails] = useState(details);
+  const [sessionDetails, setSessionDetails] = useState([]);
   const [dataLoading, setDataLoading] = useState(true);
+  const dao_name =
+    props.daoDelegates.charAt(0).toUpperCase() + props.daoDelegates.slice(1);
 
   useEffect(() => {
-    setSessionDetails(details);
-    setDataLoading(false);
-  }, []);
+    const fetchData = async () => {
+      try {
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+
+        const raw = JSON.stringify({
+          address: props.individualDelegate,
+        });
+
+        const requestOptions: RequestInit = {
+          method: "POST",
+          headers: myHeaders,
+          body: raw,
+        };
+
+        const response = await fetch(
+          "/api/get-officehours-address",
+          requestOptions
+        );
+        const result = await response.json();
+        console.log(result);
+
+        //api for individual attendees
+        const rawData = JSON.stringify({
+          attendee_address: props.individualDelegate,
+        });
+
+        const requestOption: RequestInit = {
+          method: "POST",
+          headers: myHeaders,
+          body: rawData,
+        };
+
+        const responseData = await fetch(
+          "/api/get-attendee-individual",
+          requestOption
+        );
+        const resultData = await responseData.json();
+        console.log(resultData);
+
+        if (
+          searchParams.get("hours") === "ongoing" ||
+          searchParams.get("hours") === "upcoming" ||
+          searchParams.get("hours") === "hosted"
+        ) {
+          const filteredSessions = result.filter((session: Session) => {
+            if (searchParams.get("hours") === "ongoing") {
+              return session.status === "ongoing";
+            } else if (searchParams.get("hours") === "upcoming") {
+              return session.status === "active";
+            } else if (searchParams.get("hours") === "hosted") {
+              return session.status === "inactive";
+            }
+          });
+          setSessionDetails(filteredSessions);
+        } else if (searchParams.get("hours") === "attended") {
+          const filteredSessions = resultData.filter((session: Session) => {
+            return session.attendees.some(
+              (attendee: any) =>
+                attendee.attendee_address === props.individualDelegate
+            );
+          });
+          setSessionDetails(filteredSessions);
+        }
+
+        setDataLoading(false);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchData();
+  }, [searchParams.get("hours")]); // Re-fetch data when filter changes
+
+  useEffect(() => {
+    // Set initial session details
+    setSessionDetails([]);
+    setDataLoading(true);
+  }, [props]);
 
   return (
     <div>
