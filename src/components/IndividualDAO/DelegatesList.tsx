@@ -10,6 +10,7 @@ import { Button, Pagination, Tooltip } from "@nextui-org/react";
 import { Oval } from "react-loader-spinner";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import toast, { Toaster } from "react-hot-toast";
+import styles from "@/components/IndividualDelegate/DelegateVotes.module.css";
 
 function DelegatesList({ props }: { props: string }) {
   const [delegateData, setDelegateData] = useState<any>();
@@ -94,17 +95,31 @@ function DelegatesList({ props }: { props: string }) {
   return (
     <div>
       {isShowing && (
-      <div className="bg-yellow-200 border border-gray-300 rounded-md shadow-md text-gray-700 flex items-center p-3 w-70 mb-4" style={{width:"80%"}}>
-        <span>Data of the Delegates is retrieved from Karma API. Find out how they empower communities.</span> &nbsp; 
-        <a href="http://karmahq.xyz" target="_blank" rel="noopener noreferrer" className="text-blue-500 font-medium hover:underline">Click Here!🚀</a>
-        <button
-          className="flex ml-auto items-center justify-center p-1 text-gray-500 hover:text-red-500 bg-white border border-gray-300 rounded-md"
-          onClick={handleClose}
+        <div
+          className="bg-yellow-200 border border-gray-300 rounded-md shadow-md text-gray-700 flex items-center p-3 w-70 mb-4"
+          style={{ width: "80%" }}
         >
-          Close
-        </button>
-      </div>
-    )}
+          <span>
+            Data of the Delegates is retrieved from Karma API. Find out how they
+            empower communities.
+          </span>{" "}
+          &nbsp;
+          <a
+            href="http://karmahq.xyz"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-500 font-medium hover:underline"
+          >
+            Click Here!🚀
+          </a>
+          <button
+            className="flex ml-auto items-center justify-center p-1 text-gray-500 hover:text-red-500 bg-white border border-gray-300 rounded-md"
+            onClick={handleClose}
+          >
+            Close
+          </button>
+        </div>
+      )}
       <div className="flex items-center justify-between">
         <div
           style={{ background: "rgba(238, 237, 237, 0.36)" }}
@@ -123,7 +138,6 @@ function DelegatesList({ props }: { props: string }) {
           </span>
         </div>
       </div>
-      
 
       <div className="py-8 pe-10 font-poppins">
         {isPageLoading ? (
@@ -146,59 +160,65 @@ function DelegatesList({ props }: { props: string }) {
                   style={{
                     boxShadow: "0px 4px 50.8px 0px rgba(0, 0, 0, 0.11)",
                   }}
-                  className="px-5 py-7 rounded-2xl"
+                  className="px-5 py-7 rounded-2xl flex flex-col justify-between"
                 >
-                  <div className="flex justify-center">
-                    <Image
-                      src={
-                        daos.profilePicture == null
-                          ? user1
-                          : daos.profilePicture
-                      }
-                      alt="Image not found"
-                      width={80}
-                      height={80}
-                      className="rounded-full"
-                    ></Image>
-                  </div>
+                  <div>
+                    <div className="flex justify-center">
+                      <Image
+                        src={
+                          daos.profilePicture == null
+                            ? user1
+                            : daos.profilePicture
+                        }
+                        alt="Image not found"
+                        width={80}
+                        height={80}
+                        className="rounded-full"
+                      ></Image>
+                    </div>
 
-                  <div className="text-center">
-                    <div className="py-3">
-                      <div className="font-semibold">
-                        {daos.ensName == null ? (
-                          <span>
-                            {daos.publicAddress.substring(0, 5)}...
-                            {daos.publicAddress.substring(
-                              daos.publicAddress.length - 4
-                            )}
-                          </span>
-                        ) : (
-                          daos.ensName
-                        )}
-                      </div>
-                      <div className="flex justify-center items-center gap-2 pb-2 pt-1">
-                        {daos.publicAddress.substring(0, 5)}...
-                        {daos.publicAddress.substring(
-                          daos.publicAddress.length - 4
-                        )}
-                        <Tooltip
-                          content="Copy"
-                          placement="right"
-                          closeDelay={1}
-                          showArrow
+                    <div className="text-center">
+                      <div className="py-3">
+                        <div
+                          className={`font-semibold overflow-hidden ${styles.desc}`}
                         >
-                          <span className="cursor-pointer text-sm">
-                            <IoCopy
-                              onClick={() => handleCopy(daos.publicAddress)}
-                            />
+                          {daos.ensName == null ? (
+                            <span>
+                              {daos.publicAddress.slice(0, 6) +
+                                "..." +
+                                daos.publicAddress.slice(-4)}
+                            </span>
+                          ) : (
+                            <span>
+                              {daos.ensName.length > 15
+                                ? daos.ensName.slice(0, 15) + "..."
+                                : daos.ensName}
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex justify-center items-center gap-2 pb-2 pt-1">
+                          {daos.publicAddress.slice(0, 6) +
+                            "..." +
+                            daos.publicAddress.slice(-4)}
+                          <Tooltip
+                            content="Copy"
+                            placement="right"
+                            closeDelay={1}
+                            showArrow
+                          >
+                            <span className="cursor-pointer text-sm">
+                              <IoCopy
+                                onClick={() => handleCopy(daos.publicAddress)}
+                              />
+                            </span>
+                          </Tooltip>
+                        </div>
+                        <div className="text-sm border border-[#D9D9D9] py-2 px-1 rounded-lg w-full">
+                          <span className="text-blue-shade-200 font-semibold">
+                            {formatNumber(daos.delegatedVotes)}&nbsp;
                           </span>
-                        </Tooltip>
-                      </div>
-                      <div className="text-sm border border-[#D9D9D9] py-2 px-1 rounded-lg w-full">
-                        <span className="text-blue-shade-200 font-semibold">
-                          {formatNumber(daos.delegatedVotes)}&nbsp;
-                        </span>
-                        delegated tokens
+                          delegated tokens
+                        </div>
                       </div>
                     </div>
                   </div>
