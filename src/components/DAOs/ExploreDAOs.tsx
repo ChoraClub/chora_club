@@ -59,7 +59,7 @@ function ExploreDAOs() {
     <div className="p-6">
       {showNotification && (
         <div
-          className={`flex absolute items-center justify-center top-7 rounded-full font-poppins text-sm font-medium left-[34%] w-[32rem] ${
+          className={`flex absolute items-center justify-center bottom-9 rounded-full font-poppins text-sm font-medium left-[34%] w-[32rem] ${
             status ? "" : "hidden"
           }`}
         >
