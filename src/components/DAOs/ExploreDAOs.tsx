@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Image,{StaticImageData} from "next/image";
+import Image, { StaticImageData } from "next/image";
 import search from "@/assets/images/daos/search.png";
 import op_logo from "@/assets/images/daos/op.png";
 import arb_logo from "@/assets/images/daos/arbitrum.jpg";
@@ -52,39 +52,39 @@ function ExploreDAOs() {
 
   const handleClose = () => {
     setStatus(false);
-    localStorage.setItem("hasSeenNotification", "true"); 
+    localStorage.setItem("hasSeenNotification", "true");
   };
 
   return (
     <div className="p-6">
-      {showNotification && ( 
+      {showNotification && (
         <div
-        className={`flex absolute items-center justify-center top-4 rounded-full font-poppins text-sm font-medium left-[34%] w-[32rem] ${
-          status ? "" : "hidden"
-        }`}
-      >
-        <div className="py-2 bg-blue-shade-100 text-white rounded-full px-7">
-          To ensure optimal user experience, please note that our site is
-          designed to be responsive on desktop devices.
-        </div>
-        <div
-          className="bg-red-600 hover:bg-red-700 p-2 rounded-full cursor-pointer ml-3"
-          onClick={handleCloseNotification}
+          className={`flex absolute items-center justify-center bottom-9 rounded-full font-poppins text-sm font-medium left-[34%] w-[32rem] ${
+            status ? "" : "hidden"
+          }`}
         >
-          <ImCross color="#fff" size={10} />
+          <div className="py-2 bg-blue-shade-100 text-white rounded-full px-7">
+            To ensure optimal user experience, please note that our site is
+            designed to be responsive on desktop devices.
+          </div>
+          <div
+            className="bg-red-600 hover:bg-red-700 p-2 rounded-full cursor-pointer ml-3"
+            onClick={handleCloseNotification}
+          >
+            <ImCross color="#fff" size={10} />
+          </div>
         </div>
-      </div>
       )}
 
       <div className="">
-      <div className="flex justify-between pe-10">
-        <div className="text-blue-shade-200 font-medium text-4xl font-quanty pb-4">
-          Explore DAOs
+        <div className="flex justify-between pe-10">
+          <div className="text-blue-shade-200 font-medium text-4xl font-quanty pb-4">
+            Explore DAOs
+          </div>
+          <div>
+            <ConnectButton />
+          </div>
         </div>
-        <div>
-          <ConnectButton />
-        </div>
-      </div>
 
         <div
           style={{ background: "rgba(238, 237, 237, 0.36)" }}

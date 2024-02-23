@@ -19,6 +19,15 @@ interface Type {
   started: string;
   desc: string;
 }
+interface Session {
+  _id: string;
+  address: string;
+  office_hours_slot: string;
+  title: string;
+  description: string;
+  status: "ongoing" | "active" | "inactive"; // Define the possible statuses
+  chain_name: string;
+}
 
 function DaoOfficeHours() {
   const [activeSection, setActiveSection] = useState("ongoing");
@@ -27,50 +36,53 @@ function DaoOfficeHours() {
   const path = usePathname();
   const searchParams = useSearchParams();
 
-  const details: Type[] = [
-    {
-      img: text1,
-      title: "Optimism Open Forum: Governance, Applications, and Beyond",
-      dao: "Optimism",
-      participant: 12,
-      attendee: "olimpio.eth",
-      host: "lindaxie.eth",
-      started: "07/09/2023 12:15 PM EST",
-      desc:
-        "Join the conversation about the future of Optimism. Discuss governance proposals, dApp adoption, and technical developments.",
-    },
-    {
-      img: text2,
-      title: "Open Forum: Governance, Applications, and Beyond",
-      dao: "Arbitrum",
-      participant: 5,
-      attendee: "olimpio.eth",
-      host: "l2beatcom.eth",
-      started: "08/09/2023 01:15 PM EST",
-      desc:
-        "Join the conversation about the future of Arbitrum. Discuss governance proposals, dApp adoption, and technical developments.",
-    },
-  ];
-
   const [sessionDetails, setSessionDetails] = useState<Type[]>([]);
   const [dataLoading, setDataLoading] = useState(true);
 
   useEffect(() => {
-    setSessionDetails(details);
-    setDataLoading(false);
-  }, []);
+    const fetchData = async () => {
+      try {
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+
+        const requestOptions: RequestInit = {
+          method: "GET",
+          headers: myHeaders,
+        };
+
+        const response = await fetch(
+          "/api/get-specific-officehours",
+          requestOptions
+        );
+        const result = await response.json();
+        console.log(result);
+
+        // Filter sessions based on status
+        const filteredSessions = result.filter((session: Session) => {
+          if (searchParams.get("hours") === "ongoing") {
+            return session.status === "ongoing";
+          } else if (searchParams.get("hours") === "upcoming") {
+            return session.status === "active";
+          } else if (searchParams.get("hours") === "recorded") {
+            return session.status === "inactive";
+          }
+        });
+
+        setSessionDetails(filteredSessions);
+        setDataLoading(false);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchData();
+  }, [searchParams.get("hours")]); // Re-fetch data when filter changes
 
   useEffect(() => {
+    // Set initial session details
+    setSessionDetails([]);
     setDataLoading(true);
-    const filtered = details.filter(
-      (item) =>
-        item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.host.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-    setSessionDetails(filtered);
-    setDataLoading(false);
-  }, [searchQuery]);
-
+  }, []);
 
   return (
     <div className="p-6">
@@ -79,7 +91,7 @@ function DaoOfficeHours() {
           Office Hours
         </div>
         <div>
-            <ConnectButton />
+          <ConnectButton />
         </div>
       </div>
 
@@ -136,13 +148,28 @@ function DaoOfficeHours() {
 
         <div className="py-5">
           {searchParams.get("hours") === "ongoing" && (
-            <Tile sessionDetails={sessionDetails} dataLoading={dataLoading} isEvent="Ongoing" isOfficeHour={true}/>
+            <Tile
+              sessionDetails={sessionDetails}
+              dataLoading={dataLoading}
+              isEvent="Ongoing"
+              isOfficeHour={true}
+            />
           )}
           {searchParams.get("hours") === "upcoming" && (
-            <Tile sessionDetails={sessionDetails} dataLoading={dataLoading} isEvent="Upcoming" isOfficeHour={true}/>
+            <Tile
+              sessionDetails={sessionDetails}
+              dataLoading={dataLoading}
+              isEvent="Upcoming"
+              isOfficeHour={true}
+            />
           )}
           {searchParams.get("hours") === "recorded" && (
-            <Tile sessionDetails={sessionDetails} dataLoading={dataLoading} isEvent="Recorded" isOfficeHour={true}/>
+            <Tile
+              sessionDetails={sessionDetails}
+              dataLoading={dataLoading}
+              isEvent="Recorded"
+              isOfficeHour={true}
+            />
           )}
         </div>
       </div>
