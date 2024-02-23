@@ -6,6 +6,8 @@ import { NextUIProvider } from "@nextui-org/react";
 import SidebarMain from "@/components/MainSidebar/SidebarMain";
 import RootProviders from "./providers/root-providers";
 import HuddleContextProvider from "@/components/ClientComponents/HuddleContextProvider";
+import { useEffect } from "react";
+import FeedbackTile from "@/components/utils/FeedbackTile";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -44,7 +46,10 @@ export default function RootLayout({
               <div className="fixed w-[6%] bg-blue-shade-100 h-screen mr-4 lg:mr-8 ">
                 <SidebarMain />
               </div>
-              <div className="w-[92%] ml-auto">{children}</div>
+              <div className="w-[94%] ml-auto">
+                <FeedbackTile />
+                <div className="pl-[2%]">{children}</div>
+              </div>
             </div>
           </HuddleContextProvider>
         </RootProviders>
