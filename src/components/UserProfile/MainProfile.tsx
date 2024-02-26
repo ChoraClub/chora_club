@@ -37,6 +37,7 @@ import { Oval } from "react-loader-spinner";
 
 function MainProfile() {
   const { address } = useAccount();
+  // const address = "0x5e349eca2dc61abcd9dd99ce94d04136151a09ee";
   const { chain, chains } = useNetwork();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [img, setImg] = useState<File | undefined>();
@@ -144,24 +145,24 @@ function MainProfile() {
     console.log(delegateTx);
   };
 
-// useEffect(()=>{
-//   const getDelegatesVotes = async (address: string) => {
-//     const addr = await walletClient.getAddresses();
-//     const address1 = addr[0];
-//     console.log("Get Votes addr", address1);
-  
-//     console.log(walletClient);
-//     const votingPower = await publicClient.readContract({
-//       address: "0x4200000000000000000000000000000000000042",
-//       abi: dao_abi.abi,
-//       functionName: "getVotes", 
-//       args: [address],
-//     });
-//     console.log("Delegates Votes:", votingPower);
-//   };
-//   getDelegatesVotes(`${address}`);
-// }, [address])
- 
+  // useEffect(()=>{
+  //   const getDelegatesVotes = async (address: string) => {
+  //     const addr = await walletClient.getAddresses();
+  //     const address1 = addr[0];
+  //     console.log("Get Votes addr", address1);
+
+  //     console.log(walletClient);
+  //     const votingPower = await publicClient.readContract({
+  //       address: "0x4200000000000000000000000000000000000042",
+  //       abi: dao_abi.abi,
+  //       functionName: "getVotes",
+  //       args: [address],
+  //     });
+  //     console.log("Delegates Votes:", votingPower);
+  //   };
+  //   getDelegatesVotes(`${address}`);
+  // }, [address])
+
   const handleCopy = (addr: string) => {
     copy(addr);
     toast("Address Copied");
@@ -529,8 +530,8 @@ function MainProfile() {
                 <Image
                   src={karmaImage || profileDetails?.profilePicture || user1}
                   alt="user"
-                  width={40}
-                  height={40}
+                  width={256}
+                  height={256}
                   className="w-40 rounded-3xl"
                 />
                 {/* <div
@@ -755,8 +756,6 @@ function MainProfile() {
                     )
                   : null}
 
-              
-
                 {selfDelegate === false ? (
                   <div className="pt-2 flex gap-5">
                     {/* pass address of whom you want to delegate the voting power to */}
@@ -766,14 +765,14 @@ function MainProfile() {
                     >
                       Become Delegate
                     </button>
-{/* 
+                    {/* 
                     <button
                       className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
                       onClick={() => handleAttestation()}
                     >
                       Attest
                     </button> */}
-                    
+
                     {/* <div className="">
                 <select className="outline-none border border-blue-shade-200 text-blue-shade-200 rounded-full py-2 px-3">
                   <option className="text-gray-700">Optimism</option>
@@ -800,7 +799,7 @@ function MainProfile() {
             >
               Info
             </button>
-            {(selfDelegate=== true || isDelegate === true) && (
+            {(selfDelegate === true || isDelegate === true) && (
               <button
                 className={`border-b-2 py-4 px-2 outline-none ${
                   searchParams.get("active") === "votes"
@@ -869,19 +868,25 @@ function MainProfile() {
               ""
             )}
             {searchParams.get("active") === "sessions" ? (
-              <UserSessions isDelegate={isDelegate} selfDelegate={selfDelegate} />
+              <UserSessions
+                isDelegate={isDelegate}
+                selfDelegate={selfDelegate}
+              />
             ) : (
               ""
             )}
             {searchParams.get("active") === "officeHours" ? (
-              <UserOfficeHours isDelegate={isDelegate} selfDelegate={selfDelegate}/>
+              <UserOfficeHours
+                isDelegate={isDelegate}
+                selfDelegate={selfDelegate}
+              />
             ) : (
               ""
             )}
             {/* {searchParams.get("active") === "claimNft" ? <ClaimNFTs /> : ""} */}
           </div>
         </div>
-       ) : (
+      ) : (
         <>
           <div className="flex items-center justify-center pt-10">
             <Oval
@@ -894,7 +899,7 @@ function MainProfile() {
             />
           </div>
         </>
-      )} 
+      )}
     </>
   );
 }

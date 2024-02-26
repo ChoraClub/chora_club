@@ -13,7 +13,7 @@ import Tile from "../utils/Tile";
 import SessionTile from "../utils/SessionTiles";
 interface UserSessionsProps {
   isDelegate: boolean | undefined;
-  selfDelegate:boolean;
+  selfDelegate: boolean;
 }
 
 interface Session {
@@ -32,6 +32,7 @@ interface Session {
 
 function UserSessions({ isDelegate, selfDelegate }: UserSessionsProps) {
   const { address } = useAccount();
+  // const address = "0x5e349eca2dc61abcd9dd99ce94d04136151a09ee";
   const router = useRouter();
   const path = usePathname();
   const searchParams = useSearchParams();
@@ -53,7 +54,7 @@ function UserSessions({ isDelegate, selfDelegate }: UserSessionsProps) {
       if (result.success) {
         // setSessionDetails(result.data);
         const resultData = await result.data;
-        console.log("resultData", resultData);
+        // console.log("resultData", resultData);
         if (Array.isArray(resultData)) {
           let filteredData: any = resultData;
           if (searchParams.get("session") === "hosted") {
@@ -65,7 +66,7 @@ function UserSessions({ isDelegate, selfDelegate }: UserSessionsProps) {
               return session.user_address === address;
             });
           }
-          console.log("filtered", filteredData);
+          // console.log("filtered", filteredData);
           setSessionDetails(filteredData);
         }
       }
@@ -106,7 +107,7 @@ function UserSessions({ isDelegate, selfDelegate }: UserSessionsProps) {
             </button>
           )}
 
-          {(selfDelegate===true || isDelegate === true) && (
+          {(selfDelegate === true || isDelegate === true) && (
             <button
               className={`py-2  ${
                 searchParams.get("session") === "book"
@@ -132,7 +133,7 @@ function UserSessions({ isDelegate, selfDelegate }: UserSessionsProps) {
           >
             Attending
           </button>
-          {(selfDelegate===true || isDelegate === true) && (
+          {(selfDelegate === true || isDelegate === true) && (
             <button
               className={`py-2 ${
                 searchParams.get("session") === "hosted"
@@ -161,24 +162,24 @@ function UserSessions({ isDelegate, selfDelegate }: UserSessionsProps) {
         </div>
 
         <div className="py-10">
-          {(selfDelegate ===true || isDelegate === true) &&
+          {(selfDelegate === true || isDelegate === true) &&
             searchParams.get("session") === "schedule" && (
               <ScheduledUserSessions />
             )}
-          {(selfDelegate ===true || isDelegate === true) && searchParams.get("session") === "book" && (
-            <BookedUserSessions />
-          )}
+          {(selfDelegate === true || isDelegate === true) &&
+            searchParams.get("session") === "book" && <BookedUserSessions />}
           {searchParams.get("session") === "attending" && (
             <AttendingUserSessions />
           )}
-          {(selfDelegate ===true || isDelegate === true) && searchParams.get("session") === "hosted" && (
-            <SessionTile
-              sessionDetails={sessionDetails}
-              dataLoading={dataLoading}
-              isEvent="Recorded"
-              isOfficeHour={false}
-            />
-          )}
+          {(selfDelegate === true || isDelegate === true) &&
+            searchParams.get("session") === "hosted" && (
+              <SessionTile
+                sessionDetails={sessionDetails}
+                dataLoading={dataLoading}
+                isEvent="Recorded"
+                isOfficeHour={false}
+              />
+            )}
           {searchParams.get("session") === "attended" && (
             <SessionTile
               sessionDetails={sessionDetails}
