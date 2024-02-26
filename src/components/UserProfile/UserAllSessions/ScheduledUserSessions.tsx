@@ -9,8 +9,8 @@ import { FaCircleInfo } from "react-icons/fa6";
 import { Tooltip } from "@nextui-org/react";
 
 function ScheduledUserSessions() {
-  // const { address } = useAccount();
-  const address = "0x5e349eca2dc61abcd9dd99ce94d04136151a09ee";
+  const { address } = useAccount();
+  // const address = "0x5e349eca2dc61abcd9dd99ce94d04136151a09ee";
   const [timeSlotSizeMinutes, setTimeSlotSizeMinutes] = useState(15);
   const [selectedDate, setSelectedDate] = useState<any>("");
   const [dateAndRanges, setDateAndRanges] = useState<any>([]);
@@ -234,7 +234,7 @@ function ScheduledUserSessions() {
       </div>
 
       <div className="mb-4">
-        <label className="block text-gray-700 font-semibold flex items-center">
+        <label className="text-gray-700 font-semibold flex items-center">
           Select Time Slot Size:
           <Tooltip
             showArrow
@@ -265,7 +265,7 @@ function ScheduledUserSessions() {
       </div>
 
       <div className="mb-4">
-        <label className="block text-gray-700 font-semibold flex items-center">
+        <label className="text-gray-700 font-semibold flex items-center">
           Select Date:
           <Tooltip
             showArrow
@@ -306,7 +306,7 @@ function ScheduledUserSessions() {
           />
         </div>
         <div>
-          <label className="block text-gray-700 font-semibold flex items-center">
+          <label className="text-gray-700 font-semibold flex items-center">
             End Time:
             <Tooltip
               showArrow
