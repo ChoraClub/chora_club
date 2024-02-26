@@ -83,13 +83,18 @@ function Sidebar() {
             className="rounded-md bg-opacity-90"
             closeDelay={1}
           >
-            <Image
-              src={rocket}
-              alt={"image"}
-              width={40}
-              className={`cursor-pointer `}
-              onClick={() => router.push("/")}
-            ></Image>
+            <Link href={"/"}>
+              <Image
+                src={rocket}
+                alt={"image"}
+                width={40}
+                className={`cursor-pointer ${
+                  pathname.endsWith(`/`)
+                    ? "border-white border-2 rounded-full"
+                    : ""
+                }`}
+              ></Image>
+            </Link>
           </Tooltip>
           <Tooltip
             content="Office Hours"
@@ -97,13 +102,18 @@ function Sidebar() {
             className="rounded-md bg-opacity-90"
             closeDelay={1}
           >
-            <Image
-              src={office}
-              alt={"image"}
-              width={40}
-              className={`cursor-pointer `}
-              onClick={() => router.push("/office-hours?hours=ongoing")}
-            ></Image>
+            <Link href={"/office-hours?hours=ongoing"}>
+              <Image
+                src={office}
+                alt={"image"}
+                width={40}
+                className={`cursor-pointer  ${
+                  pathname.includes(`/office-hours`)
+                    ? "border-white border-2 rounded-full"
+                    : ""
+                }`}
+              ></Image>
+            </Link>
           </Tooltip>
         </div>
 
@@ -132,20 +142,19 @@ function Sidebar() {
                     className="rounded-md bg-opacity-90"
                     closeDelay={1}
                   >
-                    <Image
-                      key={index}
-                      src={data[1]}
-                      alt="image"
-                      className={`w-10 h-10 rounded-full cursor-pointer ${
-                        pathname.includes(`/${data[0]}`)
-                          ? "border-white border-[2.5px]"
-                          : ""
-                      }`}
-                      priority={true}
-                      onClick={() =>
-                        router.push(`/${data[0]}?active=delegatesList`)
-                      }
-                    ></Image>
+                    <Link href={`/${data[0]}?active=delegatesList`}>
+                      <Image
+                        key={index}
+                        src={data[1]}
+                        alt="image"
+                        className={`w-10 h-10 rounded-full cursor-pointer ${
+                          pathname.includes(`/${data[0]}`)
+                            ? "border-white border-[2.5px]"
+                            : ""
+                        }`}
+                        priority={true}
+                      ></Image>
+                    </Link>
                   </Tooltip>
                 </Badge>
               </div>
