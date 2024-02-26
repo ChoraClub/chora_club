@@ -12,8 +12,8 @@ import toast, { Toaster } from "react-hot-toast";
 import { Oval } from "react-loader-spinner";
 
 function BookedUserSessions() {
-  const { address } = useAccount();
-  // const address = "0x5e349eca2dc61abcd9dd99ce94d04136151a09ee";
+  // const { address } = useAccount();
+  const address = "0x5e349eca2dc61abcd9dd99ce94d04136151a09ee";
   const [sessionDetails, setSessionDetails] = useState([]);
   const [pageLoading, setPageLoading] = useState(true);
 

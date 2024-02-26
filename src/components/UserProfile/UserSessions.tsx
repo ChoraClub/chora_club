@@ -31,8 +31,8 @@ interface Session {
 }
 
 function UserSessions({ isDelegate, selfDelegate }: UserSessionsProps) {
-  const { address } = useAccount();
-  // const address = "0x5e349eca2dc61abcd9dd99ce94d04136151a09ee";
+  // const { address } = useAccount();
+  const address = "0x5e349eca2dc61abcd9dd99ce94d04136151a09ee";
   const router = useRouter();
   const path = usePathname();
   const searchParams = useSearchParams();
