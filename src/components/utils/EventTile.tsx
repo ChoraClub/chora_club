@@ -34,19 +34,16 @@ interface TileProps {
 }
 
 const createRandomRoom = async () => {
-  const res = await fetch("https://api.huddle01.com/api/v1/create-room", {
-    method: "POST",
-    body: JSON.stringify({
-      title: "Test Room",
-    }),
+  const res = await fetch("/api/create-room", {
+    method: "GET",
     headers: {
       "Content-Type": "application/json",
-      "x-api-key": process.env.NEXT_PUBLIC_API_KEY ?? "",
     },
-    cache: "no-store",
   });
-  const data: RoomDetails = await res.json();
-  const { roomId } = data.data;
+  const result = await res.json();
+  // console.log("result", result);
+  const roomId = await result.data;
+  // console.log("roomId", roomId);
   return roomId;
 };
 
@@ -71,9 +68,9 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
   };
 
   const confirmSlot = async (id: any, status: any) => {
-    console.log("confirmSlot clicked");
-    console.log("id:", id);
-    console.log("status:", status);
+    // console.log("confirmSlot clicked");
+    // console.log("id:", id);
+    // console.log("status:", status);
     try {
       setIsConfirmSlotLoading(true);
       let roomId = null;
@@ -86,7 +83,7 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
         meeting_status = "Denied";
       }
 
-      console.log(meeting_status);
+      // console.log(meeting_status);
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
 
@@ -97,7 +94,7 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
         meetingId: roomId,
       });
 
-      const requestOptions = {
+      const requestOptions = await {
         method: "PUT",
         headers: myHeaders,
         body: raw,
@@ -108,15 +105,15 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
       );
       const result = await response.json();
       if (result.success) {
+        toast(`You ${status} the booking.`);
         setTimeout(() => {
-          toast(`You ${status} the booking.`);
-          setIsConfirmSlotLoading(false);
           setIsPageLoading(false);
+          setIsConfirmSlotLoading(false);
         }, 1000);
         console.log("status updated");
       }
     } catch (error) {
-      setIsConfirmSlotLoading(false);
+      // setIsConfirmSlotLoading(false);
       console.error(error);
     }
   };
