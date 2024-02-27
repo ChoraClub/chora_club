@@ -11,19 +11,15 @@ const UserScheduledHours: React.FC = () => {
   const { chain } = useNetwork();
 
   const createRandomRoom = async () => {
-    const res = await fetch("https://api.huddle01.com/api/v1/create-room", {
-      method: "POST",
-      body: JSON.stringify({
-        title: "Test Room",
-      }),
+    const res = await fetch("/api/create-room", {
+      method: "GET",
       headers: {
         "Content-Type": "application/json",
-        "x-api-key": process.env.NEXT_PUBLIC_API_KEY ?? "",
       },
-      cache: "no-store",
     });
-    const data = await res.json();
-    return data.data.roomId;
+    const result = await res.json();
+    const roomId = await result.data;
+    return roomId;
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {

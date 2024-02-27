@@ -38,6 +38,7 @@ import lighthouse from "@lighthouse-web3/sdk";
 
 function MainProfile() {
   const { address } = useAccount();
+  // const address = "0x5e349eca2dc61abcd9dd99ce94d04136151a09ee";
   const { chain, chains } = useNetwork();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [displayImage, setDisplayImage] = useState("");
@@ -559,8 +560,8 @@ function MainProfile() {
                 <Image
                   src={karmaImage || profileDetails?.profilePicture || user1}
                   alt="user"
-                  width={40}
-                  height={40}
+                  width={256}
+                  height={256}
                   className="w-40 rounded-3xl"
                 />
                 <div
