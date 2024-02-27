@@ -11,6 +11,8 @@ const nextConfig = {
       "cdn.discordapp.com",
       "i.ibb.co",
       "img.redbull.com",
+      "www.google.com",
+      "s3.hj",
     ],
   },
   reactStrictMode: false,

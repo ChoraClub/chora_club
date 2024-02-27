@@ -7,8 +7,9 @@ interface DelegateRequestBody {
   address: string;
   image: string;
   description: string;
-  daoName:string;
+  daoName: string;
   isDelegate: boolean;
+  displayName: string;
   socialHandles: {
     twitter: string;
     discord: string;
@@ -24,9 +25,10 @@ interface DelegateResponseBody {
     id: string;
     address: string;
     image: string;
-    daoName:string;
+    daoName: string;
     description: string;
     isDelegate: boolean;
+    displayName: string;
     socialHandles: {
       twitter: string;
       discord: string;
@@ -47,6 +49,7 @@ export async function POST(
     description,
     daoName,
     isDelegate,
+    displayName,
     socialHandles,
   }: DelegateRequestBody = await req.json();
 
@@ -70,6 +73,7 @@ export async function POST(
       description,
       daoName,
       isDelegate,
+      displayName,
       socialHandles,
     });
     // console.log("Delegate document inserted:", result);
@@ -109,6 +113,7 @@ export async function PUT(
     image,
     description,
     isDelegate,
+    displayName,
     socialHandles,
   }: DelegateRequestBody = await req.json();
 
@@ -133,6 +138,7 @@ export async function PUT(
           image,
           description,
           isDelegate,
+          displayName,
           socialHandles,
         },
       }
