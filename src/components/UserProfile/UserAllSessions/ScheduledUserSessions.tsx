@@ -195,6 +195,50 @@ function ScheduledUserSessions() {
     setEndMinute("");
     setStartTime("");
     setEndTime("");
+    setSelectedStartTime("");
+    setSelectedEndTime("");
+  };
+
+  const [startTimeOptions, setStartTimeOptions] = useState([]);
+  const [endTimeOptions, setEndTimeOptions] = useState([]);
+  const [selectedStartTime, setSelectedStartTime] = useState("");
+  const [selectedEndTime, setSelectedEndTime] = useState("");
+
+  useEffect(() => {
+    // Function to generate time options based on time slot size
+    const generateTimeOptions = () => {
+      const timeOptions: any = [];
+      for (let hour = 0; hour < 24; hour++) {
+        for (let minute = 0; minute < 60; minute += timeSlotSizeMinutes) {
+          const formattedHour = hour.toString().padStart(2, "0");
+          const formattedMinute = minute.toString().padStart(2, "0");
+          timeOptions.push(`${formattedHour}:${formattedMinute}`);
+        }
+      }
+      return timeOptions;
+    };
+
+    // Update time options when time slot size changes
+    const timeOptions = generateTimeOptions();
+    setStartTimeOptions(timeOptions);
+    setEndTimeOptions(timeOptions);
+  }, [timeSlotSizeMinutes]);
+
+  const handleStartTimeChange = (e: any) => {
+    setSelectedStartTime(e.target.value);
+    console.log(e.target.value);
+    const [hour, minute] = e.target.value.split(":");
+    console.log(hour + ":" + minute);
+    setStartHour(hour);
+    setStartMinute(minute);
+  };
+
+  const handleEndTimeChange = (e: any) => {
+    setSelectedEndTime(e.target.value);
+    const [hour, minute] = e.target.value.split(":");
+    console.log(hour + ":" + minute);
+    setEndHour(hour);
+    setEndMinute(minute);
   };
 
   return (
@@ -294,17 +338,19 @@ function ScheduledUserSessions() {
           <label className="block text-gray-700 font-semibold">
             Start Time:
           </label>
-          <input
-            type="time"
-            value={`${startHour}:${startMinute}`}
-            onChange={(e) => {
-              const [hour, minute] = e.target.value.split(":");
-              setStartHour(hour);
-              setStartMinute(minute);
-            }}
+          <select
             className="border border-gray-300 rounded px-3 py-2 mt-1 w-full"
-          />
+            value={selectedStartTime}
+            onChange={(e) => handleStartTimeChange(e)}
+          >
+            {startTimeOptions.map((time) => (
+              <option key={time} value={time}>
+                {time}
+              </option>
+            ))}
+          </select>
         </div>
+
         <div>
           <label className="text-gray-700 font-semibold flex items-center">
             End Time:
@@ -324,21 +370,18 @@ function ScheduledUserSessions() {
               </span>
             </Tooltip>
           </label>
-          <input
-            type="time"
-            value={`${endHour}:${endMinute}`}
-            onChange={(e) => {
-              const [hour, minute] = e.target.value.split(":");
-              setEndHour(hour);
-              setEndMinute(minute);
-            }}
+          <select
             className="border border-gray-300 rounded px-3 py-2 mt-1 w-full"
-          />
+            value={selectedEndTime}
+            onChange={(e) => handleEndTimeChange(e)}
+          >
+            {endTimeOptions.map((time) => (
+              <option key={time} value={time}>
+                {time}
+              </option>
+            ))}
+          </select>
         </div>
-        {/* <br></br> */}
-        {/* <div>
-          <b>Development in Progress🚀 </b>
-        </div> */}
       </div>
 
       <button
