@@ -75,7 +75,7 @@ function MainProfile() {
   }
 
   const uploadImage = async (selectedFile: any) => {
-    const progressCallback = (progressData: any) => {
+    const progressCallback = async (progressData: any) => {
       let percentageDone =
         100 -
         (
@@ -116,8 +116,8 @@ function MainProfile() {
       recipient: "0xbFc4A28D8F1003Bec33f4Fdb7024ad6ad1605AA8",
       meetingId: "abc-def-ggi",
       meetingType: 1,
-      startTime: 16452456, // Example start time (in UNIX timestamp format)
-      endTime: 16452492, // Example end time (in UNIX timestamp format)
+      startTime: 16452456,
+      endTime: 16452492,
     };
 
     console.log(window.location.origin);
