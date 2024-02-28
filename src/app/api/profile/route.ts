@@ -116,6 +116,12 @@ export async function PUT(
     displayName,
     socialHandles,
   }: DelegateRequestBody = await req.json();
+  console.log("address in api: ", address);
+  console.log("image in api: ", image);
+  console.log("description in api: ", description);
+  console.log("isDelegate in api: ", isDelegate);
+  console.log("displayName in api: ", displayName);
+  console.log("socialHandles in api: ", socialHandles);
 
   try {
     // Connect to your MongoDB database
