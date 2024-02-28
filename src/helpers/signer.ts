@@ -16,13 +16,9 @@ const WalletAndPublicClient = () => {
 
   const { chain } = useNetwork();
   let chainName: any;
-
-  console.log("Chain", chain);
-  console.log("Chain name", chain.name);
-
-  if (chain.name === "Optimism") {
+  if (chain?.name === "Optimism") {
     chainName = optimism;
-  } else if (chain.name === "Arbitrum One") {
+  } else if (chain?.name === "Arbitrum One") {
     chainName = arbitrum;
   } else {
     chainName = "";

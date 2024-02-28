@@ -144,9 +144,9 @@ function MainProfile() {
       const addr = await walletClient.getAddresses();
       const address1 = addr[0];
       let delegateTxAddr = "";
-      const contractAddress = chain.name === "Optimism" 
+      const contractAddress = chain?.name === "Optimism" 
       ? "0x4200000000000000000000000000000000000042"
-      : chain.name === "Arbitrum One"
+      : chain?.name === "Arbitrum One"
           ? "0x912CE59144191C1204E64559FE8253a0e49E6548"
           : "";
       console.log(walletClient);
