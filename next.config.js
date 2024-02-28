@@ -13,6 +13,7 @@ const nextConfig = {
       "img.redbull.com",
       "www.google.com",
       "s3.hj",
+      "gateway.lighthouse.storage",
     ],
   },
   reactStrictMode: false,
