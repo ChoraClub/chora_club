@@ -6,7 +6,7 @@ import search from "@/assets/images/daos/search.png";
 import user1 from "@/assets/images/daos/profile.png";
 import { IoCopy } from "react-icons/io5";
 import copy from "copy-to-clipboard";
-import { Button, Pagination, Tooltip } from "@nextui-org/react";
+import { Button, Dropdown, Pagination, Tooltip } from "@nextui-org/react";
 import { Oval } from "react-loader-spinner";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import toast, { Toaster } from "react-hot-toast";
@@ -109,6 +109,18 @@ function DelegatesList({ props }: { props: string }) {
     }
   };
 
+  const handleSelectChange = (event: any) => {
+    const selectedValue = event.target.value;
+    if (
+      selectedValue === "Random" ||
+      selectedValue === "Most delegators" ||
+      selectedValue === "Karma score" ||
+      selectedValue === "Most active"
+    ) {
+      toast("Coming Soon 🚀");
+    }
+  };
+
   return (
     <div>
       {isShowing && (
@@ -137,7 +149,7 @@ function DelegatesList({ props }: { props: string }) {
           </button>
         </div>
       )}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between pe-10">
         <div
           style={{ background: "rgba(238, 237, 237, 0.36)" }}
           className="flex border-[0.5px] border-black w-fit rounded-full my-3 font-poppins"
@@ -153,6 +165,19 @@ function DelegatesList({ props }: { props: string }) {
           <span className="flex items-center bg-black rounded-full px-5 py-2">
             <Image src={search} alt="search" width={20} />
           </span>
+        </div>
+        <div>
+          <select
+            style={{ background: "rgba(238, 237, 237, 0.36)" }}
+            className="rounded-full py-2 px-4 outline-none"
+            onChange={handleSelectChange}
+          >
+            <option>Most voting power</option>
+            <option>Random</option>
+            <option>Most delegators</option>
+            <option>Karma score</option>
+            <option>Most active</option>
+          </select>
         </div>
       </div>
 
