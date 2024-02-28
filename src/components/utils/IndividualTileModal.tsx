@@ -72,7 +72,7 @@ function IndividualTileModal({ title, description, videoUrl, date, host, attende
                   <tr>
                     <td className="font-semibold pr-4">Attestation Link:</td>
                     <td>
-                      <a href="https://optimism.easscan.org/attestation/view/0xa59d5ace908bf138a1f87e615755bea41f4764ce8f30a755719e48e4ab74366d" target="_blank" rel="noopener noreferrer" style={{color:"blue"}}>View↗️</a>
+                      <a href="https://optimism.easscan.org/" target="_blank" rel="noopener noreferrer" style={{color:"blue"}}>View↗️</a>
                     </td>
                   </tr>
                 </tbody>
