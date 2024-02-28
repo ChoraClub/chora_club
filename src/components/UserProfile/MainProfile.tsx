@@ -75,21 +75,20 @@ function MainProfile() {
   }
 
   const uploadImage = async (selectedFile: any) => {
-    const progressCallback = (progressData: any) => {
+    const progressCallback = async (progressData: any) => {
       let percentageDone =
-        100 - (progressData?.total / progressData?.uploaded)?.toFixed(2);
+        100 -
+        (
+          ((progressData?.total as any) / progressData?.uploaded) as any
+        )?.toFixed(2);
       console.log(percentageDone);
     };
 
-    const apiKey = process.env.NEXT_PUBLIC_LIGHTHOUSE_KEY;
+    const apiKey: string = process.env.NEXT_PUBLIC_LIGHTHOUSE_KEY
+      ? process.env.NEXT_PUBLIC_LIGHTHOUSE_KEY
+      : "";
 
-    const output = await lighthouse.upload(
-      selectedFile,
-      apiKey,
-      false,
-      null,
-      progressCallback
-    );
+    const output = await lighthouse.upload(selectedFile, apiKey);
 
     console.log("File Status:", output);
     setDisplayImage(output.data.Hash);
@@ -104,8 +103,8 @@ function MainProfile() {
       recipient: "0xbFc4A28D8F1003Bec33f4Fdb7024ad6ad1605AA8",
       meetingId: "abc-def-ggi",
       meetingType: 1,
-      startTime: 16452456, // Example start time (in UNIX timestamp format)
-      endTime: 16452492, // Example end time (in UNIX timestamp format)
+      startTime: 16452456,
+      endTime: 16452492,
     };
 
     console.log(window.location.origin);

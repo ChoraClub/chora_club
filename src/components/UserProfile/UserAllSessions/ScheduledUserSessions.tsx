@@ -29,6 +29,11 @@ function ScheduledUserSessions() {
   const [allData, setAllData] = useState<any>([]);
   const [createSessionLoading, setCreateSessionLoading] = useState<any>();
 
+  const [startTimeOptions, setStartTimeOptions] = useState([]);
+  const [endTimeOptions, setEndTimeOptions] = useState([]);
+  const [selectedStartTime, setSelectedStartTime] = useState("");
+  const [selectedEndTime, setSelectedEndTime] = useState("");
+
   const handleApplyWithCheck = () => {
     if (allData.length > 0) {
       handleApplyButtonClick();
@@ -199,11 +204,6 @@ function ScheduledUserSessions() {
     setSelectedEndTime("");
   };
 
-  const [startTimeOptions, setStartTimeOptions] = useState([]);
-  const [endTimeOptions, setEndTimeOptions] = useState([]);
-  const [selectedStartTime, setSelectedStartTime] = useState("");
-  const [selectedEndTime, setSelectedEndTime] = useState("");
-
   useEffect(() => {
     // Function to generate time options based on time slot size
     const generateTimeOptions = () => {
@@ -285,7 +285,9 @@ function ScheduledUserSessions() {
             content={
               <div className="font-poppins">
                 The duration for which you would be able to take the session.
-                The preferred duration is 30 minutes.
+                The preferred duration is 30 minutes. And note that the selected
+                time slot size will apply to all the selected dates of your
+                sessions.
               </div>
             }
             placement="right"
