@@ -13,7 +13,7 @@ import toast, { Toaster } from "react-hot-toast";
 import styles from "@/components/IndividualDelegate/DelegateVotes.module.css";
 
 function DelegatesList({ props }: { props: string }) {
-  const [delegateData, setDelegateData] = useState<any>();
+  const [delegateData, setDelegateData] = useState<any>({ delegates: [] });
   const [tempData, setTempData] = useState<any>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(0);
@@ -34,7 +34,9 @@ function DelegatesList({ props }: { props: string }) {
           `https://api.karmahq.xyz/api/dao/delegates?name=${props}&offset=${currentPage}&order=desc&field=delegatedVotes&period=lifetime&pageSize=20&statuses=active,inactive,withdrawn,recognized`
         );
         const daoInfo = await res.json().then((delegates) => delegates.data);
-        setDelegateData(daoInfo);
+        setDelegateData((prevData: any) => ({
+          delegates: [...prevData.delegates, ...daoInfo.delegates],
+        }));
         setTempData(daoInfo.delegates);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -44,7 +46,6 @@ function DelegatesList({ props }: { props: string }) {
     };
 
     fetchData();
-    router.push(`${path}?active=delegatesList&page=${currentPage}`);
   }, [currentPage]);
 
   useEffect(() => {
@@ -76,6 +77,22 @@ function DelegatesList({ props }: { props: string }) {
       setDelegateData({ ...delegateData, delegates: tempData });
     }
   };
+
+  const handleScroll = () => {
+    const { scrollTop, clientHeight, scrollHeight } = document.documentElement;
+
+    if (scrollTop + clientHeight >= scrollHeight - 100) {
+      setCurrentPage((prev) => prev + 1);
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [currentPage]);
 
   const handleCopy = (addr: string) => {
     copy(addr);
@@ -249,7 +266,7 @@ function DelegatesList({ props }: { props: string }) {
                 </div>
               ))}
             </div>
-            <div
+            {/* <div
               className={`pe-4 pt-12 flex items-center justify-center gap-10 ${
                 isPageLoading ? "hidden" : ""
               } `}
@@ -273,7 +290,7 @@ function DelegatesList({ props }: { props: string }) {
               >
                 Next
               </button>
-            </div>
+            </div> */}
           </div>
         ) : (
           <div className="flex flex-col justify-center items-center pt-10">

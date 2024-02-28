@@ -34,19 +34,21 @@ import { publicClient, walletClient } from "@/helpers/signer";
 import dao_abi from "../../artifacts/Dao.sol/GovernanceToken.json";
 import axios from "axios";
 import { Oval } from "react-loader-spinner";
+import lighthouse from "@lighthouse-web3/sdk";
 
 function MainProfile() {
   const { address } = useAccount();
   // const address = "0x5e349eca2dc61abcd9dd99ce94d04136151a09ee";
   const { chain, chains } = useNetwork();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [img, setImg] = useState<File | undefined>();
+  const [displayImage, setDisplayImage] = useState("");
   const [hovered, setHovered] = useState(false);
   const [profileDetails, setProfileDetails] = useState<any>();
   const router = useRouter();
   const path = usePathname();
   const searchParams = useSearchParams();
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
+  const [displayName, setDisplayName] = useState("");
   const [twitter, setTwitter] = useState("");
   const [discord, setDiscord] = useState("");
   const [discourse, setDiscourse] = useState("");
@@ -55,7 +57,7 @@ function MainProfile() {
   const [isDelegate, setIsDelegate] = useState<any>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [responseFromDB, setResponseFromDB] = useState<boolean>(false);
-  const [karmaImage, setKarmaImage] = useState<File | undefined>();
+  const [karmaImage, setKarmaImage] = useState<any>();
   const [ensName, setEnsName] = useState("");
   const [karmaDesc, setKarmaDesc] = useState("");
   const [votes, setVotes] = useState<any>();
@@ -66,15 +68,47 @@ function MainProfile() {
   const handleLogoClick = () => {
     fileInputRef.current?.click();
   };
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>): void => {
-    const selectedFile = e.target.files?.[0];
-    console.log(selectedFile);
-    console.log("Selected File", selectedFile);
-    if (selectedFile) {
-      setImg(selectedFile);
-      console.log("Set Image", img);
-      // handleSubmit();
-    }
+
+  interface ProgressData {
+    total: any;
+    uploaded: any;
+  }
+
+  const uploadImage = async (selectedFile: any) => {
+    const progressCallback = async (progressData: any) => {
+      let percentageDone =
+        100 -
+        (
+          ((progressData?.total as any) / progressData?.uploaded) as any
+        )?.toFixed(2);
+      console.log(percentageDone);
+    };
+
+    const apiKey = process.env.NEXT_PUBLIC_LIGHTHOUSE_KEY ? process.env.NEXT_PUBLIC_LIGHTHOUSE_KEY : "";
+
+    const output = await lighthouse.upload(selectedFile, apiKey);
+
+    console.log("File Status:", output);
+    setDisplayImage(output.data.Hash);
+    const response = await axios.put("/api/profile", {
+      address: address,
+      image: output.data.Hash,
+      description: description,
+      isDelegate: true,
+      displayName: displayName,
+      socialHandles: {
+        twitter: twitter,
+        discord: discord,
+        discourse: discourse,
+        github: github,
+      },
+    });
+
+    console.log("response: ", response);
+
+    console.log(
+      "Visit at https://gateway.lighthouse.storage/ipfs/" + output.data.Hash
+    );
   };
 
   const handleAttestation = async () => {
@@ -82,8 +116,8 @@ function MainProfile() {
       recipient: "0xbFc4A28D8F1003Bec33f4Fdb7024ad6ad1605AA8",
       meetingId: "abc-def-ggi",
       meetingType: 1,
-      startTime: 16452456, // Example start time (in UNIX timestamp format)
-      endTime: 16452492, // Example end time (in UNIX timestamp format)
+      startTime: 16452456,
+      endTime: 16452492,
     };
 
     console.log(window.location.origin);
@@ -170,6 +204,9 @@ function MainProfile() {
 
   const handleInputChange = (fieldName: string, value: string) => {
     switch (fieldName) {
+      case "displayName":
+        setDisplayName(value);
+        break;
       case "twitter":
         setTwitter(value);
         break;
@@ -222,8 +259,9 @@ function MainProfile() {
               console.log("Data found in the database");
               // Data found in the database, set the state accordingly
               setResponseFromDB(true);
-              setImg(item.image);
+              setDisplayImage(item.image);
               setDescription(item.description);
+              setDisplayName(item.displayName);
               setTwitter(item.socialHandles.twitter);
               setDiscord(item.socialHandles.discord);
               setDiscourse(item.socialHandles.discourse);
@@ -267,35 +305,25 @@ function MainProfile() {
               );
               setDescAvailable(true);
               if (details.data.delegate.twitterHandle != null) {
-                setTwitter(
-                  `https://twitter.com/${details.data.delegate.twitterHandle}`
-                );
+                setTwitter(`${details.data.delegate.twitterHandle}`);
               }
 
               if (details.data.delegate.discourseHandle != null) {
                 if (dao === "optimism") {
-                  setDiscourse(
-                    `https://gov.optimism.io/u/${details.data.delegate.discourseHandle}`
-                  );
+                  setDiscourse(`${details.data.delegate.discourseHandle}`);
                   console.log("Discourse", discourse);
                 }
                 if (dao === "arbitrum") {
-                  setDiscourse(
-                    `https://forum.arbitrum.foundation/u/${details.data.delegate.discourseHandle}`
-                  );
+                  setDiscourse(`${details.data.delegate.discourseHandle}`);
                 }
               }
 
               if (details.data.delegate.discordHandle != null) {
-                setDiscord(
-                  `https://discord.com/${details.data.delegate.discordHandle}`
-                );
+                setDiscord(`${details.data.delegate.discordHandle}`);
               }
 
               if (details.data.delegate.githubHandle != null) {
-                setGithub(
-                  `https://github.com/${details.data.delegate.githubHandle}`
-                );
+                setGithub(`${details.data.delegate.githubHandle}`);
               }
             } else {
               // If delegate data is not present, set isDelegate to false
@@ -335,11 +363,13 @@ function MainProfile() {
         // If delegate exists, update the delegate
         await handleUpdate(newDescription);
         setIsLoading(false);
+        onClose();
         console.log("Existing True");
       } else {
         // If delegate doesn't exist, add a new delegate
         await handleAdd(newDescription);
         setIsLoading(false);
+        onClose();
         console.log("Sorry! Doesnt exist");
       }
 
@@ -396,10 +426,11 @@ function MainProfile() {
       console.log("Adding the delegate..");
       const response = await axios.post("/api/profile", {
         address: address,
-        image: img,
+        image: displayImage,
         daoName: dao,
         description: newDescription,
         isDelegate: true,
+        displayName: displayName,
         socialHandles: {
           twitter: twitter,
           discord: discord,
@@ -435,9 +466,10 @@ function MainProfile() {
       console.log("Inside Updating Description", newDescription);
       const response: any = await axios.put("/api/profile", {
         address: address,
-        image: img,
-        description: newDescription,
+        image: displayImage,
+        description: description,
         isDelegate: true,
+        displayName: displayName,
         socialHandles: {
           twitter: twitter,
           discord: discord,
@@ -523,31 +555,38 @@ function MainProfile() {
           <div className="flex ps-14 py-5 pe-10 justify-between">
             <div className="flex">
               <div
-                className="relative"
+                className="relative object-cover bg-gray-100 rounded-3xl"
                 onMouseEnter={() => setHovered(true)}
                 onMouseLeave={() => setHovered(false)}
               >
                 <Image
-                  src={karmaImage || profileDetails?.profilePicture || user1}
+                  src={
+                    (displayImage
+                      ? `https://gateway.lighthouse.storage/ipfs/${displayImage}`
+                      : karmaImage) || user1
+                  }
                   alt="user"
                   width={256}
                   height={256}
-                  className="w-40 rounded-3xl"
+                  className="w-40 h-40 rounded-3xl object-cover"
                 />
-                {/* <div
-              className={`absolute top-3 right-3 cursor-pointer  ${
-                hovered ? "bg-gray-50 rounded-full p-1" : "hidden"
-              } `}
-              onClick={handleLogoClick}
-            >
-              <FaPencil className="opacity-100 backdrop-blur-sm" size={12} />
-              <input
-                type="file"
-                ref={fileInputRef}
-                hidden
-                onChange={handleFileChange}
-              />
-            </div> */}
+                <div
+                  className={`absolute top-3 right-3 cursor-pointer  ${
+                    hovered ? "bg-gray-50 rounded-full p-1" : "hidden"
+                  } `}
+                  onClick={handleLogoClick}
+                >
+                  <FaPencil
+                    className="opacity-100 backdrop-blur-sm"
+                    size={12}
+                  />
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    hidden
+                    onChange={(e) => uploadImage(e.target.files)}
+                  />
+                </div>
               </div>
 
               <div className="px-4">
@@ -555,6 +594,8 @@ function MainProfile() {
                   <div className="font-bold text-lg pr-4">
                     {ensName || profileDetails?.ensName ? (
                       ensName || profileDetails?.ensName
+                    ) : displayName ? (
+                      displayName
                     ) : (
                       <>
                         {`${address}`.substring(0, 6)} ...{" "}
@@ -564,7 +605,7 @@ function MainProfile() {
                   </div>
                   <div className="flex gap-3">
                     <Link
-                      href={twitter}
+                      href={`https://twitter.com/${twitter}`}
                       className={`border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 ${
                         twitter == "" ? "hidden" : ""
                       }`}
@@ -574,7 +615,13 @@ function MainProfile() {
                       <FaXTwitter color="#7C7C7C" size={12} />
                     </Link>
                     <Link
-                      href={discourse}
+                      href={
+                        chain?.name == "Optimism"
+                          ? `https://gov.optimism.io/u/${discourse}`
+                          : chain?.name == "Arbitrum One"
+                          ? `https://forum.arbitrum.foundation/u/${discourse}`
+                          : ""
+                      }
                       className={`border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1  ${
                         discourse == "" ? "hidden" : ""
                       }`}
@@ -584,7 +631,7 @@ function MainProfile() {
                       <BiSolidMessageRoundedDetail color="#7C7C7C" size={12} />
                     </Link>
                     <Link
-                      href={discord}
+                      href={`https://discord.com/${discord}`}
                       className={`border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 ${
                         discord == "" ? "hidden" : ""
                       }`}
@@ -594,7 +641,7 @@ function MainProfile() {
                       <FaDiscord color="#7C7C7C" size={12} />
                     </Link>
                     <Link
-                      href={github}
+                      href={`https://github.com/${github}`}
                       className={`border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 ${
                         github == "" ? "hidden" : ""
                       }`}
@@ -629,12 +676,28 @@ function MainProfile() {
                             </ModalHeader>
                             <ModalBody>
                               <div className="px-1 font-medium">
+                                Display name:
+                              </div>
+                              <input
+                                type="text"
+                                value={displayName}
+                                placeholder="Enter your name here"
+                                className="outline-none bg-[#D9D9D945] rounded-md px-2 py-1 text-sm"
+                                onChange={(e) =>
+                                  handleInputChange(
+                                    "displayName",
+                                    e.target.value
+                                  )
+                                }
+                              />
+
+                              <div className="px-1 font-medium">
                                 Twitter ID:
                               </div>
                               <input
                                 type="url"
                                 value={twitter}
-                                placeholder="https://twitter.com/"
+                                placeholder="Enter twitter username"
                                 className="outline-none bg-[#D9D9D945] rounded-md px-2 py-1 text-sm"
                                 onChange={(e) =>
                                   handleInputChange("twitter", e.target.value)
@@ -647,7 +710,7 @@ function MainProfile() {
                               <input
                                 type="url"
                                 value={discourse}
-                                placeholder="https://discourse.com/"
+                                placeholder="Enter discourse username"
                                 className="outline-none bg-[#D9D9D945] rounded-md px-2 py-1 text-sm"
                                 onChange={(e) =>
                                   handleInputChange("discourse", e.target.value)
@@ -660,7 +723,7 @@ function MainProfile() {
                               <input
                                 type="url"
                                 value={discord}
-                                placeholder="https://discord.com/"
+                                placeholder="Enter discord username"
                                 className="outline-none bg-[#D9D9D945] rounded-md px-2 py-1 text-sm"
                                 onChange={(e) =>
                                   handleInputChange("discord", e.target.value)
@@ -670,7 +733,7 @@ function MainProfile() {
                               <input
                                 type="url"
                                 value={github}
-                                placeholder="https://github.com/"
+                                placeholder="Enter github username"
                                 className="outline-none bg-[#D9D9D945] rounded-md px-2 py-1 text-sm"
                                 onChange={(e) =>
                                   handleInputChange("github", e.target.value)

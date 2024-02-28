@@ -44,7 +44,7 @@ function SpecificDAO({ props }: { props: { daoDelegates: string } }) {
               ? " border-blue-shade-200 text-blue-shade-200 font-semibold"
               : "border-transparent"
           }`}
-          onClick={() => router.push(path + "?active=delegatesList&page=1")}
+          onClick={() => router.push(path + "?active=delegatesList")}
         >
           Delegates List
         </button>
