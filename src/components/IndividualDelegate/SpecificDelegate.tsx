@@ -15,8 +15,8 @@ import { StaticImport } from "next/dist/shared/lib/get-img-props";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import toast, { Toaster } from "react-hot-toast";
-import { Provider, cacheExchange, createClient, fetchExchange } from "urql";
-import { walletClient } from "@/helpers/signer";
+// import { Provider, cacheExchange, createClient, fetchExchange } from "urql";
+import WalletAndPublicClient from "@/helpers/signer";
 import dao_abi from "../../artifacts/Dao.sol/GovernanceToken.json";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 
@@ -26,6 +26,7 @@ interface Type {
 }
 
 function SpecificDelegate({ props }: { props: Type }) {
+  const { walletClient } = WalletAndPublicClient();
   const [delegateInfo, setDelegateInfo] = useState<any>();
   const router = useRouter();
   const path = usePathname();
@@ -107,7 +108,7 @@ function SpecificDelegate({ props }: { props: Type }) {
     if (props.daoDelegates === "optimism") {
       chainAddress = "0x4200000000000000000000000000000000000042";
     } else if (props.daoDelegates === "arbitrum") {
-      chainAddress = " 0x912CE59144191C1204E64559FE8253a0e49E6548";
+      chainAddress = "0x912CE59144191C1204E64559FE8253a0e49E6548";
     } else {
       return;
     }

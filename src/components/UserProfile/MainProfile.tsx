@@ -30,7 +30,7 @@ import {
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useAccount } from "wagmi";
 import { useNetwork } from "wagmi";
-import { publicClient, walletClient } from "@/helpers/signer";
+import WalletAndPublicClient from "@/helpers/signer";
 import dao_abi from "../../artifacts/Dao.sol/GovernanceToken.json";
 import axios from "axios";
 import { Oval } from "react-loader-spinner";
@@ -39,6 +39,7 @@ import lighthouse from "@lighthouse-web3/sdk";
 function MainProfile() {
   const { address } = useAccount();
   // const address = "0x5e349eca2dc61abcd9dd99ce94d04136151a09ee";
+  const { publicClient, walletClient } = WalletAndPublicClient();
   const { chain, chains } = useNetwork();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [displayImage, setDisplayImage] = useState("");
@@ -143,10 +144,14 @@ function MainProfile() {
       const addr = await walletClient.getAddresses();
       const address1 = addr[0];
       let delegateTxAddr = "";
-
+      const contractAddress = chain.name === "Optimism" 
+      ? "0x4200000000000000000000000000000000000042"
+      : chain.name === "Arbitrum One"
+          ? "0x912CE59144191C1204E64559FE8253a0e49E6548"
+          : "";
       console.log(walletClient);
       const delegateTx = await publicClient.readContract({
-        address: "0x4200000000000000000000000000000000000042",
+        address:contractAddress,
         abi: dao_abi.abi,
         functionName: "delegates",
         args: [address],
@@ -167,17 +172,24 @@ function MainProfile() {
   const handleDelegateVotes = async (to: string) => {
     const addr = await walletClient.getAddresses();
     const address1 = addr[0];
-
-    console.log(walletClient);
+    
+    const contractAddress = chain.name === "Optimism" 
+        ? "0x4200000000000000000000000000000000000042"
+        : chain.name === "Arbitrum One"
+            ? "0x912CE59144191C1204E64559FE8253a0e49E6548"
+            : "";
+    console.log("Contract", contractAddress)
+    console.log("Wallet Client",walletClient);
     const delegateTx = await walletClient.writeContract({
-      address: "0x4200000000000000000000000000000000000042",
+      address: contractAddress,
       abi: dao_abi.abi,
       functionName: "delegate",
       args: [to],
       account: address1,
     });
     console.log(delegateTx);
-  };
+};
+
 
   // useEffect(()=>{
   //   const getDelegatesVotes = async (address: string) => {
