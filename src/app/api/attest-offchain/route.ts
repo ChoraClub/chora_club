@@ -168,6 +168,46 @@ export async function POST(req: NextRequest, res: NextResponse) {
         );
 
         client.close();
+      } else if (requestData.meetingType === 3) {
+        const client = await MongoClient.connect(process.env.MONGODB_URI!, {
+          dbName: `chora-club`,
+        } as MongoClientOptions);
+
+        const db = client.db();
+        const collection = db.collection("office_hours");
+
+        await collection.findOneAndUpdate(
+          { meetingId: requestData.meetingId },
+          {
+            $set: {
+              uid_host: response.data.offchainAttestationId,
+              status: "inactive",
+            },
+          }
+        );
+
+        client.close();
+      } else if (requestData.meetingType === 4) {
+        const client = await MongoClient.connect(process.env.MONGODB_URI!, {
+          dbName: `chora-club`,
+        } as MongoClientOptions);
+
+        const db = client.db();
+        const collection = db.collection("office_hours");
+
+        await collection.findOneAndUpdate(
+          {
+            meetingId: requestData.meetingId,
+            "attendees.attendee_address": requestData.recipient,
+          },
+          {
+            $set: {
+              "attendees.$.attendee_uid": response.data.offchainAttestationId,
+            },
+          }
+        );
+
+        client.close();
       }
     } catch (error) {
       console.error("Error submitting signed attestation: ", error);

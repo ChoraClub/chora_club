@@ -11,7 +11,7 @@ const IntroPage: React.FC<LobbyPageProps> = ({ roomId }) => {
   const { push } = useRouter();
 
   useEffect(() => {
-    push(`/meeting/session/${roomId}/lobby`);
+    push(`/meeting/officehours/${roomId}/lobby`);
   }, []);
 
   return null;

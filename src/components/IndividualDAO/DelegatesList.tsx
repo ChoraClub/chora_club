@@ -6,14 +6,14 @@ import search from "@/assets/images/daos/search.png";
 import user1 from "@/assets/images/daos/profile.png";
 import { IoCopy } from "react-icons/io5";
 import copy from "copy-to-clipboard";
-import { Button, Pagination, Tooltip } from "@nextui-org/react";
+import { Button, Dropdown, Pagination, Tooltip } from "@nextui-org/react";
 import { Oval } from "react-loader-spinner";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import toast, { Toaster } from "react-hot-toast";
 import styles from "@/components/IndividualDelegate/DelegateVotes.module.css";
 
 function DelegatesList({ props }: { props: string }) {
-  const [delegateData, setDelegateData] = useState<any>();
+  const [delegateData, setDelegateData] = useState<any>({ delegates: [] });
   const [tempData, setTempData] = useState<any>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(0);
@@ -34,7 +34,9 @@ function DelegatesList({ props }: { props: string }) {
           `https://api.karmahq.xyz/api/dao/delegates?name=${props}&offset=${currentPage}&order=desc&field=delegatedVotes&period=lifetime&pageSize=20&statuses=active,inactive,withdrawn,recognized`
         );
         const daoInfo = await res.json().then((delegates) => delegates.data);
-        setDelegateData(daoInfo);
+        setDelegateData((prevData: any) => ({
+          delegates: [...prevData.delegates, ...daoInfo.delegates],
+        }));
         setTempData(daoInfo.delegates);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -44,7 +46,6 @@ function DelegatesList({ props }: { props: string }) {
     };
 
     fetchData();
-    router.push(`${path}?active=delegatesList&page=${currentPage}`);
   }, [currentPage]);
 
   useEffect(() => {
@@ -77,6 +78,22 @@ function DelegatesList({ props }: { props: string }) {
     }
   };
 
+  const handleScroll = () => {
+    const { scrollTop, clientHeight, scrollHeight } = document.documentElement;
+
+    if (scrollTop + clientHeight >= scrollHeight - 100) {
+      setCurrentPage((prev) => prev + 1);
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [currentPage]);
+
   const handleCopy = (addr: string) => {
     copy(addr);
     toast("Address Copied");
@@ -89,6 +106,18 @@ function DelegatesList({ props }: { props: string }) {
       return (number / 1000).toFixed(2) + "k";
     } else {
       return 0;
+    }
+  };
+
+  const handleSelectChange = (event: any) => {
+    const selectedValue = event.target.value;
+    if (
+      selectedValue === "Random" ||
+      selectedValue === "Most delegators" ||
+      selectedValue === "Karma score" ||
+      selectedValue === "Most active"
+    ) {
+      toast("Coming Soon 🚀");
     }
   };
 
@@ -120,7 +149,7 @@ function DelegatesList({ props }: { props: string }) {
           </button>
         </div>
       )}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between pe-10">
         <div
           style={{ background: "rgba(238, 237, 237, 0.36)" }}
           className="flex border-[0.5px] border-black w-fit rounded-full my-3 font-poppins"
@@ -136,6 +165,19 @@ function DelegatesList({ props }: { props: string }) {
           <span className="flex items-center bg-black rounded-full px-5 py-2">
             <Image src={search} alt="search" width={20} />
           </span>
+        </div>
+        <div>
+          <select
+            style={{ background: "rgba(238, 237, 237, 0.36)" }}
+            className="rounded-full py-2 px-4 outline-none"
+            onChange={handleSelectChange}
+          >
+            <option>Most voting power</option>
+            <option>Random</option>
+            <option>Most delegators</option>
+            <option>Karma score</option>
+            <option>Most active</option>
+          </select>
         </div>
       </div>
 
@@ -249,7 +291,7 @@ function DelegatesList({ props }: { props: string }) {
                 </div>
               ))}
             </div>
-            <div
+            {/* <div
               className={`pe-4 pt-12 flex items-center justify-center gap-10 ${
                 isPageLoading ? "hidden" : ""
               } `}
@@ -273,7 +315,7 @@ function DelegatesList({ props }: { props: string }) {
               >
                 Next
               </button>
-            </div>
+            </div> */}
           </div>
         ) : (
           <div className="flex flex-col justify-center items-center pt-10">

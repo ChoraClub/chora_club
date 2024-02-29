@@ -17,6 +17,10 @@ function UserInfo({
   descAvailable,
   karmaDesc,
 }: userInfoProps) {
+  useEffect(() => {
+    const sessionHosted = {};
+  }, []);
+
   const details = [
     {
       number: 10,
@@ -24,11 +28,7 @@ function UserInfo({
     },
     {
       number: 15,
-      desc: "Office Hours attended",
-    },
-    {
-      number: 2,
-      desc: "Sessions missed",
+      desc: "Sessions attended",
     },
     {
       number: 2,
@@ -67,7 +67,7 @@ function UserInfo({
 
   return (
     <div className="pt-4">
-      <div className="grid grid-cols-5 pe-32 gap-7">
+      <div className="grid grid-cols-4 pe-32 gap-10">
         {data.length > 0 ? (
           data.map((key, index) => (
             <div

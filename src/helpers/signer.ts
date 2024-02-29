@@ -1,6 +1,7 @@
 import { createWalletClient, createPublicClient, custom } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
-import { optimism } from "viem/chains";
+import { optimism, arbitrum } from "viem/chains";
+import { useNetwork } from "wagmi";
 
 declare global {
   interface Window {
@@ -9,24 +10,38 @@ declare global {
   }
 }
 
-let publicClient: any;
-let walletClient: any;
+const WalletAndPublicClient = () => {
+  let publicClient: any;
+  let walletClient: any;
 
-if (typeof window !== "undefined" && window.ethereum) {
-  // Instantiate public client and wallet client
-  publicClient = createPublicClient({
-    chain: optimism,
-    transport: custom(window.ethereum),
-  });
+  const { chain } = useNetwork();
+  let chainName: any;
+  if (chain?.name === "Optimism") {
+    chainName = optimism;
+  } else if (chain?.name === "Arbitrum One") {
+    chainName = arbitrum;
+  } else {
+    chainName = "";
+  }
 
-  walletClient = createWalletClient({
-    chain: optimism,
-    transport: custom(window.ethereum),
-  });
+  if (typeof window !== "undefined" && window.ethereum) {
+    // Instantiate public client and wallet client
+    publicClient = createPublicClient({
+      chain: chainName,
+      transport: custom(window.ethereum),
+    });
 
-  // Now you can use publicClient and walletClient as needed
-} else {
-  console.error("window.ethereum is not available");
-}
+    walletClient = createWalletClient({
+      chain: chainName,
+      transport: custom(window.ethereum),
+    });
 
-export { publicClient, walletClient };
+    // Now you can use publicClient and walletClient as needed
+  } else {
+    console.error("window.ethereum is not available");
+  }
+
+  return { publicClient, walletClient };
+};
+
+export default WalletAndPublicClient;
