@@ -249,7 +249,7 @@ function DelegateInfo({ props }: { props: Type }) {
                   <div className="flex items-center justify-center">
                     <RotatingLines
                       visible={true}
-                      width="40"
+                      width="36"
                       strokeColor="grey"
                       ariaLabel="oval-loading"
                     />
@@ -258,7 +258,7 @@ function DelegateInfo({ props }: { props: Type }) {
                   key.number
                 )}
               </div>
-              <div className="text-center text-xs">{key.desc}</div>
+              <div className="text-center text-sm">{key.desc}</div>
             </div>
           ))
         ) : (
