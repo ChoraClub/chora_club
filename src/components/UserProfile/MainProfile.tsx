@@ -17,7 +17,7 @@ import { FaPencil } from "react-icons/fa6";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import toast, { Toaster } from "react-hot-toast";
 import Link from "next/link";
-import user1 from "@/assets/images/daos/profile.png";
+import user1 from "@/assets/images/daos/CC.png";
 import {
   Modal,
   ModalContent,

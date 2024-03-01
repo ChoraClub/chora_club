@@ -3,7 +3,9 @@
 import Image, { StaticImageData } from "next/image";
 import React, { useEffect, useState } from "react";
 import search from "@/assets/images/daos/search.png";
-import user1 from "@/assets/images/daos/profile.png";
+import OPLogo from "@/assets/images/daos/op.png";
+import ARBLogo from "@/assets/images/daos/arbitrum.jpg";
+import ccLogo from "@/assets/images/daos/CC.png";
 import { IoCopy } from "react-icons/io5";
 import copy from "copy-to-clipboard";
 import { Button, Dropdown, Pagination, Tooltip } from "@nextui-org/react";
@@ -205,11 +207,11 @@ function DelegatesList({ props }: { props: string }) {
                   className="px-5 py-7 rounded-2xl flex flex-col justify-between"
                 >
                   <div>
-                    <div className="flex justify-center">
+                    <div className="flex justify-center relative">
                       <Image
                         src={
                           daos.profilePicture == null
-                            ? user1
+                            ? (props =="optimism" ? OPLogo : props == "arbitrum" ? ARBLogo : "")
                             : daos.profilePicture
                         }
                         alt="Image not found"
@@ -217,8 +219,14 @@ function DelegatesList({ props }: { props: string }) {
                         height={80}
                         className="rounded-full"
                       ></Image>
+                    
+                    <Image 
+                      src={ccLogo}
+                      alt="ChoraClub Logo"
+                      className="absolute top-0 right-0"
+                      style={{ width: '35px', height: '35px', marginTop:"-20px", marginRight:"-5px" }}
+                    />
                     </div>
-
                     <div className="text-center">
                       <div className="py-3">
                         <div
