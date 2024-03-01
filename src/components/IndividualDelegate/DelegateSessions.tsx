@@ -4,6 +4,7 @@ import BookSession from "./AllSessions/BookSession";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import text1 from "@/assets/images/daos/texture1.png";
 import SessionTile from "../utils/SessionTiles";
+import { Oval } from "react-loader-spinner";
 
 interface Session {
   booking_status: string;
@@ -74,6 +75,7 @@ function DelegateSessions({ props }: { props: Type }) {
           }
           console.log("filtered", filteredData);
           setSessionDetails(filteredData);
+          setDataLoading(false);
         }
       }
     } catch (error) {
@@ -83,7 +85,6 @@ function DelegateSessions({ props }: { props: Type }) {
 
   useEffect(() => {
     getMeetingData();
-    setDataLoading(false);
   }, [
     props.daoDelegates,
     props.individualDelegate,
@@ -166,30 +167,66 @@ function DelegateSessions({ props }: { props: Type }) {
             <Tile sessionDetails={sessionDetails} dataLoading={dataLoading} isEvent="Ongoing" isOfficeHour={false} />
             </>
           )} */}
-          {searchParams.get("session") === "upcoming" && (
-            <SessionTile
-              sessionDetails={sessionDetails}
-              dataLoading={dataLoading}
-              isEvent="Upcoming"
-              isOfficeHour={false}
-            />
-          )}
-          {searchParams.get("session") === "hosted" && (
-            <SessionTile
-              sessionDetails={sessionDetails}
-              dataLoading={dataLoading}
-              isEvent="Recorded"
-              isOfficeHour={false}
-            />
-          )}
-          {searchParams.get("session") === "attended" && (
-            <SessionTile
-              sessionDetails={sessionDetails}
-              dataLoading={dataLoading}
-              isEvent="Recorded"
-              isOfficeHour={false}
-            />
-          )}
+          {searchParams.get("session") === "upcoming" &&
+            (dataLoading ? (
+              <div className="flex items-center justify-center">
+                <Oval
+                  visible={true}
+                  height="40"
+                  width="40"
+                  color="#0500FF"
+                  secondaryColor="#cdccff"
+                  ariaLabel="oval-loading"
+                />
+              </div>
+            ) : (
+              <SessionTile
+                sessionDetails={sessionDetails}
+                dataLoading={dataLoading}
+                isEvent="Upcoming"
+                isOfficeHour={false}
+              />
+            ))}
+          {searchParams.get("session") === "hosted" &&
+            (dataLoading ? (
+              <div className="flex items-center justify-center">
+                <Oval
+                  visible={true}
+                  height="40"
+                  width="40"
+                  color="#0500FF"
+                  secondaryColor="#cdccff"
+                  ariaLabel="oval-loading"
+                />
+              </div>
+            ) : (
+              <SessionTile
+                sessionDetails={sessionDetails}
+                dataLoading={dataLoading}
+                isEvent="Recorded"
+                isOfficeHour={false}
+              />
+            ))}
+          {searchParams.get("session") === "attended" &&
+            (dataLoading ? (
+              <div className="flex items-center justify-center">
+                <Oval
+                  visible={true}
+                  height="40"
+                  width="40"
+                  color="#0500FF"
+                  secondaryColor="#cdccff"
+                  ariaLabel="oval-loading"
+                />
+              </div>
+            ) : (
+              <SessionTile
+                sessionDetails={sessionDetails}
+                dataLoading={dataLoading}
+                isEvent="Recorded"
+                isOfficeHour={false}
+              />
+            ))}
         </div>
       </div>
     </div>

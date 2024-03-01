@@ -6,13 +6,14 @@ import text2 from "@/assets/images/daos/texture2.png";
 import Image from "next/image";
 import { Tooltip } from "@nextui-org/react";
 import EventTile from "../../utils/EventTile";
-import { useAccount } from "wagmi";
+import { useAccount, useNetwork } from "wagmi";
 import { Oval } from "react-loader-spinner";
 
 function AttendingUserSessions() {
   const { address } = useAccount();
   const [sessionDetails, setSessionDetails] = useState([]);
   const [pageLoading, setPageLoading] = useState(true);
+  const { chain, chains } = useNetwork();
 
   const getUserMeetingData = async () => {
     try {
@@ -25,8 +26,17 @@ function AttendingUserSessions() {
 
       const result = await response.json();
       // console.log("result in get session data", result);
+
       if (result.success) {
-        setSessionDetails(result.data);
+        let filteredData: any = result.data;
+        filteredData = result.data.filter((session: any) => {
+          return chain?.name === "Optimism"
+            ? session.dao_name === "optimism"
+            : chain?.name === "Arbitrum One"
+            ? session.dao_name === "arbitrum"
+            : "";
+        });
+        setSessionDetails(filteredData);
         setPageLoading(false);
       } else {
         setPageLoading(false);

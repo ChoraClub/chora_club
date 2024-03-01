@@ -12,6 +12,7 @@ import { useNetwork, useAccount } from "wagmi";
 import Tile from "../utils/Tile";
 import SessionTile from "../utils/SessionTiles";
 import { Oval } from "react-loader-spinner";
+
 interface UserSessionsProps {
   isDelegate: boolean | undefined;
   selfDelegate: boolean;
@@ -60,11 +61,21 @@ function UserSessions({ isDelegate, selfDelegate }: UserSessionsProps) {
           let filteredData: any = resultData;
           if (searchParams.get("session") === "hosted") {
             filteredData = resultData.filter((session: Session) => {
-              return session.meeting_status === "Recorded";
+              return session.meeting_status === "Recorded" &&
+                chain?.name === "Optimism"
+                ? session.dao_name === "optimism"
+                : chain?.name === "Arbitrum One"
+                ? session.dao_name === "arbitrum"
+                : "";
             });
           } else if (searchParams.get("session") === "attended") {
             filteredData = resultData.filter((session: Session) => {
-              return session.user_address === address;
+              return session.user_address === address &&
+                chain?.name === "Optimism"
+                ? session.dao_name === "optimism"
+                : chain?.name === "Arbitrum One"
+                ? session.dao_name === "arbitrum"
+                : "";
             });
           }
           // console.log("filtered", filteredData);

@@ -82,11 +82,23 @@ function UserOfficeHours({ isDelegate, selfDelegate }: UserOfficeHoursProps) {
         ) {
           const filteredSessions = result.filter((session: Session) => {
             if (searchParams.get("hours") === "ongoing") {
-              return session.status === "ongoing";
+              return session.status === "ongoing" && chain?.name === "Optimism"
+                ? session.chain_name === "Optimism"
+                : chain?.name === "Arbitrum One"
+                ? session.chain_name === "Arbitrum"
+                : "";
             } else if (searchParams.get("hours") === "upcoming") {
-              return session.status === "active";
+              return session.status === "active" && chain?.name === "Optimism"
+                ? session.chain_name === "Optimism"
+                : chain?.name === "Arbitrum One"
+                ? session.chain_name === "Arbitrum"
+                : "";
             } else if (searchParams.get("hours") === "hosted") {
-              return session.status === "inactive";
+              return session.status === "inactive" && chain?.name === "Optimism"
+                ? session.chain_name === "Optimism"
+                : chain?.name === "Arbitrum One"
+                ? session.chain_name === "Arbitrum"
+                : "";
             }
           });
           setSessionDetails(filteredSessions);
@@ -94,7 +106,11 @@ function UserOfficeHours({ isDelegate, selfDelegate }: UserOfficeHoursProps) {
           const filteredSessions = resultData.filter((session: Session) => {
             return session.attendees.some(
               (attendee: any) => attendee.attendee_address === address
-            );
+            ) && chain?.name === "Optimism"
+              ? session.chain_name === "Optimism"
+              : chain?.name === "Arbitrum One"
+              ? session.chain_name === "Arbitrum"
+              : "";
           });
           setSessionDetails(filteredSessions);
         }

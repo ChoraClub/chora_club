@@ -82,7 +82,7 @@ function SessionTile({
               </div>
 
               <div className="flex space-x-4 py-2">
-                <div className="bg-[#1E1E1E] border border-[#1E1E1E] text-white rounded-md text-xs px-5 py-1 font-semibold">
+                <div className="bg-[#1E1E1E] border border-[#1E1E1E] text-white rounded-md text-xs px-5 py-1 font-semibold capitalize">
                   {data.dao_name}
                 </div>
                 {/* <div className="border border-[#1E1E1E] rounded-md text-[#1E1E1E] text-xs px-5 py-1 font-medium">
@@ -135,6 +135,7 @@ function SessionTile({
           host={sessionDetails[selectedTileIndex].host_address}
           attendee={sessionDetails[selectedTileIndex].user_address}
           dao={sessionDetails[selectedTileIndex].dao_name}
+          attestation_uid={sessionDetails[selectedTileIndex].uid_attendee}
           onClose={closeModal}
         />
       ) : null}
