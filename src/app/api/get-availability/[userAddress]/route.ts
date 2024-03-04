@@ -31,7 +31,7 @@ export async function GET(request: NextRequest, res: NextResponse) {
       { status: 200 }
     );
   } catch (error) {
-    console.error("Error retrieving data:", error);
+    console.error("Error retrieving data get availability by user:", error);
     return NextResponse.json(
       { success: false, error: "Internal Server Error" },
       { status: 500 }

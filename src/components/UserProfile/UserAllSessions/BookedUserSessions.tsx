@@ -29,6 +29,9 @@ function BookedUserSessions() {
       // console.log("result in get meeting", result);
       if (result.success) {
         setSessionDetails(result.data);
+        setPageLoading(false);
+      } else {
+        setPageLoading(false);
       }
     } catch (error) {
       console.log("error in catch", error);
@@ -37,7 +40,6 @@ function BookedUserSessions() {
 
   useEffect(() => {
     getMeetingData();
-    setPageLoading(false);
   }, [address, sessionDetails]);
 
   return (

@@ -17,7 +17,9 @@ import { FaPencil } from "react-icons/fa6";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import toast, { Toaster } from "react-hot-toast";
 import Link from "next/link";
-import user1 from "@/assets/images/daos/profile.png";
+import OPLogo from "@/assets/images/daos/op.png";
+import ArbLogo from "@/assets/images/daos/arbCir.png";
+import ccLogo from "@/assets/images/daos/CC.png";
 import {
   Modal,
   ModalContent,
@@ -85,7 +87,9 @@ function MainProfile() {
       console.log(percentageDone);
     };
 
-    const apiKey = process.env.NEXT_PUBLIC_LIGHTHOUSE_KEY ? process.env.NEXT_PUBLIC_LIGHTHOUSE_KEY : "";
+    const apiKey = process.env.NEXT_PUBLIC_LIGHTHOUSE_KEY
+      ? process.env.NEXT_PUBLIC_LIGHTHOUSE_KEY
+      : "";
 
     const output = await lighthouse.upload(selectedFile, apiKey);
 
@@ -144,14 +148,15 @@ function MainProfile() {
       const addr = await walletClient.getAddresses();
       const address1 = addr[0];
       let delegateTxAddr = "";
-      const contractAddress = chain?.name === "Optimism" 
-      ? "0x4200000000000000000000000000000000000042"
-      : chain?.name === "Arbitrum One"
+      const contractAddress =
+        chain?.name === "Optimism"
+          ? "0x4200000000000000000000000000000000000042"
+          : chain?.name === "Arbitrum One"
           ? "0x912CE59144191C1204E64559FE8253a0e49E6548"
           : "";
       console.log(walletClient);
       const delegateTx = await publicClient.readContract({
-        address:contractAddress,
+        address: contractAddress,
         abi: dao_abi.abi,
         functionName: "delegates",
         args: [address],
@@ -188,8 +193,7 @@ function MainProfile() {
       account: address1,
     });
     console.log(delegateTx);
-};
-
+  };
 
   // useEffect(()=>{
   //   const getDelegatesVotes = async (address: string) => {
@@ -565,23 +569,36 @@ function MainProfile() {
       {!isPageLoading ? (
         <div className="font-poppins">
           <div className="flex ps-14 py-5 pe-10 justify-between">
-            <div className="flex">
+            <div className="flex  items-center justify-center">
               <div
-                className="relative object-cover bg-gray-100 rounded-3xl"
+                className="relative object-cover rounded-3xl "
                 onMouseEnter={() => setHovered(true)}
                 onMouseLeave={() => setHovered(false)}
+                style={{backgroundColor:"#fcfcfc", border:"2px solid #E9E9E9 "}}
               >
-                <Image
-                  src={
-                    (displayImage
-                      ? `https://gateway.lighthouse.storage/ipfs/${displayImage}`
-                      : karmaImage) || user1
-                  }
-                  alt="user"
-                  width={256}
-                  height={256}
-                  className="w-40 h-40 rounded-3xl object-cover"
-                />
+                <div className="w-40 h-40 flex items-center justify-content ">
+                  <div className="flex justify-center items-center w-40 h-40"> 
+                      <Image
+                        src={
+                          (displayImage
+                            ? `https://gateway.lighthouse.storage/ipfs/${displayImage}`
+                            : karmaImage) || (chain?.name==="Optimism" ? OPLogo : chain?.name==="Arbitrum One"?ArbLogo : ccLogo)
+                        }
+                        alt="user"
+                        width={256}
+                        height={256}
+                        className="w-20 h-20 rounded-3xl"
+                      />
+                  </div>
+
+                  <Image 
+                      src={ccLogo}
+                      alt="ChoraClub Logo"
+                      className="absolute top-0 right-0"
+                      style={{ width: '30px', height: '30px', marginTop:'10px', marginRight:'10px' }}
+                    />
+                </div>
+                
                 <div
                   className={`absolute top-3 right-3 cursor-pointer  ${
                     hovered ? "bg-gray-50 rounded-full p-1" : "hidden"

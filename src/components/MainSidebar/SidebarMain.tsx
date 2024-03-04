@@ -115,6 +115,25 @@ function Sidebar() {
               ></Image>
             </Link>
           </Tooltip>
+          {/* <Tooltip
+            content="Delegate Sessions"
+            placement="right"
+            className="rounded-md bg-opacity-90"
+            closeDelay={1}
+          >
+            <Link href={"/delegate-sessions?sessions=available"}>
+              <Image
+                src={office}
+                alt={"image"}
+                width={40}
+                className={`cursor-pointer  ${
+                  pathname.includes(`/delegate-sessions`)
+                    ? "border-white border-2 rounded-full"
+                    : ""
+                }`}
+              ></Image>
+            </Link>
+          </Tooltip> */}
         </div>
 
         <div

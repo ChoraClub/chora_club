@@ -1,0 +1,32 @@
+/* Add this CSS to your stylesheet */
+.select-container {
+  position: relative;
+}
+
+.select-container select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-color: transparent;
+  border: 1px solid #c4c4c4;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  outline: none;
+  cursor: pointer;
+}
+
+/* Style the arrow */
+.select-container::after {
+  content: "\25BC"; /* Unicode character for down arrow */
+  font-size: 1rem;
+  position: absolute;
+  top: 50%;
+  right: 1rem;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+/* Optional: Add hover effect */
+.select-container:hover select {
+  border-color: #888;
+}
