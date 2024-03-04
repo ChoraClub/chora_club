@@ -56,7 +56,7 @@ function DelegateSessions({ props }: { props: Type }) {
       // console.log("result in get meetinggggg", result);
       if (result) {
         const resultData = await result;
-        console.log("resultData", resultData);
+        // console.log("resultData", resultData);
         if (Array.isArray(resultData)) {
           let filteredData: any = resultData;
           if (searchParams.get("session") === "upcoming") {
@@ -72,7 +72,7 @@ function DelegateSessions({ props }: { props: Type }) {
               return session.user_address === props.individualDelegate;
             });
           }
-          console.log("filtered", filteredData);
+          // console.log("filtered", filteredData);
           setSessionDetails(filteredData);
         }
       }

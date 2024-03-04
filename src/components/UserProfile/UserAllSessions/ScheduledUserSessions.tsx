@@ -189,7 +189,7 @@ function ScheduledUserSessions() {
     };
 
     setDateAndRanges((prevDateAndRanges: any) => [
-      ...prevDateAndRanges,
+      ...prevDateAndRanges, 
       newDateAndRange,
     ]);
     setAllowedDates([...allowedDates, selectedDate]);
@@ -201,7 +201,7 @@ function ScheduledUserSessions() {
     setStartTime("");
     setEndTime("");
     setSelectedStartTime("");
-    setSelectedEndTime("");
+    setSelectedEndTime(""); 
   };
 
   useEffect(() => {
