@@ -17,6 +17,7 @@ import { FaPencil } from "react-icons/fa6"; // Importing the pencil icon
 
 import { MdDeleteForever } from "react-icons/md";
 import { FaSpinner } from "react-icons/fa"; // Importing the spinner icon
+import { Oval } from "react-loader-spinner";
 interface SessionDetail {
   img: any;
   title: string;
@@ -35,8 +36,10 @@ function UserUpcomingHours() {
   });
   const [loading, setLoading] = useState(false); // Loading state
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const [pageLoading, setPageLoading] = useState(true);
 
   const { address } = useAccount();
+
   useEffect(() => {
     fetch(`/api/update-office-hours/${address}`)
       .then((response) => response.json()) // Parse response JSON
@@ -50,6 +53,7 @@ function UserUpcomingHours() {
           desc: item.description, // Description from the API
         }));
         setSessionDetails(mappedData); // Set the mapped data to state
+        setPageLoading(false);
       })
       .catch((error) => console.error("Error fetching data:", error));
   }, []); // Empty dependency array ensures the effect runs only once
@@ -143,7 +147,18 @@ function UserUpcomingHours() {
   return (
     <div>
       <div className="space-y-6">
-        {sessionDetails.length > 0 ? (
+        {pageLoading ? (
+          <div className="flex items-center justify-center">
+            <Oval
+              visible={true}
+              height="40"
+              width="40"
+              color="#0500FF"
+              secondaryColor="#cdccff"
+              ariaLabel="oval-loading"
+            />
+          </div>
+        ) : sessionDetails.length > 0 ? (
           sessionDetails.map((data, index) => (
             <div
               key={index}

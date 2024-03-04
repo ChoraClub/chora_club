@@ -954,10 +954,10 @@
     bls-eth-wasm "^1.1.1"
     joi "^17.7.0"
 
-"@lighthouse-web3/sdk@0.2.9":
-  version "0.2.9"
-  resolved "https://registry.yarnpkg.com/@lighthouse-web3/sdk/-/sdk-0.2.9.tgz#46008781b22dada832a2cf63e4918540f81e9e1f"
-  integrity sha512-XfIXMSo7LeIu4jiEbR12B2ICapZeldufFOj95z49Ceh9Qn+mOA7sY6+K+hQB6eItHjZNhbd7UOWbV2ofYpVwpg==
+"@lighthouse-web3/sdk@^0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@lighthouse-web3/sdk/-/sdk-0.3.0.tgz#a1623225cf282cba89172d533926744bcdf12f82"
+  integrity sha512-QBhclo5i+oOrUt1Rml2Ea3Mz975+9iDyMzktUB/wdQ+JP0kY9Np+PKo7ph5fx7so/MZzrA9AF9eIh24pbmw+sw==
   dependencies:
     "@lighthouse-web3/kavach" "^0.1.4"
     "@peculiar/webcrypto" "^1.4.0"
@@ -9031,7 +9031,7 @@ react-is@^18.2.0:
 
 react-loader-spinner@^6.1.6:
   version "6.1.6"
-  resolved "https://registry.npmjs.org/react-loader-spinner/-/react-loader-spinner-6.1.6.tgz"
+  resolved "https://registry.yarnpkg.com/react-loader-spinner/-/react-loader-spinner-6.1.6.tgz#744d84a9763e963b565054f4f281dadfbd17e9e9"
   integrity sha512-x5h1Jcit7Qn03MuKlrWcMG9o12cp9SNDVHVJTNRi9TgtGPKcjKiXkou4NRfLAtXaFB3+Z8yZsVzONmPzhv2ErA==
   dependencies:
     react-is "^18.2.0"

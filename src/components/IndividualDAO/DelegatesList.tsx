@@ -3,10 +3,12 @@
 import Image, { StaticImageData } from "next/image";
 import React, { useEffect, useState } from "react";
 import search from "@/assets/images/daos/search.png";
-import user1 from "@/assets/images/daos/profile.png";
+import OPLogo from "@/assets/images/daos/op.png";
+import ARBLogo from "@/assets/images/daos/arbitrum.jpg";
+import ccLogo from "@/assets/images/daos/CC.png";
 import { IoCopy } from "react-icons/io5";
 import copy from "copy-to-clipboard";
-import { Button, Pagination, Tooltip } from "@nextui-org/react";
+import { Button, Dropdown, Pagination, Tooltip } from "@nextui-org/react";
 import { Oval } from "react-loader-spinner";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import toast, { Toaster } from "react-hot-toast";
@@ -109,6 +111,18 @@ function DelegatesList({ props }: { props: string }) {
     }
   };
 
+  const handleSelectChange = (event: any) => {
+    const selectedValue = event.target.value;
+    if (
+      selectedValue === "Random" ||
+      selectedValue === "Most delegators" ||
+      selectedValue === "Karma score" ||
+      selectedValue === "Most active"
+    ) {
+      toast("Coming Soon 🚀");
+    }
+  };
+
   return (
     <div>
       {isShowing && (
@@ -137,7 +151,7 @@ function DelegatesList({ props }: { props: string }) {
           </button>
         </div>
       )}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between pe-10">
         <div
           style={{ background: "rgba(238, 237, 237, 0.36)" }}
           className="flex border-[0.5px] border-black w-fit rounded-full my-3 font-poppins"
@@ -153,6 +167,19 @@ function DelegatesList({ props }: { props: string }) {
           <span className="flex items-center bg-black rounded-full px-5 py-2">
             <Image src={search} alt="search" width={20} />
           </span>
+        </div>
+        <div>
+          <select
+            style={{ background: "rgba(238, 237, 237, 0.36)" }}
+            className="rounded-full py-2 px-4 outline-none"
+            onChange={handleSelectChange}
+          >
+            <option>Most voting power</option>
+            <option>Random</option>
+            <option>Most delegators</option>
+            <option>Karma score</option>
+            <option>Most active</option>
+          </select>
         </div>
       </div>
 
@@ -180,11 +207,11 @@ function DelegatesList({ props }: { props: string }) {
                   className="px-5 py-7 rounded-2xl flex flex-col justify-between"
                 >
                   <div>
-                    <div className="flex justify-center">
+                    <div className="flex justify-center relative">
                       <Image
                         src={
                           daos.profilePicture == null
-                            ? user1
+                            ? (props =="optimism" ? OPLogo : props == "arbitrum" ? ARBLogo : "")
                             : daos.profilePicture
                         }
                         alt="Image not found"
@@ -192,8 +219,14 @@ function DelegatesList({ props }: { props: string }) {
                         height={80}
                         className="rounded-full"
                       ></Image>
+                    
+                    <Image 
+                      src={ccLogo}
+                      alt="ChoraClub Logo"
+                      className="absolute top-0 right-0"
+                      style={{ width: '35px', height: '35px', marginTop:"-20px", marginRight:"-5px" }}
+                    />
                     </div>
-
                     <div className="text-center">
                       <div className="py-3">
                         <div

@@ -3,6 +3,7 @@ import Image, { StaticImageData } from "next/image";
 import { Oval } from "react-loader-spinner";
 import IndividualTileModal from "./IndividualTileModal";
 import staticImg from "@/assets/images/daos/texture1.png";
+import { useAccount } from "wagmi";
 
 interface Type {
   img: StaticImageData;
@@ -33,6 +34,7 @@ function Tile({
   isEvent,
   isOfficeHour,
 }: TileProps) {
+  const { address } = useAccount();
   const [selectedTileIndex, setSelectedTileIndex] = useState<number | null>(
     null
   );
@@ -57,7 +59,7 @@ function Tile({
             ariaLabel="oval-loading"
           />
         ) : (
-          sessionDetails.map((data:any, index:any) => (
+          sessionDetails.map((data: any, index: any) => (
             <div
               key={index}
               className="flex p-5 rounded-[2rem] cursor-pointer"
@@ -149,9 +151,18 @@ function Tile({
           videoUrl={sessionDetails[selectedTileIndex].video_uri || ""}
           date={sessionDetails[selectedTileIndex].office_hours_slot}
           host={sessionDetails[selectedTileIndex].address}
-          attendee={sessionDetails[selectedTileIndex].attendee}
+          attendee={
+            sessionDetails[selectedTileIndex].attendees.filter(
+              (attendee: any) => attendee.attendee_address === address
+            )[0].attendee_address
+          }
           dao={sessionDetails[selectedTileIndex].chain_name}
           onClose={closeModal}
+          attestation_uid={
+            sessionDetails[selectedTileIndex].attendees.filter(
+              (attendee: any) => attendee.attendee_address === address
+            )[0].attendee_uid
+          }
         />
       ) : null}
     </div>

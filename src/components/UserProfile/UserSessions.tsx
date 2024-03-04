@@ -11,6 +11,8 @@ import EventTile from "../utils/EventTile";
 import { useNetwork, useAccount } from "wagmi";
 import Tile from "../utils/Tile";
 import SessionTile from "../utils/SessionTiles";
+import { Oval } from "react-loader-spinner";
+
 interface UserSessionsProps {
   isDelegate: boolean | undefined;
   selfDelegate: boolean;
@@ -59,15 +61,26 @@ function UserSessions({ isDelegate, selfDelegate }: UserSessionsProps) {
           let filteredData: any = resultData;
           if (searchParams.get("session") === "hosted") {
             filteredData = resultData.filter((session: Session) => {
-              return session.meeting_status === "Recorded";
+              return session.meeting_status === "Recorded" &&
+                chain?.name === "Optimism"
+                ? session.dao_name === "optimism"
+                : chain?.name === "Arbitrum One"
+                ? session.dao_name === "arbitrum"
+                : "";
             });
           } else if (searchParams.get("session") === "attended") {
             filteredData = resultData.filter((session: Session) => {
-              return session.user_address === address;
+              return session.user_address === address &&
+                chain?.name === "Optimism"
+                ? session.dao_name === "optimism"
+                : chain?.name === "Arbitrum One"
+                ? session.dao_name === "arbitrum"
+                : "";
             });
           }
           // console.log("filtered", filteredData);
           setSessionDetails(filteredData);
+          setDataLoading(false);
         }
       }
     } catch (error) {
@@ -79,9 +92,9 @@ function UserSessions({ isDelegate, selfDelegate }: UserSessionsProps) {
     getUserMeetingData();
   }, [address, sessionDetails, searchParams.get("session")]);
 
-  useEffect(() => {
-    setDataLoading(false);
-  }, []);
+  // useEffect(() => {
+  //   setDataLoading(false);
+  // }, []);
 
   useEffect(() => {
     if (!isDelegate && searchParams.get("session") === "schedule") {
@@ -172,22 +185,46 @@ function UserSessions({ isDelegate, selfDelegate }: UserSessionsProps) {
             <AttendingUserSessions />
           )}
           {(selfDelegate === true || isDelegate === true) &&
-            searchParams.get("session") === "hosted" && (
+            searchParams.get("session") === "hosted" &&
+            (dataLoading ? (
+              <div className="flex items-center justify-center">
+                <Oval
+                  visible={true}
+                  height="40"
+                  width="40"
+                  color="#0500FF"
+                  secondaryColor="#cdccff"
+                  ariaLabel="oval-loading"
+                />
+              </div>
+            ) : (
               <SessionTile
                 sessionDetails={sessionDetails}
                 dataLoading={dataLoading}
                 isEvent="Recorded"
                 isOfficeHour={false}
               />
-            )}
-          {searchParams.get("session") === "attended" && (
-            <SessionTile
-              sessionDetails={sessionDetails}
-              dataLoading={dataLoading}
-              isEvent="Recorded"
-              isOfficeHour={false}
-            />
-          )}
+            ))}
+          {searchParams.get("session") === "attended" &&
+            (dataLoading ? (
+              <div className="flex items-center justify-center">
+                <Oval
+                  visible={true}
+                  height="40"
+                  width="40"
+                  color="#0500FF"
+                  secondaryColor="#cdccff"
+                  ariaLabel="oval-loading"
+                />
+              </div>
+            ) : (
+              <SessionTile
+                sessionDetails={sessionDetails}
+                dataLoading={dataLoading}
+                isEvent="Recorded"
+                isOfficeHour={false}
+              />
+            ))}
         </div>
       </div>
     </div>

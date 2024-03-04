@@ -6,6 +6,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Tile from "../utils/Tile";
 import { useNetwork, useAccount } from "wagmi";
 import text1 from "@/assets/images/daos/texture1.png";
+import { Oval } from "react-loader-spinner";
 
 interface UserOfficeHoursProps {
   isDelegate: boolean | undefined;
@@ -81,11 +82,23 @@ function UserOfficeHours({ isDelegate, selfDelegate }: UserOfficeHoursProps) {
         ) {
           const filteredSessions = result.filter((session: Session) => {
             if (searchParams.get("hours") === "ongoing") {
-              return session.status === "ongoing";
+              return session.status === "ongoing" && chain?.name === "Optimism"
+                ? session.chain_name === "Optimism"
+                : chain?.name === "Arbitrum One"
+                ? session.chain_name === "Arbitrum"
+                : "";
             } else if (searchParams.get("hours") === "upcoming") {
-              return session.status === "active";
+              return session.status === "active" && chain?.name === "Optimism"
+                ? session.chain_name === "Optimism"
+                : chain?.name === "Arbitrum One"
+                ? session.chain_name === "Arbitrum"
+                : "";
             } else if (searchParams.get("hours") === "hosted") {
-              return session.status === "inactive";
+              return session.status === "inactive" && chain?.name === "Optimism"
+                ? session.chain_name === "Optimism"
+                : chain?.name === "Arbitrum One"
+                ? session.chain_name === "Arbitrum"
+                : "";
             }
           });
           setSessionDetails(filteredSessions);
@@ -93,7 +106,11 @@ function UserOfficeHours({ isDelegate, selfDelegate }: UserOfficeHoursProps) {
           const filteredSessions = resultData.filter((session: Session) => {
             return session.attendees.some(
               (attendee: any) => attendee.attendee_address === address
-            );
+            ) && chain?.name === "Optimism"
+              ? session.chain_name === "Optimism"
+              : chain?.name === "Arbitrum One"
+              ? session.chain_name === "Arbitrum"
+              : "";
           });
           setSessionDetails(filteredSessions);
         }
@@ -180,22 +197,46 @@ function UserOfficeHours({ isDelegate, selfDelegate }: UserOfficeHoursProps) {
             <UserUpcomingHours />
           )}
 
-          {searchParams.get("hours") === "hosted" && (
-            <Tile
-              sessionDetails={sessionDetails}
-              dataLoading={dataLoading}
-              isEvent="Recorded"
-              isOfficeHour={true}
-            />
-          )}
-          {searchParams.get("hours") === "attended" && (
-            <Tile
-              sessionDetails={sessionDetails}
-              dataLoading={dataLoading}
-              isEvent="Recorded"
-              isOfficeHour={true}
-            />
-          )}
+          {searchParams.get("hours") === "hosted" &&
+            (dataLoading ? (
+              <div className="flex items-center justify-center">
+                <Oval
+                  visible={true}
+                  height="40"
+                  width="40"
+                  color="#0500FF"
+                  secondaryColor="#cdccff"
+                  ariaLabel="oval-loading"
+                />
+              </div>
+            ) : (
+              <Tile
+                sessionDetails={sessionDetails}
+                dataLoading={dataLoading}
+                isEvent="Recorded"
+                isOfficeHour={true}
+              />
+            ))}
+          {searchParams.get("hours") === "attended" &&
+            (dataLoading ? (
+              <div className="flex items-center justify-center">
+                <Oval
+                  visible={true}
+                  height="40"
+                  width="40"
+                  color="#0500FF"
+                  secondaryColor="#cdccff"
+                  ariaLabel="oval-loading"
+                />
+              </div>
+            ) : (
+              <Tile
+                sessionDetails={sessionDetails}
+                dataLoading={dataLoading}
+                isEvent="Recorded"
+                isOfficeHour={true}
+              />
+            ))}
         </div>
       </div>
     </div>
