@@ -123,7 +123,7 @@ function IndividualTileModal({
                     <td className="font-semibold pr-4">Attendees:</td>
                     {attendees?.map((attendee, index) => (
                       // <div className="">
-                      <li className="list-decimal">
+                      <li className="list-decimal" key={index}>
                         {/* <td> */}
                         {attendee.attendee_address}
                         <a
