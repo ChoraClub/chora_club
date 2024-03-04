@@ -254,9 +254,9 @@ function MainProfile() {
       try {
         // Fetch data from your backend API to check if the address exists
         let dao = "";
-        if (chain && chain.name === "Optimism") {
+        if (chain && chain?.name === "Optimism") {
           dao = "optimism";
-        } else if (chain && chain.name === "Arbitrum One") {
+        } else if (chain && chain?.name === "Arbitrum One") {
           dao = "arbitrum";
         } else {
           return;
@@ -292,9 +292,9 @@ function MainProfile() {
           );
           // Data not found in the database, fetch data from the third-party API
           let dao = "";
-          if (chain && chain.name === "Optimism") {
+          if (chain && chain?.name === "Optimism") {
             dao = "optimism";
-          } else if (chain && chain.name === "Arbitrum One") {
+          } else if (chain && chain?.name === "Arbitrum One") {
             dao = "arbitrum";
           } else {
             return;
@@ -401,9 +401,9 @@ function MainProfile() {
     try {
       // Make a request to your backend API to check if the address exists
       let dao = "";
-      if (chain && chain.name === "Optimism") {
+      if (chain && chain?.name === "Optimism") {
         dao = "optimism";
-      } else if (chain && chain.name === "Arbitrum One") {
+      } else if (chain && chain?.name === "Arbitrum One") {
         dao = "arbitrum";
       } else {
         return;
@@ -432,9 +432,9 @@ function MainProfile() {
     try {
       // Call the POST API function for adding a new delegate
       let dao = "";
-      if (chain && chain.name === "Optimism") {
+      if (chain && chain?.name === "Optimism") {
         dao = "optimism";
-      } else if (chain && chain.name === "Arbitrum One") {
+      } else if (chain && chain?.name === "Arbitrum One") {
         dao = "arbitrum";
       } else {
         return;
@@ -515,9 +515,9 @@ function MainProfile() {
       console.log("Description", description);
       try {
         let dao = "";
-        if (chain && chain.name === "Optimism") {
+        if (chain && chain?.name === "Optimism") {
           dao = "optimism";
-        } else if (chain && chain.name === "Arbitrum One") {
+        } else if (chain && chain?.name === "Arbitrum One") {
           dao = "arbitrum";
         } else {
           return;
@@ -578,17 +578,18 @@ function MainProfile() {
               >
                 <div className="w-40 h-40 flex items-center justify-content ">
                   <div className="flex justify-center items-center w-40 h-40"> 
-                      <Image
-                        src={
+                  <Image
+                      src={
                           (displayImage
-                            ? `https://gateway.lighthouse.storage/ipfs/${displayImage}`
-                            : karmaImage) || (chain?.name==="Optimism" ? OPLogo : chain?.name==="Arbitrum One"?ArbLogo : ccLogo)
-                        }
-                        alt="user"
-                        width={256}
-                        height={256}
-                        className="w-20 h-20 rounded-3xl"
-                      />
+                              ? `https://gateway.lighthouse.storage/ipfs/${displayImage}`
+                              : karmaImage) || (chain?.name==="Optimism" ? OPLogo : chain?.name==="Arbitrum One"?ArbLogo : ccLogo)
+                      }
+                      alt="user"
+                      width={256}
+                      height={256}
+                      className={displayImage ? "w-40 h-40 rounded-3xl" : "w-20 h-20 rounded-3xl"}
+                  />
+
                   </div>
 
                   <Image 

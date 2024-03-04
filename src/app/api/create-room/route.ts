@@ -28,7 +28,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
     // Return the found documents
     return NextResponse.json({ success: true, data: roomId }, { status: 200 });
   } catch (error) {
-    console.error("Error retrieving data:", error);
+    console.error("Error retrieving data in create-room:", error);
     return NextResponse.json(
       { success: false, error: "Internal Server Error" },
       { status: 500 }
