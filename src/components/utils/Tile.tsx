@@ -82,7 +82,7 @@ function Tile({
                     {data.chain_name}
                   </div>
                   <div className="border border-[#1E1E1E] rounded-md text-[#1E1E1E] text-xs px-5 py-1 font-medium">
-                    {data.participant} Participants
+                    {data.attendees ? data.attendees.length : 0} Participants
                   </div>
                 </div>
 
@@ -151,18 +151,10 @@ function Tile({
           videoUrl={sessionDetails[selectedTileIndex].video_uri || ""}
           date={sessionDetails[selectedTileIndex].office_hours_slot}
           host={sessionDetails[selectedTileIndex].address}
-          attendee={
-            sessionDetails[selectedTileIndex].attendees.filter(
-              (attendee: any) => attendee.attendee_address === address
-            )[0].attendee_address
-          }
+          attendees={sessionDetails[selectedTileIndex].attendees}
           dao={sessionDetails[selectedTileIndex].chain_name}
+          host_attestation={sessionDetails[selectedTileIndex].uid_host}
           onClose={closeModal}
-          attestation_uid={
-            sessionDetails[selectedTileIndex].attendees.filter(
-              (attendee: any) => attendee.attendee_address === address
-            )[0].attendee_uid
-          }
         />
       ) : null}
     </div>

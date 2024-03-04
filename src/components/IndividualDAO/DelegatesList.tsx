@@ -9,17 +9,19 @@ import ccLogo from "@/assets/images/daos/CC.png";
 import { IoCopy } from "react-icons/io5";
 import copy from "copy-to-clipboard";
 import { Button, Dropdown, Pagination, Tooltip } from "@nextui-org/react";
-import { Oval } from "react-loader-spinner";
+import { Oval, RotatingLines } from "react-loader-spinner";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import toast, { Toaster } from "react-hot-toast";
 import styles from "@/components/IndividualDelegate/DelegateVotes.module.css";
 
 function DelegatesList({ props }: { props: string }) {
   const [delegateData, setDelegateData] = useState<any>({ delegates: [] });
-  const [tempData, setTempData] = useState<any>([]);
+  const [tempData, setTempData] = useState<any>({ delegates: [] });
+  const [searchResults, setSearchResults] = useState<any>({ delegates: [] });
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(0);
   const [isPageLoading, setPageLoading] = useState(true);
+  const [isDataLoading, setDataLoading] = useState(true);
   const router = useRouter();
   const path = usePathname();
   const searchParams = useSearchParams();
@@ -32,6 +34,8 @@ function DelegatesList({ props }: { props: string }) {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setDataLoading(true);
+        // console.log("Current page: ", currentPage);
         const res = await fetch(
           `https://api.karmahq.xyz/api/dao/delegates?name=${props}&offset=${currentPage}&order=desc&field=delegatedVotes&period=lifetime&pageSize=20&statuses=active,inactive,withdrawn,recognized`
         );
@@ -39,7 +43,10 @@ function DelegatesList({ props }: { props: string }) {
         setDelegateData((prevData: any) => ({
           delegates: [...prevData.delegates, ...daoInfo.delegates],
         }));
-        setTempData(daoInfo.delegates);
+        setTempData((prevData: any) => ({
+          delegates: [...prevData.delegates, ...daoInfo.delegates],
+        }));
+        setDataLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -50,40 +57,48 @@ function DelegatesList({ props }: { props: string }) {
     fetchData();
   }, [currentPage]);
 
-  useEffect(() => {
-    if (Number(searchParams.get("page")) >= 0) {
-      setCurrentPage(Number(searchParams.get("page")));
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (Number(searchParams.get("page")) >= 0) {
+  //     setCurrentPage(Number(searchParams.get("page")));
+  //   }
+  // }, []);
 
   // console.log("dao-info: ", delegateData.delegates);
 
-  const handleSearchChange = (query: string) => {
-    console.log("query: ", query);
+  const handleSearchChange = async (query: string) => {
+    console.log("query: ", query.length);
 
     setSearchQuery(query);
+    setPageLoading(true);
 
     if (query.length > 0) {
-      console.log("Delegate data: ", query, delegateData);
-      console.log(delegateData);
-      const filtered = tempData.filter(
-        (item: any) =>
-          (item.ensName !== null &&
-            item.ensName.startsWith(query.toLowerCase())) ||
-          item.publicAddress.startsWith(query)
+      // console.log("Delegate data: ", query, delegateData);
+      // console.log(delegateData);
+      window.removeEventListener("scroll", handleScroll);
+
+      const res = await fetch(
+        `https://api.karmahq.xyz/api/dao/search-delegate?user=${query}&pageSize=10&offset=0&period=lifetime&order=desc&dao=${props}`
       );
-      console.log("Filtered Data: ", filtered);
-      const newData = { ...delegateData, delegates: filtered };
-      setDelegateData(newData);
+      const filtered = await res.json().then((delegates) => delegates.data);
+
+      console.log("Filtered Data: ", query, filtered);
+      setDelegateData({ delegates: filtered.delegates });
+      setPageLoading(false);
     } else {
-      setDelegateData({ ...delegateData, delegates: tempData });
+      console.log("in else");
+      setDelegateData({ ...delegateData, delegates: tempData.delegates });
+      setPageLoading(false);
+      window.addEventListener("scroll", handleScroll);
     }
   };
 
   const handleScroll = () => {
     const { scrollTop, clientHeight, scrollHeight } = document.documentElement;
-
-    if (scrollTop + clientHeight >= scrollHeight - 100) {
+    const threshold = 100;
+    if (
+      !isDataLoading &&
+      scrollTop + clientHeight >= scrollHeight - threshold
+    ) {
       setCurrentPage((prev) => prev + 1);
     }
   };
@@ -94,7 +109,7 @@ function DelegatesList({ props }: { props: string }) {
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
-  }, [currentPage]);
+  }, [handleScroll]);
 
   const handleCopy = (addr: string) => {
     copy(addr);
@@ -211,7 +226,11 @@ function DelegatesList({ props }: { props: string }) {
                       <Image
                         src={
                           daos.profilePicture == null
-                            ? (props =="optimism" ? OPLogo : props == "arbitrum" ? ARBLogo : "")
+                            ? props == "optimism"
+                              ? OPLogo
+                              : props == "arbitrum"
+                              ? ARBLogo
+                              : ""
                             : daos.profilePicture
                         }
                         alt="Image not found"
@@ -219,13 +238,18 @@ function DelegatesList({ props }: { props: string }) {
                         height={80}
                         className="rounded-full"
                       ></Image>
-                    
-                    <Image 
-                      src={ccLogo}
-                      alt="ChoraClub Logo"
-                      className="absolute top-0 right-0"
-                      style={{ width: '35px', height: '35px', marginTop:"-20px", marginRight:"-5px" }}
-                    />
+
+                      <Image
+                        src={ccLogo}
+                        alt="ChoraClub Logo"
+                        className="absolute top-0 right-0"
+                        style={{
+                          width: "35px",
+                          height: "35px",
+                          marginTop: "-20px",
+                          marginRight: "-5px",
+                        }}
+                      />
                     </div>
                     <div className="text-center">
                       <div className="py-3">
@@ -299,31 +323,16 @@ function DelegatesList({ props }: { props: string }) {
                 </div>
               ))}
             </div>
-            {/* <div
-              className={`pe-4 pt-12 flex items-center justify-center gap-10 ${
-                isPageLoading ? "hidden" : ""
-              } `}
-            >
-              <button
-                disabled={currentPage == 0}
-                className={`text-white px-4 py-1 rounded-md font-semibold ${
-                  currentPage == 0 ? "bg-[#6B98FF]" : "bg-blue-shade-100"
-                }`}
-                onClick={() =>
-                  setCurrentPage((prev) => (prev > 0 ? prev - 1 : prev))
-                }
-              >
-                Previous
-              </button>
-              <button
-                className="bg-blue-shade-100 text-white px-6 py-1 rounded-md font-semibold"
-                onClick={() =>
-                  setCurrentPage((prev) => (prev < 1000 ? prev + 1 : prev))
-                }
-              >
-                Next
-              </button>
-            </div> */}
+            {isDataLoading && (
+              <div className="flex items-center justify-center my-4">
+                <RotatingLines
+                  visible={true}
+                  width="40"
+                  strokeColor="#0500FF"
+                  ariaLabel="oval-loading"
+                />
+              </div>
+            )}
           </div>
         ) : (
           <div className="flex flex-col justify-center items-center pt-10">

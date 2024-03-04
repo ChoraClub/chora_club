@@ -7,6 +7,7 @@ import search from "@/assets/images/daos/search.png";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Tile from "../utils/Tile";
 import SessionTile from "../utils/SessionTiles";
+import { Oval } from "react-loader-spinner";
 
 interface Session {
   booking_status: string;
@@ -27,7 +28,7 @@ function DelegatesSession({ props }: { props: string }) {
   const router = useRouter();
   const path = usePathname();
   const searchParams = useSearchParams();
-  const dao_name = props.charAt(0).toUpperCase() + props.slice(1);
+  const dao_name = props;
 
   const [sessionDetails, setSessionDetails] = useState([]);
   const [dataLoading, setDataLoading] = useState(true);
@@ -49,7 +50,7 @@ function DelegatesSession({ props }: { props: string }) {
         const result = await response.json();
         // console.log("resultt:", result);
         const resultData = await result.data;
-        // console.log("resultData", resultData);
+        console.log("resultData", resultData);
         if (Array.isArray(resultData)) {
           const filtered: any = resultData.filter((session: Session) => {
             if (searchParams.get("session") === "upcoming") {
@@ -60,6 +61,7 @@ function DelegatesSession({ props }: { props: string }) {
           });
           // console.log("filtered", filtered);
           setSessionDetails(filtered);
+          setDataLoading(false);
         } else {
           console.error("API response is not an array:", result);
         }
@@ -74,7 +76,6 @@ function DelegatesSession({ props }: { props: string }) {
 
   useEffect(() => {
     setSessionDetails([]);
-    setDataLoading(false);
   }, [props]);
 
   return (
@@ -125,22 +126,46 @@ function DelegatesSession({ props }: { props: string }) {
         </div>
 
         <div className="py-10">
-          {searchParams.get("session") === "upcoming" && (
-            <SessionTile
-              sessionDetails={sessionDetails}
-              dataLoading={dataLoading}
-              isEvent="Upcoming"
-              isOfficeHour={false}
-            />
-          )}
-          {searchParams.get("session") === "recorded" && (
-            <SessionTile
-              sessionDetails={sessionDetails}
-              dataLoading={dataLoading}
-              isEvent="Recorded"
-              isOfficeHour={false}
-            />
-          )}
+          {searchParams.get("session") === "upcoming" &&
+            (dataLoading ? (
+              <div className="flex items-center justify-center">
+                <Oval
+                  visible={true}
+                  height="40"
+                  width="40"
+                  color="#0500FF"
+                  secondaryColor="#cdccff"
+                  ariaLabel="oval-loading"
+                />
+              </div>
+            ) : (
+              <SessionTile
+                sessionDetails={sessionDetails}
+                dataLoading={dataLoading}
+                isEvent="Upcoming"
+                isOfficeHour={false}
+              />
+            ))}
+          {searchParams.get("session") === "recorded" &&
+            (dataLoading ? (
+              <div className="flex items-center justify-center">
+                <Oval
+                  visible={true}
+                  height="40"
+                  width="40"
+                  color="#0500FF"
+                  secondaryColor="#cdccff"
+                  ariaLabel="oval-loading"
+                />
+              </div>
+            ) : (
+              <SessionTile
+                sessionDetails={sessionDetails}
+                dataLoading={dataLoading}
+                isEvent="Recorded"
+                isOfficeHour={false}
+              />
+            ))}
         </div>
       </div>
     </div>

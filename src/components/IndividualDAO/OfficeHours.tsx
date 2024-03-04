@@ -3,6 +3,7 @@ import search from "@/assets/images/daos/search.png";
 import Image from "next/image";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Tile from "../utils/Tile";
+import { Oval } from "react-loader-spinner";
 
 interface Session {
   _id: string;
@@ -72,7 +73,6 @@ function OfficeHours({ props }: { props: string }) {
   useEffect(() => {
     // Set initial session details
     setSessionDetails([]);
-    setDataLoading(true);
   }, [props]);
 
   return (
@@ -135,32 +135,68 @@ function OfficeHours({ props }: { props: string }) {
         </div>
 
         <div className="py-10">
-          {searchParams.get("hours") === "ongoing" && (
-            <Tile
-              sessionDetails={sessionDetails}
-              dataLoading={dataLoading}
-              isEvent="Ongoing"
-              isOfficeHour={true}
-            />
-          )}
-          {searchParams.get("hours") === "upcoming" && (
-            <Tile
-              sessionDetails={sessionDetails}
-              dataLoading={dataLoading}
-              isEvent="Upcoming"
-              isOfficeHour={true}
-            />
-          )}
-          {searchParams.get("hours") === "recorded" && (
-            <div>
+          {searchParams.get("hours") === "ongoing" &&
+            (dataLoading ? (
+              <div className="flex items-center justify-center">
+                <Oval
+                  visible={true}
+                  height="40"
+                  width="40"
+                  color="#0500FF"
+                  secondaryColor="#cdccff"
+                  ariaLabel="oval-loading"
+                />
+              </div>
+            ) : (
               <Tile
                 sessionDetails={sessionDetails}
                 dataLoading={dataLoading}
-                isEvent="Recorded"
+                isEvent="Ongoing"
                 isOfficeHour={true}
               />
-            </div>
-          )}
+            ))}
+          {searchParams.get("hours") === "upcoming" &&
+            (dataLoading ? (
+              <div className="flex items-center justify-center">
+                <Oval
+                  visible={true}
+                  height="40"
+                  width="40"
+                  color="#0500FF"
+                  secondaryColor="#cdccff"
+                  ariaLabel="oval-loading"
+                />
+              </div>
+            ) : (
+              <Tile
+                sessionDetails={sessionDetails}
+                dataLoading={dataLoading}
+                isEvent="Upcoming"
+                isOfficeHour={true}
+              />
+            ))}
+          {searchParams.get("hours") === "recorded" &&
+            (dataLoading ? (
+              <div className="flex items-center justify-center">
+                <Oval
+                  visible={true}
+                  height="40"
+                  width="40"
+                  color="#0500FF"
+                  secondaryColor="#cdccff"
+                  ariaLabel="oval-loading"
+                />
+              </div>
+            ) : (
+              <div>
+                <Tile
+                  sessionDetails={sessionDetails}
+                  dataLoading={dataLoading}
+                  isEvent="Recorded"
+                  isOfficeHour={true}
+                />
+              </div>
+            ))}
         </div>
       </div>
     </div>

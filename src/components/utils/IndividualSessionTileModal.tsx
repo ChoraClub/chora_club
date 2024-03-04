@@ -1,10 +1,5 @@
 import React, { useRef, useEffect } from "react";
 
-interface AttestationObject {
-  attendee_address: string;
-  attendee_uid: string;
-}
-
 interface IndividualTileModalProps {
   title: string;
   description: string;
@@ -12,20 +7,22 @@ interface IndividualTileModalProps {
   videoUrl: string;
   date: string;
   host: string;
-  attendees: AttestationObject[];
+  attendee: string;
   host_attestation: string;
+  attendee_attestation: string;
   onClose: () => void;
 }
 
-function IndividualTileModal({
+function IndividualSessionTileModal({
   title,
   description,
   videoUrl,
   date,
   host,
-  attendees,
+  attendee,
   dao,
   host_attestation,
+  attendee_attestation,
   onClose,
 }: IndividualTileModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
@@ -45,8 +42,6 @@ function IndividualTileModal({
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [onClose]);
-
-  useEffect(() => console.log("Attendees: ", attendees), []);
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
@@ -120,31 +115,24 @@ function IndividualTileModal({
                     </td>
                   </tr>
                   <tr>
-                    <td className="font-semibold pr-4">Attendees:</td>
-                    {attendees?.map((attendee, index) => (
-                      // <div className="">
-                      <li className="list-decimal">
-                        {/* <td> */}
-                        {attendee.attendee_address}
-                        <a
-                          href={
-                            dao === "optimism" || "Optimism"
-                              ? `https://optimism.easscan.org/attestation/view/${attendee.attendee_uid}`
-                              : dao === "arbitrum" || "Arbitrum"
-                              ? `https://arbitrum.easscan.org/attestation/view/${attendee.attendee_uid}`
-                              : ""
-                          }
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          style={{ color: "blue" }}
-                          className="px-2"
-                        >
-                          View↗️
-                        </a>
-                        {/* </td> */}
-                      </li>
-                      // </div>
-                    ))}
+                    <td className="font-semibold pr-4">Attendee:</td>
+                    <td>
+                      {attendee}{" "}
+                      <a
+                        href={
+                          dao === "optimism" || "Optimism"
+                            ? `https://optimism.easscan.org/attestation/view/${attendee_attestation}`
+                            : dao === "arbitrum" || "Arbitrum"
+                            ? `https://arbitrum.easscan.org/attestation/view/${attendee_attestation}`
+                            : ""
+                        }
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ color: "blue" }}
+                      >
+                        View↗️
+                      </a>
+                    </td>
                   </tr>
                   <tr>
                     <td className="font-semibold pr-4">Date:</td>
@@ -170,4 +158,4 @@ function IndividualTileModal({
   );
 }
 
-export default IndividualTileModal;
+export default IndividualSessionTileModal;

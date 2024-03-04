@@ -32,9 +32,9 @@ function DelegateSessions({ props }: { props: Type }) {
 
   const [dataLoading, setDataLoading] = useState(true);
   const [sessionDetails, setSessionDetails] = useState([]);
-  const daoName = props.daoDelegates;
+  const dao_name = props.daoDelegates;
 
-  const dao_name = daoName.charAt(0).toUpperCase() + daoName.slice(1);
+  // const dao_name = daoName.charAt(0).toUpperCase() + daoName.slice(1);
 
   const getMeetingData = async () => {
     try {

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import Image, { StaticImageData } from "next/image";
 import { Oval } from "react-loader-spinner";
-import IndividualTileModal from "./IndividualTileModal";
 import text2 from "@/assets/images/daos/texture2.png";
+import IndividualSessionTileModal from "./IndividualSessionTileModal";
 
 interface Type {
   img: StaticImageData;
@@ -127,7 +127,7 @@ function SessionTile({
       )}
 
       {selectedTileIndex !== null && isEvent === "Recorded" ? (
-        <IndividualTileModal
+        <IndividualSessionTileModal
           title={sessionDetails[selectedTileIndex].title}
           description={sessionDetails[selectedTileIndex].description}
           videoUrl={sessionDetails[selectedTileIndex].videoUrl || ""}
@@ -135,7 +135,8 @@ function SessionTile({
           host={sessionDetails[selectedTileIndex].host_address}
           attendee={sessionDetails[selectedTileIndex].user_address}
           dao={sessionDetails[selectedTileIndex].dao_name}
-          attestation_uid={sessionDetails[selectedTileIndex].uid_attendee}
+          host_attestation={sessionDetails[selectedTileIndex].uid_host}
+          attendee_attestation={sessionDetails[selectedTileIndex].uid_attendee}
           onClose={closeModal}
         />
       ) : null}
