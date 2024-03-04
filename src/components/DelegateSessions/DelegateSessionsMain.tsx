@@ -55,7 +55,7 @@ function DelegateSessionsMain() {
         if (response.success) {
           // console.log("response", response.data);
           setAPIData(response.data);
-          // setDaoInfo(response.data);
+          setDaoInfo(response.data);
           setIsPageLoading(false);
         }
       } catch (error) {
@@ -63,11 +63,11 @@ function DelegateSessionsMain() {
       }
     };
     fetchData();
-  }, [daoInfo, APIData]);
+  }, []);
 
   useEffect(() => {
     setIsPageLoading(false);
-  }, [selectedDao]);
+  }, []);
 
   const handleCopy = (addr: string) => {
     copy(addr);
