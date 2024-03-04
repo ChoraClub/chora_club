@@ -13,11 +13,11 @@ interface RoomDetails {
 
 export default async function Home() {
   const createRandomRoom = async () => {
-    const { address } = useAccount();
+    // const { address } = useAccount();
     // if (isDisconnected) {
     //   toast.error("connect your wallet");
     // }
-    console.log("this izz adddaraaa", address);
+    // console.log("this izz adddaraaa", address);
     const response = await fetch(
       "https://api.huddle01.com/api/v1/create-room",
       {
