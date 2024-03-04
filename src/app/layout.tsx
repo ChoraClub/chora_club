@@ -50,16 +50,16 @@ export default function RootLayout({
         `}
       </Script>
       <body className={`${quanty.variable} ${poppins.variable}`}>
+        <noscript>
+          <iframe
+            src="https://www.googletagmanager.com/ns.html?id=GTM-W5684W77"
+            height="0"
+            width="0"
+            style={{ display: "none", visibility: "hidden" }}
+          ></iframe>
+        </noscript>
         <RootProviders>
           <HuddleContextProvider>
-            <noscript>
-              <iframe
-                src="https://www.googletagmanager.com/ns.html?id=GTM-W5684W77"
-                height="0"
-                width="0"
-                style={{ display: "none", visibility: "hidden" }}
-              ></iframe>
-            </noscript>
             <div className="flex">
               <div className="fixed w-[6%] bg-blue-shade-100 h-screen mr-4 lg:mr-8 ">
                 <SidebarMain />

@@ -43,6 +43,29 @@ function DelegateSessionsMain() {
   const [APIData, setAPIData] = useState<Array<Type>>([]);
 
   useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const requestOptions: any = {
+          method: "GET",
+          redirect: "follow",
+        };
+
+        const result = await fetch("/api/get-availability", requestOptions);
+        const response = await result.json();
+        if (response.success) {
+          // console.log("response", response.data);
+          setAPIData(response.data);
+          // setDaoInfo(response.data);
+          setIsPageLoading(false);
+        }
+      } catch (error) {
+        console.error("Error Fetching Data of availability:", error);
+      }
+    };
+    fetchData();
+  }, [daoInfo, APIData]);
+
+  useEffect(() => {
     setIsPageLoading(false);
   }, [selectedDao]);
 
@@ -61,16 +84,16 @@ function DelegateSessionsMain() {
     setDaoInfo(filtered);
   };
 
-  const handleDaoChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleDaoChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selected = e.target.value;
     setSelectedDao(selected);
     let filtered: any;
     if (selected === "All-DAOS") {
-      filtered = APIData;
+      setDaoInfo(APIData);
     } else {
       filtered = APIData.filter((item) => item.dao_name === selected);
+      setDaoInfo(filtered);
     }
-    setDaoInfo(filtered);
   };
 
   const generateTimeOptions = () => {
@@ -87,31 +110,6 @@ function DelegateSessionsMain() {
   };
 
   const timeOptions = generateTimeOptions();
-
-  useEffect(() => {
-    let tempData: any;
-    const fetchData = async () => {
-      try {
-        const requestOptions: any = {
-          method: "GET",
-          redirect: "follow",
-        };
-
-        const result = await fetch("/api/get-availability", requestOptions);
-        const response = await result.json();
-        if (response.success) {
-          // console.log("response", response.data);
-          setAPIData(response.data);
-          tempData = await response.data;
-          // setDaoInfo(response.data);
-        }
-      } catch (error) {
-        console.error("Error Fetching Data of availability:", error);
-      }
-    };
-    fetchData();
-    setDaoInfo(tempData);
-  }, [APIData]);
 
   return (
     <>
