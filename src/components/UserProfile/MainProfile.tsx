@@ -578,17 +578,18 @@ function MainProfile() {
               >
                 <div className="w-40 h-40 flex items-center justify-content ">
                   <div className="flex justify-center items-center w-40 h-40"> 
-                      <Image
-                        src={
+                  <Image
+                      src={
                           (displayImage
-                            ? `https://gateway.lighthouse.storage/ipfs/${displayImage}`
-                            : karmaImage) || (chain?.name==="Optimism" ? OPLogo : chain?.name==="Arbitrum One"?ArbLogo : ccLogo)
-                        }
-                        alt="user"
-                        width={256}
-                        height={256}
-                        className="w-20 h-20 rounded-3xl"
-                      />
+                              ? `https://gateway.lighthouse.storage/ipfs/${displayImage}`
+                              : karmaImage) || (chain?.name==="Optimism" ? OPLogo : chain?.name==="Arbitrum One"?ArbLogo : ccLogo)
+                      }
+                      alt="user"
+                      width={256}
+                      height={256}
+                      className={displayImage ? "w-40 h-40 rounded-3xl" : "w-20 h-20 rounded-3xl"}
+                  />
+
                   </div>
 
                   <Image 
