@@ -173,9 +173,9 @@ function MainProfile() {
     const addr = await walletClient.getAddresses();
     const address1 = addr[0];
     
-    const contractAddress = chain.name === "Optimism" 
+    const contractAddress = chain?.name === "Optimism" 
         ? "0x4200000000000000000000000000000000000042"
-        : chain.name === "Arbitrum One"
+        : chain?.name === "Arbitrum One"
             ? "0x912CE59144191C1204E64559FE8253a0e49E6548"
             : "";
     console.log("Contract", contractAddress)
@@ -250,9 +250,9 @@ function MainProfile() {
       try {
         // Fetch data from your backend API to check if the address exists
         let dao = "";
-        if (chain && chain.name === "Optimism") {
+        if (chain && chain?.name === "Optimism") {
           dao = "optimism";
-        } else if (chain && chain.name === "Arbitrum One") {
+        } else if (chain && chain?.name === "Arbitrum One") {
           dao = "arbitrum";
         } else {
           return;
@@ -288,9 +288,9 @@ function MainProfile() {
           );
           // Data not found in the database, fetch data from the third-party API
           let dao = "";
-          if (chain && chain.name === "Optimism") {
+          if (chain && chain?.name === "Optimism") {
             dao = "optimism";
-          } else if (chain && chain.name === "Arbitrum One") {
+          } else if (chain && chain?.name === "Arbitrum One") {
             dao = "arbitrum";
           } else {
             return;
@@ -397,9 +397,9 @@ function MainProfile() {
     try {
       // Make a request to your backend API to check if the address exists
       let dao = "";
-      if (chain && chain.name === "Optimism") {
+      if (chain && chain?.name === "Optimism") {
         dao = "optimism";
-      } else if (chain && chain.name === "Arbitrum One") {
+      } else if (chain && chain?.name === "Arbitrum One") {
         dao = "arbitrum";
       } else {
         return;
@@ -428,9 +428,9 @@ function MainProfile() {
     try {
       // Call the POST API function for adding a new delegate
       let dao = "";
-      if (chain && chain.name === "Optimism") {
+      if (chain && chain?.name === "Optimism") {
         dao = "optimism";
-      } else if (chain && chain.name === "Arbitrum One") {
+      } else if (chain && chain?.name === "Arbitrum One") {
         dao = "arbitrum";
       } else {
         return;
@@ -511,9 +511,9 @@ function MainProfile() {
       console.log("Description", description);
       try {
         let dao = "";
-        if (chain && chain.name === "Optimism") {
+        if (chain && chain?.name === "Optimism") {
           dao = "optimism";
-        } else if (chain && chain.name === "Arbitrum One") {
+        } else if (chain && chain?.name === "Arbitrum One") {
           dao = "arbitrum";
         } else {
           return;

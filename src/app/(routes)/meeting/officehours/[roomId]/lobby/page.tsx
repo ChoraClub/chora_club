@@ -25,6 +25,7 @@ import {
   useRoom,
   useLocalPeer,
 } from "@huddle01/react/hooks";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 type lobbyProps = {};
 
@@ -43,7 +44,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
     isHandRaised: boolean;
   }>();
 
-  const { address } = useAccount();
+  const { address, isDisconnected } = useAccount();
 
   const { push } = useRouter();
 
@@ -51,43 +52,66 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
   const { joinRoom, state, room } = useRoom();
   console.log("role from startspace", role);
 
- 
-
   const handleStartSpaces = async () => {
     setIsJoining(true);
+
+    const userDisplayName = "demoNamefromDemo";
+    if (isDisconnected) {
+      toast.error("account is not connected");
+    }
+
     let token = "";
     if (state !== "connected") {
+      const requestBody = {
+        roomId: params.roomId,
+        role: "host",
+        displayName: address,
+        address: address, // assuming you have userAddress defined somewhere
+      };
       try {
-        const response = await fetch(`/api/token?roomId=${params.roomId}`);
-        token = await response.text();
-        console.log(response);
+        const response = await fetch("/api/new-token", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(requestBody),
+        });
+
+        // if (!response.ok) {
+        //   throw new Error("Failed to fetch token");
+        // }
+
+        token = await response.text(); // Change this line
+        console.log("Token fetched successfully:", token);
       } catch (error) {
         console.error("Error fetching token:", error);
-        toast.error("Error fetching token. Please try again.");
-        setIsJoining(false); // Reset joining state
+        // Handle error appropriately, e.g., show error message to user
+        toast.error("Failed to fetch token");
+        setIsJoining(false);
         return;
       }
     }
 
     if (!userDisplayName.length) {
       toast.error("Display name is required!");
-      setIsJoining(false); // Reset joining state
+      setIsJoining(false);
       return;
     }
 
     try {
+      console.log({ token });
+      console.log(params.roomId);
       await joinRoom({
         roomId: params.roomId,
         token,
       });
-
-
-      setIsJoining(false); // Reset joining state
     } catch (error) {
-      console.error("Error starting spaces:", error);
-      toast.error("Error starting spaces. Please try again.");
-      setIsJoining(false); // Reset joining state
+      console.error("Error joining room:", error);
+      // Handle error appropriately, e.g., show error message to user
+      toast.error("Failed to join room");
     }
+
+    setIsJoining(false);
   };
 
   useEffect(() => {
@@ -109,6 +133,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
             quality={100}
             priority
           />
+
           <video
             src={avatarUrl}
             muted
@@ -116,6 +141,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
             // autoPlay
             loop
           />
+
           <button
             onClick={() => setIsOpen((prev) => !prev)}
             type="button"
@@ -159,6 +185,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
             </div>
           </FeatCommon>
         </div>
+        {isDisconnected ? <ConnectButton /> : null}
         <div className="flex items-center w-full flex-col">
           <div className="flex flex-col justify-center w-full gap-1 text-black">
             Set a display name
