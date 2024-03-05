@@ -7,15 +7,30 @@ import Image from "next/image";
 import { FaCircleCheck, FaCircleXmark, FaCirclePlay } from "react-icons/fa6";
 import { Tooltip } from "@nextui-org/react";
 import EventTile from "../../utils/EventTile";
-import { useAccount } from "wagmi";
+import { useAccount, useNetwork } from "wagmi";
 import toast, { Toaster } from "react-hot-toast";
 import { Oval } from "react-loader-spinner";
+
+interface Session {
+  booking_status: string;
+  dao_name: string;
+  description: string;
+  host_address: string;
+  joined_status: string;
+  meetingId: string;
+  meeting_status: "Upcoming" | "Recorded" | "Denied";
+  slot_time: string;
+  title: string;
+  user_address: string;
+  _id: string;
+}
 
 function BookedUserSessions() {
   const { address } = useAccount();
   // const address = "0x5e349eca2dc61abcd9dd99ce94d04136151a09ee";
   const [sessionDetails, setSessionDetails] = useState([]);
   const [pageLoading, setPageLoading] = useState(true);
+  const { chain, chains } = useNetwork();
 
   const getMeetingData = async () => {
     try {
@@ -27,8 +42,18 @@ function BookedUserSessions() {
       });
       const result = await response.json();
       // console.log("result in get meeting", result);
+      let filteredData: any = result.data;
       if (result.success) {
-        setSessionDetails(result.data);
+        if (chain?.name === "Optimism") {
+          filteredData = result.data.filter(
+            (session: Session) => session.dao_name === "optimism"
+          );
+        } else if (chain?.name === "Arbitrum One") {
+          filteredData = result.data.filter(
+            (session: Session) => session.dao_name === "arbitrum"
+          );
+        }
+        setSessionDetails(filteredData);
         setPageLoading(false);
       } else {
         setPageLoading(false);

@@ -61,9 +61,10 @@ function BookSession({ props }: { props: Type }) {
       setTimeout(() => {
         getAvailability();
         getSlotTimeAvailability();
-      }, 3000);
+        // setIsPageLoading(false);
+      }, 1000);
     }
-    setIsPageLoading(false);
+    // setIsPageLoading(false);
 
     return () => {
       clearTimeout(loadingTimeout);
@@ -108,6 +109,7 @@ function BookSession({ props }: { props: Type }) {
         );
         console.log("extractedSlotTimes", extractedSlotTimes);
         setSlotTimes(extractedSlotTimes);
+        setIsPageLoading(false);
 
         // Assuming bookedSlots is an array of Date objects
         const newBookedSlots: any = [
@@ -120,6 +122,7 @@ function BookSession({ props }: { props: Type }) {
       }
     } catch (error) {
       console.log("error in catch", error);
+      setIsPageLoading(false);
     }
   };
 
