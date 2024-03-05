@@ -5,12 +5,9 @@ import { Pagination } from "@nextui-org/react";
 import { cacheExchange, createClient, fetchExchange, gql } from "urql/core";
 import styles from "../IndividualDelegate/DelegateVotes.module.css";
 import { Oval } from "react-loader-spinner";
-import { useAccount} from "wagmi";
-import { useNetwork } from 'wagmi'
+import { useAccount } from "wagmi";
+import { useNetwork } from "wagmi";
 Chart.register(ArcElement, Tooltip, Legend);
-
-
-
 
 const op_client = createClient({
   url: "https://api.thegraph.com/subgraphs/name/show-karma/dao-onchain-voting-optimism",
@@ -22,7 +19,7 @@ const arb_client = createClient({
   exchanges: [cacheExchange, fetchExchange],
 });
 function UserVotes() {
-  const {address} = useAccount();
+  const { address } = useAccount();
   const { chain, chains } = useNetwork();
   const [first, setfirst] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -82,7 +79,7 @@ function UserVotes() {
     const fetchGraphData = async () => {
       if (chain && chain.name == "Optimism") {
         const op_gqdata: any = await op_client.query(opQuery, {
-          address: address
+          address: address,
         });
         console.log("Urql: ", op_gqdata.data.votes);
         setGraphData(op_gqdata.data.votes);
@@ -158,46 +155,11 @@ function UserVotes() {
 
   return (
     <div className="pt-4">
-       <div className="grid grid-cols-5 pe-5 gap-4 pb-6">
-      <div
-        style={{ boxShadow: "0px 4px 15.1px 0px rgba(0, 0, 0, 0.17)" }}
-        className="col-span-2 space-y-4 p-10 rounded-xl"
-      >
-        {isPageLoading ? (
-          <div className="flex pt-6 justify-center">
-            <Oval
-              visible={true}
-              height="40"
-              width="40"
-              color="#0500FF"
-              secondaryColor="#cdccff"
-              ariaLabel="oval-loading"
-            />
-          </div>
-        ) : first && !isPageLoading && pageData.length > 0 ? (
-          <Doughnut
-            data={chartData}
-            width={700}
-            height={350}
-            options={{
-              maintainAspectRatio: false,
-            }}
-          />
-        ) : (
-          <div className="flex text-center font-semibold h-full">
-            Sorry, you have not submitted any on chain votes!
-          </div>
-        )}
-      </div>
-      <div
-        style={{ boxShadow: "0px 4px 11.8px 0px rgba(0, 0, 0, 0.21)" }}
-        className="min-h-10 rounded-xl col-span-3 p-7"
-      >
-        <div className="font-semibold text-blue-shade-200 text-2xl py-2 ">
-          List of Proposals
-        </div>
-
-        <div className={`h-[23rem] overflow-y-auto ${styles.scrollbar}`}>
+      <div className="grid grid-cols-5 pe-5 gap-4 pb-6">
+        <div
+          style={{ boxShadow: "0px 4px 15.1px 0px rgba(0, 0, 0, 0.17)" }}
+          className="col-span-2 space-y-4 p-10 rounded-xl"
+        >
           {isPageLoading ? (
             <div className="flex pt-6 justify-center">
               <Oval
@@ -210,72 +172,106 @@ function UserVotes() {
               />
             </div>
           ) : first && !isPageLoading && pageData.length > 0 ? (
-            pageData.map((proposal: any, index: number) => (
-              <div
-                key={index}
-                className={`flex justify-between border border-[#7C7C7C] text-sm px-3 py-2 rounded-lg items-center my-3 `}
-              >
-                <div className="w-4/5">
-                  <div className={`${openDesc[index] ? "" : styles.desc}`}>
-                    {proposal.proposal.description}
-                  </div>
-                  <span
-                    className="text-xs text-blue-shade-100 underline cursor-pointer"
-                    onClick={() => {
-                      const newOpenDesc = [...openDesc];
-                      newOpenDesc[index] = !newOpenDesc[index];
-                      setOpenDesc(newOpenDesc);
-                    }}
-                  >
-                    {openDesc[index] ? "Close" : "View"}
-                  </span>
-                </div>
-                <div
-                  className={`text-white rounded-full px-3 py-[2px] ${
-                    proposal.support === 1
-                      ? "bg-[#0033A8]"
-                      : proposal.support === 0
-                      ? "bg-[#6B98FF]"
-                      : "bg-[#004DFF]"
-                  }`}
-                >
-                  {proposal.support === 1
-                    ? "For"
-                    : proposal.support === 0
-                    ? "Against"
-                    : "Other"}
-                </div>
-              </div>
-            ))
+            <Doughnut
+              data={chartData}
+              width={700}
+              height={350}
+              options={{
+                maintainAspectRatio: false,
+              }}
+            />
           ) : (
-            <div className="pt-4 flex items-center flex-col justify-center">
-              <div className="text-3xl">☹️</div>
-              <div>Oops, no data available</div>
+            <div className="flex text-center font-semibold h-full">
+              Sorry, you have not submitted any on chain votes!
             </div>
           )}
         </div>
-
-        {isPageLoading ? (
-          ""
-        ) : (
-          <div
-            className={`pt-4 flex items-end bottom-0 justify-center ${
-              graphData.length == 0 ? "hidden" : ""
-            }`}
-          >
-            <Pagination
-              color="primary"
-              total={totalPages}
-              initialPage={1}
-              page={currentPage}
-              onChange={setCurrentPage}
-              showControls
-            />
+        <div
+          style={{ boxShadow: "0px 4px 11.8px 0px rgba(0, 0, 0, 0.21)" }}
+          className="min-h-10 rounded-xl col-span-3 p-7"
+        >
+          <div className="font-semibold text-blue-shade-200 text-2xl py-2 ">
+            List of Proposals
           </div>
-        )}
-      </div>
-    </div>
 
+          <div className={`h-[23rem] overflow-y-auto ${styles.scrollbar}`}>
+            {isPageLoading ? (
+              <div className="flex pt-6 justify-center">
+                <Oval
+                  visible={true}
+                  height="40"
+                  width="40"
+                  color="#0500FF"
+                  secondaryColor="#cdccff"
+                  ariaLabel="oval-loading"
+                />
+              </div>
+            ) : first && !isPageLoading && pageData.length > 0 ? (
+              pageData.map((proposal: any, index: number) => (
+                <div
+                  key={index}
+                  className={`flex justify-between border border-[#7C7C7C] text-sm px-3 py-2 rounded-lg items-center my-3 `}
+                >
+                  <div className="w-4/5 break-words">
+                    <div className={`${openDesc[index] ? "" : styles.desc}`}>
+                      {proposal.proposal.description}
+                    </div>
+                    <span
+                      className="text-xs text-blue-shade-100 underline cursor-pointer"
+                      onClick={() => {
+                        const newOpenDesc = [...openDesc];
+                        newOpenDesc[index] = !newOpenDesc[index];
+                        setOpenDesc(newOpenDesc);
+                      }}
+                    >
+                      {openDesc[index] ? "Close" : "View"}
+                    </span>
+                  </div>
+                  <div
+                    className={`text-white rounded-full px-3 py-[2px] ${
+                      proposal.support === 1
+                        ? "bg-[#0033A8]"
+                        : proposal.support === 0
+                        ? "bg-[#6B98FF]"
+                        : "bg-[#004DFF]"
+                    }`}
+                  >
+                    {proposal.support === 1
+                      ? "For"
+                      : proposal.support === 0
+                      ? "Against"
+                      : "Other"}
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="pt-4 flex items-center flex-col justify-center">
+                <div className="text-3xl">☹️</div>
+                <div>Oops, no data available</div>
+              </div>
+            )}
+          </div>
+
+          {isPageLoading ? (
+            ""
+          ) : (
+            <div
+              className={`pt-4 flex items-end bottom-0 justify-center ${
+                graphData.length == 0 ? "hidden" : ""
+              }`}
+            >
+              <Pagination
+                color="primary"
+                total={totalPages}
+                initialPage={1}
+                page={currentPage}
+                onChange={setCurrentPage}
+                showControls
+              />
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

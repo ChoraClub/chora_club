@@ -21,7 +21,7 @@ function SpecificDAO({ props }: { props: { daoDelegates: string } }) {
   const searchParams = useSearchParams();
 
   return (
-    <div className="font-poppins py-6">
+    <div className="font-poppins py-6" id="secondSection">
       <div className="px-8 pb-5">
         <div className="flex justify-between pe-10">
           <div className="capitalize text-4xl text-blue-shade-100">

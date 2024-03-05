@@ -13,6 +13,7 @@ import { Oval, RotatingLines } from "react-loader-spinner";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import toast, { Toaster } from "react-hot-toast";
 import styles from "@/components/IndividualDelegate/DelegateVotes.module.css";
+import { FaArrowUp } from "react-icons/fa6";
 
 function DelegatesList({ props }: { props: string }) {
   const [delegateData, setDelegateData] = useState<any>({ delegates: [] });
@@ -26,6 +27,7 @@ function DelegatesList({ props }: { props: string }) {
   const path = usePathname();
   const searchParams = useSearchParams();
   const [isShowing, setIsShowing] = useState(true);
+  const [isSearching, setIsSearching] = useState<boolean>(false);
 
   const handleClose = () => {
     setIsShowing(false);
@@ -74,6 +76,7 @@ function DelegatesList({ props }: { props: string }) {
     if (query.length > 0) {
       // console.log("Delegate data: ", query, delegateData);
       // console.log(delegateData);
+      setIsSearching(true);
       window.removeEventListener("scroll", handleScroll);
 
       const res = await fetch(
@@ -86,6 +89,7 @@ function DelegatesList({ props }: { props: string }) {
       setPageLoading(false);
     } else {
       console.log("in else");
+      setIsSearching(false);
       setDelegateData({ ...delegateData, delegates: tempData.delegates });
       setPageLoading(false);
       window.addEventListener("scroll", handleScroll);
@@ -104,7 +108,9 @@ function DelegatesList({ props }: { props: string }) {
   };
 
   useEffect(() => {
-    window.addEventListener("scroll", handleScroll);
+    if (isSearching === false) {
+      window.addEventListener("scroll", handleScroll);
+    }
 
     return () => {
       window.removeEventListener("scroll", handleScroll);
@@ -135,6 +141,39 @@ function DelegatesList({ props }: { props: string }) {
       selectedValue === "Most active"
     ) {
       toast("Coming Soon 🚀");
+    }
+  };
+
+  const scrollToSection = (sectionId: string, duration = 1000) => {
+    const section = document.getElementById(sectionId);
+
+    if (section) {
+      const startingY = window.scrollY;
+      const targetY = section.offsetTop - 250;
+      const distance = targetY - startingY;
+      const startTime = performance.now();
+
+      function scrollStep(timestamp: any) {
+        const elapsed = timestamp - startTime;
+
+        window.scrollTo(
+          0,
+          startingY + easeInOutQuad(elapsed, 0, distance, duration)
+        );
+
+        if (elapsed < duration) {
+          requestAnimationFrame(scrollStep);
+        }
+      }
+
+      function easeInOutQuad(t: any, b: any, c: any, d: any) {
+        t /= d / 2;
+        if (t < 1) return (c / 2) * t * t + b;
+        t--;
+        return (-c / 2) * (t * (t - 2) - 1) + b;
+      }
+
+      requestAnimationFrame(scrollStep);
     }
   };
 
@@ -342,6 +381,15 @@ function DelegatesList({ props }: { props: string }) {
             </div>
           </div>
         )}
+      </div>
+
+      <div className="fixed right-5 bottom-5 cursor-pointer">
+        <div
+          className="bg-blue-shade-100 p-3 rounded-full"
+          onClick={() => scrollToSection("secondSection")}
+        >
+          <FaArrowUp size={25} color="white" />
+        </div>
       </div>
     </div>
   );
