@@ -1,0 +1,358 @@
+"use client";
+
+import React, { useState, useEffect } from "react";
+import search from "@/assets/images/daos/search.png";
+import Image, { StaticImageData } from "next/image";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { Oval } from "react-loader-spinner";
+import { IoCopy } from "react-icons/io5";
+import copy from "copy-to-clipboard";
+import toast, { Toaster } from "react-hot-toast";
+import opImg from "@/assets/images/daos/op.png";
+import arbImg from "@/assets/images/daos/arbitrum.jpg";
+import { Tooltip } from "@nextui-org/react";
+
+interface Type {
+  ensName: string;
+  dao_name: string;
+  userAddress: string;
+  timeSlotSizeMinutes: number;
+  allowedDates: string[];
+  dateAndRanges: {
+    date: string;
+    timeRanges: [string, string, string, string][];
+    formattedUTCTime_startTime: string;
+    utcTime_startTime: string;
+    formattedUTCTime_endTime: string;
+    utcTime_endTime: string;
+  }[];
+}
+
+function AvailableSessions() {
+  const router = useRouter();
+  const path = usePathname();
+  const searchParams = useSearchParams();
+  const [daoInfo, setDaoInfo] = useState<Array<Type>>([]);
+  const [APIData, setAPIData] = useState<Array<Type>>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isPageLoading, setIsPageLoading] = useState(true);
+  const [selectedDao, setSelectedDao] = useState<any>(null);
+  const [selectedDate, setSelectedDate] = useState<any>(null);
+  // new Date().toISOString().split("T")[0]
+  const [startTime, setStartTime] = useState<any>(null);
+  const [endTime, setEndTime] = useState<any>(null);
+
+  useEffect(() => {
+    setIsPageLoading(false);
+    console.log("selectedDate", selectedDate);
+  }, [selectedDate]);
+
+  const getLocalDateFormat = async (local: Date) => {
+    // Extract year, month, and day from local Date object
+    const year = local.getFullYear();
+    const month = (local.getMonth() + 1).toString().padStart(2, "0");
+    const day = local.getDate().toString().padStart(2, "0");
+
+    // Format local date
+    const localDateStr = `${year}-${month}-${day}`;
+    console.log("localDateStr", localDateStr);
+    return localDateStr;
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+
+        const localDate = new Date();
+        console.log("local date", localDate);
+        const localDateStr = await getLocalDateFormat(localDate);
+        const localToIso = localDate.toISOString().split("T")[0];
+
+        const raw = JSON.stringify({
+          dao_name: selectedDao,
+          date: selectedDate,
+          startTime: startTime,
+          endTime: endTime,
+        });
+
+        const requestOptions: any = {
+          method: "POST",
+          headers: myHeaders,
+          body: raw,
+          redirect: "follow",
+        };
+
+        const result = await fetch(
+          "/api/get-availability/filter",
+          requestOptions
+        );
+        const response = await result.json();
+        if (response.success) {
+          // console.log("response", response.data);
+          const resultData = await response.data;
+          setAPIData(resultData);
+          setDaoInfo(resultData);
+          setIsPageLoading(false);
+        }
+      } catch (error) {
+        console.error("Error Fetching Data of availability:", error);
+      }
+    };
+    fetchData();
+  }, []);
+
+  //   if (APIData) {
+  //     APIData.forEach((item: any) => {
+  //       // console.log("item", item);
+  //     });
+  //   }
+
+  const handleCopy = (addr: string) => {
+    copy(addr);
+    toast("Address Copied");
+  };
+
+  const handleSearchChange = (query: string) => {
+    setSearchQuery(query);
+    const filtered: any = APIData.filter(
+      (item) =>
+        item.ensName?.toLowerCase().includes(query.toLowerCase()) ||
+        item.userAddress.toLowerCase().includes(query.toLowerCase())
+    );
+    setDaoInfo(filtered);
+  };
+
+  const handleDaoChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selected = e.target.value;
+    setSelectedDao(selected);
+    let filtered: any;
+    if (selected === "All-DAOS") {
+      setDaoInfo(APIData);
+    } else {
+      filtered = APIData.filter((item) => item.dao_name === selected);
+      setDaoInfo(filtered);
+    }
+  };
+
+  const generateTimeOptions = () => {
+    const options = [];
+    for (let hour = 0; hour < 24; hour++) {
+      for (let minute = 0; minute < 60; minute += 15) {
+        const time = `${hour.toString().padStart(2, "0")}:${minute
+          .toString()
+          .padStart(2, "0")}`;
+        options.push(time);
+      }
+    }
+    return options;
+  };
+
+  const timeOptions = generateTimeOptions();
+  return (
+    <div>
+      <div className="flex">
+        <div
+          style={{ background: "rgba(238, 237, 237, 0.36)" }}
+          className="flex border-[0.5px] border-black w-fit rounded-full my-8 font-poppins"
+        >
+          <input
+            type="text"
+            placeholder="Search"
+            style={{ background: "rgba(238, 237, 237, 0.36)" }}
+            className="pl-5 rounded-full outline-none text-sm"
+            value={searchQuery}
+            onChange={(e) => handleSearchChange(e.target.value)}
+          ></input>
+          <span className="flex items-center bg-black rounded-full px-5 py-2">
+            <Image
+              className="min-w-[25px]"
+              src={search}
+              alt="search"
+              width={20}
+            />
+          </span>
+        </div>
+
+        <div className="flex items-center m-8">
+          <select
+            value={selectedDao}
+            onChange={handleDaoChange}
+            className="px-3 py-2 rounded-md border border-gray-300 "
+          >
+            <option value="All-DAOS">All DAOS</option>
+            <option value="optimism">Optimism</option>
+            <option value="arbitrum">Arbitrum</option>
+          </select>
+        </div>
+
+        <div className="flex items-center m-8">
+          <input
+            type="date"
+            value={selectedDate}
+            onChange={(e) => setSelectedDate(e.target.value)}
+            className="px-3 py-2 rounded-md border border-gray-300 mr-2"
+          />
+        </div>
+
+        <div className="flex items-center m-8 select-container">
+          <select
+            value={startTime}
+            onChange={(e) => setStartTime(e.target.value)}
+            className="px-3 py-2 rounded-md border border-gray-300 mr-2"
+          >
+            {timeOptions.map((time) => (
+              <option key={time} value={time}>
+                {time}
+              </option>
+            ))}
+          </select>
+          <span>to</span>
+          <select
+            value={endTime}
+            onChange={(e) => setEndTime(e.target.value)}
+            className="px-3 py-2 rounded-md border border-gray-300 ml-2"
+          >
+            {timeOptions.map((time) => (
+              <option key={time} value={time}>
+                {time}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      <div className="py-8 pe-10 font-poppins">
+        {isPageLoading ? (
+          <div className="flex items-center justify-center">
+            <Oval
+              visible={true}
+              height="40"
+              width="40"
+              color="#0500FF"
+              secondaryColor="#cdccff"
+              ariaLabel="oval-loading"
+            />
+          </div>
+        ) : daoInfo.length > 0 ? (
+          <div>
+            <div className="grid min-[475px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-10 ">
+              {daoInfo.map((daos: any, index: number) => (
+                <>
+                  <div
+                    key={index}
+                    style={{
+                      boxShadow: "0px 4px 50.8px 0px rgba(0, 0, 0, 0.11)",
+                    }}
+                    className="px-5 py-7 rounded-2xl flex flex-col justify-between"
+                  >
+                    <div>
+                      <div className="flex justify-center">
+                        <Image
+                          src={
+                            daos.profilePicture
+                              ? daos.profilePicture === null
+                                ? daos.dao_name === "optimism"
+                                  ? opImg
+                                  : daos.dao_name === "arbitrum"
+                                  ? arbImg
+                                  : ""
+                                : ""
+                              : daos.dao_name === "optimism"
+                              ? opImg
+                              : daos.dao_name === "arbitrum"
+                              ? arbImg
+                              : ""
+                          }
+                          alt="Image not found"
+                          width={80}
+                          height={80}
+                          className="rounded-full"
+                        ></Image>
+                      </div>
+
+                      <div className="text-center">
+                        <div className="py-3">
+                          <div className={`font-semibold overflow-hidden `}>
+                            {daos.ensName == null ? (
+                              <span>
+                                {daos.userAddress
+                                  ? daos.userAddress.slice(0, 6) +
+                                    "..." +
+                                    daos.userAddress.slice(-4)
+                                  : ""}
+                              </span>
+                            ) : (
+                              <span>
+                                {daos.ensName.length > 15
+                                  ? daos.ensName.slice(0, 15) + "..."
+                                  : daos.ensName}
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex justify-center items-center gap-2 pb-2 pt-1">
+                            {daos.userAddress
+                              ? daos.userAddress.slice(0, 6) +
+                                "..." +
+                                daos.userAddress.slice(-4)
+                              : ""}
+                            <Tooltip
+                              content="Copy"
+                              placement="right"
+                              closeDelay={1}
+                              showArrow
+                            >
+                              <span className="cursor-pointer text-sm">
+                                <IoCopy
+                                  onClick={() => handleCopy(daos.userAddress)}
+                                />
+                              </span>
+                            </Tooltip>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div>
+                      <button
+                        className="bg-blue-shade-100 text-white font-poppins w-full rounded-[4px] text-sm py-1 font-medium"
+                        onClick={() =>
+                          router.push(
+                            `/${daos.dao_name}/${daos.userAddress}?active=delegatesSession&session=book `
+                          )
+                        }
+                      >
+                        Book Session
+                      </button>
+                    </div>
+                    <Toaster
+                      toastOptions={{
+                        style: {
+                          fontSize: "14px",
+                          backgroundColor: "#3E3D3D",
+                          color: "#fff",
+                          boxShadow: "none",
+                          borderRadius: "50px",
+                          padding: "3px 5px",
+                        },
+                      }}
+                    />
+                  </div>
+                </>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-col justify-center items-center pt-10">
+            <div className="text-5xl">☹️</div>{" "}
+            <div className="pt-4 font-semibold text-lg">
+              Oops, no such result available!
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default AvailableSessions;
