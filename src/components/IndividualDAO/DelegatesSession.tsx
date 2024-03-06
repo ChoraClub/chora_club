@@ -31,6 +31,7 @@ function DelegatesSession({ props }: { props: string }) {
   const dao_name = props;
 
   const [sessionDetails, setSessionDetails] = useState([]);
+  const [tempSession, setTempSession] = useState([]);
   const [dataLoading, setDataLoading] = useState(true);
 
   // console.log("propspropsprops", dao_name);
@@ -60,7 +61,9 @@ function DelegatesSession({ props }: { props: string }) {
             }
           });
           // console.log("filtered", filtered);
+          setSearchQuery("")
           setSessionDetails(filtered);
+          setTempSession(filtered);
           setDataLoading(false);
         } else {
           console.error("API response is not an array:", result);
@@ -78,6 +81,42 @@ function DelegatesSession({ props }: { props: string }) {
     setSessionDetails([]);
   }, [props]);
 
+  const handleSearchChange = async (query: string) => {
+    setSearchQuery(query);
+
+    if (query.length > 0) {
+      setDataLoading(true);
+      const raw = JSON.stringify({
+        dao_name: dao_name,
+      });
+
+      const requestOptions: any = {
+        method: "POST",
+        body: raw,
+        redirect: "follow",
+      };
+      const res = await fetch(`/api/search-session/${query}`, requestOptions);
+      const result = await res.json();
+      const resultData = await result.data;
+
+      if (result.success) {
+        const filtered: any = resultData.filter((session: Session) => {
+          if (searchParams.get("session") === "upcoming") {
+            return session.meeting_status === "Upcoming";
+          } else if (searchParams.get("session") === "recorded") {
+            return session.meeting_status === "Recorded";
+          }
+        });
+        console.log("filtered: ", filtered);
+        setSessionDetails(filtered);
+        setDataLoading(false);
+      }
+    } else {
+      setSessionDetails(tempSession);
+      setDataLoading(false);
+    }
+  };
+
   return (
     <div className="font-poppins">
       <div
@@ -88,9 +127,9 @@ function DelegatesSession({ props }: { props: string }) {
           type="text"
           placeholder="Search"
           style={{ background: "rgba(238, 237, 237, 0.36)" }}
-          className="pl-5 rounded-full outline-none text-sm"
+          className="pl-5 rounded-full outline-none"
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          onChange={(e) => handleSearchChange(e.target.value)}
         ></input>
         <span className="flex items-center bg-black rounded-full px-5 py-2">
           <Image src={search} alt="search" width={20} />
@@ -144,6 +183,7 @@ function DelegatesSession({ props }: { props: string }) {
                 dataLoading={dataLoading}
                 isEvent="Upcoming"
                 isOfficeHour={false}
+                // query={searchQuery}
               />
             ))}
           {searchParams.get("session") === "recorded" &&
@@ -164,6 +204,7 @@ function DelegatesSession({ props }: { props: string }) {
                 dataLoading={dataLoading}
                 isEvent="Recorded"
                 isOfficeHour={false}
+                // query={searchQuery}
               />
             ))}
         </div>

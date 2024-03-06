@@ -23,6 +23,7 @@ interface TileProps {
   dataLoading: boolean;
   isEvent: string;
   isOfficeHour: boolean;
+  // query: string;
 }
 
 function SessionTile({
@@ -30,6 +31,7 @@ function SessionTile({
   dataLoading,
   isEvent,
   isOfficeHour,
+  // query,
 }: TileProps) {
   const [selectedTileIndex, setSelectedTileIndex] = useState<number | null>(
     null
@@ -53,12 +55,6 @@ function SessionTile({
   };
 
   const [pageLoading, setPageLoading] = useState(true);
-
-  // useEffect(() => {
-  //   if (sessionDetails.length > 0) {
-  //     setPageLoading(false);
-  //   }
-  // }, [sessionDetails]);
 
   return (
     <div className="space-y-6">

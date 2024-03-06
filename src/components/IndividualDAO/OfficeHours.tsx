@@ -24,6 +24,7 @@ function OfficeHours({ props }: { props: string }) {
   const dao_name = props.charAt(0).toUpperCase() + props.slice(1);
 
   const [sessionDetails, setSessionDetails] = useState([]);
+  const [tempDetails, setTempDetails] = useState([]);
   const [dataLoading, setDataLoading] = useState(true);
 
   useEffect(() => {
@@ -59,8 +60,9 @@ function OfficeHours({ props }: { props: string }) {
             return session.status === "inactive";
           }
         });
-
+        setSearchQuery("");
         setSessionDetails(filteredSessions);
+        setTempDetails(filteredSessions);
         setDataLoading(false);
       } catch (error) {
         console.error(error);
@@ -75,6 +77,47 @@ function OfficeHours({ props }: { props: string }) {
     setSessionDetails([]);
   }, [props]);
 
+  const handleSearchChange = async (query: string) => {
+    setSearchQuery(query);
+
+    if (query.length > 0) {
+      setDataLoading(true);
+      const raw = JSON.stringify({
+        dao_name: dao_name,
+      });
+
+      const requestOptions: any = {
+        method: "POST",
+        body: raw,
+        redirect: "follow",
+      };
+      const res = await fetch(
+        `/api/search-officehours/${query}`,
+        requestOptions
+      );
+      const result = await res.json();
+      const resultData = await result.data;
+
+      if (result.success) {
+        const filtered: any = resultData.filter((session: Session) => {
+          if (searchParams.get("hours") === "ongoing") {
+            return session.status === "ongoing";
+          } else if (searchParams.get("hours") === "upcoming") {
+            return session.status === "active";
+          } else if (searchParams.get("hours") === "recorded") {
+            return session.status === "inactive";
+          }
+        });
+        console.log("filtered: ", filtered);
+        setSessionDetails(filtered);
+        setDataLoading(false);
+      }
+    } else {
+      setSessionDetails(tempDetails);
+      setDataLoading(false);
+    }
+  };
+
   return (
     <div>
       <div
@@ -85,9 +128,9 @@ function OfficeHours({ props }: { props: string }) {
           type="text"
           placeholder="Search"
           style={{ background: "rgba(238, 237, 237, 0.36)" }}
-          className="pl-5 rounded-full outline-none text-sm"
+          className="pl-5 rounded-full outline-none"
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          onChange={(e) => handleSearchChange(e.target.value)}
         ></input>
         <span className="flex items-center bg-black rounded-full px-5 py-2">
           <Image src={search} alt="search" width={20} />

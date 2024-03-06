@@ -59,16 +59,8 @@ function DelegatesList({ props }: { props: string }) {
     fetchData();
   }, [currentPage]);
 
-  // useEffect(() => {
-  //   if (Number(searchParams.get("page")) >= 0) {
-  //     setCurrentPage(Number(searchParams.get("page")));
-  //   }
-  // }, []);
-
-  // console.log("dao-info: ", delegateData.delegates);
-
   const handleSearchChange = async (query: string) => {
-    console.log("query: ", query.length);
+    // console.log("query: ", query.length);
 
     setSearchQuery(query);
     setPageLoading(true);
@@ -84,11 +76,11 @@ function DelegatesList({ props }: { props: string }) {
       );
       const filtered = await res.json().then((delegates) => delegates.data);
 
-      console.log("Filtered Data: ", query, filtered);
+      // console.log("Filtered Data: ", query, filtered);
       setDelegateData({ delegates: filtered.delegates });
       setPageLoading(false);
     } else {
-      console.log("in else");
+      // console.log("in else");
       setIsSearching(false);
       setDelegateData({ ...delegateData, delegates: tempData.delegates });
       setPageLoading(false);
