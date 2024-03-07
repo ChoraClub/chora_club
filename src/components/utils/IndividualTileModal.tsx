@@ -114,37 +114,36 @@ function IndividualTileModal({
                         target="_blank"
                         rel="noopener noreferrer"
                         style={{ color: "blue" }}
+                        className="px-2"
                       >
                         View↗️
                       </a>
                     </td>
                   </tr>
                   <tr>
-                    <td className="font-semibold pr-4">Attendees:</td>
-                    {attendees?.map((attendee, index) => (
-                      // <div className="">
-                      <li className="list-decimal" key={index}>
-                        {/* <td> */}
-                        {attendee.attendee_address}
-                        <a
-                          href={
-                            dao === "optimism" || "Optimism"
-                              ? `https://optimism.easscan.org/attestation/view/${attendee.attendee_uid}`
-                              : dao === "arbitrum" || "Arbitrum"
-                              ? `https://arbitrum.easscan.org/attestation/view/${attendee.attendee_uid}`
-                              : ""
-                          }
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          style={{ color: "blue" }}
-                          className="px-2"
-                        >
-                          View↗️
-                        </a>
-                        {/* </td> */}
-                      </li>
-                      // </div>
-                    ))}
+                    <td className="font-semibold pr-4">Attendees:</td>{" "}
+                    <td>
+                      {attendees?.map((attendee, index) => (
+                        <li className="list-decimal" key={index}>
+                          {attendee.attendee_address}
+                          <a
+                            href={
+                              dao === "optimism" || "Optimism"
+                                ? `https://optimism.easscan.org/attestation/view/${attendee.attendee_uid}`
+                                : dao === "arbitrum" || "Arbitrum"
+                                ? `https://arbitrum.easscan.org/attestation/view/${attendee.attendee_uid}`
+                                : ""
+                            }
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{ color: "blue" }}
+                            className="px-3"
+                          >
+                            View↗️
+                          </a>
+                        </li>
+                      ))}
+                    </td>
                   </tr>
                   <tr>
                     <td className="font-semibold pr-4">Date:</td>

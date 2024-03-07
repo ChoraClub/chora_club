@@ -6,7 +6,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
   const query = req.url.split("search-officehours/")[1];
 
   const { dao_name } = await req.json();
-  // console.log("Dao name: ", dao_name);
+  console.log("Dao name: ", dao_name);
 
   // console.log(user_address);
   try {
@@ -24,19 +24,21 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
     // Find documents based on user_address
     // console.log("Finding documents for user:", user_address);
-    const documents = await collection
-      .find({
-        $and: [
-          {
-            $or: [
-              { title: { $regex: `\\b${query}`, $options: "i" } },
-              { address: { $regex: `\\b${query}`, $options: "i" } },
-            ],
-          },
-          { chain_name: dao_name }, // Condition for matching dao_name
-        ],
-      })
-      .toArray();
+
+    let filter: any = {
+      $or: [
+        { title: { $regex: `\\b${query}`, $options: "i" } },
+        { address: { $regex: `\\b${query}`, $options: "i" } },
+      ],
+    };
+
+    if (dao_name) {
+      filter = {
+        $and: [filter, { chain_name: dao_name }],
+      };
+    }
+
+    const documents = await collection.find(filter).toArray();
     // console.log("Documents found:", documents);
 
     client.close();

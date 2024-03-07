@@ -14,14 +14,23 @@ function AttendingUserSessions() {
   const [sessionDetails, setSessionDetails] = useState([]);
   const [pageLoading, setPageLoading] = useState(true);
   const { chain, chains } = useNetwork();
+  let dao_name = "";
 
   const getUserMeetingData = async () => {
+    if (chain?.name === "Optimism") {
+      dao_name = "optimism";
+    } else if (chain?.name === "Arbitrum One") {
+      dao_name = "arbitrum";
+    }
     try {
       const response = await fetch(`/api/get-session-data/${address}`, {
-        method: "GET",
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
+        body: JSON.stringify({
+          dao_name: dao_name,
+        }),
       });
 
       const result = await response.json();

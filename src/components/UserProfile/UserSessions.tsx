@@ -42,13 +42,24 @@ function UserSessions({ isDelegate, selfDelegate }: UserSessionsProps) {
   const [sessionDetails, setSessionDetails] = useState([]);
   const [dataLoading, setDataLoading] = useState(true);
 
+  let dao_name = "";
+
   const getUserMeetingData = async () => {
+    if (chain?.name === "Optimism") {
+      dao_name = "optimism";
+    } else if (chain?.name === "Arbitrum One") {
+      dao_name = "arbitrum";
+    }
     try {
+      // setDataLoading(true);
       const response = await fetch(`/api/get-session-data/${address}`, {
-        method: "GET",
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
+        body: JSON.stringify({
+          dao_name: dao_name,
+        }),
       });
 
       const result = await response.json();
@@ -57,28 +68,19 @@ function UserSessions({ isDelegate, selfDelegate }: UserSessionsProps) {
         // setSessionDetails(result.data);
         const resultData = await result.data;
         // console.log("resultData", resultData);
+        setDataLoading(true);
         if (Array.isArray(resultData)) {
           let filteredData: any = resultData;
           if (searchParams.get("session") === "hosted") {
             filteredData = resultData.filter((session: Session) => {
-              return session.meeting_status === "Recorded" &&
-                chain?.name === "Optimism"
-                ? session.dao_name === "optimism"
-                : chain?.name === "Arbitrum One"
-                ? session.dao_name === "arbitrum"
-                : "";
+              return session.meeting_status === "Recorded";
             });
           } else if (searchParams.get("session") === "attended") {
             filteredData = resultData.filter((session: Session) => {
-              return session.user_address === address &&
-                chain?.name === "Optimism"
-                ? session.dao_name === "optimism"
-                : chain?.name === "Arbitrum One"
-                ? session.dao_name === "arbitrum"
-                : "";
+              return session.user_address === address;
             });
           }
-          // console.log("filtered", filteredData);
+          console.log("filtered", filteredData);
           setSessionDetails(filteredData);
           setDataLoading(false);
         }

@@ -72,10 +72,13 @@ function DelegateInfo({ props }: { props: Type }) {
         const response = await fetch(
           `/api/get-session-data/${props.individualDelegate}`,
           {
-            method: "GET",
+            method: "POST",
             headers: {
               "Content-Type": "application/json",
             },
+            body: JSON.stringify({
+              dao_name: props.daoDelegates,
+            }),
           }
         );
         const result = await response.json();

@@ -30,6 +30,7 @@ function OfficeHours({ props }: { props: string }) {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setDataLoading(true);
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
 

@@ -37,6 +37,7 @@ function UserOfficeHours({ isDelegate, selfDelegate }: UserOfficeHoursProps) {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setDataLoading(true);
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
 
