@@ -21,10 +21,12 @@ function ExploreDAOs() {
 
   const router = useRouter();
   const [showNotification, setShowNotification] = useState(true);
+  const [isPageLoading, setIsPageLoading] = useState(true);
 
   useEffect(() => {
     const storedStatus = sessionStorage.getItem("notificationStatus");
     setShowNotification(storedStatus !== "closed");
+    setIsPageLoading(false);
   }, []);
 
   const handleCloseNotification = () => {
@@ -57,7 +59,7 @@ function ExploreDAOs() {
 
   return (
     <div className="p-6">
-      {showNotification && (
+      {showNotification && !isPageLoading && (
         <div
           className={`flex absolute items-center justify-center bottom-9 rounded-full font-poppins text-sm font-medium left-[34%] w-[32rem] ${
             status ? "" : "hidden"

@@ -4,7 +4,8 @@ import Link from "next/link";
 import React, { useEffect, useState } from "react";
 
 function FeedbackTile() {
-  const [isShowing, setIsShowing] = useState(true); // Start visible
+  const [isShowing, setIsShowing] = useState(true);
+  const [isPageLoading, setIsPageLoading] = useState(true);
 
   const handleCloseClick = () => {
     setIsShowing(false);
@@ -16,11 +17,12 @@ function FeedbackTile() {
       sessionStorage.getItem("feedbackTileClosed") || "false"
     );
     setIsShowing(!feedbackTileClosed);
+    setIsPageLoading(false);
   }, []);
 
   return (
     <>
-      {isShowing && (
+      {isShowing && !isPageLoading && (
         <div className="bg-yellow-200 flex justify-center items-center py-2 font-poppins">
           <span className="">
             Enjoying Chora Club? Share your feedback on{" "}

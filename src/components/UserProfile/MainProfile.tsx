@@ -39,8 +39,8 @@ import { Oval } from "react-loader-spinner";
 import lighthouse from "@lighthouse-web3/sdk";
 
 function MainProfile() {
-  // const { address } = useAccount();
-  const address = "0x5e349eca2dc61abcd9dd99ce94d04136151a09ee";
+  const { address } = useAccount();
+  // const address = "0x5e349eca2dc61abcd9dd99ce94d04136151a09ee";
   const { publicClient, walletClient } = WalletAndPublicClient();
   const { chain, chains } = useNetwork();
   const fileInputRef = useRef<HTMLInputElement>(null);

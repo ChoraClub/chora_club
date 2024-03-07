@@ -39,6 +39,7 @@ function AvailableSessions() {
   const [selectedDao, setSelectedDao] = useState<any>(null);
   const [selectedDate, setSelectedDate] = useState<any>(null);
   // new Date().toISOString().split("T")[0]
+  // new Date().toISOString().split("T")[0]
   const [startTime, setStartTime] = useState<any>(null);
   const [endTime, setEndTime] = useState<any>(null);
 
@@ -65,16 +66,47 @@ function AvailableSessions() {
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
 
-        const localDate = new Date();
-        console.log("local date", localDate);
-        const localDateStr = await getLocalDateFormat(localDate);
-        const localToIso = localDate.toISOString().split("T")[0];
+        // const localDate = new Date();
+        // console.log("local date", localDate);
+        // const localDateStr = await getLocalDateFormat(localDate);
+        // const localToIso = localDate.toISOString().split("T")[0];
+
+        let dateToSend;
+        if (selectedDate) {
+          //   const local = new Date(selectedDate);
+          //   const formattedDate = await getLocalDateFormat(local);
+          //   console.log("formattedDate", formattedDate);
+
+          const utcDate = new Date(selectedDate).toISOString().split("T")[0];
+          console.log("utcDate", utcDate);
+
+          dateToSend = utcDate;
+        } else {
+          dateToSend = null;
+        }
+
+        if (selectedDao === "" || selectedDao === "All-DAOS") {
+          setSelectedDao(null);
+        }
+        if (startTime === "00:00") {
+          setStartTime(null);
+        }
+        if (endTime === "00:00") {
+          setEndTime(null);
+        }
+
+        console.log("selectedDao", selectedDao);
+        console.log("selectedDate", selectedDate);
+        console.log("startTime", startTime);
+        console.log("endTime", endTime);
 
         const raw = JSON.stringify({
           dao_name: selectedDao,
-          date: selectedDate,
+          date: dateToSend,
           startTime: startTime,
           endTime: endTime,
+          //   startTime: startTime ? startTimeToSend : null,
+          //   endTime: endTime ? endTimeToSend : null,
         });
 
         const requestOptions: any = {
@@ -92,6 +124,7 @@ function AvailableSessions() {
         if (response.success) {
           // console.log("response", response.data);
           const resultData = await response.data;
+          console.log("resultData", resultData);
           setAPIData(resultData);
           setDaoInfo(resultData);
           setIsPageLoading(false);
@@ -101,7 +134,7 @@ function AvailableSessions() {
       }
     };
     fetchData();
-  }, []);
+  }, [selectedDao, selectedDate, startTime, endTime]);
 
   //   if (APIData) {
   //     APIData.forEach((item: any) => {
@@ -127,13 +160,13 @@ function AvailableSessions() {
   const handleDaoChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selected = e.target.value;
     setSelectedDao(selected);
-    let filtered: any;
-    if (selected === "All-DAOS") {
-      setDaoInfo(APIData);
-    } else {
-      filtered = APIData.filter((item) => item.dao_name === selected);
-      setDaoInfo(filtered);
-    }
+    // let filtered: any;
+    // if (selected === "All-DAOS") {
+    //   setDaoInfo(APIData);
+    // } else {
+    //   filtered = APIData.filter((item) => item.dao_name === selected);
+    //   setDaoInfo(filtered);
+    // }
   };
 
   const generateTimeOptions = () => {
@@ -150,6 +183,12 @@ function AvailableSessions() {
   };
 
   const timeOptions = generateTimeOptions();
+
+  const handleClearTime = () => {
+    setStartTime("00:00");
+    setEndTime("00:00");
+  };
+
   return (
     <div>
       <div className="flex">
@@ -220,6 +259,11 @@ function AvailableSessions() {
               </option>
             ))}
           </select>
+          {startTime && endTime && (
+            <button onClick={handleClearTime} className="ml-2 text-red-500">
+              Clear Time
+            </button>
+          )}
         </div>
       </div>
 
@@ -239,106 +283,104 @@ function AvailableSessions() {
           <div>
             <div className="grid min-[475px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-10 ">
               {daoInfo.map((daos: any, index: number) => (
-                <>
-                  <div
-                    key={index}
-                    style={{
-                      boxShadow: "0px 4px 50.8px 0px rgba(0, 0, 0, 0.11)",
-                    }}
-                    className="px-5 py-7 rounded-2xl flex flex-col justify-between"
-                  >
-                    <div>
-                      <div className="flex justify-center">
-                        <Image
-                          src={
-                            daos.profilePicture
-                              ? daos.profilePicture === null
-                                ? daos.dao_name === "optimism"
-                                  ? opImg
-                                  : daos.dao_name === "arbitrum"
-                                  ? arbImg
-                                  : ""
+                <div
+                  key={index}
+                  style={{
+                    boxShadow: "0px 4px 50.8px 0px rgba(0, 0, 0, 0.11)",
+                  }}
+                  className="px-5 py-7 rounded-2xl flex flex-col justify-between"
+                >
+                  <div>
+                    <div className="flex justify-center">
+                      <Image
+                        src={
+                          daos.profilePicture
+                            ? daos.profilePicture === null
+                              ? daos.dao_name === "optimism"
+                                ? opImg
+                                : daos.dao_name === "arbitrum"
+                                ? arbImg
                                 : ""
-                              : daos.dao_name === "optimism"
-                              ? opImg
-                              : daos.dao_name === "arbitrum"
-                              ? arbImg
                               : ""
-                          }
-                          alt="Image not found"
-                          width={80}
-                          height={80}
-                          className="rounded-full"
-                        ></Image>
-                      </div>
+                            : daos.dao_name === "optimism"
+                            ? opImg
+                            : daos.dao_name === "arbitrum"
+                            ? arbImg
+                            : ""
+                        }
+                        alt="Image not found"
+                        width={80}
+                        height={80}
+                        className="rounded-full"
+                      ></Image>
+                    </div>
 
-                      <div className="text-center">
-                        <div className="py-3">
-                          <div className={`font-semibold overflow-hidden `}>
-                            {daos.ensName == null ? (
-                              <span>
-                                {daos.userAddress
-                                  ? daos.userAddress.slice(0, 6) +
-                                    "..." +
-                                    daos.userAddress.slice(-4)
-                                  : ""}
-                              </span>
-                            ) : (
-                              <span>
-                                {daos.ensName.length > 15
-                                  ? daos.ensName.slice(0, 15) + "..."
-                                  : daos.ensName}
-                              </span>
-                            )}
-                          </div>
-                          <div className="flex justify-center items-center gap-2 pb-2 pt-1">
-                            {daos.userAddress
-                              ? daos.userAddress.slice(0, 6) +
-                                "..." +
-                                daos.userAddress.slice(-4)
-                              : ""}
-                            <Tooltip
-                              content="Copy"
-                              placement="right"
-                              closeDelay={1}
-                              showArrow
-                            >
-                              <span className="cursor-pointer text-sm">
-                                <IoCopy
-                                  onClick={() => handleCopy(daos.userAddress)}
-                                />
-                              </span>
-                            </Tooltip>
-                          </div>
+                    <div className="text-center">
+                      <div className="py-3">
+                        <div className={`font-semibold overflow-hidden `}>
+                          {daos.ensName == null ? (
+                            <span>
+                              {daos.userAddress
+                                ? daos.userAddress.slice(0, 6) +
+                                  "..." +
+                                  daos.userAddress.slice(-4)
+                                : ""}
+                            </span>
+                          ) : (
+                            <span>
+                              {daos.ensName.length > 15
+                                ? daos.ensName.slice(0, 15) + "..."
+                                : daos.ensName}
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex justify-center items-center gap-2 pb-2 pt-1">
+                          {daos.userAddress
+                            ? daos.userAddress.slice(0, 6) +
+                              "..." +
+                              daos.userAddress.slice(-4)
+                            : ""}
+                          <Tooltip
+                            content="Copy"
+                            placement="right"
+                            closeDelay={1}
+                            showArrow
+                          >
+                            <span className="cursor-pointer text-sm">
+                              <IoCopy
+                                onClick={() => handleCopy(daos.userAddress)}
+                              />
+                            </span>
+                          </Tooltip>
                         </div>
                       </div>
                     </div>
-                    <div>
-                      <button
-                        className="bg-blue-shade-100 text-white font-poppins w-full rounded-[4px] text-sm py-1 font-medium"
-                        onClick={() =>
-                          router.push(
-                            `/${daos.dao_name}/${daos.userAddress}?active=delegatesSession&session=book `
-                          )
-                        }
-                      >
-                        Book Session
-                      </button>
-                    </div>
-                    <Toaster
-                      toastOptions={{
-                        style: {
-                          fontSize: "14px",
-                          backgroundColor: "#3E3D3D",
-                          color: "#fff",
-                          boxShadow: "none",
-                          borderRadius: "50px",
-                          padding: "3px 5px",
-                        },
-                      }}
-                    />
                   </div>
-                </>
+                  <div>
+                    <button
+                      className="bg-blue-shade-100 text-white font-poppins w-full rounded-[4px] text-sm py-1 font-medium"
+                      onClick={() =>
+                        router.push(
+                          `/${daos.dao_name}/${daos.userAddress}?active=delegatesSession&session=book `
+                        )
+                      }
+                    >
+                      Book Session
+                    </button>
+                  </div>
+                  <Toaster
+                    toastOptions={{
+                      style: {
+                        fontSize: "14px",
+                        backgroundColor: "#3E3D3D",
+                        color: "#fff",
+                        boxShadow: "none",
+                        borderRadius: "50px",
+                        padding: "3px 5px",
+                      },
+                    }}
+                  />
+                </div>
               ))}
             </div>
           </div>
