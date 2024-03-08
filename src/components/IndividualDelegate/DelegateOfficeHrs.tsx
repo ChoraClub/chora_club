@@ -34,6 +34,7 @@ function DelegateOfficeHrs({ props }: { props: Type }) {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setDataLoading(true);
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
 

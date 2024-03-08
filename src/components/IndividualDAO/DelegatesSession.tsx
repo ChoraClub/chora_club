@@ -8,6 +8,16 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Tile from "../utils/Tile";
 import SessionTile from "../utils/SessionTiles";
 import { Oval } from "react-loader-spinner";
+import {
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Button,
+  useDisclosure,
+} from "@nextui-org/react";
+import AttestationModal from "../utils/AttestationModal";
 
 interface Session {
   booking_status: string;
@@ -33,12 +43,14 @@ function DelegatesSession({ props }: { props: string }) {
   const [sessionDetails, setSessionDetails] = useState([]);
   const [tempSession, setTempSession] = useState([]);
   const [dataLoading, setDataLoading] = useState(true);
+  const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
 
   // console.log("propspropsprops", dao_name);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setDataLoading(true);
         const requestOptions: any = {
           method: "GET",
           redirect: "follow",
@@ -61,7 +73,7 @@ function DelegatesSession({ props }: { props: string }) {
             }
           });
           // console.log("filtered", filtered);
-          setSearchQuery("")
+          setSearchQuery("");
           setSessionDetails(filtered);
           setTempSession(filtered);
           setDataLoading(false);
@@ -135,6 +147,9 @@ function DelegatesSession({ props }: { props: string }) {
           <Image src={search} alt="search" width={20} />
         </span>
       </div>
+      {/* <div>
+        <AttestationModal />
+      </div> */}
 
       <div className="pr-36 pt-3">
         <div className="flex gap-16 border-1 border-[#7C7C7C] pl-6 rounded-xl text-sm">

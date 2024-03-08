@@ -52,23 +52,29 @@ function DelegateSessions({ props }: { props: Type }) {
         body: raw,
         redirect: "follow",
       };
+
       const response = await fetch("/api/get-specific-session", requestOptions);
       const result = await response.json();
       // console.log("result in get meetinggggg", result);
+
       if (result) {
         const resultData = await result;
         // console.log("resultData", resultData);
         if (Array.isArray(resultData)) {
+          // setDataLoading(true);
           let filteredData: any = resultData;
           if (searchParams.get("session") === "upcoming") {
+            setDataLoading(true);
             filteredData = resultData.filter((session: Session) => {
               return session.meeting_status === "Upcoming";
             });
           } else if (searchParams.get("session") === "hosted") {
+            setDataLoading(true);
             filteredData = resultData.filter((session: Session) => {
               return session.meeting_status === "Recorded";
             });
           } else if (searchParams.get("session") === "attended") {
+            setDataLoading(true);
             filteredData = resultData.filter((session: Session) => {
               return session.user_address === props.individualDelegate;
             });

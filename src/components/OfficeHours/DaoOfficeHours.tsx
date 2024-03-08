@@ -9,6 +9,8 @@ import text2 from "@/assets/images/daos/texture2.png";
 import { StaticImageData } from "next/image";
 import Tile from "../utils/Tile";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { Oval } from "react-loader-spinner";
+
 interface Type {
   img: StaticImageData;
   title: string;
@@ -19,6 +21,7 @@ interface Type {
   started: string;
   desc: string;
 }
+
 interface Session {
   _id: string;
   address: string;
@@ -42,6 +45,7 @@ function DaoOfficeHours() {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setDataLoading(true);
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
 
@@ -83,6 +87,46 @@ function DaoOfficeHours() {
     setSessionDetails([]);
     setDataLoading(true);
   }, []);
+
+  const handleSearchChange = async (query: string) => {
+    setSearchQuery(query);
+
+    if (query.length > 0) {
+      setDataLoading(true);
+
+      const requestOptions: any = {
+        method: "POST",
+        body: JSON.stringify({
+          dao_name: null,
+        }),
+        redirect: "follow",
+      };
+      const res = await fetch(
+        `/api/search-officehours/${query}`,
+        requestOptions
+      );
+      const result = await res.json();
+      const resultData = await result.data;
+
+      if (result.success) {
+        const filtered: any = resultData.filter((session: Session) => {
+          if (searchParams.get("hours") === "ongoing") {
+            return session.status === "ongoing";
+          } else if (searchParams.get("hours") === "upcoming") {
+            return session.status === "active";
+          } else if (searchParams.get("hours") === "recorded") {
+            return session.status === "inactive";
+          }
+        });
+        console.log("filtered: ", filtered);
+        setSessionDetails(filtered);
+        setDataLoading(false);
+      }
+    } else {
+      // setSessionDetails(tempDetails);
+      setDataLoading(false);
+    }
+  };
 
   return (
     <div className="p-6">
@@ -137,9 +181,9 @@ function DaoOfficeHours() {
             type="text"
             placeholder="Search"
             style={{ background: "rgba(238, 237, 237, 0.36)" }}
-            className="pl-5 rounded-full outline-none text-sm"
+            className="pl-5 rounded-full outline-none"
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => handleSearchChange(e.target.value)}
           ></input>
           <span className="flex items-center bg-black rounded-full px-5 py-2">
             <Image src={search} alt="search" width={20} />
@@ -147,30 +191,66 @@ function DaoOfficeHours() {
         </div>
 
         <div className="py-5">
-          {searchParams.get("hours") === "ongoing" && (
-            <Tile
-              sessionDetails={sessionDetails}
-              dataLoading={dataLoading}
-              isEvent="Ongoing"
-              isOfficeHour={true}
-            />
-          )}
-          {searchParams.get("hours") === "upcoming" && (
-            <Tile
-              sessionDetails={sessionDetails}
-              dataLoading={dataLoading}
-              isEvent="Upcoming"
-              isOfficeHour={true}
-            />
-          )}
-          {searchParams.get("hours") === "recorded" && (
-            <Tile
-              sessionDetails={sessionDetails}
-              dataLoading={dataLoading}
-              isEvent="Recorded"
-              isOfficeHour={true}
-            />
-          )}
+          {searchParams.get("hours") === "ongoing" &&
+            (dataLoading ? (
+              <div className="flex items-center justify-center">
+                <Oval
+                  visible={true}
+                  height="40"
+                  width="40"
+                  color="#0500FF"
+                  secondaryColor="#cdccff"
+                  ariaLabel="oval-loading"
+                />
+              </div>
+            ) : (
+              <Tile
+                sessionDetails={sessionDetails}
+                dataLoading={dataLoading}
+                isEvent="Ongoing"
+                isOfficeHour={true}
+              />
+            ))}
+          {searchParams.get("hours") === "upcoming" &&
+            (dataLoading ? (
+              <div className="flex items-center justify-center">
+                <Oval
+                  visible={true}
+                  height="40"
+                  width="40"
+                  color="#0500FF"
+                  secondaryColor="#cdccff"
+                  ariaLabel="oval-loading"
+                />
+              </div>
+            ) : (
+              <Tile
+                sessionDetails={sessionDetails}
+                dataLoading={dataLoading}
+                isEvent="Upcoming"
+                isOfficeHour={true}
+              />
+            ))}
+          {searchParams.get("hours") === "recorded" &&
+            (dataLoading ? (
+              <div className="flex items-center justify-center">
+                <Oval
+                  visible={true}
+                  height="40"
+                  width="40"
+                  color="#0500FF"
+                  secondaryColor="#cdccff"
+                  ariaLabel="oval-loading"
+                />
+              </div>
+            ) : (
+              <Tile
+                sessionDetails={sessionDetails}
+                dataLoading={dataLoading}
+                isEvent="Recorded"
+                isOfficeHour={true}
+              />
+            ))}
         </div>
       </div>
     </div>

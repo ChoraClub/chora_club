@@ -1,10 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { MongoClient, MongoClientOptions } from "mongodb";
 
-export async function GET(req: NextRequest, res: NextResponse) {
+export async function POST(req: NextRequest, res: NextResponse) {
   // console.log("GET req call");
   const user_address = req.url.split("get-session-data/")[1];
   // console.log(user_address);
+
+  const { dao_name } = await req.json();
+
   try {
     // Connect to MongoDB
     // console.log("Connecting to MongoDB...");
@@ -19,7 +22,9 @@ export async function GET(req: NextRequest, res: NextResponse) {
 
     // Find documents based on user_address
     // console.log("Finding documents for user:", user_address);
-    const documents = await collection.find({ user_address }).toArray();
+    const documents = await collection
+      .find({ user_address: user_address, dao_name: dao_name })
+      .toArray();
     // console.log("Documents found:", documents);
 
     client.close();

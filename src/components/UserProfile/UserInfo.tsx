@@ -37,9 +37,15 @@ function UserInfo({
   let sessionAttendingCount = 0;
   let officehoursHostingCount = 0;
   let officehoursAttendingCount = 0;
+  let dao_name = "";
 
   useEffect(() => {
     const sessionHosted = async () => {
+      if (chain?.name === "Optimism") {
+        dao_name = "optimism";
+      } else if (chain?.name === "Arbitrum One") {
+        dao_name = "arbitrum";
+      }
       try {
         const response = await fetch(`/api/get-meeting/${address}`, {
           method: "GET",
@@ -80,10 +86,13 @@ function UserInfo({
     const sessionAttended = async () => {
       try {
         const response = await fetch(`/api/get-session-data/${address}`, {
-          method: "GET",
+          method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
+          body: JSON.stringify({
+            dao_name: dao_name,
+          }),
         });
         const result = await response.json();
         if (result.success) {
