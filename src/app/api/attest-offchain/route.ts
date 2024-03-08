@@ -53,12 +53,12 @@ eas.connect(signer);
 
 export async function POST(req: NextRequest, res: NextResponse) {
   const origin = req.headers.get("Origin");
-  if (origin !== allowedOrigin) {
-    return NextResponse.json(
-      { success: false, error: "Unauthorized access" },
-      { status: 403 }
-    );
-  }
+  // if (origin !== allowedOrigin) {
+  //   return NextResponse.json(
+  //     { success: false, error: "Unauthorized access" },
+  //     { status: 403 }
+  //   );
+  // }
   console.log("log1");
   (BigInt.prototype as any).toJSON = function () {
     return this.toString();
