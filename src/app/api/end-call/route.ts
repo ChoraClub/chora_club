@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { MongoClient, MongoClientOptions } from "mongodb";
 
 interface Meeting {
   meetingId: string;
@@ -10,6 +11,7 @@ interface Participant {
   displayName: string;
   joinedAt: string;
   exitedAt: string;
+  attestation: string; // Added attestation field
 }
 
 interface MeetingTimePerEOA {
@@ -18,11 +20,24 @@ interface MeetingTimePerEOA {
 
 export async function POST(req: NextRequest, res: NextResponse) {
   try {
-    const { roomId }: { roomId: string } = await req.json();
+    const { roomId, meetingType }: { roomId: string; meetingType: number } =
+      await req.json();
 
     if (!roomId) {
       return NextResponse.json(
         { success: false, error: "roomId parameter is required" },
+        { status: 400 }
+      );
+    }
+
+    let meetingTypeName: string;
+    if (meetingType === 1) {
+      meetingTypeName = "session";
+    } else if (meetingType === 2) {
+      meetingTypeName = "officehours";
+    } else {
+      return NextResponse.json(
+        { success: false, error: "Invalid meetingType" },
         { status: 400 }
       );
     }
@@ -39,7 +54,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
       headers: myHeaders,
       body: raw,
     };
-    const baseUrl = process.env.BASE_URL;
+    const baseUrl = process.env.NEXTAUTH_URL;
     const hostResponse = await fetch(`${baseUrl}/api/get-host`, requestOptions);
     const hostData = await hostResponse.json();
     console.log("Host Data:", hostData);
@@ -121,36 +136,107 @@ export async function POST(req: NextRequest, res: NextResponse) {
       console.log(`${eoaAddress}: ${meetingTimePerEOA[eoaAddress]} minutes`);
     }
 
-    // Concatenate participant lists into one array
-    let allParticipants: Participant[] = combinedParticipantLists.reduce(
-      (acc, participants) => acc.concat(participants),
-      []
-    );
+    // Calculate minimum attendance time required
+    const minimumAttendanceTime = totalMeetingTimeInMinutes * 0.5;
 
-    // Remove host from participants and add to hosts object
+    // Filter participants based on attendance
+    let participantsWithSufficientAttendance: Participant[] = [];
+
+    for (const participant of combinedParticipantLists.flat()) {
+      const participantMeetingTime =
+        meetingTimePerEOA[participant.displayName] || 0;
+      if (participantMeetingTime >= minimumAttendanceTime) {
+        // Add the "attestation" field with value "pending" to each participant
+        participantsWithSufficientAttendance.push({
+          ...participant,
+          attestation: "pending",
+        });
+      }
+    }
+
+    // Remove host from participants with sufficient attendance
+    participantsWithSufficientAttendance =
+      participantsWithSufficientAttendance.filter(
+        (participant) => participant.displayName !== hostData?.address
+      );
+
+    // Add the "attestation" field with value "pending" to each host
     const hosts: Participant[] = [];
     if (
       hostData &&
-      allParticipants.some(
-        (participant) => participant.displayName === hostData
-      )
+      combinedParticipantLists
+        .flat()
+        .some((participant) => participant.displayName === hostData.address)
     ) {
-      allParticipants = allParticipants.filter((participant) => {
-        if (participant.displayName === hostData) {
-          hosts.push(participant);
-          return false;
+      combinedParticipantLists.flat().forEach((participant) => {
+        if (participant.displayName === hostData.address) {
+          hosts.push({ ...participant, attestation: "pending" });
         }
-        return true;
       });
     }
+
+    let earliestStartTime = Infinity;
+    let latestEndTime = -Infinity;
+
+    // Find earliest startTime and latest endTime
+    meetings.forEach((meeting) => {
+      earliestStartTime = Math.min(earliestStartTime, meeting.startTime);
+      latestEndTime = Math.max(latestEndTime, meeting.endTime);
+    });
+
+    console.log("Earliest Start Time:", new Date(earliestStartTime));
+    console.log("Latest End Time:", new Date(latestEndTime));
+
+    const client = await MongoClient.connect(process.env.MONGODB_URI!, {
+      dbName: `chora-club`,
+    } as MongoClientOptions);
+
+    // Access the collection
+    const db = client.db();
+    const collection = db.collection("attestation");
+
+    // Check if data with same roomId exists
+    const existingData = await collection.findOne({ roomId });
+
+    const earliestStartTimeEpoch = Math.floor(earliestStartTime / 1000);
+    const latestEndTimeEpoch = Math.floor(latestEndTime / 1000);
+
+    // Prepare the data to store
+    const dataToStore = {
+      roomId,
+      participants: participantsWithSufficientAttendance,
+      meetingTimePerEOA,
+      totalMeetingTimeInMinutes,
+      hosts,
+      startTime: earliestStartTimeEpoch,
+      endTime: latestEndTimeEpoch,
+      meetingType: meetingTypeName,
+      attestation: "pending",
+    };
+
+    if (existingData) {
+      // If data exists, update it
+      await collection.updateOne({ roomId }, { $set: dataToStore });
+      console.log(`Data with roomId ${roomId} updated.`);
+    } else {
+      // If data doesn't exist, insert new data
+      await collection.insertOne(dataToStore);
+      console.log(`New data with roomId ${roomId} inserted.`);
+    }
+
+    // Close the MongoDB client connection
+    await client.close();
 
     return NextResponse.json(
       {
         success: true,
-        data: allParticipants,
+        data: participantsWithSufficientAttendance,
         meetingTimePerEOA,
         totalMeetingTimeInMinutes,
-        hosts, // Adding hosts object to the response
+        hosts,
+        startTime: earliestStartTimeEpoch,
+        endTime: latestEndTimeEpoch,
+        meetingType: meetingTypeName,
       },
       { status: 200 }
     );
