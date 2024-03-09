@@ -46,9 +46,11 @@ export async function POST(req: NextRequest, res: NextResponse<Type[]>) {
       "startDateTime",
       startDateTime?.toISOString().split("T")[1].substring(0, 5)
     );
+
     const endDateTime = (await endTime)
       ? new Date(`${date ? date : newDate} ${endTime}:00`)
       : null;
+
     console.log(
       "endDateTime",
       endDateTime?.toISOString().split("T")[1].substring(0, 5)
@@ -68,6 +70,7 @@ export async function POST(req: NextRequest, res: NextResponse<Type[]>) {
     // console.log("currentTime", currentTime);
 
     let query: any = {
+      // allowedDates: { $gte: "2023-01-01" },
       allowedDates: { $gte: newDate },
     };
 
@@ -78,6 +81,20 @@ export async function POST(req: NextRequest, res: NextResponse<Type[]>) {
       query.$and = [
         { "dateAndRanges.utcTime_endTime": { $gte: startTimeToSend } },
         { "dateAndRanges.utcTime_startTime": { $lte: endTimeToSend } },
+      ];
+    }
+    if (startTime !== null && endTime === null) {
+      console.log("inside startTime not null");
+      query.$and = [
+        { "dateAndRanges.utcTime_startTime": { $lte: startTimeToSend } },
+        { "dateAndRanges.utcTime_endTime": { $gte: startTimeToSend } },
+      ];
+    }
+    if (endTime !== null && startTime === null) {
+      console.log("inside endTime not null");
+      query.$and = [
+        { "dateAndRanges.utcTime_startTime": { $lte: endTimeToSend } },
+        { "dateAndRanges.utcTime_endTime": { $gte: endTimeToSend } },
       ];
     }
 

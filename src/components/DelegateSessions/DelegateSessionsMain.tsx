@@ -13,17 +13,25 @@ function DelegateSessionsMain() {
 
   return (
     <>
-      <div className="p-6">
+      <div className="pt-6 px-6">
         <div className="flex justify-between pe-10">
           <div className="font-quanty font-medium text-4xl text-blue-shade-200 pb-4">
-            Delegate Sessions
+            Available Delegates
           </div>
           <div>
             <ConnectButton />
           </div>
         </div>
+        <div className="font-poppins mt-2">
+          Welcome to our Available Delegates page, where you can easily find
+          available delegates to conduct sessions. Utilize our intuitive filters
+          to streamline your search process. Choose your desired DAO, select a
+          date, and specify the time to narrow down the list of available
+          delegates. Start your journey today by booking a session and unlock
+          the boundless opportunities waiting for you in the world of Web3.
+        </div>
 
-        <div className="pr-32 pt-4 font-poppins">
+        {/* <div className="pr-32 pt-4 font-poppins">
           <div className="flex gap-16 border-1 border-[#7C7C7C] pl-6 rounded-xl">
             <button
               className={`py-2  ${
@@ -46,13 +54,10 @@ function DelegateSessionsMain() {
               Recorded
             </button>
           </div>
-        </div>
+        </div> */}
 
         <div className="mt-1">
-          {searchParams.get("sessions") === "available" && (
-            <AvailableSessions />
-          )}
-          {searchParams.get("sessions") === "recorded" && <RecordedSessions />}
+          <AvailableSessions />
         </div>
       </div>
     </>

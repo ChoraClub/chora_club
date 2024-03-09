@@ -10,7 +10,13 @@ import copy from "copy-to-clipboard";
 import toast, { Toaster } from "react-hot-toast";
 import opImg from "@/assets/images/daos/op.png";
 import arbImg from "@/assets/images/daos/arbitrum.jpg";
+import { FaCircleInfo } from "react-icons/fa6";
 import { Tooltip } from "@nextui-org/react";
+import text1 from "@/assets/images/daos/texture1.png";
+import clockIcn from "@/assets/icon_clock.png";
+import ccLogo from "@/assets/images/daos/CC.png";
+import OPLogo from "@/assets/images/daos/op.png";
+import ArbLogo from "@/assets/images/daos/arbCir.png";
 
 interface Type {
   ensName: string;
@@ -36,62 +42,51 @@ function AvailableSessions() {
   const [APIData, setAPIData] = useState<Array<Type>>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isPageLoading, setIsPageLoading] = useState(true);
-  const [selectedDao, setSelectedDao] = useState<any>(null);
-  const [selectedDate, setSelectedDate] = useState<any>(null);
-  // new Date().toISOString().split("T")[0]
-  // new Date().toISOString().split("T")[0]
-  const [startTime, setStartTime] = useState<any>(null);
-  const [endTime, setEndTime] = useState<any>(null);
+  const [selectedDao, setSelectedDao] = useState<any>("");
+  const [selectedDate, setSelectedDate] = useState<any>("");
+  const [startTime, setStartTime] = useState<any>("");
+  const [endTime, setEndTime] = useState<any>("");
 
   useEffect(() => {
     setIsPageLoading(false);
-    console.log("selectedDate", selectedDate);
   }, [selectedDate]);
-
-  const getLocalDateFormat = async (local: Date) => {
-    // Extract year, month, and day from local Date object
-    const year = local.getFullYear();
-    const month = (local.getMonth() + 1).toString().padStart(2, "0");
-    const day = local.getDate().toString().padStart(2, "0");
-
-    // Format local date
-    const localDateStr = `${year}-${month}-${day}`;
-    console.log("localDateStr", localDateStr);
-    return localDateStr;
-  };
 
   useEffect(() => {
     const fetchData = async () => {
+      setIsPageLoading(true);
       try {
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
 
-        // const localDate = new Date();
-        // console.log("local date", localDate);
-        // const localDateStr = await getLocalDateFormat(localDate);
-        // const localToIso = localDate.toISOString().split("T")[0];
-
         let dateToSend;
         if (selectedDate) {
-          //   const local = new Date(selectedDate);
-          //   const formattedDate = await getLocalDateFormat(local);
-          //   console.log("formattedDate", formattedDate);
-
           const utcDate = new Date(selectedDate).toISOString().split("T")[0];
           console.log("utcDate", utcDate);
 
           dateToSend = utcDate;
+          setSelectedDate(utcDate);
         } else {
           dateToSend = null;
+          setSelectedDate(null);
+        }
+
+        if (selectedDate === "") {
+          dateToSend = null;
+          setSelectedDate(null);
         }
 
         if (selectedDao === "" || selectedDao === "All-DAOS") {
           setSelectedDao(null);
         }
-        if (startTime === "00:00") {
+
+        if (
+          startTime === "00:00" ||
+          startTime === "Start Time" ||
+          startTime === ""
+        ) {
           setStartTime(null);
         }
-        if (endTime === "00:00") {
+        if (endTime === "00:00" || endTime === "End Time" || endTime === "") {
           setEndTime(null);
         }
 
@@ -102,11 +97,9 @@ function AvailableSessions() {
 
         const raw = JSON.stringify({
           dao_name: selectedDao,
-          date: dateToSend,
+          date: selectedDate,
           startTime: startTime,
           endTime: endTime,
-          //   startTime: startTime ? startTimeToSend : null,
-          //   endTime: endTime ? endTimeToSend : null,
         });
 
         const requestOptions: any = {
@@ -131,16 +124,12 @@ function AvailableSessions() {
         }
       } catch (error) {
         console.error("Error Fetching Data of availability:", error);
+      } finally {
+        setIsPageLoading(false);
       }
     };
     fetchData();
   }, [selectedDao, selectedDate, startTime, endTime]);
-
-  //   if (APIData) {
-  //     APIData.forEach((item: any) => {
-  //       // console.log("item", item);
-  //     });
-  //   }
 
   const handleCopy = (addr: string) => {
     copy(addr);
@@ -185,16 +174,16 @@ function AvailableSessions() {
   const timeOptions = generateTimeOptions();
 
   const handleClearTime = () => {
-    setStartTime("00:00");
-    setEndTime("00:00");
+    setStartTime("Start Time");
+    setEndTime("End Time");
   };
 
   return (
-    <div>
-      <div className="flex">
+    <>
+      <div className="flex gap-7 bg-[#D9D9D945] p-4 mt-4 rounded-2xl">
         <div
           style={{ background: "rgba(238, 237, 237, 0.36)" }}
-          className="flex border-[0.5px] border-black w-fit rounded-full my-8 font-poppins"
+          className="flex border-[0.5px] border-black w-fit rounded-full  font-poppins"
         >
           <input
             type="text"
@@ -214,33 +203,64 @@ function AvailableSessions() {
           </span>
         </div>
 
-        <div className="flex items-center m-8">
+        <div className="flex items-center">
           <select
             value={selectedDao}
             onChange={handleDaoChange}
-            className="px-3 py-2 rounded-md border border-gray-300 "
+            className="px-3 py-2 rounded-md border border-[#606060]"
           >
             <option value="All-DAOS">All DAOS</option>
             <option value="optimism">Optimism</option>
             <option value="arbitrum">Arbitrum</option>
           </select>
+          <Tooltip
+            showArrow
+            content={
+              <div className="font-poppins">
+                Select a DAO option to view available Delegates of that DAO.
+              </div>
+            }
+            placement="bottom"
+            className="rounded-md bg-opacity-90"
+            closeDelay={1}
+          >
+            <span className="px-2 justify-end">
+              <FaCircleInfo className="cursor-pointer" />
+            </span>
+          </Tooltip>
         </div>
 
-        <div className="flex items-center m-8">
+        <div className="flex items-center">
           <input
             type="date"
             value={selectedDate}
             onChange={(e) => setSelectedDate(e.target.value)}
-            className="px-3 py-2 rounded-md border border-gray-300 mr-2"
+            className="px-3 py-2 rounded-md border border-[#606060] mr-1"
           />
+          <Tooltip
+            showArrow
+            content={
+              <div className="font-poppins">
+                Select a date to view available Delegates for that date.
+              </div>
+            }
+            placement="bottom"
+            className="rounded-md bg-opacity-90"
+            closeDelay={1}
+          >
+            <span className="px-2 justify-end">
+              <FaCircleInfo className="cursor-pointer" />
+            </span>
+          </Tooltip>
         </div>
 
-        <div className="flex items-center m-8 select-container">
+        <div className="flex items-center select-container">
           <select
             value={startTime}
             onChange={(e) => setStartTime(e.target.value)}
-            className="px-3 py-2 rounded-md border border-gray-300 mr-2"
+            className="px-3 py-2 rounded-md border border-[#606060] mr-2"
           >
+            <option>Start Time</option>
             {timeOptions.map((time) => (
               <option key={time} value={time}>
                 {time}
@@ -251,15 +271,32 @@ function AvailableSessions() {
           <select
             value={endTime}
             onChange={(e) => setEndTime(e.target.value)}
-            className="px-3 py-2 rounded-md border border-gray-300 ml-2"
+            className="px-3 py-2 rounded-md border border-[#606060] ml-2"
           >
+            <option>End Time</option>
             {timeOptions.map((time) => (
               <option key={time} value={time}>
                 {time}
               </option>
             ))}
           </select>
-          {startTime && endTime && (
+          <Tooltip
+            showArrow
+            content={
+              <div className="font-poppins">
+                Select a time to view available Delegates for that specific
+                time.
+              </div>
+            }
+            placement="bottom"
+            className="rounded-md bg-opacity-90"
+            closeDelay={1}
+          >
+            <span className="px-2 justify-end">
+              <FaCircleInfo className="cursor-pointer" />
+            </span>
+          </Tooltip>
+          {!isPageLoading && startTime && endTime && (
             <button onClick={handleClearTime} className="ml-2 text-red-500">
               Clear Time
             </button>
@@ -267,9 +304,9 @@ function AvailableSessions() {
         </div>
       </div>
 
-      <div className="py-8 pe-10 font-poppins">
+      <div className="pt-8 font-poppins">
         {isPageLoading ? (
-          <div className="flex items-center justify-center">
+          <div className="flex items-center justify-center m-6">
             <Oval
               visible={true}
               height="40"
@@ -280,109 +317,142 @@ function AvailableSessions() {
             />
           </div>
         ) : daoInfo.length > 0 ? (
-          <div>
-            <div className="grid min-[475px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-10 ">
-              {daoInfo.map((daos: any, index: number) => (
-                <div
-                  key={index}
-                  style={{
-                    boxShadow: "0px 4px 50.8px 0px rgba(0, 0, 0, 0.11)",
-                  }}
-                  className="px-5 py-7 rounded-2xl flex flex-col justify-between"
-                >
-                  <div>
-                    <div className="flex justify-center">
+          <div className="overflow-auto max-h-[61vh] font-poppins grid  grid-cols-1 md:grid-cols-2 lg:grid-cols-2 2xl:grid-cols-2 gap-10">
+            {daoInfo.map((daos: any, index: number) => (
+              <div
+                key={index}
+                style={{
+                  boxShadow: "0px 4px 50.8px 0px rgba(0, 0, 0, 0.11)",
+                }}
+                className="rounded-3xl m-4 flex flex-col mx-auto justify-between bg-white w-[35rem]"
+              >
+                <div className="flex items-center mb-4 border-b-2 py-5 px-5 rounded-tl-3xl rounded-tr-3xl">
+                  <div className="w-1/4 flex justify-center items-center relative">
+                    <div className="relative">
                       <Image
                         src={
                           daos.profilePicture
-                            ? daos.profilePicture === null
-                              ? daos.dao_name === "optimism"
-                                ? opImg
-                                : daos.dao_name === "arbitrum"
-                                ? arbImg
-                                : ""
-                              : ""
-                            : daos.dao_name === "optimism"
-                            ? opImg
-                            : daos.dao_name === "arbitrum"
-                            ? arbImg
-                            : ""
+                            ? `https://gateway.lighthouse.storage/ipfs/${daos.profilePicture}`
+                            : daos?.dao_name === "optimism"
+                            ? OPLogo
+                            : daos?.dao_name === "arbitrum"
+                            ? ArbLogo
+                            : text1
                         }
                         alt="Image not found"
-                        width={80}
-                        height={80}
-                        className="rounded-full"
-                      ></Image>
+                        width={180}
+                        height={120}
+                        className="w-44 h-30 rounded-3xl"
+                      />
                     </div>
+                    <Image
+                      src={ccLogo}
+                      alt="ChoraClub Logo"
+                      className={`absolute top-0 right-0`}
+                      style={{
+                        width: "30px",
+                        height: "30px",
+                        marginTop: "10px",
+                        marginRight: "10px",
+                      }}
+                    />
+                  </div>
 
-                    <div className="text-center">
-                      <div className="py-3">
-                        <div className={`font-semibold overflow-hidden `}>
-                          {daos.ensName == null ? (
-                            <span>
-                              {daos.userAddress
-                                ? daos.userAddress.slice(0, 6) +
-                                  "..." +
-                                  daos.userAddress.slice(-4)
-                                : ""}
-                            </span>
-                          ) : (
-                            <span>
-                              {daos.ensName.length > 15
-                                ? daos.ensName.slice(0, 15) + "..."
-                                : daos.ensName}
-                            </span>
-                          )}
-                        </div>
-                        <div className="flex justify-center items-center gap-2 pb-2 pt-1">
-                          {daos.userAddress
-                            ? daos.userAddress.slice(0, 6) +
-                              "..." +
-                              daos.userAddress.slice(-4)
-                            : ""}
-                          <Tooltip
-                            content="Copy"
-                            placement="right"
-                            closeDelay={1}
-                            showArrow
+                  <div className="w-3/4 ml-4">
+                    <div className="text-[#3E3D3D] text-lg font-semibold mb-1">
+                      {daos.ensName && daos.ensName.length > 15
+                        ? daos.ensName.slice(0, 15) + "..."
+                        : daos.ensName ||
+                          daos.userAddress.slice(0, 6) +
+                            "..." +
+                            daos.userAddress.slice(-4)}
+                    </div>
+                    <div className="text-sm flex">
+                      <div>{daos.userAddress}</div>
+                      <div className="items-center">
+                        <Tooltip
+                          content="Copy"
+                          placement="right"
+                          closeDelay={1}
+                          showArrow
+                        >
+                          <div
+                            className="pl-2 pt-[2px] cursor-pointer"
+                            color="#3E3D3D"
                           >
-                            <span className="cursor-pointer text-sm">
-                              <IoCopy
-                                onClick={() => handleCopy(daos.userAddress)}
-                              />
-                            </span>
-                          </Tooltip>
-                        </div>
+                            <IoCopy
+                              onClick={() => handleCopy(`${daos.userAddress}`)}
+                            />
+                          </div>
+                        </Tooltip>
+                        <Toaster
+                          toastOptions={{
+                            style: {
+                              fontSize: "14px",
+                              backgroundColor: "#3E3D3D",
+                              color: "#fff",
+                              boxShadow: "none",
+                              borderRadius: "50px",
+                              padding: "3px 5px",
+                            },
+                          }}
+                        />
+                      </div>
+                    </div>
+                    <div className="mt-2 bg-[#1E1E1E] border border-[#1E1E1E] text-white rounded-md text-xs px-5 py-1 font-semibold w-fit capitalize">
+                      {daos.dao_name}
+                    </div>
+                    <div>
+                      <div className="text-[#4F4F4F] border-[0.5px] border-[#D9D9D9] rounded-md px-3 py-1 mt-4">
+                        Delegated from
+                        <span className="text-blue-shade-200 font-semibold">
+                          &nbsp; 25k &nbsp;
+                        </span>
+                        Addresses
                       </div>
                     </div>
                   </div>
-                  <div>
-                    <button
-                      className="bg-blue-shade-100 text-white font-poppins w-full rounded-[4px] text-sm py-1 font-medium"
+                </div>
+
+                <div className="flex items-center px-5 pb-3">
+                  <Image
+                    alt="clockIcn"
+                    width={20}
+                    height={20}
+                    src={clockIcn}
+                    priority
+                  />
+                  <div className="w-[60%]">
+                    <span className="text-base font-semibold text-[#0500FF] ml-1">
+                      Available for {`${daos.timeSlotSizeMinutes}`} minutes
+                    </span>
+                  </div>
+                  <div className="w-[40%] flex justify-end ">
+                    {/* <button
                       onClick={() =>
                         router.push(
                           `/${daos.dao_name}/${daos.userAddress}?active=delegatesSession&session=book `
                         )
                       }
+                      className="bg-black text-white py-4 px-6 rounded-[36px] text-sm w-[11rem] relative  hover:bg-[#333333] focus:outline-none focus:ring-2 focus:ring-gray-400"
+                    >
+                      <span className="relative">Book Session</span>
+                      <span className="absolute top-0 left-0 w-full h-full bg-white opacity-0 transition-opacity duration-300"></span>
+                    </button> */}
+                    <button
+                      onClick={() =>
+                        router.push(
+                          `/${daos.dao_name}/${daos.userAddress}?active=delegatesSession&session=book `
+                        )
+                      }
+                      className="bg-black text-white py-4 px-6 rounded-[36px] text-sm w-[11rem] hover:bg-[#333333] focus:outline-none focus:ring-2 focus:ring-gray-400"
                     >
                       Book Session
                     </button>
                   </div>
-                  <Toaster
-                    toastOptions={{
-                      style: {
-                        fontSize: "14px",
-                        backgroundColor: "#3E3D3D",
-                        color: "#fff",
-                        boxShadow: "none",
-                        borderRadius: "50px",
-                        padding: "3px 5px",
-                      },
-                    }}
-                  />
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
         ) : (
           <div className="flex flex-col justify-center items-center pt-10">
@@ -393,7 +463,7 @@ function AvailableSessions() {
           </div>
         )}
       </div>
-    </div>
+    </>
   );
 }
 
