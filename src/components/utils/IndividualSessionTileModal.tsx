@@ -69,7 +69,7 @@ function IndividualSessionTileModal({
                 <video
                   controls
                   className="h-full w-full"
-                  src="https://huddle01.s3.amazonaws.com/recording/jsv-xzam-tnw/1704174878002.mp4"
+                  src={videoUrl}
                 >
                   Your browser does not support the video tag.
                 </video>
