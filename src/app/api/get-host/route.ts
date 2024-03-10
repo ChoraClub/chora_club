@@ -1,9 +1,7 @@
-// Import necessary modules and interfaces
 import { MongoClient, MongoClientOptions } from "mongodb";
-import { NextApiRequest, NextApiResponse } from "next";
+
 import { NextResponse, NextRequest } from "next/server";
 
-// Define the response body type
 interface OfficeHours {
   _id: string;
   address: string;
@@ -16,39 +14,59 @@ interface OfficeHours {
   meetingId: string;
 }
 
+interface Meeting {
+  _id: string;
+  host_address: string;
+  user_address: string;
+  slot_time: Date;
+  meetingId: string;
+  meeting_status: string;
+  joined_status: string | null;
+  booking_status: string;
+  dao_name: string;
+  title: string;
+  description: string;
+}
+
 export async function POST(
   req: NextRequest,
-  res: NextResponse<OfficeHours | { error: string }>
+  res: NextResponse<OfficeHours | Meeting | { error: string }>
 ) {
   try {
-    // Extract the meetingId parameter from the request query
     const { meetingId } = await req.json();
 
-    // Connect to MongoDB database
     const client = await MongoClient.connect(process.env.MONGODB_URI!, {
       dbName: `chora-club`,
     } as MongoClientOptions);
 
-    // Access the collection
     const db = client.db();
-    const collection = db.collection("office_hours");
 
-    // Find the office hours document based on the provided meetingId
-    const officeHours = await collection.findOne({ meetingId: meetingId });
+    const officeHoursCollection = db.collection<OfficeHours>("office_hours");
+    const meetingsCollection = db.collection<Meeting>("meetings");
 
-    // Close MongoDB connection
+    const officeHours = await officeHoursCollection.findOne({ meetingId });
+    const meeting = await meetingsCollection.findOne({ meetingId });
+
     client.close();
 
     if (officeHours) {
-      return NextResponse.json(officeHours.address, { status: 200 });
+      return NextResponse.json(
+        { address: officeHours.address },
+        { status: 200 }
+      );
+    } else if (meeting) {
+      return NextResponse.json(
+        { address: meeting.host_address },
+        { status: 200 }
+      );
     } else {
       return NextResponse.json(
-        { error: "Office hours document not found" },
+        { error: "Office hours or meeting document not found" },
         { status: 404 }
       );
     }
   } catch (error) {
-    console.error(`Error fetching office hours:`, error);
+    console.error(`Error fetching data:`, error);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }

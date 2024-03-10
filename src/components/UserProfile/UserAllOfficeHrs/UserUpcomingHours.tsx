@@ -25,6 +25,8 @@ interface SessionDetail {
   host: string;
   desc: string;
   started: string;
+
+  meetingId: string;
 }
 
 function UserUpcomingHours() {
@@ -50,7 +52,8 @@ function UserUpcomingHours() {
           dao: item.chain_name,
           started: item.office_hours_slot,
           host: item.address, // Host is the address from the API
-          desc: item.description, // Description from the API
+          desc: item.description,
+          meetingId: item.meetingId, // Description from the API
         }));
         setSessionDetails(mappedData); // Set the mapped data to state
         setPageLoading(false);
@@ -90,6 +93,7 @@ function UserUpcomingHours() {
               started: item.office_hours_slot,
               host: item.address,
               desc: item.description,
+              meetingId: item.meetingId,
             }));
             setSessionDetails(mappedData);
           })
@@ -183,6 +187,14 @@ function UserUpcomingHours() {
                     {data.dao}
                   </div>
                 </div>
+                <div className="text-center bg-blue-shade-100 rounded-full font-bold text-white py-2 text-xs cursor-pointer">
+                  <a
+                    href={`/meeting/officehours/${data.meetingId}`}
+                    rel="noopener noreferrer"
+                  >
+                    Join
+                  </a>
+                </div>
 
                 <div className="pt-1 pe-10">
                   <hr />
@@ -201,7 +213,8 @@ function UserUpcomingHours() {
 
                 <div className="text-[#1E1E1E] text-sm">{data.desc}</div>
               </div>
-              <Tooltip content="Edit social links" placement="right" showArrow>
+
+              <Tooltip content="Edit Office hours" placement="right" showArrow>
                 <span
                   className="border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 cursor-pointer"
                   style={{
@@ -213,7 +226,11 @@ function UserUpcomingHours() {
                 </span>
               </Tooltip>
 
-              <Tooltip content="Edit social links" placement="right" showArrow>
+              <Tooltip
+                content="Delete Office Hours"
+                placement="right"
+                showArrow
+              >
                 <span
                   className="border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 cursor-pointer"
                   style={{
@@ -233,7 +250,7 @@ function UserUpcomingHours() {
                   {(onClose) => (
                     <>
                       <ModalHeader className="flex flex-col gap-1">
-                        Edit Socials
+                        Edit Officehours
                       </ModalHeader>
                       <ModalBody>
                         <div className="px-1 font-medium">Title</div>

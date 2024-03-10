@@ -106,6 +106,7 @@ function Tile({
                       ) : null}
                       {new Date(data.office_hours_slot).toLocaleDateString()}
                     </div>
+                  
                   </div>
                 ) : (
                   <div className="flex gap-x-16 text-sm py-3">
