@@ -193,9 +193,9 @@ const BottomBar: React.FC<BottomBarProps> = () => {
       });
       const res_data = await res.json();
 
-      if (res_data.success) {
-        console.log("Updated");
-      }
+      // if (res_data.success) {
+        console.log("Updated",res_data);
+      // }
     } catch (e) {}
   };
 
