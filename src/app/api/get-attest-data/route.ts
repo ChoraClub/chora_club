@@ -92,10 +92,10 @@ export async function POST(req: NextRequest, res: NextResponse) {
     }
 
     // Update attestation status to "attested"
-    await collection.updateOne(
-      { roomId },
-      { $set: { attestation: "attested" } }
-    );
+    // await collection.updateOne(
+    //   { roomId },
+    //   { $set: { attestation: "attested" } }
+    // );
     console.log("Updated attestation status to 'attested'");
 
     return NextResponse.json(data, { status: 200 });
