@@ -38,10 +38,10 @@ interface MyError {
   code?: number; // Optionally, you can include a code for specific error types
 }
 
-const allowedOrigin = "http://localhost:3000";
+// const allowedOrigin = "http://localhost:3000";
+const allowedOrigin = process.env.NEXTAUTH_URL;
 
-const url =
-  "https://opt-sepolia.g.alchemy.com/v2/A6sb4y_yoUVTlWMtBAPR7S7aJWmKit8r";
+const url = process.env.NEXT_PUBLIC_ATTESTATION_URL;
 // Set up your ethers provider and signer
 const provider = new ethers.JsonRpcProvider(url, undefined, {
   staticNetwork: true,

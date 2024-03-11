@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import text1 from "@/assets/images/daos/texture1.png"; // Assuming this is your static image
 import Image from "next/image";
 import { useAccount } from "wagmi";
-
 import {
   Modal,
   ModalContent,
@@ -14,10 +13,11 @@ import {
 } from "@nextui-org/react";
 import { Tooltip } from "@nextui-org/react";
 import { FaPencil } from "react-icons/fa6"; // Importing the pencil icon
-
-import { MdDeleteForever } from "react-icons/md";
+import { FiEdit } from "react-icons/fi";
+import { RiDeleteBin5Line } from "react-icons/ri";
 import { FaSpinner } from "react-icons/fa"; // Importing the spinner icon
 import { Oval } from "react-loader-spinner";
+
 interface SessionDetail {
   img: any;
   title: string;
@@ -187,14 +187,6 @@ function UserUpcomingHours() {
                     {data.dao}
                   </div>
                 </div>
-                <div className="text-center bg-blue-shade-100 rounded-full font-bold text-white py-2 text-xs cursor-pointer">
-                  <a
-                    href={`/meeting/officehours/${data.meetingId}`}
-                    rel="noopener noreferrer"
-                  >
-                    Join
-                  </a>
-                </div>
 
                 <div className="pt-1 pe-10">
                   <hr />
@@ -214,43 +206,52 @@ function UserUpcomingHours() {
                 <div className="text-[#1E1E1E] text-sm">{data.desc}</div>
               </div>
 
-              <Tooltip content="Edit Office hours" placement="right" showArrow>
-                <span
-                  className="border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 cursor-pointer"
-                  style={{
-                    backgroundColor: "rgba(217, 217, 217, 0.42)",
-                  }}
-                  onClick={onOpen}
-                >
-                  <FaPencil color="#3e3d3d" size={12} />
-                </span>
-              </Tooltip>
+              <div className="flex flex-col justify-between">
+                <div className="flex gap-2">
+                  <Tooltip content="Edit" placement="top" showArrow>
+                    <span
+                      className="border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 cursor-pointer"
+                      style={{
+                        backgroundColor: "rgba(217, 217, 217, 0.42)",
+                      }}
+                      onClick={onOpen}
+                    >
+                      <FiEdit color="#3e3d3d" size={13} />
+                    </span>
+                  </Tooltip>
 
-              <Tooltip
-                content="Delete Office Hours"
-                placement="right"
-                showArrow
-              >
-                <span
-                  className="border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 cursor-pointer"
-                  style={{
-                    backgroundColor: "rgba(217, 217, 217, 0.42)",
-                  }}
-                  onClick={() => handleDelete(index)}
-                >
-                  <MdDeleteForever color="#3e3d3d" size={12} />
-                </span>
-              </Tooltip>
+                  <Tooltip content="Delete" placement="top" showArrow>
+                    <span
+                      className="border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 cursor-pointer"
+                      style={{
+                        backgroundColor: "rgba(217, 217, 217, 0.42)",
+                      }}
+                      onClick={() => handleDelete(index)}
+                    >
+                      <RiDeleteBin5Line color="#3e3d3d" size={13} />
+                    </span>
+                  </Tooltip>
+                </div>
+                <div className="text-center bg-blue-shade-100 rounded-full font-bold text-white py-2 px-3 text-xs cursor-pointer">
+                  <a
+                    href={`/meeting/officehours/${data.meetingId}`}
+                    rel="noopener noreferrer"
+                  >
+                    Join
+                  </a>
+                </div>
+              </div>
               <Modal
                 isOpen={isOpen}
                 onOpenChange={onOpenChange}
                 className="font-poppins"
+                size="3xl"
               >
                 <ModalContent>
                   {(onClose) => (
                     <>
                       <ModalHeader className="flex flex-col gap-1">
-                        Edit Officehours
+                        Edit Office Hours
                       </ModalHeader>
                       <ModalBody>
                         <div className="px-1 font-medium">Title</div>

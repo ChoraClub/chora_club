@@ -68,14 +68,11 @@ const UserScheduledHours: React.FC = () => {
   };
 
   return (
-    <div className="p-4">
-      <h1 className="text-xl font-bold mb-2">Schedule Office Hours</h1>
+    <div className="ps-4 font-poppins">
+      <h1 className="text-xl font-bold mb-4">Schedule Office Hours</h1>
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
-          <label
-            className="block text-gray-700 text-sm font-bold mb-2"
-            htmlFor="title"
-          >
+          <label className="block font-bold mb-2" htmlFor="title">
             Title
           </label>
           <input
@@ -87,10 +84,7 @@ const UserScheduledHours: React.FC = () => {
           />
         </div>
         <div className="mb-4">
-          <label
-            className="block text-gray-700 text-sm font-bold mb-2"
-            htmlFor="description"
-          >
+          <label className="block font-bold mb-2" htmlFor="description">
             Description
           </label>
           <textarea
@@ -101,10 +95,7 @@ const UserScheduledHours: React.FC = () => {
           />
         </div>
         <div className="mb-4">
-          <label
-            className="block text-gray-700 text-sm font-bold mb-2"
-            htmlFor="startDate"
-          >
+          <label className="block font-bold mb-2" htmlFor="startDate">
             Date & Time
           </label>
           <input
