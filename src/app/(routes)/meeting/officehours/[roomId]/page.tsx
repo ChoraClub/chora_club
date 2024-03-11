@@ -58,7 +58,6 @@ const Home = ({ params }: { params: { roomId: string } }) => {
       push(`/meeting/officehours/${params.roomId}/lobby`);
       return;
     } else {
-      console.log("length", peerIds.length);
       updateMetadata({
         displayName: userDisplayName,
         avatarUrl: avatarUrl,

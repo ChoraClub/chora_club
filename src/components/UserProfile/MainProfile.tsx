@@ -39,8 +39,8 @@ import { Oval } from "react-loader-spinner";
 import lighthouse from "@lighthouse-web3/sdk";
 
 function MainProfile() {
-  const { address } = useAccount();
-  // const address = "0x5e349eca2dc61abcd9dd99ce94d04136151a09ee";
+  // const { address } = useAccount();
+  const address = "0x5e349eca2dc61abcd9dd99ce94d04136151a09ee";
   const { publicClient, walletClient } = WalletAndPublicClient();
   const { chain, chains } = useNetwork();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -67,10 +67,6 @@ function MainProfile() {
   const [descAvailable, setDescAvailable] = useState<boolean>(true);
   const [isPageLoading, setIsPageLoading] = useState(true);
   const [selfDelegate, setSelfDelegate] = useState(false);
-
-  const handleLogoClick = () => {
-    fileInputRef.current?.click();
-  };
 
   interface ProgressData {
     total: any;
@@ -177,14 +173,15 @@ function MainProfile() {
   const handleDelegateVotes = async (to: string) => {
     const addr = await walletClient.getAddresses();
     const address1 = addr[0];
-    
-    const contractAddress = chain?.name === "Optimism" 
+
+    const contractAddress =
+      chain?.name === "Optimism"
         ? "0x4200000000000000000000000000000000000042"
         : chain?.name === "Arbitrum One"
-            ? "0x912CE59144191C1204E64559FE8253a0e49E6548"
-            : "";
-    console.log("Contract", contractAddress)
-    console.log("Wallet Client",walletClient);
+        ? "0x912CE59144191C1204E64559FE8253a0e49E6548"
+        : "";
+    console.log("Contract", contractAddress);
+    console.log("Wallet Client", walletClient);
     const delegateTx = await walletClient.writeContract({
       address: contractAddress,
       abi: dao_abi.abi,
@@ -574,47 +571,45 @@ function MainProfile() {
                 className="relative object-cover rounded-3xl "
                 onMouseEnter={() => setHovered(true)}
                 onMouseLeave={() => setHovered(false)}
-                style={{backgroundColor:"#fcfcfc", border:"2px solid #E9E9E9 "}}
+                style={{
+                  backgroundColor: "#fcfcfc",
+                  border: "2px solid #E9E9E9 ",
+                }}
               >
                 <div className="w-40 h-40 flex items-center justify-content ">
-                  <div className="flex justify-center items-center w-40 h-40"> 
-                  <Image
+                  <div className="flex justify-center items-center w-40 h-40">
+                    <Image
                       src={
-                          (displayImage
-                              ? `https://gateway.lighthouse.storage/ipfs/${displayImage}`
-                              : karmaImage) || (chain?.name==="Optimism" ? OPLogo : chain?.name==="Arbitrum One"?ArbLogo : ccLogo)
+                        (displayImage
+                          ? `https://gateway.lighthouse.storage/ipfs/${displayImage}`
+                          : karmaImage) ||
+                        (chain?.name === "Optimism"
+                          ? OPLogo
+                          : chain?.name === "Arbitrum One"
+                          ? ArbLogo
+                          : ccLogo)
                       }
                       alt="user"
                       width={256}
                       height={256}
-                      className={displayImage ? "w-40 h-40 rounded-3xl" : "w-20 h-20 rounded-3xl"}
-                  />
-
+                      className={
+                        displayImage
+                          ? "w-40 h-40 rounded-3xl"
+                          : "w-20 h-20 rounded-3xl"
+                      }
+                    />
                   </div>
 
-                  <Image 
-                      src={ccLogo}
-                      alt="ChoraClub Logo"
-                      className="absolute top-0 right-0"
-                      style={{ width: '30px', height: '30px', marginTop:'10px', marginRight:'10px' }}
-                    />
-                </div>
-                
-                <div
-                  className={`absolute top-3 right-3 cursor-pointer  ${
-                    hovered ? "bg-gray-50 rounded-full p-1" : "hidden"
-                  } `}
-                  onClick={handleLogoClick}
-                >
-                  <FaPencil
-                    className="opacity-100 backdrop-blur-sm"
-                    size={12}
-                  />
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    hidden
-                    onChange={(e) => uploadImage(e.target.files)}
+                  <Image
+                    src={ccLogo}
+                    alt="ChoraClub Logo"
+                    className="absolute top-0 right-0"
+                    style={{
+                      width: "30px",
+                      height: "30px",
+                      marginTop: "10px",
+                      marginRight: "10px",
+                    }}
                   />
                 </div>
               </div>
@@ -681,7 +676,7 @@ function MainProfile() {
                       <FaGithub color="#7C7C7C" size={12} />
                     </Link>
                     <Tooltip
-                      content="Edit social links"
+                      content="Update your Profile"
                       placement="right"
                       showArrow
                     >
@@ -701,10 +696,20 @@ function MainProfile() {
                       <ModalContent>
                         {(onClose: any) => (
                           <>
-                            <ModalHeader className="flex flex-col gap-1">
-                              Edit Socials
+                             <ModalHeader className="flex flex-col gap-1">
+                              Update your Profile
                             </ModalHeader>
                             <ModalBody>
+
+                              <div className="px-1 font-medium">
+                                Upload Profile Image:
+                              </div>
+                              <input
+                                type="file"
+                                ref={fileInputRef}
+                                placeholder="Upload Image"
+                                onChange={(e) => uploadImage(e.target.files)}
+                              />
                               <div className="px-1 font-medium">
                                 Display name:
                               </div>
@@ -719,7 +724,7 @@ function MainProfile() {
                                     e.target.value
                                   )
                                 }
-                              />
+                              />  
 
                               <div className="px-1 font-medium">
                                 Twitter ID:
