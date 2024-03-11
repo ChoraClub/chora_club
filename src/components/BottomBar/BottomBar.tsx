@@ -171,6 +171,32 @@ const BottomBar: React.FC<BottomBarProps> = () => {
     } catch (error) {
       console.error("Error handling end call:", error);
     }
+
+    try {
+      const response = await fetch(`/api/get-host`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          meetingId: roomId,
+        }),
+      });
+      const response_data = await response.json();
+      const host_address = await response_data.address;
+
+      const res = await fetch(`/api/update-office-hours/${host_address}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const res_data = await res.json();
+
+      // if (res_data.success) {
+        console.log("Updated",res_data);
+      // }
+    } catch (e) {}
   };
 
   return (

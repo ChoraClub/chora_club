@@ -19,9 +19,12 @@ import useStore from "@/components/store/slices";
 import {
   useHuddle01,
   useLobby,
+  useLocalPeer,
   usePeerIds,
   useRoom,
 } from "@huddle01/react/hooks";
+import { useAccount } from "wagmi";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 type lobbyProps = {};
 
@@ -34,6 +37,13 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
   const userDisplayName = useStore((state) => state.userDisplayName);
   const [token, setToken] = useState<string>("");
   const [isJoining, setIsJoining] = useState<boolean>(false);
+  const { updateMetadata, metadata, peerId, role } = useLocalPeer<{
+    displayName: string;
+    avatarUrl: string;
+    isHandRaised: boolean;
+  }>();
+
+  const { address, isDisconnected } = useAccount();
 
   const { push } = useRouter();
 
@@ -42,24 +52,63 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
 
   const handleStartSpaces = async () => {
     setIsJoining(true);
+
+    const userDisplayName = "demoNamefromDemo";
+    if (isDisconnected) {
+      toast.error("account is not connected");
+    }
+
     let token = "";
     if (state !== "connected") {
-      const response = await fetch(`/api/token?roomId=${params.roomId}`);
-      token = await response.text();
-      console.log(response);
+      const requestBody = {
+        roomId: params.roomId,
+        role: "host",
+        displayName: address,
+        address: address, // assuming you have userAddress defined somewhere
+      };
+      try {
+        const response = await fetch("/api/new-token", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(requestBody),
+        });
+
+        // if (!response.ok) {
+        //   throw new Error("Failed to fetch token");
+        // }
+
+        token = await response.text(); // Change this line
+        console.log("Token fetched successfully:", token);
+      } catch (error) {
+        console.error("Error fetching token:", error);
+        // Handle error appropriately, e.g., show error message to user
+        toast.error("Failed to fetch token");
+        setIsJoining(false);
+        return;
+      }
     }
 
     if (!userDisplayName.length) {
       toast.error("Display name is required!");
+      setIsJoining(false);
       return;
-    } else {
-      // console.log("token from lobby", { token });
-      // console.log("roomId from loby", params.roomId);
+    }
+
+    try {
+      console.log({ token });
+      console.log(params.roomId);
       await joinRoom({
         roomId: params.roomId,
         token,
       });
+    } catch (error) {
+      console.error("Error joining room:", error);
+      // Handle error appropriately, e.g., show error message to user
+      toast.error("Failed to join room");
     }
+
     setIsJoining(false);
   };
 
@@ -132,6 +181,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
             </div>
           </FeatCommon>
         </div>
+        {isDisconnected ? <ConnectButton /> : null}
         <div className="flex items-center w-full flex-col">
           <div className="flex flex-col justify-center w-full gap-1 text-black">
             Set a display name

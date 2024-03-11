@@ -26,6 +26,7 @@ import {
   useLocalPeer,
 } from "@huddle01/react/hooks";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { Role } from "@huddle01/server-sdk/auth";
 
 type lobbyProps = {};
 
@@ -111,10 +112,22 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
       toast.error("Failed to join room");
     }
 
+    if (role === "host") {
+      const response = await fetch(
+        `/api/update-meeting-status/${params.roomId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const responseData = await response.json();
+      console.log("responseData: ", responseData);
+    }
+
     setIsJoining(false);
   };
-
-
 
   useEffect(() => {
     if (state === "connected") {
