@@ -39,8 +39,8 @@ import { Oval } from "react-loader-spinner";
 import lighthouse from "@lighthouse-web3/sdk";
 
 function MainProfile() {
-  // const { address } = useAccount();
-  const address = "0x5e349eca2dc61abcd9dd99ce94d04136151a09ee";
+  const { address } = useAccount();
+  // const address = "0x5e349eca2dc61abcd9dd99ce94d04136151a09ee";
   const { publicClient, walletClient } = WalletAndPublicClient();
   const { chain, chains } = useNetwork();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -561,6 +561,10 @@ function MainProfile() {
     fetchData();
   }, [chain, address]);
 
+  const handleLogoClick = () => {
+    fileInputRef.current?.click();
+  };
+
   return (
     <>
       {!isPageLoading ? (
@@ -696,11 +700,10 @@ function MainProfile() {
                       <ModalContent>
                         {(onClose: any) => (
                           <>
-                             <ModalHeader className="flex flex-col gap-1">
+                            <ModalHeader className="flex flex-col gap-1">
                               Update your Profile
                             </ModalHeader>
                             <ModalBody>
-
                               <div className="px-1 font-medium">
                                 Upload Profile Image:
                               </div>
@@ -724,7 +727,7 @@ function MainProfile() {
                                     e.target.value
                                   )
                                 }
-                              />  
+                              />
 
                               <div className="px-1 font-medium">
                                 Twitter ID:
