@@ -19,7 +19,10 @@ import toast, { Toaster } from "react-hot-toast";
 import WalletAndPublicClient from "@/helpers/signer";
 import dao_abi from "../../artifacts/Dao.sol/GovernanceToken.json";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-
+import { useNetwork } from "wagmi";
+import OPLogo from "@/assets/images/daos/op.png";
+import ArbLogo from "@/assets/images/daos/arbCir.png";
+import ccLogo from "@/assets/images/daos/CC.png"
 interface Type {
   daoDelegates: string;
   individualDelegate: string;
@@ -27,6 +30,7 @@ interface Type {
 
 function SpecificDelegate({ props }: { props: Type }) {
   const { walletClient } = WalletAndPublicClient();
+  const { chain, chains } = useNetwork();
   const [delegateInfo, setDelegateInfo] = useState<any>();
   const router = useRouter();
   const path = usePathname();
@@ -35,7 +39,7 @@ function SpecificDelegate({ props }: { props: Type }) {
   const [discord, setDiscord] = useState("");
   const [discourse, setDiscourse] = useState("");
   const [github, setGithub] = useState("");
-
+  console.log("Props", props.daoDelegates)
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -128,14 +132,39 @@ function SpecificDelegate({ props }: { props: Type }) {
     <div className="font-poppins">
       <div className="flex ps-14 py-5 justify-between">
         <div className="flex">
-          <Image
+          {/* <Image
             src={delegateInfo?.profilePicture || user}
             alt="user"
             width={256}
             height={256}
             className="w-40 rounded-3xl"
-          />
+          /> */}
+                 <div
+                className="relative object-cover rounded-3xl"
+                style={{backgroundColor:"#fcfcfc", border:"2px solid #E9E9E9 "}}
+              >
+                <div className="w-40 h-40 flex items-center justify-content ">
+                  <div className="flex justify-center items-center w-40 h-40"> 
+                  <Image
+                      src={
+                        delegateInfo?.profilePicture || (props.daoDelegates==="optimism" ? OPLogo : props.daoDelegates==="arbitrum"?ArbLogo : ccLogo)
+                      }
+                      alt="user"
+                      width={256}
+                      height={256}
+                      className={delegateInfo?.profilePicture ? "w-40 h-40 rounded-3xl" : "w-20 h-20 rounded-3xl"}
+                  />
 
+                  </div>
+
+                  <Image 
+                      src={ccLogo}
+                      alt="ChoraClub Logo"
+                      className="absolute top-0 right-0"
+                      style={{ width: '30px', height: '30px', marginTop:'10px', marginRight:'10px' }}
+                    />
+                </div>
+                </div>
           <div className="px-4">
             <div className=" flex items-center py-1">
               <div className="font-bold text-lg pr-4">

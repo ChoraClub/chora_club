@@ -68,10 +68,6 @@ function MainProfile() {
   const [isPageLoading, setIsPageLoading] = useState(true);
   const [selfDelegate, setSelfDelegate] = useState(false);
 
-  const handleLogoClick = () => {
-    fileInputRef.current?.click();
-  };
-
   interface ProgressData {
     total: any;
     uploaded: any;
@@ -616,24 +612,6 @@ function MainProfile() {
                     }}
                   />
                 </div>
-
-                <div
-                  className={`absolute top-3 right-3 cursor-pointer  ${
-                    hovered ? "bg-gray-50 rounded-full p-1" : "hidden"
-                  } `}
-                  onClick={handleLogoClick}
-                >
-                  <FaPencil
-                    className="opacity-100 backdrop-blur-sm"
-                    size={12}
-                  />
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    hidden
-                    onChange={(e) => uploadImage(e.target.files)}
-                  />
-                </div>
               </div>
 
               <div className="px-4">
@@ -698,7 +676,7 @@ function MainProfile() {
                       <FaGithub color="#7C7C7C" size={12} />
                     </Link>
                     <Tooltip
-                      content="Edit social links"
+                      content="Update your Profile"
                       placement="right"
                       showArrow
                     >
@@ -718,10 +696,20 @@ function MainProfile() {
                       <ModalContent>
                         {(onClose: any) => (
                           <>
-                            <ModalHeader className="flex flex-col gap-1">
-                              Edit Socials
+                             <ModalHeader className="flex flex-col gap-1">
+                              Update your Profile
                             </ModalHeader>
                             <ModalBody>
+
+                              <div className="px-1 font-medium">
+                                Upload Profile Image:
+                              </div>
+                              <input
+                                type="file"
+                                ref={fileInputRef}
+                                placeholder="Upload Image"
+                                onChange={(e) => uploadImage(e.target.files)}
+                              />
                               <div className="px-1 font-medium">
                                 Display name:
                               </div>
@@ -736,7 +724,7 @@ function MainProfile() {
                                     e.target.value
                                   )
                                 }
-                              />
+                              />  
 
                               <div className="px-1 font-medium">
                                 Twitter ID:
