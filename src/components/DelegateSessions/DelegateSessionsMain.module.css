@@ -30,3 +30,22 @@
 .select-container:hover select {
   border-color: #888;
 }
+
+/* .srb::-webkit-scrollbar {
+  display: none;
+}
+
+.srb::-webkit-scrollbar-thumb:hover {
+  display: block;
+  background: #555;
+}
+
+.srb::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.srb::-webkit-scrollbar-thumb {
+  display: none;
+  background: #888;
+  border-radius: 10px;
+} */
