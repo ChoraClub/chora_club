@@ -4,7 +4,8 @@ import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import logo from "@/assets/images/sidebar/favicon.png";
 import rocket from "@/assets/images/sidebar/rocket.png";
-import office from "@/assets/images/sidebar/office.png";
+import sessionIcn from "@/assets/images/sidebar/office.png";
+import office from "@/assets/images/sidebar/Office hour (1).png";
 import wallet from "@/assets/images/sidebar/wallet.png";
 import gitbook from "@/assets/images/sidebar/gitbook.png";
 import user from "@/assets/images/sidebar/user.png";
@@ -85,6 +86,7 @@ function Sidebar() {
           >
             <Link href={"/"}>
               <Image
+                priority
                 src={rocket}
                 alt={"image"}
                 width={40}
@@ -104,6 +106,7 @@ function Sidebar() {
           >
             <Link href={"/office-hours?hours=ongoing"}>
               <Image
+                priority
                 src={office}
                 alt={"image"}
                 width={40}
@@ -115,7 +118,7 @@ function Sidebar() {
               ></Image>
             </Link>
           </Tooltip>
-          {/* <Tooltip
+          <Tooltip
             content="Delegate Sessions"
             placement="right"
             className="rounded-md bg-opacity-90"
@@ -123,7 +126,8 @@ function Sidebar() {
           >
             <Link href={"/delegate-sessions?sessions=available"}>
               <Image
-                src={office}
+                priority
+                src={sessionIcn}
                 alt={"image"}
                 width={40}
                 className={`cursor-pointer  ${
@@ -133,7 +137,7 @@ function Sidebar() {
                 }`}
               ></Image>
             </Link>
-          </Tooltip> */}
+          </Tooltip>
         </div>
 
         <div
