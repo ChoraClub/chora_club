@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { Recorder } from "@huddle01/server-sdk/recorder";
 
 interface Recordings {
@@ -8,7 +8,7 @@ interface Recordings {
   recordingSize: number;
 }
 
-export async function GET(request: Request, res: NextResponse) {
+export async function GET(request: Request, res: NextResponse): Promise<void | Response> {
   const roomId = request.url.split("stopRecording/")[1];
   console.log("room ID from stop", roomId);
 
