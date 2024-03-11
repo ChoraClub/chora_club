@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { MongoClient } from "mongodb";
+import { MongoClient, MongoClientOptions } from "mongodb";
 import { NextRequest, NextResponse } from "next/server";
 
 async function delegateAttestationOnchain(data: any) {
@@ -14,11 +14,17 @@ async function delegateAttestationOnchain(data: any) {
     body: raw,
   };
 
-  const response = await fetch(
-    `${baseUrl}/api/attest-offchain/`,
-    requestOptions
-  );
-  return response.json();
+  try {
+    const response = await fetch(
+      `${baseUrl}/api/attest-offchain/`,
+      requestOptions
+    );
+    console.log("Response from attestation endpoint:", response);
+    return response.json();
+  } catch (error) {
+    console.error("Error fetching from attestation endpoint:", error);
+    throw error;
+  }
 }
 
 export async function POST(req: NextRequest, res: NextResponse) {
@@ -28,7 +34,9 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
   try {
     // Connect to MongoDB
-    const client = await MongoClient.connect(process.env.MONGODB_URI!);
+    const client = await MongoClient.connect(process.env.MONGODB_URI!, {
+      dbName: `chora-club`,
+    } as MongoClientOptions);
     console.log("Connected to MongoDB");
 
     const db = client.db();
@@ -92,11 +100,11 @@ export async function POST(req: NextRequest, res: NextResponse) {
     }
 
     // Update attestation status to "attested"
-    await collection.updateOne(
-      { roomId },
-      { $set: { attestation: "attested" } }
-    );
-    console.log("Updated attestation status to 'attested'");
+    // await collection.updateOne(
+    //   { roomId },
+    //   { $set: { attestation: "attested" } }
+    // );
+    // console.log("Updated attestation status to 'attested'");
 
     return NextResponse.json(data, { status: 200 });
   } catch (error) {
