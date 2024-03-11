@@ -367,35 +367,48 @@ function AvailableSessions() {
                 className="rounded-3xl flex flex-col bg-white"
               >
                 <div className="flex items-center mb-4 border-b-2 py-5 px-5 rounded-tl-3xl rounded-tr-3xl">
-                  <div className="w-1/4 flex justify-center items-center relative">
-                    <div className="relative">
+                  <div
+                    className="relative object-cover rounded-3xl"
+                    style={{
+                      backgroundColor: "#fcfcfc",
+                      border: "2px solid #E9E9E9 ",
+                    }}
+                  >
+                    <div className="w-32 h-32 flex items-center justify-content ">
+                      <div className="flex justify-center items-center w-32 h-32">
+                        <Image
+                          src={
+                            daos.profilePicture
+                              ? `https://gateway.lighthouse.storage/ipfs/${daos.profilePicture}`
+                              : daos.dao_name === "optimism"
+                              ? OPLogo
+                              : daos.dao_name === "arbitrum"
+                              ? ArbLogo
+                              : ccLogo
+                          }
+                          alt="user"
+                          width={256}
+                          height={256}
+                          className={
+                            daos?.profilePicture
+                              ? "w-32 h-32 rounded-3xl"
+                              : "w-20 h-20 rounded-3xl"
+                          }
+                        />
+                      </div>
+
                       <Image
-                        src={
-                          daos.profilePicture
-                            ? `https://gateway.lighthouse.storage/ipfs/${daos.profilePicture}`
-                            : daos?.dao_name === "optimism"
-                            ? OPLogo
-                            : daos?.dao_name === "arbitrum"
-                            ? ArbLogo
-                            : text1
-                        }
-                        alt="Image not found"
-                        width={180}
-                        height={120}
-                        className="w-44 h-30 rounded-3xl"
+                        src={ccLogo}
+                        alt="ChoraClub Logo"
+                        className="absolute top-0 right-0"
+                        style={{
+                          width: "30px",
+                          height: "30px",
+                          marginTop: "10px",
+                          marginRight: "10px",
+                        }}
                       />
                     </div>
-                    <Image
-                      src={ccLogo}
-                      alt="ChoraClub Logo"
-                      className={`absolute top-0 right-0`}
-                      style={{
-                        width: "30px",
-                        height: "30px",
-                        marginTop: "10px",
-                        marginRight: "10px",
-                      }}
-                    />
                   </div>
 
                   <div className="w-3/4 ml-4">
@@ -446,7 +459,7 @@ function AvailableSessions() {
                     <div className="mt-2 bg-[#1E1E1E] border border-[#1E1E1E] text-white rounded-md text-xs px-5 py-1 font-semibold w-fit capitalize">
                       {daos.dao_name}
                     </div>
-                    <div>
+                    {/* <div>
                       <div className="text-[#4F4F4F] border-[0.5px] border-[#D9D9D9] rounded-md px-3 py-1 mt-4">
                         Delegated from
                         <span className="text-blue-shade-200 font-semibold">
@@ -454,7 +467,7 @@ function AvailableSessions() {
                         </span>
                         Addresses
                       </div>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
 
