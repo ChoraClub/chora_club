@@ -247,7 +247,12 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
             ) : null
           ) : isEvent === "Attending" ? (
             data.booking_status === "Approved" && (
-              <div className="text-center bg-blue-shade-100 rounded-full font-bold text-white py-2 text-xs cursor-pointer">
+              <div
+                onClick={() => {
+                  router.push(`/meeting/session/${data.meetingId}`);
+                }}
+                className="text-center bg-blue-shade-100 rounded-full font-bold text-white py-2 text-xs cursor-pointer"
+              >
                 Join
               </div>
             )

@@ -42,14 +42,14 @@ function AvailableSessions() {
   const [APIData, setAPIData] = useState<Array<Type>>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isPageLoading, setIsPageLoading] = useState(true);
-  const [selectedDao, setSelectedDao] = useState<any>("");
-  const [selectedDate, setSelectedDate] = useState<any>("");
-  const [startTime, setStartTime] = useState<any>("");
-  const [endTime, setEndTime] = useState<any>("");
+  const [selectedDao, setSelectedDao] = useState<any>(null);
+  const [selectedDate, setSelectedDate] = useState<any>(null);
+  const [startTime, setStartTime] = useState<any>(null);
+  const [endTime, setEndTime] = useState<any>(null);
 
   useEffect(() => {
     setIsPageLoading(false);
-  }, [selectedDate]);
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -58,37 +58,29 @@ function AvailableSessions() {
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
 
-        let dateToSend;
-        if (selectedDate) {
-          const utcDate = new Date(selectedDate).toISOString().split("T")[0];
-          console.log("utcDate", utcDate);
+        let dateToSend = null;
 
-          dateToSend = utcDate;
-          setSelectedDate(utcDate);
-        } else {
-          dateToSend = null;
-          setSelectedDate(null);
-        }
+        // if (selectedDate) {
+        //   const utcDate = new Date(selectedDate).toISOString().split("T")[0];
+        //   console.log("utcDate", utcDate);
+        //   dateToSend = utcDate;
+        //   setSelectedDate(utcDate);
+        // } else if (selectedDate === "") {
+        //   setSelectedDate(null);
+        // }
 
-        if (selectedDate === "") {
-          dateToSend = null;
-          setSelectedDate(null);
-        }
+        // if (selectedDao === "" || selectedDao === "All-DAOS") {
+        //   setSelectedDao(null);
+        // }
 
-        if (selectedDao === "" || selectedDao === "All-DAOS") {
-          setSelectedDao(null);
-        }
+        // if (startTime === "Start Time" || startTime === "") {
+        //   console.log("start time not null");
+        //   setStartTime(null);
+        // }
 
-        if (
-          startTime === "00:00" ||
-          startTime === "Start Time" ||
-          startTime === ""
-        ) {
-          setStartTime(null);
-        }
-        if (endTime === "00:00" || endTime === "End Time" || endTime === "") {
-          setEndTime(null);
-        }
+        // if (endTime === "End Time" || endTime === "") {
+        //   setEndTime(null);
+        // }
 
         console.log("selectedDao", selectedDao);
         console.log("selectedDate", selectedDate);
@@ -102,30 +94,33 @@ function AvailableSessions() {
           endTime: endTime,
         });
 
+        // console.log("")
+
         const requestOptions: any = {
           method: "POST",
           headers: myHeaders,
           body: raw,
-          redirect: "follow",
         };
 
+        console.log("requestOptions", requestOptions);
         const result = await fetch(
           "/api/get-availability/filter",
           requestOptions
         );
         const response = await result.json();
-        if (response.success) {
-          // console.log("response", response.data);
-          const resultData = await response.data;
+
+        let resultData;
+        console.log("resultData: ", response);
+        if (response.success === true) {
+          console.log("response", response.data);
+          resultData = await response.data;
           console.log("resultData", resultData);
-          setAPIData(resultData);
-          setDaoInfo(resultData);
-          setIsPageLoading(false);
         }
+        setAPIData(resultData);
+        setDaoInfo(resultData);
+        setIsPageLoading(false);
       } catch (error) {
         console.error("Error Fetching Data of availability:", error);
-      } finally {
-        setIsPageLoading(false);
       }
     };
     fetchData();
@@ -148,14 +143,51 @@ function AvailableSessions() {
 
   const handleDaoChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selected = e.target.value;
-    setSelectedDao(selected);
-    // let filtered: any;
-    // if (selected === "All-DAOS") {
-    //   setDaoInfo(APIData);
-    // } else {
-    //   filtered = APIData.filter((item) => item.dao_name === selected);
-    //   setDaoInfo(filtered);
-    // }
+    // setSelectedDao(selected);
+    let filtered: any;
+    if (selected === "All-DAOS") {
+      // setDaoInfo(APIData);
+      setSelectedDao(null);
+    } else {
+      // filtered = APIData.filter((item) => item.dao_name === selected);
+      // setDaoInfo(filtered);
+      setSelectedDao(selected);
+    }
+  };
+
+  const handleDateChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selected = e.target.value;
+    console.log("selected date", selected);
+    if (selected === "") {
+      console.log("its empty string");
+      setSelectedDate(null);
+    } else {
+      setSelectedDate(selected);
+    }
+  };
+
+  const handleStartTimeChange = async (
+    e: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    const selected = e.target.value;
+    console.log("selected startTime", selected);
+    if (selected === "Start Time") {
+      setStartTime(null);
+    } else {
+      setStartTime(selected);
+    }
+  };
+
+  const handleEndTimeChange = async (
+    e: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    const selected = e.target.value;
+    console.log("selected endTime", selected);
+    if (selected === "End Time") {
+      setEndTime(null);
+    } else {
+      setEndTime(selected);
+    }
   };
 
   const generateTimeOptions = () => {
@@ -174,16 +206,18 @@ function AvailableSessions() {
   const timeOptions = generateTimeOptions();
 
   const handleClearTime = () => {
-    setStartTime("Start Time");
-    setEndTime("End Time");
+    setStartTime(null);
+    setEndTime(null);
   };
+
+  const currentDate = new Date().toISOString().split("T")[0];
 
   return (
     <>
-      <div className="flex gap-7 bg-[#D9D9D945] p-4 mt-4 rounded-2xl">
+      <div className="flex gap-7 bg-[#D9D9D945] p-4 mt-4 rounded-2xl font-poppins">
         <div
           style={{ background: "rgba(238, 237, 237, 0.36)" }}
-          className="flex border-[0.5px] border-black w-fit rounded-full  font-poppins"
+          className="flex border-[0.5px] border-black w-fit rounded-full  "
         >
           <input
             type="text"
@@ -206,6 +240,7 @@ function AvailableSessions() {
         <div className="flex items-center">
           <select
             value={selectedDao}
+            // onChange={(e) => setSelectedDao(e.target.value)}
             onChange={handleDaoChange}
             className="px-3 py-2 rounded-md border border-[#606060]"
           >
@@ -234,7 +269,9 @@ function AvailableSessions() {
           <input
             type="date"
             value={selectedDate}
-            onChange={(e) => setSelectedDate(e.target.value)}
+            onChange={handleDateChange}
+            min={currentDate}
+            // onChange={(e) => setSelectedDate(e.target.value)}
             className="px-3 py-2 rounded-md border border-[#606060] mr-1"
           />
           <Tooltip
@@ -256,11 +293,11 @@ function AvailableSessions() {
 
         <div className="flex items-center select-container">
           <select
-            value={startTime}
-            onChange={(e) => setStartTime(e.target.value)}
+            value={startTime || "Start Time"}
+            onChange={handleStartTimeChange}
             className="px-3 py-2 rounded-md border border-[#606060] mr-2"
           >
-            <option>Start Time</option>
+            <option disabled>Start Time</option>
             {timeOptions.map((time) => (
               <option key={time} value={time}>
                 {time}
@@ -269,11 +306,11 @@ function AvailableSessions() {
           </select>
           <span>to</span>
           <select
-            value={endTime}
-            onChange={(e) => setEndTime(e.target.value)}
+            value={endTime || "End Time"}
+            onChange={handleEndTimeChange}
             className="px-3 py-2 rounded-md border border-[#606060] ml-2"
           >
-            <option>End Time</option>
+            <option disabled>End Time</option>
             {timeOptions.map((time) => (
               <option key={time} value={time}>
                 {time}
@@ -296,8 +333,11 @@ function AvailableSessions() {
               <FaCircleInfo className="cursor-pointer" />
             </span>
           </Tooltip>
-          {!isPageLoading && startTime && endTime && (
-            <button onClick={handleClearTime} className="ml-2 text-red-500">
+          {(startTime || endTime) && (
+            <button
+              onClick={handleClearTime}
+              className="ml-2 text-red-500 px-3 py-1 rounded-md border border-red-500 hover:bg-red-500 hover:text-white focus:outline-none focus:ring-2 focus:ring-red-500"
+            >
               Clear Time
             </button>
           )}
@@ -317,14 +357,14 @@ function AvailableSessions() {
             />
           </div>
         ) : daoInfo.length > 0 ? (
-          <div className="overflow-auto max-h-[61vh] font-poppins grid  grid-cols-1 md:grid-cols-2 lg:grid-cols-2 2xl:grid-cols-2 gap-10">
+          <div className="overflow-auto font-poppins grid  grid-cols-1 md:grid-cols-1 lg:grid-cols-2 2xl:grid-cols-2 gap-12 py-5 px-10">
             {daoInfo.map((daos: any, index: number) => (
               <div
                 key={index}
                 style={{
                   boxShadow: "0px 4px 50.8px 0px rgba(0, 0, 0, 0.11)",
                 }}
-                className="rounded-3xl m-4 flex flex-col mx-auto justify-between bg-white w-[35rem]"
+                className="rounded-3xl flex flex-col bg-white"
               >
                 <div className="flex items-center mb-4 border-b-2 py-5 px-5 rounded-tl-3xl rounded-tr-3xl">
                   <div className="w-1/4 flex justify-center items-center relative">
@@ -368,7 +408,11 @@ function AvailableSessions() {
                             daos.userAddress.slice(-4)}
                     </div>
                     <div className="text-sm flex">
-                      <div>{daos.userAddress}</div>
+                      <div>
+                        {daos.userAddress.slice(0, 6) +
+                          "..." +
+                          daos.userAddress.slice(-4)}
+                      </div>
                       <div className="items-center">
                         <Tooltip
                           content="Copy"

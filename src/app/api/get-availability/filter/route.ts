@@ -100,7 +100,7 @@ export async function POST(req: NextRequest, res: NextResponse<Type[]>) {
 
     const SessionData = await collection.find(query).toArray();
 
-    // console.log("SessionData", SessionData);
+    console.log("SessionData", SessionData);
     client.close();
 
     return NextResponse.json(

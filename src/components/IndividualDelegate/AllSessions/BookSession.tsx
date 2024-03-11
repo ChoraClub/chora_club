@@ -57,13 +57,14 @@ function BookSession({ props }: { props: Type }) {
       setIsLoading(false);
     }, 2000);
 
-    if (isConnected) {
-      setTimeout(() => {
-        getAvailability();
-        getSlotTimeAvailability();
-        // setIsPageLoading(false);
-      }, 1000);
-    }
+    // if (isConnected) {
+    // setTimeout(() => {
+    getAvailability();
+    getSlotTimeAvailability();
+    // setIsPageLoading(false);
+    // }, 1000);
+    // }
+
     // setIsPageLoading(false);
 
     return () => {
