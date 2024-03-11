@@ -19,8 +19,10 @@ interface OfficeHours {
   meetingId: string;
 }
 
+const baseUrl = process.env.NEXTAUTH_URL;
+
 const createRandomRoom = async () => {
-  const res = await fetch("/api/create-room", {
+  const res = await fetch(`${baseUrl}/api/create-room`, {
     method: "POST",
     body: JSON.stringify({
       title: "Test Room",
