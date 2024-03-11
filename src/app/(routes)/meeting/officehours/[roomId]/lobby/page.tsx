@@ -114,6 +114,8 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
     setIsJoining(false);
   };
 
+
+
   useEffect(() => {
     if (state === "connected") {
       push(`/meeting/officehours/${params.roomId}`);

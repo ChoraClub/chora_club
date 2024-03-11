@@ -35,7 +35,7 @@ const BottomBar: React.FC<BottomBarProps> = () => {
 
   const { peerIds } = usePeerIds();
 
-  const { leaveRoom, closeRoom } = useRoom();
+  const { leaveRoom, closeRoom, state } = useRoom();
 
   const { enableAudio, disableAudio, isAudioOn } = useLocalAudio({
     onProduceStart(producer) {
@@ -61,199 +61,115 @@ const BottomBar: React.FC<BottomBarProps> = () => {
 
   const [showLeaveDropDown, setShowLeaveDropDown] = useState<boolean>(false);
 
-  const handleRecordingButtonClick = async () => {
-    if (!roomId) {
-      console.error("roomId is undefined");
-      return;
+  // const handleRecordingButtonClick = async () => {
+  //   if (!roomId) {
+  //     console.error("roomId is undefined");
+  //     return;
+  //   }
+
+  //   try {
+  //     const status = isRecording
+  //       ? await fetch(`/api/stopRecording/${roomId}`)
+  //       : await fetch(`/api/startRecording/${roomId}`);
+
+  //     if (!status.ok) {
+  //       console.error(`Request failed with status: ${status.status}`);
+  //       toast.error(`Failed to ${isRecording ? "stop" : "start"} recording`);
+  //       return;
+  //     }
+
+  //     setIsRecording(!isRecording);
+  //     toast.success(`Recording ${isRecording ? "stopped" : "started"}`);
+
+  //     // If it's a stop recording action, you can fetch the recordings
+  //     if (!isRecording) {
+  //       const recordingsResponse = await fetch("/api/stopRecording/:roomId");
+  //       const recordingsData = await recordingsResponse.json();
+  //       console.log("Recordings:", recordingsData);
+  //       // Now you can use the recordingsData in your frontend as needed
+  //     }
+  //   } catch (error) {
+  //     console.error(
+  //       `Error during ${isRecording ? "stop" : "start"} recording:`,
+  //       error
+  //     );
+  //     toast.error(`Error during ${isRecording ? "stop" : "start"} recording`);
+  //   }
+  // };
+
+  useEffect(() => {
+    if (role === "host") {
+      startRecordingAutomatically();
     }
+  }, []);
 
+  const startRecordingAutomatically = async () => {
     try {
-      const status = isRecording
-        ? await fetch(`/api/stopRecording/${roomId}`)
-        : await fetch(`/api/startRecording/${roomId}`);
+      // Check if it's the host
 
+      const status = await fetch(`/api/startRecording/${params.roomId}`);
       if (!status.ok) {
         console.error(`Request failed with status: ${status.status}`);
-        toast.error(`Failed to ${isRecording ? "stop" : "start"} recording`);
+        toast.error("Failed to start recording");
         return;
       }
-
-      setIsRecording(!isRecording);
-      toast.success(`Recording ${isRecording ? "stopped" : "started"}`);
-
-      // If it's a stop recording action, you can fetch the recordings
-      if (!isRecording) {
-        const recordingsResponse = await fetch("/api/stopRecording/:roomId");
-        const recordingsData = await recordingsResponse.json();
-        console.log("Recordings:", recordingsData);
-        // Now you can use the recordingsData in your frontend as needed
-      }
+      setIsRecording(true); // Assuming this should be true after starting recording
+      toast.success("Recording started");
     } catch (error) {
-      console.error(
-        `Error during ${isRecording ? "stop" : "start"} recording:`,
-        error
-      );
-      toast.error(`Error during ${isRecording ? "stop" : "start"} recording`);
+      console.error("Error starting recording:", error);
+      toast.error("Error starting recording");
     }
   };
 
-  const getSessionData = async () => {
-    try {
-      const response = await fetch(`/api/meeting-session-data/${roomId}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      const result = await response.json();
-      console.log("result in get meeting", result);
-      return result;
-    } catch (error) {
-      console.log("error in catch", error);
-    }
-  };
-
-  const getOfficehoursData = async () => {
-    try {
-      const response = await fetch(`/api/meeting-officehours-data/${roomId}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      const result = await response.json();
-      console.log("result in get meeting", result);
-      return result;
-    } catch (error) {
-      console.log("error in catch", error);
-    }
-  };
-
-  const handleAttestation = async (endMeet: string) => {
-    if (endMeet == "leave") {
+  const handleEndCall = async (endMeet: string) => {
+    if (endMeet === "leave") {
       leaveRoom();
-    } else if (endMeet == "close") {
+    } else if (endMeet === "close") {
       closeRoom();
     } else {
       return;
     }
 
-    let meetingData;
-    if (meetingCategory === "session") {
-      const data = await getSessionData();
-      console.log("session data: ", data.data[0]);
-      meetingData = data.data[0];
+    // Check if the user is the host
+    if (role !== "host") {
+      return; // Do not proceed with API calls if not the host
+    }
 
-      const slotTimeUnix = Math.floor(
-        new Date(meetingData.slot_time).getTime() / 1000
-      );
-      const endTimeUnix = Math.floor(Date.now() / 1000); // Current time in Unix timestamp format
-
-      console.log(window.location.origin);
-      const headers = {
-        "Content-Type": "application/json",
-        //   Origin: window.location.origin, // Set the Origin header to your frontend URL
-      };
-
-      const hostData = {
-        recipient: meetingData.host_address,
-        meetingId: roomId,
-        meetingType: 1,
-        startTime: slotTimeUnix,
-        endTime: endTimeUnix,
-      };
-
-      try {
-        const response = await axios.post("/api/attest-offchain", hostData, {
-          headers,
-        });
-        console.log(response.data);
-        // Handle response as needed
-      } catch (error) {
-        console.error("Error:", error);
-        // Handle error
-      }
-
-      const userData = {
-        recipient: meetingData.user_address,
-        meetingId: roomId,
-        meetingType: 2,
-        startTime: slotTimeUnix,
-        endTime: endTimeUnix,
-      };
-
-      try {
-        const response = await axios.post("/api/attest-offchain", userData, {
-          headers,
-        });
-        console.log(response.data);
-        // Handle response as needed
-      } catch (error) {
-        console.error("Error:", error);
-        // Handle error
-      }
-    } else if (meetingCategory === "officehours") {
-      const data = await getOfficehoursData();
-      console.log("session data: ", data);
-      meetingData = data[0];
-
-      const slotTimeUnix = Math.floor(
-        new Date(meetingData.office_hours_slot).getTime() / 1000
-      );
-      const endTimeUnix = Math.floor(Date.now() / 1000);
-
-      console.log(window.location.origin);
-      const headers = {
-        "Content-Type": "application/json",
-        //   Origin: window.location.origin, // Set the Origin header to your frontend URL
-      };
-
-      console.log("attendees: ", meetingData.attendees.length);
-
-      const hostData = {
-        recipient: meetingData.address,
-        meetingId: roomId,
-        meetingType: 3,
-        startTime: slotTimeUnix,
-        endTime: endTimeUnix,
-      };
-
-      try {
-        const response = await axios.post("/api/attest-offchain", hostData, {
-          headers,
-        });
-        console.log(response.data);
-        // Handle response as needed
-      } catch (error) {
-        console.error("Error:", error);
-        // Handle error
-      }
-
-      for (let len = 0; len < meetingData.attendees.length; len++) {
-        const attendeeData = {
-          recipient: meetingData.attendees[len].attendee_address,
-          meetingId: roomId,
-          meetingType: 4,
-          startTime: slotTimeUnix,
-          endTime: endTimeUnix,
-        };
-        try {
-          const response = await axios.post(
-            "/api/attest-offchain",
-            attendeeData,
-            {
-              headers,
-            }
-          );
-          console.log(response.data);
-          // Handle response as needed
-        } catch (error) {
-          console.error("Error:", error);
-          // Handle error
-        }
-      }
+    let meetingType;
+    if (meetingCategory === "officehours") {
+      meetingType = 2;
+    } else if (meetingCategory === "session") {
+      meetingType = 1;
     } else {
-      console.log("error");
+      meetingType = 0;
+    }
+
+    try {
+      const response = await fetch(`/api/stopRecording/${roomId}`);
+      if (!response.ok) {
+        console.error("Failed to fetch recordings data");
+        return;
+      }
+      const recordingsData = await response.json();
+      console.log("Recordings:", recordingsData);
+
+      const requestOptions = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          roomId: roomId,
+          meetingType: meetingType,
+          video_uri: recordingsData,
+        }),
+      };
+
+      const response2 = await fetch("/api/end-call", requestOptions);
+      const result = await response2.text();
+      console.log(result);
+    } catch (error) {
+      console.error("Error handling end call:", error);
     }
   };
 
@@ -371,14 +287,14 @@ const BottomBar: React.FC<BottomBarProps> = () => {
                 type="close"
                 title="End spaces for all"
                 variant="danger"
-                onClick={() => handleAttestation("close")}
+                onClick={() => handleEndCall("close")}
               />
             )}
             <Strip
               type="leave"
               title="Leave the spaces"
               variant="danger"
-              onClick={() => handleAttestation("leave")}
+              onClick={() => handleEndCall("leave")}
             />
           </Dropdown>
         </div>

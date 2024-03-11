@@ -20,7 +20,11 @@ interface MeetingTimePerEOA {
 
 export async function POST(req: NextRequest, res: NextResponse) {
   try {
-    const { roomId, meetingType }: { roomId: string; meetingType: number } =
+    const {
+      roomId,
+      meetingType,
+      video_uri,
+    }: { roomId: string; meetingType: number; video_uri: string } =
       await req.json();
 
     if (!roomId) {
@@ -138,6 +142,14 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
     // Calculate minimum attendance time required
     const minimumAttendanceTime = totalMeetingTimeInMinutes * 0.5;
+    let validParticipants: Participant[] = [];
+
+    for (const participant of combinedParticipantLists.flat()) {
+      // Skip participants with "No name" display name
+      if (participant.displayName !== "No name") {
+        validParticipants.push(participant);
+      }
+    }
 
     // Filter participants based on attendance
     let participantsWithSufficientAttendance: Participant[] = [];
@@ -212,6 +224,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
       endTime: latestEndTimeEpoch,
       meetingType: meetingTypeName,
       attestation: "pending",
+      video_uri,
     };
 
     if (existingData) {
