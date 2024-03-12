@@ -19,37 +19,27 @@ interface OfficeHours {
   meetingId: string;
 }
 
-const createRandomRoom = async () => {
-  const res = await fetch("https://iriko.huddle01.media/api/v1/create-room", {
-    method: "POST",
-    body: JSON.stringify({
-      title: "Test Room",
-    }),
-    headers: {
-      "Content-Type": "application/json",
-      "x-api-key": process.env.NEXT_PUBLIC_API_KEY ?? "",
-    },
-    cache: "no-store",
-  });
-  const data = await res.json();
-  const { roomId } = data.data;
-  return roomId;
-};
+const baseUrl = process.env.NEXTAUTH_URL;
 
 export async function PUT(
   req: NextRequest,
   res: NextApiResponse<UpdateOfficeHoursResponse>
 ) {
-  console.log("calling.......");
+  console.log("calling PUT....");
   const address = req.url.split("update-office-hours/")[1];
 
   try {
+    const res = await fetch(`${baseUrl}/api/create-room`, {
+      method: "GET",
+    });
+    const data = await res.json();
+    const roomId = data.data; // Extract roomId directly from the response
+    console.log("Generated roomId:", roomId);
+
     // Connect to your MongoDB database
     const client = await MongoClient.connect(process.env.MONGODB_URI!, {
       dbName: `chora-club`,
     } as MongoClientOptions);
-
-    const roomId = await createRandomRoom(); // Generate roomId
 
     const db = client.db();
     const collection = db.collection("office_hours");

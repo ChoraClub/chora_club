@@ -17,6 +17,7 @@ import clockIcn from "@/assets/icon_clock.png";
 import ccLogo from "@/assets/images/daos/CC.png";
 import OPLogo from "@/assets/images/daos/op.png";
 import ArbLogo from "@/assets/images/daos/arbCir.png";
+import "@/components/DelegateSessions/DelegateSessionsMain.module.css";
 
 interface Type {
   ensName: string;
@@ -459,15 +460,28 @@ function AvailableSessions() {
                     <div className="mt-2 bg-[#1E1E1E] border border-[#1E1E1E] text-white rounded-md text-xs px-5 py-1 font-semibold w-fit capitalize">
                       {daos.dao_name}
                     </div>
-                    {/* <div>
-                      <div className="text-[#4F4F4F] border-[0.5px] border-[#D9D9D9] rounded-md px-3 py-1 mt-4">
-                        Delegated from
-                        <span className="text-blue-shade-200 font-semibold">
-                          &nbsp; 25k &nbsp;
-                        </span>
-                        Addresses
+                    <div>
+                      <div
+                        className="text-[#4F4F4F] border-[0.5px] border-[#D9D9D9] rounded-md px-3 py-1 mt-4 "
+                        style={{
+                          overflowX: "auto",
+                          overflowY: "hidden",
+                          scrollbarWidth: "none",
+                          msOverflowStyle: "none",
+                        }}
+                      >
+                        <div style={{ display: "flex" }}>
+                          {daos.allowedDates.map((date: any, index: any) => (
+                            <div
+                              key={index}
+                              className="text-black bg-[#f7f7f7c3] rounded-2xl font-semibold text-small border-[0.5px] border-[#D9D9D9] px-3 py-1 mr-4"
+                            >
+                              {new Date(date).toLocaleString().split(",")[0]}{" "}
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                    </div> */}
+                    </div>
                   </div>
                 </div>
 

@@ -17,6 +17,8 @@ import {
   Button,
   useDisclosure,
 } from "@nextui-org/react";
+import toast, { Toaster } from "react-hot-toast";
+import { useConnectModal } from "@rainbow-me/rainbowkit";
 interface Type {
   daoDelegates: string;
   individualDelegate: string;
@@ -28,6 +30,7 @@ const StyledTimePickerContainer = styled.div`
 `;
 
 function BookSession({ props }: { props: Type }) {
+  const { openConnectModal } = useConnectModal();
   // const host_address = "0x3013bb4E03a7B81106D69C10710EaE148C8410E1";
   const host_address = props.individualDelegate;
   const { isConnected, address } = useAccount();
@@ -141,7 +144,9 @@ function BookSession({ props }: { props: Type }) {
     });
   };
 
-  const handleModalInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleModalInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     setModalData((prevData) => ({
       ...prevData,
@@ -150,10 +155,16 @@ function BookSession({ props }: { props: Type }) {
   };
 
   const handleScheduled = async (data: any) => {
-    setIsScheduling(true);
-    setScheduleErr("");
-    setDateInfo(data);
-    onOpen();
+    if (isConnected) {
+      setIsScheduling(true);
+      setScheduleErr("");
+      setDateInfo(data);
+      onOpen();
+    } else {
+      if (openConnectModal) {
+        openConnectModal();
+      }
+    }
   };
 
   const apiCall = async () => {
@@ -356,8 +367,7 @@ function BookSession({ props }: { props: Type }) {
               />
 
               <div className="px-1 font-medium">Description:</div>
-              <input
-                type="textarea"
+              <textarea
                 name="description"
                 value={modalData.description}
                 onChange={handleModalInputChange}

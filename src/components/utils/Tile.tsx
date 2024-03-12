@@ -165,11 +165,11 @@ function Tile({
                 </div>
               </div>
 
-              {isEvent === "Upcoming" ? (
+              {isEvent === "Ongoing" ? (
                 <div className="flex flex-col justify-items-end">
                   <div className="text-center bg-blue-shade-100 rounded-full font-bold text-white py-2 px-3 text-xs cursor-pointer">
                     <a
-                      href={`/meeting/officehours/${data.meetingId}`}
+                      href={`/meeting/officehours/${data.meetingId}/lobby`}
                       rel="noopener noreferrer"
                     >
                       Join

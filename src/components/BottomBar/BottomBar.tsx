@@ -18,7 +18,7 @@ import {
   useLocalVideo,
   useLocalScreenShare,
 } from "@huddle01/react/hooks";
-import toast from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
 import { useParams, usePathname } from "next/navigation";
 import axios from "axios";
 
@@ -122,6 +122,7 @@ const BottomBar: React.FC<BottomBarProps> = () => {
   };
 
   const handleEndCall = async (endMeet: string) => {
+    toast("Meeting Ended");
     if (endMeet === "leave") {
       leaveRoom();
     } else if (endMeet === "close") {
@@ -152,6 +153,7 @@ const BottomBar: React.FC<BottomBarProps> = () => {
       }
       const recordingsData = await response.json();
       console.log("Recordings:", recordingsData);
+      toast.success("Recording stopped");
 
       const requestOptions = {
         method: "POST",
@@ -170,6 +172,55 @@ const BottomBar: React.FC<BottomBarProps> = () => {
       console.log(result);
     } catch (error) {
       console.error("Error handling end call:", error);
+    }
+
+    try {
+      toast.success("Giving Attestations");
+      const response = await fetch(`/api/get-attest-data`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          roomId: roomId,
+        }),
+      });
+      const response_data = await response.json();
+      console.log("Updated", response_data);
+      toast.success("Attestation successful");
+    } catch (e) {
+      console.log("Error in attestation: ", e);
+      toast.error("Attestation denied");
+    }
+
+    try {
+      const response = await fetch(`/api/get-host`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          meetingId: roomId,
+        }),
+      });
+      const response_data = await response.json();
+      const host_address = await response_data.address;
+
+      const res = await fetch(`/api/update-office-hours/${host_address}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const res_data = await res.json();
+
+      // if (res_data.success) {
+      console.log("Updated", res_data);
+      toast.success("Next Office hour is scheduled!");
+
+      // }
+    } catch (e) {
+      console.log("error: ", e);
     }
   };
 
@@ -329,6 +380,18 @@ const BottomBar: React.FC<BottomBarProps> = () => {
           {BasicIcons.chat}
         </OutlineButton>
       </div>
+      <Toaster
+        toastOptions={{
+          style: {
+            fontSize: "14px",
+            backgroundColor: "#3E3D3D",
+            color: "#fff",
+            boxShadow: "none",
+            borderRadius: "50px",
+            padding: "3px 5px",
+          },
+        }}
+      />
     </div>
   );
 };
