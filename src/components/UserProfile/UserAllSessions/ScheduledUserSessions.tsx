@@ -67,7 +67,7 @@ function ScheduledUserSessions() {
       const response = await fetch("/api/store-availability", requestOptions);
       const result = await response.json();
       console.log(result);
-      toast.success("Successfully schedule your sessions.");
+      toast.success("Successfully scheduled your sessions.");
       setCreateSessionLoading(false);
     } catch (error) {
       console.error("Error:", error);

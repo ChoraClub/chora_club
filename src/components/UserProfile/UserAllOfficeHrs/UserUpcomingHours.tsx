@@ -17,6 +17,7 @@ import { FiEdit } from "react-icons/fi";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { FaSpinner } from "react-icons/fa"; // Importing the spinner icon
 import { Oval } from "react-loader-spinner";
+import toast, { Toaster } from "react-hot-toast";
 
 interface SessionDetail {
   img: any;
@@ -41,6 +42,13 @@ function UserUpcomingHours() {
   const [pageLoading, setPageLoading] = useState(true);
 
   const { address } = useAccount();
+
+  const [selectedDate, setSelectedDate] = useState<string>("");
+  const [selectedTime, setSelectedTime] = useState<string>("");
+
+  const handleTimeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedTime(e.target.value);
+  };
 
   useEffect(() => {
     fetch(`/api/update-office-hours/${address}`)
@@ -69,9 +77,15 @@ function UserUpcomingHours() {
   };
 
   const handleSubmit = () => {
-    // Convert officeHoursSlot to UTC before submitting
-    const selectedDate = new Date(formData.officeHoursSlot);
-    const utcFormattedDate = selectedDate.toISOString();
+    // const selectedDate = new Date(formData.officeHoursSlot);
+    // const utcFormattedDate = selectedDate.toISOString();
+
+    const selectedDateTime = `${selectedDate} ${selectedTime}:00`;
+
+    const selectedDateUTC = new Date(selectedDateTime);
+    const utcFormattedDate = selectedDateUTC.toISOString();
+
+    console.log("utcFormattedDate", utcFormattedDate);
 
     // Create updated form data with UTC formatted date
     const updatedFormData = { ...formData, officeHoursSlot: utcFormattedDate };
@@ -96,16 +110,20 @@ function UserUpcomingHours() {
               meetingId: item.meetingId,
             }));
             setSessionDetails(mappedData);
+            toast.success("Successfully updated your office hour.");
           })
-          .catch((error) =>
-            console.error("Error fetching updated data:", error)
-          )
+          .catch((error) => {
+            console.error("Error fetching updated data:", error);
+            toast.error("Error updating your office hour.");
+          })
           .finally(() => {
             // Toggle loading state
             setLoading(false);
           });
       })
       .catch((error) => console.error("Error updating data:", error));
+
+    setLoading(false);
 
     // Close the modal
     onOpenChange();
@@ -148,6 +166,21 @@ function UserUpcomingHours() {
       .catch((error) => console.error(error));
   };
 
+  const generateTimeOptions = () => {
+    const options = [];
+    for (let hour = 0; hour < 24; hour++) {
+      for (let minute = 0; minute < 60; minute += 15) {
+        const time = `${hour.toString().padStart(2, "0")}:${minute
+          .toString()
+          .padStart(2, "0")}`;
+        options.push(time);
+      }
+    }
+    return options;
+  };
+
+  const timeOptions = generateTimeOptions();
+
   return (
     <div>
       <div className="space-y-6">
@@ -166,44 +199,46 @@ function UserUpcomingHours() {
           sessionDetails.map((data, index) => (
             <div
               key={index}
-              className="flex p-5 rounded-[2rem]"
+              className="flex p-5 rounded-[2rem] justify-between"
               style={{
                 boxShadow: "0px 4px 26.7px 0px rgba(0, 0, 0, 0.10)",
               }}
             >
-              <Image
-                src={data.img}
-                alt="image"
-                className="w-44 h-44 rounded-3xl border border-[#D9D9D9]"
-              />
+              <div className="flex">
+                <Image
+                  src={data.img}
+                  alt="image"
+                  className="w-44 h-44 rounded-3xl border border-[#D9D9D9]"
+                />
 
-              <div className="ps-6 pe-12 py-1">
-                <div className="font-semibold text-blue-shade-200 text-lg">
-                  {data.title}
-                </div>
-
-                <div className="flex space-x-4 py-2">
-                  <div className="bg-[#1E1E1E] border border-[#1E1E1E] text-white rounded-md text-xs px-5 py-1 font-semibold">
-                    {data.dao}
+                <div className="ps-6 pe-12 py-1">
+                  <div className="font-semibold text-blue-shade-200 text-lg">
+                    {data.title}
                   </div>
-                </div>
 
-                <div className="pt-1 pe-10">
-                  <hr />
-                </div>
-
-                <div className="flex gap-x-16 text-sm py-3">
-                  <div className="text-[#3E3D3D]">
-                    <span className="font-semibold">Host:</span> {data.host}
+                  <div className="flex space-x-4 py-2">
+                    <div className="bg-[#1E1E1E] border border-[#1E1E1E] text-white rounded-md text-xs px-5 py-1 font-semibold">
+                      {data.dao}
+                    </div>
                   </div>
-                  <div className="text-[#3E3D3D]">
-                    <span className="font-semibold">Started at:</span>{" "}
-                    {new Date(data.started).toLocaleString()}{" "}
-                    {/* Format start time */}
-                  </div>
-                </div>
 
-                <div className="text-[#1E1E1E] text-sm">{data.desc}</div>
+                  <div className="pt-1 pe-10">
+                    <hr />
+                  </div>
+
+                  <div className="flex gap-x-16 text-sm py-3">
+                    <div className="text-[#3E3D3D]">
+                      <span className="font-semibold">Host:</span> {data.host}
+                    </div>
+                    <div className="text-[#3E3D3D]">
+                      <span className="font-semibold">Started at:</span>{" "}
+                      {new Date(data.started).toLocaleString()}{" "}
+                      {/* Format start time */}
+                    </div>
+                  </div>
+
+                  <div className="text-[#1E1E1E] text-sm">{data.desc}</div>
+                </div>
               </div>
 
               <div className="flex flex-col justify-between">
@@ -278,14 +313,27 @@ function UserUpcomingHours() {
                         <div className="px-1 font-medium">
                           Office Hours Slot
                         </div>
-                        <input
-                          type="datetime-local"
-                          value={formData.officeHoursSlot}
-                          className="outline-none bg-[#D9D9D945] rounded-md px-2 py-1 text-sm"
-                          onChange={(e) =>
-                            handleInputChange("officeHoursSlot", e.target.value)
-                          }
-                        />
+                        <div className="flex">
+                          <input
+                            id="startDate"
+                            type="date"
+                            value={selectedDate}
+                            onChange={(e) => setSelectedDate(e.target.value)}
+                            className="outline-none bg-[#D9D9D945] rounded-md px-2 py-1 text-sm w-2/5"
+                          />
+                          <select
+                            value={selectedTime || "Time"}
+                            onChange={handleTimeChange}
+                            className="outline-none bg-[#D9D9D945] rounded-md px-2 py-2 text-sm ml-1 w-1/5"
+                          >
+                            <option disabled>Time</option>
+                            {timeOptions.map((time) => (
+                              <option key={time} value={time}>
+                                {time}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
                       </ModalBody>
                       <ModalFooter>
                         <Button color="default" onPress={onClose}>

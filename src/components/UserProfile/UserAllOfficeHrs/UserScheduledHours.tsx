@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useAccount, useNetwork } from "wagmi";
+import toast, { Toaster } from "react-hot-toast";
 
 const UserScheduledHours: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<string>("");
@@ -65,9 +66,11 @@ const UserScheduledHours: React.FC = () => {
       setDescription("");
       setSelectedDate("");
       setError(null);
+      toast.success("Successfully scheduled your office hour.");
       console.log("Data submitted successfully");
     } catch (error) {
       console.error("Error:", error);
+      toast.error("Error scheduling your office hour.");
       setError("Failed to submit data");
     } finally {
       setIsSubmitting(false);
