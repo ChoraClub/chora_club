@@ -112,7 +112,9 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
       toast.error("Failed to join room");
     }
 
-    if (role === "host") {
+    console.log("Role.HOST", Role.HOST);
+    if (Role.HOST) {
+      console.log("inside put api");
       const response = await fetch(
         `/api/update-meeting-status/${params.roomId}`,
         {

@@ -206,6 +206,8 @@ const BottomBar: React.FC<BottomBarProps> = () => {
       const response_data = await response.json();
       const host_address = await response_data.address;
 
+      console.log("host address", host_address);
+
       const res = await fetch(`/api/update-office-hours/${host_address}`, {
         method: "PUT",
         headers: {

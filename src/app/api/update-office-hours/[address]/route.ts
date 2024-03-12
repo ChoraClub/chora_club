@@ -45,10 +45,12 @@ export async function PUT(
     const collection = db.collection("office_hours");
 
     const lastActiveOfficeHours = await collection.findOneAndUpdate(
-      { address, status: "active" },
+      { address, status: "ongoing" },
       { $set: { status: "inactive" } },
       { sort: { office_hours_slot: -1 } }
     );
+
+    console.log("lastActiveOfficeHours", lastActiveOfficeHours);
 
     if (!lastActiveOfficeHours) {
       throw new Error("No active office hours found for the provided address");
