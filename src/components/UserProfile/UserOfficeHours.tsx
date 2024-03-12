@@ -131,6 +131,12 @@ function UserOfficeHours({ isDelegate, selfDelegate }: UserOfficeHoursProps) {
     setDataLoading(true);
   }, [address]);
 
+  useEffect(() => {
+    if (!isDelegate && searchParams.get("hours") === "schedule") {
+      router.replace(path + "?active=officeHours&hours=attended");
+    }
+  }, [isDelegate]);
+
   return (
     <div>
       <div className="pt-3 pr-32">
@@ -193,12 +199,10 @@ function UserOfficeHours({ isDelegate, selfDelegate }: UserOfficeHoursProps) {
         </div>
 
         <div className="py-10">
-          {(selfDelegate===true || isDelegate === true) && searchParams.get("hours") === "schedule" && (
-            <UserScheduledHours />
-          )}
-          {(selfDelegate===true || isDelegate === true)  && searchParams.get("hours") === "upcoming" && (
-            <UserUpcomingHours />
-          )}
+          {(selfDelegate === true || isDelegate === true) &&
+            searchParams.get("hours") === "schedule" && <UserScheduledHours />}
+          {(selfDelegate === true || isDelegate === true) &&
+            searchParams.get("hours") === "upcoming" && <UserUpcomingHours />}
 
           {searchParams.get("hours") === "hosted" &&
             (dataLoading ? (

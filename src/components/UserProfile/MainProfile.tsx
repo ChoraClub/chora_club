@@ -931,7 +931,7 @@ function MainProfile() {
                   : "border-transparent"
               }`}
               onClick={() =>
-                router.push(path + "?active=officeHours&hours=attended")
+                router.push(path + "?active=officeHours&hours=schedule")
               }
             >
               Office Hours
