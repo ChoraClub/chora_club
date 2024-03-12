@@ -193,7 +193,7 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
                       size={35}
                       color="#004DFF"
                       onClick={() =>
-                        router.push(`/meeting/session/${data.meetingId}`)
+                        router.push(`/meeting/session/${data.meetingId}/lobby`)
                       }
                     />
                   </span>
@@ -249,7 +249,7 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
             data.booking_status === "Approved" && (
               <div
                 onClick={() => {
-                  router.push(`/meeting/session/${data.meetingId}`);
+                  router.push(`/meeting/session/${data.meetingId}/lobby`);
                 }}
                 className="text-center bg-blue-shade-100 rounded-full font-bold text-white py-2 text-xs cursor-pointer"
               >
