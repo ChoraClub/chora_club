@@ -243,7 +243,7 @@ function AvailableSessions() {
             value={selectedDao}
             // onChange={(e) => setSelectedDao(e.target.value)}
             onChange={handleDaoChange}
-            className="px-3 py-2 rounded-md border border-[#606060]"
+            className="px-3 py-2 rounded-md shadow"
           >
             <option value="All-DAOS">All DAOS</option>
             <option value="optimism">Optimism</option>
@@ -273,7 +273,7 @@ function AvailableSessions() {
             onChange={handleDateChange}
             min={currentDate}
             // onChange={(e) => setSelectedDate(e.target.value)}
-            className="px-3 py-2 rounded-md border border-[#606060] mr-1"
+            className="px-3 py-2 shadow mr-1 rounded-md"
           />
           <Tooltip
             showArrow
@@ -296,7 +296,7 @@ function AvailableSessions() {
           <select
             value={startTime || "Start Time"}
             onChange={handleStartTimeChange}
-            className="px-3 py-2 rounded-md border border-[#606060] mr-2"
+            className="px-3 py-2 rounded-md shadow mr-1"
           >
             <option disabled>Start Time</option>
             {timeOptions.map((time) => (
@@ -309,7 +309,7 @@ function AvailableSessions() {
           <select
             value={endTime || "End Time"}
             onChange={handleEndTimeChange}
-            className="px-3 py-2 rounded-md border border-[#606060] ml-2"
+            className="px-3 py-2 rounded-md shadow ml-2"
           >
             <option disabled>End Time</option>
             {timeOptions.map((time) => (
@@ -516,7 +516,7 @@ function AvailableSessions() {
                           `/${daos.dao_name}/${daos.userAddress}?active=delegatesSession&session=book `
                         )
                       }
-                      className="bg-black text-white py-4 px-6 rounded-[36px] text-sm w-[11rem] hover:bg-[#333333] focus:outline-none focus:ring-2 focus:ring-gray-400"
+                      className="bg-black text-white py-4 px-6 rounded-[36px] text-sm w-[11rem] hover:bg-[#333333] focus:outline-none focus:ring-2 focus:ring-gray-400 font-medium"
                     >
                       Book Session
                     </button>

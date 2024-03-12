@@ -10,6 +10,12 @@ const UserScheduledHours: React.FC = () => {
   const { address } = useAccount();
   const { chain } = useNetwork();
 
+  const [selectedTime, setSelectedTime] = useState<string>("");
+
+  const handleTimeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedTime(e.target.value);
+  };
+
   const createRandomRoom = async () => {
     const res = await fetch("/api/create-room", {
       method: "GET",
@@ -30,8 +36,9 @@ const UserScheduledHours: React.FC = () => {
 
       const roomId = await createRandomRoom();
 
-      // Convert the selected date to UTC
-      const selectedDateUTC = new Date(selectedDate);
+      const selectedDateTime = `${selectedDate} ${selectedTime}:00`;
+
+      const selectedDateUTC = new Date(selectedDateTime);
       const utcFormattedDate = selectedDateUTC.toISOString();
 
       const response = await fetch("/api/office-hours", {
@@ -67,6 +74,21 @@ const UserScheduledHours: React.FC = () => {
     }
   };
 
+  const generateTimeOptions = () => {
+    const options = [];
+    for (let hour = 0; hour < 24; hour++) {
+      for (let minute = 0; minute < 60; minute += 15) {
+        const time = `${hour.toString().padStart(2, "0")}:${minute
+          .toString()
+          .padStart(2, "0")}`;
+        options.push(time);
+      }
+    }
+    return options;
+  };
+
+  const timeOptions = generateTimeOptions();
+
   return (
     <div className="ps-4 font-poppins">
       <h1 className="text-xl font-bold mb-4">Schedule Office Hours</h1>
@@ -98,14 +120,29 @@ const UserScheduledHours: React.FC = () => {
           <label className="block font-bold mb-2" htmlFor="startDate">
             Date & Time
           </label>
-          <input
-            id="startDate"
-            type="datetime-local"
-            value={selectedDate}
-            onChange={(e) => setSelectedDate(e.target.value)}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          />
+          <div className="flex">
+            <input
+              id="startDate"
+              type="date"
+              value={selectedDate}
+              onChange={(e) => setSelectedDate(e.target.value)}
+              className="shadow appearance-none border rounded w-2/5 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mr-1"
+            />
+            <select
+              value={selectedTime || "Time"}
+              onChange={handleTimeChange}
+              className="shadow appearance-none border rounded w-1/5 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ml-1"
+            >
+              <option disabled>Time</option>
+              {timeOptions.map((time) => (
+                <option key={time} value={time}>
+                  {time}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
+
         {error && <div className="text-red-500">{error}</div>}
         <button
           type="submit"
