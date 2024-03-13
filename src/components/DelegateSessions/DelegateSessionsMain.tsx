@@ -5,6 +5,8 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import AvailableSessions from "./AvailableSessions";
 import RecordedSessions from "./RecordedSessions";
+import { FaCircleInfo } from "react-icons/fa6";
+import { Tooltip } from "@nextui-org/react";
 
 function DelegateSessionsMain() {
   const router = useRouter();
@@ -15,20 +17,30 @@ function DelegateSessionsMain() {
     <>
       <div className="pt-6 px-6">
         <div className="flex justify-between pe-10">
-          <div className="font-quanty font-medium text-4xl text-blue-shade-200 pb-4">
-            Available Delegates
+          <div className="flex font-quanty font-medium text-4xl text-blue-shade-200 pb-4 items-center">
+            <div> Available Delegates</div>
+            <div>
+              <Tooltip
+                showArrow
+                content={
+                  <div className="font-poppins">
+                    Explore available delegates by DAO, date, and time to book
+                    sessions and unlock Web3 opportunities.
+                  </div>
+                }
+                placement="right"
+                className="rounded-md bg-opacity-90 max-w-96"
+                closeDelay={1}
+              >
+                <div className=" px-2">
+                  <FaCircleInfo size={20} className="cursor-pointer" />
+                </div>
+              </Tooltip>
+            </div>
           </div>
           <div>
             <ConnectButton />
           </div>
-        </div>
-        <div className="font-poppins mt-2">
-          Welcome to our Available Delegates page, where you can easily find
-          available delegates to conduct sessions. Utilize our intuitive filters
-          to streamline your search process. Choose your desired DAO, select a
-          date, and specify the time to narrow down the list of available
-          delegates. Start your journey today by booking a session and unlock
-          the boundless opportunities waiting for you in the world of Web3.
         </div>
 
         <div className="mt-1">
