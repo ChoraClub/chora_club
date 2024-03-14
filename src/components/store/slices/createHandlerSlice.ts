@@ -1,7 +1,7 @@
-import { StoreSlice } from '../types';
+import { StoreSlice } from "../types";
 
-export type TSidebarView = 'close' | 'peers';
-export type TPromptView = 'close' | 'request-to-speak';
+export type TSidebarView = "close" | "peers";
+export type TPromptView = "close" | "request-to-speak";
 
 export interface IChatMessage {
   name: string;
@@ -23,6 +23,7 @@ export interface ISidebarState {
   userDisplayName: string;
   chatMessages: IChatMessage[];
   showAcceptRequest: boolean;
+  hasNewMessage: boolean;
   setPromptView: (val: TPromptView) => void;
   setSidebarView: (val: TSidebarView) => void;
   setAvatarUrl: (va: string) => void;
@@ -33,24 +34,26 @@ export interface ISidebarState {
   removeRequestedPeers: (val: string) => void;
   setUserDisplayName: (val: string) => void;
   setIsChatOpen: (val: boolean) => void;
+  setHasNewMessage: (val: boolean) => void;
   setShowAcceptRequest: (val: boolean) => void;
 }
 
 const createHandlerSlice: StoreSlice<ISidebarState> = (set, get) => ({
   sidebar: {
     isSidebarOpen: false,
-    sidebarView: 'close',
+    sidebarView: "close",
   },
-  avatarUrl: '/avatars/avatars/0.png',
-  chatView: 'close',
+  avatarUrl: "/avatars/avatars/0.png",
+  chatView: "close",
   isChatOpen: false,
-  promptView: 'close',
+  promptView: "close",
   isMyHandRaised: false,
-  myReaction: '',
+  myReaction: "",
   requestedPeers: [],
-  userDisplayName: '',
+  userDisplayName: "",
   chatMessages: [],
   showAcceptRequest: false,
+  hasNewMessage: false,
 
   setIsChatOpen: (chatOpen: boolean) => {
     set(() => ({
@@ -61,11 +64,11 @@ const createHandlerSlice: StoreSlice<ISidebarState> = (set, get) => ({
   setSidebarView(sidebarView: TSidebarView) {
     const prevView = get().sidebar.sidebarView;
 
-    if (sidebarView === 'close' || sidebarView === prevView) {
+    if (sidebarView === "close" || sidebarView === prevView) {
       set(() => ({
         sidebar: {
           isSidebarOpen: false,
-          sidebarView: 'close',
+          sidebarView: "close",
         },
       }));
     }
@@ -82,14 +85,16 @@ const createHandlerSlice: StoreSlice<ISidebarState> = (set, get) => ({
     set((state) => ({
       chatMessages: [...state.chatMessages, val],
     }));
+
+    
   },
 
   setPromptView: (val: TPromptView) => {
     const prevPromptView = get().promptView;
 
-    if (val === 'close' || val === prevPromptView) {
+    if (val === "close" || val === prevPromptView) {
       set(() => ({
-        promptView: 'close',
+        promptView: "close",
       }));
     }
 
@@ -138,7 +143,13 @@ const createHandlerSlice: StoreSlice<ISidebarState> = (set, get) => ({
     set(() => ({
       showAcceptRequest: val,
     }));
-  }
+  },
+
+  setHasNewMessage: (val: boolean) => {
+    set(() => ({
+      hasNewMessage: val,
+    }));
+  },
 });
 
 export default createHandlerSlice;

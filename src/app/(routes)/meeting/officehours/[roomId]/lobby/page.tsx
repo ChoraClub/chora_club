@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { useAccount } from "wagmi";
 
 // Assets
-import { toast } from "react-hot-toast";
+import { Toaster, toast } from "react-hot-toast";
 import { BasicIcons } from "@/assets/BasicIcons";
 
 // Components
@@ -54,81 +54,86 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
   console.log("role from startspace", role);
 
   const handleStartSpaces = async () => {
-    setIsJoining(true);
-
-    const userDisplayName = "demoNamefromDemo";
+    console.log("handle spaces");
     if (isDisconnected) {
-      toast.error("account is not connected");
-    }
+      toast("Connect your wallet to join the meeting!");
+    } else {
+      setIsJoining(true);
 
-    let token = "";
-    if (state !== "connected") {
-      const requestBody = {
-        roomId: params.roomId,
-        role: "host",
-        displayName: address,
-        address: address, // assuming you have userAddress defined somewhere
-      };
-      try {
-        const response = await fetch("/api/new-token", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(requestBody),
-        });
+      const userDisplayName = "demoNamefromDemo";
+      if (isDisconnected) {
+        toast.error("account is not connected");
+      }
 
-        // if (!response.ok) {
-        //   throw new Error("Failed to fetch token");
-        // }
+      let token = "";
+      if (state !== "connected") {
+        const requestBody = {
+          roomId: params.roomId,
+          role: "host",
+          displayName: address,
+          address: address, // assuming you have userAddress defined somewhere
+        };
+        try {
+          const response = await fetch("/api/new-token", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(requestBody),
+          });
 
-        token = await response.text(); // Change this line
-        console.log("Token fetched successfully:", token);
-      } catch (error) {
-        console.error("Error fetching token:", error);
-        // Handle error appropriately, e.g., show error message to user
-        toast.error("Failed to fetch token");
+          // if (!response.ok) {
+          //   throw new Error("Failed to fetch token");
+          // }
+
+          token = await response.text(); // Change this line
+          console.log("Token fetched successfully:", token);
+        } catch (error) {
+          console.error("Error fetching token:", error);
+          // Handle error appropriately, e.g., show error message to user
+          toast.error("Failed to fetch token");
+          setIsJoining(false);
+          return;
+        }
+      }
+
+      if (!userDisplayName.length) {
+        toast.error("Display name is required!");
         setIsJoining(false);
         return;
       }
-    }
 
-    if (!userDisplayName.length) {
-      toast.error("Display name is required!");
+      try {
+        console.log({ token });
+        console.log(params.roomId);
+        await joinRoom({
+          roomId: params.roomId,
+          token,
+        });
+      } catch (error) {
+        console.error("Error joining room:", error);
+        // Handle error appropriately, e.g., show error message to user
+        toast.error("Failed to join room");
+      }
+
+      console.log("Role.HOST", Role.HOST);
+      if (Role.HOST) {
+        console.log("inside put api");
+        const response = await fetch(
+          `/api/update-meeting-status/${params.roomId}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        const responseData = await response.json();
+        console.log("responseData: ", responseData);
+      }
+
       setIsJoining(false);
-      return;
     }
-
-    try {
-      console.log({ token });
-      console.log(params.roomId);
-      await joinRoom({
-        roomId: params.roomId,
-        token,
-      });
-    } catch (error) {
-      console.error("Error joining room:", error);
-      // Handle error appropriately, e.g., show error message to user
-      toast.error("Failed to join room");
-    }
-
-    console.log("Role.HOST", Role.HOST);
-    if (Role.HOST) {
-      console.log("inside put api");
-      const response = await fetch(
-        `/api/update-meeting-status/${params.roomId}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      const responseData = await response.json();
-      console.log("responseData: ", responseData);
-    }
-
-    setIsJoining(false);
   };
 
   useEffect(() => {
@@ -139,68 +144,68 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
 
   return (
     <main className="flex h-screen flex-col items-center justify-center bg-lobby text-slate-100 font-poppins">
-      <div className="flex flex-col items-center justify-center gap-4 w-[26.25rem]">
-        <div className="relative text-center flex items-center justify-center w-fit mx-auto">
-          <Image
-            src={avatarUrl}
-            alt="audio-spaces-img"
-            width={125}
-            height={125}
-            className="maskAvatar object-contain"
-            quality={100}
-            priority
-          />
+      <div className="flex flex-col items-center justify-center gap-4 h-screen w-1/3">
+        <div className="text-center flex items-center justify-center bg-slate-100 w-full rounded-xl py-16">
+          <div className="relative">
+            <Image
+              src={avatarUrl}
+              alt="audio-spaces-img"
+              width={125}
+              height={125}
+              className="maskAvatar object-contain"
+              quality={100}
+              priority
+            />
+            <video
+              src={avatarUrl}
+              muted
+              className="maskAvatar absolute left-1/2 top-1/2 z-10 h-full w-full -translate-x-1/2 -translate-y-1/2"
+              // autoPlay
+              loop
+            />
+            <button
+              onClick={() => setIsOpen((prev) => !prev)}
+              type="button"
+              className="text-white absolute bottom-0 right-0 z-10"
+            >
+              {BasicIcons.edit}
+            </button>
+            <FeatCommon
+              onClose={() => setIsOpen(false)}
+              className={
+                isOpen
+                  ? "absolute top-4 block"
+                  : "absolute top-1/2 -translate-y-1/2 hidden "
+              }
+            >
+              <div className="relative mt-5">
+                <div className="grid-cols-3 grid h-full w-full place-items-center gap-6  px-6 ">
+                  {Array.from({ length: 20 }).map((_, i) => {
+                    const url = `/avatars/avatars/${i}.png`;
 
-          <video
-            src={avatarUrl}
-            muted
-            className="maskAvatar absolute left-1/2 top-1/2 z-10 h-full w-full -translate-x-1/2 -translate-y-1/2"
-            // autoPlay
-            loop
-          />
-
-          <button
-            onClick={() => setIsOpen((prev) => !prev)}
-            type="button"
-            className="text-white absolute bottom-0 right-0 z-10"
-          >
-            {BasicIcons.edit}
-          </button>
-          <FeatCommon
-            onClose={() => setIsOpen(false)}
-            className={
-              isOpen
-                ? "absolute top-4 block"
-                : "absolute top-1/2 -translate-y-1/2 hidden "
-            }
-          >
-            <div className="relative mt-5">
-              <div className="grid-cols-3 grid h-full w-full place-items-center gap-6  px-6 ">
-                {Array.from({ length: 20 }).map((_, i) => {
-                  const url = `/avatars/avatars/${i}.png`;
-
-                  return (
-                    <AvatarWrapper
-                      key={`sidebar-avatars-${i}`}
-                      isActive={avatarUrl === url}
-                      onClick={() => {
-                        setAvatarUrl(url);
-                      }}
-                    >
-                      <Image
-                        src={url}
-                        alt={`avatar-${i}`}
-                        width={45}
-                        height={45}
-                        loading="lazy"
-                        className="object-contain"
-                      />
-                    </AvatarWrapper>
-                  );
-                })}
+                    return (
+                      <AvatarWrapper
+                        key={`sidebar-avatars-${i}`}
+                        isActive={avatarUrl === url}
+                        onClick={() => {
+                          setAvatarUrl(url);
+                        }}
+                      >
+                        <Image
+                          src={url}
+                          alt={`avatar-${i}`}
+                          width={45}
+                          height={45}
+                          loading="lazy"
+                          className="object-contain"
+                        />
+                      </AvatarWrapper>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          </FeatCommon>
+            </FeatCommon>
+          </div>
         </div>
         {isDisconnected ? <ConnectButton /> : null}
         <div className="flex items-center w-full flex-col">
@@ -246,6 +251,17 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
           </button>
         </div>
       </div>
+      <Toaster
+        toastOptions={{
+          style: {
+            fontSize: "14px",
+            backgroundColor: "#333",
+            color: "#fff",
+            borderRadius: "8px",
+            padding: "12px",
+          },
+        }}
+      />
     </main>
   );
 };

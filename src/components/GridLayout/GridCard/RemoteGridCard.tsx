@@ -82,6 +82,7 @@ const GridCard: React.FC<GridCardProps> = ({ peerId }) => {
   return (
     <div className="flex justify-center items-center flex-col p-4 rounded-lg shadow-md">
       <div className="grid grid-cols-2 gap-4 w-full">
+        {audioStream && <AudioElem peerId={peerId} />}
         {screenShareVideoStream && (
           <div
             className={!videoStream ? "col-span-2 h-96" : "col-span-1 w-full"}
@@ -89,6 +90,7 @@ const GridCard: React.FC<GridCardProps> = ({ peerId }) => {
             <video
               autoPlay
               playsInline
+              controls
               className="aspect-video w-full mt-6 h-[23rem]"
               ref={(screenRef) =>
                 screenRef && (screenRef.srcObject = screenShareVideoStream)
@@ -112,7 +114,7 @@ const GridCard: React.FC<GridCardProps> = ({ peerId }) => {
         )}
       </div>
       {(!screenShareVideoStream || !videoStream) && (
-        <div className="relative mt-4">
+        <div className="relative mt-4 flex flex-col items-center">
           {audioStream && <AudioElem peerId={peerId} />}
           <Image
             src={metadata?.avatarUrl || "/avatars/avatars/0.png"}

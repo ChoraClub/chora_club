@@ -75,22 +75,24 @@ const PeerMetaData: React.FC<PeerMetaDatProps> = ({
         />
       ) : (
         <div className="flex items-center gap-3">
-          <button onClick={() => {}}>
+          <div onClick={() => {}}>
             {metadata?.isHandRaised
               ? NestedPeerListIcons.active.hand
               : NestedPeerListIcons.inactive.hand}
-          </button>
-          <button>
+          </div>
+          <div>
             {isAudioOn
               ? NestedPeerListIcons.active.mic
               : NestedPeerListIcons.inactive.mic}
-          </button>
-          <Dropdown
-            triggerChild={<div>{NestedPeerListIcons.inactive.more}</div>}
-            align="end"
-          >
-            {role && RoleData[role as keyof typeof RoleData]}
-          </Dropdown>
+          </div>
+          <div className="cursor-pointer flex items-center">
+            <Dropdown
+              triggerChild={<div>{NestedPeerListIcons.inactive.more}</div>}
+              align="end"
+            >
+              {role && RoleData[role as keyof typeof RoleData]}
+            </Dropdown>
+          </div>
         </div>
       )}
     </div>

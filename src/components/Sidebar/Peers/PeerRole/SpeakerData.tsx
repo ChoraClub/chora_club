@@ -8,13 +8,13 @@ type SpeakerDataProps = {
 };
 
 const Speaker: React.FC<SpeakerDataProps> = ({ peerId }) => {
-  const { leaveRoom } = useRoom();
+  const { leaveRoom, kickPeer } = useRoom();
   const { updateRole } = useRemotePeer({ peerId });
   const me = useLocalPeer();
 
   return (
     <>
-      {me.role === "host" && (
+      {/* {me.role === "host" && (
           <div>
             <Strip
               type="personNormal"
@@ -25,28 +25,27 @@ const Speaker: React.FC<SpeakerDataProps> = ({ peerId }) => {
               }}
             />
             </div>
-            )}
-            {me.role && ["host", "coHost"].includes(me.role) && (
-              <div>
-            <Strip
-              type="speaker"
-              title="Remove as Speaker"
-              variant="danger"
-              onClick={() => {
-                  updateRole(Role.LISTENER);
-                }
-              }
-            />
-            <Strip
-              type="leave"
-              title="Remove from spaces"
-              variant="danger"
-              onClick={() => {
-                  // kickPeer(peerId);
-              }}
-            />
-          </div>
-        )}
+            )} */}
+      {me.role && ["host", "coHost"].includes(me.role) && (
+        <div>
+          <Strip
+            type="speaker"
+            title="Remove as Speaker"
+            variant="danger"
+            onClick={() => {
+              updateRole(Role.LISTENER);
+            }}
+          />
+          <Strip
+            type="leave"
+            title="Remove from spaces"
+            variant="danger"
+            onClick={() => {
+              kickPeer(peerId);
+            }}
+          />
+        </div>
+      )}
 
       {me.role === "speaker" && (
         <div>

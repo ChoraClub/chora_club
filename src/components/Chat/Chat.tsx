@@ -7,6 +7,7 @@ import { useState, useRef } from "react";
 import { BasicIcons } from "@/assets/BasicIcons";
 import { useDataMessage } from "@huddle01/react/hooks";
 import Header from "../Sidebar/Header/Header";
+import toast, { Toaster } from "react-hot-toast";
 
 const Chat = () => {
   const userDisplayName = useStore((state) => state.userDisplayName);
@@ -17,6 +18,11 @@ const Chat = () => {
   const buttonRef = useRef<HTMLButtonElement | null>(null);
   const { sendData } = useDataMessage();
   const setIsChatOpen = useStore((state) => state.setIsChatOpen);
+  const setHasNewMessages = useStore((state) => state.setHasNewMessage);
+
+  const handleNewMessageReceived = () => {
+    setHasNewMessages(true);
+  };
 
   async function handleSend() {
     sendDataToAllPeers();
@@ -26,7 +32,10 @@ const Chat = () => {
       is_user: true,
     };
     addChatMessage(newChatMessage);
+    setHasNewMessages(true);
     setMessage("");
+
+    // toast(newChatMessage.text);
   }
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -36,7 +45,9 @@ const Chat = () => {
   };
 
   function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
-    setMessage(event.target.value);
+    if (event.target.value != null) {
+      setMessage(event.target.value);
+    }
   }
 
   const sendDataToAllPeers = () => {
@@ -61,6 +72,8 @@ const Chat = () => {
           {chat.is_user ? null : chat.name}
         </div>
         {chat.text}
+
+        {/* {chat.is_user ? null : toast(chat.text)} */}
       </div>
     );
   });
@@ -94,6 +107,18 @@ const Chat = () => {
           </button>
         </div>
       </div>
+      {/* <Toaster
+        position="bottom-right"
+        toastOptions={{
+          style: {
+            fontSize: "14px",
+            backgroundColor: "#333",
+            color: "#fff",
+            borderRadius: "8px",
+            padding: "12px",
+          },
+        }}
+      /> */}
     </aside>
   );
 };

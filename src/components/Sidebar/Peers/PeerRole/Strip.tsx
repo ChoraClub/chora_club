@@ -14,7 +14,7 @@ const Strip: React.FC<StripProps> = ({ type, title, variant, onClick }) => {
   return (
     <div
       className={cn(
-        "flex items-center gap-3 text-sm font-normal mb-1 last:mb-0 transition-all duration-300 ease-in-out p-1 cursor-pointer rounded-md",
+        "flex items-center gap-3 text-sm font-normal mb-1 last:mb-0 transition-all duration-300 ease-in-out p-1 rounded-md",
         variant === "normal"
           ? "text-gray-700"
           : " text-red-400 hover:bg-rgbColors-4 "
