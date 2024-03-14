@@ -238,7 +238,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
             className="flex items-center justify-center bg-blue-shade-100 text-slate-100 rounded-md p-2 mt-2 w-full"
             onClick={() => handleStartSpaces()}
           >
-            {isJoining ? "Joining Spaces..." : "Start Spaces"}
+            {isJoining ? "Joining Spaces..." : "Start meeting"}
             {!isJoining && (
               <Image
                 alt="narrow-right"

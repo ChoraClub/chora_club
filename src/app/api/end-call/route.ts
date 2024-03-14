@@ -172,30 +172,28 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
     // Calculate minimum attendance time required
     const minimumAttendanceTime = totalMeetingTimeInMinutes * 0.5;
-    let validParticipants: Participant[] = [];
-
-    for (const participant of combinedParticipantLists.flat()) {
-      // Skip participants with "No name" display name
-      if (participant.displayName !== "No name") {
-        validParticipants.push(participant);
+    // Filter out participants with display name "No name"
+    const validParticipants: Participant[] = [];
+    for (const participantList of combinedParticipantLists) {
+      for (const participant of participantList) {
+        if (participant.displayName !== "No name") {
+          validParticipants.push(participant);
+        }
       }
     }
 
     // Filter participants based on attendance
     let participantsWithSufficientAttendance: Participant[] = [];
-
-    for (const participant of combinedParticipantLists.flat()) {
+    for (const participant of validParticipants) {
       const participantMeetingTime =
         meetingTimePerEOA[participant.displayName] || 0;
       if (participantMeetingTime >= minimumAttendanceTime) {
-        // Add the "attestation" field with value "pending" to each participant
         participantsWithSufficientAttendance.push({
           ...participant,
           attestation: "pending",
         });
       }
     }
-
     // Remove host from participants with sufficient attendance
     participantsWithSufficientAttendance =
       participantsWithSufficientAttendance.filter(
