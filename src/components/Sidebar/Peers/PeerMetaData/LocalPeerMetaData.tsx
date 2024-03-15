@@ -74,7 +74,7 @@ const PeerMetaData: React.FC<PeerMetaDatProps> = ({
         />
       ) : (
         <div className="flex items-center gap-3">
-          <button
+          <div
             onClick={() => {
               // if (peerId === localPeerId) {
               updateMetadata({
@@ -88,8 +88,8 @@ const PeerMetaData: React.FC<PeerMetaDatProps> = ({
             {metadata?.isHandRaised
               ? NestedPeerListIcons.active.hand
               : NestedPeerListIcons.inactive.hand}
-          </button>
-          <button
+          </div>
+          <div
             onClick={() => {
               if (role && ["host", "coHost", "speaker"].includes(role)) {
                 isAudioOn ? disableAudio() : enableAudio();
@@ -99,14 +99,16 @@ const PeerMetaData: React.FC<PeerMetaDatProps> = ({
             {isAudioOn
               ? NestedPeerListIcons.active.mic
               : NestedPeerListIcons.inactive.mic}
-          </button>
+          </div>
 
-          <Dropdown
-            triggerChild={<div>{NestedPeerListIcons.inactive.more}</div>}
-            align="end"
-          >
-            {role && RoleData[role as keyof typeof RoleData]}
-          </Dropdown>
+          <div className="flex items-center cursor-pointer">
+            <Dropdown
+              triggerChild={<div>{NestedPeerListIcons.inactive.more}</div>}
+              align="end"
+            >
+              {role && RoleData[role as keyof typeof RoleData]}
+            </Dropdown>
+          </div>
         </div>
       )}
     </div>

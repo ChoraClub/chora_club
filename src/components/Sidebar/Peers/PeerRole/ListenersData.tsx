@@ -13,14 +13,14 @@ type ListenersDataProps = {
 };
 
 const ListenersData: React.FC<ListenersDataProps> = ({ peerId }) => {
-  const { leaveRoom } = useRoom();
+  const { leaveRoom, kickPeer } = useRoom();
   const { updateRole } = useRemotePeer({ peerId });
   const me = useLocalPeer();
   console.log("Local peer id>>>>>>>> ", me);
 
   return (
     <>
-      {me.role === "host" && (
+      {/* {me.role === "host" && (
         <div>
           <Strip
             type="personNormal"
@@ -31,7 +31,7 @@ const ListenersData: React.FC<ListenersDataProps> = ({ peerId }) => {
             }}
           />
         </div>
-      )}
+      )} */}
       {me.role === "coHost" ||
         (me.role === "host" && (
           <div>
@@ -48,7 +48,7 @@ const ListenersData: React.FC<ListenersDataProps> = ({ peerId }) => {
               title="Remove from spaces"
               variant="danger"
               onClick={() => {
-                // kickPeer(peerId);
+                kickPeer(peerId);
               }}
             />
           </div>

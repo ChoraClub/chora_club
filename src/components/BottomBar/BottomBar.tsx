@@ -21,6 +21,7 @@ import {
 import toast, { Toaster } from "react-hot-toast";
 import { useParams, usePathname } from "next/navigation";
 import axios from "axios";
+import { GoDotFill } from "react-icons/go";
 
 type BottomBarProps = {};
 
@@ -52,6 +53,9 @@ const BottomBar: React.FC<BottomBarProps> = () => {
 
   const isChatOpen = useStore((state) => state.isChatOpen);
   const setIsChatOpen = useStore((state) => state.setIsChatOpen);
+
+  const newMessage = useStore((state) => state.hasNewMessage);
+  const setHasNewMessage = useStore((state) => state.setHasNewMessage);
 
   const setSidebarView = useStore((state) => state.setSidebarView);
 
@@ -96,6 +100,12 @@ const BottomBar: React.FC<BottomBarProps> = () => {
   //     toast.error(`Error during ${isRecording ? "stop" : "start"} recording`);
   //   }
   // };
+
+  const [hasNewMessages, setHasNewMessages] = useState<boolean>(false);
+
+  const handleNewMessageReceived = () => {
+    setHasNewMessages(true);
+  };
 
   useEffect(() => {
     if (role === "host") {
@@ -225,6 +235,8 @@ const BottomBar: React.FC<BottomBarProps> = () => {
       console.log("error: ", e);
     }
   };
+
+  console.log("has message: ", newMessage);
 
   return (
     <div className="w-full flex items-center px-10 justify-between pb-6 font-poppins">
@@ -366,20 +378,31 @@ const BottomBar: React.FC<BottomBarProps> = () => {
         >
           {BasicIcons.peers}
           <span className="text-black">
-            {Object.keys(peerIds).filter((peerId) => peerId !== localPeerId)
-              .length + 1}
+            {
+              Object.keys(peerIds).filter((peerId) => peerId !== localPeerId)
+                .length
+            }
           </span>
         </OutlineButton>
         <OutlineButton
-          className="ml-auto flex items-center gap-3 border-[#0500FF]"
+          className="ml-auto flex items-center gap-3 border-[#0500FF] relative"
           onClick={() => {
             setIsChatOpen(!isChatOpen);
             if (sidebarView !== "close") {
               setSidebarView("close");
             }
+            setHasNewMessages(false);
           }}
         >
           {BasicIcons.chat}
+          {/* <div className="absolute -top-2 -right-3">
+            <GoDotFill color="#0500FF" size={25} />
+          </div> */}
+          {/* {newMessage && (
+            <div className="absolute -top-2 -right-3 bg-red-500 text-white rounded-full h-4 w-4 flex items-center justify-center">
+              <GoDotFill color="#0500FF" size={25} />
+            </div>
+          )} */}
         </OutlineButton>
       </div>
       <Toaster

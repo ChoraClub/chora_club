@@ -52,6 +52,19 @@ const LocalGridCard: FC = () => {
     }
   }, [stream]);
 
+  useDataMessage({
+    onMessage(payload, from, label) {
+      if (from === localPeerId) {
+        if (label === "reaction") {
+          setReaction(payload);
+          setTimeout(() => {
+            setReaction("");
+          }, 5000);
+        }
+      }
+    },
+  });
+
   return (
     <div
       className={`flex h-full justify-between rounded-xl text-white p-6 ${
@@ -59,7 +72,7 @@ const LocalGridCard: FC = () => {
       }`}
     >
       {(!stream || !shareStream) && (
-        <div className="relative flex flex-col mx-10">
+        <div className="relative flex flex-col mx-10 items-center">
           <Image
             src={metadata?.avatarUrl || "/avatars/avatars/0.png"}
             alt="default-avatar"
@@ -77,7 +90,7 @@ const LocalGridCard: FC = () => {
             <div className="text-gray-500 text-sm font-normal">{role}</div>
           </div>
 
-          <div className="absolute left-1/2 bottom-1/2 -translate-x-1/2 mb-2 text-4xl">
+          <div className="absolute left-1/2 bottom-1/2 -translate-x-1/2 mb-2 text-4xl z-50">
             {reaction}
           </div>
 
@@ -101,7 +114,6 @@ const LocalGridCard: FC = () => {
                 ref={videoRef}
                 className="aspect-video rounded-xl h-48 w-full"
                 autoPlay
-                muted
               />
             </div>
           )}
@@ -113,7 +125,6 @@ const LocalGridCard: FC = () => {
                 screenShareRef && (screenShareRef.srcObject = shareStream)
               }
               autoPlay
-              muted
             />
           </div>
         </div>
@@ -125,7 +136,6 @@ const LocalGridCard: FC = () => {
                 ref={videoRef}
                 className="aspect-video rounded-xl h-48 w-full"
                 autoPlay
-                muted
               />
             </div>
           )}
