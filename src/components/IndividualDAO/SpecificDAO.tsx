@@ -33,7 +33,11 @@ function SpecificDAO({ props }: { props: { daoDelegates: string } }) {
         </div>
 
         <div className="py-5 pr-8">
-          {props.daoDelegates === "optimism" ? desc.optimism : desc.arbitrum}
+          {props.daoDelegates === "optimism"
+            ? desc.optimism
+            : props.daoDelegates === "arbitrum"
+            ? desc.arbitrum
+            : null}
         </div>
       </div>
 

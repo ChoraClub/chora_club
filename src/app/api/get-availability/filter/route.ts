@@ -66,16 +66,13 @@ export async function POST(req: NextRequest, res: NextResponse<Type[]>) {
       .split("T")[1]
       .substring(0, 5);
 
-    // const currentTime = new Date().toISOString().split("T")[1].substring(0, 5);
-    // console.log("currentTime", currentTime);
 
     let query: any = {
-      // allowedDates: { $gte: "2023-01-01" },
-      allowedDates: { $gte: newDate },
+      "dateAndRanges.date": { $gte: newDate },
     };
 
     if (dao_name !== null) query.dao_name = dao_name;
-    if (date !== null) query.allowedDates = date;
+    if (date !== null) query["dateAndRanges.date"] = date;
     if (startTime !== null && endTime !== null) {
       console.log("inside start and end not null");
       query.$and = [

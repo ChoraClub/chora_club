@@ -305,7 +305,7 @@ function AvailableSessions() {
               </option>
             ))}
           </select>
-          <span>to</span>
+          <span>&nbsp;to</span>
           <select
             value={endTime || "End Time"}
             onChange={handleEndTimeChange}
@@ -471,12 +471,16 @@ function AvailableSessions() {
                         }}
                       >
                         <div style={{ display: "flex" }}>
-                          {daos.allowedDates.map((date: any, index: any) => (
+                          {daos.dateAndRanges.map((date: any, index: any) => (
                             <div
                               key={index}
                               className="text-black bg-[#f7f7f7c3] rounded-2xl font-semibold text-small border-[0.5px] border-[#D9D9D9] px-3 py-1 mr-4"
                             >
-                              {new Date(date).toLocaleString().split(",")[0]}{" "}
+                              {
+                                new Date(date.date)
+                                  .toLocaleString()
+                                  .split(",")[0]
+                              }{" "}
                             </div>
                           ))}
                         </div>
