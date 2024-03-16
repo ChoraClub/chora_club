@@ -54,6 +54,7 @@ function Tile({
 
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [applyStyles, setApplyStyles] = useState(true);
+  const [startLoading, setStartLoading] = useState(false);
 
   const openModal = (index: number) => {
     setSelectedTileIndex(index);
@@ -171,8 +172,22 @@ function Tile({
                     <a
                       href={`/meeting/officehours/${data.meetingId}/lobby`}
                       rel="noopener noreferrer"
+                      onClick={() => setStartLoading(true)}
                     >
-                      Join
+                      {startLoading ? (
+                        <>
+                          <Oval
+                            visible={true}
+                            height="20"
+                            width="20"
+                            color="#fff"
+                            secondaryColor="#cdccff"
+                            ariaLabel="oval-loading"
+                          />
+                        </>
+                      ) : (
+                        "Join"
+                      )}
                     </a>
                   </div>
                 </div>

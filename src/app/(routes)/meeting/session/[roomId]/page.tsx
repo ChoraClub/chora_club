@@ -98,7 +98,9 @@ const Home = ({ params }: { params: { roomId: string } }) => {
         <GridLayout />
         <Sidebar />
         <div className="absolute right-4 bottom-20">
-          {showAcceptRequest && <AcceptRequest peerId={requestedPeerId} />}
+          {Role.HOST
+            ? showAcceptRequest && <AcceptRequest peerId={requestedPeerId} />
+            : null}
         </div>
         {isChatOpen && <Chat />}
       </div>

@@ -60,7 +60,7 @@ const EmojiTray: React.FC<Props> = ({ onClick, onClose }) => {
 
   return (
     <div>
-      <div className="relative">
+      <div className="relative z-50">
         <div className=" border-b border-slate-700 py-3 text-center text-base font-semibold text-gray-800">
           Reactions
           <span

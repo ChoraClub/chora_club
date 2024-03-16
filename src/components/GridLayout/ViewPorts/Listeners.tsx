@@ -15,9 +15,12 @@ const Speakers = () => {
       {localPeerRole === Role.LISTENER && localPeerId && (
         <LocalGridCard key={`grid-${localPeerId}`} />
       )}
-      {peerIds.slice(0, 4).map((peerId) => {
-        return <RemoteGridCard key={`grid-${peerId}`} peerId={peerId} />;
-      })}
+
+      {localPeerRole == Role.HOST
+        ? peerIds.slice(0, 4).map((peerId) => {
+            return <RemoteGridCard key={`grid-${peerId}`} peerId={peerId} />;
+          })
+        : ""}
     </>
   );
 };

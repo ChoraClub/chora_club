@@ -80,18 +80,50 @@ const GridCard: React.FC<GridCardProps> = ({ peerId }) => {
     },
   });
   return (
-    <div className="flex justify-center items-center flex-col p-4 rounded-lg shadow-md">
-      <div className="grid grid-cols-2 gap-4 w-full">
+    <div className="flex w-full h-full justify-center items-center rounded-xl p-3 gap-4">
+      {(!screenShareVideoStream || !videoStream) && (
+        <div className="mt-4 flex flex-col items-center bg-slate-100 w-full h-full justify-center py-4 px-7 rounded-xl">
+          {audioStream && <AudioElem peerId={peerId} />}
+          <div className="relative">
+            <Image
+              src={metadata?.avatarUrl || "/avatars/avatars/0.png"}
+              alt="default-avatar"
+              width={100}
+              height={100}
+              quality={100}
+              priority
+              className="maskAvatar"
+            />
+
+            <div className="mt-1 text-center">
+              <div className="text-gray-800 text-base font-medium">
+                {metadata?.displayName}
+              </div>
+              <div className="text-gray-800 text-sm font-normal">{role}</div>
+            </div>
+            <div className="absolute left-1/2 bottom-1/2 -translate-x-1/2 mb-2 text-4xl">
+              {reaction}
+            </div>
+            {role && ["host", "coHost", "speaker"].includes(role) && (
+              <div className="absolute top-0 right-0">{BasicIcons.audio}</div>
+            )}
+            {metadata?.isHandRaised && (
+              <div className="absolute flex bottom-12 w-8 h-8 right-0 rounded-full justify-center items-center bg-gray-600 text-xl border-gray-600 border-2">
+                ✋
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+      <div className="grid grid-cols-2 gap-4 justify-center items-center mt-3">
         {audioStream && <AudioElem peerId={peerId} />}
         {screenShareVideoStream && (
-          <div
-            className={!videoStream ? "col-span-2 h-96" : "col-span-1 w-full"}
-          >
+          <div className={!videoStream ? "col-span-2" : "col-span-1 w-full"}>
             <video
               autoPlay
               playsInline
               controls
-              className="aspect-video w-full mt-6 h-[23rem]"
+              className="aspect-video w-full"
               ref={(screenRef) =>
                 screenRef && (screenRef.srcObject = screenShareVideoStream)
               }
@@ -101,50 +133,18 @@ const GridCard: React.FC<GridCardProps> = ({ peerId }) => {
         {videoStream && (
           <div
             className={
-              !screenShareVideoStream ? "col-span-2 h-96" : "col-span-1 w-full"
+              !screenShareVideoStream ? "col-span-2" : "col-span-1 w-full"
             }
           >
             <video
               ref={vidRef}
               autoPlay
               playsInline
-              className="aspect-video w-full mt-6 h-[23rem]"
+              className="aspect-video w-full"
             />
           </div>
         )}
       </div>
-      {(!screenShareVideoStream || !videoStream) && (
-        <div className="relative mt-4 flex flex-col items-center">
-          {audioStream && <AudioElem peerId={peerId} />}
-          <Image
-            src={metadata?.avatarUrl || "/avatars/avatars/0.png"}
-            alt="default-avatar"
-            width={100}
-            height={100}
-            quality={100}
-            priority
-            className="maskAvatar"
-          />
-
-          <div className="mt-1 text-center">
-            <div className="text-gray-800 text-base font-medium">
-              {metadata?.displayName}
-            </div>
-            <div className="text-gray-800 text-sm font-normal">{role}</div>
-          </div>
-          <div className="absolute left-1/2 bottom-1/2 -translate-x-1/2 mb-2 text-4xl">
-            {reaction}
-          </div>
-          {role && ["host", "coHost", "speaker"].includes(role) && (
-            <div className="absolute top-0 right-0">{BasicIcons.audio}</div>
-          )}
-          {metadata?.isHandRaised && (
-            <div className="absolute flex bottom-12 w-8 h-8 right-0 rounded-full justify-center items-center bg-gray-600 text-xl border-gray-600 border-2">
-              ✋
-            </div>
-          )}
-        </div>
-      )}
     </div>
   );
 };

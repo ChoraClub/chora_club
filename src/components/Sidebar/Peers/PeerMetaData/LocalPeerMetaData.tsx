@@ -100,15 +100,16 @@ const PeerMetaData: React.FC<PeerMetaDatProps> = ({
               ? NestedPeerListIcons.active.mic
               : NestedPeerListIcons.inactive.mic}
           </div>
-
-          <div className="flex items-center cursor-pointer">
-            <Dropdown
-              triggerChild={<div>{NestedPeerListIcons.inactive.more}</div>}
-              align="end"
-            >
-              {role && RoleData[role as keyof typeof RoleData]}
-            </Dropdown>
-          </div>
+          {/* {role === "host" ? ( */}
+            <div className="flex items-center cursor-pointer">
+              <Dropdown
+                triggerChild={<div>{NestedPeerListIcons.inactive.more}</div>}
+                align="end"
+              >
+                {role && RoleData[role as keyof typeof RoleData]}
+              </Dropdown>
+            </div>
+          {/* ) : null} */}
         </div>
       )}
     </div>

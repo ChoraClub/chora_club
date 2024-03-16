@@ -45,6 +45,7 @@ function UserUpcomingHours() {
 
   const [selectedDate, setSelectedDate] = useState<string>("");
   const [selectedTime, setSelectedTime] = useState<string>("");
+  const [startLoading, setStartLoading] = useState(false);
 
   const handleTimeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedTime(e.target.value);
@@ -271,8 +272,22 @@ function UserUpcomingHours() {
                   <a
                     href={`/meeting/officehours/${data.meetingId}/lobby`}
                     rel="noopener noreferrer"
+                    onClick={() => setStartLoading(true)}
                   >
-                    Start
+                    {startLoading ? (
+                      <>
+                        <Oval
+                          visible={true}
+                          height="20"
+                          width="20"
+                          color="#fff"
+                          secondaryColor="#cdccff"
+                          ariaLabel="oval-loading"
+                        />
+                      </>
+                    ) : (
+                      "Start"
+                    )}
                   </a>
                 </div>
               </div>

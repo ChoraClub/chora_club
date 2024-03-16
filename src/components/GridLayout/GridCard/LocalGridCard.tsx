@@ -67,52 +67,54 @@ const LocalGridCard: FC = () => {
 
   return (
     <div
-      className={`flex h-full justify-between rounded-xl text-white p-6 ${
-        role && ["host", "coHost", "speaker"].includes(role) ? "pb-6" : ""
+      className={`flex h-full w-full justify-between rounded-xl text-white p-6 gap-6 ${
+        role && ["host", "coHost", "speaker"].includes(role) ? "" : ""
       }`}
     >
       {(!stream || !shareStream) && (
-        <div className="relative flex flex-col mx-10 items-center">
-          <Image
-            src={metadata?.avatarUrl || "/avatars/avatars/0.png"}
-            alt="default-avatar"
-            width={100}
-            height={100}
-            quality={100}
-            priority
-            className="maskAvatar"
-          />
+        <div className=" flex flex-col items-center justify-center bg-slate-100 py-5 px-10 rounded-xl w-full">
+          <div className="relative">
+            <Image
+              src={metadata?.avatarUrl || "/avatars/avatars/0.png"}
+              alt="default-avatar"
+              width={100}
+              height={100}
+              quality={100}
+              priority
+              className="maskAvatar"
+            />
 
-          <div className="mt-1 text-center">
-            <div className="text-gray-700 text-base font-medium">
-              {`${metadata?.displayName} (You)`}
+            <div className="mt-1 text-center">
+              <div className="text-gray-700 text-base font-medium">
+                {`${metadata?.displayName} (You)`}
+              </div>
+              <div className="text-gray-500 text-sm font-normal">{role}</div>
             </div>
-            <div className="text-gray-500 text-sm font-normal">{role}</div>
-          </div>
 
-          <div className="absolute left-1/2 bottom-1/2 -translate-x-1/2 mb-2 text-4xl z-50">
-            {reaction}
-          </div>
-
-          {role && ["host", "coHost", "speaker"].includes(role) && (
-            <div className="absolute right-0">{BasicIcons.audio}</div>
-          )}
-
-          {metadata?.isHandRaised && (
-            <div className="absolute flex bottom-12 right-0 w-8 h-8 rounded-full justify-center items-center bg-gray-600 text-xl border-gray-600 border-2">
-              ✋
+            <div className="absolute left-1/2 bottom-1/2 -translate-x-1/2 mb-2 text-4xl z-10">
+              {reaction}
             </div>
-          )}
+
+            {role && ["host", "coHost", "speaker"].includes(role) && (
+              <div className="absolute right-0 top-0">{BasicIcons.audio}</div>
+            )}
+
+            {metadata?.isHandRaised && (
+              <div className="absolute flex bottom-12 right-0 w-8 h-8 rounded-full justify-center items-center bg-gray-600 text-xl border-gray-600 border-2">
+                ✋
+              </div>
+            )}
+          </div>
         </div>
       )}
 
       {shareStream ? (
-        <div className="grid grid-cols-2 gap-4 mt-2">
+        <div className="grid grid-cols-2 gap-4 h-full justify-center items-center">
           {stream && (
-            <div className="col-span-1">
+            <div className="col-span-1 w-full h-full">
               <video
                 ref={videoRef}
-                className="aspect-video rounded-xl h-48 w-full"
+                className="rounded-xl w-full h-full"
                 autoPlay
               />
             </div>
@@ -120,7 +122,7 @@ const LocalGridCard: FC = () => {
 
           <div className={stream ? "col-span-1" : "col-span-2"}>
             <video
-              className="aspect-video rounded-xl h-48 w-full"
+              className="aspect-video w-full h-full"
               ref={(screenShareRef) =>
                 screenShareRef && (screenShareRef.srcObject = shareStream)
               }
@@ -129,12 +131,12 @@ const LocalGridCard: FC = () => {
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-2 mt-2">
+        <div className="grid grid-cols-2 h-full justify-center items-center">
           {stream && (
-            <div className="col-span-2">
+            <div className="col-span-2 h-full w-full">
               <video
                 ref={videoRef}
-                className="aspect-video rounded-xl h-48 w-full"
+                className="aspect-video w-full h-full"
                 autoPlay
               />
             </div>

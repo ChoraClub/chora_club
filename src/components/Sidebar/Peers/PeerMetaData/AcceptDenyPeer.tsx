@@ -21,7 +21,7 @@ const AcceptDenyPeer: FC<AcceptDenyPeerProps> = ({ peerId }) => {
 
   return (
     <div className="flex items-center justify-between w-full">
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 py-1">
         <Image
           src={metadata?.avatarUrl ?? "/avatars/avatars/0.png"}
           alt="default"
@@ -38,6 +38,7 @@ const AcceptDenyPeer: FC<AcceptDenyPeerProps> = ({ peerId }) => {
       <div className="flex items-center gap-4">
         <div
           role="presentation"
+          className="cursor-pointer"
           onClick={() => {
             updateRole(Role.SPEAKER);
             removeRequestedPeers(peerId);
@@ -47,6 +48,7 @@ const AcceptDenyPeer: FC<AcceptDenyPeerProps> = ({ peerId }) => {
         </div>
         <div
           role="presentation"
+          className="cursor-pointer"
           onClick={() => {
             removeRequestedPeers(peerId);
           }}

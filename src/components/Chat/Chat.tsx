@@ -25,15 +25,17 @@ const Chat = () => {
   };
 
   async function handleSend() {
-    sendDataToAllPeers();
-    const newChatMessage = {
-      name: userDisplayName,
-      text: message,
-      is_user: true,
-    };
-    addChatMessage(newChatMessage);
-    setHasNewMessages(true);
-    setMessage("");
+    if (message != "") {
+      sendDataToAllPeers();
+      const newChatMessage = {
+        name: userDisplayName,
+        text: message,
+        is_user: true,
+      };
+      addChatMessage(newChatMessage);
+      setHasNewMessages(true);
+      setMessage("");
+    }
 
     // toast(newChatMessage.text);
   }
@@ -45,9 +47,7 @@ const Chat = () => {
   };
 
   function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
-    if (event.target.value != null) {
-      setMessage(event.target.value);
-    }
+    setMessage(event.target.value);
   }
 
   const sendDataToAllPeers = () => {

@@ -51,6 +51,7 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
   const [isPageLoading, setIsPageLoading] = useState(true);
   const [isConfirmSlotLoading, setIsConfirmSlotLoading] = useState(true);
   const router = useRouter();
+  const [startLoading, setStartLoading] = useState(false);
 
   useEffect(() => {
     setIsPageLoading(false);
@@ -249,11 +250,25 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
             data.booking_status === "Approved" && (
               <div
                 onClick={() => {
+                  setStartLoading(true);
                   router.push(`/meeting/session/${data.meetingId}/lobby`);
                 }}
                 className="text-center bg-blue-shade-100 rounded-full font-bold text-white py-2 text-xs cursor-pointer"
               >
-                Join
+                {startLoading ? (
+                  <>
+                    <Oval
+                      visible={true}
+                      height="20"
+                      width="20"
+                      color="#fff"
+                      secondaryColor="#cdccff"
+                      ariaLabel="oval-loading"
+                    />
+                  </>
+                ) : (
+                  "Join"
+                )}
               </div>
             )
           ) : (
