@@ -25,7 +25,7 @@ function AttestationModal({
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div
             className="absolute inset-0 bg-gray-800 opacity-50"
-            onClick={toggleModal}
+            // onClick={toggleModal}
           ></div>
           <div className="z-50 bg-white rounded-3xl max-w-7xl">
             <div className="flex justify-evenly">

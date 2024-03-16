@@ -145,7 +145,12 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
         await collection.findOneAndUpdate(
           { meetingId: requestData.meetingId },
-          { $set: { uid_host: response.data.offchainAttestationId } }
+          {
+            $set: {
+              uid_host: response.data.offchainAttestationId,
+              meeting_status: "Recorded",
+            },
+          }
         );
 
         client.close();
@@ -162,7 +167,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
           {
             $set: {
               uid_attendee: response.data.offchainAttestationId,
-              meeting_status: "Recorded",
             },
           }
         );
@@ -234,4 +238,3 @@ export async function POST(req: NextRequest, res: NextResponse) {
     );
   }
 }
-

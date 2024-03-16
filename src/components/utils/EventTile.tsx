@@ -182,23 +182,39 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
 
           {isEvent === "Book" ? (
             data.booking_status === "Approved" ? (
-              <div className="flex justify-end">
-                <Tooltip
-                  content="Start Session"
-                  placement="top"
-                  closeDelay={1}
-                  showArrow
-                >
-                  <span className="cursor-pointer">
-                    <FaCirclePlay
-                      size={35}
-                      color="#004DFF"
-                      onClick={() =>
-                        router.push(`/meeting/session/${data.meetingId}/lobby`)
-                      }
+              <div className="flex justify-end ">
+                {startLoading ? (
+                  <div className="flex items-center justify-center">
+                    <Oval
+                      visible={true}
+                      height="20"
+                      width="20"
+                      color="#fff"
+                      secondaryColor="#cdccff"
+                      ariaLabel="oval-loading"
                     />
-                  </span>
-                </Tooltip>
+                  </div>
+                ) : (
+                  <Tooltip
+                    content="Start Session"
+                    placement="top"
+                    closeDelay={1}
+                    showArrow
+                  >
+                    <span className="cursor-pointer">
+                      <FaCirclePlay
+                        size={35}
+                        color="#004DFF"
+                        onClick={() => {
+                          setStartLoading(true);
+                          router.push(
+                            `/meeting/session/${data.meetingId}/lobby`
+                          );
+                        }}
+                      />
+                    </span>
+                  </Tooltip>
+                )}
               </div>
             ) : data.booking_status === "Pending" ? (
               isConfirmSlotLoading ? (
