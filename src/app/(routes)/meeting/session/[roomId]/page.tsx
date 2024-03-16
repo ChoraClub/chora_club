@@ -21,12 +21,32 @@ import useStore from "@/components/store/slices";
 import { toast } from "react-hot-toast";
 import { Role } from "@huddle01/server-sdk/auth";
 import Chat from "@/components/Chat/Chat";
+import { useAccount } from "wagmi";
+import AttestationModal from "@/components/utils/AttestationModal";
+
 // import Chat from '@/components/Chat/Chat';
 
 const Home = ({ params }: { params: { roomId: string } }) => {
+  const [modalOpen, setModalOpen] = useState(false);
+
+  const handleModalClose = () => {
+    console.log("Popup Closed");
+    setModalOpen(false); // Close the modal
+    // Push the router after the modal is closed
+
+    push(`/meeting/session/${params.roomId}/lobby`);
+    console.log("Popup 3");
+  };
+
+  const displayPopup = async () => {
+    console.log("Popup");
+    setModalOpen(true);
+    console.log("Popup 2");
+  };
+
   const { state } = useRoom({
     onLeave: () => {
-      push(`/meeting/session/${params.roomId}/lobby`);
+      displayPopup();
     },
   });
   const { push } = useRouter();
@@ -49,12 +69,13 @@ const Home = ({ params }: { params: { roomId: string } }) => {
 
   const { huddleClient } = useHuddle01();
 
+  const { address } = useAccount();
+
   useEffect(() => {
     if (state === "idle") {
       push(`/meeting/session/${params.roomId}/lobby`);
       return;
     } else {
-      console.log("length", peerIds.length);
       updateMetadata({
         displayName: userDisplayName,
         avatarUrl: avatarUrl,
@@ -107,6 +128,9 @@ const Home = ({ params }: { params: { roomId: string } }) => {
 
       <BottomBar />
       <Prompts />
+      {modalOpen && (
+        <AttestationModal isOpen={modalOpen} onClose={handleModalClose} />
+      )}
     </section>
   );
 };

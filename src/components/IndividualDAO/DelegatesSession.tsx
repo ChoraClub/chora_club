@@ -148,7 +148,7 @@ function DelegatesSession({ props }: { props: string }) {
         </span>
       </div>
       {/* <div>
-        <AttestationModal />
+        <AttestationModal props={true} />
       </div> */}
 
       <div className="pr-36 pt-3">
