@@ -38,34 +38,27 @@ export async function POST(req: NextRequest, res: NextResponse<Type[]>) {
     const newDate = new Date().toISOString().split("T")[0];
     console.log("currentDate", newDate);
 
-    const startDateTime = (await startTime)
+    const startDateTime = startTime
       ? new Date(`${date ? date : newDate} ${startTime}:00`)
       : null;
 
-    console.log(
-      "startDateTime",
-      startDateTime?.toISOString().split("T")[1].substring(0, 5)
-    );
-
-    const endDateTime = (await endTime)
+    const endDateTime = endTime
       ? new Date(`${date ? date : newDate} ${endTime}:00`)
       : null;
 
-    console.log(
-      "endDateTime",
-      endDateTime?.toISOString().split("T")[1].substring(0, 5)
-    );
+    console.log("startDateTime", startDateTime);
+    console.log("endDateTime", endDateTime);
 
     const startTimeToSend = startDateTime
-      ?.toISOString()
-      .split("T")[1]
-      .substring(0, 5);
+      ? startDateTime.toISOString().split("T")[1].substring(0, 5)
+      : undefined;
 
     const endTimeToSend = endDateTime
-      ?.toISOString()
-      .split("T")[1]
-      .substring(0, 5);
+      ? endDateTime.toISOString().split("T")[1].substring(0, 5)
+      : undefined;
 
+    console.log("startTimeToSend", startTimeToSend);
+    console.log("endTimeToSend", endTimeToSend);
 
     let query: any = {
       "dateAndRanges.date": { $gte: newDate },
@@ -73,35 +66,93 @@ export async function POST(req: NextRequest, res: NextResponse<Type[]>) {
 
     if (dao_name !== null) query.dao_name = dao_name;
     if (date !== null) query["dateAndRanges.date"] = date;
+    // if (startTime !== null && endTime !== null) {
+    //   console.log("inside start and end not null");
+    //   query.$and = [
+    //     { "dateAndRanges.utcTime_endTime": { $gte: startTimeToSend } },
+    //     { "dateAndRanges.utcTime_startTime": { $lte: endTimeToSend } },
+    //   ];
+    // }
+    // if (startTime !== null && endTime === null) {
+    //   console.log("inside startTime not null");
+    //   query.$and = [
+    //     { "dateAndRanges.utcTime_startTime": { $lte: startTimeToSend } },
+    //     { "dateAndRanges.utcTime_endTime": { $gte: startTimeToSend } },
+    //   ];
+    // }
+    // if (endTime !== null && startTime === null) {
+    //   console.log("inside endTime not null");
+    //   query.$and = [
+    //     { "dateAndRanges.utcTime_startTime": { $lte: endTimeToSend } },
+    //     { "dateAndRanges.utcTime_endTime": { $gte: endTimeToSend } },
+    //   ];
+    // }
+
+    const sessionData = await collection.find(query).toArray();
+
+    console.log("SessionData", sessionData);
+
+    sessionData.forEach((session: any) => {
+      session.dateAndRanges = session.dateAndRanges.filter((dateRange: any) => {
+        return new Date(dateRange.date) >= new Date(newDate);
+      });
+    });
+
+    // Filter out sessions that have no dateAndRanges left
+    let finalSessionData = sessionData.filter(
+      (session) => session.dateAndRanges.length > 0
+    );
+
+    console.log("finalSessionData", finalSessionData);
+
+    // If both startTime and endTime are provided, apply additional filtering
     if (startTime !== null && endTime !== null) {
-      console.log("inside start and end not null");
-      query.$and = [
-        { "dateAndRanges.utcTime_endTime": { $gte: startTimeToSend } },
-        { "dateAndRanges.utcTime_startTime": { $lte: endTimeToSend } },
-      ];
+      console.log("when both startTime and endTime is given");
+      finalSessionData = finalSessionData.filter((session) => {
+        return session.dateAndRanges.some((dateRange: any) => {
+          // console.log(new Date(dateRange.date) >= new Date(newDate));
+          return (
+            new Date(dateRange.date) >= new Date(date ? date : newDate) &&
+            dateRange.utcTime_startTime <= endTimeToSend! &&
+            dateRange.utcTime_endTime >= startTimeToSend!
+          );
+        });
+      });
     }
+
     if (startTime !== null && endTime === null) {
-      console.log("inside startTime not null");
-      query.$and = [
-        { "dateAndRanges.utcTime_startTime": { $lte: startTimeToSend } },
-        { "dateAndRanges.utcTime_endTime": { $gte: startTimeToSend } },
-      ];
+      console.log("when only startTime is given");
+      finalSessionData = finalSessionData.filter((session) => {
+        return session.dateAndRanges.some((dateRange: any) => {
+          // console.log(new Date(dateRange.date) >= new Date(newDate));
+          return (
+            new Date(dateRange.date) >= new Date(date ? date : newDate) &&
+            dateRange.utcTime_startTime <= startTimeToSend! &&
+            dateRange.utcTime_endTime >= startTimeToSend!
+          );
+        });
+      });
     }
-    if (endTime !== null && startTime === null) {
-      console.log("inside endTime not null");
-      query.$and = [
-        { "dateAndRanges.utcTime_startTime": { $lte: endTimeToSend } },
-        { "dateAndRanges.utcTime_endTime": { $gte: endTimeToSend } },
-      ];
+    if (startTime === null && endTime !== null) {
+      console.log("when only endTime is given");
+      finalSessionData = finalSessionData.filter((session) => {
+        return session.dateAndRanges.some((dateRange: any) => {
+          // console.log(new Date(dateRange.date) >= new Date(newDate));
+          return (
+            new Date(dateRange.date) >= new Date(date ? date : newDate) &&
+            dateRange.utcTime_startTime <= endTimeToSend! &&
+            dateRange.utcTime_endTime >= endTimeToSend!
+          );
+        });
+      });
     }
 
-    const SessionData = await collection.find(query).toArray();
+    console.log("finalSessionData", finalSessionData);
 
-    console.log("SessionData", SessionData);
     client.close();
 
     return NextResponse.json(
-      { success: true, data: SessionData },
+      { success: true, data: finalSessionData, fetchedData: sessionData },
       { status: 200 }
     );
   } catch (error) {

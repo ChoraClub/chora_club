@@ -211,7 +211,21 @@ function AvailableSessions() {
     setEndTime(null);
   };
 
-  const currentDate = new Date().toISOString().split("T")[0];
+  const currentDate = new Date();
+  let formattedDate = currentDate.toLocaleDateString();
+  if (
+    formattedDate.length !== 10 ||
+    !formattedDate.match(/^\d{4}-\d{2}-\d{2}$/)
+  ) {
+    const year = currentDate.getFullYear();
+    const month = String(currentDate.getMonth() + 1).padStart(2, "0");
+    const day = String(currentDate.getDate()).padStart(2, "0");
+    formattedDate = `${year}-${month}-${day}`;
+  }
+
+  // console.log("formattedDate", formattedDate);
+
+  // console.log("currentDate", currentDate);
 
   return (
     <>
@@ -271,7 +285,7 @@ function AvailableSessions() {
             type="date"
             value={selectedDate}
             onChange={handleDateChange}
-            min={currentDate}
+            min={formattedDate}
             // onChange={(e) => setSelectedDate(e.target.value)}
             className="px-3 py-2 shadow mr-1 rounded-md"
           />
