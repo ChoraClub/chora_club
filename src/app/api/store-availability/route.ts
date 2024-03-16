@@ -1,5 +1,4 @@
 import { MongoClient, MongoClientOptions } from "mongodb";
-import { NextApiRequest, NextApiResponse } from "next";
 import { NextResponse, NextRequest } from "next/server";
 
 // Define the request body type
@@ -43,7 +42,7 @@ interface StoreAvailabilityResponseBody {
 
 export async function POST(
   req: NextRequest,
-  res: NextApiResponse<StoreAvailabilityResponseBody>
+  res: NextResponse<StoreAvailabilityResponseBody>
 ) {
   const {
     dao_name,
@@ -54,46 +53,80 @@ export async function POST(
   }: StoreAvailabilityRequestBody = await req.json();
 
   try {
-    // Connect to your MongoDB database
-    // console.log("Connecting to MongoDB...");
+    // Connect to MongoDB
     const client = await MongoClient.connect(process.env.MONGODB_URI!, {
       dbName: `chora-club`,
     } as MongoClientOptions);
-    // console.log("Connected to MongoDB");
 
     // Access the collection
     const db = client.db();
     const collection = db.collection("scheduling");
 
-    // Insert the new availability document
-    // console.log("Inserting availability document...");
-    const result = await collection.insertOne({
+    // Check if a document with the same dao_name, userAddress, and timeSlotSizeMinutes exists
+    const existingDocument = await collection.findOne({
       dao_name,
       userAddress,
       timeSlotSizeMinutes,
-      allowedDates,
-      dateAndRanges,
-      createdAt: new Date(),
-      updatedAt: new Date(),
     });
-    // console.log("Availability document inserted:", result);
 
-    client.close();
-    // console.log("MongoDB connection closed");
-
-    if (result.insertedId) {
-      // Retrieve the inserted document using the insertedId
-      // console.log("Retrieving inserted document...");
-      const insertedDocument = await collection.findOne({
-        _id: result.insertedId,
-      });
-      // console.log("Inserted document retrieved");
-      return NextResponse.json({ result: insertedDocument }, { status: 200 });
-    } else {
-      return NextResponse.json(
-        { error: "Failed to retrieve inserted document" },
-        { status: 500 }
+    if (existingDocument) {
+      // Update the existing document by pushing new allowedDates and dateAndRanges
+      await collection.updateOne(
+        {
+          _id: existingDocument._id,
+        },
+        {
+          $push: {
+            allowedDates: { $each: allowedDates },
+            dateAndRanges: { $each: dateAndRanges },
+          },
+          $set: {
+            updatedAt: new Date(),
+          },
+        }
       );
+
+      // Retrieve the updated document
+      const updatedDocument = await collection.findOne({
+        _id: existingDocument._id,
+      });
+
+      client.close();
+
+      return NextResponse.json(
+        { success: true, data: updatedDocument },
+        { status: 200 }
+      );
+    } else {
+      // Insert new data
+      const result = await collection.insertOne({
+        dao_name,
+        userAddress,
+        timeSlotSizeMinutes,
+        allowedDates,
+        dateAndRanges,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+
+      client.close();
+
+      if (result.insertedId) {
+        // Retrieve the inserted document using the insertedId
+        const insertedDocument = await collection.findOne({
+          _id: result.insertedId,
+        });
+
+        return NextResponse.json(
+          { success: true, data: insertedDocument },
+          { status: 200 }
+        );
+      } else {
+        return NextResponse.json(
+          { error: "Failed to retrieve inserted document" },
+          { status: 500 }
+        );
+      }
     }
   } catch (error) {
     console.error("Error storing availability:", error);

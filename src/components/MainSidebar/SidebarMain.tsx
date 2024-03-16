@@ -119,19 +119,19 @@ function Sidebar() {
             </Link>
           </Tooltip>
           <Tooltip
-            content="Delegate Sessions"
+            content="Available Delegates"
             placement="right"
             className="rounded-md bg-opacity-90"
             closeDelay={1}
           >
-            <Link href={"/delegate-sessions?sessions=available"}>
+            <Link href={"/available-delegates"}>
               <Image
                 priority
                 src={sessionIcn}
                 alt={"image"}
                 width={40}
                 className={`cursor-pointer  ${
-                  pathname.includes(`/delegate-sessions`)
+                  pathname.includes(`/available-delegates`)
                     ? "border-white border-2 rounded-full"
                     : ""
                 }`}
