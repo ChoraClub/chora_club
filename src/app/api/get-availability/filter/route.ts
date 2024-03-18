@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { MongoClient, MongoClientOptions } from "mongodb";
+import { DateTime } from "luxon";
 
 interface Type {
   ensName: string;
@@ -35,30 +36,86 @@ export async function POST(req: NextRequest, res: NextResponse<Type[]>) {
     const db = client.db();
     const collection = db.collection("scheduling");
 
-    const newDate = new Date().toISOString().split("T")[0];
-    console.log("currentDate", newDate);
+    // const newDate = new Date().toISOString().split("T")[0];
 
+    const currentDate = new Date();
+    let newDate = currentDate.toLocaleDateString();
+    if (newDate.length !== 10 || !newDate.match(/^\d{4}-\d{2}-\d{2}$/)) {
+      const year = currentDate.getFullYear();
+      const month = String(currentDate.getMonth() + 1).padStart(2, "0");
+      const day = String(currentDate.getDate()).padStart(2, "0");
+      newDate = `${year}-${month}-${day}`;
+    }
+    console.log("currentDate", newDate);
     const startDateTime = startTime
-      ? new Date(`${date ? date : newDate} ${startTime}:00`)
+      ? DateTime.fromFormat(
+          `${date ? date : newDate} ${startTime}:00`,
+          "yyyy-MM-dd HH:mm:ss"
+        )
       : null;
 
     const endDateTime = endTime
-      ? new Date(`${date ? date : newDate} ${endTime}:00`)
+      ? DateTime.fromFormat(
+          `${date ? date : newDate} ${endTime}:00`,
+          "yyyy-MM-dd HH:mm:ss"
+        )
       : null;
 
-    console.log("startDateTime", startDateTime);
-    console.log("endDateTime", endDateTime);
+    // Check if startDateTime and endDateTime are not null before calling toISO()
+    const utcStartDateTime = startDateTime
+      ? startDateTime.toUTC().toISO()
+      : null;
+    const utcEndDateTime = endDateTime ? endDateTime.toUTC().toISO() : null;
 
-    const startTimeToSend = startDateTime
-      ? startDateTime.toISOString().split("T")[1].substring(0, 5)
-      : undefined;
+    let startTimeToSend;
+    let endTimeToSend;
 
-    const endTimeToSend = endDateTime
-      ? endDateTime.toISOString().split("T")[1].substring(0, 5)
-      : undefined;
+    // Check if utcStartDateTime and utcEndDateTime are not null before further processing
+    if (utcStartDateTime && utcEndDateTime) {
+      console.log("startDateTime", utcStartDateTime);
+      console.log("endDateTime", utcEndDateTime);
 
-    console.log("startTimeToSend", startTimeToSend);
-    console.log("endTimeToSend", endTimeToSend);
+      startTimeToSend = utcStartDateTime.split("T")[1].substring(0, 5);
+      endTimeToSend = utcEndDateTime.split("T")[1].substring(0, 5);
+
+      console.log("startTimeToSend", startTimeToSend);
+      console.log("endTimeToSend", endTimeToSend);
+    }
+
+    // const currentDate = new Date();
+    // let newDate = currentDate.toLocaleDateString();
+    // if (newDate.length !== 10 || !newDate.match(/^\d{4}-\d{2}-\d{2}$/)) {
+    //   const year = currentDate.getFullYear();
+    //   const month = String(currentDate.getMonth() + 1).padStart(2, "0");
+    //   const day = String(currentDate.getDate()).padStart(2, "0");
+    //   newDate = `${year}-${month}-${day}`;
+    // }
+
+    // console.log("currentDate", newDate);
+
+    // const startDateTime = (await startTime)
+    //   ? new Date(`${date ? date : newDate} ${startTime}:00`)
+    //   : null;
+
+    // const endDateTime = (await endTime)
+    //   ? new Date(`${date ? date : newDate} ${endTime}:00`)
+    //   : null;
+
+    // console.log("startDateTime", startDateTime);
+    // console.log("endDateTime", endDateTime);
+
+    // const startTimeToSend = startDateTime
+    //   ?.toISOString()
+    //   .split("T")[1]
+    //   .substring(0, 5);
+
+    // const endTimeToSend = endDateTime
+    //   ?.toISOString()
+    //   .split("T")[1]
+    //   .substring(0, 5);
+
+    // console.log("startTimeToSend", startTimeToSend);
+    // console.log("endTimeToSend", endTimeToSend);
 
     let query: any = {
       "dateAndRanges.date": { $gte: newDate },
@@ -66,27 +123,6 @@ export async function POST(req: NextRequest, res: NextResponse<Type[]>) {
 
     if (dao_name !== null) query.dao_name = dao_name;
     if (date !== null) query["dateAndRanges.date"] = date;
-    // if (startTime !== null && endTime !== null) {
-    //   console.log("inside start and end not null");
-    //   query.$and = [
-    //     { "dateAndRanges.utcTime_endTime": { $gte: startTimeToSend } },
-    //     { "dateAndRanges.utcTime_startTime": { $lte: endTimeToSend } },
-    //   ];
-    // }
-    // if (startTime !== null && endTime === null) {
-    //   console.log("inside startTime not null");
-    //   query.$and = [
-    //     { "dateAndRanges.utcTime_startTime": { $lte: startTimeToSend } },
-    //     { "dateAndRanges.utcTime_endTime": { $gte: startTimeToSend } },
-    //   ];
-    // }
-    // if (endTime !== null && startTime === null) {
-    //   console.log("inside endTime not null");
-    //   query.$and = [
-    //     { "dateAndRanges.utcTime_startTime": { $lte: endTimeToSend } },
-    //     { "dateAndRanges.utcTime_endTime": { $gte: endTimeToSend } },
-    //   ];
-    // }
 
     const sessionData = await collection.find(query).toArray();
 
@@ -113,8 +149,8 @@ export async function POST(req: NextRequest, res: NextResponse<Type[]>) {
           // console.log(new Date(dateRange.date) >= new Date(newDate));
           return (
             new Date(dateRange.date) >= new Date(date ? date : newDate) &&
-            dateRange.utcTime_startTime <= endTimeToSend! &&
-            dateRange.utcTime_endTime >= startTimeToSend!
+            dateRange.utcTime_startTime <= endTime! &&
+            dateRange.utcTime_endTime >= startTime!
           );
         });
       });
@@ -127,8 +163,8 @@ export async function POST(req: NextRequest, res: NextResponse<Type[]>) {
           // console.log(new Date(dateRange.date) >= new Date(newDate));
           return (
             new Date(dateRange.date) >= new Date(date ? date : newDate) &&
-            dateRange.utcTime_startTime <= startTimeToSend! &&
-            dateRange.utcTime_endTime >= startTimeToSend!
+            dateRange.utcTime_startTime <= startTime! &&
+            dateRange.utcTime_endTime >= startTime!
           );
         });
       });
@@ -140,8 +176,8 @@ export async function POST(req: NextRequest, res: NextResponse<Type[]>) {
           // console.log(new Date(dateRange.date) >= new Date(newDate));
           return (
             new Date(dateRange.date) >= new Date(date ? date : newDate) &&
-            dateRange.utcTime_startTime <= endTimeToSend! &&
-            dateRange.utcTime_endTime >= endTimeToSend!
+            dateRange.utcTime_startTime <= endTime! &&
+            dateRange.utcTime_endTime >= endTime!
           );
         });
       });
