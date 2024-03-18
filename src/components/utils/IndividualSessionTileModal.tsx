@@ -66,11 +66,7 @@ function IndividualSessionTileModal({
           <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
             <div className="sm:flex sm:items-start">
               <div className="sm:w-3/5 mx-auto flex items-center justify-center bg-blue-100 rounded-lg">
-                <video
-                  controls
-                  className="h-full w-full"
-                  src={videoUrl}
-                >
+                <video controls className="h-full w-full" src={videoUrl}>
                   Your browser does not support the video tag.
                 </video>
               </div>
@@ -101,7 +97,7 @@ function IndividualSessionTileModal({
                       <a
                         href={
                           dao === "optimism" || "Optimism"
-                            ? `https://optimism.easscan.org/attestation/view/${host_attestation}`
+                            ? `https://optimism-sepolia.easscan.org/offchain/attestation/view/${host_attestation}`
                             : dao === "arbitrum" || "Arbitrum"
                             ? `https://arbitrum.easscan.org/attestation/view/${host_attestation}`
                             : ""
@@ -121,7 +117,7 @@ function IndividualSessionTileModal({
                       <a
                         href={
                           dao === "optimism" || "Optimism"
-                            ? `https://optimism.easscan.org/attestation/view/${attendee_attestation}`
+                            ? `https://optimism-sepolia.easscan.org/offchain/attestation/view/${attendee_attestation}`
                             : dao === "arbitrum" || "Arbitrum"
                             ? `https://arbitrum.easscan.org/attestation/view/${attendee_attestation}`
                             : ""

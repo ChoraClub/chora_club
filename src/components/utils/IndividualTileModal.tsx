@@ -106,7 +106,7 @@ function IndividualTileModal({
                       <a
                         href={
                           dao === "optimism" || "Optimism"
-                            ? `https://optimism.easscan.org/attestation/view/${host_attestation}`
+                            ? `https://optimism-sepolia.easscan.org/offchain/attestation/view/${host_attestation}`
                             : dao === "arbitrum" || "Arbitrum"
                             ? `https://arbitrum.easscan.org/attestation/view/${host_attestation}`
                             : ""
@@ -129,7 +129,7 @@ function IndividualTileModal({
                           <a
                             href={
                               dao === "optimism" || "Optimism"
-                                ? `https://optimism.easscan.org/attestation/view/${attendee.attendee_uid}`
+                                ? `https://optimism-sepolia.easscan.org/offchain/attestation/view/${attendee.attendee_uid}`
                                 : dao === "arbitrum" || "Arbitrum"
                                 ? `https://arbitrum.easscan.org/attestation/view/${attendee.attendee_uid}`
                                 : ""
