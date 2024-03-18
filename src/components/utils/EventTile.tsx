@@ -272,7 +272,7 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
                 className="text-center bg-blue-shade-100 rounded-full font-bold text-white py-2 text-xs cursor-pointer"
               >
                 {startLoading ? (
-                  <>
+                  <div className="flex justify-center items-center">
                     <Oval
                       visible={true}
                       height="20"
@@ -281,7 +281,7 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
                       secondaryColor="#cdccff"
                       ariaLabel="oval-loading"
                     />
-                  </>
+                  </div>
                 ) : (
                   "Join"
                 )}

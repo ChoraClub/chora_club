@@ -84,7 +84,7 @@ const GridCard: React.FC<GridCardProps> = ({ peerId }) => {
       {(!screenShareVideoStream || !videoStream) && (
         <div className="mt-4 flex flex-col items-center bg-slate-100 w-full h-full justify-center py-4 px-7 rounded-xl">
           {audioStream && <AudioElem peerId={peerId} />}
-          <div className="relative">
+          <div className="relative flex flex-col items-center justify-center">
             <Image
               src={metadata?.avatarUrl || "/avatars/avatars/0.png"}
               alt="default-avatar"
@@ -95,12 +95,6 @@ const GridCard: React.FC<GridCardProps> = ({ peerId }) => {
               className="maskAvatar"
             />
 
-            <div className="mt-1 text-center">
-              <div className="text-gray-800 text-base font-medium">
-                {metadata?.displayName}
-              </div>
-              <div className="text-gray-800 text-sm font-normal">{role}</div>
-            </div>
             <div className="absolute left-1/2 bottom-1/2 -translate-x-1/2 mb-2 text-4xl">
               {reaction}
             </div>
@@ -108,10 +102,16 @@ const GridCard: React.FC<GridCardProps> = ({ peerId }) => {
               <div className="absolute top-0 right-0">{BasicIcons.audio}</div>
             )}
             {metadata?.isHandRaised && (
-              <div className="absolute flex bottom-12 w-8 h-8 right-0 rounded-full justify-center items-center bg-gray-600 text-xl border-gray-600 border-2">
+              <div className="absolute flex bottom-0 w-8 h-8 right-0 rounded-full justify-center items-center bg-gray-600 text-xl border-gray-600 border-2">
                 ✋
               </div>
             )}
+          </div>
+          <div className="mt-1 text-center">
+            <div className="text-gray-800 text-base font-medium">
+              {metadata?.displayName}
+            </div>
+            <div className="text-gray-800 text-sm font-normal">{role}</div>
           </div>
         </div>
       )}

@@ -953,6 +953,8 @@ function MainProfile() {
               <UserInfo
                 karmaDesc={karmaDesc}
                 description={description}
+                isDelegate={isDelegate}
+                isSelfDelegate={selfDelegate}
                 descAvailable={descAvailable}
                 onSaveButtonClick={(newDescription?: string) =>
                   handleSubmit(newDescription)

@@ -203,36 +203,38 @@ const BottomBar: React.FC<BottomBarProps> = () => {
       toast.error("Attestation denied");
     }
 
-    try {
-      const response = await fetch(`/api/get-host`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          meetingId: roomId,
-        }),
-      });
-      const response_data = await response.json();
-      const host_address = await response_data.address;
+    if (meetingCategory === "officehours") {
+      try {
+        const response = await fetch(`/api/get-host`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            meetingId: roomId,
+          }),
+        });
+        const response_data = await response.json();
+        const host_address = await response_data.address;
 
-      console.log("host address", host_address);
+        console.log("host address", host_address);
 
-      const res = await fetch(`/api/update-office-hours/${host_address}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      const res_data = await res.json();
+        const res = await fetch(`/api/update-office-hours/${host_address}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        const res_data = await res.json();
 
-      // if (res_data.success) {
-      console.log("Updated", res_data);
-      toast.success("Next Office hour is scheduled!");
+        // if (res_data.success) {
+        console.log("Updated", res_data);
+        toast.success("Next Office hour is scheduled!");
 
-      // }
-    } catch (e) {
-      console.log("error: ", e);
+        // }
+      } catch (e) {
+        console.log("error: ", e);
+      }
     }
   };
 

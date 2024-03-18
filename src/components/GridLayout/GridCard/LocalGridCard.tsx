@@ -72,8 +72,8 @@ const LocalGridCard: FC = () => {
       }`}
     >
       {(!stream || !shareStream) && (
-        <div className=" flex flex-col items-center justify-center bg-slate-100 py-5 px-10 rounded-xl w-full">
-          <div className="relative">
+        <div className="flex flex-col items-center justify-center bg-slate-100 py-5 px-10 rounded-xl w-full">
+          <div className="relative flex flex-col items-center justify-center">
             <Image
               src={metadata?.avatarUrl || "/avatars/avatars/0.png"}
               alt="default-avatar"
@@ -84,13 +84,6 @@ const LocalGridCard: FC = () => {
               className="maskAvatar"
             />
 
-            <div className="mt-1 text-center">
-              <div className="text-gray-700 text-base font-medium">
-                {`${metadata?.displayName} (You)`}
-              </div>
-              <div className="text-gray-500 text-sm font-normal">{role}</div>
-            </div>
-
             <div className="absolute left-1/2 bottom-1/2 -translate-x-1/2 mb-2 text-4xl z-10">
               {reaction}
             </div>
@@ -100,10 +93,16 @@ const LocalGridCard: FC = () => {
             )}
 
             {metadata?.isHandRaised && (
-              <div className="absolute flex bottom-12 right-0 w-8 h-8 rounded-full justify-center items-center bg-gray-600 text-xl border-gray-600 border-2">
+              <div className="absolute flex bottom-0 right-0 w-8 h-8 rounded-full justify-center items-center bg-gray-600 text-xl border-gray-600 border-2">
                 ✋
               </div>
             )}
+          </div>
+          <div className="mt-1 text-center">
+            <div className="text-gray-700 text-base font-medium">
+              {`${metadata?.displayName} (You)`}
+            </div>
+            <div className="text-gray-500 text-sm font-normal">{role}</div>
           </div>
         </div>
       )}

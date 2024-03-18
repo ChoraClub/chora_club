@@ -1,3 +1,4 @@
+import { useRouter } from "next/navigation";
 import React, { ChangeEvent, useState, useEffect } from "react";
 import { Oval, RotatingLines } from "react-loader-spinner";
 import { useAccount } from "wagmi";
@@ -9,6 +10,8 @@ interface userInfoProps {
   isLoading: boolean;
   descAvailable: boolean;
   karmaDesc: string;
+  isDelegate: boolean;
+  isSelfDelegate: boolean;
 }
 
 function UserInfo({
@@ -16,6 +19,8 @@ function UserInfo({
   onSaveButtonClick,
   isLoading,
   descAvailable,
+  isDelegate,
+  isSelfDelegate,
   karmaDesc,
 }: userInfoProps) {
   const { address } = useAccount();
@@ -28,6 +33,7 @@ function UserInfo({
   const [tempDesc, setTempDesc] = useState("");
   const [desc, setDesc] = useState<string>();
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
   const [isDataLoading, setDataLoading] = useState(true);
   const [sessionHostCount, setSessionHostCount] = useState(0);
   const [sessionAttendCount, setSessionAttendCount] = useState(0);
@@ -218,18 +224,22 @@ function UserInfo({
     {
       number: sessionHostCount,
       desc: "Sessions hosted",
+      ref: `/profile/${address}}?active=sessions&session=hosted`,
     },
     {
       number: sessionAttendCount,
       desc: "Sessions attended",
+      ref: `/profile/${address}}?active=sessions&session=attended`,
     },
     {
       number: officehoursHostCount,
       desc: "Office Hours hosted",
+      ref: `/profile/${address}}?active=officeHours&hours=attended`,
     },
     {
       number: officehoursAttendCount,
       desc: "Office Hours attended",
+      ref: `/profile/${address}}?active=officeHours&hours=attended`,
     },
   ];
 
@@ -253,7 +263,16 @@ function UserInfo({
           blocks.map((key, index) => (
             <div
               key={index}
-              className="bg-[#3E3D3D] text-white rounded-2xl px-3 py-7"
+              className={`bg-[#3E3D3D] text-white rounded-2xl px-3 py-7 ${
+                isDelegate === true || isSelfDelegate === true
+                  ? "cursor-pointer"
+                  : ""
+              }`}
+              onClick={
+                isSelfDelegate === true || isDelegate === true
+                  ? () => router.push(`${key.ref}`)
+                  : undefined
+              }
             >
               <div className="font-semibold text-3xl text-center pb-2">
                 {isDataLoading ? (

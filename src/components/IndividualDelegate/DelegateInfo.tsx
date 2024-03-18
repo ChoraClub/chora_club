@@ -1,3 +1,4 @@
+import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import {
   Comment,
@@ -16,6 +17,7 @@ function DelegateInfo({ props }: { props: Type }) {
   const [description, setDescription] = useState<string>();
   const [loading, setLoading] = useState(true);
   const [isDataLoading, setDataLoading] = useState(true);
+  const router = useRouter();
   const [sessionHostCount, setSessionHostCount] = useState(0);
   const [sessionAttendCount, setSessionAttendCount] = useState(0);
   const [officehoursHostCount, setOfficehoursHostCount] = useState(0);
@@ -205,18 +207,22 @@ function DelegateInfo({ props }: { props: Type }) {
     {
       number: sessionHostCount,
       desc: "Sessions hosted",
+      ref: `/${props.daoDelegates}/${props.individualDelegate}?active=delegatesSession&session=hosted`,
     },
     {
       number: sessionAttendCount,
       desc: "Sessions attended",
+      ref: `/${props.daoDelegates}/${props.individualDelegate}?active=delegatesSession&session=attended`,
     },
     {
       number: officehoursHostCount,
       desc: "Office Hours hosted",
+      ref: `/${props.daoDelegates}/${props.individualDelegate}?active=officeHours&hours=hosted`,
     },
     {
       number: officehoursAttendCount,
       desc: "Office Hours attended",
+      ref: `/${props.daoDelegates}/${props.individualDelegate}?active=officeHours&hours=attended`,
     },
   ];
 
@@ -245,7 +251,8 @@ function DelegateInfo({ props }: { props: Type }) {
           details.map((key, index) => (
             <div
               key={index}
-              className="bg-[#3E3D3D] text-white rounded-2xl px-3 py-5"
+              className="bg-[#3E3D3D] text-white rounded-2xl px-3 py-5 cursor-pointer"
+              onClick={() => router.push(`${key.ref}`)}
             >
               <div className="font-semibold text-3xl text-center pb-2">
                 {isDataLoading ? (
