@@ -8,7 +8,10 @@ interface Recordings {
   recordingSize: number;
 }
 
-export async function GET(request: Request, res: NextResponse): Promise<void | Response> {
+export async function GET(
+  request: Request,
+  res: NextResponse
+): Promise<void | Response> {
   const roomId = request.url.split("stopRecording/")[1];
   console.log("room ID from stop", roomId);
 
@@ -60,7 +63,7 @@ export async function GET(request: Request, res: NextResponse): Promise<void | R
         } catch (error) {
           reject(error);
         }
-      }, 5000); // 5 seconds timeout
+      }, 10000); // 5 seconds timeout
     });
   }
 
