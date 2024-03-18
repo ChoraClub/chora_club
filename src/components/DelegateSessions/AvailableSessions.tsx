@@ -61,38 +61,51 @@ function AvailableSessions() {
 
         let dateToSend = null;
 
-        // if (selectedDate) {
-        //   const utcDate = new Date(selectedDate).toISOString().split("T")[0];
-        //   console.log("utcDate", utcDate);
-        //   dateToSend = utcDate;
-        //   setSelectedDate(utcDate);
-        // } else if (selectedDate === "") {
-        //   setSelectedDate(null);
-        // }
-
-        // if (selectedDao === "" || selectedDao === "All-DAOS") {
-        //   setSelectedDao(null);
-        // }
-
-        // if (startTime === "Start Time" || startTime === "") {
-        //   console.log("start time not null");
-        //   setStartTime(null);
-        // }
-
-        // if (endTime === "End Time" || endTime === "") {
-        //   setEndTime(null);
-        // }
-
         console.log("selectedDao", selectedDao);
         console.log("selectedDate", selectedDate);
         console.log("startTime", startTime);
         console.log("endTime", endTime);
 
+        const currentDate = new Date();
+        let newDate = currentDate.toLocaleDateString();
+        if (newDate.length !== 10 || !newDate.match(/^\d{4}-\d{2}-\d{2}$/)) {
+          const year = currentDate.getFullYear();
+          const month = String(currentDate.getMonth() + 1).padStart(2, "0");
+          const day = String(currentDate.getDate()).padStart(2, "0");
+          newDate = `${year}-${month}-${day}`;
+        }
+
+        console.log("currentDate", newDate);
+
+        const startDateTime = (await startTime)
+          ? new Date(`${newDate} ${startTime}:00`)
+          : null;
+
+        const endDateTime = (await endTime)
+          ? new Date(`${newDate} ${endTime}:00`)
+          : null;
+
+        console.log("startDateTime", startDateTime);
+        console.log("endDateTime", endDateTime);
+
+        const startTimeToSend = startDateTime
+          ?.toISOString()
+          .split("T")[1]
+          .substring(0, 5);
+
+        const endTimeToSend = endDateTime
+          ?.toISOString()
+          .split("T")[1]
+          .substring(0, 5);
+
+        console.log("startTimeToSend", startTimeToSend);
+        console.log("endTimeToSend", endTimeToSend);
+
         const raw = JSON.stringify({
           dao_name: selectedDao,
           date: selectedDate,
-          startTime: startTime,
-          endTime: endTime,
+          startTime: startTimeToSend ? startTimeToSend : null,
+          endTime: endTimeToSend ? endTimeToSend : null,
         });
 
         // console.log("")
@@ -211,7 +224,21 @@ function AvailableSessions() {
     setEndTime(null);
   };
 
-  const currentDate = new Date().toISOString().split("T")[0];
+  const currentDate = new Date();
+  let formattedDate = currentDate.toLocaleDateString();
+  if (
+    formattedDate.length !== 10 ||
+    !formattedDate.match(/^\d{4}-\d{2}-\d{2}$/)
+  ) {
+    const year = currentDate.getFullYear();
+    const month = String(currentDate.getMonth() + 1).padStart(2, "0");
+    const day = String(currentDate.getDate()).padStart(2, "0");
+    formattedDate = `${year}-${month}-${day}`;
+  }
+
+  // console.log("formattedDate", formattedDate);
+
+  // console.log("currentDate", currentDate);
 
   return (
     <>
@@ -271,7 +298,7 @@ function AvailableSessions() {
             type="date"
             value={selectedDate}
             onChange={handleDateChange}
-            min={currentDate}
+            min={formattedDate}
             // onChange={(e) => setSelectedDate(e.target.value)}
             className="px-3 py-2 shadow mr-1 rounded-md"
           />

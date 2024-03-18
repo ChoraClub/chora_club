@@ -92,6 +92,22 @@ const UserScheduledHours: React.FC = () => {
 
   const timeOptions = generateTimeOptions();
 
+  const currentDate = new Date();
+  let formattedDate = currentDate.toLocaleDateString();
+  if (
+    formattedDate.length !== 10 ||
+    !formattedDate.match(/^\d{4}-\d{2}-\d{2}$/)
+  ) {
+    const year = currentDate.getFullYear();
+    const month = String(currentDate.getMonth() + 1).padStart(2, "0");
+    const day = String(currentDate.getDate()).padStart(2, "0");
+    formattedDate = `${year}-${month}-${day}`;
+  }
+
+  // console.log("formattedDate", formattedDate);
+
+  // console.log("currentDate", currentDate);
+
   return (
     <div className="ps-4 font-poppins">
       <h1 className="text-xl font-bold mb-4">Schedule Office Hours</h1>
@@ -130,6 +146,7 @@ const UserScheduledHours: React.FC = () => {
               value={selectedDate}
               onChange={(e) => setSelectedDate(e.target.value)}
               className="shadow appearance-none border rounded w-2/5 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mr-1"
+              min={formattedDate}
             />
             <select
               value={selectedTime || "Time"}

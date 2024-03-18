@@ -182,6 +182,22 @@ function UserUpcomingHours() {
 
   const timeOptions = generateTimeOptions();
 
+  const currentDate = new Date();
+  let formattedDate = currentDate.toLocaleDateString();
+  if (
+    formattedDate.length !== 10 ||
+    !formattedDate.match(/^\d{4}-\d{2}-\d{2}$/)
+  ) {
+    const year = currentDate.getFullYear();
+    const month = String(currentDate.getMonth() + 1).padStart(2, "0");
+    const day = String(currentDate.getDate()).padStart(2, "0");
+    formattedDate = `${year}-${month}-${day}`;
+  }
+
+  // console.log("formattedDate", formattedDate);
+
+  // console.log("currentDate", currentDate);
+
   return (
     <div>
       <div className="space-y-6">
@@ -335,6 +351,7 @@ function UserUpcomingHours() {
                             value={selectedDate}
                             onChange={(e) => setSelectedDate(e.target.value)}
                             className="outline-none bg-[#D9D9D945] rounded-md px-2 py-1 text-sm w-2/5"
+                            min={formattedDate}
                           />
                           <select
                             value={selectedTime || "Time"}

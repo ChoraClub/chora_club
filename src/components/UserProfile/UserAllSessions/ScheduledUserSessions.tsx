@@ -189,7 +189,7 @@ function ScheduledUserSessions() {
     };
 
     setDateAndRanges((prevDateAndRanges: any) => [
-      ...prevDateAndRanges, 
+      ...prevDateAndRanges,
       newDateAndRange,
     ]);
     setAllowedDates([...allowedDates, selectedDate]);
@@ -201,7 +201,7 @@ function ScheduledUserSessions() {
     setStartTime("");
     setEndTime("");
     setSelectedStartTime("");
-    setSelectedEndTime(""); 
+    setSelectedEndTime("");
   };
 
   useEffect(() => {
@@ -240,6 +240,22 @@ function ScheduledUserSessions() {
     setEndHour(hour);
     setEndMinute(minute);
   };
+
+  const currentDate = new Date();
+  let formattedDate = currentDate.toLocaleDateString();
+  if (
+    formattedDate.length !== 10 ||
+    !formattedDate.match(/^\d{4}-\d{2}-\d{2}$/)
+  ) {
+    const year = currentDate.getFullYear();
+    const month = String(currentDate.getMonth() + 1).padStart(2, "0");
+    const day = String(currentDate.getDate()).padStart(2, "0");
+    formattedDate = `${year}-${month}-${day}`;
+  }
+
+  // console.log("formattedDate", formattedDate);
+
+  // console.log("currentDate", currentDate);
 
   return (
     <div
@@ -332,6 +348,7 @@ function ScheduledUserSessions() {
           value={selectedDate}
           onChange={(e) => setSelectedDate(e.target.value)}
           className="border border-gray-300 rounded px-3 py-2 mt-1 w-full"
+          min={formattedDate}
         />
       </div>
 
