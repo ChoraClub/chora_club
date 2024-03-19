@@ -59,7 +59,7 @@ function SpecificDAO({ props }: { props: { daoDelegates: string } }) {
               : "border-transparent"
           }`}
           onClick={() =>
-            router.push(path + "?active=delegatesSession&session=upcoming")
+            router.push(path + "?active=delegatesSession&session=recorded")
           }
         >
           Delegates Sessions

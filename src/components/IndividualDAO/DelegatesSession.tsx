@@ -152,8 +152,8 @@ function DelegatesSession({ props }: { props: string }) {
       </div> */}
 
       <div className="pr-36 pt-3">
-        <div className="flex gap-16 border-1 border-[#7C7C7C] pl-6 rounded-xl text-sm">
-          <button
+        <div className="flex w-fit gap-16 border-1 border-[#7C7C7C] px-6 rounded-xl text-sm">
+          {/* <button
             className={`py-2 ${
               searchParams.get("session") === "upcoming"
                 ? "text-[#3E3D3D] font-bold"
@@ -164,7 +164,7 @@ function DelegatesSession({ props }: { props: string }) {
             }
           >
             Upcoming
-          </button>
+          </button> */}
           <button
             className={`py-2 ${
               searchParams.get("session") === "recorded"
@@ -180,7 +180,7 @@ function DelegatesSession({ props }: { props: string }) {
         </div>
 
         <div className="py-10">
-          {searchParams.get("session") === "upcoming" &&
+          {/* {searchParams.get("session") === "upcoming" &&
             (dataLoading ? (
               <div className="flex items-center justify-center">
                 <Oval
@@ -200,7 +200,7 @@ function DelegatesSession({ props }: { props: string }) {
                 isOfficeHour={false}
                 // query={searchQuery}
               />
-            ))}
+            ))} */}
           {searchParams.get("session") === "recorded" &&
             (dataLoading ? (
               <div className="flex items-center justify-center">
