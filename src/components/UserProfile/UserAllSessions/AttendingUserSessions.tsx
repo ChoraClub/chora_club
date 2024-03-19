@@ -7,9 +7,26 @@ import Image from "next/image";
 import { Tooltip } from "@nextui-org/react";
 import EventTile from "../../utils/EventTile";
 import { useAccount, useNetwork } from "wagmi";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Oval } from "react-loader-spinner";
+interface Session {
+  booking_status: string;
+  dao_name: string;
+  description: string;
+  host_address: string;
+  joined_status: string;
+  meetingId: string;
+  meeting_status: "Upcoming" | "Recorded" | "Denied";
+  slot_time: string;
+  title: string;
+  user_address: string;
+  _id: string;
+}
 
 function AttendingUserSessions() {
+  const router = useRouter();
+  const path = usePathname();
+  const searchParams = useSearchParams();
   const { address } = useAccount();
   const [sessionDetails, setSessionDetails] = useState([]);
   const [pageLoading, setPageLoading] = useState(true);
@@ -37,19 +54,40 @@ function AttendingUserSessions() {
       // console.log("result in get session data", result);
 
       if (result.success) {
-        let filteredData: any = result.data;
-        filteredData = result.data.filter((session: any) => {
-          return chain?.name === "Optimism"
-            ? session.dao_name === "optimism"
-            : chain?.name === "Arbitrum One"
-            ? session.dao_name === "arbitrum"
-            : "";
-        });
-        setSessionDetails(filteredData);
-        setPageLoading(false);
-      } else {
-        setPageLoading(false);
+        // setSessionDetails(result.data);
+        const resultData = await result.data;
+        // console.log("resultData", resultData);
+        setPageLoading(true);
+        if (Array.isArray(resultData)) {
+          let filteredData: any = resultData;
+          if (searchParams.get("session") === "attending") {
+            filteredData = resultData.filter((session: Session) => {
+              return (
+                session.meeting_status === "Upcoming" &&
+                session.user_address === address
+              );
+            });
+          }
+          console.log("filtered", filteredData);
+          setSessionDetails(filteredData);
+          setPageLoading(false);
+        }
       }
+
+      // if (result.success) {
+      //   let filteredData: any = result.data;
+      //   filteredData = result.data.filter((session: any) => {
+      //     return chain?.name === "Optimism"
+      //       ? session.dao_name === "optimism"
+      //       : chain?.name === "Arbitrum One"
+      //       ? session.dao_name === "arbitrum"
+      //       : "";
+      //   });
+      //   setSessionDetails(filteredData);
+      //   setPageLoading(false);
+      // } else {
+      //   setPageLoading(false);
+      // }
     } catch (error) {
       console.log("error in catch", error);
     }
@@ -57,7 +95,7 @@ function AttendingUserSessions() {
 
   useEffect(() => {
     getUserMeetingData();
-  }, []);
+  }, [searchParams.get("session")]);
 
   return (
     <div className="space-y-6">
