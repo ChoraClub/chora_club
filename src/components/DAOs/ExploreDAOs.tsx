@@ -8,6 +8,7 @@ import arb_logo from "@/assets/images/daos/arbitrum.jpg";
 import { useRouter } from "next/navigation";
 import { ImCross } from "react-icons/im";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { FaCirclePlus } from "react-icons/fa6";
 
 function ExploreDAOs() {
   const dao_info = [
@@ -22,6 +23,7 @@ function ExploreDAOs() {
   const router = useRouter();
   const [showNotification, setShowNotification] = useState(true);
   const [isPageLoading, setIsPageLoading] = useState(true);
+  const [isHovered, setIsHovered] = useState(false);
 
   useEffect(() => {
     const storedStatus = sessionStorage.getItem("notificationStatus");
@@ -137,6 +139,30 @@ function ExploreDAOs() {
               No such Dao available
             </div>
           )}
+          <div
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+            style={{ boxShadow: "0px 4px 50.8px 0px rgba(0, 0, 0, 0.11)" }}
+            className={`px-5 py-7 rounded-2xl cursor-pointer flex items-center justify-center relative transition-all duration-300 ${
+              isHovered ? "bg-gray-50" : "bg-white"
+            }`}
+          >
+            <div>
+              <FaCirclePlus
+                size={130}
+                className={isHovered ? "text-gray-300" : "text-gray-400"}
+              />
+            </div>
+            <div
+              className={`absolute inset-0 flex items-center justify-center bottom-0 ${
+                isHovered ? "block" : "hidden"
+              }`}
+            >
+              <span className="text-xl font-semibold text-slate-800">
+                Add your DAO
+              </span>
+            </div>
+          </div>
         </div>
       </div>
     </div>

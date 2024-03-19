@@ -110,6 +110,8 @@ const Home = ({ params }: { params: { roomId: string } }) => {
           });
         }
 
+        console.log("All attendees: ", attendees);
+
         const raw = JSON.stringify({
           meetingId: params.roomId,
           attendees: attendees,

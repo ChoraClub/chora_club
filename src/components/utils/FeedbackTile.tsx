@@ -1,11 +1,14 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
 function FeedbackTile() {
+  const path = usePathname();
   const [isShowing, setIsShowing] = useState(true);
   const [isPageLoading, setIsPageLoading] = useState(true);
+  const [dataShowing, setDataShowing] = useState(false);
 
   const handleCloseClick = () => {
     setIsShowing(false);
@@ -20,9 +23,17 @@ function FeedbackTile() {
     setIsPageLoading(false);
   }, []);
 
+  useEffect(() => {
+    console.log("meeting feedback path: ", path);
+    if (path.includes("/huddle") || path.includes("/meeting")) {
+      console.log("in meeting path");
+      setDataShowing(true);
+    }
+  }, []);
+
   return (
     <>
-      {isShowing && !isPageLoading && (
+      {isShowing && !isPageLoading && !dataShowing && (
         <div className="bg-yellow-200 flex justify-center items-center py-2 font-poppins">
           <span className="">
             Enjoying Chora Club? Share your feedback on{" "}
