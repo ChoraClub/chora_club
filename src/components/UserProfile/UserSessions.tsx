@@ -73,11 +73,17 @@ function UserSessions({ isDelegate, selfDelegate }: UserSessionsProps) {
           let filteredData: any = resultData;
           if (searchParams.get("session") === "hosted") {
             filteredData = resultData.filter((session: Session) => {
-              return session.meeting_status === "Recorded";
+              return (
+                session.meeting_status === "Recorded" &&
+                session.host_address === address
+              );
             });
           } else if (searchParams.get("session") === "attended") {
             filteredData = resultData.filter((session: Session) => {
-              return session.user_address === address;
+              return (
+                session.meeting_status === "Recorded" &&
+                session.user_address === address
+              );
             });
           }
           console.log("filtered", filteredData);
@@ -99,10 +105,14 @@ function UserSessions({ isDelegate, selfDelegate }: UserSessionsProps) {
   // }, []);
 
   useEffect(() => {
-    if (!isDelegate && searchParams.get("session") === "schedule") {
+    if (
+      !isDelegate &&
+      !selfDelegate &&
+      searchParams.get("session") === "schedule"
+    ) {
       router.replace(path + "?active=sessions&session=attending");
     }
-  }, [isDelegate]);
+  }, [isDelegate, selfDelegate]);
   return (
     <div>
       <div className="pr-32 pt-3">

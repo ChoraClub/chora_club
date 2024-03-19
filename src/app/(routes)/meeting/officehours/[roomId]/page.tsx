@@ -88,12 +88,27 @@ const Home = ({ params }: { params: { roomId: string } }) => {
         const attendeeAddress = role === "listener" ? address : peerId;
 
         // Construct the request body
-        let attendees = [];
+        // let attendees = [];
 
         // Add the attendee dynamically one by one
-        attendees.push({
-          attendee_address: attendeeAddress,
-        });
+        // attendees.push({
+        //   attendee_address: attendeeAddress,
+        // });
+
+        let uniqueAddresses = new Set();
+        let attendees = [];
+
+        if (!uniqueAddresses.has(attendeeAddress)) {
+          // Add the address to the set of unique addresses
+          uniqueAddresses.add(attendeeAddress);
+
+          // Construct the request body
+
+          // Add the attendee dynamically one by one
+          attendees.push({
+            attendee_address: attendeeAddress,
+          });
+        }
 
         const raw = JSON.stringify({
           meetingId: params.roomId,

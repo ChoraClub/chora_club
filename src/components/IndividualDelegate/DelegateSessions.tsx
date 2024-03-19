@@ -71,12 +71,18 @@ function DelegateSessions({ props }: { props: Type }) {
           } else if (searchParams.get("session") === "hosted") {
             setDataLoading(true);
             filteredData = resultData.filter((session: Session) => {
-              return session.meeting_status === "Recorded";
+              return (
+                session.meeting_status === "Recorded" &&
+                session.host_address === props.individualDelegate
+              );
             });
           } else if (searchParams.get("session") === "attended") {
             setDataLoading(true);
             filteredData = resultData.filter((session: Session) => {
-              return session.user_address === props.individualDelegate;
+              return (
+                session.meeting_status === "Recorded" &&
+                session.user_address === props.individualDelegate
+              );
             });
           }
           // console.log("filtered", filteredData);
