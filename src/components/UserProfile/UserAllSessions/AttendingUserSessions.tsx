@@ -62,10 +62,13 @@ function AttendingUserSessions() {
           let filteredData: any = resultData;
           if (searchParams.get("session") === "attending") {
             filteredData = resultData.filter((session: Session) => {
-              return (
-                session.meeting_status === "Upcoming" &&
-                session.user_address === address
-              );
+              return session.meeting_status === "Upcoming" &&
+                session.user_address === address &&
+                chain?.name === "Optimism"
+                ? session.dao_name === "optimism"
+                : chain?.name === "Arbitrum One"
+                ? session.dao_name === "arbitrum"
+                : "";
             });
           }
           console.log("filtered", filteredData);
