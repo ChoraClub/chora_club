@@ -498,18 +498,24 @@ function AvailableSessions() {
                         }}
                       >
                         <div style={{ display: "flex" }}>
-                          {daos.dateAndRanges.map((date: any, index: any) => (
-                            <div
-                              key={index}
-                              className="text-black bg-[#f7f7f7c3] rounded-2xl font-semibold text-small border-[0.5px] border-[#D9D9D9] px-3 py-1 mr-4"
-                            >
-                              {
-                                new Date(date.date)
-                                  .toLocaleString()
-                                  .split(",")[0]
-                              }{" "}
-                            </div>
-                          ))}
+                          {daos.dateAndRanges
+                            .flatMap((dateRange: any) => dateRange.date)
+                            .filter(
+                              (date: any, index: any, self: any) =>
+                                self.indexOf(date) === index
+                            )
+                            .sort(
+                              (a: any, b: any) =>
+                                new Date(a).getTime() - new Date(b).getTime()
+                            )
+                            .map((date: string, index: number) => (
+                              <div
+                                key={index}
+                                className="text-black bg-[#f7f7f7c3] rounded-2xl font-semibold text-small border-[0.5px] border-[#D9D9D9] px-3 py-1 mr-4"
+                              >
+                                {new Date(date).toLocaleString().split(",")[0]}
+                              </div>
+                            ))}
                         </div>
                       </div>
                     </div>
