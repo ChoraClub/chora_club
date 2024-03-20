@@ -206,17 +206,15 @@ function Sidebar() {
               className="rounded-md bg-opacity-90"
               closeDelay={1}
             >
-              {isPageLoading && sessionLoading ? (
+              {isPageLoading || sessionLoading ? (
                 <Image
                   src={user}
                   alt={"image"}
                   width={40}
                   className="cursor-pointer"
-                ></Image>
+                />
               ) : (
-                <div>
-                  <ConnectWallet />
-                </div>
+                <ConnectWallet />
               )}
             </Tooltip>
           ) : (
