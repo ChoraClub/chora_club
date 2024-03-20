@@ -132,7 +132,11 @@ function UserOfficeHours({ isDelegate, selfDelegate }: UserOfficeHoursProps) {
   }, [address]);
 
   useEffect(() => {
-    if (!isDelegate && searchParams.get("hours") === "schedule") {
+    if (
+      !isDelegate &&
+      !selfDelegate &&
+      searchParams.get("hours") === "schedule"
+    ) {
       router.replace(path + "?active=officeHours&hours=attended");
     }
   }, [isDelegate]);

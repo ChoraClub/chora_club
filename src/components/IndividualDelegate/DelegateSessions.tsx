@@ -41,9 +41,8 @@ function DelegateSessions({ props }: { props: Type }) {
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
 
-      const raw = await JSON.stringify({
+      const raw = JSON.stringify({
         dao_name: dao_name,
-        host_address: props.individualDelegate,
       });
       // console.log("raw", raw);
       const requestOptions: any = {
@@ -53,7 +52,7 @@ function DelegateSessions({ props }: { props: Type }) {
         redirect: "follow",
       };
 
-      const response = await fetch("/api/get-specific-session", requestOptions);
+      const response = await fetch("/api/get-dao-sessions", requestOptions);
       const result = await response.json();
       // console.log("result in get meetinggggg", result);
 

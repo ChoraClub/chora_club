@@ -29,7 +29,7 @@ function FeedbackTile() {
       console.log("in meeting path");
       setDataShowing(true);
     }
-  }, []);
+  }, [path]);
 
   return (
     <>

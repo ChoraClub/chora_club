@@ -84,7 +84,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
             // }
 
             token = await response.text(); // Change this line
-            console.log("Token fetched successfully:", token);
+            // console.log("Token fetched successfully:", token);
           } catch (error) {
             console.error("Error fetching token:", error);
             // Handle error appropriately, e.g., show error message to user

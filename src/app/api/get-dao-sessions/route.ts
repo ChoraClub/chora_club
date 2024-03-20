@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { MongoClient, MongoClientOptions } from "mongodb";
 
-export async function GET(req: NextRequest, res: NextResponse) {
+export async function POST(req: NextRequest, res: NextResponse) {
   // console.log("GET req call");
-  const dao_name = req.url.split("get-dao-sessions/")[1];
+  const { dao_name } = await req.json();
   // console.log(dao_name);
   try {
     // Connect to MongoDB

@@ -52,14 +52,14 @@ function DelegatesSession({ props }: { props: string }) {
       try {
         setDataLoading(true);
         const requestOptions: any = {
-          method: "GET",
+          method: "POST",
           redirect: "follow",
+          body: JSON.stringify({
+            dao_name: dao_name,
+          }),
         };
 
-        const response = await fetch(
-          `/api/get-dao-sessions/${dao_name}`,
-          requestOptions
-        );
+        const response = await fetch(`/api/get-dao-sessions`, requestOptions);
         const result = await response.json();
         // console.log("resultt:", result);
         const resultData = await result.data;
