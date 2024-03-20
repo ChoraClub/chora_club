@@ -52,7 +52,7 @@ function UserSessions({ isDelegate, selfDelegate }: UserSessionsProps) {
     }
     try {
       // setDataLoading(true);
-      const response = await fetch(`/api/get-session-data/${address}`, {
+      const response = await fetch(`/api/get-dao-sessions`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -72,22 +72,27 @@ function UserSessions({ isDelegate, selfDelegate }: UserSessionsProps) {
         if (Array.isArray(resultData)) {
           let filteredData: any = resultData;
           if (searchParams.get("session") === "hosted") {
+            setSessionDetails([]);
+            console.log("in session hosted");
             filteredData = resultData.filter((session: Session) => {
               return (
                 session.meeting_status === "Recorded" &&
                 session.host_address === address
               );
             });
+            // console.log("hosted filtered: ", filteredData);
+            setSessionDetails(filteredData);
           } else if (searchParams.get("session") === "attended") {
+            setSessionDetails([]);
             filteredData = resultData.filter((session: Session) => {
               return (
                 session.meeting_status === "Recorded" &&
                 session.user_address === address
               );
             });
+            setSessionDetails(filteredData);
           }
           console.log("filtered", filteredData);
-          setSessionDetails(filteredData);
           setDataLoading(false);
         }
       }
@@ -98,11 +103,12 @@ function UserSessions({ isDelegate, selfDelegate }: UserSessionsProps) {
 
   useEffect(() => {
     getUserMeetingData();
-  }, [address, sessionDetails, searchParams.get("session")]);
+  }, [address, sessionDetails, searchParams.get("session"), dataLoading]);
 
   // useEffect(() => {
-  //   setDataLoading(false);
-  // }, []);
+  //   setDataLoading(true);
+  //   setSessionDetails([]);
+  // }, [searchParams.get("session")]);
 
   useEffect(() => {
     if (
@@ -158,7 +164,7 @@ function UserSessions({ isDelegate, selfDelegate }: UserSessionsProps) {
           >
             Attending
           </button>
-          {(selfDelegate === true || isDelegate === true) && (
+          {(selfDelegate === true || isDelegate === false) && (
             <button
               className={`py-2 ${
                 searchParams.get("session") === "hosted"
@@ -196,7 +202,7 @@ function UserSessions({ isDelegate, selfDelegate }: UserSessionsProps) {
           {searchParams.get("session") === "attending" && (
             <AttendingUserSessions />
           )}
-          {(selfDelegate === true || isDelegate === true) &&
+          {(selfDelegate === true || isDelegate === false) &&
             searchParams.get("session") === "hosted" &&
             (dataLoading ? (
               <div className="flex items-center justify-center">

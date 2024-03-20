@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { ImCross } from "react-icons/im";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { FaCirclePlus } from "react-icons/fa6";
+import Link from "next/link";
 
 function ExploreDAOs() {
   const dao_info = [
@@ -144,24 +145,26 @@ function ExploreDAOs() {
             onMouseLeave={() => setIsHovered(false)}
             style={{ boxShadow: "0px 4px 50.8px 0px rgba(0, 0, 0, 0.11)" }}
             className={`px-5 py-7 rounded-2xl cursor-pointer flex items-center justify-center relative transition-all duration-300 ${
-              isHovered ? "bg-gray-50" : "bg-white"
+              isHovered ? "bg-gray-800" : "bg-white"
             }`}
           >
-            <div>
+            <div className="transition-all duration-300">
               <FaCirclePlus
-                size={130}
-                className={isHovered ? "text-gray-300" : "text-gray-400"}
+                size={70}
+                className={isHovered ? "hidden" : "block text-slate-300"}
               />
             </div>
-            <div
+            <Link
+              href={`https://app.deform.cc/form/a401a65c-73c0-49cb-8d96-63e36ef36f88`}
+              target="_blank"
               className={`absolute inset-0 flex items-center justify-center bottom-0 ${
                 isHovered ? "block" : "hidden"
               }`}
             >
-              <span className="text-xl font-semibold text-slate-800">
+              <span className="text-xl font-semibold text-gray-100 transition-all duration-300">
                 Add your DAO
               </span>
-            </div>
+            </Link>
           </div>
         </div>
       </div>
