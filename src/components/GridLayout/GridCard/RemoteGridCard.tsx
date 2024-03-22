@@ -39,11 +39,11 @@ const GridCard: React.FC<GridCardProps> = ({ peerId }) => {
   } = useRemoteScreenShare({
     peerId,
     onPlayable: (data) => {
-      console.log("Ready to play remote peer's screen being shared!");
+      // console.log("Ready to play remote peer's screen being shared!");
       // your code here
     },
     onClose: () => {
-      console.log("Remote peer has stopped sharing their screen!");
+      // console.log("Remote peer has stopped sharing their screen!");
       // your code here
     },
   });
@@ -81,7 +81,7 @@ const GridCard: React.FC<GridCardProps> = ({ peerId }) => {
   });
   return (
     <div className="flex w-full h-full justify-center items-center rounded-xl p-3 gap-4">
-      {(!screenShareVideoStream || !videoStream) && (
+      {!videoStream && (
         <div className="mt-4 flex flex-col items-center bg-slate-100 w-full h-full justify-center py-4 px-7 rounded-xl">
           {audioStream && <AudioElem peerId={peerId} />}
           <div className="relative flex flex-col items-center justify-center">
@@ -133,15 +133,19 @@ const GridCard: React.FC<GridCardProps> = ({ peerId }) => {
         {videoStream && (
           <div
             className={
-              !screenShareVideoStream ? "col-span-2" : "col-span-1 w-full"
+              !screenShareVideoStream
+                ? "col-span-2 flex items-center justify-center"
+                : "col-span-1"
             }
           >
-            <video
-              ref={vidRef}
-              autoPlay
-              playsInline
-              className="aspect-video w-full"
-            />
+            <div className={!screenShareVideoStream ? "w-[60%]" : ""}>
+              <video
+                ref={vidRef}
+                autoPlay
+                playsInline
+                className="aspect-video w-full"
+              />
+            </div>
           </div>
         )}
       </div>

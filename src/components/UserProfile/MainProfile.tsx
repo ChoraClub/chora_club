@@ -37,6 +37,7 @@ import dao_abi from "../../artifacts/Dao.sol/GovernanceToken.json";
 import axios from "axios";
 import { Oval } from "react-loader-spinner";
 import lighthouse from "@lighthouse-web3/sdk";
+import InstantMeet from "./InstantMeet";
 
 function MainProfile() {
   const { address } = useAccount();
@@ -936,6 +937,19 @@ function MainProfile() {
             >
               Office Hours
             </button>
+
+            {(selfDelegate === true || isDelegate === false) && (
+              <button
+                className={`border-b-2 py-4 px-2 outline-none ${
+                  searchParams.get("active") === "instant-meet"
+                    ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
+                    : "border-transparent"
+                }`}
+                onClick={() => router.push(path + "?active=instant-meet")}
+              >
+                Instant Meet
+              </button>
+            )}
             {/* <button
           className={`border-b-2 py-4 px-2 outline-none ${
             searchParams.get("active") === "claimNft"
@@ -980,6 +994,14 @@ function MainProfile() {
             )}
             {searchParams.get("active") === "officeHours" ? (
               <UserOfficeHours
+                isDelegate={isDelegate}
+                selfDelegate={selfDelegate}
+              />
+            ) : (
+              ""
+            )}
+            {searchParams.get("active") === "instant-meet" ? (
+              <InstantMeet
                 isDelegate={isDelegate}
                 selfDelegate={selfDelegate}
               />

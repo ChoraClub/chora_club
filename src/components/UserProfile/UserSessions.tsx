@@ -62,7 +62,10 @@ function UserSessions({ isDelegate, selfDelegate }: UserSessionsProps) {
         }),
       });
 
+      console.log("Response", response);
+
       const result = await response.json();
+      console.log("Result", result);
       // console.log("result in get session data", result);
       if (result.success) {
         // setSessionDetails(result.data);
@@ -164,7 +167,7 @@ function UserSessions({ isDelegate, selfDelegate }: UserSessionsProps) {
           >
             Attending
           </button>
-          {(selfDelegate === true || isDelegate === false) && (
+          {(selfDelegate === true || isDelegate === true) && (
             <button
               className={`py-2 ${
                 searchParams.get("session") === "hosted"
@@ -202,7 +205,7 @@ function UserSessions({ isDelegate, selfDelegate }: UserSessionsProps) {
           {searchParams.get("session") === "attending" && (
             <AttendingUserSessions />
           )}
-          {(selfDelegate === true || isDelegate === false) &&
+          {(selfDelegate === true || isDelegate === true) &&
             searchParams.get("session") === "hosted" &&
             (dataLoading ? (
               <div className="flex items-center justify-center">
