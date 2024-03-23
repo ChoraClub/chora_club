@@ -144,24 +144,28 @@ function ExploreDAOs() {
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
             style={{ boxShadow: "0px 4px 50.8px 0px rgba(0, 0, 0, 0.11)" }}
-            className={`px-5 py-7 rounded-2xl cursor-pointer flex items-center justify-center relative transition-all duration-300 ${
-              isHovered ? "bg-gray-800" : "bg-white"
+            className={`px-5 py-7 rounded-2xl cursor-pointer flex items-center justify-center relative transition-all duration-250 ease-in-out ${
+              isHovered ? "border-2 border-gray-600" : ""
             }`}
           >
-            <div className="transition-all duration-300">
+            <div className="">
               <FaCirclePlus
                 size={70}
-                className={isHovered ? "hidden" : "block text-slate-300"}
+                className={
+                  isHovered
+                    ? "blur-md transition-all duration-250 ease-in-out text-slate-300"
+                    : "block transition-all duration-250 ease-in-out text-slate-300"
+                }
               />
             </div>
             <Link
               href={`https://app.deform.cc/form/a401a65c-73c0-49cb-8d96-63e36ef36f88`}
               target="_blank"
-              className={`absolute inset-0 flex items-center justify-center bottom-0 ${
+              className={`absolute inset-0 flex items-center justify-center bottom-0  ${
                 isHovered ? "block" : "hidden"
               }`}
             >
-              <span className="text-xl font-semibold text-gray-100 transition-all duration-300">
+              <span className="text-xl font-semibold text-slate-800">
                 Add your DAO
               </span>
             </Link>
