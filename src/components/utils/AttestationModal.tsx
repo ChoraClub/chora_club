@@ -4,6 +4,8 @@ import Image from "next/image";
 import { RxCross2 } from "react-icons/rx";
 import Link from "next/link";
 import { FaArrowRight } from "react-icons/fa6";
+import Confetti from "react-confetti";
+import { BsTwitterX } from "react-icons/bs";
 
 function AttestationModal({
   isOpen,
@@ -19,6 +21,21 @@ function AttestationModal({
   };
   console.log("Attestation modal");
 
+  const shareOnTwitter = () => {
+    const url = encodeURIComponent(`https://app.chora.club/`);
+    const text = encodeURIComponent(
+      `Just attended an amazing session on #Web3 in Chora Club! Learned so much and got a deeper understanding of ecosystem. Feeling inspired and ready to dive in!🚀 \n👉 ${decodeURIComponent(
+        url
+      )}\n\n#choraclub #session #growth`
+    );
+
+    // Twitter share URL
+    const twitterUrl = `https://twitter.com/intent/tweet?text=${text}`;
+
+    // Open Twitter share dialog
+    window.open(twitterUrl, "_blank");
+  };
+
   return (
     <div>
       {isOpen && (
@@ -28,6 +45,7 @@ function AttestationModal({
             // onClick={toggleModal}
           ></div>
           <div className="z-50 bg-white rounded-3xl max-w-7xl">
+            <Confetti recycle={false} />
             <div className="flex justify-evenly">
               <div>
                 <Image
@@ -61,17 +79,31 @@ function AttestationModal({
                     Off-chain
                   </button>
                 </div> */}
-                <div className="flex items-center text-blue-shade-100">
-                  <FaArrowRight size={10} className="" />
-                  <Link
-                    href={
-                      "https://app.deform.cc/form/580f4057-b21e-4052-bf93-6b85e28a6032/?page_number=0"
-                    }
-                    target="_blank"
-                    className="ps-[2px] underline font-semibold text-xs"
-                  >
-                    Share Your Feedback!
-                  </Link>
+                <div className="flex items-center text-blue-shade-100 mt-6">
+                  <FaArrowRight size={10} className="mt-1 mr-1" />
+                  <div className="mr-8">
+                    <Link
+                      href={
+                        "https://app.deform.cc/form/580f4057-b21e-4052-bf93-6b85e28a6032/?page_number=0"
+                      }
+                      target="_blank"
+                      className="ps-[2px] underline font-semibold text-xs"
+                    >
+                      Share Your Feedback!
+                    </Link>
+                  </div>
+                  {/* </div> */}
+
+                  <div>
+                    {/* <div className="flex justify-center"> */}
+                    <button
+                      className="bg-black text-white rounded-full px-4 py-2 flex items-center space-x-1"
+                      onClick={shareOnTwitter}
+                    >
+                      Share on Twitter
+                      <BsTwitterX className="ml-2" />
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>

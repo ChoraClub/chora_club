@@ -19,6 +19,8 @@ import {
 } from "@nextui-org/react";
 import toast, { Toaster } from "react-hot-toast";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
+import SchedulingSuccessModal from "@/components/UserProfile/UserAllSessions/SchedulingSuccessModal";
+import BookingSuccessModal from "./BookingSuccessModal";
 interface Type {
   daoDelegates: string;
   individualDelegate: string;
@@ -54,6 +56,7 @@ function BookSession({ props }: { props: Type }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [confirmSave, setConfirmSave] = useState(false);
   const [slotTimes, setSlotTimes] = useState<any[]>([]);
+  const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
     const loadingTimeout = setTimeout(() => {
@@ -195,6 +198,7 @@ function BookSession({ props }: { props: Type }) {
       if (result.success) {
         setIsScheduled(true);
         setConfirmSave(false);
+        setModalOpen(true);
       }
     } catch (error) {
       setConfirmSave(false);
@@ -299,6 +303,11 @@ function BookSession({ props }: { props: Type }) {
 
     return false;
   }
+
+  const handleModalClose = () => {
+    console.log("Popup Closed");
+    setModalOpen(false);
+  };
 
   return (
     <>
@@ -410,6 +419,10 @@ function BookSession({ props }: { props: Type }) {
           </>
         </ModalContent>
       </Modal>
+
+      {modalOpen && (
+        <BookingSuccessModal isOpen={modalOpen} onClose={handleModalClose} />
+      )}
     </>
   );
 }

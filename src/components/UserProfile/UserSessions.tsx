@@ -164,7 +164,7 @@ function UserSessions({ isDelegate, selfDelegate }: UserSessionsProps) {
           >
             Attending
           </button>
-          {(selfDelegate === true || isDelegate === false) && (
+          {(selfDelegate === true || isDelegate === true) && (
             <button
               className={`py-2 ${
                 searchParams.get("session") === "hosted"
@@ -202,7 +202,7 @@ function UserSessions({ isDelegate, selfDelegate }: UserSessionsProps) {
           {searchParams.get("session") === "attending" && (
             <AttendingUserSessions />
           )}
-          {(selfDelegate === true || isDelegate === false) &&
+          {(selfDelegate === true || isDelegate === true) &&
             searchParams.get("session") === "hosted" &&
             (dataLoading ? (
               <div className="flex items-center justify-center">
