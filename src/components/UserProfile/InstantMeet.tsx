@@ -7,6 +7,7 @@ import {
   ModalHeader,
   useDisclosure,
 } from "@nextui-org/react";
+import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { Oval } from "react-loader-spinner";
 import { useAccount } from "wagmi";
@@ -28,6 +29,8 @@ function InstantMeet({ isDelegate, selfDelegate }: instantMeetProps) {
   const [confirmSave, setConfirmSave] = useState(false);
   const { address } = useAccount();
   const { chain, chains } = useNetwork();
+  const [isScheduling, setIsScheduling] = useState(false);
+  const router = useRouter();
 
   const handleModalInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -40,6 +43,7 @@ function InstantMeet({ isDelegate, selfDelegate }: instantMeetProps) {
   };
 
   const startInstantMeet = async () => {
+    setConfirmSave(true);
     const res = await fetch("/api/create-room", {
       method: "GET",
       headers: {
@@ -68,6 +72,9 @@ function InstantMeet({ isDelegate, selfDelegate }: instantMeetProps) {
       description: modalData.description,
       host_address: address,
       session_type: "instant-meet",
+      meetingId: roomId,
+      meeting_status: "Ongoing",
+      attendees: [],
     };
 
     console.log("requestData", requestData);
@@ -81,13 +88,13 @@ function InstantMeet({ isDelegate, selfDelegate }: instantMeetProps) {
 
     try {
       console.log("calling.......");
-      setConfirmSave(true);
       const response = await fetch("/api/book-slot", requestOptions);
       const result = await response.json();
       console.log("result of book-slots", result);
       if (result.success) {
         // setIsScheduled(true);
         setConfirmSave(false);
+        router.push(`/meeting/session/${roomId}/lobby`);
       }
     } catch (error) {
       setConfirmSave(false);
@@ -100,7 +107,6 @@ function InstantMeet({ isDelegate, selfDelegate }: instantMeetProps) {
       title: "",
       description: "",
     });
-    onClose();
   };
 
   return (
@@ -159,15 +165,15 @@ function InstantMeet({ isDelegate, selfDelegate }: instantMeetProps) {
               </Button>
               <Button
                 color="primary"
-                // onClick={apiCall}
-                // isDisabled={confirmSave}
+                onClick={startInstantMeet}
+                isDisabled={confirmSave}
               >
                 {confirmSave ? (
                   <div className="flex items-center justify-center">
                     <Oval
                       visible={true}
-                      height="30"
-                      width="30"
+                      height="20"
+                      width="20"
                       color="#0500FF"
                       secondaryColor="#cdccff"
                       ariaLabel="oval-loading"
