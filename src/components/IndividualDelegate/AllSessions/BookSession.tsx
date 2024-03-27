@@ -174,8 +174,9 @@ function BookSession({ props }: { props: Type }) {
       title: modalData.title,
       description: modalData.description,
       host_address: host_address,
-      user_address: address,
+      attendees: [{ attendee_address: address }],
       booking_status: "Pending",
+      session_type: "session",
     };
     console.log("requestData", requestData);
 

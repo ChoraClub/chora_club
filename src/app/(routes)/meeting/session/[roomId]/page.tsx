@@ -81,6 +81,43 @@ const Home = ({ params }: { params: { roomId: string } }) => {
         avatarUrl: avatarUrl,
         isHandRaised: metadata?.isHandRaised || false,
       });
+
+      if (role === "listener" || role === "speaker") {
+        // Get the attendee address based on the role
+        const attendeeAddress = role === "listener" ? address : peerId;
+        let uniqueAddresses = new Set();
+        let attendees = [];
+
+        if (!uniqueAddresses.has(attendeeAddress)) {
+          // Add the address to the set of unique addresses
+          uniqueAddresses.add(attendeeAddress);
+
+          // Construct the request body
+
+          // Add the attendee dynamically one by one
+          attendees.push({
+            attendee_address: attendeeAddress,
+          });
+        }
+
+        console.log("All attendees: ", attendees);
+
+        const raw = JSON.stringify({
+          meetingId: params.roomId,
+          attendees: attendees,
+        });
+
+        // Make the API request
+        const requestOptions = {
+          method: "PUT",
+          body: raw,
+        };
+
+        fetch("/api/update-session-attendees", requestOptions)
+          .then((response) => response.text())
+          .then((result) => console.log(result))
+          .catch((error) => console.error(error));
+      }
     }
   }, []);
 

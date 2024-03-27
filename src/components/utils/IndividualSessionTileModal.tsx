@@ -1,5 +1,10 @@
 import React, { useRef, useEffect } from "react";
 
+interface AttestationObject {
+  attendee_address: string;
+  attendee_uid: string;
+}
+
 interface IndividualTileModalProps {
   title: string;
   description: string;
@@ -7,9 +12,9 @@ interface IndividualTileModalProps {
   videoUrl: string;
   date: string;
   host: string;
-  attendee: string;
+  attendees: AttestationObject[];
   host_attestation: string;
-  attendee_attestation: string;
+  // attendee_attestation: string;
   onClose: () => void;
 }
 
@@ -19,10 +24,10 @@ function IndividualSessionTileModal({
   videoUrl,
   date,
   host,
-  attendee,
+  attendees,
   dao,
   host_attestation,
-  attendee_attestation,
+  // attendee_attestation,
   onClose,
 }: IndividualTileModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
@@ -113,21 +118,30 @@ function IndividualSessionTileModal({
                   <tr>
                     <td className="font-semibold pr-4">Attendee:</td>
                     <td>
-                      {attendee}{" "}
-                      <a
-                        href={
-                          dao === "optimism" || "Optimism"
-                            ? `https://optimism-sepolia.easscan.org/offchain/attestation/view/${attendee_attestation}`
-                            : dao === "arbitrum" || "Arbitrum"
-                            ? `https://arbitrum.easscan.org/attestation/view/${attendee_attestation}`
-                            : ""
-                        }
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{ color: "blue" }}
-                      >
-                        View↗️
-                      </a>
+                      {attendees?.map((attendee, index) => (
+                        <li className="list-decimal" key={index}>
+                          {attendee.attendee_address}
+                          {attendee.attendee_uid ? (
+                            <a
+                              href={
+                                dao === "optimism" || "Optimism"
+                                  ? `https://optimism-sepolia.easscan.org/offchain/attestation/view/${attendee.attendee_uid}`
+                                  : dao === "arbitrum" || "Arbitrum"
+                                  ? `https://arbitrum.easscan.org/attestation/view/${attendee.attendee_uid}`
+                                  : ""
+                              }
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              style={{ color: "blue" }}
+                              className="px-3"
+                            >
+                              View↗️
+                            </a>
+                          ) : (
+                            <></>
+                          )}
+                        </li>
+                      ))}
                     </td>
                   </tr>
                   <tr>

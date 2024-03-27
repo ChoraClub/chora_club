@@ -18,6 +18,11 @@ interface UserSessionsProps {
   selfDelegate: boolean;
 }
 
+type Attendee = {
+  attendee_address: string;
+  attendee_uid?: string; // Making attendee_uid optional
+};
+
 interface Session {
   booking_status: string;
   dao_name: string;
@@ -28,7 +33,7 @@ interface Session {
   meeting_status: "Upcoming" | "Recorded" | "Denied";
   slot_time: string;
   title: string;
-  user_address: string;
+  attendees: Attendee[];
   _id: string;
 }
 
@@ -90,7 +95,9 @@ function UserSessions({ isDelegate, selfDelegate }: UserSessionsProps) {
             filteredData = resultData.filter((session: Session) => {
               return (
                 session.meeting_status === "Recorded" &&
-                session.user_address === address
+                session.attendees?.some(
+                  (attendee) => attendee.attendee_address === address
+                )
               );
             });
             setSessionDetails(filteredData);

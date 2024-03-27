@@ -163,10 +163,13 @@ export async function POST(req: NextRequest, res: NextResponse) {
         const collection = db.collection("meetings");
 
         await collection.findOneAndUpdate(
-          { meetingId: requestData.meetingId },
+          {
+            meetingId: requestData.meetingId,
+            "attendees.attendee_address": requestData.recipient,
+          },
           {
             $set: {
-              uid_attendee: response.data.offchainAttestationId,
+              "attendees.$.attendee_uid": response.data.offchainAttestationId,
             },
           }
         );

@@ -6,6 +6,11 @@ import text1 from "@/assets/images/daos/texture1.png";
 import SessionTile from "../utils/SessionTiles";
 import { Oval } from "react-loader-spinner";
 
+type Attendee = {
+  attendee_address: string;
+  attendee_uid?: string; // Making attendee_uid optional
+};
+
 interface Session {
   booking_status: string;
   dao_name: string;
@@ -16,7 +21,7 @@ interface Session {
   meeting_status: "Upcoming" | "Recorded" | "Denied";
   slot_time: string;
   title: string;
-  user_address: string;
+  attendees: Attendee[];
   _id: string;
 }
 
@@ -80,7 +85,10 @@ function DelegateSessions({ props }: { props: Type }) {
             filteredData = resultData.filter((session: Session) => {
               return (
                 session.meeting_status === "Recorded" &&
-                session.user_address === props.individualDelegate
+                session.attendees?.some(
+                  (attendee) =>
+                    attendee.attendee_address === props.individualDelegate
+                )
               );
             });
           }

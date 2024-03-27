@@ -149,10 +149,10 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
             </div>
 
             <div className="flex gap-x-16 text-sm py-3">
-              <div className="text-[#3E3D3D]">
+              {/* <div className="text-[#3E3D3D]">
                 <span className="font-semibold">Attendee:</span>{" "}
                 {formatWalletAddress(data.user_address)}
-              </div>
+              </div> */}
               <div className="text-[#3E3D3D]">
                 <span className="font-semibold">Host:</span>{" "}
                 {formatWalletAddress(data.host_address)}
