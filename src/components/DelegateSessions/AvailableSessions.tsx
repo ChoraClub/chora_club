@@ -550,7 +550,7 @@ function AvailableSessions() {
                     <button
                       onClick={() =>
                         router.push(
-                          `/${daos.dao_name}/${daos.userAddress}?active=delegatesSession&session=book `
+                          `/${daos.dao_name}/${daos.userAddress}?active=delegatesSession&session=book`
                         )
                       }
                       className="bg-black text-white py-4 px-6 rounded-[36px] text-sm w-[11rem] hover:bg-[#333333] focus:outline-none focus:ring-2 focus:ring-gray-400 font-medium"
