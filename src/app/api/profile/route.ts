@@ -10,6 +10,7 @@ interface DelegateRequestBody {
   daoName: string;
   isDelegate: boolean;
   displayName: string;
+  emailId:string;
   socialHandles: {
     twitter: string;
     discord: string;
@@ -29,6 +30,7 @@ interface DelegateResponseBody {
     description: string;
     isDelegate: boolean;
     displayName: string;
+    emailId:string;
     socialHandles: {
       twitter: string;
       discord: string;
@@ -50,6 +52,7 @@ export async function POST(
     daoName,
     isDelegate,
     displayName,
+    emailId,
     socialHandles,
   }: DelegateRequestBody = await req.json();
 
@@ -74,9 +77,10 @@ export async function POST(
       daoName,
       isDelegate,
       displayName,
+      emailId,
       socialHandles,
     });
-    // console.log("Delegate document inserted:", result);
+    console.log("Delegate document inserted:", result);
 
     client.close();
     // console.log("MongoDB connection closed");
@@ -114,6 +118,7 @@ export async function PUT(
     description,
     isDelegate,
     displayName,
+    emailId,
     socialHandles,
   }: DelegateRequestBody = await req.json();
   console.log("address in api: ", address);
@@ -121,6 +126,7 @@ export async function PUT(
   console.log("description in api: ", description);
   console.log("isDelegate in api: ", isDelegate);
   console.log("displayName in api: ", displayName);
+  console.log("emailId in api:",emailId);
   console.log("socialHandles in api: ", socialHandles);
 
   try {
@@ -145,6 +151,7 @@ export async function PUT(
           description,
           isDelegate,
           displayName,
+          emailId,
           socialHandles,
         },
       }
