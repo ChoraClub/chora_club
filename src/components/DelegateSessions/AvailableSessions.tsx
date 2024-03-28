@@ -249,7 +249,7 @@ function AvailableSessions() {
         >
           <input
             type="text"
-            placeholder="Search"
+            placeholder="Search by Address"
             style={{ background: "rgba(238, 237, 237, 0.36)" }}
             className="pl-5 rounded-full outline-none text-sm"
             value={searchQuery}
@@ -266,17 +266,7 @@ function AvailableSessions() {
         </div>
 
         <div className="flex items-center">
-          <select
-            value={selectedDao}
-            // onChange={(e) => setSelectedDao(e.target.value)}
-            onChange={handleDaoChange}
-            className="px-3 py-2 rounded-md shadow"
-          >
-            <option value="All-DAOS">All DAOS</option>
-            <option value="optimism">Optimism</option>
-            <option value="arbitrum">Arbitrum</option>
-          </select>
-          <Tooltip
+        <Tooltip
             showArrow
             content={
               <div className="font-poppins">
@@ -287,22 +277,24 @@ function AvailableSessions() {
             className="rounded-md bg-opacity-90"
             closeDelay={1}
           >
-            <span className="px-2 justify-end">
-              <FaCircleInfo className="cursor-pointer" />
-            </span>
+          <select
+            value={selectedDao}
+            // onChange={(e) => setSelectedDao(e.target.value)}
+            onChange={handleDaoChange}
+            className="px-3 py-2 rounded-md shadow"
+          >
+            <option value="All-DAOS">All DAOS</option>
+            <option value="optimism">Optimism</option>
+            <option value="arbitrum">Arbitrum</option>
+          </select>
+        
           </Tooltip>
         </div>
 
+        
+
         <div className="flex items-center">
-          <input
-            type="date"
-            value={selectedDate}
-            onChange={handleDateChange}
-            min={formattedDate}
-            // onChange={(e) => setSelectedDate(e.target.value)}
-            className="px-3 py-2 shadow mr-1 rounded-md"
-          />
-          <Tooltip
+        <Tooltip
             showArrow
             content={
               <div className="font-poppins">
@@ -313,9 +305,14 @@ function AvailableSessions() {
             className="rounded-md bg-opacity-90"
             closeDelay={1}
           >
-            <span className="px-2 justify-end">
-              <FaCircleInfo className="cursor-pointer" />
-            </span>
+          <input
+            type="date"
+            value={selectedDate}
+            onChange={handleDateChange}
+            min={formattedDate}
+            // onChange={(e) => setSelectedDate(e.target.value)}
+            className="px-3 py-2 shadow mr-1 rounded-md"
+          />
           </Tooltip>
         </div>
 
@@ -333,18 +330,6 @@ function AvailableSessions() {
             ))}
           </select>
           <span>&nbsp;to</span>
-          <select
-            value={endTime || "End Time"}
-            onChange={handleEndTimeChange}
-            className="px-3 py-2 rounded-md shadow ml-2"
-          >
-            <option disabled>End Time</option>
-            {timeOptions.map((time) => (
-              <option key={time} value={time}>
-                {time}
-              </option>
-            ))}
-          </select>
           <Tooltip
             showArrow
             content={
@@ -357,9 +342,18 @@ function AvailableSessions() {
             className="rounded-md bg-opacity-90"
             closeDelay={1}
           >
-            <span className="px-2 justify-end">
-              <FaCircleInfo className="cursor-pointer" />
-            </span>
+          <select
+            value={endTime || "End Time"}
+            onChange={handleEndTimeChange}
+            className="px-3 py-2 rounded-md shadow ml-2"
+          >
+            <option disabled>End Time</option>
+            {timeOptions.map((time) => (
+              <option key={time} value={time}>
+                {time}
+              </option>
+            ))}
+          </select>
           </Tooltip>
           {(startTime || endTime) && (
             <button

@@ -18,8 +18,7 @@ function DelegateSessionsMain() {
       <div className="pt-6 px-6">
         <div className="flex justify-between pe-10">
           <div className="flex font-quanty font-medium text-4xl text-blue-shade-200 pb-4 items-center">
-            <div> Available Delegates</div>
-            <div>
+          <div>
               <Tooltip
                 showArrow
                 content={
@@ -32,9 +31,7 @@ function DelegateSessionsMain() {
                 className="rounded-md bg-opacity-90 max-w-96"
                 closeDelay={1}
               >
-                <div className=" px-2">
-                  <FaCircleInfo size={20} className="cursor-pointer" />
-                </div>
+            <div> Available Delegates</div>
               </Tooltip>
             </div>
           </div>
