@@ -57,6 +57,7 @@ function MainProfile() {
   const searchParams = useSearchParams();
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const [displayName, setDisplayName] = useState("");
+  const [emailId,setEmailId]=useState("");
   const [twitter, setTwitter] = useState("");
   const [discord, setDiscord] = useState("");
   const [discourse, setDiscourse] = useState("");
@@ -114,6 +115,7 @@ function MainProfile() {
       description: description,
       isDelegate: true,
       displayName: displayName,
+      emailId:emailId,
       socialHandles: {
         twitter: twitter,
         discord: discord,
@@ -240,6 +242,9 @@ function MainProfile() {
       case "displayName":
         setDisplayName(value);
         break;
+      case "emailId":
+        setEmailId(value);
+        break;  
       case "twitter":
         setTwitter(value);
         break;
@@ -295,6 +300,7 @@ function MainProfile() {
               setDisplayImage(item.image);
               setDescription(item.description);
               setDisplayName(item.displayName);
+              setEmailId(item.emailId);
               setTwitter(item.socialHandles.twitter);
               setDiscord(item.socialHandles.discord);
               setDiscourse(item.socialHandles.discourse);
@@ -464,6 +470,7 @@ function MainProfile() {
         description: newDescription,
         isDelegate: true,
         displayName: displayName,
+        emailId:emailId,
         socialHandles: {
           twitter: twitter,
           discord: discord,
@@ -503,6 +510,7 @@ function MainProfile() {
         description: description,
         isDelegate: true,
         displayName: displayName,
+        emailId:emailId,
         socialHandles: {
           twitter: twitter,
           discord: discord,
@@ -748,9 +756,26 @@ function MainProfile() {
                                   )
                                 }
                               />
+                                <div className="px-1 font-medium">
+                                Email:
+                              </div>
+                              <input
+                                type="email"
+                                value={emailId}
+                                placeholder="Enter your email here"
+                                className="outline-none bg-[#D9D9D945] rounded-md px-2 py-1 text-sm"
+                                onChange={(e) =>
+                                  handleInputChange(
+                                    "emailId",
+                                    e.target.value
+                                  )
+                                }
+
+                               
+                              />
 
                               <div className="px-1 font-medium">
-                                Twitter ID:
+                                X (Formerly Twitter):
                               </div>
                               <input
                                 type="url"
@@ -763,7 +788,7 @@ function MainProfile() {
                               />
 
                               <div className="px-1 font-medium">
-                                Discourse ID:
+                                Discourse:
                               </div>
                               <input
                                 type="url"
@@ -776,7 +801,7 @@ function MainProfile() {
                               />
 
                               <div className="px-1 font-medium">
-                                Discord ID:
+                                Discord:
                               </div>
                               <input
                                 type="url"
@@ -787,7 +812,7 @@ function MainProfile() {
                                   handleInputChange("discord", e.target.value)
                                 }
                               />
-                              <div className="px-1 font-medium">Github ID:</div>
+                              <div className="px-1 font-medium">Github:</div>
                               <input
                                 type="url"
                                 value={github}

@@ -197,14 +197,14 @@ function DelegatesList({ props }: { props: string }) {
           </button>
         </div>
       )}
-      <div className="flex items-center justify-between pe-10">
+      <div className="flex items-center justify-between pe-22">
         <div
           style={{ background: "rgba(238, 237, 237, 0.36)" }}
           className="flex border-[0.5px] border-black w-fit rounded-full my-3 font-poppins"
         >
           <input
             type="text"
-            placeholder="Search"
+            placeholder="Search by Address or ENS Name"
             style={{ background: "rgba(238, 237, 237, 0.36)" }}
             className="pl-5 rounded-full outline-none"
             value={searchQuery}
