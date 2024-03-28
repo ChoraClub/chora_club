@@ -14,6 +14,7 @@ const nextConfig = {
       "www.google.com",
       "s3.hj",
       "gateway.lighthouse.storage",
+      "static.tally.xyz",
     ],
   },
   reactStrictMode: false,

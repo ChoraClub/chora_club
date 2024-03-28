@@ -72,11 +72,12 @@ function BookingSuccessModal({
               <div className="p-8 text-gray-900">
                 <p className="mb-4">
                   Your session is booked! Please wait for confirmation from the
-                  delegate's side.
+                  delegate&apos;s side.
                 </p>
                 <p className="mb-8">
-                  Share the news of your learnings on Twitter!📣
+                  Share the news of your learnings on Twitter!&nbsp;📣
                 </p>
+
                 <div className="flex justify-center">
                   <button
                     className="bg-black text-white rounded-full px-4 py-2 flex items-center space-x-1"

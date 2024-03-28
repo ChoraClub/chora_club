@@ -314,7 +314,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
                 </div>
                 <button
                   onClick={() => push(`/profile/${address}?active=info`)}
-                  className="px-6 py-3 bg-white text-indigo-600 rounded-full shadow-lg hover:bg-indigo-600 hover:text-white transition duration-300 ease-in-out"
+                  className="px-6 py-3 bg-white text-blue-shade-200 rounded-full shadow-lg hover:bg-blue-shade-200 hover:text-white transition duration-300 ease-in-out"
                 >
                   Back to Profile
                 </button>
