@@ -71,8 +71,67 @@ const Home = ({ params }: { params: { roomId: string } }) => {
 
   const { address } = useAccount();
 
+  const [isAllowToEnter, setIsAllowToEnter] = useState<boolean>();
+  const [notAllowedMessage, setNotAllowedMessage] = useState<string>();
+
   useEffect(() => {
-    if (state === "idle") {
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+
+    const raw = JSON.stringify({
+      roomId: params.roomId,
+      meetingType: "session",
+    });
+
+    const requestOptions: any = {
+      method: "POST",
+      headers: myHeaders,
+      body: raw,
+      redirect: "follow",
+    };
+
+    async function verifyMeetingId() {
+      try {
+        const response = await fetch("/api/verify-meeting-id", requestOptions);
+        const data = await response.json();
+
+        if (data.success) {
+          if (data.message === "Meeting has ended") {
+            console.log("Meeting has ended");
+            setIsAllowToEnter(false);
+            setNotAllowedMessage("Meeting has ended");
+          } else if (data.message === "Meeting is upcoming") {
+            console.log("Meeting is upcoming");
+            setIsAllowToEnter(true);
+          } else if (data.message === "Meeting has been denied") {
+            console.log("Meeting has been denied");
+            setIsAllowToEnter(false);
+            setNotAllowedMessage("Meeting never happened");
+          } else if (data.message === "Meeting does not exist") {
+            setIsAllowToEnter(false);
+            setNotAllowedMessage("Meeting does not exist");
+            console.log("Meeting does not exist");
+          } else if (data.message === "Meeting is ongoing") {
+            setIsAllowToEnter(false);
+            setNotAllowedMessage("Meeting is ongoing");
+            console.log("Meeting is ongoing");
+          }
+        } else {
+          // Handle error scenarios
+          console.error("Error:", data.error || data.message);
+        }
+      } catch (error) {
+        // Handle network errors
+        console.error("Fetch error:", error);
+      }
+    }
+
+    verifyMeetingId();
+  }, [params.roomId, isAllowToEnter]);
+
+  useEffect(() => {
+    if (state === "idle" && isAllowToEnter) {
+      console.log(`pushing to /meeting/session/${params.roomId}/lobby`);
       push(`/meeting/session/${params.roomId}/lobby`);
       return;
     } else {
@@ -119,7 +178,7 @@ const Home = ({ params }: { params: { roomId: string } }) => {
           .catch((error) => console.error(error));
       }
     }
-  }, []);
+  }, [isAllowToEnter]);
 
   useDataMessage({
     onMessage(payload, from, label) {
@@ -151,24 +210,32 @@ const Home = ({ params }: { params: { roomId: string } }) => {
   }, [requestedPeers]);
 
   return (
-    <section className="bg-white flex h-screen text-slate-100 flex-col justify-between overflow-hidden">
-      <div className="flex w-full h-[90%] pb-4">
-        <GridLayout />
-        <Sidebar />
-        <div className="absolute right-4 bottom-20">
-          {Role.HOST
-            ? showAcceptRequest && <AcceptRequest peerId={requestedPeerId} />
-            : null}
-        </div>
-        {isChatOpen && <Chat />}
-      </div>
+    <>
+      {isAllowToEnter ? (
+        <section className="bg-white flex h-screen text-slate-100 flex-col justify-between overflow-hidden">
+          <div className="flex w-full h-[90%] pb-4">
+            <GridLayout />
+            <Sidebar />
+            <div className="absolute right-4 bottom-20">
+              {Role.HOST
+                ? showAcceptRequest && (
+                    <AcceptRequest peerId={requestedPeerId} />
+                  )
+                : null}
+            </div>
+            {isChatOpen && <Chat />}
+          </div>
 
-      <BottomBar />
-      <Prompts />
-      {modalOpen && (
-        <AttestationModal isOpen={modalOpen} onClose={handleModalClose} />
+          <BottomBar />
+          <Prompts />
+          {modalOpen && (
+            <AttestationModal isOpen={modalOpen} onClose={handleModalClose} />
+          )}
+        </section>
+      ) : (
+        <>{notAllowedMessage}</>
       )}
-    </section>
+    </>
   );
 };
 export default Home;
