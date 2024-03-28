@@ -62,10 +62,19 @@ export async function POST(req: NextRequest, res: NextResponse) {
           { success: true, message: "Meeting has ended" },
           { status: 200 }
         );
-      } else if (meeting[statusField] === "ongoing") {
+      } else if (
+        meeting[statusField] === "ongoing" ||
+        meeting[statusField] === "Ongoing"
+      ) {
         // Meeting is ongoing
         return NextResponse.json(
           { success: true, message: "Meeting is ongoing" },
+          { status: 200 }
+        );
+      } else if (meeting[statusField] === "Denied") {
+        // Meeting is ongoing
+        return NextResponse.json(
+          { success: true, message: "Meeting has been denied" },
           { status: 200 }
         );
       } else {

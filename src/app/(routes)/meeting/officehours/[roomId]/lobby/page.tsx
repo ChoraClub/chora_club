@@ -27,6 +27,7 @@ import {
 } from "@huddle01/react/hooks";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { Role } from "@huddle01/server-sdk/auth";
+import { Oval, TailSpin } from "react-loader-spinner";
 
 type lobbyProps = {};
 
@@ -166,18 +167,21 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
           if (data.message === "Meeting has ended") {
             console.log("Meeting has ended");
             setIsAllowToEnter(false);
-            setNotAllowedMessage("Meeting has ended");
+            setNotAllowedMessage(data.message);
           } else if (data.message === "Meeting is upcoming") {
             console.log("Meeting is upcoming");
             setIsAllowToEnter(true);
           } else if (data.message === "Meeting has been denied") {
             console.log("Meeting has been denied");
             setIsAllowToEnter(false);
-            setNotAllowedMessage("Meeting never happened");
+            setNotAllowedMessage(data.message);
           } else if (data.message === "Meeting does not exist") {
             setIsAllowToEnter(false);
-            setNotAllowedMessage("Meeting does not exist");
-            console.log("Other success scenario:", data.message);
+            setNotAllowedMessage(data.message);
+            console.log("Meeting does not exist");
+          } else if (data.message === "Meeting is ongoing") {
+            setIsAllowToEnter(true);
+            console.log("Meeting is ongoing");
           }
         } else {
           // Handle error scenarios
@@ -190,7 +194,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
     }
 
     verifyMeetingId();
-  }, [params.roomId]);
+  }, [params.roomId, isAllowToEnter, notAllowedMessage]);
 
   return (
     <>
@@ -316,7 +320,49 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
           />
         </main>
       ) : (
-        <>{notAllowedMessage}</>
+        <>
+          {notAllowedMessage ? (
+            <div className="flex justify-center items-center h-screen">
+              <div className="text-center">
+                <div className="text-6xl mb-6">☹️</div>
+                <div className="text-lg font-semibold mb-8">
+                  Oops, {notAllowedMessage}
+                </div>
+                <button
+                  onClick={() => push(`/profile/${address}?active=info`)}
+                  className="px-6 py-3 bg-white text-indigo-600 rounded-full shadow-lg hover:bg-indigo-600 hover:text-white transition duration-300 ease-in-out"
+                >
+                  Back to Profile
+                </button>
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className="flex justify-center items-center h-screen">
+                <div className="text-center">
+                  <div className="flex items-center justify-center pt-10">
+                    <TailSpin
+                      // visible={true}
+                      // height="40"
+                      // width="40"
+                      // color="#0500FF"
+                      // secondaryColor="#cdccff"
+                      // ariaLabel="oval-loading"
+                      visible={true}
+                      height="80"
+                      width="80"
+                      color="#0500FF"
+                      ariaLabel="tail-spin-loading"
+                      radius="1"
+                      wrapperStyle={{}}
+                      wrapperClass=""
+                    />
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+        </>
       )}
     </>
   );
