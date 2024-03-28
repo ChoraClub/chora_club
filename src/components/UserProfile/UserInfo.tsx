@@ -106,14 +106,14 @@ function UserInfo({
             if (
               item.meeting_status === "Recorded" &&
               item.dao_name === "optimism" &&
-              item.uid_attendee &&
+              item.attendees.some((attendee: any) => attendee.attendee_uid) &&
               chain?.name == "Optimism"
             ) {
               sessionAttendingCount++;
             } else if (
               item.meeting_status === "Recorded" &&
               item.dao_name === "arbitrum" &&
-              item.uid_attendee &&
+              item.attendees.some((attendee: any) => attendee.attendee_uid) &&
               chain?.name == "Arbitrum One"
             ) {
               sessionAttendingCount++;
