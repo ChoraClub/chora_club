@@ -172,14 +172,18 @@ function SpecificDelegate({ props }: { props: Type }) {
     }
 
     console.log(walletClient);
-    const delegateTx = await walletClient.writeContract({
-      address: chainAddress,
-      abi: dao_abi.abi,
-      functionName: "delegate",
-      args: [to],
-      account: address1,
-    });
-    console.log(delegateTx);
+    try {
+      const delegateTx = await walletClient.writeContract({
+        address: chainAddress,
+        abi: dao_abi.abi,
+        functionName: "delegate",
+        args: [to],
+        account: address1,
+      });
+      console.log(delegateTx);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
