@@ -13,7 +13,6 @@ interface AddAttendeeRequestBody {
   attendees: Attendee[]; // Array of attendees
 }
 
-
 export async function PUT(req: NextRequest, res: NextResponse) {
   const { meetingId, attendees }: AddAttendeeRequestBody = await req.json();
 
@@ -41,21 +40,49 @@ export async function PUT(req: NextRequest, res: NextResponse) {
       );
     }
 
-    console.log("Updating session document with attendees...");
-    const updatedDocument = await collection.updateOne(
-      { meetingId },
-      { $push: { attendees: { $each: attendees } } } // Use $push operator to add attendees to the array
-    );
+    console.log("Checking for existing attendees...");
+    const existingAttendees = existingDocument.attendees || [];
+
+    const uniqueAttendees = attendees.filter((newAttendee) => {
+      return !existingAttendees.some((existingAttendee: any) => {
+        return (
+          existingAttendee.attendee_address === newAttendee.attendee_address
+        );
+      });
+    });
+
+    console.log("Adding unique attendees...");
+    if (uniqueAttendees.length > 0) {
+      const updatedDocument = await collection.updateOne(
+        { meetingId },
+        { $push: { attendees: { $each: uniqueAttendees } } }
+      );
+
+      if (updatedDocument.modifiedCount !== 1) {
+        return NextResponse.json(
+          { success: false, error: "Failed to update document" },
+          { status: 500 }
+        );
+      }
+    } else {
+      console.log("No unique attendees to add");
+    }
+
+    // console.log("Updating session document with attendees...");
+    // const updatedDocument = await collection.updateOne(
+    //   { meetingId },
+    //   { $push: { attendees: { $each: attendees } } } // Use $push operator to add attendees to the array
+    // );
 
     client.close();
     console.log("MongoDB connection closed");
 
-    if (updatedDocument.modifiedCount !== 1) {
-      return NextResponse.json(
-        { success: false, error: "Failed to update document" },
-        { status: 500 }
-      );
-    }
+    // if (updatedDocument.modifiedCount !== 1) {
+    //   return NextResponse.json(
+    //     { success: false, error: "Failed to update document" },
+    //     { status: 500 }
+    //   );
+    // }
 
     // Fetch the updated document after the update
     const updatedDocumentData = await collection.findOne({ meetingId });
