@@ -67,10 +67,10 @@ function UserSessions({ isDelegate, selfDelegate }: UserSessionsProps) {
         }),
       });
 
-      console.log("Response", response);
+      // console.log("Response", response);
 
       const result = await response.json();
-      console.log("Result", result);
+      // console.log("Result", result);
       // console.log("result in get session data", result);
       if (result.success) {
         // setSessionDetails(result.data);
@@ -102,7 +102,7 @@ function UserSessions({ isDelegate, selfDelegate }: UserSessionsProps) {
             });
             setSessionDetails(filteredData);
           }
-          console.log("filtered", filteredData);
+          // console.log("filtered", filteredData);
           setDataLoading(false);
         }
       }

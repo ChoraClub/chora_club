@@ -57,7 +57,7 @@ function MainProfile() {
   const searchParams = useSearchParams();
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const [displayName, setDisplayName] = useState("");
-  const [emailId,setEmailId]=useState("");
+  const [emailId, setEmailId] = useState("");
   const [twitter, setTwitter] = useState("");
   const [discord, setDiscord] = useState("");
   const [discourse, setDiscourse] = useState("");
@@ -79,17 +79,41 @@ function MainProfile() {
     uploaded: any;
   }
 
+  // useEffect(() => {
+  //   console.log("path", path);
+  //   if (isConnected && session) {
+  //     router.replace(`/profile/${address}?active=info`);
+  //   } else {
+  //     if (openConnectModal) {
+  //       openConnectModal();
+  //     } else {
+  //       console.error("openConnectModal is not defined");
+  //     }
+  //   }
+  // }, [isConnected, address, router, session, path]);
+
   useEffect(() => {
-    if (isConnected && session) {
-      router.replace(`/profile/${address}?active=info`);
-    } else {
+    // console.log("path", path);
+    if (isConnected && session && path.includes("profile/undefined")) {
+      const newPath = path.includes("profile/undefined")
+        ? path.replace("profile/undefined", `profile/${address}?active=info`)
+        : path;
+      // console.log("newPath", newPath);
+      router.replace(`${newPath}`);
+    } else if (!isConnected && !session) {
       if (openConnectModal) {
         openConnectModal();
       } else {
         console.error("openConnectModal is not defined");
       }
     }
-  }, [isConnected, address, router, session]);
+  }, [
+    isConnected,
+    address,
+    router,
+    session,
+    path.includes("profile/undefined"),
+  ]);
 
   const uploadImage = async (selectedFile: any) => {
     const progressCallback = async (progressData: any) => {
@@ -115,7 +139,7 @@ function MainProfile() {
       description: description,
       isDelegate: true,
       displayName: displayName,
-      emailId:emailId,
+      emailId: emailId,
       socialHandles: {
         twitter: twitter,
         discord: discord,
@@ -244,7 +268,7 @@ function MainProfile() {
         break;
       case "emailId":
         setEmailId(value);
-        break;  
+        break;
       case "twitter":
         setTwitter(value);
         break;
@@ -470,7 +494,7 @@ function MainProfile() {
         description: newDescription,
         isDelegate: true,
         displayName: displayName,
-        emailId:emailId,
+        emailId: emailId,
         socialHandles: {
           twitter: twitter,
           discord: discord,
@@ -510,7 +534,7 @@ function MainProfile() {
         description: description,
         isDelegate: true,
         displayName: displayName,
-        emailId:emailId,
+        emailId: emailId,
         socialHandles: {
           twitter: twitter,
           discord: discord,
@@ -756,22 +780,15 @@ function MainProfile() {
                                   )
                                 }
                               />
-                                <div className="px-1 font-medium">
-                                Email:
-                              </div>
+                              <div className="px-1 font-medium">Email:</div>
                               <input
                                 type="email"
                                 value={emailId}
                                 placeholder="Enter your email here"
                                 className="outline-none bg-[#D9D9D945] rounded-md px-2 py-1 text-sm"
                                 onChange={(e) =>
-                                  handleInputChange(
-                                    "emailId",
-                                    e.target.value
-                                  )
+                                  handleInputChange("emailId", e.target.value)
                                 }
-
-                               
                               />
 
                               <div className="px-1 font-medium">
@@ -787,9 +804,7 @@ function MainProfile() {
                                 }
                               />
 
-                              <div className="px-1 font-medium">
-                                Discourse:
-                              </div>
+                              <div className="px-1 font-medium">Discourse:</div>
                               <input
                                 type="url"
                                 value={discourse}
@@ -800,9 +815,7 @@ function MainProfile() {
                                 }
                               />
 
-                              <div className="px-1 font-medium">
-                                Discord:
-                              </div>
+                              <div className="px-1 font-medium">Discord:</div>
                               <input
                                 type="url"
                                 value={discord}

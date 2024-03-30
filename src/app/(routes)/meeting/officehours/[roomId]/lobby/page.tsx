@@ -28,6 +28,7 @@ import {
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { Role } from "@huddle01/server-sdk/auth";
 import { Oval, TailSpin } from "react-loader-spinner";
+import Link from "next/link";
 
 type lobbyProps = {};
 
@@ -328,12 +329,13 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
                 <div className="text-lg font-semibold mb-8">
                   Oops, {notAllowedMessage}
                 </div>
-                <button
-                  onClick={() => push(`/profile/${address}?active=info`)}
+                <Link
+                  // onClick={() => push(`/profile/${address}?active=info`)}
+                  href={`/profile/${address}?active=info`}
                   className="px-6 py-3 bg-white text-blue-shade-200 rounded-full shadow-lg hover:bg-blue-shade-200 hover:text-white transition duration-300 ease-in-out"
                 >
                   Back to Profile
-                </button>
+                </Link>
               </div>
             </div>
           ) : (

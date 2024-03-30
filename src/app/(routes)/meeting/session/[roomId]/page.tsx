@@ -24,6 +24,7 @@ import Chat from "@/components/Chat/Chat";
 import { useAccount } from "wagmi";
 import AttestationModal from "@/components/utils/AttestationModal";
 import { Oval, TailSpin } from "react-loader-spinner";
+import Link from "next/link";
 
 // import Chat from '@/components/Chat/Chat';
 
@@ -242,12 +243,13 @@ const Home = ({ params }: { params: { roomId: string } }) => {
                 <div className="text-lg font-semibold mb-8">
                   Oops, {notAllowedMessage}
                 </div>
-                <button
-                  onClick={() => push(`/profile/${address}?active=info`)}
+                <Link
+                  // onClick={() => push(`/profile/${address}?active=info`)}
+                  href={`/profile/${address}?active=info`}
                   className="px-6 py-3 bg-white text-blue-shade-200 rounded-full shadow-lg hover:bg-blue-shade-200 hover:text-white transition duration-300 ease-in-out"
                 >
                   Back to Profile
-                </button>
+                </Link>
               </div>
             </div>
           ) : (

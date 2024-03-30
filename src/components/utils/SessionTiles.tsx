@@ -64,7 +64,8 @@ TileProps) {
             key={index}
             className="flex p-5 rounded-[2rem] cursor-pointer"
             style={{ boxShadow: "0px 4px 26.7px 0px rgba(0, 0, 0, 0.10)" }}
-            onClick={() => openModal(index)}
+            // onClick={() => openModal(index)}
+            onClick={() => console.log(data.meetingId)}
           >
             <Image
               src={text2}
