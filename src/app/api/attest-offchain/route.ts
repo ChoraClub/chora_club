@@ -188,7 +188,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
           {
             $set: {
               uid_host: response.data.offchainAttestationId,
-              status: "inactive",
+              meeting_status: "inactive",
             },
           }
         );

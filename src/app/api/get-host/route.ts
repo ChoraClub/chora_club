@@ -4,12 +4,12 @@ import { NextResponse, NextRequest } from "next/server";
 
 interface OfficeHours {
   _id: string;
-  address: string;
+  host_address: string;
   office_hours_slot: Date;
   title: string;
   description: string;
-  status: string;
-  chain_name: string;
+  meeting_status: string;
+  dao_name: string;
   video_uri: string;
   meetingId: string;
 }
@@ -51,7 +51,7 @@ export async function POST(
 
     if (officeHours) {
       return NextResponse.json(
-        { address: officeHours.address },
+        { address: officeHours.host_address },
         { status: 200 }
       );
     } else if (meeting) {

@@ -4,21 +4,21 @@ import { NextRequest, NextResponse } from "next/server";
 // Define the response body type
 interface OfficeHours {
   _id: string;
-  address: string;
+  host_address: string;
   office_hours_slot: Date;
   title: string;
   description: string;
-  status: string;
-  chain_name: string;
+  meeting_status: string;
+  dao_name: string;
 }
 
 export async function POST(req: NextRequest, res: NextResponse<OfficeHours[]>) {
   try {
-    // Extract the chain_name from the request body
-    const { chain_name } = await req.json();
+    // Extract the dao_name from the request body
+    const { dao_name } = await req.json();
 
-    // Validate the chain_name
-    if (!chain_name || typeof chain_name !== "string") {
+    // Validate the dao_name
+    if (!dao_name || typeof dao_name !== "string") {
       return NextResponse.json(
         { error: "Invalid chain name parameter" },
         { status: 400 }
@@ -34,8 +34,8 @@ export async function POST(req: NextRequest, res: NextResponse<OfficeHours[]>) {
     const db = client.db();
     const collection = db.collection<OfficeHours>("office_hours");
 
-    // Find office hours documents based on the provided chain_name
-    const officeHours = await collection.find({ chain_name }).toArray();
+    // Find office hours documents based on the provided dao_name
+    const officeHours = await collection.find({ dao_name: dao_name }).toArray();
 
     client.close();
 

@@ -28,8 +28,8 @@ interface Type {
   desc: string;
   attendee: string;
   video_uri?: string;
-  chain_name: string;
-  address: string;
+  dao_name: string;
+  host_address: string;
   office_hours_slot: string;
   description: string;
 }
@@ -104,7 +104,7 @@ function Tile({
 
                   <div className="flex space-x-4 py-2">
                     <div className="bg-[#1E1E1E] border border-[#1E1E1E] text-white rounded-md text-xs px-5 py-1 font-semibold">
-                      {data.chain_name}
+                      {data.dao_name}
                     </div>
                     <div className="border border-[#1E1E1E] rounded-md text-[#1E1E1E] text-xs px-5 py-1 font-medium">
                       {data.attendees ? data.attendees.length : 0} Participants
@@ -119,7 +119,7 @@ function Tile({
                     <div className="flex gap-x-16 text-sm py-3">
                       <div className="text-[#3E3D3D]">
                         <span className="font-semibold">Host:</span>{" "}
-                        {data.address}
+                        {data.host_address}
                       </div>
                       <div className="text-[#3E3D3D]">
                         {isEvent === "Upcoming" ? (
@@ -210,9 +210,9 @@ function Tile({
           description={sessionDetails[selectedTileIndex].description}
           videoUrl={sessionDetails[selectedTileIndex].video_uri || ""}
           date={sessionDetails[selectedTileIndex].office_hours_slot}
-          host={sessionDetails[selectedTileIndex].address}
+          host={sessionDetails[selectedTileIndex].host_address}
           attendees={sessionDetails[selectedTileIndex].attendees}
-          dao={sessionDetails[selectedTileIndex].chain_name}
+          dao={sessionDetails[selectedTileIndex].dao_name}
           host_attestation={sessionDetails[selectedTileIndex].uid_host}
           onClose={closeModal}
         />

@@ -28,13 +28,13 @@ export async function POST(req: NextRequest, res: NextResponse) {
     let filter: any = {
       $or: [
         { title: { $regex: `\\b${query}`, $options: "i" } },
-        { address: { $regex: `\\b${query}`, $options: "i" } },
+        { host_address: { $regex: `\\b${query}`, $options: "i" } },
       ],
     };
 
     if (dao_name) {
       filter = {
-        $and: [filter, { chain_name: dao_name }],
+        $and: [filter, { dao_name: dao_name }],
       };
     }
 

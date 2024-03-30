@@ -6,12 +6,12 @@ import { NextResponse, NextRequest } from "next/server";
 // Define the response body type
 interface OfficeHours {
   _id: string;
-  address: string;
+  host_address: string;
   office_hours_slot: Date;
   title: string;
   description: string;
-  status: string;
-  chain_name: string;
+  meeting_status: string;
+  dao_name: string;
   office_hours_status: string;
 }
 
@@ -41,7 +41,7 @@ export async function POST(req: NextRequest, res: NextResponse<OfficeHours[]>) {
     // Find office hours documents based on the provided office_hours_status
     // console.log(`Fetching ${office_hours_status} office hours documents...`);
     const officeHours = await collection
-      .find({ status: office_hours_status })
+      .find({ meeting_status: office_hours_status })
       .toArray();
 
     // console.log(

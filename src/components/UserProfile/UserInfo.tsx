@@ -146,15 +146,15 @@ function UserInfo({
         if (result.length > 0) {
           result.forEach((item: any) => {
             if (
-              item.status === "inactive" &&
-              item.chain_name === "Optimism" &&
+              item.meeting_status === "inactive" &&
+              item.dao_name === "Optimism" &&
               item.uid_host &&
               chain?.name == "Optimism"
             ) {
               officehoursHostingCount++;
             } else if (
-              item.status === "inactive" &&
-              item.chain_name === "Arbitrum" &&
+              item.meeting_status === "inactive" &&
+              item.dao_name === "Arbitrum" &&
               item.uid_host &&
               chain?.name == "Arbitrum One"
             ) {
@@ -188,15 +188,15 @@ function UserInfo({
         if (result.length > 0) {
           result.forEach((item: any) => {
             if (
-              item.status === "inactive" &&
-              item.chain_name === "Optimism" &&
+              item.meeting_status === "inactive" &&
+              item.dao_name === "Optimism" &&
               item.attendees.some((attendee: any) => attendee.attendee_uid) &&
               chain?.name == "Optimism"
             ) {
               officehoursAttendingCount++;
             } else if (
-              item.status === "inactive" &&
-              item.chain_name === "Arbitrum" &&
+              item.meeting_status === "inactive" &&
+              item.dao_name === "Arbitrum" &&
               item.attendees.some((attendee: any) => attendee.attendee_uid) &&
               chain?.name == "Arbitrum One"
             ) {

@@ -4,17 +4,17 @@ import { NextRequest, NextResponse } from "next/server";
 // Define the response body type
 interface OfficeHours {
   _id: string;
-  address: string;
+  host_address: string;
   office_hours_slot: Date;
   title: string;
   description: string;
-  status: string;
-  chain_name: string;
+  meeting_status: string;
+  dao_name: string;
 }
 
 export async function POST(req: NextRequest, res: NextResponse<OfficeHours[]>) {
   try {
-    // Extract the chain_name from the request body
+    // Extract the dao_name from the request body
     const { address } = await req.json();
 
     // Connect to MongoDB database
@@ -26,8 +26,8 @@ export async function POST(req: NextRequest, res: NextResponse<OfficeHours[]>) {
     const db = client.db();
     const collection = db.collection<OfficeHours>("office_hours");
 
-    // Find office hours documents based on the provided chain_name
-    const officeHours = await collection.find({ address }).toArray();
+    // Find office hours documents based on the provided dao_name
+    const officeHours = await collection.find({ host_address: address }).toArray();
 
     client.close();
 

@@ -42,7 +42,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
     } else {
       // Meeting exists
       const statusField =
-        meetingType === "session" ? "meeting_status" : "status";
+        meetingType === "session" ? "meeting_status" : "meeting_status";
 
       if (
         meeting[statusField] === "active" ||

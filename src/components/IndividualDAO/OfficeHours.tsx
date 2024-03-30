@@ -7,12 +7,12 @@ import { Oval } from "react-loader-spinner";
 
 interface Session {
   _id: string;
-  address: string;
+  host_address: string;
   office_hours_slot: string;
   title: string;
   description: string;
-  status: "ongoing" | "active" | "inactive"; // Define the possible statuses
-  chain_name: string;
+  meeting_status: "ongoing" | "active" | "inactive"; // Define the possible statuses
+  dao_name: string;
 }
 
 function OfficeHours({ props }: { props: string }) {
@@ -35,7 +35,7 @@ function OfficeHours({ props }: { props: string }) {
         myHeaders.append("Content-Type", "application/json");
 
         const raw = JSON.stringify({
-          chain_name: dao_name,
+          dao_name: dao_name,
         });
 
         const requestOptions: RequestInit = {
@@ -51,14 +51,14 @@ function OfficeHours({ props }: { props: string }) {
         const result = await response.json();
         console.log(result);
 
-        // Filter sessions based on status
+        // Filter sessions based on meeting_status
         const filteredSessions = result.filter((session: Session) => {
           if (searchParams.get("hours") === "ongoing") {
-            return session.status === "ongoing";
+            return session.meeting_status === "ongoing";
           } else if (searchParams.get("hours") === "upcoming") {
-            return session.status === "active";
+            return session.meeting_status === "active";
           } else if (searchParams.get("hours") === "recorded") {
-            return session.status === "inactive";
+            return session.meeting_status === "inactive";
           }
         });
         setSearchQuery("");
@@ -102,11 +102,11 @@ function OfficeHours({ props }: { props: string }) {
       if (result.success) {
         const filtered: any = resultData.filter((session: Session) => {
           if (searchParams.get("hours") === "ongoing") {
-            return session.status === "ongoing";
+            return session.meeting_status === "ongoing";
           } else if (searchParams.get("hours") === "upcoming") {
-            return session.status === "active";
+            return session.meeting_status === "active";
           } else if (searchParams.get("hours") === "recorded") {
-            return session.status === "inactive";
+            return session.meeting_status === "inactive";
           }
         });
         console.log("filtered: ", filtered);

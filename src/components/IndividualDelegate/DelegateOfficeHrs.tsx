@@ -10,12 +10,12 @@ interface Type {
 }
 interface Session {
   _id: string;
-  address: string;
+  host_address: string;
   office_hours_slot: string;
   title: string;
   description: string;
-  status: "ongoing" | "active" | "inactive"; // Define the possible statuses
-  chain_name: string;
+  meeting_status: "ongoing" | "active" | "inactive"; // Define the possible statuses
+  dao_name: string;
   attendees: any[];
 }
 
@@ -80,11 +80,11 @@ function DelegateOfficeHrs({ props }: { props: Type }) {
         ) {
           const filteredSessions = result.filter((session: Session) => {
             if (searchParams.get("hours") === "ongoing") {
-              return session.status === "ongoing";
+              return session.meeting_status === "ongoing";
             } else if (searchParams.get("hours") === "upcoming") {
-              return session.status === "active";
+              return session.meeting_status === "active";
             } else if (searchParams.get("hours") === "hosted") {
-              return session.status === "inactive";
+              return session.meeting_status === "inactive";
             }
           });
           setSessionDetails(filteredSessions);

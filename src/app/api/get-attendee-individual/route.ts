@@ -4,12 +4,12 @@ import { NextRequest, NextResponse } from "next/server";
 // Define the response body type
 interface OfficeHours {
   _id: string;
-  address: string;
+  host_address: string;
   office_hours_slot: Date;
   title: string;
   description: string;
-  status: string;
-  chain_name: string;
+  meeting_status: string;
+  dao_name: string;
   video_uri: string | null;
   meetingId: string;
   attendees: { attendee_address: string }[];

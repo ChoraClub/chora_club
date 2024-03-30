@@ -48,12 +48,12 @@ const UserScheduledHours: React.FC = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          address: address,
+          host_address: address,
           office_hours_slot: utcFormattedDate,
           title,
           description,
-          status: "active",
-          chain_name: chain?.name,
+          meeting_status: "active",
+          dao_name: chain?.name,
           meetingId: roomId, // Pass the roomId as meetingId
         }),
       });

@@ -32,7 +32,7 @@ export async function GET(req: NextRequest, context: { params: Params }) {
     // Find documents in "office_hours" collection
     console.log("Finding documents from office_hours for user:", meetingId);
     const officeHoursDocuments = await officeHoursCollection
-      .find({ meetingId, status: "inactive" })
+      .find({ meetingId, meeting_status: "inactive" })
       .toArray();
     console.log("Office Hours documents found:", officeHoursDocuments);
 

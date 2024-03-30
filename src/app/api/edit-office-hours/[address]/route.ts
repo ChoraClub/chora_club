@@ -46,8 +46,8 @@ export async function PUT(
     // Find the office hours document to update
     // console.log("Finding office hours document to update...");
     const officeHoursToUpdate = await collection.find({
-      address,
-      status: "active",
+      host_address: address,
+      meeting_status: "active",
     });
     // console.log("office hour to update", officeHoursToUpdate);
 
@@ -61,7 +61,7 @@ export async function PUT(
     // Update the office hours document
     // console.log("Updating office hours document...");
     await collection.updateMany(
-      { address, status: "active" },
+      { host_address: address, meeting_status: "active" },
       {
         $set: {
           title,
@@ -113,8 +113,8 @@ export async function DELETE(
     // Find and delete the office hours document with the provided address
     console.log("Deleting office hours document...");
     const deleteResult = await collection.deleteOne({
-      address,
-      status: "active",
+      host_address: address,
+      meeting_status: "active",
     });
     console.log("Office hours document deleted:", deleteResult);
 

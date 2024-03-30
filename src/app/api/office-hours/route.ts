@@ -4,12 +4,12 @@ import { NextResponse, NextRequest } from "next/server";
 
 // Define the request body type
 interface OfficeHoursRequestBody {
-  address: string;
+  host_address: string;
   office_hours_slot: string;
   title: string;
   description: string;
-  status: string;
-  chain_name: string;
+  meeting_status: string;
+  dao_name: string;
   video_uri: string;
   meetingId: string;
 }
@@ -19,12 +19,12 @@ interface OfficeHoursResponseBody {
   success: boolean;
   data?: {
     id: string;
-    address: string;
+    host_address: string;
     office_hours_slot: string;
     title: string;
     description: string;
-    chain_name: string;
-    status: string;
+    dao_name: string;
+    meeting_status: string;
     video_uri: string;
     meetingId: string;
   } | null;
@@ -36,12 +36,12 @@ export async function POST(
   res: NextApiResponse<OfficeHoursResponseBody>
 ) {
   const {
-    address,
+    host_address,
     office_hours_slot,
     title,
     description,
-    status,
-    chain_name,
+    meeting_status,
+    dao_name,
     video_uri,
     meetingId,
   }: OfficeHoursRequestBody = await req.json();
@@ -61,12 +61,12 @@ export async function POST(
     // Insert the new office hours document
     // console.log("Inserting office hours document...");
     const result = await collection.insertOne({
-      address,
+      host_address,
       office_hours_slot,
       title,
       description,
-      status,
-      chain_name,
+      meeting_status,
+      dao_name,
       video_uri,
       meetingId,
     });

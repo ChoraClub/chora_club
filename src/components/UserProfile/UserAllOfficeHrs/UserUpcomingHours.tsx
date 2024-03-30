@@ -58,9 +58,9 @@ function UserUpcomingHours() {
         const mappedData: SessionDetail[] = data.map((item) => ({
           img: text1, // Static image
           title: item.title,
-          dao: item.chain_name,
+          dao: item.dao_name,
           started: item.office_hours_slot,
-          host: item.address, // Host is the address from the API
+          host: item.host_address, // Host is the address from the API
           desc: item.description,
           meetingId: item.meetingId, // Description from the API
         }));
@@ -104,9 +104,9 @@ function UserUpcomingHours() {
             const mappedData: SessionDetail[] = data.map((item) => ({
               img: text1,
               title: item.title,
-              dao: item.chain_name,
+              dao: item.dao_name,
               started: item.office_hours_slot,
-              host: item.address,
+              host: item.host_address,
               desc: item.description,
               meetingId: item.meetingId,
             }));

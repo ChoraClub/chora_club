@@ -16,7 +16,7 @@ export async function PUT(req: NextRequest, res: NextResponse) {
     // Find all office hours documents
     const officeHours = await collection.findOneAndUpdate(
       { meetingId },
-      { $set: { status: "ongoing" } }
+      { $set: { meeting_status: "ongoing" } }
     );
 
     client.close();

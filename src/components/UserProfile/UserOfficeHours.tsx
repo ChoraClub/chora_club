@@ -15,12 +15,12 @@ interface UserOfficeHoursProps {
 
 interface Session {
   _id: string;
-  address: string;
+  host_address: string;
   office_hours_slot: string;
   title: string;
   description: string;
-  status: "ongoing" | "active" | "inactive"; // Define the possible statuses
-  chain_name: string;
+  meeting_status: "ongoing" | "active" | "inactive"; // Define the possible statuses
+  dao_name: string;
   attendees: any[];
 }
 
@@ -83,22 +83,25 @@ function UserOfficeHours({ isDelegate, selfDelegate }: UserOfficeHoursProps) {
         ) {
           const filteredSessions = result.filter((session: Session) => {
             if (searchParams.get("hours") === "ongoing") {
-              return session.status === "ongoing" && chain?.name === "Optimism"
-                ? session.chain_name === "Optimism"
+              return session.meeting_status === "ongoing" &&
+                chain?.name === "Optimism"
+                ? session.dao_name === "Optimism"
                 : chain?.name === "Arbitrum One"
-                ? session.chain_name === "Arbitrum"
+                ? session.dao_name === "Arbitrum"
                 : "";
             } else if (searchParams.get("hours") === "upcoming") {
-              return session.status === "active" && chain?.name === "Optimism"
-                ? session.chain_name === "Optimism"
+              return session.meeting_status === "active" &&
+                chain?.name === "Optimism"
+                ? session.dao_name === "Optimism"
                 : chain?.name === "Arbitrum One"
-                ? session.chain_name === "Arbitrum"
+                ? session.dao_name === "Arbitrum"
                 : "";
             } else if (searchParams.get("hours") === "hosted") {
-              return session.status === "inactive" && chain?.name === "Optimism"
-                ? session.chain_name === "Optimism"
+              return session.meeting_status === "inactive" &&
+                chain?.name === "Optimism"
+                ? session.dao_name === "Optimism"
                 : chain?.name === "Arbitrum One"
-                ? session.chain_name === "Arbitrum"
+                ? session.dao_name === "Arbitrum"
                 : "";
             }
           });
@@ -108,9 +111,9 @@ function UserOfficeHours({ isDelegate, selfDelegate }: UserOfficeHoursProps) {
             return session.attendees.some(
               (attendee: any) => attendee.attendee_address === address
             ) && chain?.name === "Optimism"
-              ? session.chain_name === "Optimism"
+              ? session.dao_name === "Optimism"
               : chain?.name === "Arbitrum One"
-              ? session.chain_name === "Arbitrum"
+              ? session.dao_name === "Arbitrum"
               : "";
           });
           setSessionDetails(filteredSessions);

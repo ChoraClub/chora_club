@@ -10,12 +10,12 @@ interface UpdateOfficeHoursResponse {
 
 interface OfficeHours {
   _id: string;
-  address: string;
+  host_address: string;
   office_hours_slot: Date;
   title: string;
   description: string;
-  status: string;
-  chain_name: string;
+  meeting_status: string;
+  dao_name: string;
   meetingId: string;
 }
 
@@ -45,8 +45,8 @@ export async function PUT(
     const collection = db.collection("office_hours");
 
     const lastActiveOfficeHours = await collection.findOneAndUpdate(
-      { address, status: "ongoing" },
-      { $set: { status: "inactive" } },
+      { host_address: address, meeting_status: "ongoing" },
+      { $set: { meeting_status: "inactive" } },
       { sort: { office_hours_slot: -1 } }
     );
 
@@ -60,12 +60,12 @@ export async function PUT(
     currentSlotDate.setDate(currentSlotDate.getDate() + 1);
 
     const createResult = await collection.insertOne({
-      address,
+      host_address: address,
       office_hours_slot: currentSlotDate,
       title: lastActiveOfficeHours.title,
       description: lastActiveOfficeHours.description,
-      chain_name: lastActiveOfficeHours.chain_name,
-      status: "active",
+      dao_name: lastActiveOfficeHours.dao_name,
+      meeting_status: "active",
       meetingId: roomId, // Insert roomId into the document
     });
     console.log("New office hours document created:", createResult);
@@ -101,7 +101,7 @@ export async function GET(req: NextRequest, res: NextResponse<OfficeHours[]>) {
     const collection = db.collection("office_hours");
 
     const activeOfficeHours = await collection
-      .find({ address, status: "active" })
+      .find({ host_address: address, meeting_status: "active" })
       .toArray();
 
     client.close();
