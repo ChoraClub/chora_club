@@ -17,6 +17,7 @@ import {
   useRoom,
   useLocalVideo,
   useLocalScreenShare,
+  useDataMessage,
 } from "@huddle01/react/hooks";
 import toast, { Toaster } from "react-hot-toast";
 import { useParams, usePathname } from "next/navigation";
@@ -64,6 +65,42 @@ const BottomBar: React.FC<BottomBarProps> = () => {
   const { role, metadata, updateRole, peerId: localPeerId } = useLocalPeer();
 
   const [showLeaveDropDown, setShowLeaveDropDown] = useState<boolean>(false);
+  const [s3URL, setS3URL] = useState<string>("");
+  useDataMessage({
+    async onMessage(payload, from, label) {
+      if (label === "server-message") {
+        const { s3URL } = JSON.parse(payload);
+        console.log("s3URL", s3URL);
+        const videoUri = s3URL;
+        setS3URL(videoUri);
+
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+
+        const raw = JSON.stringify({
+          meetingId: roomId,
+          video_uri: videoUri,
+        });
+
+        const requestOptions = {
+          method: "POST",
+          headers: myHeaders,
+          body: raw,
+        };
+
+        try {
+          const response = await fetch(
+            "http://localhost:3000/api/update-video-uri",
+            requestOptions
+          );
+          const result = await response.text();
+          console.log(result);
+        } catch (error) {
+          console.error(error);
+        }
+      }
+    },
+  });
 
   // const handleRecordingButtonClick = async () => {
   //   if (!roomId) {
@@ -101,6 +138,35 @@ const BottomBar: React.FC<BottomBarProps> = () => {
   //   }
   // };
 
+  const handleStopRecording = async () => {
+    if (!roomId) {
+      console.error("roomId is undefined");
+      return;
+    }
+
+    try {
+      const status = await fetch(`/api/stopRecording/${roomId}`);
+
+      if (!status.ok) {
+        console.error(`Request failed with status: ${status.status}`);
+        toast.error("Failed to stop recording");
+        return;
+      }
+
+      setIsRecording(false);
+      toast.success("Recording stopped");
+
+      // // Fetch the recordings
+      // const recordingsResponse = await fetch(`/api/recordings/${roomId}`);
+      // const recordingsData = await recordingsResponse.json();
+      // console.log("Recordings:", recordingsData);
+      // // Now you can use the recordingsData in your frontend as needed
+    } catch (error) {
+      console.error("Error during stop recording:", error);
+      toast.error("Error during stop recording");
+    }
+  };
+
   const [hasNewMessages, setHasNewMessages] = useState<boolean>(false);
 
   const handleNewMessageReceived = () => {
@@ -115,8 +181,6 @@ const BottomBar: React.FC<BottomBarProps> = () => {
 
   const startRecordingAutomatically = async () => {
     try {
-      // Check if it's the host
-
       const status = await fetch(`/api/startRecording/${params.roomId}`);
       if (!status.ok) {
         console.error(`Request failed with status: ${status.status}`);
@@ -132,6 +196,13 @@ const BottomBar: React.FC<BottomBarProps> = () => {
   };
 
   const handleEndCall = async (endMeet: string) => {
+    // Check if the user is the host
+    if (role !== "host") {
+      return; // Do not proceed with API calls if not the host
+    }
+    await handleStopRecording();
+
+    console.log("s3URL in handleEndCall", s3URL);
     toast("Meeting Ended");
     if (endMeet === "leave") {
       leaveRoom();
@@ -139,11 +210,6 @@ const BottomBar: React.FC<BottomBarProps> = () => {
       closeRoom();
     } else {
       return;
-    }
-
-    // Check if the user is the host
-    if (role !== "host") {
-      return; // Do not proceed with API calls if not the host
     }
 
     let meetingType;
@@ -156,15 +222,6 @@ const BottomBar: React.FC<BottomBarProps> = () => {
     }
 
     try {
-      const response = await fetch(`/api/stopRecording/${roomId}`);
-      if (!response.ok) {
-        console.error("Failed to fetch recordings data");
-        return;
-      }
-      const recordingsData = await response.json();
-      console.log("Recordings:", recordingsData);
-      toast.success("Recording stopped");
-
       const requestOptions = {
         method: "POST",
         headers: {
@@ -173,9 +230,9 @@ const BottomBar: React.FC<BottomBarProps> = () => {
         body: JSON.stringify({
           roomId: roomId,
           meetingType: meetingType,
-          video_uri: recordingsData,
         }),
       };
+      console.log("req optionnnn", requestOptions);
 
       const response2 = await fetch("/api/end-call", requestOptions);
       const result = await response2.text();
