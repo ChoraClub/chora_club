@@ -17,6 +17,7 @@ import {
   useDisclosure,
 } from "@nextui-org/react";
 import styles from "./Tile.module.css";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 interface Type {
   img: StaticImageData;
@@ -47,6 +48,8 @@ function Tile({
   isEvent,
   isOfficeHour,
 }: TileProps) {
+  const router = useRouter();
+  const path = usePathname();
   const { address } = useAccount();
   const [selectedTileIndex, setSelectedTileIndex] = useState<number | null>(
     null
@@ -88,7 +91,8 @@ function Tile({
                 isEvent === "Recorded" ? "cursor-pointer" : ""
               }`}
               style={{ boxShadow: "0px 4px 26.7px 0px rgba(0, 0, 0, 0.10)" }}
-              onClick={() => openModal(index)}
+              // onClick={() => openModal(index)}
+              onClick={() => router.push(`/watch/${data.meetingId}`)}
             >
               <div className="flex">
                 <Image

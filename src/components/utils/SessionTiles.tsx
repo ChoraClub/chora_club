@@ -3,6 +3,7 @@ import Image, { StaticImageData } from "next/image";
 import { Oval } from "react-loader-spinner";
 import text2 from "@/assets/images/daos/texture2.png";
 import IndividualSessionTileModal from "./IndividualSessionTileModal";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 interface Type {
   img: StaticImageData;
@@ -33,6 +34,8 @@ function SessionTile({
   isOfficeHour,
 }: // query,
 TileProps) {
+  const router = useRouter();
+  const path = usePathname();
   const [selectedTileIndex, setSelectedTileIndex] = useState<number | null>(
     null
   );
@@ -65,7 +68,7 @@ TileProps) {
             className="flex p-5 rounded-[2rem] cursor-pointer"
             style={{ boxShadow: "0px 4px 26.7px 0px rgba(0, 0, 0, 0.10)" }}
             // onClick={() => openModal(index)}
-            onClick={() => console.log(data.meetingId)}
+            onClick={() => router.push(`/watch/${data.meetingId}`)}
           >
             <Image
               src={text2}
