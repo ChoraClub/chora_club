@@ -170,7 +170,6 @@ const BottomBar: React.FC<BottomBarProps> = () => {
     }
   };
 
-
   useEffect(() => {
     if (role === "host") {
       startRecordingAutomatically();
@@ -319,36 +318,42 @@ const BottomBar: React.FC<BottomBarProps> = () => {
                 <div className="arrow-up"></div>
                 <a
                   href="https://forum.arbitrum.foundation"
+                  target="_blank"
                   className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
                 >
                   Forum
                 </a>
                 <a
                   href="https://arbitrum.io"
+                  target="_blank"
                   className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
                 >
                   Website
                 </a>
                 <a
                   href="https://arbitrum.foundation"
+                  target="_blank"
                   className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
                 >
                   Arbitrum Foundation Website
                 </a>
                 <a
                   href="https://arbiscan.io"
+                  target="_blank"
                   className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
                 >
                   Block Explorer
                 </a>
                 <a
                   href="https://twitter.com/arbitrum"
+                  target="_blank"
                   className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
                 >
                   Arbitrum Twitter Profile
                 </a>
                 <a
                   href="https://twitter.com/DAO_Arbitrum"
+                  target="_blank"
                   className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
                 >
                   Arbitrum DAO Twitter Profile
@@ -360,30 +365,35 @@ const BottomBar: React.FC<BottomBarProps> = () => {
                 <div className="arrow-up"></div>
                 <a
                   href="https://gov.optimism.io/"
+                  target="_blank"
                   className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
                 >
                   Forum
                 </a>
                 <a
                   href="https://optimism.io/"
+                  target="_blank"
                   className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
                 >
                   Website
                 </a>
                 <a
                   href="https://optimistic.etherscan.io/"
+                  target="_blank"
                   className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
                 >
                   Block Explorer
                 </a>
                 <a
                   href="https://twitter.com/Optimism"
+                  target="_blank"
                   className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
                 >
                   Optimism Twitter Profile
                 </a>
                 <a
                   href="https://twitter.com/OptimismGov"
+                  target="_blank"
                   className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
                 >
                   Optimism DAO Twitter Profile

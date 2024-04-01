@@ -64,11 +64,7 @@ function WatchComponentMain({ props }: { props: { id: string } }) {
           <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
             <div className="sm:flex sm:items-start">
               <div className="sm:w-3/5 mx-auto flex items-center justify-center bg-blue-100 rounded-lg">
-                <video
-                  controls
-                  className="h-full w-full"
-                  src={data?.video_uri?.video_uri}
-                >
+                <video controls className="h-full w-full" src={data?.video_uri}>
                   Your browser does not support the video tag.
                 </video>
               </div>
