@@ -238,8 +238,6 @@ const BottomBar: React.FC<BottomBarProps> = () => {
     }
   };
 
-  console.log("has message: ", newMessage);
-
   return (
     <div className="w-full flex items-center px-10 justify-between pb-6 font-poppins">
       {/* Bottom Bar Left */}

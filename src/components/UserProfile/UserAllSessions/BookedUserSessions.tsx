@@ -44,13 +44,23 @@ function BookedUserSessions() {
       // console.log("result in get meeting", result);
       let filteredData: any = result.data;
       if (result.success) {
+        const currentTime = new Date();
+        const currentSlot = new Date(currentTime.getTime() + 60 * 60 * 1000);
         if (chain?.name === "Optimism") {
           filteredData = result.data.filter(
-            (session: Session) => session.dao_name === "optimism"
+            (session: Session) =>
+              session.dao_name === "optimism" &&
+              session.meeting_status !== "Recorded" &&
+              new Date(session.slot_time).toLocaleString() <
+                currentSlot.toLocaleString()
           );
         } else if (chain?.name === "Arbitrum One") {
           filteredData = result.data.filter(
-            (session: Session) => session.dao_name === "arbitrum"
+            (session: Session) =>
+              session.dao_name === "arbitrum" &&
+              session.meeting_status !== "Recorded" &&
+              new Date(session.slot_time).toLocaleString() <
+                currentSlot.toLocaleString()
           );
         }
         setSessionDetails(filteredData);

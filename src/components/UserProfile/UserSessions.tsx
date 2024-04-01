@@ -18,6 +18,11 @@ interface UserSessionsProps {
   selfDelegate: boolean;
 }
 
+type Attendee = {
+  attendee_address: string;
+  attendee_uid?: string; // Making attendee_uid optional
+};
+
 interface Session {
   booking_status: string;
   dao_name: string;
@@ -28,7 +33,7 @@ interface Session {
   meeting_status: "Upcoming" | "Recorded" | "Denied";
   slot_time: string;
   title: string;
-  user_address: string;
+  attendees: Attendee[];
   _id: string;
 }
 
@@ -62,7 +67,10 @@ function UserSessions({ isDelegate, selfDelegate }: UserSessionsProps) {
         }),
       });
 
+      console.log("Response", response);
+
       const result = await response.json();
+      console.log("Result", result);
       // console.log("result in get session data", result);
       if (result.success) {
         // setSessionDetails(result.data);
@@ -87,7 +95,9 @@ function UserSessions({ isDelegate, selfDelegate }: UserSessionsProps) {
             filteredData = resultData.filter((session: Session) => {
               return (
                 session.meeting_status === "Recorded" &&
-                session.user_address === address
+                session.attendees?.some(
+                  (attendee) => attendee.attendee_address === address
+                )
               );
             });
             setSessionDetails(filteredData);
@@ -164,7 +174,7 @@ function UserSessions({ isDelegate, selfDelegate }: UserSessionsProps) {
           >
             Attending
           </button>
-          {(selfDelegate === true || isDelegate === false) && (
+          {(selfDelegate === true || isDelegate === true) && (
             <button
               className={`py-2 ${
                 searchParams.get("session") === "hosted"
@@ -202,7 +212,7 @@ function UserSessions({ isDelegate, selfDelegate }: UserSessionsProps) {
           {searchParams.get("session") === "attending" && (
             <AttendingUserSessions />
           )}
-          {(selfDelegate === true || isDelegate === false) &&
+          {(selfDelegate === true || isDelegate === true) &&
             searchParams.get("session") === "hosted" &&
             (dataLoading ? (
               <div className="flex items-center justify-center">

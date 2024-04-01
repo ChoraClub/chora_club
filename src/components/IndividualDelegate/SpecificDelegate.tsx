@@ -195,7 +195,6 @@ function SpecificDelegate({ props }: { props: Type }) {
     }
     
   };
-
   return (
     <>
       {isPageLoading && (

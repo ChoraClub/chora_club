@@ -23,6 +23,7 @@ import { Role } from "@huddle01/server-sdk/auth";
 import Chat from "@/components/Chat/Chat";
 import { useAccount } from "wagmi";
 import AttestationModal from "@/components/utils/AttestationModal";
+import { Oval, TailSpin } from "react-loader-spinner";
 
 // import Chat from '@/components/Chat/Chat';
 
@@ -71,8 +72,67 @@ const Home = ({ params }: { params: { roomId: string } }) => {
 
   const { address } = useAccount();
 
+  const [isAllowToEnter, setIsAllowToEnter] = useState<boolean>();
+  const [notAllowedMessage, setNotAllowedMessage] = useState<string>();
+
   useEffect(() => {
-    if (state === "idle") {
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+
+    const raw = JSON.stringify({
+      roomId: params.roomId,
+      meetingType: "session",
+    });
+
+    const requestOptions: any = {
+      method: "POST",
+      headers: myHeaders,
+      body: raw,
+      redirect: "follow",
+    };
+
+    async function verifyMeetingId() {
+      try {
+        const response = await fetch("/api/verify-meeting-id", requestOptions);
+        const data = await response.json();
+
+        if (data.success) {
+          if (data.message === "Meeting has ended") {
+            console.log("Meeting has ended");
+            setIsAllowToEnter(false);
+            setNotAllowedMessage(data.message);
+          } else if (data.message === "Meeting is upcoming") {
+            console.log("Meeting is upcoming");
+            setIsAllowToEnter(true);
+          } else if (data.message === "Meeting has been denied") {
+            console.log("Meeting has been denied");
+            setIsAllowToEnter(false);
+            setNotAllowedMessage(data.message);
+          } else if (data.message === "Meeting does not exist") {
+            setIsAllowToEnter(false);
+            setNotAllowedMessage(data.message);
+            console.log("Meeting does not exist");
+          } else if (data.message === "Meeting is ongoing") {
+            setIsAllowToEnter(true);
+            console.log("Meeting is ongoing");
+          }
+        } else {
+          // Handle error scenarios
+          setNotAllowedMessage(data.error || data.message);
+          console.error("Error:", data.error || data.message);
+        }
+      } catch (error) {
+        // Handle network errors
+        console.error("Fetch error:", error);
+      }
+    }
+
+    verifyMeetingId();
+  }, [params.roomId, isAllowToEnter, notAllowedMessage]);
+
+  useEffect(() => {
+    if (state === "idle" && isAllowToEnter) {
+      console.log(`pushing to /meeting/session/${params.roomId}/lobby`);
       push(`/meeting/session/${params.roomId}/lobby`);
       return;
     } else {
@@ -81,8 +141,45 @@ const Home = ({ params }: { params: { roomId: string } }) => {
         avatarUrl: avatarUrl,
         isHandRaised: metadata?.isHandRaised || false,
       });
+
+      if (role === "listener" || role === "speaker") {
+        // Get the attendee address based on the role
+        const attendeeAddress = role === "listener" ? address : peerId;
+        let uniqueAddresses = new Set();
+        let attendees = [];
+
+        if (!uniqueAddresses.has(attendeeAddress)) {
+          // Add the address to the set of unique addresses
+          uniqueAddresses.add(attendeeAddress);
+
+          // Construct the request body
+
+          // Add the attendee dynamically one by one
+          attendees.push({
+            attendee_address: attendeeAddress,
+          });
+        }
+
+        console.log("All attendees: ", attendees);
+
+        const raw = JSON.stringify({
+          meetingId: params.roomId,
+          attendees: attendees,
+        });
+
+        // Make the API request
+        const requestOptions = {
+          method: "PUT",
+          body: raw,
+        };
+
+        fetch("/api/update-session-attendees", requestOptions)
+          .then((response) => response.text())
+          .then((result) => console.log(result))
+          .catch((error) => console.error(error));
+      }
     }
-  }, []);
+  }, [isAllowToEnter]);
 
   useDataMessage({
     onMessage(payload, from, label) {
@@ -114,24 +211,74 @@ const Home = ({ params }: { params: { roomId: string } }) => {
   }, [requestedPeers]);
 
   return (
-    <section className="bg-white flex h-screen text-slate-100 flex-col justify-between overflow-hidden">
-      <div className="flex w-full h-[90%] pb-4">
-        <GridLayout />
-        <Sidebar />
-        <div className="absolute right-4 bottom-20">
-          {Role.HOST
-            ? showAcceptRequest && <AcceptRequest peerId={requestedPeerId} />
-            : null}
-        </div>
-        {isChatOpen && <Chat />}
-      </div>
+    <>
+      {isAllowToEnter ? (
+        <section className="bg-white flex h-screen text-slate-100 flex-col justify-between overflow-hidden">
+          <div className="flex w-full h-[90%] pb-4">
+            <GridLayout />
+            <Sidebar />
+            <div className="absolute right-4 bottom-20">
+              {Role.HOST
+                ? showAcceptRequest && (
+                    <AcceptRequest peerId={requestedPeerId} />
+                  )
+                : null}
+            </div>
+            {isChatOpen && <Chat />}
+          </div>
 
-      <BottomBar />
-      <Prompts />
-      {modalOpen && (
-        <AttestationModal isOpen={modalOpen} onClose={handleModalClose} />
+          <BottomBar />
+          <Prompts />
+          {modalOpen && (
+            <AttestationModal isOpen={modalOpen} onClose={handleModalClose} />
+          )}
+        </section>
+      ) : (
+        <>
+          {notAllowedMessage ? (
+            <div className="flex justify-center items-center h-screen">
+              <div className="text-center">
+                <div className="text-6xl mb-6">☹️</div>
+                <div className="text-lg font-semibold mb-8">
+                  Oops, {notAllowedMessage}
+                </div>
+                <button
+                  onClick={() => push(`/profile/${address}?active=info`)}
+                  className="px-6 py-3 bg-white text-indigo-600 rounded-full shadow-lg hover:bg-indigo-600 hover:text-white transition duration-300 ease-in-out"
+                >
+                  Back to Profile
+                </button>
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className="flex justify-center items-center h-screen">
+                <div className="text-center">
+                  <div className="flex items-center justify-center pt-10">
+                    <TailSpin
+                      // visible={true}
+                      // height="40"
+                      // width="40"
+                      // color="#0500FF"
+                      // secondaryColor="#cdccff"
+                      // ariaLabel="oval-loading"
+                      visible={true}
+                      height="80"
+                      width="80"
+                      color="#0500FF"
+                      ariaLabel="tail-spin-loading"
+                      radius="1"
+                      wrapperStyle={{}}
+                      wrapperClass=""
+                    />
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+        </>
       )}
-    </section>
+    </>
   );
 };
 export default Home;

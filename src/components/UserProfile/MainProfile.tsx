@@ -37,11 +37,15 @@ import dao_abi from "../../artifacts/Dao.sol/GovernanceToken.json";
 import axios from "axios";
 import { Oval } from "react-loader-spinner";
 import lighthouse from "@lighthouse-web3/sdk";
+import InstantMeet from "./InstantMeet";
+import { useSession } from "next-auth/react";
+import { useConnectModal } from "@rainbow-me/rainbowkit";
 
 function MainProfile() {
-  const { address } = useAccount();
-  console.log(address);
+  const { isConnected, address } = useAccount();
   // const address = "0x5e349eca2dc61abcd9dd99ce94d04136151a09ee";
+  const { data: session, status } = useSession();
+  const { openConnectModal } = useConnectModal();
   const { publicClient, walletClient } = WalletAndPublicClient();
   const { chain, chains } = useNetwork();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -74,6 +78,18 @@ function MainProfile() {
     total: any;
     uploaded: any;
   }
+
+  useEffect(() => {
+    if (isConnected && session) {
+      router.replace(`/profile/${address}?active=info`);
+    } else {
+      if (openConnectModal) {
+        openConnectModal();
+      } else {
+        console.error("openConnectModal is not defined");
+      }
+    }
+  }, [isConnected, address, router, session]);
 
   const uploadImage = async (selectedFile: any) => {
     const progressCallback = async (progressData: any) => {
@@ -154,15 +170,18 @@ function MainProfile() {
           ? "0x912CE59144191C1204E64559FE8253a0e49E6548"
           : "";
       console.log(walletClient);
-      const delegateTx = await publicClient.readContract({
-        address: contractAddress,
-        abi: dao_abi.abi,
-        functionName: "delegates",
-        args: [address],
-        // account: address1,
-      });
-      console.log("Delegate tx", delegateTx);
-      delegateTxAddr = delegateTx;
+      let delegateTx;
+      if (address) {
+        delegateTx = await publicClient.readContract({
+          address: contractAddress,
+          abi: dao_abi.abi,
+          functionName: "delegates",
+          args: [address],
+          // account: address1,
+        });
+        console.log("Delegate tx", delegateTx);
+        delegateTxAddr = delegateTx;
+      }
 
       if (delegateTxAddr.toLowerCase() === address?.toLowerCase()) {
         console.log("Delegate comparison: ", delegateTx, address);
@@ -170,7 +189,7 @@ function MainProfile() {
       }
     };
     checkDelegateStatus();
-  }, []);
+  }, [address]);
 
   // Pass the address of whom you want to delegate the voting power to
   const handleDelegateVotes = async (to: string) => {
@@ -962,6 +981,19 @@ function MainProfile() {
             >
               Office Hours
             </button>
+
+            {(selfDelegate === true || isDelegate === false) && (
+              <button
+                className={`border-b-2 py-4 px-2 outline-none ${
+                  searchParams.get("active") === "instant-meet"
+                    ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
+                    : "border-transparent"
+                }`}
+                onClick={() => router.push(path + "?active=instant-meet")}
+              >
+                Instant Meet
+              </button>
+            )}
             {/* <button
           className={`border-b-2 py-4 px-2 outline-none ${
             searchParams.get("active") === "claimNft"
@@ -1006,6 +1038,14 @@ function MainProfile() {
             )}
             {searchParams.get("active") === "officeHours" ? (
               <UserOfficeHours
+                isDelegate={isDelegate}
+                selfDelegate={selfDelegate}
+              />
+            ) : (
+              ""
+            )}
+            {searchParams.get("active") === "instant-meet" ? (
+              <InstantMeet
                 isDelegate={isDelegate}
                 selfDelegate={selfDelegate}
               />

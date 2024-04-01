@@ -2,10 +2,15 @@ import { MongoClient, MongoClientOptions } from "mongodb";
 import { NextApiRequest, NextApiResponse } from "next";
 import { NextResponse, NextRequest } from "next/server";
 
+type Attendee = {
+  attendee_address: string;
+  attendee_uid?: string; // Making attendee_uid optional
+};
+
 // Define the request body type
 interface MeetingRequestBody {
   host_address: string;
-  user_address: string;
+  attendees: Attendee[];
   slot_time: string;
   meetingId: string;
   meeting_status: boolean;
@@ -14,6 +19,7 @@ interface MeetingRequestBody {
   dao_name: string;
   title: string;
   description: string;
+  session_type: string;
 }
 
 // Define the response body type
@@ -22,7 +28,7 @@ interface MeetingResponseBody {
   data?: {
     id: string;
     host_address: string;
-    user_address: string;
+    attendees: Attendee[];
     slot_time: string;
     meetingId: string;
     meeting_status: boolean;
@@ -31,6 +37,7 @@ interface MeetingResponseBody {
     dao_name: string;
     title: string;
     description: string;
+    session_type: string;
   } | null;
   error?: string;
 }
@@ -41,7 +48,7 @@ export async function POST(
 ) {
   const {
     host_address,
-    user_address,
+    attendees,
     slot_time,
     meetingId,
     meeting_status,
@@ -50,6 +57,7 @@ export async function POST(
     dao_name,
     title,
     description,
+    session_type,
   }: MeetingRequestBody = await req.json();
 
   try {
@@ -68,7 +76,7 @@ export async function POST(
     // console.log("Inserting meeting document...");
     const result = await collection.insertOne({
       host_address,
-      user_address,
+      attendees,
       slot_time,
       meetingId,
       meeting_status,
@@ -77,6 +85,7 @@ export async function POST(
       dao_name,
       title,
       description,
+      session_type,
     });
     // console.log("Meeting document inserted:", result);
 

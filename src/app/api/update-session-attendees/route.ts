@@ -13,7 +13,6 @@ interface AddAttendeeRequestBody {
   attendees: Attendee[]; // Array of attendees
 }
 
-
 export async function PUT(req: NextRequest, res: NextResponse) {
   const { meetingId, attendees }: AddAttendeeRequestBody = await req.json();
 
@@ -25,9 +24,9 @@ export async function PUT(req: NextRequest, res: NextResponse) {
     console.log("Connected to MongoDB");
 
     const db = client.db();
-    const collection = db.collection("office_hours");
+    const collection = db.collection("meetings");
 
-    console.log("Fetching office hours document by meeting ID...");
+    console.log("Fetching session document by meeting ID...");
     const existingDocument = await collection.findOne({
       meetingId: meetingId,
     });
@@ -69,7 +68,7 @@ export async function PUT(req: NextRequest, res: NextResponse) {
       console.log("No unique attendees to add");
     }
 
-    // console.log("Updating office hours document with attendees...");
+    // console.log("Updating session document with attendees...");
     // const updatedDocument = await collection.updateOne(
     //   { meetingId },
     //   { $push: { attendees: { $each: attendees } } } // Use $push operator to add attendees to the array

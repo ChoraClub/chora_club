@@ -31,6 +31,7 @@
     "pino-pretty": "^10.3.1",
     "react": "^18.2.0",
     "react-chartjs-2": "^5.2.0",
+    "react-confetti": "^6.1.0",
     "react-copy-to-clipboard": "^5.1.0",
     "react-datepicker": "^6.1.0",
     "react-datetime": "^3.2.0",
