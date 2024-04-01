@@ -256,7 +256,7 @@ const Home = ({ params }: { params: { roomId: string } }) => {
                 : null}
             </div>
             {isChatOpen && <Chat />}
-            {meetingDetailsVisible && (
+            {/* {meetingDetailsVisible && (
               <div className="absolute bottom-20 bg-white shadow-md p-4 rounded-lg text-black">
                 <div className="flex justify-between items-center mb-2">
                   <h3 className="text-lg font-semibold">
@@ -288,7 +288,7 @@ const Home = ({ params }: { params: { roomId: string } }) => {
 
                 <div className="text-sm py-2">Joined in as {address}</div>
               </div>
-            )}
+            )} */}
           </div>
 
           <BottomBar />
