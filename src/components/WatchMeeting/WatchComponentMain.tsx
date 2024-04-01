@@ -38,12 +38,24 @@ function WatchComponentMain({ props }: { props: { id: string } }) {
     fetchData();
   }, [props.id]);
 
+  function utcToLocal(utcDateString: any) {
+    // Create a Date object from the UTC string
+    const utcDate = new Date(utcDateString);
+
+    // Get the local date and time components
+    const localDate = utcDate.toLocaleDateString();
+    const localTime = utcDate.toLocaleTimeString();
+
+    // Combine and return the formatted local date and time
+    return `${localDate} ${localTime}`;
+  }
+
   return (
     <>
       {data ? (
         <div
           ref={modalRef}
-          className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full"
+          className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden  transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full"
           style={{
             maxWidth: "calc(95% + 50px)",
             maxHeight: "calc(80% + 50px)",
@@ -79,8 +91,8 @@ function WatchComponentMain({ props }: { props: { id: string } }) {
               <table className="table-auto w-full">
                 <tbody>
                   <tr>
-                    <td className="font-semibold pr-4">DAO Name:</td>
-                    <td>{data.dao_name}</td>
+                    <td className="font-semibold pr-4 ">DAO Name:</td>
+                    <td className="capitalize">{data.dao_name}</td>
                   </tr>
                   <tr>
                     <td className="font-semibold pr-4">Host:</td>
@@ -135,8 +147,8 @@ function WatchComponentMain({ props }: { props: { id: string } }) {
                     <td className="font-semibold pr-4">Date:</td>
                     <td>
                       {collection === "office_hours"
-                        ? data.office_hours_slot
-                        : data.slot_time}
+                        ? utcToLocal(data.office_hours_slot)
+                        : utcToLocal(data.slot_time)}
                     </td>
                   </tr>
                 </tbody>

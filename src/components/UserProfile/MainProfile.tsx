@@ -217,25 +217,29 @@ function MainProfile() {
 
   // Pass the address of whom you want to delegate the voting power to
   const handleDelegateVotes = async (to: string) => {
-    const addr = await walletClient.getAddresses();
-    const address1 = addr[0];
+    try {
+      const addr = await walletClient.getAddresses();
+      const address1 = addr[0];
 
-    const contractAddress =
-      chain?.name === "Optimism"
-        ? "0x4200000000000000000000000000000000000042"
-        : chain?.name === "Arbitrum One"
-        ? "0x912CE59144191C1204E64559FE8253a0e49E6548"
-        : "";
-    console.log("Contract", contractAddress);
-    console.log("Wallet Client", walletClient);
-    const delegateTx = await walletClient.writeContract({
-      address: contractAddress,
-      abi: dao_abi.abi,
-      functionName: "delegate",
-      args: [to],
-      account: address1,
-    });
-    console.log(delegateTx);
+      const contractAddress =
+        chain?.name === "Optimism"
+          ? "0x4200000000000000000000000000000000000042"
+          : chain?.name === "Arbitrum One"
+          ? "0x912CE59144191C1204E64559FE8253a0e49E6548"
+          : "";
+      console.log("Contract", contractAddress);
+      console.log("Wallet Client", walletClient);
+      const delegateTx = await walletClient.writeContract({
+        address: contractAddress,
+        abi: dao_abi.abi,
+        functionName: "delegate",
+        args: [to],
+        account: address1,
+      });
+      console.log(delegateTx);
+    } catch (error) {
+      console.log("Error:", error);
+    }
   };
 
   // useEffect(()=>{
