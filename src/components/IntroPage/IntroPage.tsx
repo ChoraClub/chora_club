@@ -12,7 +12,7 @@ const IntroPage: React.FC<LobbyPageProps> = ({ roomId }) => {
 
   console.log("roomid from mainIntro", roomId);
   useEffect(() => {
-    push(`/meeting/officehours/${roomId}/lobby`);
+    push(`/meeting/session/${roomId}/lobby`);
   }, []);
 
   return null;

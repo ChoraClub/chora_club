@@ -67,11 +67,11 @@ const LocalGridCard: FC = () => {
 
   return (
     <div
-      className={`flex h-full w-full justify-between rounded-xl text-white p-6 gap-6 ${
+      className={`flex h-full w-full justify-between rounded-xl text-white p-4 gap-6 ${
         role && ["host", "coHost", "speaker"].includes(role) ? "" : ""
       }`}
     >
-      {(!stream || !shareStream) && (
+      {!stream && (
         <div className="flex flex-col items-center justify-center bg-slate-100 py-5 px-10 rounded-xl w-full">
           <div className="relative flex flex-col items-center justify-center">
             <Image
@@ -84,7 +84,7 @@ const LocalGridCard: FC = () => {
               className="maskAvatar"
             />
 
-            <div className="absolute left-1/2 bottom-1/2 -translate-x-1/2 mb-2 text-4xl z-10">
+            <div className="absolute left-1/2 -translate-x-1/2 mb-2 text-4xl z-10">
               {reaction}
             </div>
 
@@ -102,46 +102,49 @@ const LocalGridCard: FC = () => {
             <div className="text-gray-700 text-base font-medium">
               {`${metadata?.displayName} (You)`}
             </div>
-            <div className="text-gray-500 text-sm font-normal">{role}</div>
+            {/* <div className="text-gray-500 text-sm font-normal">{role}</div> */}
           </div>
         </div>
       )}
 
-      {shareStream ? (
-        <div className="grid grid-cols-2 gap-4 h-full justify-center items-center">
-          {stream && (
-            <div className="col-span-1 w-full h-full">
-              <video
-                ref={videoRef}
-                className="rounded-xl w-full h-full"
-                autoPlay
-              />
-            </div>
-          )}
+      <div>
+        {shareStream ? (
+          <div className="grid grid-cols-2 h-full justify-center items-center">
+            {stream && (
+              <div className="col-span-1 w-full h-full">
+                <video
+                  ref={videoRef}
+                  className="rounded-xl w-full h-full"
+                  autoPlay
+                />
+              </div>
+            )}
 
-          <div className={stream ? "col-span-1" : "col-span-2"}>
-            <video
-              className="aspect-video w-full h-full"
-              ref={(screenShareRef) =>
-                screenShareRef && (screenShareRef.srcObject = shareStream)
-              }
-              autoPlay
-            />
-          </div>
-        </div>
-      ) : (
-        <div className="grid grid-cols-2 h-full justify-center items-center">
-          {stream && (
-            <div className="col-span-2 h-full w-full">
+            <div className={stream ? "col-span-1" : "col-span-2"}>
               <video
-                ref={videoRef}
                 className="aspect-video w-full h-full"
+                ref={(screenShareRef) =>
+                  screenShareRef && (screenShareRef.srcObject = shareStream)
+                }
                 autoPlay
               />
             </div>
-          )}
-        </div>
-      )}
+          </div>
+        ) : (
+          <div className="flex grid-cols-2 justify-center items-center">
+            {/* <div className="w-full h-full"></div> */}
+            {stream && (
+              <div className="col-span-2 h-full w-[60%]">
+                <video
+                  ref={videoRef}
+                  className="aspect-video w-full h-full"
+                  autoPlay
+                />
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

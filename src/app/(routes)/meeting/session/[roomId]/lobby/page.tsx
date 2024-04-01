@@ -23,11 +23,12 @@ import {
   usePeerIds,
   useRoom,
 } from "@huddle01/react/hooks";
-import { useAccount } from "wagmi";
+import { useAccount, useNetwork } from "wagmi";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { Role } from "@huddle01/server-sdk/auth";
 import { Oval, TailSpin } from "react-loader-spinner";
 import Link from "next/link";
+import { RxCross2 } from "react-icons/rx";
 
 type lobbyProps = {};
 
@@ -48,8 +49,13 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
   }>();
 
   const { address, isDisconnected } = useAccount();
+  const [isLoading, setIsLoading] = useState(true);
 
   const { push } = useRouter();
+  const { chain, chains } = useNetwork();
+  const [profileDetails, setProfileDetails] = useState<any>();
+
+  const [popupVisibility, setPopupVisibility] = useState(true);
 
   // Huddle Hooks
   const { joinRoom, state, room } = useRoom();
@@ -57,79 +63,74 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
   const [notAllowedMessage, setNotAllowedMessage] = useState<string>();
 
   const handleStartSpaces = async () => {
+    console.log("in start spaces");
     if (isDisconnected) {
       toast("Connect your wallet to join the meeting!");
     } else {
-      if (userDisplayName.length === 0) {
-        toast.error("Display name is required!");
-        setIsJoining(false);
-        return;
-      } else {
-        setIsJoining(true);
+      setIsJoining(true);
 
-        let token = "";
-        if (state !== "connected") {
-          const requestBody = {
-            roomId: params.roomId,
-            role: "host",
-            displayName: address,
-            address: address, // assuming you have userAddress defined somewhere
-          };
-          try {
-            const response = await fetch("/api/new-token", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(requestBody),
-            });
-
-            // if (!response.ok) {
-            //   throw new Error("Failed to fetch token");
-            // }
-
-            token = await response.text(); // Change this line
-            // console.log("Token fetched successfully:", token);
-          } catch (error) {
-            console.error("Error fetching token:", error);
-            // Handle error appropriately, e.g., show error message to user
-            toast.error("Failed to fetch token");
-            setIsJoining(false);
-            return;
-          }
-        }
-
+      let token = "";
+      if (state !== "connected") {
+        const requestBody = {
+          roomId: params.roomId,
+          role: "host",
+          displayName: address,
+          address: address, // assuming you have userAddress defined somewhere
+        };
         try {
-          console.log({ token });
-          console.log(params.roomId);
-          await joinRoom({
-            roomId: params.roomId,
-            token,
+          const response = await fetch("/api/new-token", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(requestBody),
           });
+
+          // if (!response.ok) {
+          //   throw new Error("Failed to fetch token");
+          // }
+
+          token = await response.text(); // Change this line
+          // console.log("Token fetched successfully:", token);
         } catch (error) {
-          console.error("Error joining room:", error);
+          console.error("Error fetching token:", error);
           // Handle error appropriately, e.g., show error message to user
-          toast.error("Failed to join room");
+          toast.error("Failed to fetch token");
+          setIsJoining(false);
+          return;
         }
-
-        console.log("Role.HOST", Role.HOST);
-        if (Role.HOST) {
-          console.log("inside put api");
-          const response = await fetch(
-            `/api/update-meeting-status/${params.roomId}`,
-            {
-              method: "PUT",
-              headers: {
-                "Content-Type": "application/json",
-              },
-            }
-          );
-          const responseData = await response.json();
-          console.log("responseData: ", responseData);
-        }
-
-        setIsJoining(false);
       }
+
+      try {
+        console.log({ token });
+        console.log(params.roomId);
+        await joinRoom({
+          roomId: params.roomId,
+          token,
+        });
+      } catch (error) {
+        console.error("Error joining room:", error);
+        // Handle error appropriately, e.g., show error message to user
+        toast.error("Failed to join room");
+      }
+
+      console.log("Role.HOST", Role.HOST);
+      if (Role.HOST) {
+        console.log("inside put api");
+        const response = await fetch(
+          `/api/update-meeting-status/${params.roomId}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        const responseData = await response.json();
+        console.log("responseData: ", responseData);
+      }
+
+      setIsJoining(false);
     }
   };
 
@@ -194,10 +195,77 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
     verifyMeetingId();
   }, [params.roomId, isAllowToEnter, notAllowedMessage]);
 
+  useEffect(() => {
+    let dao = "";
+    if (chain && chain?.name === "Optimism") {
+      dao = "optimism";
+    } else if (chain && chain?.name === "Arbitrum One") {
+      dao = "arbitrum";
+    } else {
+      return;
+    }
+
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`/api/profile/${address}`, {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+        });
+        const result = await response.json();
+        const resultData = await result.data;
+
+        if (Array.isArray(resultData)) {
+          const filtered: any = resultData.filter((data) => {
+            return data.daoName === dao && data.displayName !== "";
+          });
+          console.log("filtered profile: ", filtered);
+          setProfileDetails(filtered[0]);
+          setIsLoading(false);
+          setUserDisplayName(filtered[0].displayName);
+        }
+
+        if (resultData.length === 0) {
+          const res = await fetch(
+            `https://api.karmahq.xyz/api/dao/find-delegate?dao=${dao}&user=${address}`
+          );
+          const result = await response.json();
+          const resultData = await result.data.delegate;
+
+          setProfileDetails(resultData);
+          setIsLoading(false);
+
+          if (resultData.ensName !== null) {
+            setUserDisplayName(resultData.ensName);
+          } else {
+            setUserDisplayName(formattedAddress);
+          }
+        }
+      } catch (error) {
+        console.log("Error in catch: ", error);
+      }
+    };
+    fetchData();
+  }, []);
+
+  const formattedAddress = address?.slice(0, 6) + "..." + address?.slice(-4);
+
   return (
     <>
       {isAllowToEnter ? (
         <main className="flex h-screen flex-col items-center justify-center bg-lobby text-slate-100 font-poppins">
+          {popupVisibility && (
+            <div className="relative bg-red-700 text-white flex justify-center items-center py-2 font-poppins w-1/2 mt-2 rounded-md">
+              <div className="">This meeting is being recorded.</div>
+              <div className="flex absolute right-2">
+                <button
+                  onClick={() => setPopupVisibility(false)}
+                  className="p-2 hover:bg-red-600 hover:rounded-full"
+                >
+                  <RxCross2 size={20} />
+                </button>
+              </div>
+            </div>
+          )}
           <div className="flex flex-col items-center justify-center gap-4 w-[26.25rem]">
             <div className="relative text-center flex items-center justify-center w-fit mx-auto">
               <Image
@@ -262,7 +330,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
             {isDisconnected ? <ConnectButton /> : null}
             <div className="flex items-center w-full flex-col">
               <div className="flex flex-col justify-center w-full gap-1 text-black">
-                Set a display name
+                Display name
                 <div className="flex w-full items-center rounded-[10px] border px-3 text-slate-300 outline-none border-zinc-800 backdrop-blur-[400px] focus-within:border-slate-600 gap-">
                   <div className="mr-2">
                     <Image
@@ -273,7 +341,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
                       height={30}
                     />
                   </div>
-                  <input
+                  {/* <input
                     value={userDisplayName}
                     onChange={(e) => {
                       setUserDisplayName(e.target.value);
@@ -281,7 +349,25 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
                     type="text"
                     placeholder="Enter your name"
                     className="flex-1 bg-transparent py-3 outline-none text-black"
-                  />
+                  /> */}
+                  <div className="flex-1 bg-transparent py-3 outline-none text-black">
+                    {isLoading ? (
+                      <div className="flex items-center justify-center">
+                        <Oval
+                          visible={true}
+                          height="20"
+                          width="20"
+                          color="#0500FF"
+                          secondaryColor="#cdccff"
+                          ariaLabel="oval-loading"
+                        />
+                      </div>
+                    ) : (
+                      profileDetails?.displayName ||
+                      profileDetails?.ensName ||
+                      formattedAddress
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

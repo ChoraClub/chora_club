@@ -23,6 +23,8 @@ import toast, { Toaster } from "react-hot-toast";
 import { useParams, usePathname } from "next/navigation";
 import axios from "axios";
 import { GoDotFill } from "react-icons/go";
+import { PiLinkSimpleBold } from "react-icons/pi";
+import { useNetwork } from "wagmi";
 
 type BottomBarProps = {};
 
@@ -99,6 +101,10 @@ const BottomBar: React.FC<BottomBarProps> = () => {
     },
   });
 
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  const { chain } = useNetwork();
+
   // const handleRecordingButtonClick = async () => {
   //   if (!roomId) {
   //     console.error("roomId is undefined");
@@ -164,11 +170,6 @@ const BottomBar: React.FC<BottomBarProps> = () => {
     }
   };
 
-  const [hasNewMessages, setHasNewMessages] = useState<boolean>(false);
-
-  const handleNewMessageReceived = () => {
-    setHasNewMessages(true);
-  };
 
   useEffect(() => {
     if (role === "host") {
@@ -296,40 +297,134 @@ const BottomBar: React.FC<BottomBarProps> = () => {
     <div className="w-full flex items-center px-10 justify-between pb-6 font-poppins">
       {/* Bottom Bar Left */}
       <div>
-        {role === "host" || role === "coHost" || role === "speaker" ? (
-          <div className="mr-auto flex items-center justify-between gap-3 w-44"></div>
+        {role === "host" ||
+        role === "coHost" ||
+        role === "speaker" ||
+        role === "listener" ? (
+          <div className="relative">
+            <div
+              className="mr-auto flex items-center gap-4 w-44 cursor-pointer"
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+            >
+              <div className="bg-blue-shade-200 p-2 rounded-lg">
+                <PiLinkSimpleBold
+                  className="text-white"
+                  size={24}
+                ></PiLinkSimpleBold>
+              </div>
+              <span className="text-gray-800">Quick Links</span>
+            </div>
+            {isDropdownOpen && chain?.name === "Arbitrum One" && (
+              <div className="absolute z-10 top-auto bottom-full left-0 mb-2 w-52 bg-white rounded-lg shadow-lg">
+                <div className="arrow-up"></div>
+                <a
+                  href="https://forum.arbitrum.foundation"
+                  className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
+                >
+                  Forum
+                </a>
+                <a
+                  href="https://arbitrum.io"
+                  className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
+                >
+                  Website
+                </a>
+                <a
+                  href="https://arbitrum.foundation"
+                  className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
+                >
+                  Arbitrum Foundation Website
+                </a>
+                <a
+                  href="https://arbiscan.io"
+                  className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
+                >
+                  Block Explorer
+                </a>
+                <a
+                  href="https://twitter.com/arbitrum"
+                  className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
+                >
+                  Arbitrum Twitter Profile
+                </a>
+                <a
+                  href="https://twitter.com/DAO_Arbitrum"
+                  className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
+                >
+                  Arbitrum DAO Twitter Profile
+                </a>
+              </div>
+            )}
+            {isDropdownOpen && chain?.name === "Optimism" && (
+              <div className="absolute z-10 top-auto bottom-full left-0 mb-2 w-52 bg-white rounded-lg shadow-lg">
+                <div className="arrow-up"></div>
+                <a
+                  href="https://gov.optimism.io/"
+                  className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
+                >
+                  Forum
+                </a>
+                <a
+                  href="https://optimism.io/"
+                  className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
+                >
+                  Website
+                </a>
+                <a
+                  href="https://optimistic.etherscan.io/"
+                  className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
+                >
+                  Block Explorer
+                </a>
+                <a
+                  href="https://twitter.com/Optimism"
+                  className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
+                >
+                  Optimism Twitter Profile
+                </a>
+                <a
+                  href="https://twitter.com/OptimismGov"
+                  className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
+                >
+                  Optimism DAO Twitter Profile
+                </a>
+              </div>
+            )}
+          </div>
         ) : (
-          <OutlineButton
-            className="mr-auto flex items-center justify-between gap-3"
-            onClick={() => setPromptView("request-to-speak")}
-          >
-            {BasicIcons.requestToSpeak}
-            <div className="text-black ">Request to speak</div>
-          </OutlineButton>
+          // <OutlineButton
+          //   className="mr-auto flex items-center justify-between gap-3"
+          //   onClick={() => setPromptView("request-to-speak")}
+          // >
+          //   {BasicIcons.requestToSpeak}
+          //   <div className="text-black ">Request to speak</div>
+          // </OutlineButton>
+          <></>
         )}
       </div>
 
       {/* Bottom Bar Center */}
       <div className="flex items-center gap-4">
-        {role !== "listener" &&
-          (!isAudioOn ? (
-            <button
-              onClick={() => {
-                enableAudio();
-              }}
-            >
-              {NestedBasicIcons.inactive.mic}
-            </button>
-          ) : (
-            <button
-              onClick={() => {
-                disableAudio();
-              }}
-            >
-              {NestedBasicIcons.active.mic}
-            </button>
-          ))}
-        {role === "host" &&
+        {!isAudioOn ? (
+          <button
+            onClick={() => {
+              enableAudio();
+            }}
+          >
+            {NestedBasicIcons.inactive.mic}
+          </button>
+        ) : (
+          <button
+            onClick={() => {
+              disableAudio();
+            }}
+          >
+            {NestedBasicIcons.active.mic}
+          </button>
+        )}
+        {(role === "host" ||
+          ((role === "listener" || role === "speaker") &&
+            meetingCategory === "session")) &&
           (!isVideoOn ? (
             <button
               className="rounded-lg inline-flex items-center"
@@ -351,7 +446,9 @@ const BottomBar: React.FC<BottomBarProps> = () => {
               {NestedBasicIcons.active.video}
             </button>
           ))}
-        {role === "host" &&
+        {(role === "host" ||
+          ((role === "listener" || role === "speaker") &&
+            meetingCategory === "session")) &&
           (!videoTrack ? (
             <button
               className=" rounded-lg inline-flex items-center"
@@ -417,6 +514,8 @@ const BottomBar: React.FC<BottomBarProps> = () => {
             />
           </Dropdown>
         </div>
+
+        <div></div>
       </div>
       <div className="flex items-center gap-4">
         {/* Bottom Bar Right */}
@@ -445,7 +544,6 @@ const BottomBar: React.FC<BottomBarProps> = () => {
             if (sidebarView !== "close") {
               setSidebarView("close");
             }
-            setHasNewMessages(false);
           }}
         >
           {BasicIcons.chat}

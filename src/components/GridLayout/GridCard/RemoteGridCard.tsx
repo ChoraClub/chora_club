@@ -80,9 +80,9 @@ const GridCard: React.FC<GridCardProps> = ({ peerId }) => {
     },
   });
   return (
-    <div className="flex w-full h-full justify-center items-center rounded-xl p-3 gap-4">
+    <div className="flex w-full h-full justify-center items-center rounded-xl p-4 gap-4">
       {!videoStream && (
-        <div className="mt-4 flex flex-col items-center bg-slate-100 w-full h-full justify-center py-4 px-7 rounded-xl">
+        <div className="flex flex-col items-center bg-slate-100 w-full h-full justify-center py-4 px-7 rounded-xl">
           {audioStream && <AudioElem peerId={peerId} />}
           <div className="relative flex flex-col items-center justify-center">
             <Image
@@ -95,7 +95,7 @@ const GridCard: React.FC<GridCardProps> = ({ peerId }) => {
               className="maskAvatar"
             />
 
-            <div className="absolute left-1/2 bottom-1/2 -translate-x-1/2 mb-2 text-4xl">
+            <div className="absolute left-1/2 -translate-x-1/2 mb-2 text-4xl">
               {reaction}
             </div>
             {role && ["host", "coHost", "speaker"].includes(role) && (
@@ -111,11 +111,12 @@ const GridCard: React.FC<GridCardProps> = ({ peerId }) => {
             <div className="text-gray-800 text-base font-medium">
               {metadata?.displayName}
             </div>
-            <div className="text-gray-800 text-sm font-normal">{role}</div>
+
+            {/* <div className="text-gray-800 text-sm font-normal">{role}</div> */}
           </div>
         </div>
       )}
-      <div className="grid grid-cols-2 gap-4 justify-center items-center mt-3">
+      <div className="grid grid-cols-2 gap-4 justify-center items-center">
         {audioStream && <AudioElem peerId={peerId} />}
         {screenShareVideoStream && (
           <div className={!videoStream ? "col-span-2" : "col-span-1 w-full"}>

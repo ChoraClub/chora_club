@@ -53,11 +53,11 @@ const GridLayout: React.FC<GridLayoutProps> = () => {
         <Hosts />
       </div>
       <div className="mt-2">
-        {(!screenShareVideoStream || !videoStream) && (
+        {/* {(!screenShareVideoStream || !videoStream) && (
           <div className="text-black text-base font-normal text-center">
             Listeners : {peerIds.length}
           </div>
-        )}
+        )} */}
 
         <div className="flex items-center justify-center gap-12 w-full">
           {localPeerRole == Role.HOST ? (
