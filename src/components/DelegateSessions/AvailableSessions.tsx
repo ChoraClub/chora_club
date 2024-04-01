@@ -316,6 +316,18 @@ function AvailableSessions() {
           </Tooltip>
         </div>
 
+        <Tooltip
+            showArrow
+            content={
+              <div className="font-poppins">
+                Select a time to view available Delegates for that specific
+                time.
+              </div>
+            }
+            placement="bottom"
+            className="rounded-md bg-opacity-90"
+            closeDelay={1}
+          >
         <div className="flex items-center select-container">
           <select
             value={startTime || "Start Time"}
@@ -330,18 +342,6 @@ function AvailableSessions() {
             ))}
           </select>
           <span>&nbsp;to</span>
-          <Tooltip
-            showArrow
-            content={
-              <div className="font-poppins">
-                Select a time to view available Delegates for that specific
-                time.
-              </div>
-            }
-            placement="bottom"
-            className="rounded-md bg-opacity-90"
-            closeDelay={1}
-          >
           <select
             value={endTime || "End Time"}
             onChange={handleEndTimeChange}
@@ -354,7 +354,6 @@ function AvailableSessions() {
               </option>
             ))}
           </select>
-          </Tooltip>
           {(startTime || endTime) && (
             <button
               onClick={handleClearTime}
@@ -364,7 +363,9 @@ function AvailableSessions() {
             </button>
           )}
         </div>
+        </Tooltip>
       </div>
+      
 
       <div className="pt-8 font-poppins">
         {isPageLoading ? (

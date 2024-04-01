@@ -31,7 +31,17 @@ function DelegatesList({ props }: { props: string }) {
 
   const handleClose = () => {
     setIsShowing(false);
+    sessionStorage.setItem("KarmaCreditClosed", JSON.stringify(true));
   };
+
+  useEffect(() => {
+    const KarmaCreditClosed = JSON.parse(
+      sessionStorage.getItem("KarmaCreditClosed") || "false"
+    );
+    setIsShowing(!KarmaCreditClosed);
+  }, []);
+
+  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -206,7 +216,7 @@ function DelegatesList({ props }: { props: string }) {
             type="text"
             placeholder="Search by Address or ENS Name"
             style={{ background: "rgba(238, 237, 237, 0.36)" }}
-            className="pl-5 rounded-full outline-none"
+            className="pl-5 pr-3 rounded-full outline-none"
             value={searchQuery}
             onChange={(e) => handleSearchChange(e.target.value)}
           ></input>

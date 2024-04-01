@@ -158,8 +158,15 @@ function SpecificDelegate({ props }: { props: Type }) {
   };
 
   const handleDelegateVotes = async (to: string) => {
+
+    if (typeof window.ethereum === 'undefined' || !window.ethereum.isConnected()) {
+      console.log('not connected');
+    }
+
     const address = await walletClient.getAddresses();
+    console.log(address);
     const address1 = address[0];
+    console.log(address1);
 
     let chainAddress;
 
@@ -172,20 +179,22 @@ function SpecificDelegate({ props }: { props: Type }) {
     }
 
     console.log(walletClient);
-    try {
-      const delegateTx = await walletClient.writeContract({
-        address: chainAddress,
-        abi: dao_abi.abi,
-        functionName: "delegate",
-        args: [to],
-        account: address1,
-      });
-      console.log(delegateTx);
-    } catch (error) {
-      console.log(error);
+    if(walletClient.chain==""){
+      toast.error("Please connect your wallet!");
     }
+    else
+    {
+    const delegateTx = await walletClient.writeContract({
+      address: chainAddress,
+      abi: dao_abi.abi,
+      functionName: "delegate",
+      args: [to],
+      account: address1,
+    });
+    console.log(delegateTx);
+    }
+    
   };
-
   return (
     <>
       {isPageLoading && (
