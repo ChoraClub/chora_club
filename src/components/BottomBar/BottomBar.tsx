@@ -24,7 +24,11 @@ import { useParams, usePathname } from "next/navigation";
 import axios from "axios";
 import { GoDotFill } from "react-icons/go";
 import { PiLinkSimpleBold } from "react-icons/pi";
-import { useNetwork } from "wagmi";
+import { useAccount, useNetwork } from "wagmi";
+import { FaCircleInfo } from "react-icons/fa6";
+import { RxCross2 } from "react-icons/rx";
+import { IoCopy } from "react-icons/io5";
+import copy from "copy-to-clipboard";
 
 type BottomBarProps = {};
 
@@ -103,7 +107,13 @@ const BottomBar: React.FC<BottomBarProps> = () => {
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
+  const [meetingDetailsVisible, setMeetingDetailsVisible] = useState(true);
+
   const { chain } = useNetwork();
+
+  const { address } = useAccount();
+
+  const path = usePathname();
 
   // const handleRecordingButtonClick = async () => {
   //   if (!roomId) {
@@ -175,6 +185,11 @@ const BottomBar: React.FC<BottomBarProps> = () => {
       startRecordingAutomatically();
     }
   }, []);
+
+  const handleCopy = (link: string) => {
+    copy(link);
+    toast("Meeting link Copied");
+  };
 
   const startRecordingAutomatically = async () => {
     try {
@@ -529,6 +544,47 @@ const BottomBar: React.FC<BottomBarProps> = () => {
       </div>
       <div className="flex items-center gap-4">
         {/* Bottom Bar Right */}
+
+        <div
+          className="cursor-pointer"
+          onClick={() => setMeetingDetailsVisible(!meetingDetailsVisible)}
+        >
+          <FaCircleInfo color="#0500FF" size={20} />
+        </div>
+
+        {meetingDetailsVisible && (
+          <div className="absolute bottom-24 right-6 bg-white shadow-md p-4 rounded-lg text-black">
+            <div className="flex justify-between items-center mb-2">
+              <h3 className="text-lg font-semibold">
+                Your meeting&apos;s ready
+              </h3>
+              <button
+                onClick={() => setMeetingDetailsVisible(!meetingDetailsVisible)}
+                className="p-2 hover:bg-slate-100 hover:rounded-full"
+              >
+                <RxCross2 size={20} />
+              </button>
+            </div>
+
+            <div className="pb-3 text-sm">
+              Or share this meeting link with others that you want in the
+              meeting
+            </div>
+
+            <div className="flex mb-2 bg-slate-100 rounded-sm px-2 py-1 justify-between items-center">
+              <div>{"https://app.chora.club" + path}</div>
+              <div className="pl-5 cursor-pointer">
+                <IoCopy
+                  onClick={() =>
+                    handleCopy("https://app.chora.club" + `${path}`)
+                  }
+                />
+              </div>
+            </div>
+
+            <div className="text-sm py-2">Joined in as {address}</div>
+          </div>
+        )}
 
         <OutlineButton
           className="ml-auto flex items-center gap-3 border-[#0500FF]"
