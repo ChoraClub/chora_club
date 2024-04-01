@@ -39,7 +39,7 @@ function AttestationModal({
   return (
     <div>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <div className="fixed inset-0 z-50 flex items-center justify-center font-poppins">
           <div
             className="absolute inset-0 bg-gray-800"
             // onClick={toggleModal}

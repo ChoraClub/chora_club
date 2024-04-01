@@ -300,7 +300,7 @@ const Home = ({ params }: { params: { roomId: string } }) => {
       ) : (
         <>
           {notAllowedMessage ? (
-            <div className="flex justify-center items-center h-screen">
+            <div className="flex justify-center items-center h-screen font-poppins">
               <div className="text-center">
                 <div className="text-6xl mb-6">☹️</div>
                 <div className="text-lg font-semibold mb-8">

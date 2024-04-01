@@ -55,7 +55,7 @@ function WatchComponentMain({ props }: { props: { id: string } }) {
       {data ? (
         <div
           ref={modalRef}
-          className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden  transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full"
+          className="font-poppins inline-block align-bottom bg-white rounded-lg text-left overflow-hidden  transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full"
           style={{
             maxWidth: "calc(95% + 50px)",
             maxHeight: "calc(80% + 50px)",
