@@ -260,7 +260,7 @@ const Home = ({ params }: { params: { roomId: string } }) => {
               <div className="absolute bottom-20 bg-white shadow-md p-4 rounded-lg text-black">
                 <div className="flex justify-between items-center mb-2">
                   <h3 className="text-lg font-semibold">
-                    Your meeting's ready
+                    Your meeting&apos;s ready
                   </h3>
                   <button
                     onClick={() => setMeetingDetailsVisible(false)}
