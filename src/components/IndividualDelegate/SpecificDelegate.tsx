@@ -180,7 +180,7 @@ function SpecificDelegate({ props }: { props: Type }) {
 
     console.log(walletClient);
     if(walletClient.chain==""){
-      toast.error("Wallet is not connected!");
+      toast.error("Please connect your wallet!");
     }
     else
     {
