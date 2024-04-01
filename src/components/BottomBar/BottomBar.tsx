@@ -89,10 +89,7 @@ const BottomBar: React.FC<BottomBarProps> = () => {
         };
 
         try {
-          const response = await fetch(
-            "http://localhost:3000/api/update-video-uri",
-            requestOptions
-          );
+          const response = await fetch("/api/update-video-uri", requestOptions);
           const result = await response.text();
           console.log(result);
         } catch (error) {

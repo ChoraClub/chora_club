@@ -53,8 +53,8 @@ export async function POST(req: NextRequest, res: NextResponse) {
     const {
       roomId,
       meetingType,
-      // video_uri,
-    }: { roomId: string; meetingType: number; video_uri: string } =
+    }: // video_uri,
+    { roomId: string; meetingType: number; video_uri: string } =
       await req.json();
 
     if (!roomId) {
@@ -63,8 +63,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
         { status: 400 }
       );
     }
-
-  
 
     let meetingTypeName: string;
     if (meetingType === 1) {
