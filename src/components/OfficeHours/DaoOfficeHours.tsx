@@ -179,7 +179,7 @@ function DaoOfficeHours() {
         >
           <input
             type="text"
-            placeholder="Search"
+            placeholder="Search by title "
             style={{ background: "rgba(238, 237, 237, 0.36)" }}
             className="pl-5 rounded-full outline-none"
             value={searchQuery}
