@@ -18,14 +18,28 @@ const UserScheduledHours: React.FC = () => {
   };
 
   const createRandomRoom = async () => {
-    const res = await fetch("/api/create-room", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    const result = await res.json();
-    const roomId = await result.data;
+    const response = await fetch(
+      "https://api.huddle01.com/api/v1/create-room",
+      {
+        method: "POST",
+        body: JSON.stringify({
+          title: "Test Room",
+        }),
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": process.env.NEXT_PUBLIC_API_KEY ?? "",
+        },
+        cache: "no-store",
+      }
+    );
+
+    // if (!response.ok) {
+    //   throw new Error("Failed to fetch");
+    // }
+
+    const result = await response.json();
+    // console.log(result);
+    const { roomId } = await result.data;
     return roomId;
   };
 
