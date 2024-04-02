@@ -34,16 +34,25 @@ interface TileProps {
 }
 
 const createRandomRoom = async () => {
-  const res = await fetch("/api/create-room", {
-    method: "GET",
+  const response = await fetch("https://api.huddle01.com/api/v1/create-room", {
+    method: "POST",
+    body: JSON.stringify({
+      title: "Test Room",
+    }),
     headers: {
       "Content-Type": "application/json",
+      "x-api-key": process.env.NEXT_PUBLIC_API_KEY ?? "",
     },
+    cache: "no-store",
   });
-  const result = await res.json();
-  // console.log("result", result);
-  const roomId = await result.data;
-  // console.log("roomId", roomId);
+
+  // if (!response.ok) {
+  //   throw new Error("Failed to fetch");
+  // }
+
+  const result = await response.json();
+  // console.log(result);
+  const { roomId } = await result.data;
   return roomId;
 };
 
