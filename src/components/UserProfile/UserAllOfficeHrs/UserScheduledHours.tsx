@@ -18,12 +18,15 @@ const UserScheduledHours: React.FC = () => {
   };
 
   const createRandomRoom = async () => {
-    const res = await fetch("/api/create-room", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const res = await fetch(
+      "https://api-choraclub.vercel.app/api/create-room",
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
     const result = await res.json();
     const roomId = await result.data;
     return roomId;
