@@ -50,7 +50,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
       ) {
         // Meeting is upcoming
         return NextResponse.json(
-          { success: true, message: "Meeting is upcoming" },
+          { success: true, message: "Meeting is upcoming", data: meeting },
           { status: 200 }
         );
       } else if (
@@ -59,7 +59,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
       ) {
         // Meeting has ended
         return NextResponse.json(
-          { success: true, message: "Meeting has ended" },
+          { success: true, message: "Meeting has ended", data: meeting },
           { status: 200 }
         );
       } else if (
@@ -68,13 +68,13 @@ export async function POST(req: NextRequest, res: NextResponse) {
       ) {
         // Meeting is ongoing
         return NextResponse.json(
-          { success: true, message: "Meeting is ongoing" },
+          { success: true, message: "Meeting is ongoing", data: meeting },
           { status: 200 }
         );
       } else if (meeting[statusField] === "Denied") {
-        // Meeting is ongoing
+        // Meeting is Denied
         return NextResponse.json(
-          { success: true, message: "Meeting has been denied" },
+          { success: true, message: "Meeting has been denied", data: meeting },
           { status: 200 }
         );
       } else {

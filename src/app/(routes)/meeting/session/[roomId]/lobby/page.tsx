@@ -117,14 +117,23 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
       console.log("Role.HOST", Role.HOST);
       if (Role.HOST) {
         console.log("inside put api");
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+
+        const raw = JSON.stringify({
+          meetingId: params.roomId,
+          meetingType: "session",
+        });
+
+        const requestOptions: any = {
+          method: "PUT",
+          headers: myHeaders,
+          body: raw,
+          redirect: "follow",
+        };
         const response = await fetch(
           `/api/update-meeting-status/${params.roomId}`,
-          {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
+          requestOptions
         );
         const responseData = await response.json();
         console.log("responseData: ", responseData);
@@ -159,32 +168,32 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
     async function verifyMeetingId() {
       try {
         const response = await fetch("/api/verify-meeting-id", requestOptions);
-        const data = await response.json();
+        const result = await response.json();
 
-        if (data.success) {
-          if (data.message === "Meeting has ended") {
+        if (result.success) {
+          if (result.message === "Meeting has ended") {
             console.log("Meeting has ended");
             setIsAllowToEnter(false);
-            setNotAllowedMessage(data.message);
-          } else if (data.message === "Meeting is upcoming") {
+            setNotAllowedMessage(result.message);
+          } else if (result.message === "Meeting is upcoming") {
             console.log("Meeting is upcoming");
             setIsAllowToEnter(true);
-          } else if (data.message === "Meeting has been denied") {
+          } else if (result.message === "Meeting has been denied") {
             console.log("Meeting has been denied");
             setIsAllowToEnter(false);
-            setNotAllowedMessage(data.message);
-          } else if (data.message === "Meeting does not exist") {
+            setNotAllowedMessage(result.message);
+          } else if (result.message === "Meeting does not exist") {
             setIsAllowToEnter(false);
-            setNotAllowedMessage(data.message);
+            setNotAllowedMessage(result.message);
             console.log("Meeting does not exist");
-          } else if (data.message === "Meeting is ongoing") {
+          } else if (result.message === "Meeting is ongoing") {
             setIsAllowToEnter(true);
             console.log("Meeting is ongoing");
           }
         } else {
           // Handle error scenarios
-          setNotAllowedMessage(data.message);
-          console.error("Error:", data.error || data.message);
+          setNotAllowedMessage(result.error || result.message);
+          console.error("Error:", result.error || result.message);
         }
       } catch (error) {
         // Handle network errors
@@ -251,100 +260,100 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
 
   return (
     <>
-      {isAllowToEnter ? (
-        <div className="mt-2">
-          {popupVisibility && (
-            <div className="relative bg-red-700 text-white flex justify-center items-center top-0 py-2 font-poppins w-1/3 rounded-md mx-auto">
-              <div className="">This meeting is being recorded.</div>
-              <div className="flex absolute right-2">
+      {/* {isAllowToEnter ? ( */}
+      <div className="mt-2">
+        {popupVisibility && (
+          <div className="relative bg-red-700 text-white flex justify-center items-center top-0 py-2 font-poppins w-1/3 rounded-md mx-auto">
+            <div className="">This meeting is being recorded.</div>
+            <div className="flex absolute right-2">
+              <button
+                onClick={() => setPopupVisibility(false)}
+                className="p-2 hover:bg-red-600 hover:rounded-full"
+              >
+                <RxCross2 size={20} />
+              </button>
+            </div>
+          </div>
+        )}
+        <main className="flex h-screen flex-col items-center justify-center bg-lobby text-slate-100 font-poppins">
+          <div className="flex flex-col items-center justify-center gap-4 w-1/3">
+            <div className="text-center flex items-center justify-center bg-slate-100 w-full rounded-xl py-16">
+              <div className="relative">
+                <Image
+                  src={avatarUrl}
+                  alt="audio-spaces-img"
+                  width={125}
+                  height={125}
+                  className="maskAvatar object-contain"
+                  quality={100}
+                  priority
+                />
+                <video
+                  src={avatarUrl}
+                  muted
+                  className="maskAvatar absolute left-1/2 top-1/2 z-10 h-full w-full -translate-x-1/2 -translate-y-1/2"
+                  // autoPlay
+                  loop
+                />
                 <button
-                  onClick={() => setPopupVisibility(false)}
-                  className="p-2 hover:bg-red-600 hover:rounded-full"
+                  onClick={() => setIsOpen((prev) => !prev)}
+                  type="button"
+                  className="text-white absolute bottom-0 right-0 z-10"
                 >
-                  <RxCross2 size={20} />
+                  {BasicIcons.edit}
                 </button>
+                <FeatCommon
+                  onClose={() => setIsOpen(false)}
+                  className={
+                    isOpen
+                      ? "absolute top-4 block"
+                      : "absolute top-1/2 -translate-y-1/2 hidden "
+                  }
+                >
+                  <div className="relative mt-5">
+                    <div className="grid-cols-3 grid h-full w-full place-items-center gap-6  px-6 ">
+                      {Array.from({ length: 20 }).map((_, i) => {
+                        const url = `/avatars/avatars/${i}.png`;
+
+                        return (
+                          <AvatarWrapper
+                            key={`sidebar-avatars-${i}`}
+                            isActive={avatarUrl === url}
+                            onClick={() => {
+                              setAvatarUrl(url);
+                            }}
+                          >
+                            <Image
+                              src={url}
+                              alt={`avatar-${i}`}
+                              width={45}
+                              height={45}
+                              loading="lazy"
+                              className="object-contain"
+                            />
+                          </AvatarWrapper>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </FeatCommon>
               </div>
             </div>
-          )}
-          <main className="flex h-screen flex-col items-center justify-center bg-lobby text-slate-100 font-poppins">
-            <div className="flex flex-col items-center justify-center gap-4 w-1/3">
-              <div className="text-center flex items-center justify-center bg-slate-100 w-full rounded-xl py-16">
-                <div className="relative">
-                  <Image
-                    src={avatarUrl}
-                    alt="audio-spaces-img"
-                    width={125}
-                    height={125}
-                    className="maskAvatar object-contain"
-                    quality={100}
-                    priority
-                  />
-                  <video
-                    src={avatarUrl}
-                    muted
-                    className="maskAvatar absolute left-1/2 top-1/2 z-10 h-full w-full -translate-x-1/2 -translate-y-1/2"
-                    // autoPlay
-                    loop
-                  />
-                  <button
-                    onClick={() => setIsOpen((prev) => !prev)}
-                    type="button"
-                    className="text-white absolute bottom-0 right-0 z-10"
-                  >
-                    {BasicIcons.edit}
-                  </button>
-                  <FeatCommon
-                    onClose={() => setIsOpen(false)}
-                    className={
-                      isOpen
-                        ? "absolute top-4 block"
-                        : "absolute top-1/2 -translate-y-1/2 hidden "
-                    }
-                  >
-                    <div className="relative mt-5">
-                      <div className="grid-cols-3 grid h-full w-full place-items-center gap-6  px-6 ">
-                        {Array.from({ length: 20 }).map((_, i) => {
-                          const url = `/avatars/avatars/${i}.png`;
-
-                          return (
-                            <AvatarWrapper
-                              key={`sidebar-avatars-${i}`}
-                              isActive={avatarUrl === url}
-                              onClick={() => {
-                                setAvatarUrl(url);
-                              }}
-                            >
-                              <Image
-                                src={url}
-                                alt={`avatar-${i}`}
-                                width={45}
-                                height={45}
-                                loading="lazy"
-                                className="object-contain"
-                              />
-                            </AvatarWrapper>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  </FeatCommon>
-                </div>
-              </div>
-              {isDisconnected ? <ConnectButton /> : null}
-              <div className="flex items-center w-full flex-col">
-                <div className="flex flex-col justify-center w-full gap-1 text-black">
-                  Display name
-                  <div className="flex w-full items-center rounded-[10px] border px-3 text-slate-300 outline-none border-zinc-800 backdrop-blur-[400px] focus-within:border-slate-600 gap-">
-                    <div className="mr-2">
-                      <Image
-                        alt="user-icon"
-                        src="/images/user-icon.svg"
-                        className="w-5 h-5"
-                        width={30}
-                        height={30}
-                      />
-                    </div>
-                    {/* <input
+            {isDisconnected ? <ConnectButton /> : null}
+            <div className="flex items-center w-full flex-col">
+              <div className="flex flex-col justify-center w-full gap-1 text-black">
+                Display name
+                <div className="flex w-full items-center rounded-[10px] border px-3 text-slate-300 outline-none border-zinc-800 backdrop-blur-[400px] focus-within:border-slate-600 gap-">
+                  <div className="mr-2">
+                    <Image
+                      alt="user-icon"
+                      src="/images/user-icon.svg"
+                      className="w-5 h-5"
+                      width={30}
+                      height={30}
+                    />
+                  </div>
+                  {/* <input
                     value={userDisplayName}
                     onChange={(e) => {
                       setUserDisplayName(e.target.value);
@@ -353,48 +362,49 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
                     placeholder="Enter your name"
                     className="flex-1 bg-transparent py-3 outline-none text-black"
                   /> */}
-                    <div className="flex-1 bg-transparent py-3 outline-none text-black">
-                      {isLoading ? (
-                        <div className="flex items-center justify-center">
-                          <Oval
-                            visible={true}
-                            height="20"
-                            width="20"
-                            color="#0500FF"
-                            secondaryColor="#cdccff"
-                            ariaLabel="oval-loading"
-                          />
-                        </div>
-                      ) : (
-                        profileDetails?.displayName ||
-                        profileDetails?.ensName ||
-                        formattedAddress
-                      )}
-                    </div>
+                  <div className="flex-1 bg-transparent py-3 outline-none text-black">
+                    {isLoading ? (
+                      <div className="flex items-center justify-center">
+                        <Oval
+                          visible={true}
+                          height="20"
+                          width="20"
+                          color="#0500FF"
+                          secondaryColor="#cdccff"
+                          ariaLabel="oval-loading"
+                        />
+                      </div>
+                    ) : (
+                      profileDetails?.displayName ||
+                      profileDetails?.ensName ||
+                      formattedAddress
+                    )}
                   </div>
                 </div>
               </div>
-              <div className="flex items-center w-full">
-                <button
-                  className="flex items-center justify-center bg-blue-shade-100 text-slate-100 rounded-md p-2 mt-2 w-full"
-                  onClick={handleStartSpaces}
-                >
-                  {isJoining ? "Joining Spaces..." : "Start meeting"}
-                  {!isJoining && (
-                    <Image
-                      alt="narrow-right"
-                      width={30}
-                      height={30}
-                      src="/images/arrow-narrow-right.svg"
-                      className="w-6 h-6 ml-1"
-                    />
-                  )}
-                </button>
-              </div>
             </div>
-          </main>
-        </div>
-      ) : (
+            <div className="flex items-center w-full">
+              <button
+                className="flex items-center justify-center bg-blue-shade-100 text-slate-100 rounded-md p-2 mt-2 w-full"
+                onClick={handleStartSpaces}
+                disabled={isLoading}
+              >
+                {isJoining ? "Joining Spaces..." : "Start meeting"}
+                {!isJoining && (
+                  <Image
+                    alt="narrow-right"
+                    width={30}
+                    height={30}
+                    src="/images/arrow-narrow-right.svg"
+                    className="w-6 h-6 ml-1"
+                  />
+                )}
+              </button>
+            </div>
+          </div>
+        </main>
+      </div>
+      {/*  ) : (
         <>
           {notAllowedMessage ? (
             <div className="flex justify-center items-center h-screen">
@@ -439,7 +449,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
             </>
           )}
         </>
-      )}
+      )} */}
     </>
   );
 };

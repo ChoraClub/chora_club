@@ -103,32 +103,32 @@ const Home = ({ params }: { params: { roomId: string } }) => {
     async function verifyMeetingId() {
       try {
         const response = await fetch("/api/verify-meeting-id", requestOptions);
-        const data = await response.json();
+        const result = await response.json();
 
-        if (data.success) {
-          if (data.message === "Meeting has ended") {
+        if (result.success) {
+          if (result.message === "Meeting has ended") {
             console.log("Meeting has ended");
             setIsAllowToEnter(false);
-            setNotAllowedMessage(data.message);
-          } else if (data.message === "Meeting is upcoming") {
+            setNotAllowedMessage(result.message);
+          } else if (result.message === "Meeting is upcoming") {
             console.log("Meeting is upcoming");
             setIsAllowToEnter(true);
-          } else if (data.message === "Meeting has been denied") {
+          } else if (result.message === "Meeting has been denied") {
             console.log("Meeting has been denied");
             setIsAllowToEnter(false);
-            setNotAllowedMessage(data.message);
-          } else if (data.message === "Meeting does not exist") {
+            setNotAllowedMessage(result.message);
+          } else if (result.message === "Meeting does not exist") {
             setIsAllowToEnter(false);
-            setNotAllowedMessage(data.message);
+            setNotAllowedMessage(result.message);
             console.log("Meeting does not exist");
-          } else if (data.message === "Meeting is ongoing") {
+          } else if (result.message === "Meeting is ongoing") {
             setIsAllowToEnter(true);
             console.log("Meeting is ongoing");
           }
         } else {
           // Handle error scenarios
-          setNotAllowedMessage(data.error || data.message);
-          console.error("Error:", data.error || data.message);
+          setNotAllowedMessage(result.error || result.message);
+          console.error("Error:", result.error || result.message);
         }
       } catch (error) {
         // Handle network errors
@@ -226,37 +226,35 @@ const Home = ({ params }: { params: { roomId: string } }) => {
 
   return (
     <>
-      {isAllowToEnter ? (
-        <section className="bg-white flex h-screen text-slate-100 flex-col justify-between overflow-hidden">
-          <div className="flex w-full h-[90%] pb-4">
-            <div className="relative top-4">
-              <Tooltip
-                showArrow
-                content={
-                  <div className="font-poppins">
-                    This meeting is being recorded
-                  </div>
-                }
-                placement="right"
-                className="rounded-md bg-opacity-90 max-w-96"
-                closeDelay={1}
-              >
-                <span>
-                  <PiRecordFill color="#c42727" size={22} />
-                </span>
-              </Tooltip>
-            </div>
-            <GridLayout />
-            <Sidebar />
-            <div className="absolute right-4 bottom-20">
-              {Role.HOST
-                ? showAcceptRequest && (
-                    <AcceptRequest peerId={requestedPeerId} />
-                  )
-                : null}
-            </div>
-            {isChatOpen && <Chat />}
-            {/* {meetingDetailsVisible && (
+      {/* {isAllowToEnter ? ( */}
+      <section className="bg-white flex h-screen text-slate-100 flex-col justify-between overflow-hidden">
+        <div className="flex w-full h-[90%] pb-4">
+          <div className="relative top-4">
+            <Tooltip
+              showArrow
+              content={
+                <div className="font-poppins">
+                  This meeting is being recorded
+                </div>
+              }
+              placement="right"
+              className="rounded-md bg-opacity-90 max-w-96"
+              closeDelay={1}
+            >
+              <span>
+                <PiRecordFill color="#c42727" size={22} />
+              </span>
+            </Tooltip>
+          </div>
+          <GridLayout />
+          <Sidebar />
+          <div className="absolute right-4 bottom-20">
+            {Role.HOST
+              ? showAcceptRequest && <AcceptRequest peerId={requestedPeerId} />
+              : null}
+          </div>
+          {isChatOpen && <Chat />}
+          {/* {meetingDetailsVisible && (
               <div className="absolute bottom-20 bg-white shadow-md p-4 rounded-lg text-black">
                 <div className="flex justify-between items-center mb-2">
                   <h3 className="text-lg font-semibold">
@@ -289,15 +287,15 @@ const Home = ({ params }: { params: { roomId: string } }) => {
                 <div className="text-sm py-2">Joined in as {address}</div>
               </div>
             )} */}
-          </div>
+        </div>
 
-          <BottomBar />
-          <Prompts />
-          {modalOpen && (
-            <AttestationModal isOpen={modalOpen} onClose={handleModalClose} />
-          )}
-        </section>
-      ) : (
+        <BottomBar />
+        <Prompts />
+        {modalOpen && (
+          <AttestationModal isOpen={modalOpen} onClose={handleModalClose} />
+        )}
+      </section>
+      {/* ) : (
         <>
           {notAllowedMessage ? (
             <div className="flex justify-center items-center h-screen font-poppins">
@@ -342,7 +340,7 @@ const Home = ({ params }: { params: { roomId: string } }) => {
             </>
           )}
         </>
-      )}
+      )} */}
     </>
   );
 };
