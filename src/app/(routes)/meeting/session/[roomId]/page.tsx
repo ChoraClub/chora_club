@@ -37,18 +37,16 @@ const Home = ({ params }: { params: { roomId: string } }) => {
   const [modalOpen, setModalOpen] = useState(false);
 
   const handleModalClose = () => {
-    console.log("Popup Closed");
+    // console.log("Popup Closed");
     setModalOpen(false); // Close the modal
     // Push the router after the modal is closed
 
     push(`/meeting/session/${params.roomId}/lobby`);
-    console.log("Popup 3");
+    // console.log("Popup 3");
   };
 
   const displayPopup = async () => {
-    console.log("Popup");
     setModalOpen(true);
-    console.log("Popup 2");
   };
 
   const { state } = useRoom({
@@ -226,37 +224,35 @@ const Home = ({ params }: { params: { roomId: string } }) => {
 
   return (
     <>
-      {isAllowToEnter ? (
-        <section className="bg-white flex h-screen text-slate-100 flex-col justify-between overflow-hidden">
-          <div className="flex w-full h-[90%] pb-4">
-            <div className="relative top-4">
-              <Tooltip
-                showArrow
-                content={
-                  <div className="font-poppins">
-                    This meeting is being recorded
-                  </div>
-                }
-                placement="right"
-                className="rounded-md bg-opacity-90 max-w-96"
-                closeDelay={1}
-              >
-                <span>
-                  <PiRecordFill color="#c42727" size={22} />
-                </span>
-              </Tooltip>
-            </div>
-            <GridLayout />
-            <Sidebar />
-            <div className="absolute right-4 bottom-20">
-              {Role.HOST
-                ? showAcceptRequest && (
-                    <AcceptRequest peerId={requestedPeerId} />
-                  )
-                : null}
-            </div>
-            {isChatOpen && <Chat />}
-            {/* {meetingDetailsVisible && (
+      {/* {isAllowToEnter ? ( */}
+      <section className="bg-white flex h-screen text-slate-100 flex-col justify-between overflow-hidden">
+        <div className="flex w-full h-[90%] pb-4">
+          <div className="relative top-4">
+            <Tooltip
+              showArrow
+              content={
+                <div className="font-poppins">
+                  This meeting is being recorded
+                </div>
+              }
+              placement="right"
+              className="rounded-md bg-opacity-90 max-w-96"
+              closeDelay={1}
+            >
+              <span>
+                <PiRecordFill color="#c42727" size={22} />
+              </span>
+            </Tooltip>
+          </div>
+          <GridLayout />
+          <Sidebar />
+          <div className="absolute right-4 bottom-20">
+            {Role.HOST
+              ? showAcceptRequest && <AcceptRequest peerId={requestedPeerId} />
+              : null}
+          </div>
+          {isChatOpen && <Chat />}
+          {/* {meetingDetailsVisible && (
               <div className="absolute bottom-20 bg-white shadow-md p-4 rounded-lg text-black">
                 <div className="flex justify-between items-center mb-2">
                   <h3 className="text-lg font-semibold">
@@ -289,15 +285,15 @@ const Home = ({ params }: { params: { roomId: string } }) => {
                 <div className="text-sm py-2">Joined in as {address}</div>
               </div>
             )} */}
-          </div>
+        </div>
 
-          <BottomBar />
-          <Prompts />
-          {modalOpen && (
-            <AttestationModal isOpen={modalOpen} onClose={handleModalClose} />
-          )}
-        </section>
-      ) : (
+        <BottomBar />
+        <Prompts />
+        {modalOpen && (
+          <AttestationModal isOpen={modalOpen} onClose={handleModalClose} />
+        )}
+      </section>
+      {/* ) : (
         <>
           {notAllowedMessage ? (
             <div className="flex justify-center items-center h-screen font-poppins">
@@ -342,7 +338,7 @@ const Home = ({ params }: { params: { roomId: string } }) => {
             </>
           )}
         </>
-      )}
+      )} */}
     </>
   );
 };

@@ -32,18 +32,14 @@ const Home = ({ params }: { params: { roomId: string } }) => {
   const [modalOpen, setModalOpen] = useState(false);
 
   const handleModalClose = () => {
-    console.log("Popup Closed");
     setModalOpen(false); // Close the modal
     // Push the router after the modal is closed
 
     push(`/meeting/officehours/${params.roomId}/lobby`);
-    console.log("Popup 3");
   };
 
   const displayPopup = async () => {
-    console.log("Popup");
     setModalOpen(true);
-    console.log("Popup 2");
   };
 
   const { state } = useRoom({
