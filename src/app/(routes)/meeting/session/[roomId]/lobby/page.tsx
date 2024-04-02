@@ -117,14 +117,23 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
       console.log("Role.HOST", Role.HOST);
       if (Role.HOST) {
         console.log("inside put api");
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+
+        const raw = JSON.stringify({
+          meetingId: params.roomId,
+          meetingType: "session",
+        });
+
+        const requestOptions: any = {
+          method: "PUT",
+          headers: myHeaders,
+          body: raw,
+          redirect: "follow",
+        };
         const response = await fetch(
           `/api/update-meeting-status/${params.roomId}`,
-          {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
+          requestOptions
         );
         const responseData = await response.json();
         console.log("responseData: ", responseData);
@@ -159,32 +168,32 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
     async function verifyMeetingId() {
       try {
         const response = await fetch("/api/verify-meeting-id", requestOptions);
-        const data = await response.json();
+        const result = await response.json();
 
-        if (data.success) {
-          if (data.message === "Meeting has ended") {
+        if (result.success) {
+          if (result.message === "Meeting has ended") {
             console.log("Meeting has ended");
             setIsAllowToEnter(false);
-            setNotAllowedMessage(data.message);
-          } else if (data.message === "Meeting is upcoming") {
+            setNotAllowedMessage(result.message);
+          } else if (result.message === "Meeting is upcoming") {
             console.log("Meeting is upcoming");
             setIsAllowToEnter(true);
-          } else if (data.message === "Meeting has been denied") {
+          } else if (result.message === "Meeting has been denied") {
             console.log("Meeting has been denied");
             setIsAllowToEnter(false);
-            setNotAllowedMessage(data.message);
-          } else if (data.message === "Meeting does not exist") {
+            setNotAllowedMessage(result.message);
+          } else if (result.message === "Meeting does not exist") {
             setIsAllowToEnter(false);
-            setNotAllowedMessage(data.message);
+            setNotAllowedMessage(result.message);
             console.log("Meeting does not exist");
-          } else if (data.message === "Meeting is ongoing") {
+          } else if (result.message === "Meeting is ongoing") {
             setIsAllowToEnter(true);
             console.log("Meeting is ongoing");
           }
         } else {
           // Handle error scenarios
-          setNotAllowedMessage(data.message);
-          console.error("Error:", data.error || data.message);
+          setNotAllowedMessage(result.error || result.message);
+          console.error("Error:", result.error || result.message);
         }
       } catch (error) {
         // Handle network errors
@@ -268,7 +277,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
             </div>
           </div>
         )}
-        <main className="flex h-full flex-col items-center justify-center bg-lobby text-slate-100 font-poppins">
+        <main className="flex h-screen flex-col items-center justify-center bg-lobby text-slate-100 font-poppins">
           <div className="flex flex-col items-center justify-center gap-4 w-1/3">
             <div className="text-center flex items-center justify-center bg-slate-100 w-full rounded-xl py-16">
               <div className="relative">
@@ -380,6 +389,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
               <button
                 className="flex items-center justify-center bg-blue-shade-100 text-slate-100 rounded-md p-2 mt-2 w-full"
                 onClick={handleStartSpaces}
+                disabled={isLoading}
               >
                 {isJoining ? "Joining Spaces..." : "Start meeting"}
                 {!isJoining && (
@@ -396,7 +406,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
           </div>
         </main>
       </div>
-      {/* ) : (
+      {/*  ) : (
         <>
           {notAllowedMessage ? (
             <div className="flex justify-center items-center h-screen">
@@ -441,7 +451,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
             </>
           )}
         </>
-          )}  */}
+      )} */}
     </>
   );
 };
