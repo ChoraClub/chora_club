@@ -62,11 +62,15 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
   const [isAllowToEnter, setIsAllowToEnter] = useState<boolean>();
   const [notAllowedMessage, setNotAllowedMessage] = useState<string>();
 
+  const [hostAddress, setHostAddress] = useState();
+  const [meetingStatus, setMeetingStatus] = useState<any>();
+
   const handleStartSpaces = async () => {
     console.log("in start spaces");
     if (isDisconnected) {
       toast("Connect your wallet to join the meeting!");
     } else {
+      if (address === hostAddress || meetingStatus === "Ongoing") {
       setIsJoining(true);
 
       let token = "";
@@ -124,7 +128,6 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
           meetingId: params.roomId,
           meetingType: "session",
         });
-
         const requestOptions: any = {
           method: "PUT",
           headers: myHeaders,
@@ -140,6 +143,9 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
       }
 
       setIsJoining(false);
+      } else {
+        console.log("Wait..");
+      }
     }
   };
 
@@ -171,6 +177,10 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
         const result = await response.json();
 
         if (result.success) {
+          setHostAddress(result.data.host_address);
+        }
+
+        if (result.success) {
           if (result.message === "Meeting has ended") {
             console.log("Meeting has ended");
             setIsAllowToEnter(false);
@@ -187,6 +197,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
             setNotAllowedMessage(result.message);
             console.log("Meeting does not exist");
           } else if (result.message === "Meeting is ongoing") {
+            setMeetingStatus("Ongoing");
             setIsAllowToEnter(true);
             console.log("Meeting is ongoing");
           }
@@ -202,7 +213,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
     }
 
     verifyMeetingId();
-  }, [params.roomId, isAllowToEnter, notAllowedMessage]);
+  }, [params.roomId, isAllowToEnter, notAllowedMessage, meetingStatus]);
 
   useEffect(() => {
     let dao = "";
@@ -230,6 +241,8 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
           console.log("filtered profile: ", filtered);
           setProfileDetails(filtered[0]);
           setIsLoading(false);
+          const imageCid = filtered[0].image;
+          setAvatarUrl(`https://gateway.lighthouse.storage/ipfs/${imageCid}`);
           setUserDisplayName(filtered[0].displayName);
         }
 
@@ -260,102 +273,117 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
 
   return (
     <>
-      {/* {isAllowToEnter ? ( */}
-      <div className="h-screen">
-        {popupVisibility && (
-          <div className="flex items-center justify-center">
-            <div className="absolute bg-red-700 text-white flex justify-center items-center py-2 font-poppins w-1/3 rounded-md top-2">
-              <div className="">This meeting is being recorded.</div>
-              <div className="flex absolute right-2">
-                <button
-                  onClick={() => setPopupVisibility(false)}
-                  className="p-2 hover:bg-red-600 hover:rounded-full"
-                >
-                  <RxCross2 size={20} />
-                </button>
+      {isAllowToEnter ? (
+        <div className="h-screen">
+          {popupVisibility && (
+            <div className="flex items-center justify-center">
+              <div className="absolute bg-red-700 text-white flex justify-center items-center py-2 font-poppins w-1/3 rounded-md top-2">
+                <div className="">This meeting is being recorded.</div>
+                <div className="flex absolute right-2">
+                  <button
+                    onClick={() => setPopupVisibility(false)}
+                    className="p-2 hover:bg-red-600 hover:rounded-full"
+                  >
+                    <RxCross2 size={20} />
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        )}
-        <main className="flex h-screen flex-col items-center justify-center bg-lobby text-slate-100 font-poppins">
-          <div className="flex flex-col items-center justify-center gap-4 w-1/3">
-            <div className="text-center flex items-center justify-center bg-slate-100 w-full rounded-xl py-16">
-              <div className="relative">
-                <Image
-                  src={avatarUrl}
-                  alt="audio-spaces-img"
-                  width={125}
-                  height={125}
-                  className="maskAvatar object-contain"
-                  quality={100}
-                  priority
-                />
-                <video
-                  src={avatarUrl}
-                  muted
-                  className="maskAvatar absolute left-1/2 top-1/2 z-10 h-full w-full -translate-x-1/2 -translate-y-1/2"
-                  // autoPlay
-                  loop
-                />
-                <button
-                  onClick={() => setIsOpen((prev) => !prev)}
-                  type="button"
-                  className="text-white absolute bottom-0 right-0 z-10"
-                >
-                  {BasicIcons.edit}
-                </button>
-                <FeatCommon
-                  onClose={() => setIsOpen(false)}
-                  className={
-                    isOpen
-                      ? "absolute top-4 block"
-                      : "absolute top-1/2 -translate-y-1/2 hidden "
-                  }
-                >
-                  <div className="relative mt-5">
-                    <div className="grid-cols-3 grid h-full w-full place-items-center gap-6  px-6 ">
-                      {Array.from({ length: 20 }).map((_, i) => {
-                        const url = `/avatars/avatars/${i}.png`;
-
-                        return (
-                          <AvatarWrapper
-                            key={`sidebar-avatars-${i}`}
-                            isActive={avatarUrl === url}
+          )}
+          <main className="flex h-screen flex-col items-center justify-center bg-lobby text-slate-100 font-poppins">
+            <div className="flex flex-col items-center justify-center gap-4 w-1/3">
+              <div className="text-center flex items-center justify-center bg-slate-100 w-full rounded-xl py-16">
+                <div className="relative">
+                  <Image
+                    src={avatarUrl}
+                    alt="audio-spaces-img"
+                    width={125}
+                    height={125}
+                    className="maskAvatar object-contain"
+                    quality={100}
+                    priority
+                  />
+                  <video
+                    src={avatarUrl}
+                    muted
+                    className="maskAvatar absolute left-1/2 top-1/2 z-10 h-full w-full -translate-x-1/2 -translate-y-1/2"
+                    // autoPlay
+                    loop
+                  />
+                  <button
+                    onClick={() => setIsOpen((prev) => !prev)}
+                    type="button"
+                    className="text-white absolute bottom-0 right-0 z-10"
+                  >
+                    {BasicIcons.edit}
+                  </button>
+                  <FeatCommon
+                    onClose={() => setIsOpen(false)}
+                    className={
+                      isOpen
+                        ? "absolute top-4 block"
+                        : "absolute top-1/2 -translate-y-1/2 hidden "
+                    }
+                  >
+                    <div className="relative mt-5">
+                      <div className="grid-cols-3 grid h-full w-full place-items-center gap-6  px-6 ">
+                        {profileDetails?.image && ( // Check if profileDetails contains an image
+                          <Image
+                            src={`https://gateway.lighthouse.storage/ipfs/${profileDetails.image}`}
+                            alt={`image`}
+                            width={45}
+                            height={45}
+                            loading="lazy"
+                            className="object-contain cursor-pointer"
                             onClick={() => {
-                              setAvatarUrl(url);
+                              setAvatarUrl(
+                                `https://gateway.lighthouse.storage/ipfs/${profileDetails.image}`
+                              );
                             }}
-                          >
-                            <Image
-                              src={url}
-                              alt={`avatar-${i}`}
-                              width={45}
-                              height={45}
-                              loading="lazy"
-                              className="object-contain"
-                            />
-                          </AvatarWrapper>
-                        );
-                      })}
+                          />
+                        )}
+                        {Array.from({ length: 20 }).map((_, i) => {
+                          const url = `/avatars/avatars/${i}.png`;
+
+                          return (
+                            <AvatarWrapper
+                              key={`sidebar-avatars-${i}`}
+                              isActive={avatarUrl === url}
+                              onClick={() => {
+                                setAvatarUrl(url);
+                              }}
+                            >
+                              <Image
+                                src={url}
+                                alt={`avatar-${i}`}
+                                width={45}
+                                height={45}
+                                loading="lazy"
+                                className="object-contain"
+                              />
+                            </AvatarWrapper>
+                          );
+                        })}
+                      </div>
                     </div>
-                  </div>
-                </FeatCommon>
+                  </FeatCommon>
+                </div>
               </div>
-            </div>
-            {isDisconnected ? <ConnectButton /> : null}
-            <div className="flex items-center w-full flex-col">
-              <div className="flex flex-col justify-center w-full gap-1 text-black">
-                Display name
-                <div className="flex w-full items-center rounded-[10px] border px-3 text-slate-300 outline-none border-zinc-800 backdrop-blur-[400px] focus-within:border-slate-600 gap-">
-                  <div className="mr-2">
-                    <Image
-                      alt="user-icon"
-                      src="/images/user-icon.svg"
-                      className="w-5 h-5"
-                      width={30}
-                      height={30}
-                    />
-                  </div>
-                  {/* <input
+              {isDisconnected ? <ConnectButton /> : null}
+              <div className="flex items-center w-full flex-col">
+                <div className="flex flex-col justify-center w-full gap-1 text-black">
+                  Display name
+                  <div className="flex w-full items-center rounded-[10px] border px-3 text-slate-300 outline-none border-zinc-800 backdrop-blur-[400px] focus-within:border-slate-600 gap-">
+                    <div className="mr-2">
+                      <Image
+                        alt="user-icon"
+                        src="/images/user-icon.svg"
+                        className="w-5 h-5"
+                        width={30}
+                        height={30}
+                      />
+                    </div>
+                    {/* <input
                     value={userDisplayName}
                     onChange={(e) => {
                       setUserDisplayName(e.target.value);
@@ -364,49 +392,49 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
                     placeholder="Enter your name"
                     className="flex-1 bg-transparent py-3 outline-none text-black"
                   /> */}
-                  <div className="flex-1 bg-transparent py-3 outline-none text-black">
-                    {isLoading ? (
-                      <div className="flex items-center justify-center">
-                        <Oval
-                          visible={true}
-                          height="20"
-                          width="20"
-                          color="#0500FF"
-                          secondaryColor="#cdccff"
-                          ariaLabel="oval-loading"
-                        />
-                      </div>
-                    ) : (
-                      profileDetails?.displayName ||
-                      profileDetails?.ensName ||
-                      formattedAddress
-                    )}
+                    <div className="flex-1 bg-transparent py-3 outline-none text-black">
+                      {isLoading ? (
+                        <div className="flex items-center justify-center">
+                          <Oval
+                            visible={true}
+                            height="20"
+                            width="20"
+                            color="#0500FF"
+                            secondaryColor="#cdccff"
+                            ariaLabel="oval-loading"
+                          />
+                        </div>
+                      ) : (
+                        profileDetails?.displayName ||
+                        profileDetails?.ensName ||
+                        formattedAddress
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
+              <div className="flex items-center w-full">
+                <button
+                  className="flex items-center justify-center bg-blue-shade-100 text-slate-100 rounded-md p-2 mt-2 w-full"
+                  onClick={handleStartSpaces}
+                  disabled={isLoading}
+                >
+                  {isJoining ? "Joining Spaces..." : "Start meeting"}
+                  {!isJoining && (
+                    <Image
+                      alt="narrow-right"
+                      width={30}
+                      height={30}
+                      src="/images/arrow-narrow-right.svg"
+                      className="w-6 h-6 ml-1"
+                    />
+                  )}
+                </button>
+              </div>
             </div>
-            <div className="flex items-center w-full">
-              <button
-                className="flex items-center justify-center bg-blue-shade-100 text-slate-100 rounded-md p-2 mt-2 w-full"
-                onClick={handleStartSpaces}
-                disabled={isLoading}
-              >
-                {isJoining ? "Joining Spaces..." : "Start meeting"}
-                {!isJoining && (
-                  <Image
-                    alt="narrow-right"
-                    width={30}
-                    height={30}
-                    src="/images/arrow-narrow-right.svg"
-                    className="w-6 h-6 ml-1"
-                  />
-                )}
-              </button>
-            </div>
-          </div>
-        </main>
-      </div>
-      {/*  ) : (
+          </main>
+        </div>
+      ) : (
         <>
           {notAllowedMessage ? (
             <div className="flex justify-center items-center h-screen">
@@ -451,7 +479,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
             </>
           )}
         </>
-      )} */}
+      )}
     </>
   );
 };

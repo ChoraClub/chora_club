@@ -72,6 +72,14 @@ const BottomBar: React.FC<BottomBarProps> = () => {
 
   const [showLeaveDropDown, setShowLeaveDropDown] = useState<boolean>(false);
   const [s3URL, setS3URL] = useState<string>("");
+
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [meetingDetailsVisible, setMeetingDetailsVisible] = useState(true);
+  const { chain } = useNetwork();
+  const { address } = useAccount();
+  const path = usePathname();
+  const [isLoading, setIsLoading] = useState(false);
+
   useDataMessage({
     async onMessage(payload, from, label) {
       if (label === "server-message") {
@@ -104,16 +112,6 @@ const BottomBar: React.FC<BottomBarProps> = () => {
       }
     },
   });
-
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
-  const [meetingDetailsVisible, setMeetingDetailsVisible] = useState(true);
-
-  const { chain } = useNetwork();
-
-  const { address } = useAccount();
-
-  const path = usePathname();
 
   // const handleRecordingButtonClick = async () => {
   //   if (!roomId) {
@@ -208,6 +206,7 @@ const BottomBar: React.FC<BottomBarProps> = () => {
   };
 
   const handleEndCall = async (endMeet: string) => {
+    setIsLoading(true);
     // Check if the user is the host
     if (role === "host") {
       await handleStopRecording(); // Do not proceed with API calls if not the host
@@ -217,8 +216,10 @@ const BottomBar: React.FC<BottomBarProps> = () => {
     toast("Meeting Ended");
     if (endMeet === "leave") {
       leaveRoom();
+      setIsLoading(false);
     } else if (endMeet === "close") {
       closeRoom();
+      setIsLoading(false);
     } else {
       return;
     }
@@ -243,7 +244,7 @@ const BottomBar: React.FC<BottomBarProps> = () => {
           meetingType: meetingType,
         }),
       };
-      console.log("req optionnnn", requestOptions);
+      // console.log("req optionnnn", requestOptions);
 
       const response2 = await fetch("/api/end-call", requestOptions);
       const result = await response2.text();
@@ -265,7 +266,9 @@ const BottomBar: React.FC<BottomBarProps> = () => {
       });
       const response_data = await response.json();
       console.log("Updated", response_data);
-      toast.success("Attestation successful");
+      if (response_data.success) {
+        toast.success("Attestation successful");
+      }
     } catch (e) {
       console.log("Error in attestation: ", e);
       toast.error("Attestation denied");
@@ -516,17 +519,19 @@ const BottomBar: React.FC<BottomBarProps> = () => {
             {role === "host" && (
               <Strip
                 type="close"
-                title="End spaces for all"
+                title={isLoading ? "Leaving...." : "End spaces for all"}
                 variant="danger"
                 onClick={() => handleEndCall("close")}
               />
             )}
-            <Strip
-              type="leave"
-              title="Leave the spaces"
-              variant="danger"
-              onClick={() => handleEndCall("leave")}
-            />
+            {role !== "host" && (
+              <Strip
+                type="leave"
+                title={isLoading ? "Leaving..." : "Leave the spaces"}
+                variant="danger"
+                onClick={() => handleEndCall("leave")}
+              />
+            )}
           </Dropdown>
         </div>
 

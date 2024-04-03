@@ -106,7 +106,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
     // );
     // console.log("Updated attestation status to 'attested'");
 
-    return NextResponse.json(data, { status: 200 });
+    return NextResponse.json({ success: true, data }, { status: 200 });
   } catch (error) {
     console.error("Error retrieving data:", error);
     return NextResponse.json(

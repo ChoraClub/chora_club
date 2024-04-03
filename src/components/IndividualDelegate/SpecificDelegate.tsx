@@ -158,9 +158,11 @@ function SpecificDelegate({ props }: { props: Type }) {
   };
 
   const handleDelegateVotes = async (to: string) => {
-
-    if (typeof window.ethereum === 'undefined' || !window.ethereum.isConnected()) {
-      console.log('not connected');
+    if (
+      typeof window.ethereum === "undefined" ||
+      !window.ethereum.isConnected()
+    ) {
+      console.log("not connected");
     }
 
     const address = await walletClient.getAddresses();
@@ -179,21 +181,18 @@ function SpecificDelegate({ props }: { props: Type }) {
     }
 
     console.log(walletClient);
-    if(walletClient.chain==""){
+    if (walletClient.chain == "") {
       toast.error("Please connect your wallet!");
+    } else {
+      const delegateTx = await walletClient.writeContract({
+        address: chainAddress,
+        abi: dao_abi.abi,
+        functionName: "delegate",
+        args: [to],
+        account: address1,
+      });
+      console.log(delegateTx);
     }
-    else
-    {
-    const delegateTx = await walletClient.writeContract({
-      address: chainAddress,
-      abi: dao_abi.abi,
-      functionName: "delegate",
-      args: [to],
-      account: address1,
-    });
-    console.log(delegateTx);
-    }
-    
   };
   return (
     <>
@@ -209,7 +208,7 @@ function SpecificDelegate({ props }: { props: Type }) {
           />
         </div>
       )}
-      {!(isPageLoading || (!isDelegate && !selfDelegate)) ? (
+      {!(isPageLoading || (!isDelegate && selfDelegate)) ? (
         <div className="font-poppins">
           <div className="flex ps-14 py-5 justify-between">
             <div className="flex">
