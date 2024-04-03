@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 // Assets
-import { toast } from "react-hot-toast";
+import { Toaster, toast } from "react-hot-toast";
 import { BasicIcons } from "@/assets/BasicIcons";
 
 // Components
@@ -61,76 +61,121 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
   const { joinRoom, state, room } = useRoom();
   const [isAllowToEnter, setIsAllowToEnter] = useState<boolean>();
   const [notAllowedMessage, setNotAllowedMessage] = useState<string>();
+  const [hostAddress, setHostAddress] = useState();
+  const [meetingStatus, setMeetingStatus] = useState<any>();
+
+  useEffect(() => {
+    console.log("meetingStatus", meetingStatus);
+  }, [meetingStatus]);
 
   const handleStartSpaces = async () => {
     console.log("in start spaces");
     if (isDisconnected) {
       toast("Connect your wallet to join the meeting!");
     } else {
-      setIsJoining(true);
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
 
-      let token = "";
-      if (state !== "connected") {
-        const requestBody = {
-          roomId: params.roomId,
-          role: "host",
-          displayName: address,
-          address: address, // assuming you have userAddress defined somewhere
-        };
-        try {
-          const response = await fetch("/api/new-token", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(requestBody),
-          });
+      const raw = JSON.stringify({
+        roomId: params.roomId,
+        meetingType: "session",
+      });
 
-          // if (!response.ok) {
-          //   throw new Error("Failed to fetch token");
-          // }
+      const requestOptions: any = {
+        method: "POST",
+        headers: myHeaders,
+        body: raw,
+        redirect: "follow",
+      };
+      const response = await fetch("/api/verify-meeting-id", requestOptions);
+      const result = await response.json();
 
-          token = await response.text(); // Change this line
-          // console.log("Token fetched successfully:", token);
-        } catch (error) {
-          console.error("Error fetching token:", error);
-          // Handle error appropriately, e.g., show error message to user
-          toast.error("Failed to fetch token");
-          setIsJoining(false);
-          return;
-        }
+      if (result.success) {
+        setHostAddress(result.data.host_address);
+      }
+      if (result.message === "Meeting is ongoing") {
+        setMeetingStatus("Ongoing");
       }
 
-      try {
-        console.log({ token });
-        console.log(params.roomId);
-        await joinRoom({
-          roomId: params.roomId,
-          token,
-        });
-      } catch (error) {
-        console.error("Error joining room:", error);
-        // Handle error appropriately, e.g., show error message to user
-        toast.error("Failed to join room");
-      }
+      // if (address === hostAddress || meetingStatus === "Ongoing") {
+      if (address === hostAddress || result.message === "Meeting is ongoing") {
+        setIsJoining(true);
 
-      console.log("Role.HOST", Role.HOST);
-      if (Role.HOST) {
-        console.log("inside put api");
-        const response = await fetch(
-          `/api/update-meeting-status/${params.roomId}`,
-          {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
+        let token = "";
+        if (state !== "connected") {
+          const requestBody = {
+            roomId: params.roomId,
+            role: "host",
+            displayName: address,
+            address: address, // assuming you have userAddress defined somewhere
+          };
+          try {
+            const response = await fetch("/api/new-token", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(requestBody),
+            });
+
+            // if (!response.ok) {
+            //   throw new Error("Failed to fetch token");
+            // }
+
+            token = await response.text(); // Change this line
+            // console.log("Token fetched successfully:", token);
+          } catch (error) {
+            console.error("Error fetching token:", error);
+            // Handle error appropriately, e.g., show error message to user
+            toast.error("Failed to fetch token");
+            setIsJoining(false);
+            return;
           }
-        );
-        const responseData = await response.json();
-        console.log("responseData: ", responseData);
-      }
+        }
 
-      setIsJoining(false);
+        try {
+          console.log({ token });
+          console.log(params.roomId);
+          await joinRoom({
+            roomId: params.roomId,
+            token,
+          });
+        } catch (error) {
+          console.error("Error joining room:", error);
+          // Handle error appropriately, e.g., show error message to user
+          toast.error("Failed to join room");
+        }
+
+        console.log("Role.HOST", Role.HOST);
+        if (Role.HOST) {
+          console.log("inside put api");
+          const myHeaders = new Headers();
+          myHeaders.append("Content-Type", "application/json");
+
+          const raw = JSON.stringify({
+            meetingId: params.roomId,
+            meetingType: "session",
+          });
+          const requestOptions: any = {
+            method: "PUT",
+            headers: myHeaders,
+            body: raw,
+            redirect: "follow",
+          };
+          const response = await fetch(
+            `/api/update-meeting-status/${params.roomId}`,
+            requestOptions
+          );
+          const responseData = await response.json();
+          console.log("responseData: ", responseData);
+          // setMeetingStatus("Ongoing");
+        }
+
+        setIsJoining(false);
+      } else {
+        toast("Please wait, Host has not started the session yet.");
+        console.log("Wait..");
+      }
     }
   };
 
@@ -159,41 +204,46 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
     async function verifyMeetingId() {
       try {
         const response = await fetch("/api/verify-meeting-id", requestOptions);
-        const data = await response.json();
+        const result = await response.json();
 
-        if (data.success) {
-          if (data.message === "Meeting has ended") {
+        if (result.success) {
+          setHostAddress(result.data.host_address);
+        }
+
+        if (result.success) {
+          if (result.message === "Meeting has ended") {
             console.log("Meeting has ended");
             setIsAllowToEnter(false);
-            setNotAllowedMessage(data.message);
-          } else if (data.message === "Meeting is upcoming") {
+            setNotAllowedMessage(result.message);
+          } else if (result.message === "Meeting is upcoming") {
             console.log("Meeting is upcoming");
             setIsAllowToEnter(true);
-          } else if (data.message === "Meeting has been denied") {
+          } else if (result.message === "Meeting has been denied") {
             console.log("Meeting has been denied");
             setIsAllowToEnter(false);
-            setNotAllowedMessage(data.message);
-          } else if (data.message === "Meeting does not exist") {
+            setNotAllowedMessage(result.message);
+          } else if (result.message === "Meeting does not exist") {
             setIsAllowToEnter(false);
-            setNotAllowedMessage(data.message);
+            setNotAllowedMessage(result.message);
             console.log("Meeting does not exist");
-          } else if (data.message === "Meeting is ongoing") {
+          } else if (result.message === "Meeting is ongoing") {
+            setMeetingStatus("Ongoing");
             setIsAllowToEnter(true);
+            // setMeetingStatus("Ongoing");
             console.log("Meeting is ongoing");
           }
         } else {
           // Handle error scenarios
-          setNotAllowedMessage(data.message);
-          console.error("Error:", data.error || data.message);
+          setNotAllowedMessage(result.error || result.message);
+          console.error("Error:", result.error || result.message);
         }
       } catch (error) {
         // Handle network errors
         console.error("Fetch error:", error);
       }
     }
-
     verifyMeetingId();
-  }, [params.roomId, isAllowToEnter, notAllowedMessage]);
+  }, [params.roomId, isAllowToEnter, notAllowedMessage, meetingStatus]);
 
   useEffect(() => {
     let dao = "";
@@ -221,6 +271,8 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
           console.log("filtered profile: ", filtered);
           setProfileDetails(filtered[0]);
           setIsLoading(false);
+          const imageCid = filtered[0].image;
+          setAvatarUrl(`https://gateway.lighthouse.storage/ipfs/${imageCid}`);
           setUserDisplayName(filtered[0].displayName);
         }
 
@@ -252,17 +304,19 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
   return (
     <>
       {isAllowToEnter ? (
-        <div className="mt-2">
+        <div className="h-screen">
           {popupVisibility && (
-            <div className="relative bg-red-700 text-white flex justify-center items-center top-0 py-2 font-poppins w-1/3 rounded-md mx-auto">
-              <div className="">This meeting is being recorded.</div>
-              <div className="flex absolute right-2">
-                <button
-                  onClick={() => setPopupVisibility(false)}
-                  className="p-2 hover:bg-red-600 hover:rounded-full"
-                >
-                  <RxCross2 size={20} />
-                </button>
+            <div className="flex items-center justify-center">
+              <div className="absolute bg-red-700 text-white flex justify-center items-center py-2 font-poppins w-1/3 rounded-md top-2">
+                <div className="">This meeting is being recorded.</div>
+                <div className="flex absolute right-2">
+                  <button
+                    onClick={() => setPopupVisibility(false)}
+                    className="p-2 hover:bg-red-600 hover:rounded-full"
+                  >
+                    <RxCross2 size={20} />
+                  </button>
+                </div>
               </div>
             </div>
           )}
@@ -303,6 +357,21 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
                   >
                     <div className="relative mt-5">
                       <div className="grid-cols-3 grid h-full w-full place-items-center gap-6  px-6 ">
+                        {profileDetails?.image && (
+                          <Image
+                            src={`https://gateway.lighthouse.storage/ipfs/${profileDetails.image}`}
+                            alt={`image`}
+                            width={45}
+                            height={45}
+                            loading="lazy"
+                            className="object-contain cursor-pointer"
+                            onClick={() => {
+                              setAvatarUrl(
+                                `https://gateway.lighthouse.storage/ipfs/${profileDetails.image}`
+                              );
+                            }}
+                          />
+                        )}
                         {Array.from({ length: 20 }).map((_, i) => {
                           const url = `/avatars/avatars/${i}.png`;
 
@@ -378,6 +447,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
                 <button
                   className="flex items-center justify-center bg-blue-shade-100 text-slate-100 rounded-md p-2 mt-2 w-full"
                   onClick={handleStartSpaces}
+                  disabled={isLoading}
                 >
                   {isJoining ? "Joining Spaces..." : "Start meeting"}
                   {!isJoining && (
@@ -440,6 +510,17 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
           )}
         </>
       )}
+      <Toaster
+        toastOptions={{
+          style: {
+            fontSize: "14px",
+            backgroundColor: "#333",
+            color: "#fff",
+            borderRadius: "8px",
+            padding: "12px",
+          },
+        }}
+      />
     </>
   );
 };

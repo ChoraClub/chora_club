@@ -89,7 +89,7 @@ function InstantMeet({ isDelegate, selfDelegate }: instantMeetProps) {
     };
 
     try {
-      console.log("calling.......");
+      // console.log("calling.......");
       const response = await fetch("/api/book-slot", requestOptions);
       const result = await response.json();
       console.log("result of book-slots", result);

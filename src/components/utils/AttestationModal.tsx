@@ -19,7 +19,7 @@ function AttestationModal({
   const toggleModal = () => {
     onClose();
   };
-  console.log("Attestation modal");
+  // console.log("Attestation modal");
 
   const shareOnTwitter = () => {
     const url = encodeURIComponent(`https://app.chora.club/`);

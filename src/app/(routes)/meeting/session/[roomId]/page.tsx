@@ -37,18 +37,16 @@ const Home = ({ params }: { params: { roomId: string } }) => {
   const [modalOpen, setModalOpen] = useState(false);
 
   const handleModalClose = () => {
-    console.log("Popup Closed");
+    // console.log("Popup Closed");
     setModalOpen(false); // Close the modal
     // Push the router after the modal is closed
 
     push(`/meeting/session/${params.roomId}/lobby`);
-    console.log("Popup 3");
+    // console.log("Popup 3");
   };
 
   const displayPopup = async () => {
-    console.log("Popup");
     setModalOpen(true);
-    console.log("Popup 2");
   };
 
   const { state } = useRoom({
@@ -103,32 +101,32 @@ const Home = ({ params }: { params: { roomId: string } }) => {
     async function verifyMeetingId() {
       try {
         const response = await fetch("/api/verify-meeting-id", requestOptions);
-        const data = await response.json();
+        const result = await response.json();
 
-        if (data.success) {
-          if (data.message === "Meeting has ended") {
+        if (result.success) {
+          if (result.message === "Meeting has ended") {
             console.log("Meeting has ended");
             setIsAllowToEnter(false);
-            setNotAllowedMessage(data.message);
-          } else if (data.message === "Meeting is upcoming") {
+            setNotAllowedMessage(result.message);
+          } else if (result.message === "Meeting is upcoming") {
             console.log("Meeting is upcoming");
             setIsAllowToEnter(true);
-          } else if (data.message === "Meeting has been denied") {
+          } else if (result.message === "Meeting has been denied") {
             console.log("Meeting has been denied");
             setIsAllowToEnter(false);
-            setNotAllowedMessage(data.message);
-          } else if (data.message === "Meeting does not exist") {
+            setNotAllowedMessage(result.message);
+          } else if (result.message === "Meeting does not exist") {
             setIsAllowToEnter(false);
-            setNotAllowedMessage(data.message);
+            setNotAllowedMessage(result.message);
             console.log("Meeting does not exist");
-          } else if (data.message === "Meeting is ongoing") {
+          } else if (result.message === "Meeting is ongoing") {
             setIsAllowToEnter(true);
             console.log("Meeting is ongoing");
           }
         } else {
           // Handle error scenarios
-          setNotAllowedMessage(data.error || data.message);
-          console.error("Error:", data.error || data.message);
+          setNotAllowedMessage(result.error || result.message);
+          console.error("Error:", result.error || result.message);
         }
       } catch (error) {
         // Handle network errors

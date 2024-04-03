@@ -44,11 +44,14 @@ export async function PUT(req: NextRequest, res: NextResponse) {
     const existingAttendees = existingDocument.attendees || [];
 
     const uniqueAttendees = attendees.filter((newAttendee) => {
-      return !existingAttendees.some((existingAttendee: any) => {
-        return (
-          existingAttendee.attendee_address === newAttendee.attendee_address
-        );
-      });
+      return (
+        newAttendee.attendee_address !== existingDocument.host_address &&
+        !existingAttendees.some((existingAttendee: any) => {
+          return (
+            existingAttendee.attendee_address === newAttendee.attendee_address
+          );
+        })
+      );
     });
 
     console.log("Adding unique attendees...");

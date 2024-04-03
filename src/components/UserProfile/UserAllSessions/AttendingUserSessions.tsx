@@ -64,14 +64,16 @@ function AttendingUserSessions() {
         const resultData = await result.data;
         // console.log("resultData", resultData);
         setPageLoading(true);
+        // const currentTime = new Date();
+        // const currentSlot = new Date(currentTime.getTime() + 60 * 60 * 1000);
         if (Array.isArray(resultData)) {
           let filteredData: any = resultData;
           if (searchParams.get("session") === "attending") {
             filteredData = resultData.filter((session: Session) => {
-              return session.meeting_status === "Upcoming" &&
-                session.attendees?.some(
-                  (attendee) => attendee.attendee_address === address
-                ) &&
+              return session.attendees?.some(
+                (attendee) => attendee.attendee_address === address
+              ) &&
+                session.meeting_status !== "Recorded" &&
                 chain?.name === "Optimism"
                 ? session.dao_name === "optimism"
                 : chain?.name === "Arbitrum One"

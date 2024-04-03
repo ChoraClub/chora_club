@@ -24,7 +24,7 @@ function FeedbackTile() {
   }, []);
 
   useEffect(() => {
-    console.log("meeting feedback path: ", path);
+    // console.log("meeting feedback path: ", path);
     if (path.includes("/huddle") || path.includes("/meeting")) {
       console.log("in meeting path");
       setDataShowing(true);

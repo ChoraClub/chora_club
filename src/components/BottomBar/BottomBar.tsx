@@ -72,6 +72,14 @@ const BottomBar: React.FC<BottomBarProps> = () => {
 
   const [showLeaveDropDown, setShowLeaveDropDown] = useState<boolean>(false);
   const [s3URL, setS3URL] = useState<string>("");
+
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [meetingDetailsVisible, setMeetingDetailsVisible] = useState(true);
+  const { chain } = useNetwork();
+  const { address } = useAccount();
+  const path = usePathname();
+  const [isLoading, setIsLoading] = useState(false);
+
   useDataMessage({
     async onMessage(payload, from, label) {
       if (label === "server-message") {
@@ -104,16 +112,6 @@ const BottomBar: React.FC<BottomBarProps> = () => {
       }
     },
   });
-
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
-  const [meetingDetailsVisible, setMeetingDetailsVisible] = useState(true);
-
-  const { chain } = useNetwork();
-
-  const { address } = useAccount();
-
-  const path = usePathname();
 
   // const handleRecordingButtonClick = async () => {
   //   if (!roomId) {
@@ -208,18 +206,20 @@ const BottomBar: React.FC<BottomBarProps> = () => {
   };
 
   const handleEndCall = async (endMeet: string) => {
+    setIsLoading(true);
     // Check if the user is the host
-    if (role !== "host") {
-      return; // Do not proceed with API calls if not the host
+    if (role === "host") {
+      await handleStopRecording(); // Do not proceed with API calls if not the host
     }
-    await handleStopRecording();
 
     console.log("s3URL in handleEndCall", s3URL);
     toast("Meeting Ended");
     if (endMeet === "leave") {
       leaveRoom();
+      setIsLoading(false);
     } else if (endMeet === "close") {
       closeRoom();
+      setIsLoading(false);
     } else {
       return;
     }
@@ -244,7 +244,7 @@ const BottomBar: React.FC<BottomBarProps> = () => {
           meetingType: meetingType,
         }),
       };
-      console.log("req optionnnn", requestOptions);
+      // console.log("req optionnnn", requestOptions);
 
       const response2 = await fetch("/api/end-call", requestOptions);
       const result = await response2.text();
@@ -266,7 +266,9 @@ const BottomBar: React.FC<BottomBarProps> = () => {
       });
       const response_data = await response.json();
       console.log("Updated", response_data);
-      toast.success("Attestation successful");
+      if (response_data.success) {
+        toast.success("Attestation successful");
+      }
     } catch (e) {
       console.log("Error in attestation: ", e);
       toast.error("Attestation denied");
@@ -307,6 +309,56 @@ const BottomBar: React.FC<BottomBarProps> = () => {
     }
   };
 
+  const opBlock = [
+    {
+      title: "Forum",
+      link: "https://gov.optimism.io/",
+    },
+    {
+      title: "Website",
+      link: "https://optimism.io/",
+    },
+    {
+      title: "Block Explorer",
+      link: "https://optimistic.etherscan.io/",
+    },
+    {
+      title: "Optimism Twitter Profile",
+      link: "https://twitter.com/Optimism",
+    },
+    {
+      title: "Optimism DAO Twitter Profile",
+      link: "https://twitter.com/OptimismGov",
+    },
+  ];
+
+  const arbBlock = [
+    {
+      title: "Forum",
+      link: "https://forum.arbitrum.foundation",
+    },
+    {
+      title: "Website",
+      link: "https://arbitrum.io",
+    },
+    {
+      title: "Arbitrum Foundation Website",
+      link: "https://arbitrum.foundation",
+    },
+    {
+      title: "Block Explorer",
+      link: "https://arbiscan.io",
+    },
+    {
+      title: "Arbitrum Twitter Profile",
+      link: "https://twitter.com/arbitrum",
+    },
+    {
+      title: "Arbitrum DAO Twitter Profile",
+      link: "https://twitter.com/DAO_Arbitrum",
+    },
+  ];
+
   return (
     <div className="w-full flex items-center px-10 justify-between pb-6 font-poppins">
       {/* Bottom Bar Left */}
@@ -331,88 +383,31 @@ const BottomBar: React.FC<BottomBarProps> = () => {
             {isDropdownOpen && chain?.name === "Arbitrum One" && (
               <div className="absolute z-10 top-auto bottom-full left-0 mb-2 w-52 bg-white rounded-lg shadow-lg">
                 <div className="arrow-up"></div>
-                <a
-                  href="https://forum.arbitrum.foundation"
-                  target="_blank"
-                  className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
-                >
-                  Forum
-                </a>
-                <a
-                  href="https://arbitrum.io"
-                  target="_blank"
-                  className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
-                >
-                  Website
-                </a>
-                <a
-                  href="https://arbitrum.foundation"
-                  target="_blank"
-                  className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
-                >
-                  Arbitrum Foundation Website
-                </a>
-                <a
-                  href="https://arbiscan.io"
-                  target="_blank"
-                  className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
-                >
-                  Block Explorer
-                </a>
-                <a
-                  href="https://twitter.com/arbitrum"
-                  target="_blank"
-                  className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
-                >
-                  Arbitrum Twitter Profile
-                </a>
-                <a
-                  href="https://twitter.com/DAO_Arbitrum"
-                  target="_blank"
-                  className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
-                >
-                  Arbitrum DAO Twitter Profile
-                </a>
+                {arbBlock.map((block, index) => (
+                  <a
+                    href={block.link}
+                    target="_blank"
+                    className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
+                    key={index}
+                  >
+                    {block.title}
+                  </a>
+                ))}
               </div>
             )}
             {isDropdownOpen && chain?.name === "Optimism" && (
               <div className="absolute z-10 top-auto bottom-full left-0 mb-2 w-52 bg-white rounded-lg shadow-lg">
                 <div className="arrow-up"></div>
-                <a
-                  href="https://gov.optimism.io/"
-                  target="_blank"
-                  className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
-                >
-                  Forum
-                </a>
-                <a
-                  href="https://optimism.io/"
-                  target="_blank"
-                  className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
-                >
-                  Website
-                </a>
-                <a
-                  href="https://optimistic.etherscan.io/"
-                  target="_blank"
-                  className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
-                >
-                  Block Explorer
-                </a>
-                <a
-                  href="https://twitter.com/Optimism"
-                  target="_blank"
-                  className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
-                >
-                  Optimism Twitter Profile
-                </a>
-                <a
-                  href="https://twitter.com/OptimismGov"
-                  target="_blank"
-                  className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
-                >
-                  Optimism DAO Twitter Profile
-                </a>
+                {opBlock.map((block, index) => (
+                  <a
+                    href={block.link}
+                    target="_blank"
+                    className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
+                    key={index}
+                  >
+                    {block.title}
+                  </a>
+                ))}
               </div>
             )}
           </div>
@@ -447,9 +442,8 @@ const BottomBar: React.FC<BottomBarProps> = () => {
             {NestedBasicIcons.active.mic}
           </button>
         )}
-        {(role === "host" ||
-          ((role === "listener" || role === "speaker") &&
-            meetingCategory === "session")) &&
+        {role === "host" &&
+          meetingCategory === "session" &&
           (!isVideoOn ? (
             <button
               className="rounded-lg inline-flex items-center"
@@ -471,9 +465,8 @@ const BottomBar: React.FC<BottomBarProps> = () => {
               {NestedBasicIcons.active.video}
             </button>
           ))}
-        {(role === "host" ||
-          ((role === "listener" || role === "speaker") &&
-            meetingCategory === "session")) &&
+        {role === "host" &&
+          meetingCategory === "session" &&
           (!videoTrack ? (
             <button
               className=" rounded-lg inline-flex items-center"
@@ -526,17 +519,19 @@ const BottomBar: React.FC<BottomBarProps> = () => {
             {role === "host" && (
               <Strip
                 type="close"
-                title="End spaces for all"
+                title={isLoading ? "Leaving...." : "End spaces for all"}
                 variant="danger"
                 onClick={() => handleEndCall("close")}
               />
             )}
-            <Strip
-              type="leave"
-              title="Leave the spaces"
-              variant="danger"
-              onClick={() => handleEndCall("leave")}
-            />
+            {role !== "host" && (
+              <Strip
+                type="leave"
+                title={isLoading ? "Leaving..." : "Leave the spaces"}
+                variant="danger"
+                onClick={() => handleEndCall("leave")}
+              />
+            )}
           </Dropdown>
         </div>
 
@@ -549,7 +544,7 @@ const BottomBar: React.FC<BottomBarProps> = () => {
           className="cursor-pointer"
           onClick={() => setMeetingDetailsVisible(!meetingDetailsVisible)}
         >
-          <FaCircleInfo color="#0500FF" size={20} />
+          <FaCircleInfo color="#0500FF" size={24} />
         </div>
 
         {meetingDetailsVisible && (
@@ -572,7 +567,7 @@ const BottomBar: React.FC<BottomBarProps> = () => {
             </div>
 
             <div className="flex mb-2 bg-slate-100 rounded-sm px-2 py-1 justify-between items-center">
-              <div>{"https://app.chora.club" + path}</div>
+              <div>{"app.chora.club" + path}</div>
               <div className="pl-5 cursor-pointer">
                 <IoCopy
                   onClick={() =>
