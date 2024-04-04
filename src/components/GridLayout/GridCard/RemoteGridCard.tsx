@@ -80,9 +80,17 @@ const GridCard: React.FC<GridCardProps> = ({ peerId }) => {
     },
   });
   return (
-    <div className="flex w-full h-full justify-center items-center rounded-xl p-4 gap-4">
+    <div
+      className="w-full h-full rounded-lg pt-2 gap-4"
+      style={{
+        height: "100%",
+        width: "100%",
+        minHeight: "50%",
+        minWidth: "32%",
+      }}
+    >
       {!videoStream && (
-        <div className="flex flex-col items-center bg-slate-100 w-full h-full justify-center py-4 px-7 rounded-xl">
+        <div className="flex flex-col items-center bg-slate-100 w-full h-full justify-center py-4 px-7 rounded-lg">
           {audioStream && <AudioElem peerId={peerId} />}
           <div className="relative flex flex-col items-center justify-center">
             <Image

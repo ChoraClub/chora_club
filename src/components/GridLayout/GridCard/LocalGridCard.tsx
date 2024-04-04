@@ -67,12 +67,16 @@ const LocalGridCard: FC = () => {
 
   return (
     <div
-      className={`flex h-full w-full justify-between rounded-xl text-white p-4 gap-6 ${
-        role && ["host", "coHost", "speaker"].includes(role) ? "" : ""
-      }`}
+      className={`h-screen w-full rounded-lg pt-2 gap-4`}
+      style={{
+        height: "100%",
+        width: "100%",
+        minHeight: "50%",
+        minWidth: "32%",
+      }}
     >
       {!stream && (
-        <div className="flex flex-col items-center justify-center bg-slate-100 py-5 px-10 rounded-xl w-full">
+        <div className="flex flex-col items-center justify-center bg-slate-100 py-5 px-10 rounded-lg w-full h-full">
           <div className="relative flex flex-col items-center justify-center">
             <Image
               src={metadata?.avatarUrl || "/avatars/avatars/0.png"}

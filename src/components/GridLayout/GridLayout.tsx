@@ -48,17 +48,15 @@ const GridLayout: React.FC<GridLayoutProps> = () => {
   });
 
   return (
-    <div className="w-full flex items-center justify-center flex-col h-full font-poppins">
-      <div className="flex items-center justify-center gap-4 h-full w-full">
-        <Hosts />
-      </div>
-      <div className="mt-2">
-        {/* {(!screenShareVideoStream || !videoStream) && (
-          <div className="text-black text-base font-normal text-center">
-            Listeners : {peerIds.length}
-          </div>
-        )} */}
-
+    <div className="w-full flex h-full font-poppins gap-4 pe-2">
+      {/* <div className="flex flex-wrap items-center justify-center gap-4 h-full w-full"> */}
+      {/* <div className=""> */}
+      <Hosts />
+      {/* <Speakers />
+      <Listeners /> */}
+      {/* </div> */}
+      {/* </div> */}
+      {/* <div className="mt-2">
         <div className="flex items-center justify-center gap-12 w-full">
           {localPeerRole == Role.HOST ? (
             <>
@@ -77,7 +75,7 @@ const GridLayout: React.FC<GridLayoutProps> = () => {
             ""
           )}
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };

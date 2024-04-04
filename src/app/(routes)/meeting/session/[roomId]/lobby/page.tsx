@@ -87,18 +87,18 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
         body: raw,
         redirect: "follow",
       };
-      const response = await fetch("/api/verify-meeting-id", requestOptions);
-      const result = await response.json();
+      // const response = await fetch("/api/verify-meeting-id", requestOptions);
+      // const result = await response.json();
 
-      if (result.success) {
-        setHostAddress(result.data.host_address);
-      }
-      if (result.message === "Meeting is ongoing") {
-        setMeetingStatus("Ongoing");
-      }
+      // if (result.success) {
+      //   setHostAddress(result.data.host_address);
+      // }
+      // if (result.message === "Meeting is ongoing") {
+      //   setMeetingStatus("Ongoing");
+      // }
 
       // if (address === hostAddress || meetingStatus === "Ongoing") {
-      if (address === hostAddress || result.message === "Meeting is ongoing") {
+      // if (address === hostAddress || result.message === "Meeting is ongoing") {
         setIsJoining(true);
 
         let token = "";
@@ -172,10 +172,10 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
         }
 
         setIsJoining(false);
-      } else {
-        toast("Please wait, Host has not started the session yet.");
-        console.log("Wait..");
-      }
+      // } else {
+      //   toast("Please wait, Host has not started the session yet.");
+      //   console.log("Wait..");
+      // }
     }
   };
 
@@ -303,7 +303,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
 
   return (
     <>
-      {isAllowToEnter ? (
+      {/* {isAllowToEnter ? ( */}
         <div className="h-screen">
           {popupVisibility && (
             <div className="flex items-center justify-center">
@@ -464,7 +464,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
             </div>
           </main>
         </div>
-      ) : (
+     {/*  ) : (
         <>
           {notAllowedMessage ? (
             <div className="flex justify-center items-center h-screen">
@@ -509,7 +509,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
             </>
           )}
         </>
-      )}
+      )} */}
       <Toaster
         toastOptions={{
           style: {

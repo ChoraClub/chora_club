@@ -548,7 +548,7 @@ const BottomBar: React.FC<BottomBarProps> = () => {
         </div>
 
         {meetingDetailsVisible && (
-          <div className="absolute bottom-24 right-6 bg-white shadow-md p-4 rounded-lg text-black">
+          <div className="absolute bottom-20 right-2 bg-white shadow-md px-8 py-4 rounded-lg text-black">
             <div className="flex justify-between items-center mb-2">
               <h3 className="text-lg font-semibold">
                 Your meeting&apos;s ready

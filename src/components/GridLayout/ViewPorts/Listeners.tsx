@@ -12,15 +12,14 @@ const Speakers = () => {
 
   return (
     <>
-      {localPeerRole === Role.LISTENER && localPeerId && (
-        <LocalGridCard key={`grid-${localPeerId}`} />
-      )}
-
-      {localPeerRole == Role.HOST
-        ? peerIds.slice(0, 4).map((peerId) => {
-            return <RemoteGridCard key={`grid-${peerId}`} peerId={peerId} />;
-          })
-        : ""}
+      <div className="h-full w-full space-x-2">
+        {localPeerId && <LocalGridCard key={`grid-${localPeerId}`} />}
+      </div>
+      <div className="h-full w-full">
+        {peerIds.map((peerId) => {
+          return <RemoteGridCard key={`grid-${peerId}`} peerId={peerId} />;
+        })}
+      </div>
     </>
   );
 };
