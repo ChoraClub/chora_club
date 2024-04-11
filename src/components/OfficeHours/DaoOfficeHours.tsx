@@ -129,7 +129,7 @@ function DaoOfficeHours() {
   };
 
   return (
-    <div className="p-6">
+    <div className="pt-6 pl-14 pr-6">
       <div className="flex justify-between pe-10">
         <div className="font-quanty font-medium text-4xl text-blue-shade-200 pb-4">
           Office Hours
