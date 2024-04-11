@@ -15,6 +15,7 @@ const nextConfig = {
       "s3.hj",
       "gateway.lighthouse.storage",
       "static.tally.xyz",
+      "ugc.production.linktr.ee"
     ],
   },
   reactStrictMode: false,

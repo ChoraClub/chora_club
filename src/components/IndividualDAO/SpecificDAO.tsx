@@ -1,12 +1,13 @@
 "use client";
-
+import Image, { StaticImageData } from "next/image";
 import React, { useEffect, useState } from "react";
 import DelegatesList from "./DelegatesList";
 import DelegatesSession from "./DelegatesSession";
 import OfficeHours from "./OfficeHours";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-
+import OPLogo from "@/assets/images/daos/op.png";
+import ARBLogo from "@/assets/images/daos/arbitrum.jpg";
 
 const desc = {
   optimism:
@@ -16,32 +17,66 @@ const desc = {
     "The Arbitrum DAO is a decentralized autonomous organization (DAO) built on the Ethereum blockchain. At its core, the Arbitrum DAO is a community-driven governance mechanism that allows $ARB token holders to propose and vote on changes to the organization and the technologies it governs.",
 };
 
-// const handleDaoChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
-//   const selected = e.target.value;
-//   // setSelectedDao(selected);
-//   let filtered: any;
-//   if (selected === "All-DAOS") {
-//     // setDaoInfo(APIData);
-//     setSelectedDao(null);
-//   } else {
-//     // filtered = APIData.filter((item) => item.dao_name === selected);
-//     // setDaoInfo(filtered);
-//     setSelectedDao(selected);
-//   }
-// };
-
-
-
 
 function SpecificDAO({ props }: { props: { daoDelegates: string } }) {
   const router = useRouter();
   const path = usePathname();
+  const daoname=path.slice(1);
   const searchParams = useSearchParams();
 
+  const logoMapping = {
+    optimism: OPLogo,
+    arbitrum: ARBLogo,
+    // Add more mappings as needed
+  };
+
+  const selectedLogo = logoMapping[daoname] || OPLogo;
+
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedOption, setSelectedOption] = useState({ value: daoname, label: daoname, image:selectedLogo });
+  
+  const options = [
+    { value: 'optimism', label: 'optimism', image: OPLogo },
+    { value: 'arbitrum', label: 'arbitrum', image: ARBLogo },
+  ];
+
+  const handleMouseEnter = () => {
+    setIsOpen(true);
+  };
+
+  const handleMouseLeave = () => {
+    setIsOpen(false);
+  };
+
+  const selectOption = (option) => {
+    setSelectedOption(option);
+    setIsOpen(false);
+
+    let name:string;
+    name=option.value;
+    const formatted = name.toLowerCase();
+    const localData = JSON.parse(localStorage.getItem("visitedDao") || "{}");
+    localStorage.setItem(
+      "visitedDao",
+      JSON.stringify({ ...localData, [formatted]: [formatted, option.image] })
+    );
+    
+    // Redirect or perform other actions based on the selected DAO
+    switch (option.value) {
+      case 'optimism':
+        window.location.href = '/optimism?active=delegatesList';
+        break;
+      case 'arbitrum':
+        window.location.href = '/arbitrum?active=delegatesList';
+        break;
+      default:
+        break;
+    }
+  };
+ 
   return (
     <div className="font-poppins py-6" id="secondSection">
-   
-      <div className="px-8 pb-5">
+      {/* <div className="px-8 pb-5">
         <div className="flex justify-between pe-10">
           <div className="capitalize text-4xl text-blue-shade-100">
             {props.daoDelegates}
@@ -58,10 +93,54 @@ function SpecificDAO({ props }: { props: { daoDelegates: string } }) {
             ? desc.arbitrum
             : null}
         </div>
+      </div> */}
+      <div className="px-8 pb-5">
+        <div className="flex items-center justify-between pe-10">
+        <div className="relative"onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+        <div className="custom-dropdown">
+        <div className="selected-option p-3 pl-7 pr-5 rounded-full capitalize text-2xl text-blue-shade-100 bg-white-200 outline-none cursor-pointer flex items-center justify-between border border-white-shade-100 hover:border-blue-500 hover:shadow-xl transition delay-100  duration-500"onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+    <div className="mr-5 flex items-center"><Image
+                        src={selectedOption.image}
+                        alt={selectedOption.label}
+                        width={25}
+                        height={25}
+                        className="rounded-full w-10 h-10 mr-5"
+                      ></Image>{selectedOption.label}</div>
+    <svg className={`w-4 h-4 mr-2 ${isOpen ? 'transform rotate-180 transition-transform duration-300' : 'transition-transform duration-300'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+    </svg>
+  </div>
+      {isOpen && (
+        <div className={`absolute mt-1 p-2 w-72 border border-white-shade-100 bg-white shadow-md ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`} style={{ transition: 'opacity 0.3s' }}onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+          {options.map((option) => (
+            <div key={option.value} className={`option flex items-center cursor-pointer p-2  rounded-lg transition duration-300 ease-in-out transform hover:scale-105 capitalize text-blue-shade-500 ${option.label === daoname ? 'bg-gray-200 text-blue-shade-100' : ''}`}  onClick={() => selectOption(option)} style={{fontSize:"1.4rem"}}>
+              <Image
+                        src={option.image}
+                        alt={option.label}
+                        width={25}
+                        height={25}
+                        className="rounded-full w-10 h-10 mr-5"
+                      ></Image>
+              {option.value}   
+            </div>
+           
+            
+          ))}
+        </div>
+      )}
+    </div>
+         
+        </div>
+          
+          <div>
+            <ConnectButton />
+          </div>
+        </div>
+
+      
       </div>
 
       <div className="flex gap-12 bg-[#D9D9D945] pl-16">
-        
         <button
           className={`border-b-2 py-4 px-2 ${
             searchParams.get("active") === "delegatesList"
