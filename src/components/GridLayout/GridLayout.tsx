@@ -16,13 +16,14 @@ import {
   useRemoteVideo,
   useRemoteScreenShare,
 } from "@huddle01/react/hooks";
+import ScreenSharingPort from "./ViewPorts/ScreenSharingPort";
 
 type GridLayoutProps = {};
 
 const GridLayout: React.FC<GridLayoutProps> = () => {
   // const { peerIds } = usePeerIds({ roles: [Role.LISTENER] });
   const { peerId: localPeerId, role: localPeerRole } = useLocalPeer();
-  const { peerIds } = usePeerIds({ roles: [Role.HOST, Role.LISTENER] });
+  const { peerIds } = usePeerIds({ roles: ["host", "listener", "speaker"] });
   // console.log("peerIds----- ", peerIds);
   // console.log("Peer id: ", peerIds[0]);
   const hostId = peerIds[0];
@@ -48,10 +49,11 @@ const GridLayout: React.FC<GridLayoutProps> = () => {
   });
 
   return (
-    <div className="w-full flex h-full font-poppins gap-4 pe-2">
+    <div className="w-full flex h-full font-poppins pe-2 pt-2">
       {/* <div className="flex flex-wrap items-center justify-center gap-4 h-full w-full"> */}
       {/* <div className=""> */}
-      <Hosts />
+      {/* <Hosts /> */}
+      <ScreenSharingPort />
       {/* <Speakers />
       <Listeners /> */}
       {/* </div> */}

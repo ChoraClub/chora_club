@@ -80,51 +80,56 @@ const GridCard: React.FC<GridCardProps> = ({ peerId }) => {
     },
   });
   return (
-    <div
-      className="w-full h-full rounded-lg pt-2 gap-4"
-      style={{
-        height: "100%",
-        width: "100%",
-        minHeight: "50%",
-        minWidth: "32%",
-      }}
-    >
-      {!videoStream && (
-        <div className="flex flex-col items-center bg-slate-100 w-full h-full justify-center py-4 px-7 rounded-lg">
-          {audioStream && <AudioElem peerId={peerId} />}
-          <div className="relative flex flex-col items-center justify-center">
-            <Image
-              src={metadata?.avatarUrl || "/avatars/avatars/0.png"}
-              alt="default-avatar"
-              width={100}
-              height={100}
-              quality={100}
-              priority
-              className="maskAvatar"
-            />
+    <div className="w-full h-full rounded-lg gap-4">
+      <div className="relative w-full h-full">
+        {!videoStream ? (
+          <div className="flex flex-col items-center bg-slate-100 w-full h-full justify-center py-4 px-7 rounded-lg">
+            {audioStream && <AudioElem peerId={peerId} />}
+            <div className="relative flex flex-col items-center justify-center">
+              <Image
+                src={metadata?.avatarUrl || "/avatars/avatars/0.png"}
+                alt="default-avatar"
+                width={100}
+                height={100}
+                quality={100}
+                priority
+                className="maskAvatar"
+              />
 
-            <div className="absolute left-1/2 -translate-x-1/2 mb-2 text-4xl">
-              {reaction}
-            </div>
-            {role && ["host", "coHost", "speaker"].includes(role) && (
-              <div className="absolute top-0 right-0">{BasicIcons.audio}</div>
-            )}
-            {metadata?.isHandRaised && (
-              <div className="absolute flex bottom-0 w-8 h-8 right-0 rounded-full justify-center items-center bg-gray-600 text-xl border-gray-600 border-2">
-                ✋
+              <div className="absolute left-1/2 -translate-x-1/2 mb-2 text-4xl">
+                {reaction}
               </div>
-            )}
-          </div>
-          <div className="mt-1 text-center">
-            <div className="text-gray-800 text-base font-medium">
-              {metadata?.displayName}
+              {role && ["host", "coHost", "speaker"].includes(role) && (
+                <div className="absolute top-0 right-0">{BasicIcons.audio}</div>
+              )}
+              {metadata?.isHandRaised && (
+                <div className="absolute flex bottom-0 w-8 h-8 right-0 rounded-full justify-center items-center bg-gray-600 text-xl border-gray-600 border-2">
+                  ✋
+                </div>
+              )}
             </div>
+            <div className="mt-1 text-center">
+              <div className="text-gray-800 text-base font-medium">
+                {metadata?.displayName}
+              </div>
 
-            {/* <div className="text-gray-800 text-sm font-normal">{role}</div> */}
+              {role === "host" ? (
+                <div className="text-gray-800 text-sm font-normal capitalize">
+                  {role}
+                </div>
+              ) : null}
+            </div>
           </div>
-        </div>
-      )}
-      <div className="grid grid-cols-2 gap-4 justify-center items-center">
+        ) : (
+          <video
+            ref={vidRef}
+            autoPlay
+            playsInline
+            className="aspect-video w-full h-full object-cover object-center rounded-lg"
+          />
+        )}
+      </div>
+      {/* <div className="grid grid-cols-2 gap-4 justify-center items-center">
         {audioStream && <AudioElem peerId={peerId} />}
         {screenShareVideoStream && (
           <div className={!videoStream ? "col-span-2" : "col-span-1 w-full"}>
@@ -138,8 +143,8 @@ const GridCard: React.FC<GridCardProps> = ({ peerId }) => {
               }
             />
           </div>
-        )}
-        {videoStream && (
+        )} */}
+      {/* {videoStream && (
           <div
             className={
               !screenShareVideoStream
@@ -147,7 +152,7 @@ const GridCard: React.FC<GridCardProps> = ({ peerId }) => {
                 : "col-span-1"
             }
           >
-            <div className={!screenShareVideoStream ? "w-[60%]" : ""}>
+            <div>
               <video
                 ref={vidRef}
                 autoPlay
@@ -156,8 +161,8 @@ const GridCard: React.FC<GridCardProps> = ({ peerId }) => {
               />
             </div>
           </div>
-        )}
-      </div>
+        )} 
+      </div>*/}
     </div>
   );
 };

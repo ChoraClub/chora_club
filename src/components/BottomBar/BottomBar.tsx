@@ -29,6 +29,7 @@ import { FaCircleInfo } from "react-icons/fa6";
 import { RxCross2 } from "react-icons/rx";
 import { IoCopy } from "react-icons/io5";
 import copy from "copy-to-clipboard";
+import { Role } from "@huddle01/server-sdk/auth";
 
 type BottomBarProps = {};
 
@@ -41,7 +42,11 @@ const BottomBar: React.FC<BottomBarProps> = () => {
   // console.log(roomId);
   console.log("Value: ", meetingCategory);
 
-  const { peerIds } = usePeerIds();
+  const { peerIds } = usePeerIds({
+    roles: ["host", "listener", "speaker"],
+  });
+  // const {peerIds } = usePeerIds([Role.BOT])
+  console.log("peer id of host: ", peerIds);
 
   const { leaveRoom, closeRoom, state } = useRoom();
 
@@ -442,7 +447,7 @@ const BottomBar: React.FC<BottomBarProps> = () => {
             {NestedBasicIcons.active.mic}
           </button>
         )}
-        {role === "host" &&
+        {(role === "host" || "listener" || "speaker") &&
           meetingCategory === "session" &&
           (!isVideoOn ? (
             <button
@@ -465,7 +470,7 @@ const BottomBar: React.FC<BottomBarProps> = () => {
               {NestedBasicIcons.active.video}
             </button>
           ))}
-        {role === "host" &&
+        {(role === "host" || "listener" || "speaker") &&
           meetingCategory === "session" &&
           (!videoTrack ? (
             <button
@@ -591,12 +596,7 @@ const BottomBar: React.FC<BottomBarProps> = () => {
           }}
         >
           {BasicIcons.peers}
-          <span className="text-black">
-            {
-              Object.keys(peerIds).filter((peerId) => peerId !== localPeerId)
-                .length
-            }
-          </span>
+          <span className="text-black">{peerIds.length + 1}</span>
         </OutlineButton>
         <OutlineButton
           className="ml-auto flex items-center gap-3 border-[#0500FF] relative"
