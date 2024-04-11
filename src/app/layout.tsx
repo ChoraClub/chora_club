@@ -74,7 +74,7 @@ export default function RootLayout({
               </div>
               <div className="w-[94%] ml-auto">
                 <FeedbackTile />
-                <div className="pl-[2%]">{children}</div>
+                <div>{children}</div>
               </div>
             </div>
           </HuddleContextProvider>
