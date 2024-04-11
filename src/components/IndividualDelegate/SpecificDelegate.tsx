@@ -19,6 +19,7 @@ import toast, { Toaster } from "react-hot-toast";
 import WalletAndPublicClient from "@/helpers/signer";
 import dao_abi from "../../artifacts/Dao.sol/GovernanceToken.json";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { useConnectModal, useChainModal } from "@rainbow-me/rainbowkit";
 import { useNetwork } from "wagmi";
 import OPLogo from "@/assets/images/daos/op.png";
 import ArbLogo from "@/assets/images/daos/arbCir.png";
@@ -33,9 +34,12 @@ interface Type {
 function SpecificDelegate({ props }: { props: Type }) {
   const { publicClient, walletClient } = WalletAndPublicClient();
   const { chain, chains } = useNetwork();
+  console.log(chain?.name);
+  const { openChainModal } = useChainModal();
   const [delegateInfo, setDelegateInfo] = useState<any>();
   const router = useRouter();
   const path = usePathname();
+  console.log(path);
   const searchParams = useSearchParams();
   const [twitter, setTwitter] = useState("");
   const [discord, setDiscord] = useState("");
@@ -47,6 +51,7 @@ function SpecificDelegate({ props }: { props: Type }) {
   const [isPageLoading, setIsPageLoading] = useState(true);
   console.log("Props", props.daoDelegates);
   useEffect(() => {
+    console.log("Network", chain?.network);
     const fetchData = async () => {
       setIsPageLoading(true);
       try {
@@ -184,14 +189,21 @@ function SpecificDelegate({ props }: { props: Type }) {
     if (walletClient.chain == "") {
       toast.error("Please connect your wallet!");
     } else {
-      const delegateTx = await walletClient.writeContract({
-        address: chainAddress,
-        abi: dao_abi.abi,
-        functionName: "delegate",
-        args: [to],
-        account: address1,
-      });
-      console.log(delegateTx);
+      if (walletClient.chain?.network === props.daoDelegates) {
+        const delegateTx = await walletClient.writeContract({
+          address: chainAddress,
+          abi: dao_abi.abi,
+          functionName: "delegate",
+          args: [to],
+          account: address1,
+        });
+        console.log(delegateTx);
+      } else {
+        toast.error("Please switch to appropriate network to delegate!");
+        if (openChainModal) {
+          openChainModal();
+        }
+      }
     }
   };
   return (
@@ -334,18 +346,20 @@ function SpecificDelegate({ props }: { props: Type }) {
                       />
                     </span>
                   </Tooltip>
-                  <Toaster
-                    toastOptions={{
-                      style: {
-                        fontSize: "14px",
-                        backgroundColor: "#3E3D3D",
-                        color: "#fff",
-                        boxShadow: "none",
-                        borderRadius: "50px",
-                        padding: "3px 5px",
-                      },
-                    }}
-                  />
+                  <div style={{ zIndex: "21474836462" }}>
+                    <Toaster
+                      toastOptions={{
+                        style: {
+                          fontSize: "14px",
+                          backgroundColor: "#3E3D3D",
+                          color: "#fff",
+                          boxShadow: "none",
+                          borderRadius: "50px",
+                          padding: "3px 5px",
+                        },
+                      }}
+                    />
+                  </div>
                 </div>
 
                 <div className="flex gap-4 py-1">

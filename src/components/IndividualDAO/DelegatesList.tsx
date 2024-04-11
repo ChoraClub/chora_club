@@ -14,9 +14,17 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import toast, { Toaster } from "react-hot-toast";
 import styles from "@/components/IndividualDelegate/DelegateVotes.module.css";
 import { FaArrowUp } from "react-icons/fa6";
+import { useConnectModal, useChainModal } from "@rainbow-me/rainbowkit";
+import dao_abi from "../../artifacts/Dao.sol/GovernanceToken.json";
+import { useAccount } from "wagmi";
+import WalletAndPublicClient from "@/helpers/signer";
 
 function DelegatesList({ props }: { props: string }) {
   const [delegateData, setDelegateData] = useState<any>({ delegates: [] });
+  const { openChainModal } = useChainModal();
+  const { publicClient, walletClient } = WalletAndPublicClient();
+  const { openConnectModal } = useConnectModal();
+  const { isConnected, address } = useAccount();
   const [tempData, setTempData] = useState<any>({ delegates: [] });
   const [searchResults, setSearchResults] = useState<any>({ delegates: [] });
   const [searchQuery, setSearchQuery] = useState("");
@@ -40,8 +48,6 @@ function DelegatesList({ props }: { props: string }) {
     );
     setIsShowing(!KarmaCreditClosed);
   }, []);
-
-  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -122,6 +128,50 @@ function DelegatesList({ props }: { props: string }) {
   const handleCopy = (addr: string) => {
     copy(addr);
     toast("Address Copied");
+  };
+
+  const WalletOpen = async (to: string) => {
+    const adr = await walletClient.getAddresses();
+    console.log(adr);
+    const address1 = adr[0];
+    console.log(address1);
+
+    let parts = path.split("/");
+    let firstStringAfterSlash = parts[1];
+
+    let chainAddress;
+    console.log(delegateData.delegates[0].daoName);
+
+    if (delegateData.delegates[0].daoName === "optimism") {
+      chainAddress = "0x4200000000000000000000000000000000000042";
+    } else if (delegateData.delegates[0].daoName === "arbitrum") {
+      chainAddress = "0x912CE59144191C1204E64559FE8253a0e49E6548";
+    } else {
+      return;
+    }
+    console.log(chainAddress);
+
+    if (isConnected) {
+      if (walletClient.chain?.network === firstStringAfterSlash) {
+        const delegateTx = await walletClient.writeContract({
+          address: chainAddress,
+          abi: dao_abi.abi,
+          functionName: "delegate",
+          args: [to],
+          account: address1,
+        });
+        console.log(delegateTx);
+      } else {
+        toast.error("Please switch to appropriate network to delegate!");
+        if (openChainModal) {
+          openChainModal();
+        }
+      }
+    } else {
+      if (openConnectModal) {
+        openConnectModal();
+      }
+    }
   };
 
   const formatNumber = (number: number) => {
@@ -256,11 +306,14 @@ function DelegatesList({ props }: { props: string }) {
             <div className="grid min-[475px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-10 ">
               {delegateData.delegates.map((daos: any, index: number) => (
                 <div
+                  onClick={() =>
+                    router.push(`/${props}/${daos.publicAddress}?active=info  `)
+                  }
                   key={index}
                   style={{
                     boxShadow: "0px 4px 50.8px 0px rgba(0, 0, 0, 0.11)",
                   }}
-                  className="px-5 py-7 rounded-2xl flex flex-col justify-between"
+                  className="px-5 py-7 rounded-2xl flex flex-col justify-between cursor-pointer"
                 >
                   <div>
                     <div className="flex justify-center relative">
@@ -323,7 +376,10 @@ function DelegatesList({ props }: { props: string }) {
                           >
                             <span className="cursor-pointer text-sm">
                               <IoCopy
-                                onClick={() => handleCopy(daos.publicAddress)}
+                                onClick={(event) => {
+                                  event.stopPropagation();
+                                  handleCopy(daos.publicAddress);
+                                }}
                               />
                             </span>
                           </Tooltip>
@@ -338,29 +394,32 @@ function DelegatesList({ props }: { props: string }) {
                     </div>
                   </div>
                   <div>
-                    <button
-                      className="bg-blue-shade-100 text-white font-poppins w-full rounded-[4px] text-sm py-1 font-medium"
-                      onClick={() =>
-                        router.push(
-                          `/${props}/${daos.publicAddress}?active=info  `
-                        )
-                      }
-                    >
-                      View Profile
-                    </button>
+                    <div>
+                      <button
+                        className="bg-blue-shade-100 text-white font-poppins w-full rounded-[4px] text-sm py-1 font-medium"
+                        onClick={(event) => {
+                          event.stopPropagation(); // Prevent event propagation to parent container
+                          WalletOpen(daos.publicAddress);
+                        }}
+                      >
+                        Delegate
+                      </button>
+                    </div>
                   </div>
-                  <Toaster
-                    toastOptions={{
-                      style: {
-                        fontSize: "14px",
-                        backgroundColor: "#3E3D3D",
-                        color: "#fff",
-                        boxShadow: "none",
-                        borderRadius: "50px",
-                        padding: "3px 5px",
-                      },
-                    }}
-                  />
+                  <div style={{ zIndex: "21474836462" }}>
+                    <Toaster
+                      toastOptions={{
+                        style: {
+                          fontSize: "14px",
+                          backgroundColor: "#3E3D3D",
+                          color: "#fff",
+                          boxShadow: "none",
+                          borderRadius: "50px",
+                          padding: "3px 5px",
+                        },
+                      }}
+                    />
+                  </div>
                 </div>
               ))}
             </div>
