@@ -51,7 +51,7 @@ function SpecificDAO({ props }: { props: { daoDelegates: string } }) {
     setIsOpen(false);
   };
 
-  const selectOption = (option) => {
+  const selectOption = (option: any) => {
     setSelectedOption(option);
     setIsOpen(false);
 
@@ -67,10 +67,10 @@ function SpecificDAO({ props }: { props: { daoDelegates: string } }) {
     // Redirect or perform other actions based on the selected DAO
     switch (option.value) {
       case "optimism":
-        window.location.href = "/optimism?active=delegatesList";
+        router.push("/optimism?active=delegatesList");
         break;
       case "arbitrum":
-        window.location.href = "/arbitrum?active=delegatesList";
+        router.push("/arbitrum?active=delegatesList");
         break;
       default:
         break;
@@ -98,27 +98,20 @@ function SpecificDAO({ props }: { props: { daoDelegates: string } }) {
         </div>
       </div> */}
 
-      <div className="px-8 pb-5">
+      <div className="pr-8 pb-5 pl-16">
         <div className="flex items-center justify-between pe-10">
           <div
             className="relative"
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
           >
-            <div className="custom-dropdown">
+            <div>
               <div
-                className="selected-option p-3 pl-7 pr-5 rounded-full capitalize text-2xl text-blue-shade-100 bg-white-200 outline-none cursor-pointer flex items-center justify-between border border-white-shade-100 hover:border-blue-500 hover:shadow-xl transition delay-100  duration-500"
+                className="capitalize text-4xl text-blue-shade-100 bg-white-200 outline-none cursor-pointer flex items-center justify-between transition duration-500"
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
               >
                 <div className="mr-5 flex items-center">
-                  <Image
-                    src={selectedOption.image}
-                    alt={selectedOption.label}
-                    width={25}
-                    height={25}
-                    className="rounded-full w-10 h-10 mr-5"
-                  ></Image>
                   {selectedOption.label}
                 </div>
                 <svg
@@ -141,32 +134,24 @@ function SpecificDAO({ props }: { props: { daoDelegates: string } }) {
               </div>
               {isOpen && (
                 <div
-                  className={`absolute mt-1 p-2 w-72 border border-white-shade-100 bg-white shadow-md ${
+                  className={`absolute mt-1 p-2 w-72 border border-white-shade-100 rounded-xl bg-white shadow-md ${
                     isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
                   }`}
                   style={{ transition: "opacity 0.3s" }}
                   onMouseEnter={handleMouseEnter}
                   onMouseLeave={handleMouseLeave}
                 >
-                  {options.map((option) => (
-                    <div
-                      key={option.value}
-                      className={`option flex items-center cursor-pointer p-2  rounded-lg transition duration-300 ease-in-out transform hover:scale-105 capitalize text-blue-shade-500 ${
-                        option.label === daoname
-                          ? "bg-gray-200 text-blue-shade-100"
-                          : ""
-                      }`}
-                      onClick={() => selectOption(option)}
-                      style={{ fontSize: "1.4rem" }}
-                    >
-                      <Image
-                        src={option.image}
-                        alt={option.label}
-                        width={25}
-                        height={25}
-                        className="rounded-full w-10 h-10 mr-5"
-                      ></Image>
-                      {option.value}
+                  {options.map((option, index) => (
+                    <div key={index}>
+                      <div
+                        className={`option flex items-center cursor-pointer px-3 py-2 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 capitalize ${
+                          option.label === daoname ? "text-blue-shade-100" : ""
+                        }`}
+                        onClick={() => selectOption(option)}
+                      >
+                        {option.value}
+                      </div>
+                      {index !== options.length - 1 && <hr />}
                     </div>
                   ))}
                 </div>
