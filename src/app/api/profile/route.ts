@@ -10,7 +10,7 @@ interface DelegateRequestBody {
   daoName: string;
   isDelegate: boolean;
   displayName: string;
-  emailId:string;
+  emailId: string;
   socialHandles: {
     twitter: string;
     discord: string;
@@ -30,7 +30,7 @@ interface DelegateResponseBody {
     description: string;
     isDelegate: boolean;
     displayName: string;
-    emailId:string;
+    emailId: string;
     socialHandles: {
       twitter: string;
       discord: string;
@@ -121,13 +121,15 @@ export async function PUT(
     emailId,
     socialHandles,
   }: DelegateRequestBody = await req.json();
-  console.log("address in api: ", address);
-  console.log("image in api: ", image);
-  console.log("description in api: ", description);
-  console.log("isDelegate in api: ", isDelegate);
-  console.log("displayName in api: ", displayName);
-  console.log("emailId in api:",emailId);
-  console.log("socialHandles in api: ", socialHandles);
+
+  console.log("Received Properties:");
+  console.log("address:", address);
+  console.log("image:", image);
+  console.log("description:", description);
+  console.log("isDelegate:", isDelegate);
+  console.log("displayName:", displayName);
+  console.log("emailId:", emailId);
+  console.log("socialHandles:", socialHandles);
 
   try {
     // Connect to your MongoDB database
@@ -141,20 +143,20 @@ export async function PUT(
     const db = client.db();
     const collection = db.collection("delegates");
 
+    // Prepare update fields
+    const updateFields: any = {};
+    if (image !== undefined) updateFields.image = image;
+    if (description !== undefined) updateFields.description = description;
+    if (isDelegate !== undefined) updateFields.isDelegate = isDelegate;
+    if (displayName !== undefined) updateFields.displayName = displayName;
+    if (emailId !== undefined) updateFields.emailId = emailId;
+    if (socialHandles !== undefined) updateFields.socialHandles = socialHandles;
+
     // Update the delegate document
     console.log("Updating delegate document...");
     const result = await collection.updateOne(
       { address },
-      {
-        $set: {
-          image,
-          description,
-          isDelegate,
-          displayName,
-          emailId,
-          socialHandles,
-        },
-      }
+      { $set: updateFields }
     );
     console.log("Delegate document updated:", result);
 

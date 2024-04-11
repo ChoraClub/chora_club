@@ -71,7 +71,7 @@ export async function POST(
 
     if (existingDocument) {
       // Update the existing document by pushing new allowedDates and dateAndRanges
-      await collection.updateOne(
+      const result = await collection.updateOne(
         {
           _id: existingDocument._id,
         },
@@ -85,6 +85,8 @@ export async function POST(
           },
         }
       );
+
+      console.log("result", result);
 
       // Retrieve the updated document
       const updatedDocument = await collection.findOne({
@@ -110,7 +112,7 @@ export async function POST(
       });
 
       client.close();
-
+      console.log("result", result);
       if (result.insertedId) {
         // Retrieve the inserted document using the insertedId
         const insertedDocument = await collection.findOne({
