@@ -50,6 +50,7 @@ function ScheduledUserSessions() {
   const [isValidEmail, setIsValidEmail] = useState(true);
   const [continueAPICalling, setContinueAPICalling] = useState<Boolean>(false);
   const [userRejected, setUserRejected] = useState<Boolean>();
+  const [addingEmail, setAddingEmail] = useState<boolean>();
 
   const checkUser = async () => {
     try {
@@ -375,32 +376,49 @@ function ScheduledUserSessions() {
 
   const handleSubmit = async () => {
     if (address) {
-      if (isValidEmail) {
-        const myHeaders = new Headers();
-        myHeaders.append("Content-Type", "application/json");
+      if (mailId && (mailId !== "" || mailId !== undefined)) {
+        if (isValidEmail) {
+          try {
+            setAddingEmail(true);
+            const myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
 
-        const raw = JSON.stringify({
-          address: address,
-          emailId: mailId,
-        });
+            const raw = JSON.stringify({
+              address: address,
+              emailId: mailId,
+            });
 
-        const requestOptions: any = {
-          method: "PUT",
-          headers: myHeaders,
-          body: raw,
-          redirect: "follow",
-        };
+            const requestOptions: any = {
+              method: "PUT",
+              headers: myHeaders,
+              body: raw,
+              redirect: "follow",
+            };
 
-        const response = await fetch("/api/profile", requestOptions);
-        const result = await response.json();
-        if (result.success) {
-          setContinueAPICalling(true);
+            const response = await fetch("/api/profile", requestOptions);
+            const result = await response.json();
+            if (result.success) {
+              setContinueAPICalling(true);
+              setAddingEmail(false);
+            }
+            console.log("result", result);
+            console.log("Email submitted:", mailId);
+            // Optionally, close the modal
+            // handleGetMailModalClose();
+            setShowGetMailModal(false);
+          } catch (error) {
+            console.log("Error", error);
+            setAddingEmail(false);
+          }
+        } else {
+          toast.error("Enter Valid Email");
+          setShowGetMailModal(true);
+          console.log("Error");
         }
-        console.log("result", result);
-        console.log("Email submitted:", mailId);
-        // Optionally, close the modal
-        // handleGetMailModalClose();
-        setShowGetMailModal(false);
+      } else {
+        toast.error("Enter Valid Email");
+        setShowGetMailModal(true);
+        console.log("Error");
       }
     }
   };
@@ -640,6 +658,7 @@ function ScheduledUserSessions() {
       )}
       {showGetMailModal && (
         <AddEmailModal
+          addingEmail={addingEmail}
           isOpen={showGetMailModal}
           onClose={handleGetMailModalClose}
           onEmailChange={handleEmailChange}
