@@ -6,7 +6,7 @@ import { useAccount } from "wagmi";
 import { DateTime, Duration } from "luxon";
 import dateFns from "date-fns";
 import { useSession } from "next-auth/react";
-import { Oval } from "react-loader-spinner";
+import { Oval, ThreeDots } from "react-loader-spinner";
 import styled from "styled-components";
 import {
   Modal,
@@ -67,6 +67,7 @@ function BookSession({ props }: { props: Type }) {
   const [isValidEmail, setIsValidEmail] = useState(true);
   const [continueAPICalling, setContinueAPICalling] = useState<Boolean>(false);
   const [userRejected, setUserRejected] = useState<Boolean>();
+  const [addingEmail, setAddingEmail] = useState<boolean>();
 
   useEffect(() => {
     // Lock scrolling when the modal is open
@@ -93,7 +94,7 @@ function BookSession({ props }: { props: Type }) {
     // setIsPageLoading(false);
     // }, 1000);
     // }
-
+    // onOpen();
     // setIsPageLoading(false);
     return () => {
       clearTimeout(loadingTimeout);
@@ -448,31 +449,38 @@ function BookSession({ props }: { props: Type }) {
     if (address) {
       if (mailId && (mailId !== "" || mailId !== undefined)) {
         if (isValidEmail) {
-          const myHeaders = new Headers();
-          myHeaders.append("Content-Type", "application/json");
+          try {
+            setAddingEmail(true);
+            const myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
 
-          const raw = JSON.stringify({
-            address: address,
-            emailId: mailId,
-          });
+            const raw = JSON.stringify({
+              address: address,
+              emailId: mailId,
+            });
 
-          const requestOptions: any = {
-            method: "PUT",
-            headers: myHeaders,
-            body: raw,
-            redirect: "follow",
-          };
+            const requestOptions: any = {
+              method: "PUT",
+              headers: myHeaders,
+              body: raw,
+              redirect: "follow",
+            };
 
-          const response = await fetch("/api/profile", requestOptions);
-          const result = await response.json();
-          if (result.success) {
-            setContinueAPICalling(true);
+            const response = await fetch("/api/profile", requestOptions);
+            const result = await response.json();
+            if (result.success) {
+              setContinueAPICalling(true);
+              setAddingEmail(false);
+            }
+            console.log("result", result);
+            console.log("Email submitted:", mailId);
+            // Optionally, close the modal
+            // handleGetMailModalClose();
+            setShowGetMailModal(false);
+          } catch (error) {
+            console.log("Error", error);
+            setAddingEmail(false);
           }
-          console.log("result", result);
-          console.log("Email submitted:", mailId);
-          // Optionally, close the modal
-          // handleGetMailModalClose();
-          setShowGetMailModal(false);
         } else {
           toast.error("Enter Valid Email");
           setShowGetMailModal(true);
@@ -535,119 +543,6 @@ function BookSession({ props }: { props: Type }) {
           </div>
         </div>
       )}
-      {/* 
-      <Modal
-        isOpen={isOpen}
-        onClose={() => {
-          onClose();
-          setIsScheduling(false);
-        }}
-        className="font-poppins min-w-[50rem]"
-      >
-        <ModalContent>
-          <>
-            <ModalHeader className="flex flex-col gap-1 text-white bg-[#292929] p-8">
-              Book your slot for {props.daoDelegates}
-            </ModalHeader>
-            <ModalBody>
-              <div className="px-1 font-medium">Title:</div>
-              <input
-                type="text"
-                name="title"
-                value={modalData.title}
-                onChange={handleModalInputChange}
-                placeholder="Explain Governance"
-                className="outline-none bg-[#D9D9D945] rounded-md px-2 py-1 text-sm"
-                required
-              />
-
-              <div className="px-1 font-medium">Description:</div>
-              <textarea
-                name="description"
-                value={modalData.description}
-                onChange={handleModalInputChange}
-                placeholder="Please share anything that will help prepare for our meeting."
-                className="outline-none bg-[#D9D9D945] rounded-md px-2 py-1 text-sm"
-                required
-              />
-
-              {!showGetMailModal && (
-                <div className="border">
-                  <div className="px-8 py-4 border-b relative pb-7">
-                    <h2
-                      style={{
-                        color: "#0500FF",
-                        fontWeight: "600",
-                        fontSize: "16px",
-                      }}
-                    >
-                      Get Notified About Your Session Request
-                    </h2>
-                    <p style={{ color: "#7C7C7C", fontSize: "12px" }}>
-                      Add your email address to get notified when the delegate
-                      approves or rejects your session request.
-                    </p>
-                    <label className="block mb-2 px-1 font-medium">
-                      Email Address:
-                    </label>
-                    <div className="flex">
-                      <input
-                        type="text"
-                        value={mailId || ""}
-                        placeholder="Enter email address"
-                        onChange={(e) => handleEmailChange(e.target.value)}
-                        className="rounded-md p-2 w-full bg-[#D9D9D945]"
-                      />
-                      <button
-                        onClick={handleSubmit}
-                        className="bg-black text-white px-4 py-2 rounded-r-md hover:bg-gray-900"
-                      >
-                        Notify Me
-                      </button>
-                    </div>
-                    {!isValidEmail && (
-                      <p className="text-red-500 text-sm mt-1">
-                        Invalid email format
-                      </p>
-                    )}
-                  </div>
-                </div>
-              )}
-            </ModalBody>
-            <ModalFooter>
-              <Button
-                color="default"
-                onClick={() => {
-                  onClose();
-                  setIsScheduling(false);
-                }}
-              >
-                Close
-              </Button>
-              <Button
-                color="primary"
-                onClick={checkBeforeApiCall}
-                isDisabled={confirmSave}
-              >
-                {confirmSave ? (
-                  <div className="flex items-center justify-center">
-                    <Oval
-                      visible={true}
-                      height="20"
-                      width="20"
-                      color="#0500FF"
-                      secondaryColor="#cdccff"
-                      ariaLabel="oval-loading"
-                    />
-                  </div>
-                ) : (
-                  <>Save</>
-                )}
-              </Button>
-            </ModalFooter>
-          </>
-        </ModalContent>
-      </Modal> */}
 
       {isOpen && (
         <div
@@ -722,8 +617,24 @@ function BookSession({ props }: { props: Type }) {
                       <button
                         onClick={handleSubmit}
                         className="bg-black text-white px-8 py-3 rounded-3xl hover:bg-gray-900"
+                        disabled={addingEmail}
                       >
-                        Notify Me
+                        {addingEmail ? (
+                          <div className="flex items-center justify-center px-3 py-[0.15rem]">
+                            <ThreeDots
+                              visible={true}
+                              height="20"
+                              width="50"
+                              color="#ffffff"
+                              radius="9"
+                              ariaLabel="three-dots-loading"
+                              wrapperStyle={{}}
+                              wrapperClass=""
+                            />
+                          </div>
+                        ) : (
+                          <>Notify Me</>
+                        )}
                       </button>
                     </div>
                     <div className="text-blue-shade-100 text-xs italic mt-2 ps-3">
