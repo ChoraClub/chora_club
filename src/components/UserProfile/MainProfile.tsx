@@ -407,7 +407,7 @@ function MainProfile() {
     };
 
     fetchData();
-  }, [chain, address]);
+  }, [chain, address, searchParams.get("session") === "schedule"]);
 
   useEffect(() => {
     setIsPageLoading(false);
@@ -535,7 +535,7 @@ function MainProfile() {
       const response: any = await axios.put("/api/profile", {
         address: address,
         image: displayImage,
-        description: description,
+        description: newDescription,
         isDelegate: true,
         displayName: displayName,
         emailId: emailId,
@@ -546,9 +546,9 @@ function MainProfile() {
           github: github,
         },
       });
-
+      console.log("response", response);
       // Handle response from the PUT API function
-      if (response.success) {
+      if (response.data.success) {
         // Delegate updated successfully
         console.log("Delegate updated successfully");
         setIsLoading(false);

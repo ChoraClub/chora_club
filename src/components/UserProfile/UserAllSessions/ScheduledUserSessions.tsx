@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, ReactEventHandler } from "react";
 import { DateTime } from "luxon";
 import { useAccount } from "wagmi";
 import toast, { Toaster } from "react-hot-toast";
@@ -8,6 +8,8 @@ import { Oval } from "react-loader-spinner";
 import { FaCircleInfo } from "react-icons/fa6";
 import { Tooltip } from "@nextui-org/react";
 import SchedulingSuccessModal from "./SchedulingSuccessModal";
+import { RxCross2 } from "react-icons/rx";
+import AddEmailModal from "@/components/utils/AddEmailModal";
 
 interface dataToStore {
   userAddress: `0x${string}` | undefined | null;
@@ -29,25 +31,120 @@ function ScheduledUserSessions() {
   const [endMinute, setEndMinute] = useState("");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
-  const [allowedDates, setAllowedDates] = useState<any>([]);
-  const [daoName, setDaoName] = useState("optimism");
-
   const [utcStartTime, setUtcStartTime] = useState("");
   const [utcEndTime, setUtcEndTime] = useState("");
-
+  const [allowedDates, setAllowedDates] = useState<any>([]);
+  const [daoName, setDaoName] = useState("optimism");
   const [allData, setAllData] = useState<any>([]);
   const [createSessionLoading, setCreateSessionLoading] = useState<any>();
-
   const [startTimeOptions, setStartTimeOptions] = useState([]);
   const [endTimeOptions, setEndTimeOptions] = useState([]);
   const [selectedStartTime, setSelectedStartTime] = useState("");
   const [selectedEndTime, setSelectedEndTime] = useState("");
-  const [modalOpen, setModalOpen] = useState(false);
-  const [modalData, setModalData] = useState<dataToStore>();
+  const [successModalOpen, setSuccessModalOpen] = useState(false);
+  const [finalData, setFinalData] = useState<dataToStore>();
 
-  const handleApplyWithCheck = () => {
-    if (allData.length > 0) {
+  const [mailId, setMailId] = useState<string>();
+  const [hasEmailID, setHasEmailID] = useState<Boolean>();
+  const [showGetMailModal, setShowGetMailModal] = useState<Boolean>();
+  const [isValidEmail, setIsValidEmail] = useState(true);
+  const [continueAPICalling, setContinueAPICalling] = useState<Boolean>(false);
+  const [userRejected, setUserRejected] = useState<Boolean>();
+  const [addingEmail, setAddingEmail] = useState<boolean>();
+
+  const checkUser = async () => {
+    try {
+      const requestOptions: any = {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        redirect: "follow",
+      };
+      const response = await fetch(`/api/profile/${address}`, requestOptions);
+      const result = await response.json();
+      console.log("result", result);
+      if (Array.isArray(result.data) && result.data.length > 0) {
+        console.log("inside array");
+        // Iterate over each item in the response data array
+        for (const item of result.data) {
+          console.log("item::", item);
+          // Check if address and daoName match
+          if (item.address === address) {
+            if (item.emailId === null || item.emailId === "") {
+              console.log("NO emailId found");
+              setHasEmailID(false);
+              return false;
+            } else if (item.emailId) {
+              const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+              const isValid = emailPattern.test(item.emailId);
+              if (isValid) {
+                setMailId(item.emailId);
+                setContinueAPICalling(true);
+                console.log("emailId:", item.emailId);
+                return true;
+              } else {
+                setContinueAPICalling(false);
+                return false;
+              }
+            }
+          }
+        }
+      }
+    } catch (error) {
+      console.log("Error", error);
+    }
+  };
+
+  useEffect(() => {
+    // checkUser();
+    console.log("continueAPICalling", continueAPICalling);
+    if (continueAPICalling) {
       handleApplyButtonClick();
+    }
+  }, [continueAPICalling]);
+
+  useEffect(() => {
+    console.log("userRejected in useEffect", userRejected);
+    const hasRejected = JSON.parse(
+      sessionStorage.getItem("schedulingMailRejected") || "false"
+    );
+    console.log("hasRejected in useEffect", hasRejected);
+    setUserRejected(hasRejected);
+  }, [userRejected, sessionStorage.getItem("schedulingMailRejected")]);
+
+  const handleApplyWithCheck = async () => {
+    if (allData.length > 0) {
+      try {
+        setCreateSessionLoading(true);
+        const checkUserMail = await checkUser();
+        const userRejectedLocal: any = await sessionStorage.getItem(
+          "schedulingMailRejected"
+        );
+        // setUserRejected(userRejectedLocal);
+        console.log("userRejectedLocal", userRejectedLocal);
+        console.log("checkUserMail in handleApplyWithCheck", checkUserMail);
+        console.log("userRejected in handleApplyWithCheck", userRejected);
+        if (!checkUserMail && (!userRejected || !userRejectedLocal)) {
+          setShowGetMailModal(true);
+        } else {
+          console.log("inside else condition!!!!!");
+          console.log("continueAPICalling", continueAPICalling);
+          console.log("!continueAPICalling", !continueAPICalling);
+          if (!continueAPICalling || continueAPICalling === false) {
+            // console.log("inside if(!continueAPICalling)", !continueAPICalling);
+            setContinueAPICalling(true);
+          } else if (continueAPICalling) {
+            handleApplyButtonClick();
+          }
+        }
+        console.log("inside handleApplyWithCheck");
+        // if (continueAPICalling) {
+        //   handleApplyButtonClick();
+        // }
+      } catch (error) {
+        console.log("error:", error);
+      }
     } else {
       toast.error("Please select at least one date before applying.");
     }
@@ -63,7 +160,7 @@ function ScheduledUserSessions() {
       dateAndRanges: dateAndRanges,
       dao_name: daoName,
     };
-    setModalData(dataToStore);
+    setFinalData(dataToStore);
 
     console.log("dataToStore", dataToStore);
     const requestOptions: any = {
@@ -74,20 +171,25 @@ function ScheduledUserSessions() {
     };
 
     try {
-      console.log("calling.......");
+      console.log("storing....");
       setCreateSessionLoading(true);
       const response = await fetch("/api/store-availability", requestOptions);
       const result = await response.json();
       console.log(result);
-      // toast.success("Successfully scheduled your sessions.");
-      setModalOpen(true);
-      setCreateSessionLoading(false);
+      if (result.success) {
+        setSuccessModalOpen(true);
+        setCreateSessionLoading(false);
+        setContinueAPICalling(false);
+      }
     } catch (error) {
       console.error("Error:", error);
       toast.error("Error in scheduling your sessions.");
       setCreateSessionLoading(false);
+      setContinueAPICalling(false);
     }
     setAllData([]);
+    setAllowedDates([]);
+    setDateAndRanges([]);
   };
 
   const getUTCTime = async (
@@ -99,13 +201,8 @@ function ScheduledUserSessions() {
   ) => {
     const combinedDateTimeString_startTime = `${selectedDate} ${startHour}:${startMinute}:00`;
     const localDateTime_startTime = new Date(combinedDateTimeString_startTime);
-
     const utcDateTime_startTime = localDateTime_startTime.toUTCString();
-    const formattedUTCTime_startTime = utcDateTime_startTime
-      .toLocaleString
-      // "en-US",
-      // { timeZone: "UTC" }
-      ();
+    const formattedUTCTime_startTime = utcDateTime_startTime.toLocaleString();
     console.log("formattedUTCTime_startTime", formattedUTCTime_startTime);
 
     const utcFromFormatTime_startTime = DateTime.fromFormat(
@@ -121,11 +218,7 @@ function ScheduledUserSessions() {
 
     const utcDateTime_endTime = localDateTime_endTime.toUTCString();
 
-    const formattedUTCTime_endTime = utcDateTime_endTime
-      .toLocaleString
-      // "en-US",
-      // { timeZone: "UTC" }
-      ();
+    const formattedUTCTime_endTime = utcDateTime_endTime.toLocaleString();
     console.log("formattedUTCTime_endTime", formattedUTCTime_endTime);
 
     const utcFromFormatTime_endTime = DateTime.fromFormat(
@@ -266,13 +359,77 @@ function ScheduledUserSessions() {
     formattedDate = `${year}-${month}-${day}`;
   }
 
-  // console.log("formattedDate", formattedDate);
-
-  // console.log("currentDate", currentDate);
-
   const handleModalClose = () => {
     console.log("Popup Closed");
-    setModalOpen(false);
+    setSuccessModalOpen(false);
+  };
+
+  const handleEmailChange = (email: string) => {
+    setMailId(email);
+    setIsValidEmail(validateEmail(email));
+  };
+
+  const validateEmail = (email: string) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
+
+  const handleSubmit = async () => {
+    if (address) {
+      if (mailId && (mailId !== "" || mailId !== undefined)) {
+        if (isValidEmail) {
+          try {
+            setAddingEmail(true);
+            const myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+
+            const raw = JSON.stringify({
+              address: address,
+              emailId: mailId,
+            });
+
+            const requestOptions: any = {
+              method: "PUT",
+              headers: myHeaders,
+              body: raw,
+              redirect: "follow",
+            };
+
+            const response = await fetch("/api/profile", requestOptions);
+            const result = await response.json();
+            if (result.success) {
+              setContinueAPICalling(true);
+              setAddingEmail(false);
+            }
+            console.log("result", result);
+            console.log("Email submitted:", mailId);
+            // Optionally, close the modal
+            // handleGetMailModalClose();
+            setShowGetMailModal(false);
+          } catch (error) {
+            console.log("Error", error);
+            setAddingEmail(false);
+          }
+        } else {
+          toast.error("Enter Valid Email");
+          setShowGetMailModal(true);
+          console.log("Error");
+        }
+      } else {
+        toast.error("Enter Valid Email");
+        setShowGetMailModal(true);
+        console.log("Error");
+      }
+    }
+  };
+
+  const handleGetMailModalClose = () => {
+    if (!userRejected) {
+      sessionStorage.setItem("schedulingMailRejected", JSON.stringify(true));
+      setUserRejected(true);
+    }
+    setContinueAPICalling(true);
+    setShowGetMailModal(false);
   };
 
   return (
@@ -373,7 +530,6 @@ function ScheduledUserSessions() {
           />
         </div>
 
-       
         <div className="flex flex-col mb-4">
           <div className="">
             <label className="text-gray-700 font-semibold flex items-center">
@@ -493,11 +649,22 @@ function ScheduledUserSessions() {
           }}
         />
       </div>
-      {modalOpen && (
+      {successModalOpen && (
         <SchedulingSuccessModal
-          isOpen={modalOpen}
+          isOpen={successModalOpen}
           onClose={handleModalClose}
-          data={modalData}
+          data={finalData}
+        />
+      )}
+      {showGetMailModal && (
+        <AddEmailModal
+          addingEmail={addingEmail}
+          isOpen={showGetMailModal}
+          onClose={handleGetMailModalClose}
+          onEmailChange={handleEmailChange}
+          onSubmit={handleSubmit}
+          mailId={mailId}
+          isValidEmail={isValidEmail}
         />
       )}
     </>
