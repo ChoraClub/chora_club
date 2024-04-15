@@ -241,7 +241,7 @@ function AvailableSessions() {
   // console.log("currentDate", currentDate);
 
   return (
-    <>
+    <div className="pe-10">
       <div className="flex gap-7 bg-[#D9D9D945] p-4 mt-4 rounded-2xl font-poppins">
         <div
           style={{ background: "rgba(238, 237, 237, 0.36)" }}
@@ -566,7 +566,7 @@ function AvailableSessions() {
           </div>
         )}
       </div>
-    </>
+    </div>
   );
 }
 

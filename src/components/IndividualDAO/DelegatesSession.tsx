@@ -1,8 +1,6 @@
 "use client";
 import Image from "next/image";
 import React, { useState, useEffect } from "react";
-import text1 from "@/assets/images/daos/texture1.png";
-import text2 from "@/assets/images/daos/texture2.png";
 import search from "@/assets/images/daos/search.png";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Tile from "../utils/Tile";
