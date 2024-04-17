@@ -1,0 +1,26 @@
+.container {
+  /* position: relative; */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.container .timeline {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  border: none;
+  border-right: 3px solid #ccc;
+  border-left: 3px solid #ccc;
+}
+
+.container .timeline .bar {
+  background: rgb(199, 199, 204);
+  height: 4px;
+  flex: 1;
+}
+.container .timeline .bar .inner {
+  background: #ccc;
+  width: 0%;
+  height: 100%;
+}

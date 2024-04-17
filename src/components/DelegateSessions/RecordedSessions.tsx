@@ -1,5 +1,5 @@
 import Image from "next/image";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import search from "@/assets/images/daos/search.png";
 import texture1 from "@/assets/images/daos/texture1.png";
 import oplogo from "@/assets/images/daos/op.png";
@@ -7,6 +7,7 @@ import { Tooltip } from "@nextui-org/react";
 import { IoCopy } from "react-icons/io5";
 import toast from "react-hot-toast";
 import copy from "copy-to-clipboard";
+import styles from "./RecordedSessions.module.css";
 
 function RecordedSessions() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -26,28 +27,94 @@ function RecordedSessions() {
       period: "5 months ago",
       address: "0x4466B37DF22A4fb3c8e79c0272652508C6Ba3c11",
     },
-    {
-      image: texture1,
-      title: "Building Resilient Communities: Governance in the Age of DAOs",
-      dao: "Optimism",
-      period: "5 months ago",
-      address: "0x4466B37DF22A4fb3c8e79c0272652508C6Ba3c11",
-    },
-    {
-      image: texture1,
-      title: "Building Resilient Communities: Governance in the Age of DAOs",
-      dao: "Optimism",
-      period: "5 months ago",
-      address: "0x4466B37DF22A4fb3c8e79c0272652508C6Ba3c11",
-    },
-    {
-      image: texture1,
-      title: "Building Resilient Communities: Governance in the Age of DAOs",
-      dao: "Optimism",
-      period: "5 months ago",
-      address: "0x4466B37DF22A4fb3c8e79c0272652508C6Ba3c11",
-    },
+    // {
+    //   image: texture1,
+    //   title: "Building Resilient Communities: Governance in the Age of DAOs",
+    //   dao: "Optimism",
+    //   period: "5 months ago",
+    //   address: "0x4466B37DF22A4fb3c8e79c0272652508C6Ba3c11",
+    // },
+    // {
+    //   image: texture1,
+    //   title: "Building Resilient Communities: Governance in the Age of DAOs",
+    //   dao: "Optimism",
+    //   period: "5 months ago",
+    //   address: "0x4466B37DF22A4fb3c8e79c0272652508C6Ba3c11",
+    // },
+    // {
+    //   image: texture1,
+    //   title: "Building Resilient Communities: Governance in the Age of DAOs",
+    //   dao: "Optimism",
+    //   period: "5 months ago",
+    //   address: "0x4466B37DF22A4fb3c8e79c0272652508C6Ba3c11",
+    // },
   ];
+
+  // const playerRef = React.useRef(null);
+
+  // const videoJsOptions = {
+  //   autoplay: true,
+  //   responsive: true,
+  //   fluid: true,
+  //   sources: [
+  //     {
+  //       src: "https://huddle01.s3.amazonaws.com/recording/ucm-ecne-was/1712221020292.mp4",
+  //       type: "video/mp4",
+  //     },
+  //   ],
+  // };
+
+  // const handlePlayerReady = (player: any) => {
+  //   playerRef.current = player;
+
+  //   // You can handle player events here, for example:
+  //   player.on("waiting", () => {
+  //     videojs.log("player is waiting");
+  //   });
+
+  //   player.on("dispose", () => {
+  //     videojs.log("player will dispose");
+  //   });
+  // };
+
+  // const video: any = document.querySelector(".video");
+  // const progress: any = document.querySelector(".progress");
+  // const progressBar: any = document.querySelector(".progress__filled");
+
+  // function handleProgress() {
+  //   const progressPercentage = (video.currentTime / video.duration) * 100;
+  //   progressBar.style.flexBasis = `${progressPercentage}%`;
+  // }
+
+  // function scrub(e: any) {
+  //   const scrubTime = (e.offsetX / progress.offsetWidth) * video.duration;
+  //   video.currentTime = scrubTime;
+  // }
+
+  const [progress, setProgress] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const videoRef = useRef<any>(null);
+
+  const updateProgress = () => {
+    const currentTime = videoRef.current.currentTime;
+    const duration = videoRef.current.duration;
+    const progress = (currentTime / duration) * 100;
+    setProgress(progress);
+  };
+
+  // useEffect(() => {
+  //   const video: any = document.querySelector("#video");
+  //   // set the pause button to display:none by default
+
+  //   video.addEventListener("timeupdate", () => {
+  //     let curr = (video.currentTime / video.duration) * 100;
+  //     if (video.ended) {
+  //       document.querySelector(".fa-play").style.display = "block";
+  //       document.querySelector(".fa-pause").style.display = "none";
+  //     }
+  //     document.querySelector(".inner").style.width = `${curr}%`;
+  //   });
+  // }, []);
 
   return (
     <div className="pe-10">
@@ -89,19 +156,43 @@ function RecordedSessions() {
               onMouseEnter={() => setDisplayIFrame(index)}
               onMouseLeave={() => setDisplayIFrame(null)}
             >
-              {displayIFrame === index ? (
+              {/* {displayIFrame === index ? ( */}
+              <div
+                className={`w-full h-full rounded-t-3xl bg-black object-cover object-center container ${styles.container}`}
+              >
                 <video
-                  className="w-full h-full rounded-t-3xl bg-black"
-                  src="https://huddle01.s3.amazonaws.com/recording/ucm-ecne-was/1712221020292.mp4"
                   autoPlay
+                  id="video"
+                  className="w-full h-[172px] rounded-t-3xl duration-200 ease-in-out aspect-video"
+                  src="https://huddle01.s3.amazonaws.com/recording/ucm-ecne-was/1712221020292.mp4"
                 />
-              ) : (
+                <div
+                  className={`timeline w-full h-1 bg-[#ccc] ${styles.timeline}`}
+                >
+                  <div className={`bar ${styles.bar}`}>
+                    <div className={`inner ${styles.inner}`}></div>
+                  </div>
+                </div>
+              </div>
+              {/* ) : (
+                // <div className="w-full h-44 rounded-t-3xl bg-black duration-200 ease-in-out">
+                //   <VideoJS
+                //     options={videoJsOptions}
+                //     onReady={handlePlayerReady}
+                //   />
+                // </div>
+                // <div className="w-full h-44 rounded-t-3xl bg-black duration-200 ease-in-out">
+                //   <VideoJS
+                //     options={videoJsOptions}
+                //     onReady={handlePlayerReady}
+                //   />
+                // </div>
                 <Image
                   src={data.image}
                   alt="image"
-                  className="rounded-t-3xl object-cover h-full w-full object-center"
+                  className="rounded-t-3xl object-cover h-full w-full object-center duration-200 ease-in-out"
                 />
-              )}
+              )} */}
             </div>
             <div className="px-4 py-2">
               <div className="font-semibold py-1">{data.title}</div>
