@@ -888,7 +888,7 @@ function MainProfile() {
                   />
                 </div>
                 {votes
-                  ? isDelegate === true && (
+                  ? selfDelegate === true && (
                       <div className="flex gap-4 py-1">
                         <div className="text-[#4F4F4F] border-[0.5px] border-[#D9D9D9] rounded-md px-3 py-1">
                           <span className="text-blue-shade-200 font-semibold">
@@ -962,7 +962,7 @@ function MainProfile() {
             >
               Info
             </button>
-            {(selfDelegate === true || isDelegate === true) && (
+            {selfDelegate === true && (
               <button
                 className={`border-b-2 py-4 px-2 outline-none ${
                   searchParams.get("active") === "votes"
@@ -999,7 +999,7 @@ function MainProfile() {
               Office Hours
             </button>
 
-            {(selfDelegate === true || isDelegate === true) && (
+            {selfDelegate === true && (
               <button
                 className={`border-b-2 py-4 px-2 outline-none ${
                   searchParams.get("active") === "instant-meet"
@@ -1039,7 +1039,7 @@ function MainProfile() {
             ) : (
               ""
             )}
-            {(selfDelegate === true || isDelegate === true) &&
+            {selfDelegate === true &&
             searchParams.get("active") === "votes" ? (
               <UserVotes />
             ) : (
@@ -1061,7 +1061,7 @@ function MainProfile() {
             ) : (
               ""
             )}
-            {(selfDelegate === true || isDelegate === true) &&
+            {selfDelegate === true  &&
             searchParams.get("active") === "instant-meet" ? (
               <InstantMeet
                 isDelegate={isDelegate}
