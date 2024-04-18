@@ -16,6 +16,12 @@ interface RoomDetails {
     roomId: string;
   };
 }
+
+type Attendee = {
+  attendee_address: string;
+  attendee_uid?: string; // Making attendee_uid optional
+};
+
 interface TileProps {
   tileIndex: number;
   data: {
@@ -25,10 +31,13 @@ interface TileProps {
     meetingId: string;
     dao_name: string;
     booking_status: string;
-    user_address: string;
+    meeting_status: boolean;
+    joined_status: boolean;
+    attendees: Attendee[];
     host_address: string;
     slot_time: string;
     description: string;
+    session_type: string;
   };
   isEvent: string;
 }

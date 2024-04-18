@@ -51,7 +51,7 @@ function BookedUserSessions() {
             (session: Session) =>
               session.dao_name === "optimism" &&
               session.meeting_status !== "Recorded" &&
-              new Date(session.slot_time).toLocaleString() <
+              new Date(session.slot_time).toLocaleString() >
                 currentSlot.toLocaleString()
           );
         } else if (chain?.name === "Arbitrum One") {
@@ -59,7 +59,7 @@ function BookedUserSessions() {
             (session: Session) =>
               session.dao_name === "arbitrum" &&
               session.meeting_status !== "Recorded" &&
-              new Date(session.slot_time).toLocaleString() <
+              new Date(session.slot_time).toLocaleString() >
                 currentSlot.toLocaleString()
           );
         }

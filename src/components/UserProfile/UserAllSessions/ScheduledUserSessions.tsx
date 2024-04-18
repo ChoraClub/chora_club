@@ -81,6 +81,7 @@ function ScheduledUserSessions() {
               if (isValid) {
                 setMailId(item.emailId);
                 setContinueAPICalling(true);
+                setHasEmailID(true);
                 console.log("emailId:", item.emailId);
                 return true;
               } else {

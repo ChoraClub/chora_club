@@ -1,5 +1,6 @@
 import { MongoClient, MongoClientOptions } from "mongodb";
 import { NextResponse, NextRequest } from "next/server";
+import { sendMail, compileBookedSessionTemplate } from "@/libs/mail";
 
 // Define the request body type
 interface StoreAvailabilityRequestBody {
@@ -93,6 +94,40 @@ export async function POST(
         _id: existingDocument._id,
       });
 
+      const delegateCollection = db.collection("delegates");
+      const documentsForEmail = await delegateCollection
+        .find({ address: userAddress })
+        .toArray();
+
+
+      for (const document of documentsForEmail) {
+        const emailId = document.emailId;
+        if (emailId && emailId !== "" && emailId !== undefined) {
+          try {
+            await sendMail({
+              to: emailId,
+              name: "Chora Club",
+              subject: "Session Scheduled",
+              body: compileBookedSessionTemplate(
+                "Your session has been Scheduled.",
+                "Please wait till the users books any session."
+              ),
+            });
+
+            // return NextResponse.json(
+            //   { success: true, result: "Email sent successfully!" },
+            //   { status: 200 }
+            // );
+          } catch (error) {
+            console.error("Error sending mail:", error);
+            // return NextResponse.json(
+            //   { error: "Internal Server Error" },
+            //   { status: 500 }
+            // );
+          }
+        }
+      }
+
       client.close();
 
       return NextResponse.json(
@@ -118,6 +153,39 @@ export async function POST(
         const insertedDocument = await collection.findOne({
           _id: result.insertedId,
         });
+
+        const delegateCollection = db.collection("delegates");
+        const documentsForEmail = await delegateCollection
+          .find({ address: userAddress })
+          .toArray();
+
+        for (const document of documentsForEmail) {
+          const emailId = document.emailId;
+          if (emailId && emailId !== "" && emailId !== undefined) {
+            try {
+              await sendMail({
+                to: emailId,
+                name: "Chora Club",
+                subject: "Session Scheduled",
+                body: compileBookedSessionTemplate(
+                  "Your session has been Scheduled.",
+                  "Please wait till the users books any session."
+                ),
+              });
+
+              return NextResponse.json(
+                { success: true, result: "Email sent successfully!" },
+                { status: 200 }
+              );
+            } catch (error) {
+              console.error("Error sending mail:", error);
+              // return NextResponse.json(
+              //   { error: "Internal Server Error" },
+              //   { status: 500 }
+              // );
+            }
+          }
+        }
 
         return NextResponse.json(
           { success: true, data: insertedDocument },

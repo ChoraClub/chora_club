@@ -1,4 +1,4 @@
-import nodemailer from "nodemailer";
+const nodemailer = require("nodemailer");
 import * as handlebars from "handlebars";
 import { bookedSessionTemplate } from "./templates/bookedSession";
 
@@ -15,11 +15,24 @@ export async function sendMail({
 }) {
   const { SMTP_EMAIL, SMTP_PASSWORD } = process.env;
 
-  console.log("SMTP_EMAIL", SMTP_EMAIL);
-  console.log("SMTP_PASSWORD", SMTP_PASSWORD);
+  // console.log("SMTP_EMAIL", SMTP_EMAIL);
+  // console.log("SMTP_PASSWORD", SMTP_PASSWORD);
+
+  console.log("to", to);
+  console.log("name", name);
+  // console.log("subject", subject);
+  // console.log("body", body);
 
   const transport = nodemailer.createTransport({
-    service: "gmail",
+    host: "smtpout.secureserver.net",
+    secure: true,
+    secureConnection: false,
+    tls: {
+      ciphers: "SSLv3",
+    },
+    requireTLS: true,
+    port: 465,
+    debug: true,
     auth: {
       user: SMTP_EMAIL,
       pass: SMTP_PASSWORD,
@@ -40,6 +53,9 @@ export async function sendMail({
       to,
       subject,
       html: body,
+      headers: {
+        "List-Unsubscribe": "",
+      },
     });
 
     console.log("sendResult", sendResult);
