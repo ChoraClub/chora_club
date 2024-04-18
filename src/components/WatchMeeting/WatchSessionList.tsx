@@ -56,27 +56,6 @@ function WatchSessionList() {
       period: "5 months ago",
       address: "0x3013bb4E03a7B81106D69C10710EaE148C8410E1",
     },
-    // {
-    //   image: thumbnail,
-    //   title: "Building Resilient Communities: Governance in the Age of DAOs",
-    //   dao: "optimism",
-    //   period: "5 months ago",
-    //   address: "0x3013bb4E03a7B81106D69C10710EaE148C8410E1",
-    // },
-    // {
-    //   image: thumbnail,
-    //   title: "Navigating the Future: Optimism and the Rise of DAOs",
-    //   dao: "optimism",
-    //   period: "5 months ago",
-    //   address: "0x3013bb4E03a7B81106D69C10710EaE148C8410E1",
-    // },
-    // {
-    //   image: thumbnail,
-    //   title: "The Future of Governance: Exploring the Potential of DAOs",
-    //   dao: "optimism",
-    //   period: "5 months ago",
-    //   address: "0x3013bb4E03a7B81106D69C10710EaE148C8410E1",
-    // },
   ];
 
   return (
