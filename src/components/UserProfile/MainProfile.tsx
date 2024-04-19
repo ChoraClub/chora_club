@@ -490,10 +490,28 @@ function MainProfile() {
         return;
       }
       console.log("Checking");
-      const response = await axios.get(`/api/profile/${address}`);
-      if (Array.isArray(response.data.data) && response.data.data.length > 0) {
+
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+
+      const raw = JSON.stringify({
+        address: address,
+        daoName: dao,
+      });
+
+      const requestOptions: any = {
+        method: "POST",
+        headers: myHeaders,
+        body: raw,
+        redirect: "follow",
+      };
+      const res = await fetch(`/api/profile/${address}`, requestOptions);
+
+      const response = await res.json();
+
+      if (Array.isArray(response.data) && response.data.length > 0) {
         // Iterate over each item in the response data array
-        for (const item of response.data.data) {
+        for (const item of response.data) {
           // Check if address and daoName match
           if (item.address === address && item.daoName === dao) {
             return true; // Return true if match found
