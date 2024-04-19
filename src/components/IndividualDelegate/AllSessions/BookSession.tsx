@@ -466,6 +466,7 @@ function BookSession({ props }: { props: Type }) {
             const raw = JSON.stringify({
               address: address,
               emailId: mailId,
+              daoName: daoName,
             });
 
             const requestOptions: any = {

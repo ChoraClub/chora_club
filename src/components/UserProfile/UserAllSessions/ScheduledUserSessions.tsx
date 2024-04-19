@@ -394,6 +394,7 @@ function ScheduledUserSessions() {
             const raw = JSON.stringify({
               address: address,
               emailId: mailId,
+              daoName: daoName,
             });
 
             const requestOptions: any = {
