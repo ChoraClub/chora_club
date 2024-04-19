@@ -118,6 +118,7 @@ export async function PUT(
     description,
     isDelegate,
     displayName,
+    daoName,
     emailId,
     socialHandles,
   }: DelegateRequestBody = await req.json();
@@ -128,6 +129,7 @@ export async function PUT(
   console.log("description:", description);
   console.log("isDelegate:", isDelegate);
   console.log("displayName:", displayName);
+  console.log("daoName: ", daoName);
   console.log("emailId:", emailId);
   console.log("socialHandles:", socialHandles);
 
@@ -155,7 +157,7 @@ export async function PUT(
     // Update the delegate document
     console.log("Updating delegate document...");
     const result = await collection.updateOne(
-      { address },
+      { address: address, daoName: daoName },
       { $set: updateFields }
     );
     console.log("Delegate document updated:", result);

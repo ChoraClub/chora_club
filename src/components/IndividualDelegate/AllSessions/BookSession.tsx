@@ -37,6 +37,7 @@ const StyledTimePickerContainer = styled.div`
 function BookSession({ props }: { props: Type }) {
   const { openConnectModal } = useConnectModal();
   // const host_address = "0x3013bb4E03a7B81106D69C10710EaE148C8410E1";
+  const daoName = props.daoDelegates;
   const host_address = props.individualDelegate;
   const { isConnected, address } = useAccount();
   const { data: session, status } = useSession();
@@ -239,7 +240,7 @@ function BookSession({ props }: { props: Type }) {
               if (isValid) {
                 setMailId(item.emailId);
                 setContinueAPICalling(true);
-                setHasEmailID(true)
+                setHasEmailID(true);
                 console.log("emailId:", item.emailId);
                 return true;
               } else {
@@ -458,6 +459,7 @@ function BookSession({ props }: { props: Type }) {
             const raw = JSON.stringify({
               address: address,
               emailId: mailId,
+              daoName: daoName,
             });
 
             const requestOptions: any = {

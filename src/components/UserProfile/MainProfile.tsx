@@ -133,12 +133,23 @@ function MainProfile() {
 
     console.log("File Status:", output);
     setDisplayImage(output.data.Hash);
+
+    let dao = "";
+    if (chain && chain?.name === "Optimism") {
+      dao = "optimism";
+    } else if (chain && chain?.name === "Arbitrum One") {
+      dao = "arbitrum";
+    } else {
+      return;
+    }
+
     const response = await axios.put("/api/profile", {
       address: address,
       image: output.data.Hash,
       description: description,
       isDelegate: true,
       displayName: displayName,
+      daoName: dao,
       emailId: emailId,
       socialHandles: {
         twitter: twitter,
@@ -530,6 +541,15 @@ function MainProfile() {
     try {
       // Call the PUT API function for updating an existing delegate
 
+      let dao = "";
+      if (chain && chain?.name === "Optimism") {
+        dao = "optimism";
+      } else if (chain && chain?.name === "Arbitrum One") {
+        dao = "arbitrum";
+      } else {
+        return;
+      }
+
       console.log("Updating");
       console.log("Inside Updating Description", newDescription);
       const response: any = await axios.put("/api/profile", {
@@ -538,6 +558,7 @@ function MainProfile() {
         description: newDescription,
         isDelegate: true,
         displayName: displayName,
+        daoName: dao,
         emailId: emailId,
         socialHandles: {
           twitter: twitter,
@@ -616,10 +637,6 @@ function MainProfile() {
 
     fetchData();
   }, [chain, address]);
-
-  const handleLogoClick = () => {
-    fileInputRef.current?.click();
-  };
 
   return (
     <>
@@ -1039,8 +1056,7 @@ function MainProfile() {
             ) : (
               ""
             )}
-            {selfDelegate === true &&
-            searchParams.get("active") === "votes" ? (
+            {selfDelegate === true && searchParams.get("active") === "votes" ? (
               <UserVotes />
             ) : (
               ""
@@ -1061,7 +1077,7 @@ function MainProfile() {
             ) : (
               ""
             )}
-            {selfDelegate === true  &&
+            {selfDelegate === true &&
             searchParams.get("active") === "instant-meet" ? (
               <InstantMeet
                 isDelegate={isDelegate}
