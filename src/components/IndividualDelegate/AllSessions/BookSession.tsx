@@ -37,6 +37,7 @@ const StyledTimePickerContainer = styled.div`
 function BookSession({ props }: { props: Type }) {
   const { openConnectModal } = useConnectModal();
   // const host_address = "0x3013bb4E03a7B81106D69C10710EaE148C8410E1";
+  const daoName = props.daoDelegates;
   const host_address = props.individualDelegate;
   const { isConnected, address } = useAccount();
   const { data: session, status } = useSession();
@@ -212,11 +213,18 @@ function BookSession({ props }: { props: Type }) {
 
   const checkUser = async () => {
     try {
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+
+      const raw = JSON.stringify({
+        address: address,
+        daoName: daoName,
+      });
+
       const requestOptions: any = {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        method: "POST",
+        headers: myHeaders,
+        body: raw,
         redirect: "follow",
       };
       const response = await fetch(`/api/profile/${address}`, requestOptions);
@@ -239,7 +247,7 @@ function BookSession({ props }: { props: Type }) {
               if (isValid) {
                 setMailId(item.emailId);
                 setContinueAPICalling(true);
-                setHasEmailID(true)
+                setHasEmailID(true);
                 console.log("emailId:", item.emailId);
                 return true;
               } else {

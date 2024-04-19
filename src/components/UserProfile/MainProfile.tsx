@@ -312,14 +312,33 @@ function MainProfile() {
           return;
         }
         console.log("Fetching from DB");
-        const dbResponse = await axios.get(`/api/profile/${address}`);
+        // const dbResponse = await axios.get(`/api/profile/${address}`);
+
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+
+        const raw = JSON.stringify({
+          address: address,
+          daoName: dao,
+        });
+
+        const requestOptions: any = {
+          method: "POST",
+          headers: myHeaders,
+          body: raw,
+          redirect: "follow",
+        };
+        const res = await fetch(`/api/profile/${address}`, requestOptions);
+
+        const dbResponse = await res.json();
+        console.log("db Response", dbResponse);
         if (
           dbResponse &&
-          Array.isArray(dbResponse.data.data) &&
-          dbResponse.data.data.length > 0
+          Array.isArray(dbResponse.data) &&
+          dbResponse.data.length > 0
         ) {
           // Iterate over each item in the response data array
-          for (const item of dbResponse.data.data) {
+          for (const item of dbResponse.data) {
             // Check if address and daoName match
             if (item.daoName === dao && item.address === address) {
               console.log("Data found in the database");
@@ -1039,8 +1058,7 @@ function MainProfile() {
             ) : (
               ""
             )}
-            {selfDelegate === true &&
-            searchParams.get("active") === "votes" ? (
+            {selfDelegate === true && searchParams.get("active") === "votes" ? (
               <UserVotes />
             ) : (
               ""
@@ -1061,7 +1079,7 @@ function MainProfile() {
             ) : (
               ""
             )}
-            {selfDelegate === true  &&
+            {selfDelegate === true &&
             searchParams.get("active") === "instant-meet" ? (
               <InstantMeet
                 isDelegate={isDelegate}

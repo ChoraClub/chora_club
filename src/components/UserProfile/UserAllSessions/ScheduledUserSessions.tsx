@@ -54,11 +54,18 @@ function ScheduledUserSessions() {
 
   const checkUser = async () => {
     try {
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+
+      const raw = JSON.stringify({
+        address: address,
+        daoName: daoName,
+      });
+
       const requestOptions: any = {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        method: "POST",
+        headers: myHeaders,
+        body: raw,
         redirect: "follow",
       };
       const response = await fetch(`/api/profile/${address}`, requestOptions);
