@@ -4,7 +4,10 @@ interface DelegateRequestBody {
   address: string;
   image: string;
   description: string;
+  daoName: string;
   isDelegate: boolean;
+  displayName: string;
+  emailId: string;
   socialHandles: {
     twitter: string;
     discord: string;
@@ -33,11 +36,12 @@ interface DelegateResponseBody {
   error?: string;
 }
 
-export async function GET(
+export async function POST(
   req: Request,
   res: NextResponse<DelegateResponseBody>
 ) {
   // console.log("GET req call");
+  const { address, daoName }: DelegateRequestBody = await req.json();
   try {
     // Connect to MongoDB
     // console.log("Connecting to MongoDB...");
@@ -57,7 +61,7 @@ export async function GET(
 
     // Find documents based on address
     // console.log("Finding documents for address:", address);
-    const documents = await collection.find({ address }).toArray();
+    const documents = await collection.find({ address, daoName }).toArray();
     // console.log("Documents found:", documents);
 
     client.close();

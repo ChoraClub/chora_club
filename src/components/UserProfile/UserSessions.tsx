@@ -121,11 +121,7 @@ function UserSessions({ isDelegate, selfDelegate }: UserSessionsProps) {
   // }, [searchParams.get("session")]);
 
   useEffect(() => {
-    if (
-      !isDelegate &&
-      !selfDelegate &&
-      searchParams.get("session") === "schedule"
-    ) {
+    if (!selfDelegate && searchParams.get("session") === "schedule") {
       router.replace(path + "?active=sessions&session=attending");
     }
   }, [isDelegate, selfDelegate]);
@@ -133,7 +129,7 @@ function UserSessions({ isDelegate, selfDelegate }: UserSessionsProps) {
     <div>
       <div className="pr-32 pt-3">
         <div className="flex gap-16 border-1 border-[#7C7C7C] pl-6 rounded-xl text-sm">
-          {(selfDelegate === true || isDelegate === true) && (
+          {selfDelegate === true && (
             <button
               className={`py-2  ${
                 searchParams.get("session") === "schedule"
@@ -148,7 +144,7 @@ function UserSessions({ isDelegate, selfDelegate }: UserSessionsProps) {
             </button>
           )}
 
-          {(selfDelegate === true || isDelegate === true) && (
+          {selfDelegate === true && (
             <button
               className={`py-2  ${
                 searchParams.get("session") === "book"
@@ -174,7 +170,7 @@ function UserSessions({ isDelegate, selfDelegate }: UserSessionsProps) {
           >
             Attending
           </button>
-          {(selfDelegate === true || isDelegate === true) && (
+          {selfDelegate === true && (
             <button
               className={`py-2 ${
                 searchParams.get("session") === "hosted"
@@ -203,16 +199,17 @@ function UserSessions({ isDelegate, selfDelegate }: UserSessionsProps) {
         </div>
 
         <div className="py-10">
-          {(selfDelegate === true || isDelegate === true) &&
+          {selfDelegate === true &&
             searchParams.get("session") === "schedule" && (
               <ScheduledUserSessions />
             )}
-          {(selfDelegate === true || isDelegate === true) &&
-            searchParams.get("session") === "book" && <BookedUserSessions />}
+          {selfDelegate === true && searchParams.get("session") === "book" && (
+            <BookedUserSessions />
+          )}
           {searchParams.get("session") === "attending" && (
             <AttendingUserSessions />
           )}
-          {(selfDelegate === true || isDelegate === true) &&
+          {selfDelegate === true &&
             searchParams.get("session") === "hosted" &&
             (dataLoading ? (
               <div className="flex items-center justify-center">

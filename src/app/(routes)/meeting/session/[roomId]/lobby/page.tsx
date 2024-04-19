@@ -257,10 +257,21 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
 
     const fetchData = async () => {
       try {
-        const response = await fetch(`/api/profile/${address}`, {
-          method: "GET",
-          headers: { "Content-Type": "application/json" },
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+
+        const raw = JSON.stringify({
+          address: address,
+          daoName: dao,
         });
+
+        const requestOptions: any = {
+          method: "POST",
+          headers: myHeaders,
+          body: raw,
+          redirect: "follow",
+        };
+        const response = await fetch(`/api/profile/${address}`, requestOptions);
         const result = await response.json();
         const resultData = await result.data;
 

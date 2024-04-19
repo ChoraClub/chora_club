@@ -133,12 +133,23 @@ function MainProfile() {
 
     console.log("File Status:", output);
     setDisplayImage(output.data.Hash);
+
+    let dao = "";
+    if (chain && chain?.name === "Optimism") {
+      dao = "optimism";
+    } else if (chain && chain?.name === "Arbitrum One") {
+      dao = "arbitrum";
+    } else {
+      return;
+    }
+
     const response = await axios.put("/api/profile", {
       address: address,
       image: output.data.Hash,
       description: description,
       isDelegate: true,
       displayName: displayName,
+      daoName: dao,
       emailId: emailId,
       socialHandles: {
         twitter: twitter,
@@ -312,14 +323,33 @@ function MainProfile() {
           return;
         }
         console.log("Fetching from DB");
-        const dbResponse = await axios.get(`/api/profile/${address}`);
+        // const dbResponse = await axios.get(`/api/profile/${address}`);
+
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+
+        const raw = JSON.stringify({
+          address: address,
+          daoName: dao,
+        });
+
+        const requestOptions: any = {
+          method: "POST",
+          headers: myHeaders,
+          body: raw,
+          redirect: "follow",
+        };
+        const res = await fetch(`/api/profile/${address}`, requestOptions);
+
+        const dbResponse = await res.json();
+        console.log("db Response", dbResponse);
         if (
           dbResponse &&
-          Array.isArray(dbResponse.data.data) &&
-          dbResponse.data.data.length > 0
+          Array.isArray(dbResponse.data) &&
+          dbResponse.data.length > 0
         ) {
           // Iterate over each item in the response data array
-          for (const item of dbResponse.data.data) {
+          for (const item of dbResponse.data) {
             // Check if address and daoName match
             if (item.daoName === dao && item.address === address) {
               console.log("Data found in the database");
@@ -460,10 +490,28 @@ function MainProfile() {
         return;
       }
       console.log("Checking");
-      const response = await axios.get(`/api/profile/${address}`);
-      if (Array.isArray(response.data.data) && response.data.data.length > 0) {
+
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+
+      const raw = JSON.stringify({
+        address: address,
+        daoName: dao,
+      });
+
+      const requestOptions: any = {
+        method: "POST",
+        headers: myHeaders,
+        body: raw,
+        redirect: "follow",
+      };
+      const res = await fetch(`/api/profile/${address}`, requestOptions);
+
+      const response = await res.json();
+
+      if (Array.isArray(response.data) && response.data.length > 0) {
         // Iterate over each item in the response data array
-        for (const item of response.data.data) {
+        for (const item of response.data) {
           // Check if address and daoName match
           if (item.address === address && item.daoName === dao) {
             return true; // Return true if match found
@@ -530,6 +578,15 @@ function MainProfile() {
     try {
       // Call the PUT API function for updating an existing delegate
 
+      let dao = "";
+      if (chain && chain?.name === "Optimism") {
+        dao = "optimism";
+      } else if (chain && chain?.name === "Arbitrum One") {
+        dao = "arbitrum";
+      } else {
+        return;
+      }
+
       console.log("Updating");
       console.log("Inside Updating Description", newDescription);
       const response: any = await axios.put("/api/profile", {
@@ -538,6 +595,7 @@ function MainProfile() {
         description: newDescription,
         isDelegate: true,
         displayName: displayName,
+        daoName: dao,
         emailId: emailId,
         socialHandles: {
           twitter: twitter,
@@ -616,10 +674,6 @@ function MainProfile() {
 
     fetchData();
   }, [chain, address]);
-
-  const handleLogoClick = () => {
-    fileInputRef.current?.click();
-  };
 
   return (
     <>
@@ -888,7 +942,7 @@ function MainProfile() {
                   />
                 </div>
                 {votes
-                  ? isDelegate === true && (
+                  ? selfDelegate === true && (
                       <div className="flex gap-4 py-1">
                         <div className="text-[#4F4F4F] border-[0.5px] border-[#D9D9D9] rounded-md px-3 py-1">
                           <span className="text-blue-shade-200 font-semibold">
@@ -928,7 +982,7 @@ function MainProfile() {
                     >
                       Become Delegate
                     </button>
-                    {/* 
+                    {/*
                     <button
                       className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
                       onClick={() => handleAttestation()}
@@ -962,7 +1016,7 @@ function MainProfile() {
             >
               Info
             </button>
-            {(selfDelegate === true || isDelegate === true) && (
+            {selfDelegate === true && (
               <button
                 className={`border-b-2 py-4 px-2 outline-none ${
                   searchParams.get("active") === "votes"
@@ -999,7 +1053,7 @@ function MainProfile() {
               Office Hours
             </button>
 
-            {(selfDelegate === true || isDelegate === true) && (
+            {selfDelegate === true && (
               <button
                 className={`border-b-2 py-4 px-2 outline-none ${
                   searchParams.get("active") === "instant-meet"
@@ -1039,8 +1093,7 @@ function MainProfile() {
             ) : (
               ""
             )}
-            {(selfDelegate === true || isDelegate === true) &&
-            searchParams.get("active") === "votes" ? (
+            {selfDelegate === true && searchParams.get("active") === "votes" ? (
               <UserVotes />
             ) : (
               ""
@@ -1061,7 +1114,7 @@ function MainProfile() {
             ) : (
               ""
             )}
-            {(selfDelegate === true || isDelegate === true) &&
+            {selfDelegate === true &&
             searchParams.get("active") === "instant-meet" ? (
               <InstantMeet
                 isDelegate={isDelegate}
