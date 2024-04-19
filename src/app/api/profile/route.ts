@@ -1,8 +1,5 @@
-import { MongoClient, MongoClientOptions } from "mongodb";
-import { NextApiRequest, NextApiResponse } from "next";
-import { NextResponse, NextRequest } from "next/server";
-
-// Define the request body type
+import { NextRequest, NextResponse } from "next/server";
+import { MongoClient, MongoClientOptions } from "mongodb"; // Define the request body type
 interface DelegateRequestBody {
   address: string;
   image: string;
@@ -10,7 +7,7 @@ interface DelegateRequestBody {
   daoName: string;
   isDelegate: boolean;
   displayName: string;
-  emailId:string;
+  emailId: string;
   socialHandles: {
     twitter: string;
     discord: string;
@@ -26,11 +23,9 @@ interface DelegateResponseBody {
     id: string;
     address: string;
     image: string;
-    daoName: string;
     description: string;
+    daoName: string;
     isDelegate: boolean;
-    displayName: string;
-    emailId:string;
     socialHandles: {
       twitter: string;
       discord: string;
@@ -42,22 +37,13 @@ interface DelegateResponseBody {
 }
 
 export async function POST(
-  req: NextRequest,
-  res: NextApiResponse<DelegateResponseBody>
+  req: Request,
+  res: NextResponse<DelegateResponseBody>
 ) {
-  const {
-    address,
-    image,
-    description,
-    daoName,
-    isDelegate,
-    displayName,
-    emailId,
-    socialHandles,
-  }: DelegateRequestBody = await req.json();
-
+  // console.log("GET req call");
+  const { address, daoName }: DelegateRequestBody = await req.json();
   try {
-    // Connect to your MongoDB database
+    // Connect to MongoDB
     // console.log("Connecting to MongoDB...");
     const client = await MongoClient.connect(process.env.MONGODB_URI!, {
       dbName: `chora-club`,
@@ -68,113 +54,28 @@ export async function POST(
     const db = client.db();
     const collection = db.collection("delegates");
 
-    // Insert the new delegate document
-    // console.log("Inserting delegate document...");
-    const result = await collection.insertOne({
-      address,
-      image,
-      description,
-      daoName,
-      isDelegate,
-      displayName,
-      emailId,
-      socialHandles,
-    });
-    console.log("Delegate document inserted:", result);
+    // console.log("this is url", req.url);
+
+    // Extract address from request parameters
+    const address = req.url.split("profile/")[1];
+
+    // Find documents based on address
+    // console.log("Finding documents for address:", address);
+    const documents = await collection.find({ address, daoName }).toArray();
+    // console.log("Documents found:", documents);
 
     client.close();
     // console.log("MongoDB connection closed");
 
-    if (result.insertedId) {
-      // Retrieve the inserted document using the insertedId
-      // console.log("Retrieving inserted document...");
-      const insertedDocument = await collection.findOne({
-        _id: result.insertedId,
-      });
-      // console.log("Inserted document retrieved");
-      return NextResponse.json({ result: insertedDocument }, { status: 200 });
-    } else {
-      return NextResponse.json(
-        { error: "Failed to retrieve inserted document" },
-        { status: 500 }
-      );
-    }
-  } catch (error) {
-    console.error("Error storing delegate:", error);
+    // Return the found documents
     return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 }
+      { success: true, data: documents },
+      { status: 200 }
     );
-  }
-}
-
-export async function PUT(
-  req: NextRequest,
-  res: NextApiResponse<DelegateResponseBody>
-) {
-  const {
-    address,
-    image,
-    description,
-    isDelegate,
-    displayName,
-    emailId,
-    socialHandles,
-  }: DelegateRequestBody = await req.json();
-  console.log("address in api: ", address);
-  console.log("image in api: ", image);
-  console.log("description in api: ", description);
-  console.log("isDelegate in api: ", isDelegate);
-  console.log("displayName in api: ", displayName);
-  console.log("emailId in api:",emailId);
-  console.log("socialHandles in api: ", socialHandles);
-
-  try {
-    // Connect to your MongoDB database
-    console.log("Connecting to MongoDB...");
-    const client = await MongoClient.connect(process.env.MONGODB_URI!, {
-      dbName: `chora-club`,
-    } as MongoClientOptions);
-    console.log("Connected to MongoDB");
-
-    // Access the collection
-    const db = client.db();
-    const collection = db.collection("delegates");
-
-    // Update the delegate document
-    console.log("Updating delegate document...");
-    const result = await collection.updateOne(
-      { address },
-      {
-        $set: {
-          image,
-          description,
-          isDelegate,
-          displayName,
-          emailId,
-          socialHandles,
-        },
-      }
-    );
-    console.log("Delegate document updated:", result);
-
-    client.close();
-    console.log("MongoDB connection closed");
-
-    if (result.modifiedCount > 0) {
-      // If at least one document was modified
-      return NextResponse.json({ success: true }, { status: 200 });
-    } else {
-      // If no document was modified
-      return NextResponse.json(
-        { error: "No document found to update" },
-        { status: 404 }
-      );
-    }
   } catch (error) {
-    console.error("Error updating delegate:", error);
+    console.error("Error retrieving data in profile:", error);
     return NextResponse.json(
-      { error: "Internal Server Error" },
+      { success: false, error: "Internal Server Error" },
       { status: 500 }
     );
   }

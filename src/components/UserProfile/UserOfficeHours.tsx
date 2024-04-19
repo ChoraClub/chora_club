@@ -135,20 +135,16 @@ function UserOfficeHours({ isDelegate, selfDelegate }: UserOfficeHoursProps) {
   }, [address]);
 
   useEffect(() => {
-    if (
-      !isDelegate &&
-      !selfDelegate &&
-      searchParams.get("hours") === "schedule"
-    ) {
+    if (!selfDelegate && searchParams.get("hours") === "schedule") {
       router.replace(path + "?active=officeHours&hours=attended");
     }
-  }, [isDelegate]);
+  }, [isDelegate, selfDelegate, searchParams.get("hours")]);
 
   return (
     <div>
       <div className="pt-3 pr-32">
         <div className="flex w-fit gap-14 border-1 border-[#7C7C7C] px-6 rounded-xl text-sm">
-          {(selfDelegate === true || isDelegate === true) && (
+          {selfDelegate === true && (
             <button
               className={`py-2  ${
                 searchParams.get("hours") === "schedule"
@@ -163,7 +159,7 @@ function UserOfficeHours({ isDelegate, selfDelegate }: UserOfficeHoursProps) {
             </button>
           )}
 
-          {(selfDelegate === true || isDelegate === true) && (
+          {selfDelegate === true && (
             <button
               className={`py-2  ${
                 searchParams.get("hours") === "upcoming"
@@ -177,7 +173,7 @@ function UserOfficeHours({ isDelegate, selfDelegate }: UserOfficeHoursProps) {
               Upcoming
             </button>
           )}
-          {(selfDelegate === true || isDelegate === true) && (
+          {selfDelegate === true && (
             <button
               className={`py-2 ${
                 searchParams.get("hours") === "hosted"
@@ -206,9 +202,9 @@ function UserOfficeHours({ isDelegate, selfDelegate }: UserOfficeHoursProps) {
         </div>
 
         <div className="py-10">
-          {(selfDelegate === true || isDelegate === true) &&
+          {selfDelegate === true &&
             searchParams.get("hours") === "schedule" && <UserScheduledHours />}
-          {(selfDelegate === true || isDelegate === true) &&
+          {selfDelegate === true &&
             searchParams.get("hours") === "upcoming" && <UserUpcomingHours />}
 
           {searchParams.get("hours") === "hosted" &&
