@@ -45,13 +45,13 @@ function BookedUserSessions() {
       let filteredData: any = result.data;
       if (result.success) {
         const currentTime = new Date();
-        const currentSlot = new Date(currentTime.getTime() + 60 * 60 * 1000);
+        const currentSlot = new Date(currentTime.getTime() - 60 * 60 * 1000);
         if (chain?.name === "Optimism") {
           filteredData = result.data.filter(
             (session: Session) =>
               session.dao_name === "optimism" &&
               session.meeting_status !== "Recorded" &&
-              new Date(session.slot_time).toLocaleString() <
+              new Date(session.slot_time).toLocaleString() >=
                 currentSlot.toLocaleString()
           );
         } else if (chain?.name === "Arbitrum One") {
@@ -59,7 +59,7 @@ function BookedUserSessions() {
             (session: Session) =>
               session.dao_name === "arbitrum" &&
               session.meeting_status !== "Recorded" &&
-              new Date(session.slot_time).toLocaleString() <
+              new Date(session.slot_time).toLocaleString() >=
                 currentSlot.toLocaleString()
           );
         }
