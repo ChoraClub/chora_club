@@ -5,24 +5,58 @@ import text2 from "@/assets/images/daos/texture2.png";
 import IndividualSessionTileModal from "./IndividualSessionTileModal";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
-interface Type {
-  img: StaticImageData;
-  title: string;
-  dao: string;
-  dao_name: string;
-  participant: number;
-  host_address: string;
-  slot_time: string;
-  description: string;
-  attendee: string;
-  user_address: string;
-  videoUrl?: string;
+type Attendee = {
+  attendee_address: string;
+  attendee_uid?: string; // Making attendee_uid optional
+};
+interface SessionTileProps {
+  tileIndex?: number;
+  data?: {
+    _id: string;
+    img: StaticImageData;
+    title: string;
+    meetingId: string;
+    dao_name: string;
+    booking_status: string;
+    meeting_status: boolean;
+    joined_status: boolean;
+    attendees: Attendee[];
+    host_address: string;
+    slot_time: string;
+    description: string;
+    session_type: string;
+  };
+  isEvent: string;
 }
 
+// interface TileProps {
+//   sessionDetails: any;
+//   dataLoading: boolean;
+//   isEvent: string;
+//   isOfficeHour: boolean;
+//   // query: string;
+// }
+
 interface TileProps {
+  tileIndex?: number;
+  data?: {
+    _id: string;
+    img: StaticImageData;
+    title: string;
+    meetingId: string;
+    dao_name: string;
+    booking_status: string;
+    meeting_status: boolean;
+    joined_status: boolean;
+    attendees: Attendee[];
+    host_address: string;
+    slot_time: string;
+    description: string;
+    session_type: string;
+  };
+  isEvent: string;
   sessionDetails: any;
   dataLoading: boolean;
-  isEvent: string;
   isOfficeHour: boolean;
   // query: string;
 }
@@ -95,10 +129,10 @@ TileProps) {
               </div>
 
               <div className="flex gap-x-16 text-sm py-3">
-                {/* <div className="text-[#3E3D3D]">
+                <div className="text-[#3E3D3D]">
                   <span className="font-semibold">Attendee:</span>{" "}
-                  {formatWalletAddress(data.user_address)}
-                </div> */}
+                  {formatWalletAddress(data.attendees[0].attendee_address)}
+                </div>
                 <div className="text-[#3E3D3D]">
                   <span className="font-semibold">Host:</span>{" "}
                   {formatWalletAddress(data.host_address)}
