@@ -220,7 +220,7 @@ function SpecificDelegate({ props }: { props: Type }) {
           />
         </div>
       )}
-      {!(isPageLoading || (!isDelegate && selfDelegate)) ? (
+      {!(isPageLoading || (!isDelegate && !selfDelegate)) ? (
         <div className="font-poppins">
           <div className="flex ps-14 py-5 justify-between">
             <div className="flex">
