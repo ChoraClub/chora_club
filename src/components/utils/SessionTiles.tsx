@@ -5,27 +5,85 @@ import text2 from "@/assets/images/daos/texture2.png";
 import IndividualSessionTileModal from "./IndividualSessionTileModal";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
-interface Type {
+type Attendee = {
+  attendee_address: string;
+  attendee_uid?: string; // Making attendee_uid optional
+};
+// interface SessionTileProps {
+//   tileIndex?: number;
+//   data?: {
+//     _id: string;
+//     img: StaticImageData;
+//     title: string;
+//     meetingId: string;
+//     dao_name: string;
+//     booking_status: string;
+//     meeting_status: boolean;
+//     joined_status: boolean;
+//     attendees: Attendee[];
+//     host_address: string;
+//     slot_time: string;
+//     description: string;
+//     session_type: string;
+//   };
+//   isEvent: string;
+// }
+
+// interface TileProps {
+//   sessionDetails: any;
+//   dataLoading: boolean;
+//   isEvent: string;
+//   isOfficeHour: boolean;
+//   // query: string;
+// }
+
+interface SessionData {
+  _id: string;
   img: StaticImageData;
   title: string;
-  dao: string;
+  meetingId: string;
   dao_name: string;
-  participant: number;
+  booking_status: string;
+  meeting_status: boolean;
+  joined_status: boolean;
+  attendees: Attendee[];
   host_address: string;
   slot_time: string;
   description: string;
-  attendee: string;
-  user_address: string;
-  videoUrl?: string;
+  session_type: string;
 }
 
-interface TileProps {
-  sessionDetails: any;
-  dataLoading: boolean;
+interface SessionTileProps {
+  tileIndex?: number;
   isEvent: string;
+  sessionDetails: SessionData[]; // Updated to include sessionDetails with proper type
+  dataLoading: boolean;
   isOfficeHour: boolean;
-  // query: string;
 }
+
+// interface TileProps {
+//   tileIndex?: number;
+//   data?: {
+//     _id: string;
+//     img: StaticImageData;
+//     title: string;
+//     meetingId: string;
+//     dao_name: string;
+//     booking_status: string;
+//     meeting_status: boolean;
+//     joined_status: boolean;
+//     attendees: Attendee[];
+//     host_address: string;
+//     slot_time: string;
+//     description: string;
+//     session_type: string;
+//   };
+//   isEvent: string;
+//   sessionDetails: any;
+//   dataLoading: boolean;
+//   isOfficeHour: boolean;
+//   // query: string;
+// }
 
 function SessionTile({
   sessionDetails,
@@ -33,7 +91,7 @@ function SessionTile({
   isEvent,
   isOfficeHour,
 }: // query,
-TileProps) {
+SessionTileProps) {
   const router = useRouter();
   const path = usePathname();
   const [selectedTileIndex, setSelectedTileIndex] = useState<number | null>(
@@ -62,7 +120,7 @@ TileProps) {
   return (
     <div className="space-y-6">
       {sessionDetails.length > 0 ? (
-        sessionDetails.map((data: any, index: any) => (
+        sessionDetails.map((data: SessionData, index: any) => (
           <div
             key={index}
             className="flex p-5 rounded-[2rem] cursor-pointer"
@@ -95,10 +153,17 @@ TileProps) {
               </div>
 
               <div className="flex gap-x-16 text-sm py-3">
-                {/* <div className="text-[#3E3D3D]">
-                  <span className="font-semibold">Attendee:</span>{" "}
-                  {formatWalletAddress(data.user_address)}
-                </div> */}
+                {data.session_type === "session" ? (
+                  <div className="text-[#3E3D3D]">
+                    <span className="font-semibold">Session - </span>{" "}
+                    <span className="font-semibold">Attendee:</span>{" "}
+                    {formatWalletAddress(data.attendees[0].attendee_address)}
+                  </div>
+                ) : (
+                  <div className="text-[#3E3D3D]">
+                    <span className="font-semibold">Instant Meet</span>{" "}
+                  </div>
+                )}
                 <div className="text-[#3E3D3D]">
                   <span className="font-semibold">Host:</span>{" "}
                   {formatWalletAddress(data.host_address)}
@@ -126,7 +191,7 @@ TileProps) {
         </div>
       )}
 
-      {selectedTileIndex !== null && isEvent === "Recorded" ? (
+      {/* {selectedTileIndex !== null && isEvent === "Recorded" ? (
         <IndividualSessionTileModal
           title={sessionDetails[selectedTileIndex].title}
           description={sessionDetails[selectedTileIndex].description}
@@ -139,7 +204,7 @@ TileProps) {
           // attendee_attestation={sessionDetails[selectedTileIndex].uid_attendee}
           onClose={closeModal}
         />
-      ) : null}
+      ) : null} */}
     </div>
   );
 }

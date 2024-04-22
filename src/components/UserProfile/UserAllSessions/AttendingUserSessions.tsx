@@ -62,10 +62,10 @@ function AttendingUserSessions() {
       if (result.success) {
         // setSessionDetails(result.data);
         const resultData = await result.data;
-        // console.log("resultData", resultData);
+        console.log("resultData", resultData);
         setPageLoading(true);
-        // const currentTime = new Date();
-        // const currentSlot = new Date(currentTime.getTime() + 60 * 60 * 1000);
+        const currentTime = new Date();
+        const currentSlot = new Date(currentTime.getTime() - 60 * 60 * 1000);
         if (Array.isArray(resultData)) {
           let filteredData: any = resultData;
           if (searchParams.get("session") === "attending") {
@@ -74,6 +74,14 @@ function AttendingUserSessions() {
                 (attendee) => attendee.attendee_address === address
               ) &&
                 session.meeting_status !== "Recorded" &&
+                // chain?.name === "Optimism"
+                // ? session.dao_name === "optimism"
+                // : chain?.name === "Arbitrum One"
+                // ? session.dao_name === "arbitrum"
+                // : ""
+                // &&
+                new Date(session.slot_time).toLocaleString() >=
+                  currentSlot.toLocaleString() &&
                 chain?.name === "Optimism"
                 ? session.dao_name === "optimism"
                 : chain?.name === "Arbitrum One"
