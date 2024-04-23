@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@apollo/client": "^3.9.4",
-    "@ethereum-attestation-service/eas-sdk": "^1.6.1",
+    "@ethereum-attestation-service/eas-sdk": "^2.1.2",
     "@huddle01/react": "^2.0.3",
     "@huddle01/server-sdk": "^2.0.1",
     "@lighthouse-web3/sdk": "^0.3.0",
