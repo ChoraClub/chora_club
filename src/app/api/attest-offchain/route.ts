@@ -72,7 +72,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
     const offchain = await eas.getOffchain();
     console.log(offchain);
     const schemaEncoder = new SchemaEncoder(
-      "bytes16 MeetingId,uint8 MeetingType,uint32 StartTime,uint32 EndTime"
+      "bytes32 MeetingId,uint8 MeetingType,uint32 StartTime,uint32 EndTime"
     );
 
     console.log(schemaEncoder);
@@ -80,8 +80,8 @@ export async function POST(req: NextRequest, res: NextResponse) {
     const encodedData = schemaEncoder.encodeData([
       {
         name: "MeetingId",
-        value: bytesToHex(stringToBytes(requestData.meetingId), { size: 16 }),
-        type: "bytes16",
+        value: bytesToHex(stringToBytes(requestData.meetingId), { size: 32 }),
+        type: "bytes32",
       },
       { name: "MeetingType", value: requestData.meetingType, type: "uint8" },
       { name: "StartTime", value: requestData.startTime, type: "uint32" },
@@ -102,7 +102,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
     const offchainAttestation = await offchain.signOffchainAttestation(
       {
         schema:
-          "0x2d76910b8e40f8a4c63bed0c179df62335b11831669efec456ade30ca034b65f",
+          "0x98a9530fb8d7039c36f78e857b55f1c0e2d4caafa00d05dec37f4abef3e301b2",
         recipient: requestData.recipient,
         time: currentTime,
         expirationTime: expirationTime,

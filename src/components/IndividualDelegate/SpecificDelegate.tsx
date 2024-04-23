@@ -41,7 +41,7 @@ interface Type {
 }
 
 function SpecificDelegate({ props }: { props: Type }) {
-  const { publicClient, walletClient, walletClient2 } = WalletAndPublicClient();
+  const { publicClient, walletClient } = WalletAndPublicClient();
   const { chain, chains } = useNetwork();
   console.log(chain?.name);
   const { openChainModal } = useChainModal();
