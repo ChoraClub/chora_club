@@ -147,7 +147,7 @@
   dependencies:
     "@babel/helper-plugin-utils" "^7.22.5"
 
-"@babel/runtime@^7.12.5", "@babel/runtime@^7.13.10", "@babel/runtime@^7.17.2", "@babel/runtime@^7.20.13", "@babel/runtime@^7.23.2", "@babel/runtime@^7.23.4":
+"@babel/runtime@^7.11.2", "@babel/runtime@^7.12.5", "@babel/runtime@^7.13.10", "@babel/runtime@^7.17.2", "@babel/runtime@^7.20.13", "@babel/runtime@^7.23.2", "@babel/runtime@^7.23.4", "@babel/runtime@^7.5.5":
   version "7.23.9"
   resolved "https://registry.npmjs.org/@babel/runtime/-/runtime-7.23.9.tgz"
   integrity sha512-0CX6F+BI2s9dkUqr08KFrAIZgNFj75rdBU/DjCyYLIaV/quFjkk6T+EJ2LkZHyZTbEV4L5p97mNkUsHl2wLFAw==
@@ -1183,7 +1183,7 @@
 
 "@nextui-org/autocomplete@2.0.10":
   version "2.0.10"
-  resolved "https://registry.yarnpkg.com/@nextui-org/autocomplete/-/autocomplete-2.0.10.tgz#8540eef487c14505295a930f1b4b037b45c2aaa8"
+  resolved "https://registry.npmjs.org/@nextui-org/autocomplete/-/autocomplete-2.0.10.tgz"
   integrity sha512-nQr8VC5RtpjnPef1qXgjNxRAw8JbN6q5qIFtsHWOCzvvn5jGAtdxkAkNE4C7DTvlMWZkIlEuR4DyAmFfY8CChQ==
   dependencies:
     "@nextui-org/aria-utils" "2.0.15"
@@ -1244,7 +1244,7 @@
 
 "@nextui-org/button@2.0.27":
   version "2.0.27"
-  resolved "https://registry.yarnpkg.com/@nextui-org/button/-/button-2.0.27.tgz#55e221b2ed1f2c436281b65ee919fe886e01ae1c"
+  resolved "https://registry.npmjs.org/@nextui-org/button/-/button-2.0.27.tgz"
   integrity sha512-oErzUr9KtE/qjUx4dSbalphxURssxGf9tv0mW++ZMkmVX1E6i887FwZb9xAVm9oBwYwR6+xpJaqjQLmt8aN/rQ==
   dependencies:
     "@nextui-org/react-utils" "2.0.10"
@@ -1327,7 +1327,7 @@
 
 "@nextui-org/dropdown@2.1.17":
   version "2.1.17"
-  resolved "https://registry.yarnpkg.com/@nextui-org/dropdown/-/dropdown-2.1.17.tgz#aa695a40be042609a3e85510315fb620d5d3bae9"
+  resolved "https://registry.npmjs.org/@nextui-org/dropdown/-/dropdown-2.1.17.tgz"
   integrity sha512-Hxmz1Yf/LjjOLqWRF49Q5ZYJtae6ydDEk1mv8oMKNmSWHi92lrgmHlwkGvR3mjczbRuF+WkXHLEhVZH6/tZQ7A==
   dependencies:
     "@nextui-org/menu" "2.0.17"
@@ -1359,7 +1359,7 @@
 
 "@nextui-org/input@2.1.17":
   version "2.1.17"
-  resolved "https://registry.yarnpkg.com/@nextui-org/input/-/input-2.1.17.tgz#12c148af654decad60b22f3441b33e79881d3842"
+  resolved "https://registry.npmjs.org/@nextui-org/input/-/input-2.1.17.tgz"
   integrity sha512-3FW3NDDbQOa5IlUCpO2Ma/XEjGnx4TQLM8MvMbskc+GNbZ0mtzfV0hCeQkqxxJ2lP4Mkp4QhwGRRkRrDu1G0Wg==
   dependencies:
     "@nextui-org/react-utils" "2.0.10"
@@ -1439,7 +1439,7 @@
 
 "@nextui-org/modal@2.0.29":
   version "2.0.29"
-  resolved "https://registry.yarnpkg.com/@nextui-org/modal/-/modal-2.0.29.tgz#a71620bcc1f9d7bd37ed3d54e36e3e5270e5b8db"
+  resolved "https://registry.npmjs.org/@nextui-org/modal/-/modal-2.0.29.tgz"
   integrity sha512-C/pvw0fAPWKbfMoGfIVZWhMRbe+DRGEg7GqPVY7EmW4FSSIK7Sfdn6Jxm+sSv+a7xHpDr86nirFbvN3S4jCaHw==
   dependencies:
     "@nextui-org/framer-transitions" "2.0.15"
@@ -1478,7 +1478,7 @@
 
 "@nextui-org/pagination@2.0.27":
   version "2.0.27"
-  resolved "https://registry.yarnpkg.com/@nextui-org/pagination/-/pagination-2.0.27.tgz#9d7eb4f397d2e7c604b85b0b946ab3785d653d73"
+  resolved "https://registry.npmjs.org/@nextui-org/pagination/-/pagination-2.0.27.tgz"
   integrity sha512-v1tSsb0Q863/gKVUxuN7FcE1TZWuvcbWZOrWjKe0/llRgfZ23/4KD1AmFyYuKo5RDFt+i1JWSfzAu08j0Hzzqg==
   dependencies:
     "@nextui-org/react-utils" "2.0.10"
@@ -1494,7 +1494,7 @@
 
 "@nextui-org/popover@2.1.15":
   version "2.1.15"
-  resolved "https://registry.yarnpkg.com/@nextui-org/popover/-/popover-2.1.15.tgz#3cef5b4edc21251a50ab235572162fb0554953a6"
+  resolved "https://registry.npmjs.org/@nextui-org/popover/-/popover-2.1.15.tgz"
   integrity sha512-FQ66y49sQvXvyDrEsEFAC0qfpl2X+5ZPGaVXdNd3Cjox/jxAxp93cSUkk0iOfYvdsbO5zVFjuM0L3Dqn4hsHMw==
   dependencies:
     "@nextui-org/aria-utils" "2.0.15"
@@ -1516,7 +1516,7 @@
 
 "@nextui-org/progress@2.0.25":
   version "2.0.25"
-  resolved "https://registry.yarnpkg.com/@nextui-org/progress/-/progress-2.0.25.tgz#612eca688afa20c06ef9cf900db27a858eb523d8"
+  resolved "https://registry.npmjs.org/@nextui-org/progress/-/progress-2.0.25.tgz"
   integrity sha512-EFVxwT0CXq+2scPLhKKRHkWb6xNa6Vjx+HdgSg3l4lgAxAUryvdfksjW8vjxn6x4I2rGbdzAYPEu27p2KaK7jg==
   dependencies:
     "@nextui-org/react-utils" "2.0.10"
@@ -1559,7 +1559,7 @@
 
 "@nextui-org/react@^2.2.10":
   version "2.2.10"
-  resolved "https://registry.yarnpkg.com/@nextui-org/react/-/react-2.2.10.tgz#acce053a43451a36d73f467ffbc76dde8bc5691b"
+  resolved "https://registry.npmjs.org/@nextui-org/react/-/react-2.2.10.tgz"
   integrity sha512-YJhUIeLnO/FGDbZgfeWEz32RBrH2YFA1qsJQtMF7mza8rjspX/CkankvI7xs1o6sW/TYLSTq7sOF9RGMxLTIAA==
   dependencies:
     "@nextui-org/accordion" "2.0.28"
@@ -1613,7 +1613,7 @@
 
 "@nextui-org/scroll-shadow@2.1.13":
   version "2.1.13"
-  resolved "https://registry.yarnpkg.com/@nextui-org/scroll-shadow/-/scroll-shadow-2.1.13.tgz#d4c816dce9bc539cdb4b21b3ecc3ef6770ffb29e"
+  resolved "https://registry.npmjs.org/@nextui-org/scroll-shadow/-/scroll-shadow-2.1.13.tgz"
   integrity sha512-hFoVGplGMWuE+KXRz9gtKRq3e0YYkxutrqjDD0BiDHk4WkiyOrTnNuE6wnJTnd6Hd+kavLPBDu2+yGauDb7/Qg==
   dependencies:
     "@nextui-org/react-utils" "2.0.10"
@@ -1622,7 +1622,7 @@
 
 "@nextui-org/select@2.1.21":
   version "2.1.21"
-  resolved "https://registry.yarnpkg.com/@nextui-org/select/-/select-2.1.21.tgz#44f3715098a2b503300f80efc89bed3ef36c94ea"
+  resolved "https://registry.npmjs.org/@nextui-org/select/-/select-2.1.21.tgz"
   integrity sha512-BVfmxIsZTL6dBiZ1Q5RbAnqiNpVnaJgWi0M1QMV448FHMaDHLTWtNOJPMD0QyxHRNPfDgFrqEAq6a1+pA26ckQ==
   dependencies:
     "@nextui-org/aria-utils" "2.0.15"
@@ -1662,7 +1662,7 @@
 
 "@nextui-org/slider@2.2.6":
   version "2.2.6"
-  resolved "https://registry.yarnpkg.com/@nextui-org/slider/-/slider-2.2.6.tgz#b1c766e78f71840364a43cd1f6f1646196a9b723"
+  resolved "https://registry.npmjs.org/@nextui-org/slider/-/slider-2.2.6.tgz"
   integrity sha512-adCjQ8k4bUwWcvmOJUki3+UVsCz4ms+qLG4jnY2wClPdQAwISMbZzQsuv3km+1HIZE5Ja7jzeeT/dMd8l3n+bg==
   dependencies:
     "@nextui-org/react-utils" "2.0.10"
@@ -1679,7 +1679,7 @@
 
 "@nextui-org/snippet@2.0.31":
   version "2.0.31"
-  resolved "https://registry.yarnpkg.com/@nextui-org/snippet/-/snippet-2.0.31.tgz#0ac0282b078fa47ec92ae07bdee748fdc2129453"
+  resolved "https://registry.npmjs.org/@nextui-org/snippet/-/snippet-2.0.31.tgz"
   integrity sha512-WooH5cqlHoa6SqUhzseKY7g1ah8kzSv382u95Or9kIgSirEZCrjygup3nFeKTMAe01NZoAz3OOYO7XNFWJ57vA==
   dependencies:
     "@nextui-org/button" "2.0.27"
@@ -1702,7 +1702,7 @@
 
 "@nextui-org/spinner@2.0.25":
   version "2.0.25"
-  resolved "https://registry.yarnpkg.com/@nextui-org/spinner/-/spinner-2.0.25.tgz#0a28341adade33c05fc990d6eb3a474b0ada0a25"
+  resolved "https://registry.npmjs.org/@nextui-org/spinner/-/spinner-2.0.25.tgz"
   integrity sha512-s2iqaB71sanRxglJtG4UZF+Rz/W6UxnYegbkhnkkljH20vhOcrhwm5jKGStq8jkata8UZ0ajS67H8KY8lHV8nw==
   dependencies:
     "@nextui-org/react-utils" "2.0.10"
@@ -1785,7 +1785,7 @@
 
 "@nextui-org/theme@2.1.18":
   version "2.1.18"
-  resolved "https://registry.yarnpkg.com/@nextui-org/theme/-/theme-2.1.18.tgz#32862cde091712710e8ec4877f0aea0c85f2bf14"
+  resolved "https://registry.npmjs.org/@nextui-org/theme/-/theme-2.1.18.tgz"
   integrity sha512-2ptDh350lVD0yejZTpGv4fkeoGKB8+B/Coblzpjijfofn/t6MQIRIRRLp04wCCa/IbeevjS2wyadWpMDtVh3CQ==
   dependencies:
     color "^4.2.3"
@@ -1801,7 +1801,7 @@
 
 "@nextui-org/tooltip@2.0.30":
   version "2.0.30"
-  resolved "https://registry.yarnpkg.com/@nextui-org/tooltip/-/tooltip-2.0.30.tgz#79e67915d54a64b0b4abe1f10d6dc783f3afb41d"
+  resolved "https://registry.npmjs.org/@nextui-org/tooltip/-/tooltip-2.0.30.tgz"
   integrity sha512-V3N9o/oNU1Y11etiilrlqt5dF4/o9eJSttgN2CPo8eRAPc96+sRpdGPGX3XcLJZNFRcNx8BkD/bcEUcrDdjmRA==
   dependencies:
     "@nextui-org/aria-utils" "2.0.15"
@@ -1866,7 +1866,7 @@
 
 "@nextui-org/use-aria-multiselect@2.1.4":
   version "2.1.4"
-  resolved "https://registry.yarnpkg.com/@nextui-org/use-aria-multiselect/-/use-aria-multiselect-2.1.4.tgz#e80292b8d9b037881f5ac84950c5544924473695"
+  resolved "https://registry.npmjs.org/@nextui-org/use-aria-multiselect/-/use-aria-multiselect-2.1.4.tgz"
   integrity sha512-F95sF4eY5TLkom5tIMb+eoT4i0Cc4qygnQRqIosg8OryDbH62/MV4x88GjQsgDCY8dNeWCNVodHXxaWmVSAgyQ==
   dependencies:
     "@react-aria/i18n" "^3.8.4"
@@ -1918,7 +1918,7 @@
 
 "@nextui-org/use-data-scroll-overflow@2.1.3":
   version "2.1.3"
-  resolved "https://registry.yarnpkg.com/@nextui-org/use-data-scroll-overflow/-/use-data-scroll-overflow-2.1.3.tgz#3ce19c2c5a9da54edbd29d19fabb81d1cfe4fc9b"
+  resolved "https://registry.npmjs.org/@nextui-org/use-data-scroll-overflow/-/use-data-scroll-overflow-2.1.3.tgz"
   integrity sha512-f4rDr4MHGQTyqTd6L4MpKAcKfPDiVeWfYXXXX6gdN8UVTk+PzW675Fe+l7ATBgmaVTn1AEPJwW9dDUJcDpn21g==
   dependencies:
     "@nextui-org/shared-utils" "2.0.4"
@@ -1953,7 +1953,7 @@
 
 "@nextui-org/use-pagination@2.0.5":
   version "2.0.5"
-  resolved "https://registry.yarnpkg.com/@nextui-org/use-pagination/-/use-pagination-2.0.5.tgz#80a0213834ffa5d420cc28785dc4cea0ad474ab8"
+  resolved "https://registry.npmjs.org/@nextui-org/use-pagination/-/use-pagination-2.0.5.tgz"
   integrity sha512-wH0sC85XeTPPE4zRq0ycAVB+SpmPEiSmTEGxpBG2sqiJlsrNfEeXvTKf73INXM4IWfP53ONAQ7Nd1T7EVuYSkw==
   dependencies:
     "@nextui-org/shared-utils" "2.0.4"
@@ -3898,7 +3898,7 @@
 
 "@types/nodemailer@^6.4.14":
   version "6.4.14"
-  resolved "https://registry.yarnpkg.com/@types/nodemailer/-/nodemailer-6.4.14.tgz#5c81a5e856db7f8ede80013e6dbad7c5fb2283e2"
+  resolved "https://registry.npmjs.org/@types/nodemailer/-/nodemailer-6.4.14.tgz"
   integrity sha512-fUWthHO9k9DSdPCSPRqcu6TWhYyxTBg382vlNIttSe9M7XfsT06y0f24KHXtbnijPGGRIcVvdKHTNikOI6qiHA==
   dependencies:
     "@types/node" "*"
@@ -4081,6 +4081,47 @@
   version "1.6.1"
   resolved "https://registry.npmjs.org/@vanilla-extract/sprinkles/-/sprinkles-1.6.1.tgz"
   integrity sha512-N/RGKwGAAidBupZ436RpuweRQHEFGU+mvAqBo8PRMAjJEmHoPDttV8RObaMLrJHWLqvX+XUMinHUnD0hFRQISw==
+
+"@videojs/http-streaming@3.10.0":
+  version "3.10.0"
+  resolved "https://registry.npmjs.org/@videojs/http-streaming/-/http-streaming-3.10.0.tgz"
+  integrity sha512-Lf1rmhTalV4Gw0bJqHmH4lfk/FlepUDs9smuMtorblAYnqDlE2tbUOb7sBXVYoXGdbWbdTW8jH2cnS+6HWYJ4Q==
+  dependencies:
+    "@babel/runtime" "^7.12.5"
+    "@videojs/vhs-utils" "4.0.0"
+    aes-decrypter "4.0.1"
+    global "^4.4.0"
+    m3u8-parser "^7.1.0"
+    mpd-parser "^1.3.0"
+    mux.js "7.0.2"
+    video.js "^7 || ^8"
+
+"@videojs/vhs-utils@4.0.0", "@videojs/vhs-utils@^4.0.0":
+  version "4.0.0"
+  resolved "https://registry.npmjs.org/@videojs/vhs-utils/-/vhs-utils-4.0.0.tgz"
+  integrity sha512-xJp7Yd4jMLwje2vHCUmi8MOUU76nxiwII3z4Eg3Ucb+6rrkFVGosrXlMgGnaLjq724j3wzNElRZ71D/CKrTtxg==
+  dependencies:
+    "@babel/runtime" "^7.12.5"
+    global "^4.4.0"
+    url-toolkit "^2.2.1"
+
+"@videojs/vhs-utils@^3.0.5":
+  version "3.0.5"
+  resolved "https://registry.npmjs.org/@videojs/vhs-utils/-/vhs-utils-3.0.5.tgz"
+  integrity sha512-PKVgdo8/GReqdx512F+ombhS+Bzogiofy1LgAj4tN8PfdBx3HSS7V5WfJotKTqtOWGwVfSWsrYN/t09/DSryrw==
+  dependencies:
+    "@babel/runtime" "^7.12.5"
+    global "^4.4.0"
+    url-toolkit "^2.2.1"
+
+"@videojs/xhr@2.6.0":
+  version "2.6.0"
+  resolved "https://registry.npmjs.org/@videojs/xhr/-/xhr-2.6.0.tgz"
+  integrity sha512-7J361GiN1tXpm+gd0xz2QWr3xNWBE+rytvo8J3KuggFaLg+U37gZQ2BuPLcnkfGffy2e+ozY70RHC8jt7zjA6Q==
+  dependencies:
+    "@babel/runtime" "^7.5.5"
+    global "~4.4.0"
+    is-function "^1.0.1"
 
 "@wagmi/chains@1.0.0":
   version "1.0.0"
@@ -4500,6 +4541,11 @@
   dependencies:
     tslib "^2.3.0"
 
+"@xmldom/xmldom@^0.8.3":
+  version "0.8.10"
+  resolved "https://registry.npmjs.org/@xmldom/xmldom/-/xmldom-0.8.10.tgz"
+  integrity sha512-2WALfTl4xo2SkGCYRt6rDTFfk9R1czmBvUQy12gK2KuRKIpWEhcbbzy8EZXtz/jkRqHX8bFEc6FC1HjX4TUWYw==
+
 JSONStream@^1.3.5:
   version "1.3.5"
   resolved "https://registry.npmjs.org/JSONStream/-/JSONStream-1.3.5.tgz"
@@ -4552,6 +4598,16 @@ adm-zip@^0.4.16:
   version "0.4.16"
   resolved "https://registry.npmjs.org/adm-zip/-/adm-zip-0.4.16.tgz"
   integrity sha512-TFi4HBKSGfIKsK5YCkKaaFG2m4PEDyViZmEwof3MTIgzimHLto6muaHVpbrljdIvIrFZzEq/p4nafOeLcYegrg==
+
+aes-decrypter@4.0.1, aes-decrypter@^4.0.1:
+  version "4.0.1"
+  resolved "https://registry.npmjs.org/aes-decrypter/-/aes-decrypter-4.0.1.tgz"
+  integrity sha512-H1nh/P9VZXUf17AA5NQfJML88CFjVBDuGkp5zDHa7oEhYN9TTpNLJknRY1ie0iSKWlDf6JRnJKaZVDSQdPy6Cg==
+  dependencies:
+    "@babel/runtime" "^7.12.5"
+    "@videojs/vhs-utils" "^3.0.5"
+    global "^4.4.0"
+    pkcs7 "^1.0.4"
 
 aes-js@3.0.0:
   version "3.0.0"
@@ -5561,6 +5617,11 @@ date-fns@^3.3.1:
   resolved "https://registry.npmjs.org/date-fns/-/date-fns-3.3.1.tgz"
   integrity sha512-y8e109LYGgoQDveiEBD3DYXKba1jWf5BA8YU1FL5Tvm0BTdEfy54WLCwnuYWZNnzzvALy/QQ4Hov+Q9RVRv+Zw==
 
+date-fns@^3.6.0:
+  version "3.6.0"
+  resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-3.6.0.tgz#f20ca4fe94f8b754951b24240676e8618c0206bf"
+  integrity sha512-fRHTG8g/Gif+kSh50gaGEdToemgfj74aRX3swtiouboip5JDLAyDE9F11nHMIcvOaXeOC6D7SpNhi7uFyB7Uww==
+
 dateformat@^4.6.3:
   version "4.6.3"
   resolved "https://registry.npmjs.org/dateformat/-/dateformat-4.6.3.tgz"
@@ -5754,6 +5815,11 @@ dom-accessibility-api@^0.5.9:
   version "0.5.16"
   resolved "https://registry.npmjs.org/dom-accessibility-api/-/dom-accessibility-api-0.5.16.tgz"
   integrity sha512-X7BJ2yElsnOJ30pZF4uIIDfBEVgF4XEBxL9Bxhy6dnrm5hkzqmsWHGTiHqRiITNhMyFLyAiWndIJP7Z1NTteDg==
+
+dom-walk@^0.1.0:
+  version "0.1.2"
+  resolved "https://registry.npmjs.org/dom-walk/-/dom-walk-0.1.2.tgz"
+  integrity sha512-6QvTW9mrGeIegrFXdtQi9pk7O/nSK6lSdXW2eqUspN5LWD7UTji2Fqw5V2YLjBpHEoU9Xl/eUWNpDeZvoyOv2w==
 
 dot-prop@^6.0.1:
   version "6.0.1"
@@ -6766,6 +6832,14 @@ glob@^7.1.3:
     once "^1.3.0"
     path-is-absolute "^1.0.0"
 
+global@4.4.0, global@^4.3.1, global@^4.4.0, global@~4.4.0:
+  version "4.4.0"
+  resolved "https://registry.npmjs.org/global/-/global-4.4.0.tgz"
+  integrity sha512-wv/LAoHdRE3BeTGz53FAamhGlPLhlssK45usmGFThIi4XqnBmjKQ16u+RNbP7WvigRZDxUsM0J3gcQ5yicaL0w==
+  dependencies:
+    min-document "^2.19.0"
+    process "^0.11.10"
+
 globals@^11.1.0:
   version "11.12.0"
   resolved "https://registry.npmjs.org/globals/-/globals-11.12.0.tgz"
@@ -6856,7 +6930,7 @@ h3@^1.10.1, h3@^1.8.2:
 
 handlebars@^4.7.8:
   version "4.7.8"
-  resolved "https://registry.yarnpkg.com/handlebars/-/handlebars-4.7.8.tgz#41c42c18b1be2365439188c77c6afae71c0cd9e9"
+  resolved "https://registry.npmjs.org/handlebars/-/handlebars-4.7.8.tgz"
   integrity sha512-vafaFqs8MZkRrSX7sFVUdo3ap/eNiLnb4IakshzvP56X5Nr1iGKAIqdX6tMlm6HcNRIkr6AxO5jFEoJzzpT8aQ==
   dependencies:
     minimist "^1.2.5"
@@ -7095,6 +7169,11 @@ indent-string@^4.0.0:
   resolved "https://registry.npmjs.org/indent-string/-/indent-string-4.0.0.tgz"
   integrity sha512-EdDDZu4A2OyIK7Lr/2zG+w5jmbuk1DVBnEwREQvBzspBJkCEbRa8GxU1lghYcaGJCnRWibjDXlq779X1/y5xwg==
 
+individual@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.npmjs.org/individual/-/individual-2.0.0.tgz"
+  integrity sha512-pWt8hBCqJsUWI/HtcfWod7+N9SgAqyPEaF7JQjwzjn5vGrpg6aQ5qeAFQ7dx//UH4J1O+7xqew+gCeeFt6xN/g==
+
 inflight@^1.0.4:
   version "1.0.6"
   resolved "https://registry.npmjs.org/inflight/-/inflight-1.0.6.tgz"
@@ -7256,6 +7335,11 @@ is-fullwidth-code-point@^3.0.0:
   version "3.0.0"
   resolved "https://registry.npmjs.org/is-fullwidth-code-point/-/is-fullwidth-code-point-3.0.0.tgz"
   integrity sha512-zymm5+u+sCsSWyD9qNaejV3DFvhCKclKdizYaJUuHA83RLjb7nSuGnddCHGv0hk+KY7BMAlsWeK4Ueg6EV6XQg==
+
+is-function@^1.0.1:
+  version "1.0.2"
+  resolved "https://registry.npmjs.org/is-function/-/is-function-1.0.2.tgz"
+  integrity sha512-lw7DUp0aWXYg+CBCN+JKkcE0Q2RayZnSvnZBlwgxHBQhqt5pZNVy4Ri7H9GmmXkdu7LUthszM+Tor1u/2iBcpQ==
 
 is-generator-function@^1.0.10, is-generator-function@^1.0.7:
   version "1.0.10"
@@ -7646,6 +7730,11 @@ keccak@^3.0.0, keccak@^3.0.1, keccak@^3.0.2:
     node-gyp-build "^4.2.0"
     readable-stream "^3.6.0"
 
+keycode@2.2.0:
+  version "2.2.0"
+  resolved "https://registry.npmjs.org/keycode/-/keycode-2.2.0.tgz"
+  integrity sha512-ps3I9jAdNtRpJrbBvQjpzyFbss/skHqzS+eu4RxKLaEAtFqkjZaB6TZMSivPbLxf4K7VI4SjR0P5mRCX5+Q25A==
+
 keyv@^4.5.3:
   version "4.5.4"
   resolved "https://registry.npmjs.org/keyv/-/keyv-4.5.4.tgz"
@@ -7912,6 +8001,15 @@ lz-string@^1.5.0:
   resolved "https://registry.npmjs.org/lz-string/-/lz-string-1.5.0.tgz"
   integrity sha512-h5bgJWpxJNswbU7qCrV0tIKQCaS3blPDrqKWx+QxzuzL1zGUzij9XCWLrSLsJPu5t+eWA/ycetzYAO5IOMcWAQ==
 
+m3u8-parser@^7.1.0:
+  version "7.1.0"
+  resolved "https://registry.npmjs.org/m3u8-parser/-/m3u8-parser-7.1.0.tgz"
+  integrity sha512-7N+pk79EH4oLKPEYdgRXgAsKDyA/VCo0qCHlUwacttQA0WqsjZQYmNfywMvjlY9MpEBVZEt0jKFd73Kv15EBYQ==
+  dependencies:
+    "@babel/runtime" "^7.12.5"
+    "@videojs/vhs-utils" "^3.0.5"
+    global "^4.4.0"
+
 mcl-wasm@^0.7.1:
   version "0.7.9"
   resolved "https://registry.npmjs.org/mcl-wasm/-/mcl-wasm-0.7.9.tgz"
@@ -8029,6 +8127,13 @@ mimic-fn@^4.0.0:
   version "4.0.0"
   resolved "https://registry.npmjs.org/mimic-fn/-/mimic-fn-4.0.0.tgz"
   integrity sha512-vqiC06CuhBTUdZH+RYl8sFrL096vA45Ok5ISO6sE/Mr1jRbGH4Csnhi8f3wKVl7x8mO4Au7Ir9D3Oyv1VYMFJw==
+
+min-document@^2.19.0:
+  version "2.19.0"
+  resolved "https://registry.npmjs.org/min-document/-/min-document-2.19.0.tgz"
+  integrity sha512-9Wy1B3m3f66bPPmU5hdA4DR4PB2OfDU/+GS3yAB7IQozE3tqXaVv2zOjgla7MEGSRv95+ILmOuvhLkOK6wJtCQ==
+  dependencies:
+    dom-walk "^0.1.0"
 
 minimalistic-assert@^1.0.0, minimalistic-assert@^1.0.1:
   version "1.0.1"
@@ -8165,6 +8270,16 @@ motion@10.16.2:
     "@motionone/utils" "^10.15.1"
     "@motionone/vue" "^10.16.2"
 
+mpd-parser@^1.2.2, mpd-parser@^1.3.0:
+  version "1.3.0"
+  resolved "https://registry.npmjs.org/mpd-parser/-/mpd-parser-1.3.0.tgz"
+  integrity sha512-WgeIwxAqkmb9uTn4ClicXpEQYCEduDqRKfmUdp4X8vmghKfBNXZLYpREn9eqrDx/Tf5LhzRcJLSpi4ohfV742Q==
+  dependencies:
+    "@babel/runtime" "^7.12.5"
+    "@videojs/vhs-utils" "^4.0.0"
+    "@xmldom/xmldom" "^0.8.3"
+    global "^4.4.0"
+
 mri@^1.2.0:
   version "1.2.0"
   resolved "https://registry.npmjs.org/mri/-/mri-1.2.0.tgz"
@@ -8189,6 +8304,22 @@ mute-stream@~0.0.4:
   version "0.0.8"
   resolved "https://registry.npmjs.org/mute-stream/-/mute-stream-0.0.8.tgz"
   integrity sha512-nnbWWOkoWyUsTjKrhgD0dcz22mdkSnpYqbEjIm2nhwhuxlSkpywJmBo8h0ZqJdkp73mb90SssHkN4rsRaBAfAA==
+
+mux.js@7.0.2:
+  version "7.0.2"
+  resolved "https://registry.npmjs.org/mux.js/-/mux.js-7.0.2.tgz"
+  integrity sha512-CM6+QuyDbc0qW1OfEjkd2+jVKzTXF+z5VOKH0eZxtZtnrG/ilkW/U7l7IXGtBNLASF9sKZMcK1u669cq50Qq0A==
+  dependencies:
+    "@babel/runtime" "^7.11.2"
+    global "^4.4.0"
+
+mux.js@^7.0.1:
+  version "7.0.3"
+  resolved "https://registry.npmjs.org/mux.js/-/mux.js-7.0.3.tgz"
+  integrity sha512-gzlzJVEGFYPtl2vvEiJneSWAWD4nfYRHD5XgxmB2gWvXraMPOYk+sxfvexmNfjQUFpmk6hwLR5C6iSFmuwCHdQ==
+  dependencies:
+    "@babel/runtime" "^7.11.2"
+    global "^4.4.0"
 
 mz@^2.7.0:
   version "2.7.0"
@@ -8221,7 +8352,7 @@ natural-compare@^1.4.0:
 
 neo-async@^2.6.2:
   version "2.6.2"
-  resolved "https://registry.yarnpkg.com/neo-async/-/neo-async-2.6.2.tgz#b4aafb93e3aeb2d8174ca53cf163ab7d7308305f"
+  resolved "https://registry.npmjs.org/neo-async/-/neo-async-2.6.2.tgz"
   integrity sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==
 
 next-auth@^4.22.1:
@@ -8301,7 +8432,7 @@ node-releases@^2.0.14:
 
 nodemailer@^6.9.13:
   version "6.9.13"
-  resolved "https://registry.yarnpkg.com/nodemailer/-/nodemailer-6.9.13.tgz#5b292bf1e92645f4852ca872c56a6ba6c4a3d3d6"
+  resolved "https://registry.npmjs.org/nodemailer/-/nodemailer-6.9.13.tgz"
   integrity sha512-7o38Yogx6krdoBf3jCAqnIN4oSQFx+fMa0I7dK1D+me9kBxx12D+/33wSb+fhOCtIxvYJ+4x4IMEhmhCKfAiOA==
 
 normalize-path@^3.0.0, normalize-path@~3.0.0:
@@ -8737,6 +8868,13 @@ pirates@^4.0.1:
   resolved "https://registry.npmjs.org/pirates/-/pirates-4.0.6.tgz"
   integrity sha512-saLsH7WeYYPiD25LDuLRRY/i+6HaPYr6G1OUlN39otzkSTxKnubR9RTxS3/Kk50s1g2JTgFwWQDQyplC5/SHZg==
 
+pkcs7@^1.0.4:
+  version "1.0.4"
+  resolved "https://registry.npmjs.org/pkcs7/-/pkcs7-1.0.4.tgz"
+  integrity sha512-afRERtHn54AlwaF2/+LFszyAANTCggGilmcmILUzEjvs3XgFZT+xE6+QWQcAGmu4xajy+Xtj7acLOPdx5/eXWQ==
+  dependencies:
+    "@babel/runtime" "^7.5.5"
+
 pkg-types@^1.0.3:
   version "1.0.3"
   resolved "https://registry.npmjs.org/pkg-types/-/pkg-types-1.0.3.tgz"
@@ -8996,7 +9134,7 @@ react-chartjs-2@^5.2.0:
 
 react-confetti@^6.1.0:
   version "6.1.0"
-  resolved "https://registry.yarnpkg.com/react-confetti/-/react-confetti-6.1.0.tgz#03dc4340d955acd10b174dbf301f374a06e29ce6"
+  resolved "https://registry.npmjs.org/react-confetti/-/react-confetti-6.1.0.tgz"
   integrity sha512-7Ypx4vz0+g8ECVxr88W9zhcQpbeujJAVqL14ZnXJ3I23mOI9/oBVTQ3dkJhUmB0D6XOtCZEM6N0Gm9PMngkORw==
   dependencies:
     tween-functions "^1.2.0"
@@ -9349,6 +9487,13 @@ run-parallel@^1.1.9:
   dependencies:
     queue-microtask "^1.2.2"
 
+rust-result@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.npmjs.org/rust-result/-/rust-result-1.0.0.tgz"
+  integrity sha512-6cJzSBU+J/RJCF063onnQf0cDUOHs9uZI1oroSGnHOph+CQTIJ5Pp2hK5kEQq1+7yE/EEWfulSNXAQ2jikPthA==
+  dependencies:
+    individual "^2.0.0"
+
 rustbn.js@~0.2.0:
   version "0.2.0"
   resolved "https://registry.npmjs.org/rustbn.js/-/rustbn.js-0.2.0.tgz"
@@ -9380,6 +9525,13 @@ safe-buffer@~5.1.1:
   version "5.1.2"
   resolved "https://registry.npmjs.org/safe-buffer/-/safe-buffer-5.1.2.tgz"
   integrity sha512-Gd2UZBJDkXlY7GbJxfsE8/nvKkUEU1G38c1siN6QP6a9PT9MmHB8GnpscSmMJSoF8LOIrt8ud/wPtojys4G6+g==
+
+safe-json-parse@4.0.0:
+  version "4.0.0"
+  resolved "https://registry.npmjs.org/safe-json-parse/-/safe-json-parse-4.0.0.tgz"
+  integrity sha512-RjZPPHugjK0TOzFrLZ8inw44s9bKox99/0AZW9o/BEQVrJfhI+fIHMErnPyRa89/yRXUUr93q+tiN6zhoVV4wQ==
+  dependencies:
+    rust-result "^1.0.0"
 
 safe-regex-test@^1.0.3:
   version "1.0.3"
@@ -10080,7 +10232,7 @@ tsort@0.0.1:
 
 tween-functions@^1.2.0:
   version "1.2.0"
-  resolved "https://registry.yarnpkg.com/tween-functions/-/tween-functions-1.2.0.tgz#1ae3a50e7c60bb3def774eac707acbca73bbc3ff"
+  resolved "https://registry.npmjs.org/tween-functions/-/tween-functions-1.2.0.tgz"
   integrity sha512-PZBtLYcCLtEcjL14Fzb1gSxPBeL7nWvGhO5ZFPGqziCcr8uvHp0NDmdjBchp6KHL+tExcg0m3NISmKxhU394dA==
 
 tweetnacl-util@^0.15.1:
@@ -10179,7 +10331,7 @@ ufo@^1.3.0, ufo@^1.3.1, ufo@^1.3.2:
 
 uglify-js@^3.1.4:
   version "3.17.4"
-  resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-3.17.4.tgz#61678cf5fa3f5b7eb789bb345df29afb8257c22c"
+  resolved "https://registry.npmjs.org/uglify-js/-/uglify-js-3.17.4.tgz"
   integrity sha512-T9q82TJI9e/C1TAxYvfb16xO120tMVFZrGA3f9/P4424DNu6ypK103y0GPFVa17yotwSyZW5iYXgjYHkGrJW/g==
 
 uint8arrays@^3.0.0, uint8arrays@^3.1.0:
@@ -10293,6 +10445,11 @@ uri-js@^4.2.2, uri-js@^4.4.1:
   dependencies:
     punycode "^2.1.0"
 
+url-toolkit@^2.2.1:
+  version "2.2.5"
+  resolved "https://registry.npmjs.org/url-toolkit/-/url-toolkit-2.2.5.tgz"
+  integrity sha512-mtN6xk+Nac+oyJ/PrI7tzfmomRVNFIWKUbG8jdYFt52hxbiReFAXIjYskvu64/dvuW71IcB7lV8l0HvZMac6Jg==
+
 urql@^4.0.6:
   version "4.0.6"
   resolved "https://registry.npmjs.org/urql/-/urql-4.0.6.tgz"
@@ -10383,6 +10540,45 @@ valtio@1.11.2:
   dependencies:
     proxy-compare "2.5.1"
     use-sync-external-store "1.2.0"
+
+"video.js@^7 || ^8", video.js@^8.10.0:
+  version "8.10.0"
+  resolved "https://registry.npmjs.org/video.js/-/video.js-8.10.0.tgz"
+  integrity sha512-7UeG/flj/pp8tNGW8WKPP1VJb3x2FgLoqUWzpZqkoq5YIyf6MNzmIrKtxprl438T5RVkcj+OzV8IX4jYSAn4Sw==
+  dependencies:
+    "@babel/runtime" "^7.12.5"
+    "@videojs/http-streaming" "3.10.0"
+    "@videojs/vhs-utils" "^4.0.0"
+    "@videojs/xhr" "2.6.0"
+    aes-decrypter "^4.0.1"
+    global "4.4.0"
+    keycode "2.2.0"
+    m3u8-parser "^7.1.0"
+    mpd-parser "^1.2.2"
+    mux.js "^7.0.1"
+    safe-json-parse "4.0.0"
+    videojs-contrib-quality-levels "4.0.0"
+    videojs-font "4.1.0"
+    videojs-vtt.js "0.15.5"
+
+videojs-contrib-quality-levels@4.0.0:
+  version "4.0.0"
+  resolved "https://registry.npmjs.org/videojs-contrib-quality-levels/-/videojs-contrib-quality-levels-4.0.0.tgz"
+  integrity sha512-u5rmd8BjLwANp7XwuQ0Q/me34bMe6zg9PQdHfTS7aXgiVRbNTb4djcmfG7aeSrkpZjg+XCLezFNenlJaCjBHKw==
+  dependencies:
+    global "^4.4.0"
+
+videojs-font@4.1.0:
+  version "4.1.0"
+  resolved "https://registry.npmjs.org/videojs-font/-/videojs-font-4.1.0.tgz"
+  integrity sha512-X1LuPfLZPisPLrANIAKCknZbZu5obVM/ylfd1CN+SsCmPZQ3UMDPcvLTpPBJxcBuTpHQq2MO1QCFt7p8spnZ/w==
+
+videojs-vtt.js@0.15.5:
+  version "0.15.5"
+  resolved "https://registry.npmjs.org/videojs-vtt.js/-/videojs-vtt.js-0.15.5.tgz"
+  integrity sha512-yZbBxvA7QMYn15Lr/ZfhhLPrNpI/RmCSCqgIff57GC2gIrV5YfyzLfLyZMj0NnZSAz8syB4N0nHXpZg9MyrMOQ==
+  dependencies:
+    global "^4.3.1"
 
 viem@^0.3.45:
   version "0.3.50"
@@ -10531,7 +10727,7 @@ wonka@^6.3.2:
 
 wordwrap@^1.0.0:
   version "1.0.0"
-  resolved "https://registry.yarnpkg.com/wordwrap/-/wordwrap-1.0.0.tgz#27584810891456a4171c8d0226441ade90cbcaeb"
+  resolved "https://registry.npmjs.org/wordwrap/-/wordwrap-1.0.0.tgz"
   integrity sha512-gvVzJFlPycKc5dZN4yPkP8w7Dc37BtP1yczEneOb4uq34pXZcvrtRTmWV8W+Ume+XCxKgbjM+nevkyFPMybd4Q==
 
 workerpool@6.2.1:

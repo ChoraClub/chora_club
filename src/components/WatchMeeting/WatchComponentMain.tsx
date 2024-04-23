@@ -7,6 +7,8 @@ import search from "@/assets/images/daos/search.png";
 import WatchSession from "./WatchSession";
 import WatchSessionList from "./WatchSessionList";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import styles from "./WatchSession.module.css";
+import WatchSessionVideo from "./WatchSessionVideo";
 
 interface AttestationObject {
   attendee_address: string;
@@ -18,6 +20,7 @@ function WatchComponentMain({ props }: { props: { id: string } }) {
   const [data, setData] = useState<any>();
   const [collection, setCollection] = useState<any>();
   const [searchQuery, setSearchQuery] = useState("");
+  const [watchSessionHeight, setWatchSessionHeight] = useState<number | 0>();
 
   useEffect(() => {
     async function fetchData() {
@@ -60,24 +63,24 @@ function WatchComponentMain({ props }: { props: { id: string } }) {
   return (
     <>
       {data ? (
-        <div className="ps-14">
+        <div className=" ps-14">
           <div className="flex justify-between items-center pt-6 pb-3 pe-10">
-            <div className="font-poppins font-medium text-5xl">
+            <div className="font-poppins font-medium text-4xl">
               <span className="text-black">Chora</span>{" "}
               <span className="text-blue-shade-200">Club</span>
             </div>
             <ConnectButton />
           </div>
-          <div className="flex my-4 items-center gap-4 font-poppins">
+          <div className="flex py-4 items-center gap-4 font-poppins sticky top-0 z-50 bg-white">
             <div
               style={{ background: "rgba(238, 237, 237, 0.36)" }}
-              className="flex border-[0.5px] border-black w-fit rounded-full"
+              className="flex border-[0.5px] border-black w-1/3 rounded-full"
             >
               <input
                 type="text"
                 placeholder="Search"
                 style={{ background: "rgba(238, 237, 237, 0.36)" }}
-                className="pl-5 rounded-full outline-none"
+                className="pl-5 rounded-full outline-none w-full"
                 value={searchQuery}
                 // onChange={(e) => handleSearchChange(e.target.value)}
               ></input>
@@ -98,11 +101,15 @@ function WatchComponentMain({ props }: { props: { id: string } }) {
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-4">
-            <div className="col-span-2">
+          <div className="grid grid-cols-3 gap-4 pt-6 relative">
+            <div className="sticky top-10 z-10 col-span-2 space-y-5 font-poppins pb-10 ">
+              <WatchSessionVideo data={data} collection={collection} />
               <WatchSession data={data} collection={collection} />
             </div>
-            <div className="col-span-1">
+            <div
+              className={`col-span-1 me-5 pb-8 ${styles.customScrollbar}`}
+              // style={{ maxHeight: "calc(100vh - 80px)" }}
+            >
               <WatchSessionList />
             </div>
           </div>
