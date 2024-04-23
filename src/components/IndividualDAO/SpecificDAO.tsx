@@ -9,39 +9,68 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import OPLogo from "@/assets/images/daos/op.png";
 import ARBLogo from "@/assets/images/daos/arbitrum.jpg";
 
-const desc = {
-  optimism:
-    "Optimism DAO is the heart of the Optimism network, an innovative layer 2 solution for faster, cheaper transactions on Ethereum. Think of it as a community-driven engine, where token holders govern upgrades, fees, and the overall direction of the Optimism ecosystem. With a focus on scaling Ethereum effectively and sustainably, Optimism DAO is building a brighter future for blockchain technology.",
-
-  arbitrum:
-    "The Arbitrum DAO is a decentralized autonomous organization (DAO) built on the Ethereum blockchain. At its core, the Arbitrum DAO is a community-driven governance mechanism that allows $ARB token holders to propose and vote on changes to the organization and the technologies it governs.",
-};
-
 function SpecificDAO({ props }: { props: { daoDelegates: string } }) {
   const router = useRouter();
   const path = usePathname();
   const daoname = path.slice(1);
   const searchParams = useSearchParams();
-
-  const logoMapping: any = {
-    optimism: OPLogo,
-    arbitrum: ARBLogo,
-    // Add more mappings as needed
-  };
-
-  const selectedLogo = logoMapping[daoname] || OPLogo;
-
+  const [isPageLoading, setIsPageLoading] = useState(true);
+  const [desc, setDesc] = useState();
   const [isOpen, setIsOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState({
     value: daoname,
     label: daoname,
-    image: selectedLogo,
   });
 
-  const options = [
-    { value: "optimism", label: "optimism", image: OPLogo },
-    { value: "arbitrum", label: "arbitrum", image: ARBLogo },
-  ];
+  const [options, setOptions] = useState<any>([]);
+
+  useEffect(() => {
+    // setIsPageLoading(false);
+    const setDescFunction = async () => {
+      setIsPageLoading(true);
+      const data = await options?.find(
+        (option: any) => option.value === props.daoDelegates
+      )?.desc;
+      setDesc(data);
+      setIsPageLoading(false);
+    };
+    setDescFunction();
+    setIsPageLoading(false);
+  }, [isPageLoading, options, desc]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setIsPageLoading(true);
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+
+        const requestOptions: RequestInit = {
+          method: "GET",
+          headers: myHeaders,
+        };
+
+        const response = await fetch("/api/get-dao-details", requestOptions);
+        const result = await response.json();
+
+        const fetchedDaoInfo = await result.data.map((dao: any) => ({
+          value: dao.dao_name,
+          label: dao.dao_name,
+          image: dao.logo,
+          desc: dao.description,
+        }));
+        setOptions(fetchedDaoInfo);
+
+        // console.log("dao-details", result.data);
+        setIsPageLoading(false);
+      } catch (error) {
+        console.error(error);
+        setIsPageLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [isPageLoading]);
 
   const handleMouseEnter = () => {
     setIsOpen(true);
@@ -64,40 +93,11 @@ function SpecificDAO({ props }: { props: { daoDelegates: string } }) {
       JSON.stringify({ ...localData, [formatted]: [formatted, option.image] })
     );
 
-    // Redirect or perform other actions based on the selected DAO
-    switch (option.value) {
-      case "optimism":
-        router.push("/optimism?active=delegatesList");
-        break;
-      case "arbitrum":
-        router.push("/arbitrum?active=delegatesList");
-        break;
-      default:
-        break;
-    }
+    router.push(`/${name}?active=delegatesList`);
   };
 
   return (
     <div className="font-poppins py-6" id="secondSection">
-      {/* <div className="px-8 pb-5">
-        <div className="flex justify-between pe-10">
-          <div className="capitalize text-4xl text-blue-shade-100">
-            {props.daoDelegates}
-          </div>
-          <div>
-            <ConnectButton />
-          </div>
-        </div>
-
-        <div className="py-5 pr-8">
-          {props.daoDelegates === "optimism"
-            ? desc.optimism
-            : props.daoDelegates === "arbitrum"
-            ? desc.arbitrum
-            : null}
-        </div>
-      </div> */}
-
       <div className="pr-8 pb-5 pl-16">
         <div className="flex items-center justify-between pe-10">
           <div
@@ -108,8 +108,8 @@ function SpecificDAO({ props }: { props: { daoDelegates: string } }) {
             <div>
               <div
                 className="capitalize text-4xl text-blue-shade-100 bg-white-200 outline-none cursor-pointer flex items-center justify-between transition duration-500"
-                onMouseEnter={handleMouseEnter}
-                onMouseLeave={handleMouseLeave}
+                // onMouseEnter={handleMouseEnter}
+                // onMouseLeave={handleMouseLeave}
               >
                 <div className="mr-5 flex items-center">
                   {selectedOption.label}
@@ -141,7 +141,7 @@ function SpecificDAO({ props }: { props: { daoDelegates: string } }) {
                   onMouseEnter={handleMouseEnter}
                   onMouseLeave={handleMouseLeave}
                 >
-                  {options.map((option, index) => (
+                  {options.map((option: any, index: number) => (
                     <div key={index}>
                       <div
                         className={`option flex items-center cursor-pointer px-3 py-2 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 capitalize ${
@@ -164,11 +164,7 @@ function SpecificDAO({ props }: { props: { daoDelegates: string } }) {
           </div>
         </div>
         <div className="py-5 pr-8">
-          {props.daoDelegates === "optimism"
-            ? desc.optimism
-            : props.daoDelegates === "arbitrum"
-            ? desc.arbitrum
-            : null}
+          {isPageLoading ? <>Loading...</> : desc || <>Loading...</>}
         </div>
       </div>
 

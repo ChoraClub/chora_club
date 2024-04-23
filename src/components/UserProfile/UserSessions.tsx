@@ -16,6 +16,7 @@ import { Oval } from "react-loader-spinner";
 interface UserSessionsProps {
   isDelegate: boolean | undefined;
   selfDelegate: boolean;
+  daoName: string;
 }
 
 type Attendee = {
@@ -37,7 +38,11 @@ interface Session {
   _id: string;
 }
 
-function UserSessions({ isDelegate, selfDelegate }: UserSessionsProps) {
+function UserSessions({
+  isDelegate,
+  selfDelegate,
+  daoName,
+}: UserSessionsProps) {
   const { address } = useAccount();
   // const address = "0x5e349eca2dc61abcd9dd99ce94d04136151a09ee";
   const router = useRouter();
@@ -50,20 +55,16 @@ function UserSessions({ isDelegate, selfDelegate }: UserSessionsProps) {
   let dao_name = "";
 
   const getUserMeetingData = async () => {
-    if (chain?.name === "Optimism") {
-      dao_name = "optimism";
-    } else if (chain?.name === "Arbitrum One") {
-      dao_name = "arbitrum";
-    }
     try {
       // setDataLoading(true);
+      // console.log("DAO NAMEEEEEEEEE", daoName);
       const response = await fetch(`/api/get-dao-sessions`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          dao_name: dao_name,
+          dao_name: daoName,
         }),
       });
 
@@ -204,10 +205,10 @@ function UserSessions({ isDelegate, selfDelegate }: UserSessionsProps) {
               <ScheduledUserSessions />
             )}
           {selfDelegate === true && searchParams.get("session") === "book" && (
-            <BookedUserSessions />
+            <BookedUserSessions daoName={daoName} />
           )}
           {searchParams.get("session") === "attending" && (
-            <AttendingUserSessions />
+            <AttendingUserSessions daoName={daoName} />
           )}
           {selfDelegate === true &&
             searchParams.get("session") === "hosted" &&

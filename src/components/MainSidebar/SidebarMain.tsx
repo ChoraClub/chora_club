@@ -169,13 +169,16 @@ function Sidebar() {
                       <Image
                         key={index}
                         src={data[1]}
+                        height={20}
+                        width={20}
                         alt="image"
                         className={`w-10 h-10 rounded-full cursor-pointer ${
                           pathname.includes(`/${data[0]}`)
                             ? "border-white border-[2.5px]"
                             : ""
                         }`}
-                        priority={true}
+                        quality={100}
+                        priority
                       ></Image>
                     </Link>
                   </Tooltip>

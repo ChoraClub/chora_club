@@ -44,16 +44,8 @@ function DelegateInfo({ props }: { props: Type }) {
           result.data.forEach((item: any) => {
             if (
               item.meeting_status === "Recorded" &&
-              item.dao_name === "optimism" &&
-              item.uid_host &&
-              props.daoDelegates == "optimism"
-            ) {
-              sessionHostingCount++;
-            } else if (
-              item.meeting_status === "Recorded" &&
-              item.dao_name === "arbitrum" &&
-              item.uid_host &&
-              props.daoDelegates == "arbitrum"
+              item.dao_name === props.daoDelegates &&
+              item.uid_host
             ) {
               sessionHostingCount++;
             }
@@ -88,16 +80,8 @@ function DelegateInfo({ props }: { props: Type }) {
           result.data.forEach((item: any) => {
             if (
               item.meeting_status === "Recorded" &&
-              item.dao_name === "optimism" &&
-              item.uid_attendee &&
-              props.daoDelegates == "optimism"
-            ) {
-              sessionAttendingCount++;
-            } else if (
-              item.meeting_status === "Recorded" &&
-              item.dao_name === "arbitrum" &&
-              item.uid_attendee &&
-              props.daoDelegates == "arbitrum"
+              item.dao_name === props.daoDelegates &&
+              item.uid_attendee
             ) {
               sessionAttendingCount++;
             }
@@ -130,16 +114,8 @@ function DelegateInfo({ props }: { props: Type }) {
           result.forEach((item: any) => {
             if (
               item.meeting_status === "inactive" &&
-              item.dao_name === "Optimism" &&
-              item.uid_host &&
-              props.daoDelegates == "optimism"
-            ) {
-              officehoursHostingCount++;
-            } else if (
-              item.meeting_status === "inactive" &&
-              item.dao_name === "Arbitrum" &&
-              item.uid_host &&
-              props.daoDelegates == "arbitrum"
+              item.dao_name === props.daoDelegates &&
+              item.uid_host
             ) {
               officehoursHostingCount++;
             }
@@ -172,19 +148,11 @@ function DelegateInfo({ props }: { props: Type }) {
           result.forEach((item: any) => {
             if (
               item.meeting_status === "inactive" &&
-              item.dao_name === "Optimism" &&
-              item.attendees.some((attendee: any) => attendee.attendee_uid) &&
-              props.daoDelegates == "optimism"
+              item.dao_name === props.daoDelegates &&
+              item.attendees.some((attendee: any) => attendee.attendee_uid) 
             ) {
               officehoursAttendingCount++;
-            } else if (
-              item.meeting_status === "inactive" &&
-              item.dao_name === "Arbitrum" &&
-              item.attendees.some((attendee: any) => attendee.attendee_uid) &&
-              props.daoDelegates == "arbitrum"
-            ) {
-              officehoursAttendingCount++;
-            }
+            } 
             // console.log("officehours attended: ", officehoursAttendingCount);
             setOfficehoursAttendCount(officehoursAttendingCount);
             setDataLoading(false);

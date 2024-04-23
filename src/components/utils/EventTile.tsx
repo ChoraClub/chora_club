@@ -158,10 +158,17 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
             </div>
 
             <div className="flex gap-x-16 text-sm py-3">
-              <div className="text-[#3E3D3D]">
-                <span className="font-semibold">Attendee:</span>{" "}
-                {formatWalletAddress(data.attendees[0].attendee_address)}
-              </div>
+              {data.session_type === "session" ? (
+                <div className="text-[#3E3D3D]">
+                  <span className="font-semibold">Session - </span>{" "}
+                  <span className="font-semibold">Attendee:</span>{" "}
+                  {formatWalletAddress(data.attendees[0].attendee_address)}
+                </div>
+              ) : (
+                <div className="text-[#3E3D3D]">
+                  <span className="font-semibold">Instant Meet</span>{" "}
+                </div>
+              )}
               <div className="text-[#3E3D3D]">
                 <span className="font-semibold">Host:</span>{" "}
                 {formatWalletAddress(data.host_address)}

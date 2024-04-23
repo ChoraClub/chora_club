@@ -25,12 +25,11 @@ interface Session {
   _id: string;
 }
 
-function BookedUserSessions() {
+function BookedUserSessions({ daoName }: { daoName: string }) {
   const { address } = useAccount();
   // const address = "0x5e349eca2dc61abcd9dd99ce94d04136151a09ee";
   const [sessionDetails, setSessionDetails] = useState([]);
   const [pageLoading, setPageLoading] = useState(true);
-  const { chain, chains } = useNetwork();
 
   const getMeetingData = async () => {
     try {
@@ -45,24 +44,16 @@ function BookedUserSessions() {
       let filteredData: any = result.data;
       if (result.success) {
         const currentTime = new Date();
-        const currentSlot = new Date(currentTime.getTime() + 60 * 60 * 1000);
-        if (chain?.name === "Optimism") {
-          filteredData = result.data.filter(
-            (session: Session) =>
-              session.dao_name === "optimism" &&
-              session.meeting_status !== "Recorded" &&
-              new Date(session.slot_time).toLocaleString() >
-                currentSlot.toLocaleString()
-          );
-        } else if (chain?.name === "Arbitrum One") {
-          filteredData = result.data.filter(
-            (session: Session) =>
-              session.dao_name === "arbitrum" &&
-              session.meeting_status !== "Recorded" &&
-              new Date(session.slot_time).toLocaleString() >
-                currentSlot.toLocaleString()
-          );
-        }
+        const currentSlot = new Date(currentTime.getTime() - 60 * 60 * 1000);
+
+        filteredData = result.data.filter(
+          (session: Session) =>
+            session.dao_name === daoName &&
+            session.meeting_status !== "Recorded" &&
+            new Date(session.slot_time).toLocaleString() >=
+              currentSlot.toLocaleString()
+        );
+
         setSessionDetails(filteredData);
         setPageLoading(false);
       } else {

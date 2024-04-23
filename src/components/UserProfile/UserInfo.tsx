@@ -12,6 +12,7 @@ interface userInfoProps {
   karmaDesc: string;
   isDelegate: boolean;
   isSelfDelegate: boolean;
+  daoName: string;
 }
 
 function UserInfo({
@@ -22,6 +23,7 @@ function UserInfo({
   isDelegate,
   isSelfDelegate,
   karmaDesc,
+  daoName,
 }: userInfoProps) {
   const { address } = useAccount();
   // const address = "0x5e349eca2dc61abcd9dd99ce94d04136151a09ee";
@@ -43,15 +45,10 @@ function UserInfo({
   let sessionAttendingCount = 0;
   let officehoursHostingCount = 0;
   let officehoursAttendingCount = 0;
-  let dao_name = "";
+  let dao_name = daoName;
 
   useEffect(() => {
     const sessionHosted = async () => {
-      if (chain?.name === "Optimism") {
-        dao_name = "optimism";
-      } else if (chain?.name === "Arbitrum One") {
-        dao_name = "arbitrum";
-      }
       try {
         const response = await fetch(`/api/get-meeting/${address}`, {
           method: "GET",
@@ -64,20 +61,11 @@ function UserInfo({
           result.data.forEach((item: any) => {
             if (
               item.meeting_status === "Recorded" &&
-              item.dao_name === "optimism" &&
-              item.uid_host &&
-              chain?.name == "Optimism"
-            ) {
-              sessionHostingCount++;
-            } else if (
-              item.meeting_status === "Recorded" &&
-              item.dao_name === "arbitrum" &&
-              item.uid_host &&
-              chain?.name == "Arbitrum One"
+              item.dao_name === daoName &&
+              item.uid_host
             ) {
               sessionHostingCount++;
             }
-            // console.log("op host count: ", sessionHostingCount);
             setSessionHostCount(sessionHostingCount);
             setDataLoading(false);
           });
@@ -105,20 +93,11 @@ function UserInfo({
           result.data.forEach((item: any) => {
             if (
               item.meeting_status === "Recorded" &&
-              item.dao_name === "optimism" &&
-              item.attendees.some((attendee: any) => attendee.attendee_uid) &&
-              chain?.name == "Optimism"
-            ) {
-              sessionAttendingCount++;
-            } else if (
-              item.meeting_status === "Recorded" &&
-              item.dao_name === "arbitrum" &&
-              item.attendees.some((attendee: any) => attendee.attendee_uid) &&
-              chain?.name == "Arbitrum One"
+              item.dao_name === daoName &&
+              item.attendees.some((attendee: any) => attendee.attendee_uid)
             ) {
               sessionAttendingCount++;
             }
-            // console.log("op attended count: ", sessionAttendingCount);
             setSessionAttendCount(sessionAttendingCount);
             setDataLoading(false);
           });
@@ -147,20 +126,12 @@ function UserInfo({
           result.forEach((item: any) => {
             if (
               item.meeting_status === "inactive" &&
-              item.dao_name === "Optimism" &&
-              item.uid_host &&
-              chain?.name == "Optimism"
-            ) {
-              officehoursHostingCount++;
-            } else if (
-              item.meeting_status === "inactive" &&
-              item.dao_name === "Arbitrum" &&
-              item.uid_host &&
-              chain?.name == "Arbitrum One"
+              item.dao_name === daoName &&
+              item.uid_host
             ) {
               officehoursHostingCount++;
             }
-            // console.log("office hours host count: ", officehoursHostingCount);
+
             setOfficehoursHostCount(officehoursHostingCount);
             setDataLoading(false);
           });
@@ -189,20 +160,12 @@ function UserInfo({
           result.forEach((item: any) => {
             if (
               item.meeting_status === "inactive" &&
-              item.dao_name === "Optimism" &&
-              item.attendees.some((attendee: any) => attendee.attendee_uid) &&
-              chain?.name == "Optimism"
-            ) {
-              officehoursAttendingCount++;
-            } else if (
-              item.meeting_status === "inactive" &&
-              item.dao_name === "Arbitrum" &&
-              item.attendees.some((attendee: any) => attendee.attendee_uid) &&
-              chain?.name == "Arbitrum One"
+              item.dao_name === daoName &&
+              item.attendees.some((attendee: any) => attendee.attendee_uid)
             ) {
               officehoursAttendingCount++;
             }
-            // console.log("officehours attended: ", officehoursAttendingCount);
+
             setOfficehoursAttendCount(officehoursAttendingCount);
             setDataLoading(false);
           });

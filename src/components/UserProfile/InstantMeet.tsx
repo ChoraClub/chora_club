@@ -16,9 +16,10 @@ import { useNetwork } from "wagmi";
 interface instantMeetProps {
   isDelegate: boolean;
   selfDelegate: boolean;
+  daoName: string;
 }
 
-function InstantMeet({ isDelegate, selfDelegate }: instantMeetProps) {
+function InstantMeet({ isDelegate, selfDelegate, daoName }: instantMeetProps) {
   const [modalData, setModalData] = useState({
     dao_name: "",
     title: "",

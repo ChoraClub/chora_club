@@ -18,7 +18,7 @@ function DelegateSessionsMain() {
       <div className="">
         <div className="flex justify-between pt-6 pl-14 pr-14">
           <div className="flex font-quanty font-medium text-4xl text-blue-shade-200 pb-4 items-center">
-            {/* <div>
+            <div>
               <Tooltip
                 showArrow
                 content={
@@ -33,7 +33,7 @@ function DelegateSessionsMain() {
               >
                 <div> Available Delegates</div>
               </Tooltip>
-            </div> */}
+            </div> 
             Sessions
           </div>
           <div>

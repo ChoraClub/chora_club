@@ -73,24 +73,12 @@ function MainProfile() {
   const [descAvailable, setDescAvailable] = useState<boolean>(true);
   const [isPageLoading, setIsPageLoading] = useState(true);
   const [selfDelegate, setSelfDelegate] = useState(false);
+  const [daoName, setDaoName] = useState("optimism");
 
   interface ProgressData {
     total: any;
     uploaded: any;
   }
-
-  // useEffect(() => {
-  //   console.log("path", path);
-  //   if (isConnected && session) {
-  //     router.replace(`/profile/${address}?active=info`);
-  //   } else {
-  //     if (openConnectModal) {
-  //       openConnectModal();
-  //     } else {
-  //       console.error("openConnectModal is not defined");
-  //     }
-  //   }
-  // }, [isConnected, address, router, session, path]);
 
   useEffect(() => {
     // console.log("path", path);
@@ -134,15 +122,7 @@ function MainProfile() {
     console.log("File Status:", output);
     setDisplayImage(output.data.Hash);
 
-    let dao = "";
-    if (chain && chain?.name === "Optimism") {
-      dao = "optimism";
-    } else if (chain && chain?.name === "Arbitrum One") {
-      dao = "arbitrum";
-    } else {
-      return;
-    }
-
+    let dao = daoName;
     const response = await axios.put("/api/profile", {
       address: address,
       image: output.data.Hash,
@@ -199,9 +179,9 @@ function MainProfile() {
       const address1 = addr[0];
       let delegateTxAddr = "";
       const contractAddress =
-        chain?.name === "Optimism"
+        daoName === "optimism"
           ? "0x4200000000000000000000000000000000000042"
-          : chain?.name === "Arbitrum One"
+          : daoName === "arbitrum"
           ? "0x912CE59144191C1204E64559FE8253a0e49E6548"
           : "";
       console.log(walletClient);
@@ -233,9 +213,9 @@ function MainProfile() {
       const address1 = addr[0];
 
       const contractAddress =
-        chain?.name === "Optimism"
+        daoName === "optimism"
           ? "0x4200000000000000000000000000000000000042"
-          : chain?.name === "Arbitrum One"
+          : daoName === "arbitrum"
           ? "0x912CE59144191C1204E64559FE8253a0e49E6548"
           : "";
       console.log("Contract", contractAddress);
@@ -314,14 +294,7 @@ function MainProfile() {
     const fetchData = async () => {
       try {
         // Fetch data from your backend API to check if the address exists
-        let dao = "";
-        if (chain && chain?.name === "Optimism") {
-          dao = "optimism";
-        } else if (chain && chain?.name === "Arbitrum One") {
-          dao = "arbitrum";
-        } else {
-          return;
-        }
+        let dao = daoName;
         console.log("Fetching from DB");
         // const dbResponse = await axios.get(`/api/profile/${address}`);
 
@@ -372,15 +345,7 @@ function MainProfile() {
             "Data not found in the database, fetching from third-party API"
           );
           // Data not found in the database, fetch data from the third-party API
-          let dao = "";
-          if (chain && chain?.name === "Optimism") {
-            dao = "optimism";
-          } else if (chain && chain?.name === "Arbitrum One") {
-            dao = "arbitrum";
-          } else {
-            return;
-          }
-
+          let dao = daoName;
           const res = await fetch(
             `https://api.karmahq.xyz/api/dao/find-delegate?dao=${dao}&user=${address}`
           );
@@ -437,7 +402,7 @@ function MainProfile() {
     };
 
     fetchData();
-  }, [chain, address, searchParams.get("session") === "schedule"]);
+  }, [daoName, chain, address, searchParams.get("session") === "schedule"]);
 
   useEffect(() => {
     setIsPageLoading(false);
@@ -481,14 +446,7 @@ function MainProfile() {
   const checkDelegateExists = async (address: any) => {
     try {
       // Make a request to your backend API to check if the address exists
-      let dao = "";
-      if (chain && chain?.name === "Optimism") {
-        dao = "optimism";
-      } else if (chain && chain?.name === "Arbitrum One") {
-        dao = "arbitrum";
-      } else {
-        return;
-      }
+      let dao = daoName;
       console.log("Checking");
 
       const myHeaders = new Headers();
@@ -530,14 +488,7 @@ function MainProfile() {
   const handleAdd = async (newDescription?: string) => {
     try {
       // Call the POST API function for adding a new delegate
-      let dao = "";
-      if (chain && chain?.name === "Optimism") {
-        dao = "optimism";
-      } else if (chain && chain?.name === "Arbitrum One") {
-        dao = "arbitrum";
-      } else {
-        return;
-      }
+      let dao = daoName;
       console.log("Adding the delegate..");
       const response = await axios.post("/api/profile", {
         address: address,
@@ -578,15 +529,7 @@ function MainProfile() {
     try {
       // Call the PUT API function for updating an existing delegate
 
-      let dao = "";
-      if (chain && chain?.name === "Optimism") {
-        dao = "optimism";
-      } else if (chain && chain?.name === "Arbitrum One") {
-        dao = "arbitrum";
-      } else {
-        return;
-      }
-
+      let dao = daoName;
       console.log("Updating");
       console.log("Inside Updating Description", newDescription);
       const response: any = await axios.put("/api/profile", {
@@ -625,14 +568,7 @@ function MainProfile() {
     const fetchData = async () => {
       console.log("Description", description);
       try {
-        let dao = "";
-        if (chain && chain?.name === "Optimism") {
-          dao = "optimism";
-        } else if (chain && chain?.name === "Arbitrum One") {
-          dao = "arbitrum";
-        } else {
-          return;
-        }
+        let dao = daoName;
         console.log("Fetching Data...");
         const res = await fetch(
           `https://api.karmahq.xyz/api/dao/find-delegate?dao=${dao}&user=${address}`
@@ -673,7 +609,7 @@ function MainProfile() {
     };
 
     fetchData();
-  }, [chain, address]);
+  }, [chain, address, daoName]);
 
   return (
     <>
@@ -697,9 +633,9 @@ function MainProfile() {
                         (displayImage
                           ? `https://gateway.lighthouse.storage/ipfs/${displayImage}`
                           : karmaImage) ||
-                        (chain?.name === "Optimism"
+                        (daoName === "optimism"
                           ? OPLogo
-                          : chain?.name === "Arbitrum One"
+                          : daoName === "arbitrum"
                           ? ArbLogo
                           : ccLogo)
                       }
@@ -755,9 +691,9 @@ function MainProfile() {
                     </Link>
                     <Link
                       href={
-                        chain?.name == "Optimism"
+                        daoName === "optimism"
                           ? `https://gov.optimism.io/u/${discourse}`
-                          : chain?.name == "Arbitrum One"
+                          : daoName == "arbitrum"
                           ? `https://forum.arbitrum.foundation/u/${discourse}`
                           : ""
                       }
@@ -982,20 +918,27 @@ function MainProfile() {
                     >
                       Become Delegate
                     </button>
-                    {/* 
-                    <button
+                    {/* <button
                       className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
                       onClick={() => handleAttestation()}
                     >
                       Attest
                     </button> */}
 
-                    {/* <div className="">
-                <select className="outline-none border border-blue-shade-200 text-blue-shade-200 rounded-full py-2 px-3">
-                  <option className="text-gray-700">Optimism</option>
-                  <option className="text-gray-700">Arbitrum</option>
-                </select>
-              </div> */}
+                    <div className="">
+                      <select
+                        value={daoName}
+                        onChange={(e) => setDaoName(e.target.value)}
+                        className="outline-none border border-blue-shade-200 text-blue-shade-200 rounded-full py-2 px-3"
+                      >
+                        <option value="optimism" className="text-gray-700">
+                          Optimism
+                        </option>
+                        <option value="arbitrum" className="text-gray-700">
+                          Arbitrum
+                        </option>
+                      </select>
+                    </div>
                   </div>
                 ) : null}
               </div>
@@ -1089,12 +1032,13 @@ function MainProfile() {
                   handleSubmit(newDescription)
                 }
                 isLoading={isLoading}
+                daoName={daoName}
               />
             ) : (
               ""
             )}
             {selfDelegate === true && searchParams.get("active") === "votes" ? (
-              <UserVotes />
+              <UserVotes daoName={daoName} />
             ) : (
               ""
             )}
@@ -1102,6 +1046,7 @@ function MainProfile() {
               <UserSessions
                 isDelegate={isDelegate}
                 selfDelegate={selfDelegate}
+                daoName={daoName}
               />
             ) : (
               ""
@@ -1110,6 +1055,7 @@ function MainProfile() {
               <UserOfficeHours
                 isDelegate={isDelegate}
                 selfDelegate={selfDelegate}
+                daoName={daoName}
               />
             ) : (
               ""
@@ -1119,6 +1065,7 @@ function MainProfile() {
               <InstantMeet
                 isDelegate={isDelegate}
                 selfDelegate={selfDelegate}
+                daoName={daoName}
               />
             ) : (
               ""

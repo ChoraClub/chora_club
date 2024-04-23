@@ -29,22 +29,15 @@ interface Session {
   _id: string;
 }
 
-function AttendingUserSessions() {
+function AttendingUserSessions({ daoName }: { daoName: string }) {
   const router = useRouter();
   const path = usePathname();
   const searchParams = useSearchParams();
   const { address } = useAccount();
   const [sessionDetails, setSessionDetails] = useState([]);
   const [pageLoading, setPageLoading] = useState(true);
-  const { chain, chains } = useNetwork();
-  let dao_name = "";
 
   const getUserMeetingData = async () => {
-    if (chain?.name === "Optimism") {
-      dao_name = "optimism";
-    } else if (chain?.name === "Arbitrum One") {
-      dao_name = "arbitrum";
-    }
     try {
       const response = await fetch(`/api/get-session-data/${address}`, {
         method: "POST",
@@ -52,7 +45,7 @@ function AttendingUserSessions() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          dao_name: dao_name,
+          dao_name: daoName,
         }),
       });
 
@@ -62,23 +55,23 @@ function AttendingUserSessions() {
       if (result.success) {
         // setSessionDetails(result.data);
         const resultData = await result.data;
-        // console.log("resultData", resultData);
+        console.log("resultData", resultData);
         setPageLoading(true);
-        // const currentTime = new Date();
-        // const currentSlot = new Date(currentTime.getTime() + 60 * 60 * 1000);
+        const currentTime = new Date();
+        const currentSlot = new Date(currentTime.getTime() - 60 * 60 * 1000);
         if (Array.isArray(resultData)) {
           let filteredData: any = resultData;
           if (searchParams.get("session") === "attending") {
             filteredData = resultData.filter((session: Session) => {
-              return session.attendees?.some(
-                (attendee) => attendee.attendee_address === address
-              ) &&
+              return (
+                session.attendees?.some(
+                  (attendee) => attendee.attendee_address === address
+                ) &&
                 session.meeting_status !== "Recorded" &&
-                chain?.name === "Optimism"
-                ? session.dao_name === "optimism"
-                : chain?.name === "Arbitrum One"
-                ? session.dao_name === "arbitrum"
-                : "";
+                new Date(session.slot_time).toLocaleString() >=
+                  currentSlot.toLocaleString() &&
+                session.dao_name === daoName
+              );
             });
           }
           console.log("filtered", filteredData);
@@ -86,21 +79,6 @@ function AttendingUserSessions() {
           setPageLoading(false);
         }
       }
-
-      // if (result.success) {
-      //   let filteredData: any = result.data;
-      //   filteredData = result.data.filter((session: any) => {
-      //     return chain?.name === "Optimism"
-      //       ? session.dao_name === "optimism"
-      //       : chain?.name === "Arbitrum One"
-      //       ? session.dao_name === "arbitrum"
-      //       : "";
-      //   });
-      //   setSessionDetails(filteredData);
-      //   setPageLoading(false);
-      // } else {
-      //   setPageLoading(false);
-      // }
     } catch (error) {
       console.log("error in catch", error);
     }

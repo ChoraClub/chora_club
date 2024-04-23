@@ -11,6 +11,7 @@ import { Oval } from "react-loader-spinner";
 interface UserOfficeHoursProps {
   isDelegate: boolean | undefined;
   selfDelegate: boolean;
+  daoName: string;
 }
 
 interface Session {
@@ -24,7 +25,11 @@ interface Session {
   attendees: any[];
 }
 
-function UserOfficeHours({ isDelegate, selfDelegate }: UserOfficeHoursProps) {
+function UserOfficeHours({
+  isDelegate,
+  selfDelegate,
+  daoName,
+}: UserOfficeHoursProps) {
   const { address } = useAccount();
   const router = useRouter();
   const path = usePathname();
@@ -83,38 +88,30 @@ function UserOfficeHours({ isDelegate, selfDelegate }: UserOfficeHoursProps) {
         ) {
           const filteredSessions = result.filter((session: Session) => {
             if (searchParams.get("hours") === "ongoing") {
-              return session.meeting_status === "ongoing" &&
-                chain?.name === "Optimism"
-                ? session.dao_name === "Optimism"
-                : chain?.name === "Arbitrum One"
-                ? session.dao_name === "Arbitrum"
-                : "";
+              return (
+                session.meeting_status === "ongoing" &&
+                session.dao_name === daoName
+              );
             } else if (searchParams.get("hours") === "upcoming") {
-              return session.meeting_status === "active" &&
-                chain?.name === "Optimism"
-                ? session.dao_name === "Optimism"
-                : chain?.name === "Arbitrum One"
-                ? session.dao_name === "Arbitrum"
-                : "";
+              return (
+                session.meeting_status === "active" &&
+                session.dao_name === daoName
+              );
             } else if (searchParams.get("hours") === "hosted") {
-              return session.meeting_status === "inactive" &&
-                chain?.name === "Optimism"
-                ? session.dao_name === "Optimism"
-                : chain?.name === "Arbitrum One"
-                ? session.dao_name === "Arbitrum"
-                : "";
+              return (
+                session.meeting_status === "inactive" &&
+                session.dao_name === daoName
+              );
             }
           });
           setSessionDetails(filteredSessions);
         } else if (searchParams.get("hours") === "attended") {
           const filteredSessions = resultData.filter((session: Session) => {
-            return session.attendees.some(
-              (attendee: any) => attendee.attendee_address === address
-            ) && chain?.name === "Optimism"
-              ? session.dao_name === "Optimism"
-              : chain?.name === "Arbitrum One"
-              ? session.dao_name === "Arbitrum"
-              : "";
+            return (
+              session.attendees.some(
+                (attendee: any) => attendee.attendee_address === address
+              ) && session.dao_name === daoName
+            );
           });
           setSessionDetails(filteredSessions);
         }
@@ -203,7 +200,9 @@ function UserOfficeHours({ isDelegate, selfDelegate }: UserOfficeHoursProps) {
 
         <div className="py-10">
           {selfDelegate === true &&
-            searchParams.get("hours") === "schedule" && <UserScheduledHours />}
+            searchParams.get("hours") === "schedule" && (
+              <UserScheduledHours daoName={daoName} />
+            )}
           {selfDelegate === true &&
             searchParams.get("hours") === "upcoming" && <UserUpcomingHours />}
 
