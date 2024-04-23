@@ -1,18 +1,18 @@
-.customScrollbar {
-  overflow-y: auto;
-}
 .customScrollbar::-webkit-scrollbar {
-  width: 5px; /* Width of the scrollbar */
+  width: 3px;
+  /* padding: 5px; */
 }
+
 /* Track */
 .customScrollbar::-webkit-scrollbar-track {
-  background: #f1f1f1; /* Color of the track */
+  background: transparent;
+  border-radius: 5px;
+  /* padding: 5px; */
+  margin: 10px;
 }
+
 /* Handle */
 .customScrollbar::-webkit-scrollbar-thumb {
-  background: #888; /* Color of the scrollbar handle */
-}
-/* Handle on hover */
-.customScrollbar::-webkit-scrollbar-thumb:hover {
-  background: #555; /* Color of the scrollbar handle on hover */
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 5px;
 }

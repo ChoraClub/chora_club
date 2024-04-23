@@ -56,12 +56,54 @@ function WatchSessionList() {
       period: "5 months ago",
       address: "0x3013bb4E03a7B81106D69C10710EaE148C8410E1",
     },
+    {
+      image: thumbnail,
+      title: "Building Resilient Communities: Governance in the Age of DAOs",
+      dao: "optimism",
+      period: "5 months ago",
+      address: "0x3013bb4E03a7B81106D69C10710EaE148C8410E1",
+    },
+    {
+      image: thumbnail,
+      title: "Navigating the Future: Optimism and the Rise of DAOs",
+      dao: "optimism",
+      period: "5 months ago",
+      address: "0x3013bb4E03a7B81106D69C10710EaE148C8410E1",
+    },
+    {
+      image: thumbnail,
+      title: "The Future of Governance: Exploring the Potential of DAOs",
+      dao: "optimism",
+      period: "5 months ago",
+      address: "0x3013bb4E03a7B81106D69C10710EaE148C8410E1",
+    },
+    {
+      image: thumbnail,
+      title: "Building Resilient Communities: Governance in the Age of DAOs",
+      dao: "optimism",
+      period: "5 months ago",
+      address: "0x3013bb4E03a7B81106D69C10710EaE148C8410E1",
+    },
+    {
+      image: thumbnail,
+      title: "Navigating the Future: Optimism and the Rise of DAOs",
+      dao: "optimism",
+      period: "5 months ago",
+      address: "0x3013bb4E03a7B81106D69C10710EaE148C8410E1",
+    },
+    {
+      image: thumbnail,
+      title: "The Future of Governance: Exploring the Potential of DAOs",
+      dao: "optimism",
+      period: "5 months ago",
+      address: "0x3013bb4E03a7B81106D69C10710EaE148C8410E1",
+    },
   ];
 
   return (
-    <div className="font-poppins pe-6 pb-4">
+    <div className="font-poppins border rounded-xl space-y-3">
       {block.map((data) => (
-        <div className="grid grid-cols-3 items-center gap-3 border border-[#D9D9D9] rounded-xl mb-3">
+        <div className="grid grid-cols-3 items-center gap-3 border border-[#D9D9D9] rounded-xl">
           <div className="h-28 grid-cols-1">
             <Image
               src={data.image}

@@ -8,6 +8,7 @@ import WatchSession from "./WatchSession";
 import WatchSessionList from "./WatchSessionList";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import styles from "./WatchSession.module.css";
+import WatchSessionVideo from "./WatchSessionVideo";
 
 interface AttestationObject {
   attendee_address: string;
@@ -47,13 +48,6 @@ function WatchComponentMain({ props }: { props: { id: string } }) {
     fetchData();
   }, [props.id]);
 
-  useEffect(() => {
-    // Get the height of the watch session component
-    if (modalRef.current) {
-      setWatchSessionHeight(modalRef.current.offsetHeight);
-    }
-  }, [modalRef, data, collection]);
-
   function utcToLocal(utcDateString: any) {
     // Create a Date object from the UTC string
     const utcDate = new Date(utcDateString);
@@ -69,7 +63,7 @@ function WatchComponentMain({ props }: { props: { id: string } }) {
   return (
     <>
       {data ? (
-        <div className="ps-14">
+        <div className=" ps-14">
           <div className="flex justify-between items-center pt-6 pb-3 pe-10">
             <div className="font-poppins font-medium text-4xl">
               <span className="text-black">Chora</span>{" "}
@@ -107,13 +101,14 @@ function WatchComponentMain({ props }: { props: { id: string } }) {
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-4">
-            <div className="col-span-2">
+          <div className="grid grid-cols-3 gap-4 pt-6 relative">
+            <div className="sticky top-10 z-10 col-span-2 space-y-5 font-poppins pb-10 ">
+              <WatchSessionVideo data={data} collection={collection} />
               <WatchSession data={data} collection={collection} />
             </div>
             <div
-              className={`col-span-1 overflow-y-auto border rounded-xl overflow-hidden`}
-              style={{ maxHeight: "calc(100vh - 60px)" }}
+              className={`col-span-1 me-5 pb-8 ${styles.customScrollbar}`}
+              // style={{ maxHeight: "calc(100vh - 80px)" }}
             >
               <WatchSessionList />
             </div>
