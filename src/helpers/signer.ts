@@ -26,16 +26,19 @@ const optimismSepolia = defineChain({
         "wss://opt-sepolia.g.alchemy.com/v2/BZr3W1fqQEy2wnrcDQf1z4hiGCOhcHfp",
       ],
     },
+    public: {
+      http: [
+        "https://opt-sepolia.g.alchemy.com/v2/BZr3W1fqQEy2wnrcDQf1z4hiGCOhcHfp",
+      ],
+      webSocket: [
+        "wss://opt-sepolia.g.alchemy.com/v2/BZr3W1fqQEy2wnrcDQf1z4hiGCOhcHfp",
+      ],
+    }
   },
   blockExplorers: {
     default: { name: "Explorer", url: "https://explorer.zora.energy" },
   },
-  // contracts: {
-  //   multicall3: {
-  //     address: '0xcA11bde05977b3631167028862bE2a173976CA11',
-  //     blockCreated: 5882,
-  //   },
-  // },
+  network: ""
 });
 
 const WalletAndPublicClient = () => {
@@ -44,7 +47,7 @@ const WalletAndPublicClient = () => {
 
   const { chain } = useNetwork();
   let chainName: any;
-  console.log("the chain", chain.name);
+  console.log("the chain", chain?.name);
   if (chain?.name === "Optimism") {
     chainName = optimism;
   } else if (chain?.name === "Arbitrum One") {

@@ -9,33 +9,7 @@ type Attendee = {
   attendee_address: string;
   attendee_uid?: string; // Making attendee_uid optional
 };
-// interface SessionTileProps {
-//   tileIndex?: number;
-//   data?: {
-//     _id: string;
-//     img: StaticImageData;
-//     title: string;
-//     meetingId: string;
-//     dao_name: string;
-//     booking_status: string;
-//     meeting_status: boolean;
-//     joined_status: boolean;
-//     attendees: Attendee[];
-//     host_address: string;
-//     slot_time: string;
-//     description: string;
-//     session_type: string;
-//   };
-//   isEvent: string;
-// }
 
-// interface TileProps {
-//   sessionDetails: any;
-//   dataLoading: boolean;
-//   isEvent: string;
-//   isOfficeHour: boolean;
-//   // query: string;
-// }
 
 interface SessionData {
   _id: string;
@@ -60,30 +34,6 @@ interface SessionTileProps {
   dataLoading: boolean;
   isOfficeHour: boolean;
 }
-
-// interface TileProps {
-//   tileIndex?: number;
-//   data?: {
-//     _id: string;
-//     img: StaticImageData;
-//     title: string;
-//     meetingId: string;
-//     dao_name: string;
-//     booking_status: string;
-//     meeting_status: boolean;
-//     joined_status: boolean;
-//     attendees: Attendee[];
-//     host_address: string;
-//     slot_time: string;
-//     description: string;
-//     session_type: string;
-//   };
-//   isEvent: string;
-//   sessionDetails: any;
-//   dataLoading: boolean;
-//   isOfficeHour: boolean;
-//   // query: string;
-// }
 
 function SessionTile({
   sessionDetails,

@@ -106,6 +106,8 @@ export async function POST(req: NextRequest, res: NextResponse) {
           refUID: ZERO_BYTES32,
           data: encodedData,
           nonce: await eas.getNonce(signer.address),
+          value: NO_EXPIRATION,
+          deadline: NO_EXPIRATION,
         },
         signer
       );
