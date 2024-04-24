@@ -12,6 +12,15 @@ import React, { useState } from "react";
 import { Oval } from "react-loader-spinner";
 import { useAccount } from "wagmi";
 import { useNetwork } from "wagmi";
+import Image from "next/image";
+import { Tooltip } from "@nextui-org/react";
+import img1 from "@/assets/ic_baseline-connect-without-contact.png";
+import img2 from "@/assets/mingcute_link-fill.png";
+import img3 from "@/assets/wpf_video-call.png";
+import img4 from "@/assets/fluent_call-12-filled.png";
+import img5 from "@/assets/ic_baseline-screen-share.png";
+import img6 from "@/assets/lets-icons_chat-fill.png";
+import img7 from "@/assets/30470b0e3425c3f272688a1af1437d3b 1.png";
 
 interface instantMeetProps {
   isDelegate: boolean;
@@ -110,70 +119,104 @@ function InstantMeet({ isDelegate, selfDelegate }: instantMeetProps) {
     });
   };
 
+  const block = [
+    {
+      image: img1,
+      title: "Connect with Others Instantly",
+      description:
+        "Engage with yourself in an instant meeting and share the link with the people you want to connect with. Experience the following features for a comprehensive virtual meeting experience.",
+    },
+    {
+      image: img2,
+      title: "Quick Access to DAO Links",
+      description:
+        "Access the quick links of DAO directly within the meeting itself,making it easier to reference and share relevant information during your session.",
+    },
+    {
+      image: img3,
+      title: "Video Call",
+      description:
+        " Connect seamlessly and engage face-to-face with crisp and clear video quality, bringing your virtual meetings to life.",
+    },
+    {
+      image: img4,
+      title: "Audio Call",
+      description:
+        "Experience crystal-clear audio that ensures smooth and effective communication with all participants, enhancing the meeting experience.",
+    },
+    {
+      image: img5,
+      title: "Screen Sharing",
+      description:
+        "Effortlessly share your screen to showcase documents, presentations,or any other content, making collaboration more interactive and dynamic.",
+    },
+    {
+      image: img6,
+      title: "Chat",
+      description:
+        "Foster real-time communication by sending text messages to participants within the meeting, allowing for quick exchanges and enhanced collaboration.",
+    },
+  ];
+
   return (
     <div>
       <div className="pb-4 pr-12">
-        <div className="text-blue-shade-100 text-xl font-semibold pb-1">
-          Start an Instant Meeting
-        </div>
-        <div className="font-semibold pb-3">Connect with Others Instantly</div>
+        <div className="mx-2 p-8 my-5 rounded-3xl border-solid border-2 border-[#F9F9F9]-900 bg-[#FFFFFF] relative">
+        <div className="text-[#3E3D3D] text-3xl font-semibold font-poppins mx-24 p-5">
+                Start an Instant Meeting
+              </div>
+          <div className="grid grid-cols-2 gap-5 mx-7">
+            <div className="mx-7 grid grid-cols-3 grid-rows-2 text-sm gap-8 font-semibold text-[#3E3D3D] px-4 py-4 text-center">
+              {block.map((data, index) => (
+                <Tooltip
+                  key={index}
+                  content={
+                    <div className="px-1 py-2 w-80">
+                      <div className="font-poppins text-[#7C7C7C]">
+                        {data.description}
+                      </div>
+                    </div>
+                  }
+                  placement="right"
+                  className="group w-fit"
+                >
+                  <div className="group">
+                    <Image
+                      alt="{image}"
+                      src={data.image}
+                      className="border rounded-3xl bg-[#E5E5EA] w-auto p-[40px] transition duration-300 ease-in-out transform hover:scale-105"
+                    />
+                    <div className="p-2">
+                      <span className="">{data.title}</span>
+                    </div>
+                  </div>
+                </Tooltip>
+              ))}
+            </div>
+            <div className="ml-32 mt-5">
+              <div className="">
+                <Image alt="img7" src={img7} />
+                <div className="text-center mt-24">
+                  <button
+                    className="bg-blue-shade-200 p-4 rounded-full text-white font-semibold"
+                    onClick={onOpen}
+                  >
+                    Start an instant meet
+                  </button>
+                </div>
+              </div>
+            </div>
 
-        <div className="pb-3">
-          Engage with yourself in an instant meeting and share the link with the
-          people you want to connect with. Experience the following features for
-          a comprehensive virtual meeting experience:
-        </div>
-
-        <div className="pb-2">
-          <span className="font-semibold">Quick Access to DAO Links: </span>{" "}
-          <span>
-            Access the quick links of DAO directly within the meeting itself,
-            making it easier to reference and share relevant information during
-            your session.
-          </span>
-        </div>
-
-        <div className="pb-2">
-          <span className="font-semibold">Video Call: </span>{" "}
-          <span>
-            Connect seamlessly and engage face-to-face with crisp and clear
-            video quality, bringing your virtual meetings to life.
-          </span>
-        </div>
-
-        <div className="pb-2">
-          <span className="font-semibold">Audio Call: </span>{" "}
-          <span>
-            Experience crystal-clear audio that ensures smooth and effective
-            communication with all participants, enhancing the meeting
-            experience.
-          </span>
-        </div>
-
-        <div className="pb-2">
-          <span className="font-semibold">Screen Sharing: </span>{" "}
-          <span>
-            Effortlessly share your screen to showcase documents, presentations,
-            or any other content, making collaboration more interactive and
-            dynamic.
-          </span>
-        </div>
-
-        <div className="pb-2">
-          <span className="font-semibold">Chat: </span>{" "}
-          <span>
-            Foster real-time communication by sending text messages to
-            participants within the meeting, allowing for quick exchanges and
-            enhanced collaboration.
-          </span>
+            <div className="absolute top-0 bottom-0 left-[55%] bg-slate-300 w-px"></div>
+          </div>
         </div>
       </div>
-      <button
+      {/* <button
         className="bg-blue-shade-200 text-white px-4 py-2 rounded-md font-semibold"
         onClick={onOpen}
       >
         Start an instant meet
-      </button>
+      </button> */}
 
       <Modal
         isOpen={isOpen}
