@@ -309,14 +309,27 @@ SessionTileProps) {
                     });
                   }}
                   disabled={
-                    !!data.attendees[0].onchain_attendee_uid || isClaiming
+                    !!data.attendees[0].onchain_attendee_uid ||
+                    isClaiming ||
+                    isClaimed
                   }
                 >
-                  {isClaiming
-                    ? "Loading..."
-                    : data.attendees[0].onchain_attendee_uid || isClaimed
-                    ? "Claimed"
-                    : "Claim"}
+                  {isClaiming ? (
+                    <div className="flex items-center justify-center px-3">
+                      <Oval
+                        visible={true}
+                        height="20"
+                        width="20"
+                        color="#fff"
+                        secondaryColor="#cdccff"
+                        ariaLabel="oval-loading"
+                      />
+                    </div>
+                  ) : data.attendees[0].onchain_attendee_uid || isClaimed ? (
+                    "Claimed"
+                  ) : (
+                    "Claim"
+                  )}
                 </button>
               )}
 
@@ -332,15 +345,15 @@ SessionTileProps) {
                       meetingEndTime: data.attestations[0].endTime,
                     });
                   }}
-                  disabled={!!data.onchain_host_uid || isClaiming}
+                  disabled={!!data.onchain_host_uid || isClaiming || isClaimed}
                 >
                   {isClaiming ? (
-                    <div className="flex items-center justify-center">
+                    <div className="flex items-center justify-center px-3">
                       <Oval
                         visible={true}
-                        height="10"
-                        width="10"
-                        color="#0500FF"
+                        height="20"
+                        width="20"
+                        color="#fff"
                         secondaryColor="#cdccff"
                         ariaLabel="oval-loading"
                       />

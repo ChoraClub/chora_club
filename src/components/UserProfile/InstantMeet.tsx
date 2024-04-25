@@ -161,62 +161,65 @@ function InstantMeet({ isDelegate, selfDelegate }: instantMeetProps) {
   return (
     <div>
       <div className="pb-4 pr-12">
-        <div className="mx-2 p-8 my-5 rounded-3xl border-solid border-2 border-[#F9F9F9]-900 bg-[#FFFFFF] relative">
-        <div className="text-[#3E3D3D] text-3xl font-semibold font-poppins mx-24 p-5">
-                Start an Instant Meeting
-              </div>
-          <div className="grid grid-cols-2 gap-5 mx-7">
-            <div className="mx-7 grid grid-cols-3 grid-rows-2 text-sm gap-8 font-semibold text-[#3E3D3D] px-4 py-4 text-center">
-              {block.map((data, index) => (
-                <Tooltip
-                  key={index}
-                  content={
-                    <div className="px-1 py-2 w-80">
-                      <div className="font-poppins text-[#7C7C7C]">
-                        {data.description}
+        <div className="">
+          <div className="grid grid-cols-7 rounded-3xl border-solid border-2 border-[#F9F9F9]-900">
+            <div className="col-span-4 border-solid border-r-2 border-[#F9F9F9]-900">
+              <div className="p-14">
+                <div className="text-[#3E3D3D] text-3xl font-semibold font-poppins text-center">
+                  Start an Instant Meeting
+                </div>
+
+                <div className="grid grid-cols-3 grid-rows-2 text-sm gap-8 font-semibold pt-8 text-[#3E3D3D] text-center">
+                  {block.map((data, index) => (
+                    <Tooltip
+                      key={index}
+                      content={
+                        <div className="px-1 py-2 w-80">
+                          <div className="font-poppins text-[#7C7C7C]">
+                            {data.description}
+                          </div>
+                        </div>
+                      }
+                      placement="right"
+                      className="group w-fit"
+                    >
+                      <div>
+                        <div className="group border rounded-3xl bg-[#E5E5EA] flex items-center justify-center p-10">
+                          <Image
+                            alt="{image}"
+                            height={70}
+                            width={70}
+                            src={data.image}
+                            className=" transition duration-300 ease-in-out transform hover:scale-105"
+                          />
+                        </div>
+                        <div className="p-2">
+                          <span className="">{data.title}</span>
+                        </div>
                       </div>
-                    </div>
-                  }
-                  placement="right"
-                  className="group w-fit"
-                >
-                  <div className="group">
-                    <Image
-                      alt="{image}"
-                      src={data.image}
-                      className="border rounded-3xl bg-[#E5E5EA] w-auto p-[40px] transition duration-300 ease-in-out transform hover:scale-105"
-                    />
-                    <div className="p-2">
-                      <span className="">{data.title}</span>
-                    </div>
-                  </div>
-                </Tooltip>
-              ))}
-            </div>
-            <div className="ml-32 mt-5">
-              <div className="">
-                <Image alt="img7" src={img7} />
-                <div className="text-center mt-24">
-                  <button
-                    className="bg-blue-shade-200 p-4 rounded-full text-white font-semibold"
-                    onClick={onOpen}
-                  >
-                    Start an instant meet
-                  </button>
+                    </Tooltip>
+                  ))}
                 </div>
               </div>
             </div>
+            <div className="col-span-3 flex flex-col justify-center items-center px-6">
+              <div className="">
+                <Image alt="img7" src={img7} />
+              </div>
+              <div className="text-center mt-24">
+                <button
+                  className="bg-blue-shade-200 p-4 rounded-full text-white font-semibold"
+                  onClick={onOpen}
+                >
+                  Start an instant meet
+                </button>
+              </div>
+            </div>
 
-            <div className="absolute top-0 bottom-0 left-[55%] bg-slate-300 w-px"></div>
+            {/* <div className="absolute top-0 bottom-0 left-[55%] bg-slate-300 w-px"></div> */}
           </div>
         </div>
       </div>
-      {/* <button
-        className="bg-blue-shade-200 text-white px-4 py-2 rounded-md font-semibold"
-        onClick={onOpen}
-      >
-        Start an instant meet
-      </button> */}
 
       <Modal
         isOpen={isOpen}
