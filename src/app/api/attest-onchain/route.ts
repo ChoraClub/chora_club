@@ -65,6 +65,8 @@ export async function POST(req: NextRequest, res: NextResponse) {
   const requestData = (await req.json()) as AttestOffchainRequestBody;
   // Your validation logic here
 
+  console.log("request data: ", requestData);
+
   try {
     console.log("log2");
 

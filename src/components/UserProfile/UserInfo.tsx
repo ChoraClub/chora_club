@@ -39,19 +39,26 @@ function UserInfo({
   const [sessionAttendCount, setSessionAttendCount] = useState(0);
   const [officehoursHostCount, setOfficehoursHostCount] = useState(0);
   const [officehoursAttendCount, setOfficehoursAttendCount] = useState(0);
-  let sessionHostingCount = 0;
-  let sessionAttendingCount = 0;
-  let officehoursHostingCount = 0;
-  let officehoursAttendingCount = 0;
+  const [activeButton, setActiveButton] = useState("onchain");
   let dao_name = "";
 
-  useEffect(() => {
+  useEffect(() => {}, [address, chain]);
+
+  const offchainAttestation = async (buttonType: string) => {
+    let sessionHostingCount = 0;
+    let sessionAttendingCount = 0;
+    let officehoursHostingCount = 0;
+    let officehoursAttendingCount = 0;
+
+    setActiveButton(buttonType);
+
+    if (chain?.name === "Optimism") {
+      dao_name = "optimism";
+    } else if (chain?.name === "Arbitrum One") {
+      dao_name = "arbitrum";
+    }
+
     const sessionHosted = async () => {
-      if (chain?.name === "Optimism") {
-        dao_name = "optimism";
-      } else if (chain?.name === "Arbitrum One") {
-        dao_name = "arbitrum";
-      }
       try {
         const response = await fetch(`/api/get-meeting/${address}`, {
           method: "GET",
@@ -64,16 +71,14 @@ function UserInfo({
           result.data.forEach((item: any) => {
             if (
               item.meeting_status === "Recorded" &&
-              item.dao_name === "optimism" &&
-              item.uid_host &&
-              chain?.name == "Optimism"
+              item.dao_name === dao_name &&
+              item.uid_host
             ) {
               sessionHostingCount++;
             } else if (
               item.meeting_status === "Recorded" &&
-              item.dao_name === "arbitrum" &&
-              item.uid_host &&
-              chain?.name == "Arbitrum One"
+              item.dao_name === dao_name &&
+              item.uid_host
             ) {
               sessionHostingCount++;
             }
@@ -105,16 +110,14 @@ function UserInfo({
           result.data.forEach((item: any) => {
             if (
               item.meeting_status === "Recorded" &&
-              item.dao_name === "optimism" &&
-              item.attendees.some((attendee: any) => attendee.attendee_uid) &&
-              chain?.name == "Optimism"
+              item.dao_name === dao_name &&
+              item.attendees.some((attendee: any) => attendee.attendee_uid) 
             ) {
               sessionAttendingCount++;
             } else if (
               item.meeting_status === "Recorded" &&
-              item.dao_name === "arbitrum" &&
-              item.attendees.some((attendee: any) => attendee.attendee_uid) &&
-              chain?.name == "Arbitrum One"
+              item.dao_name === dao_name &&
+              item.attendees.some((attendee: any) => attendee.attendee_uid) 
             ) {
               sessionAttendingCount++;
             }
@@ -218,7 +221,7 @@ function UserInfo({
     sessionAttended();
     officeHoursHosted();
     officeHoursAttended();
-  }, [address, chain]);
+  };
 
   const blocks = [
     {
@@ -258,6 +261,28 @@ function UserInfo({
 
   return (
     <div className="pt-4">
+      <div className="flex w-fit gap-16 border-1 border-[#7C7C7C] px-6 rounded-xl text-sm mb-6">
+        <button
+          className={`py-2 ${
+            activeButton === "onchain"
+              ? "text-[#3E3D3D] font-bold"
+              : "text-[#7C7C7C]"
+          } `}
+          onClick={() => offchainAttestation("onchain")}
+        >
+          Onchain
+        </button>
+        <button
+          className={`py-2 ${
+            activeButton === "offchain"
+              ? "text-[#3E3D3D] font-bold"
+              : "text-[#7C7C7C]"
+          }`}
+          onClick={() => offchainAttestation("offchain")}
+        >
+          Offchain
+        </button>
+      </div>
       <div className="grid grid-cols-4 pe-32 gap-10">
         {blocks.length > 0 ? (
           blocks.map((key, index) => (

@@ -69,7 +69,7 @@ function DelegatesSession({ props }: { props: string }) {
             if (searchParams.get("session") === "upcoming") {
               return session.meeting_status === "Upcoming";
             } else if (searchParams.get("session") === "recorded") {
-              return session.meeting_status === "Recorded";
+              return session.meeting_status === "Recorded" ;
             }
           });
           // console.log("filtered", filtered);
