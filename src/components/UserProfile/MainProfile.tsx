@@ -1114,6 +1114,7 @@ function MainProfile() {
             ) : (
               ""
             )}
+
             {selfDelegate === true &&
             searchParams.get("active") === "instant-meet" ? (
               <InstantMeet
