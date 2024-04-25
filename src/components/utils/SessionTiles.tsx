@@ -14,11 +14,35 @@ import {
   NO_EXPIRATION,
 } from "@ethereum-attestation-service/eas-sdk";
 import { ethers } from "ethers";
+import { useNetwork, useAccount } from "wagmi";
 
 type Attendee = {
   attendee_address: string;
-  attendee_uid?: string; // Making attendee_uid optional
+  attendee_uid?: string;
+  onchain_attendee_uid?: string;
 };
+
+interface Participant {
+  displayName: string;
+  walletAddress: string | null;
+  joinedAt: string;
+  exitedAt: string;
+  attestation: string;
+}
+
+interface AttestationData {
+  roomId: string;
+  participants: Participant[];
+  meetingTimePerEOA: {
+    [key: string]: number;
+  };
+  totalMeetingTimeInMinutes: number;
+  hosts: Participant[];
+  startTime: number;
+  endTime: number;
+  meetingType: string;
+  attestation: string;
+}
 
 interface SessionData {
   _id: string;
@@ -34,14 +58,25 @@ interface SessionData {
   slot_time: string;
   description: string;
   session_type: string;
+  uid_host: string;
+  onchain_host_uid: string;
+  attestations: AttestationData[];
 }
 
 interface SessionTileProps {
   tileIndex?: number;
   isEvent: string;
-  sessionDetails: SessionData[]; // Updated to include sessionDetails with proper type
+  sessionDetails: SessionData[];
   dataLoading: boolean;
   isOfficeHour: boolean;
+  isSession: string;
+}
+
+interface AttestationDataParams {
+  meetingId: string;
+  meetingType: number;
+  meetingStartTime: number;
+  meetingEndTime: number;
 }
 
 function SessionTile({
@@ -49,13 +84,17 @@ function SessionTile({
   dataLoading,
   isEvent,
   isOfficeHour,
+  isSession,
 }: // query,
 SessionTileProps) {
+  const { address } = useAccount();
   const router = useRouter();
   const path = usePathname();
   const [selectedTileIndex, setSelectedTileIndex] = useState<number | null>(
     null
   );
+  const [isClaiming, setIsClaiming] = useState(false);
+  const [isClaimed, setIsClaimed] = useState(false);
   const provider = new ethers.BrowserProvider(window?.ethereum);
 
   const formatWalletAddress = (address: any) => {
@@ -77,7 +116,13 @@ SessionTileProps) {
 
   const [pageLoading, setPageLoading] = useState(true);
 
-  const handleAttestationOnchain = async () => {
+  const handleAttestationOnchain = async ({
+    meetingId,
+    meetingType,
+    meetingStartTime,
+    meetingEndTime,
+  }: AttestationDataParams) => {
+    setIsClaiming(true);
     if (
       typeof window.ethereum === "undefined" ||
       !window.ethereum.isConnected()
@@ -89,11 +134,11 @@ SessionTileProps) {
     // console.log(address);
 
     const data = {
-      recipient: "0xB351a70dD6E5282A8c84edCbCd5A955469b9b032",
-      meetingId: "yvt-pijt-xie",
-      meetingType: 2,
-      startTime: 16452456,
-      endTime: 16452492,
+      recipient: address,
+      meetingId: meetingId,
+      meetingType: meetingType,
+      startTime: meetingStartTime,
+      endTime: meetingEndTime,
     };
 
     // Configure the request options
@@ -118,12 +163,7 @@ SessionTileProps) {
       // Parse the response as JSON
       const attestationObject = await res.json();
 
-      // Handle the response data
-      console.log(attestationObject);
-      //   if (walletClient.chain == "") {
-      //     toast.error("Please connect your wallet!");
-      //   } else {
-      // if (walletClient.chain?.network === props.daoDelegates) {
+      // console.log(attestationObject);
       const EASContractAddress = "0x4200000000000000000000000000000000000021";
       const eas = new EAS(EASContractAddress);
       const signer = await provider.getSigner();
@@ -149,23 +189,43 @@ SessionTileProps) {
       const newAttestationUID = await tx.wait();
       console.log("New attestation UID: ", newAttestationUID);
 
-      try{
-        if(newAttestationUID){
+      if (newAttestationUID) {
+        try {
+          const myHeaders = new Headers();
+          myHeaders.append("Content-Type", "application/json");
 
+          const raw = JSON.stringify({
+            meetingId: meetingId,
+            meetingType: meetingType,
+            uidOnchain: newAttestationUID,
+            address: address,
+          });
+          const requestOptions: any = {
+            method: "PUT",
+            headers: myHeaders,
+            body: raw,
+            redirect: "follow",
+          };
+          const response = await fetch(
+            `/api/update-attestation-uid`,
+            requestOptions
+          );
+          const responseData = await response.json();
+          console.log("responseData", responseData);
+          if (responseData.success) {
+            console.log("On-chain attestation Claimed");
+            setIsClaimed(true);
+            setIsClaiming(false);
+          }
+        } catch (e) {
+          console.error(e);
+          setIsClaiming(false);
         }
-      }catch(e){
-        
       }
-      // } else {
-      //   toast.error("Please switch to appropriate network to delegate!");
-      //   if (openChainModal) {
-      //     openChainModal();
-      //   }
-      // }
-      //   }
     } catch (error) {
       // Handle any errors that occur during the fetch operation
       console.error("Error:", error);
+      setIsClaiming(false);
     }
   };
 
@@ -236,15 +296,51 @@ SessionTileProps) {
             </div>
 
             <div className="flex items-end">
-              <button
-                className="bg-blue-shade-100 text-white text-sm py-1 px-3 rounded-full font-semibold outline-none"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleAttestationOnchain();
-                }}
-              >
-                Claim
-              </button>
+              {isSession === "attended" && data.attendees[0]?.attendee_uid && (
+                <button
+                  className="bg-blue-shade-100 text-white text-sm py-1 px-3 rounded-full font-semibold outline-none"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleAttestationOnchain({
+                      meetingId: data.meetingId,
+                      meetingType: 2,
+                      meetingStartTime: data.attestations[0].startTime,
+                      meetingEndTime: data.attestations[0].endTime,
+                    });
+                  }}
+                  disabled={
+                    !!data.attendees[0].onchain_attendee_uid || isClaiming
+                  }
+                >
+                  {isClaiming
+                    ? "Loading..."
+                    : data.attendees[0].onchain_attendee_uid || isClaimed
+                    ? "Claimed"
+                    : "Claim"}
+                </button>
+              )}
+
+              {isSession === "hosted" && data.uid_host && (
+                <button
+                  className="bg-blue-shade-100 text-white text-sm py-1 px-3 rounded-full font-semibold outline-none"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleAttestationOnchain({
+                      meetingId: data.meetingId,
+                      meetingType: 1,
+                      meetingStartTime: data.attestations[0].startTime,
+                      meetingEndTime: data.attestations[0].endTime,
+                    });
+                  }}
+                  disabled={!!data.onchain_host_uid || isClaiming}
+                >
+                  {isClaiming
+                    ? "Loading..."
+                    : data.onchain_host_uid || isClaimed
+                    ? "Claimed"
+                    : "Claim"}
+                </button>
+              )}
             </div>
           </div>
         ))

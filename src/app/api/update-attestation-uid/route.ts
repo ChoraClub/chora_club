@@ -38,7 +38,7 @@ export async function PUT(req: NextRequest, res: NextResponse) {
     let existingDocument: any;
 
     if (meetingType === 1) {
-      existingDocument = await collection.updateOne(
+      existingDocument = await collection.findOneAndUpdate(
         {
           meetingId: meetingId,
           host_address: address,
@@ -46,7 +46,7 @@ export async function PUT(req: NextRequest, res: NextResponse) {
         { $set: { onchain_host_uid: uidOnchain } }
       );
     } else if (meetingType === 2) {
-      existingDocument = await collection.updateOne(
+      existingDocument = await collection.findOneAndUpdate(
         {
           meetingId: meetingId,
           "attendees.attendee_address": address,
@@ -55,10 +55,10 @@ export async function PUT(req: NextRequest, res: NextResponse) {
       );
     }
 
-    // return NextResponse.json(
-    //   { success: true, data: updatedDocumentData },
-    //   { status: 200 }
-    // );
+    return NextResponse.json(
+      { success: true, data: existingDocument },
+      { status: 200 }
+    );
   } catch (error) {
     console.error("Error updating office hours:", error);
     return NextResponse.json(

@@ -4,6 +4,9 @@ import { MongoClient, MongoClientOptions } from "mongodb";
 export async function POST(req: NextRequest, res: NextResponse) {
   const { address, dao_name } = await req.json();
 
+//   console.log("address", address);
+//   console.log("dao_name", dao_name);
+
   try {
     const client = await MongoClient.connect(process.env.MONGODB_URI!, {
       dbName: `chora-club`,
