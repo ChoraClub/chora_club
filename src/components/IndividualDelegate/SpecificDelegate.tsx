@@ -60,7 +60,7 @@ function SpecificDelegate({ props }: { props: Type }) {
   const addressFromUrl = path.split("/")[2];
   const [isPageLoading, setIsPageLoading] = useState(true);
   console.log("Props", props.daoDelegates);
-  const provider = new ethers.BrowserProvider(window?.ethereum);
+  // const provider = new ethers.BrowserProvider(window?.ethereum);
 
   useEffect(() => {
     console.log("Network", chain?.network);
@@ -172,92 +172,6 @@ function SpecificDelegate({ props }: { props: Type }) {
   const handleCopy = (addr: string) => {
     copy(addr);
     toast("Address Copied");
-  };
-  const handleAttestationOnchain = async () => {
-    if (
-      typeof window.ethereum === "undefined" ||
-      !window.ethereum.isConnected()
-    ) {
-      console.log("not connected");
-    }
-
-    // const address = await walletClient.getAddresses();
-    // console.log(address);
-
-    const data = {
-      recipient: "0xbFc4A28D8F1003Bec33f4Fdb7024ad6ad1605AA8",
-      meetingId: "abc-def-ggi/tes",
-      meetingType: 1,
-      startTime: 16452456,
-      endTime: 16452492,
-    };
-
-    // Configure the request options
-    const requestOptions = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        // Add any other headers required by your API
-      },
-      body: JSON.stringify(data),
-    };
-
-    try {
-      // Make the API call with the provided JSON data
-      const res = await fetch(
-        "http://localhost:3000/api/attest-onchain",
-        requestOptions
-      );
-
-      // Check if the request was successful
-      if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status}`);
-      }
-
-      // Parse the response as JSON
-      const attestationObject = await res.json();
-
-      // Handle the response data
-      console.log(attestationObject);
-      //   if (walletClient.chain == "") {
-      //     toast.error("Please connect your wallet!");
-      //   } else {
-      // if (walletClient.chain?.network === props.daoDelegates) {
-      const EASContractAddress = "0x4200000000000000000000000000000000000021";
-      const eas = new EAS(EASContractAddress);
-      const signer = await provider.getSigner();
-      console.log("the wallet2 obj", signer);
-      eas.connect(signer);
-      console.log("obj created");
-      console.log("eas obj", eas);
-      const schemaUID =
-        "0x98a9530fb8d7039c36f78e857b55f1c0e2d4caafa00d05dec37f4abef3e301b2";
-      const tx = await eas.attestByDelegation({
-        schema: schemaUID,
-        data: {
-          recipient: attestationObject.delegatedAttestation.message.recipient,
-          expirationTime:
-            attestationObject.delegatedAttestation.message.expirationTime,
-          revocable: attestationObject.delegatedAttestation.message.revocable,
-          refUID: attestationObject.delegatedAttestation.message.refUID,
-          data: attestationObject.delegatedAttestation.message.data,
-        },
-        signature: attestationObject.delegatedAttestation.signature,
-        attester: "0x8dEa0ad941d577e356745d758b30Fa11EFa28E80",
-      });
-      const newAttestationUID = await tx.wait();
-      console.log("New attestation UID: ", newAttestationUID);
-      // } else {
-      //   toast.error("Please switch to appropriate network to delegate!");
-      //   if (openChainModal) {
-      //     openChainModal();
-      //   }
-      // }
-      //   }
-    } catch (error) {
-      // Handle any errors that occur during the fetch operation
-      console.error("Error:", error);
-    }
   };
 
   const handleDelegateVotes = async (to: string) => {
@@ -484,13 +398,7 @@ function SpecificDelegate({ props }: { props: Type }) {
                       handleDelegateVotes(`${props.individualDelegate}`)
                     }
                   >
-                    Delegateee
-                  </button>
-                  <button
-                    className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
-                    onClick={() => handleAttestationOnchain()}
-                  >
-                    attest
+                    Delegate
                   </button>
                 </div>
               </div>

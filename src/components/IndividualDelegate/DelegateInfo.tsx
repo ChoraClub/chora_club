@@ -22,19 +22,39 @@ function DelegateInfo({ props }: { props: Type }) {
   const [sessionAttendCount, setSessionAttendCount] = useState(0);
   const [officehoursHostCount, setOfficehoursHostCount] = useState(0);
   const [officehoursAttendCount, setOfficehoursAttendCount] = useState(0);
+  const [isSessionHostedLoading, setSessionHostedLoading] = useState(true);
+  const [isSessionAttendedLoading, setSessionAttendedLoading] = useState(true);
+  const [isOfficeHoursHostedLoading, setOfficeHoursHostedLoading] =
+    useState(true);
+  const [isOfficeHourseAttendedLoading, setOfficeHoursAttendedLoading] =
+    useState(true);
   const [activeButton, setActiveButton] = useState("onchain");
 
   useEffect(() => {
-    // offchainAttestation();
-  }, [props.individualDelegate, props.daoDelegates]);
+    if (activeButton === "onchain") {
+      fetchAttestation("onchain");
+    } else if (activeButton === "offchain") {
+      fetchAttestation("offchain");
+    }
+  }, [activeButton, props.individualDelegate, props.daoDelegates]);
 
-  const offchainAttestation = async (buttonType: string) => {
+  const fetchAttestation = async (buttonType: string) => {
     let sessionHostingCount = 0;
     let sessionAttendingCount = 0;
     let officehoursHostingCount = 0;
     let officehoursAttendingCount = 0;
 
     setActiveButton(buttonType);
+    setSessionHostedLoading(true);
+    setSessionAttendedLoading(true);
+    setOfficeHoursHostedLoading(true);
+    setOfficeHoursAttendedLoading(true);
+
+    const host_uid_key =
+      buttonType === "onchain" ? "onchain_host_uid" : "uid_host";
+
+    const attendee_uid_key =
+      buttonType === "onchain" ? "onchain_uid_attendee" : "attendee_uid";
 
     const sessionHosted = async () => {
       try {
@@ -52,25 +72,17 @@ function DelegateInfo({ props }: { props: Type }) {
           result.data.forEach((item: any) => {
             if (
               item.meeting_status === "Recorded" &&
-              item.dao_name === "optimism" &&
-              item.uid_host &&
-              props.daoDelegates == "optimism"
-            ) {
-              sessionHostingCount++;
-            } else if (
-              item.meeting_status === "Recorded" &&
-              item.dao_name === "arbitrum" &&
-              item.uid_host &&
-              props.daoDelegates == "arbitrum"
+              item.dao_name === props.daoDelegates &&
+              item[host_uid_key]
             ) {
               sessionHostingCount++;
             }
             // console.log("op host count: ", sessionHostingCount);
             setSessionHostCount(sessionHostingCount);
-            setDataLoading(false);
+            setSessionHostedLoading(false);
           });
         } else {
-          setDataLoading(false);
+          setSessionHostedLoading(false);
         }
       } catch (e) {
         console.log("Error: ", e);
@@ -96,25 +108,17 @@ function DelegateInfo({ props }: { props: Type }) {
           result.data.forEach((item: any) => {
             if (
               item.meeting_status === "Recorded" &&
-              item.dao_name === "optimism" &&
-              item.uid_attendee &&
-              props.daoDelegates == "optimism"
-            ) {
-              sessionAttendingCount++;
-            } else if (
-              item.meeting_status === "Recorded" &&
-              item.dao_name === "arbitrum" &&
-              item.uid_attendee &&
-              props.daoDelegates == "arbitrum"
+              item.dao_name === props.daoDelegates &&
+              item.attendees.some((attendee: any) => attendee[attendee_uid_key])
             ) {
               sessionAttendingCount++;
             }
             // console.log("op attended count: ", sessionAttendingCount);
             setSessionAttendCount(sessionAttendingCount);
-            setDataLoading(false);
+            setSessionAttendedLoading(false);
           });
         } else {
-          setDataLoading(false);
+          setSessionAttendedLoading(false);
         }
       } catch (e) {
         console.log("Error: ", e);
@@ -138,25 +142,17 @@ function DelegateInfo({ props }: { props: Type }) {
           result.forEach((item: any) => {
             if (
               item.meeting_status === "inactive" &&
-              item.dao_name === "Optimism" &&
-              item.uid_host &&
-              props.daoDelegates == "optimism"
-            ) {
-              officehoursHostingCount++;
-            } else if (
-              item.meeting_status === "inactive" &&
-              item.dao_name === "Arbitrum" &&
-              item.uid_host &&
-              props.daoDelegates == "arbitrum"
+              item.dao_name === props.daoDelegates &&
+              item[host_uid_key]
             ) {
               officehoursHostingCount++;
             }
             // console.log("office hours host count: ", officehoursHostingCount);
             setOfficehoursHostCount(officehoursHostingCount);
-            setDataLoading(false);
+            setOfficeHoursHostedLoading(false);
           });
         } else {
-          setDataLoading(false);
+          setOfficeHoursHostedLoading(false);
         }
       } catch (e) {
         console.log("Error: ", e);
@@ -180,25 +176,17 @@ function DelegateInfo({ props }: { props: Type }) {
           result.forEach((item: any) => {
             if (
               item.meeting_status === "inactive" &&
-              item.dao_name === "Optimism" &&
-              item.attendees.some((attendee: any) => attendee.attendee_uid) &&
-              props.daoDelegates == "optimism"
-            ) {
-              officehoursAttendingCount++;
-            } else if (
-              item.meeting_status === "inactive" &&
-              item.dao_name === "Arbitrum" &&
-              item.attendees.some((attendee: any) => attendee.attendee_uid) &&
-              props.daoDelegates == "arbitrum"
+              item.dao_name === props.daoDelegates &&
+              item.attendees.some((attendee: any) => attendee[attendee_uid_key])
             ) {
               officehoursAttendingCount++;
             }
             // console.log("officehours attended: ", officehoursAttendingCount);
             setOfficehoursAttendCount(officehoursAttendingCount);
-            setDataLoading(false);
+            setOfficeHoursAttendedLoading(false);
           });
         } else {
-          setDataLoading(false);
+          setOfficeHoursAttendedLoading(false);
         }
       } catch (e) {
         console.log("Error: ", e);
@@ -261,7 +249,7 @@ function DelegateInfo({ props }: { props: Type }) {
               ? "text-[#3E3D3D] font-bold"
               : "text-[#7C7C7C]"
           } `}
-          onClick={() => offchainAttestation("onchain")}
+          onClick={() => fetchAttestation("onchain")}
         >
           Onchain
         </button>
@@ -271,7 +259,7 @@ function DelegateInfo({ props }: { props: Type }) {
               ? "text-[#3E3D3D] font-bold"
               : "text-[#7C7C7C]"
           }`}
-          onClick={() => offchainAttestation("offchain")}
+          onClick={() => fetchAttestation("offchain")}
         >
           Offchain
         </button>
@@ -285,7 +273,10 @@ function DelegateInfo({ props }: { props: Type }) {
               onClick={() => router.push(`${key.ref}`)}
             >
               <div className="font-semibold text-3xl text-center pb-2">
-                {isDataLoading ? (
+                {isSessionHostedLoading &&
+                isSessionAttendedLoading &&
+                isOfficeHoursHostedLoading &&
+                isOfficeHourseAttendedLoading ? (
                   <div className="flex items-center justify-center">
                     <RotatingLines
                       visible={true}
