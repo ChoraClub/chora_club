@@ -46,65 +46,47 @@ function UserSessions({ isDelegate, selfDelegate }: UserSessionsProps) {
   const { chain, chains } = useNetwork();
   const [sessionDetails, setSessionDetails] = useState([]);
   const [dataLoading, setDataLoading] = useState(true);
+  const [daoName, setDaoName] = useState("");
 
   let dao_name = "";
-
   const getUserMeetingData = async () => {
-    if (chain?.name === "Optimism Sepolia") {
-      dao_name = "optimism";
+    if (chain?.name === "Optimism" || chain?.name === "Optimism Sepolia") {
+      // dao_name = "optimism";
+      setDaoName("optimism");
     } else if (chain?.name === "Arbitrum One") {
-      dao_name = "arbitrum";
+      // dao_name = "arbitrum";
+      setDaoName("arbitrum");
     }
     try {
       // setDataLoading(true);
-      const response = await fetch(`/api/get-dao-sessions`, {
+      const response = await fetch(`/api/get-sessions`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          dao_name: dao_name,
+          address: address,
+          dao_name: daoName,
         }),
       });
 
       // console.log("Response", response);
 
       const result = await response.json();
-      // console.log("Result", result);
-      // console.log("result in get session data", result);
+      console.log("result", result);
       if (result.success) {
-        // setSessionDetails(result.data);
-        const resultData = await result.data;
-        // console.log("resultData", resultData);
+        const hostedData = await result.hostedMeetings;
+        console.log("hostedData", hostedData);
+        const attendedData = await result.attendedMeetings;
+        console.log("attendedData", attendedData);
         setDataLoading(true);
-        if (Array.isArray(resultData)) {
-          let filteredData: any = resultData;
-          if (searchParams.get("session") === "hosted") {
-            setSessionDetails([]);
-            console.log("in session hosted");
-            filteredData = resultData.filter((session: Session) => {
-              return (
-                session.meeting_status === "Recorded" &&
-                session.host_address === address
-              );
-            });
-            // console.log("hosted filtered: ", filteredData);
-            setSessionDetails(filteredData);
-          } else if (searchParams.get("session") === "attended") {
-            setSessionDetails([]);
-            filteredData = resultData.filter((session: Session) => {
-              return (
-                session.meeting_status === "Recorded" &&
-                session.attendees?.some(
-                  (attendee) => attendee.attendee_address === address
-                )
-              );
-            });
-            setSessionDetails(filteredData);
-          }
-          // console.log("filtered", filteredData);
-          setDataLoading(false);
+        if (searchParams.get("session") === "hosted") {
+          setSessionDetails(hostedData);
+          console.log("in session hosted");
+        } else if (searchParams.get("session") === "attended") {
+          setSessionDetails(attendedData);
         }
+        setDataLoading(false);
       }
     } catch (error) {
       console.log("error in catch", error);
@@ -113,7 +95,15 @@ function UserSessions({ isDelegate, selfDelegate }: UserSessionsProps) {
 
   useEffect(() => {
     getUserMeetingData();
-  }, [address, sessionDetails, searchParams.get("session"), dataLoading]);
+  }, [
+    address,
+    sessionDetails,
+    searchParams.get("session"),
+    dataLoading,
+    chain,
+    chain?.name,
+    daoName,
+  ]);
 
   // useEffect(() => {
   //   setDataLoading(true);
@@ -228,6 +218,7 @@ function UserSessions({ isDelegate, selfDelegate }: UserSessionsProps) {
                 dataLoading={dataLoading}
                 isEvent="Recorded"
                 isOfficeHour={false}
+                isSession="attended"
               />
             ))}
           {searchParams.get("session") === "attended" &&
@@ -248,6 +239,7 @@ function UserSessions({ isDelegate, selfDelegate }: UserSessionsProps) {
                 dataLoading={dataLoading}
                 isEvent="Recorded"
                 isOfficeHour={false}
+                isSession="attended"
               />
             ))}
         </div>
