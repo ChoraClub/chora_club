@@ -46,65 +46,47 @@ function UserSessions({ isDelegate, selfDelegate }: UserSessionsProps) {
   const { chain, chains } = useNetwork();
   const [sessionDetails, setSessionDetails] = useState([]);
   const [dataLoading, setDataLoading] = useState(true);
+  const [daoName, setDaoName] = useState("");
 
   let dao_name = "";
-
   const getUserMeetingData = async () => {
-    if (chain?.name === "Optimism") {
-      dao_name = "optimism";
+    if (chain?.name === "Optimism" || chain?.name === "Optimism Sepolia") {
+      // dao_name = "optimism";
+      setDaoName("optimism");
     } else if (chain?.name === "Arbitrum One") {
-      dao_name = "arbitrum";
+      // dao_name = "arbitrum";
+      setDaoName("arbitrum");
     }
     try {
       // setDataLoading(true);
-      const response = await fetch(`/api/get-dao-sessions`, {
+      const response = await fetch(`/api/get-sessions`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          dao_name: dao_name,
+          address: address,
+          dao_name: daoName,
         }),
       });
 
       // console.log("Response", response);
 
       const result = await response.json();
-      // console.log("Result", result);
-      // console.log("result in get session data", result);
+      console.log("result", result);
       if (result.success) {
-        // setSessionDetails(result.data);
-        const resultData = await result.data;
-        // console.log("resultData", resultData);
+        const hostedData = await result.hostedMeetings;
+        console.log("hostedData", hostedData);
+        const attendedData = await result.attendedMeetings;
+        console.log("attendedData", attendedData);
         setDataLoading(true);
-        if (Array.isArray(resultData)) {
-          let filteredData: any = resultData;
-          if (searchParams.get("session") === "hosted") {
-            setSessionDetails([]);
-            console.log("in session hosted");
-            filteredData = resultData.filter((session: Session) => {
-              return (
-                session.meeting_status === "Recorded" &&
-                session.host_address === address
-              );
-            });
-            // console.log("hosted filtered: ", filteredData);
-            setSessionDetails(filteredData);
-          } else if (searchParams.get("session") === "attended") {
-            setSessionDetails([]);
-            filteredData = resultData.filter((session: Session) => {
-              return (
-                session.meeting_status === "Recorded" &&
-                session.attendees?.some(
-                  (attendee) => attendee.attendee_address === address
-                )
-              );
-            });
-            setSessionDetails(filteredData);
-          }
-          // console.log("filtered", filteredData);
-          setDataLoading(false);
+        if (searchParams.get("session") === "hosted") {
+          setSessionDetails(hostedData);
+          console.log("in session hosted");
+        } else if (searchParams.get("session") === "attended") {
+          setSessionDetails(attendedData);
         }
+        setDataLoading(false);
       }
     } catch (error) {
       console.log("error in catch", error);
@@ -113,7 +95,15 @@ function UserSessions({ isDelegate, selfDelegate }: UserSessionsProps) {
 
   useEffect(() => {
     getUserMeetingData();
-  }, [address, sessionDetails, searchParams.get("session"), dataLoading]);
+  }, [
+    address,
+    sessionDetails,
+    searchParams.get("session"),
+    dataLoading,
+    chain,
+    chain?.name,
+    daoName,
+  ]);
 
   // useEffect(() => {
   //   setDataLoading(true);
@@ -121,11 +111,7 @@ function UserSessions({ isDelegate, selfDelegate }: UserSessionsProps) {
   // }, [searchParams.get("session")]);
 
   useEffect(() => {
-    if (
-      !isDelegate &&
-      !selfDelegate &&
-      searchParams.get("session") === "schedule"
-    ) {
+    if (!selfDelegate && searchParams.get("session") === "schedule") {
       router.replace(path + "?active=sessions&session=attending");
     }
   }, [isDelegate, selfDelegate]);
@@ -133,7 +119,7 @@ function UserSessions({ isDelegate, selfDelegate }: UserSessionsProps) {
     <div>
       <div className="pr-32 pt-3">
         <div className="flex gap-16 border-1 border-[#7C7C7C] pl-6 rounded-xl text-sm">
-          {(selfDelegate === true || isDelegate === true) && (
+          {selfDelegate === true && (
             <button
               className={`py-2  ${
                 searchParams.get("session") === "schedule"
@@ -148,7 +134,7 @@ function UserSessions({ isDelegate, selfDelegate }: UserSessionsProps) {
             </button>
           )}
 
-          {(selfDelegate === true || isDelegate === true) && (
+          {selfDelegate === true && (
             <button
               className={`py-2  ${
                 searchParams.get("session") === "book"
@@ -174,7 +160,7 @@ function UserSessions({ isDelegate, selfDelegate }: UserSessionsProps) {
           >
             Attending
           </button>
-          {(selfDelegate === true || isDelegate === true) && (
+          {selfDelegate === true && (
             <button
               className={`py-2 ${
                 searchParams.get("session") === "hosted"
@@ -203,16 +189,17 @@ function UserSessions({ isDelegate, selfDelegate }: UserSessionsProps) {
         </div>
 
         <div className="py-10">
-          {(selfDelegate === true || isDelegate === true) &&
+          {selfDelegate === true &&
             searchParams.get("session") === "schedule" && (
               <ScheduledUserSessions />
             )}
-          {(selfDelegate === true || isDelegate === true) &&
-            searchParams.get("session") === "book" && <BookedUserSessions />}
+          {selfDelegate === true && searchParams.get("session") === "book" && (
+            <BookedUserSessions />
+          )}
           {searchParams.get("session") === "attending" && (
             <AttendingUserSessions />
           )}
-          {(selfDelegate === true || isDelegate === true) &&
+          {selfDelegate === true &&
             searchParams.get("session") === "hosted" &&
             (dataLoading ? (
               <div className="flex items-center justify-center">
@@ -231,6 +218,7 @@ function UserSessions({ isDelegate, selfDelegate }: UserSessionsProps) {
                 dataLoading={dataLoading}
                 isEvent="Recorded"
                 isOfficeHour={false}
+                isSession="attended"
               />
             ))}
           {searchParams.get("session") === "attended" &&
@@ -251,6 +239,7 @@ function UserSessions({ isDelegate, selfDelegate }: UserSessionsProps) {
                 dataLoading={dataLoading}
                 isEvent="Recorded"
                 isOfficeHour={false}
+                isSession="attended"
               />
             ))}
         </div>

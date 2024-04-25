@@ -219,7 +219,7 @@ function DelegatesSession({ props }: { props: string }) {
                 dataLoading={dataLoading}
                 isEvent="Recorded"
                 isOfficeHour={false}
-                // query={searchQuery}
+                isSession={""}
               />
             ))}
         </div>

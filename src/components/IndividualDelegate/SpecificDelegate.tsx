@@ -25,6 +25,16 @@ import OPLogo from "@/assets/images/daos/op.png";
 import ArbLogo from "@/assets/images/daos/arbCir.png";
 import ccLogo from "@/assets/images/daos/CC.png";
 import { Oval } from "react-loader-spinner";
+import {
+  SchemaEncoder,
+  SchemaRegistry,
+  createOffchainURL,
+  EAS,
+  Delegated,
+  ZERO_BYTES32,
+  NO_EXPIRATION,
+} from "@ethereum-attestation-service/eas-sdk";
+import { ethers } from "ethers";
 
 interface Type {
   daoDelegates: string;
@@ -50,6 +60,8 @@ function SpecificDelegate({ props }: { props: Type }) {
   const addressFromUrl = path.split("/")[2];
   const [isPageLoading, setIsPageLoading] = useState(true);
   console.log("Props", props.daoDelegates);
+  // const provider = new ethers.BrowserProvider(window?.ethereum);
+
   useEffect(() => {
     console.log("Network", chain?.network);
     const fetchData = async () => {
@@ -110,8 +122,8 @@ function SpecificDelegate({ props }: { props: Type }) {
   useEffect(() => {
     const checkDelegateStatus = async () => {
       setIsPageLoading(true);
-      const addr = await walletClient.getAddresses();
-      const address1 = addr[0];
+      //   const addr = await walletClient.getAddresses();
+      //   const address1 = addr[0];
       let delegateTxAddr = "";
       const contractAddress =
         chain?.name === "Optimism"
@@ -119,7 +131,7 @@ function SpecificDelegate({ props }: { props: Type }) {
           : chain?.name === "Arbitrum One"
           ? "0x912CE59144191C1204E64559FE8253a0e49E6548"
           : "";
-      console.log(walletClient);
+
       const delegateTx = await publicClient.readContract({
         address: contractAddress,
         abi: dao_abi.abi,
@@ -186,10 +198,10 @@ function SpecificDelegate({ props }: { props: Type }) {
     }
 
     console.log(walletClient);
-    if (walletClient.chain == "") {
+    if (walletClient?.chain == "") {
       toast.error("Please connect your wallet!");
     } else {
-      if (walletClient.chain?.network === props.daoDelegates) {
+      if (walletClient?.chain?.network === props.daoDelegates) {
         const delegateTx = await walletClient.writeContract({
           address: chainAddress,
           abi: dao_abi.abi,
@@ -220,7 +232,7 @@ function SpecificDelegate({ props }: { props: Type }) {
           />
         </div>
       )}
-      {!(isPageLoading || (!isDelegate && selfDelegate)) ? (
+      {!(isPageLoading || (!isDelegate && !selfDelegate)) ? (
         <div className="font-poppins">
           <div className="flex ps-14 py-5 justify-between">
             <div className="flex">

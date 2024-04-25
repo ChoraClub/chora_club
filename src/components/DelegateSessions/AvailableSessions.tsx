@@ -380,7 +380,7 @@ function AvailableSessions() {
             />
           </div>
         ) : daoInfo && daoInfo.length > 0 ? (
-          <div className="overflow-auto font-poppins grid  grid-cols-1 md:grid-cols-1 lg:grid-cols-2 2xl:grid-cols-2 gap-12 py-5 px-10">
+          <div className="overflow-auto font-poppins grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 2xl:grid-cols-2 gap-12 py-5 px-10">
             {daoInfo.map((daos: any, index: number) => (
               <div
                 key={index}

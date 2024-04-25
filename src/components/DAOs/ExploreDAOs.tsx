@@ -61,7 +61,7 @@ function ExploreDAOs() {
   };
 
   return (
-    <div className="p-6">
+    <div className="pt-6 pl-14 pr-6">
       {showNotification && !isPageLoading && (
         <div
           className={`flex absolute items-center justify-center bottom-9 rounded-full font-poppins text-sm font-medium left-[34%] w-[32rem] ${

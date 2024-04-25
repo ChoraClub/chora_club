@@ -130,6 +130,7 @@ function Sidebar() {
                 src={sessionIcn}
                 alt={"image"}
                 width={40}
+                height={40}
                 className={`cursor-pointer  ${
                   pathname.includes(`/available-delegates`)
                     ? "border-white border-2 rounded-full"
@@ -169,6 +170,8 @@ function Sidebar() {
                       <Image
                         key={index}
                         src={data[1]}
+                        width={80}
+                        height={80}
                         alt="image"
                         className={`w-10 h-10 rounded-full cursor-pointer ${
                           pathname.includes(`/${data[0]}`)
