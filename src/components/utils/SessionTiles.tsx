@@ -334,11 +334,22 @@ SessionTileProps) {
                   }}
                   disabled={!!data.onchain_host_uid || isClaiming}
                 >
-                  {isClaiming
-                    ? "Loading..."
-                    : data.onchain_host_uid || isClaimed
-                    ? "Claimed"
-                    : "Claim"}
+                  {isClaiming ? (
+                    <div className="flex items-center justify-center">
+                      <Oval
+                        visible={true}
+                        height="10"
+                        width="10"
+                        color="#0500FF"
+                        secondaryColor="#cdccff"
+                        ariaLabel="oval-loading"
+                      />
+                    </div>
+                  ) : data.onchain_host_uid || isClaimed ? (
+                    "Claimed"
+                  ) : (
+                    "Claim"
+                  )}
                 </button>
               )}
             </div>
