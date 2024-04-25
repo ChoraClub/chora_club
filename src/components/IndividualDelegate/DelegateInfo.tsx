@@ -22,12 +22,20 @@ function DelegateInfo({ props }: { props: Type }) {
   const [sessionAttendCount, setSessionAttendCount] = useState(0);
   const [officehoursHostCount, setOfficehoursHostCount] = useState(0);
   const [officehoursAttendCount, setOfficehoursAttendCount] = useState(0);
-  let sessionHostingCount = 0;
-  let sessionAttendingCount = 0;
-  let officehoursHostingCount = 0;
-  let officehoursAttendingCount = 0;
+  const [activeButton, setActiveButton] = useState("onchain");
 
   useEffect(() => {
+    // offchainAttestation();
+  }, [props.individualDelegate, props.daoDelegates]);
+
+  const offchainAttestation = async (buttonType: string) => {
+    let sessionHostingCount = 0;
+    let sessionAttendingCount = 0;
+    let officehoursHostingCount = 0;
+    let officehoursAttendingCount = 0;
+
+    setActiveButton(buttonType);
+
     const sessionHosted = async () => {
       try {
         const response = await fetch(
@@ -201,7 +209,7 @@ function DelegateInfo({ props }: { props: Type }) {
     sessionAttended();
     officeHoursHosted();
     officeHoursAttended();
-  }, [props.individualDelegate, props.daoDelegates]);
+  };
 
   const details = [
     {
@@ -246,6 +254,28 @@ function DelegateInfo({ props }: { props: Type }) {
 
   return (
     <div>
+      <div className="flex w-fit gap-16 border-1 border-[#7C7C7C] px-6 rounded-xl text-sm mb-6">
+        <button
+          className={`py-2 ${
+            activeButton === "onchain"
+              ? "text-[#3E3D3D] font-bold"
+              : "text-[#7C7C7C]"
+          } `}
+          onClick={() => offchainAttestation("onchain")}
+        >
+          Onchain
+        </button>
+        <button
+          className={`py-2 ${
+            activeButton === "offchain"
+              ? "text-[#3E3D3D] font-bold"
+              : "text-[#7C7C7C]"
+          }`}
+          onClick={() => offchainAttestation("offchain")}
+        >
+          Offchain
+        </button>
+      </div>
       <div className="grid grid-cols-4 pe-32 gap-10">
         {details.length > 0 ? (
           details.map((key, index) => (

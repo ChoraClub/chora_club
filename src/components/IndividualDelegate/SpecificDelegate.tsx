@@ -35,6 +35,7 @@ import {
   NO_EXPIRATION,
 } from "@ethereum-attestation-service/eas-sdk";
 import { ethers } from "ethers";
+
 interface Type {
   daoDelegates: string;
   individualDelegate: string;
@@ -60,6 +61,7 @@ function SpecificDelegate({ props }: { props: Type }) {
   const [isPageLoading, setIsPageLoading] = useState(true);
   console.log("Props", props.daoDelegates);
   const provider = new ethers.BrowserProvider(window?.ethereum);
+
   useEffect(() => {
     console.log("Network", chain?.network);
     const fetchData = async () => {

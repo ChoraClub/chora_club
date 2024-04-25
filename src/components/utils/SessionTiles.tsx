@@ -4,12 +4,21 @@ import { Oval } from "react-loader-spinner";
 import text2 from "@/assets/images/daos/texture2.png";
 import IndividualSessionTileModal from "./IndividualSessionTileModal";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import {
+  SchemaEncoder,
+  SchemaRegistry,
+  createOffchainURL,
+  EAS,
+  Delegated,
+  ZERO_BYTES32,
+  NO_EXPIRATION,
+} from "@ethereum-attestation-service/eas-sdk";
+import { ethers } from "ethers";
 
 type Attendee = {
   attendee_address: string;
   attendee_uid?: string; // Making attendee_uid optional
 };
-
 
 interface SessionData {
   _id: string;
@@ -47,6 +56,7 @@ SessionTileProps) {
   const [selectedTileIndex, setSelectedTileIndex] = useState<number | null>(
     null
   );
+  const provider = new ethers.BrowserProvider(window?.ethereum);
 
   const formatWalletAddress = (address: any) => {
     if (typeof address !== "string" || address.length <= 10) return address;
@@ -67,68 +77,174 @@ SessionTileProps) {
 
   const [pageLoading, setPageLoading] = useState(true);
 
+  const handleAttestationOnchain = async () => {
+    if (
+      typeof window.ethereum === "undefined" ||
+      !window.ethereum.isConnected()
+    ) {
+      console.log("not connected");
+    }
+
+    // const address = await walletClient.getAddresses();
+    // console.log(address);
+
+    const data = {
+      recipient: "0xB351a70dD6E5282A8c84edCbCd5A955469b9b032",
+      meetingId: "yvt-pijt-xie",
+      meetingType: 2,
+      startTime: 16452456,
+      endTime: 16452492,
+    };
+
+    // Configure the request options
+    const requestOptions = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        // Add any other headers required by your API
+      },
+      body: JSON.stringify(data),
+    };
+
+    try {
+      // Make the API call with the provided JSON data
+      const res = await fetch("/api/attest-onchain", requestOptions);
+
+      // Check if the request was successful
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+
+      // Parse the response as JSON
+      const attestationObject = await res.json();
+
+      // Handle the response data
+      console.log(attestationObject);
+      //   if (walletClient.chain == "") {
+      //     toast.error("Please connect your wallet!");
+      //   } else {
+      // if (walletClient.chain?.network === props.daoDelegates) {
+      const EASContractAddress = "0x4200000000000000000000000000000000000021";
+      const eas = new EAS(EASContractAddress);
+      const signer = await provider.getSigner();
+      console.log("the wallet2 obj", signer);
+      eas.connect(signer);
+      console.log("obj created");
+      console.log("eas obj", eas);
+      const schemaUID =
+        "0x98a9530fb8d7039c36f78e857b55f1c0e2d4caafa00d05dec37f4abef3e301b2";
+      const tx = await eas.attestByDelegation({
+        schema: schemaUID,
+        data: {
+          recipient: attestationObject.delegatedAttestation.message.recipient,
+          expirationTime:
+            attestationObject.delegatedAttestation.message.expirationTime,
+          revocable: attestationObject.delegatedAttestation.message.revocable,
+          refUID: attestationObject.delegatedAttestation.message.refUID,
+          data: attestationObject.delegatedAttestation.message.data,
+        },
+        signature: attestationObject.delegatedAttestation.signature,
+        attester: "0x8dEa0ad941d577e356745d758b30Fa11EFa28E80",
+      });
+      const newAttestationUID = await tx.wait();
+      console.log("New attestation UID: ", newAttestationUID);
+
+      try{
+        if(newAttestationUID){
+
+        }
+      }catch(e){
+        
+      }
+      // } else {
+      //   toast.error("Please switch to appropriate network to delegate!");
+      //   if (openChainModal) {
+      //     openChainModal();
+      //   }
+      // }
+      //   }
+    } catch (error) {
+      // Handle any errors that occur during the fetch operation
+      console.error("Error:", error);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {sessionDetails.length > 0 ? (
         sessionDetails.map((data: SessionData, index: any) => (
           <div
             key={index}
-            className="flex p-5 rounded-[2rem] cursor-pointer"
+            className="flex p-5 rounded-[2rem] cursor-pointer justify-between"
             style={{ boxShadow: "0px 4px 26.7px 0px rgba(0, 0, 0, 0.10)" }}
             // onClick={() => openModal(index)}
             onClick={() => router.push(`/watch/${data.meetingId}`)}
           >
-            <Image
-              src={text2}
-              alt="image"
-              className="w-44 h-44 rounded-3xl border border-[#D9D9D9]"
-            />
+            <div className="flex">
+              <Image
+                src={text2}
+                alt="image"
+                className="w-44 h-44 rounded-3xl border border-[#D9D9D9]"
+              />
 
-            <div className="ps-6 pe-12 py-1">
-              <div className="font-semibold text-blue-shade-200 text-xl">
-                {data.title}
-              </div>
-
-              <div className="flex space-x-4 py-2">
-                <div className="bg-[#1E1E1E] border border-[#1E1E1E] text-white rounded-md text-xs px-5 py-1 font-semibold capitalize">
-                  {data.dao_name}
+              <div className="ps-6 pe-12 py-1">
+                <div className="font-semibold text-blue-shade-200 text-xl">
+                  {data.title}
                 </div>
-                {/* <div className="border border-[#1E1E1E] rounded-md text-[#1E1E1E] text-xs px-5 py-1 font-medium">
+
+                <div className="flex space-x-4 py-2">
+                  <div className="bg-[#1E1E1E] border border-[#1E1E1E] text-white rounded-md text-xs px-5 py-1 font-semibold capitalize">
+                    {data.dao_name}
+                  </div>
+                  {/* <div className="border border-[#1E1E1E] rounded-md text-[#1E1E1E] text-xs px-5 py-1 font-medium">
                     {data.participant} Participants
                   </div> */}
-              </div>
-
-              <div className="pt-2 pe-10">
-                <hr />
-              </div>
-
-              <div className="flex gap-x-16 text-sm py-3">
-                {data.session_type === "session" ? (
-                  <div className="text-[#3E3D3D]">
-                    <span className="font-semibold">Session - </span>{" "}
-                    <span className="font-semibold">Attendee:</span>{" "}
-                    {formatWalletAddress(data.attendees[0].attendee_address)}
-                  </div>
-                ) : (
-                  <div className="text-[#3E3D3D]">
-                    <span className="font-semibold">Instant Meet</span>{" "}
-                  </div>
-                )}
-                <div className="text-[#3E3D3D]">
-                  <span className="font-semibold">Host:</span>{" "}
-                  {formatWalletAddress(data.host_address)}
                 </div>
-                <div className="text-[#3E3D3D]">
-                  {isEvent === "Upcoming" ? (
-                    <span className="font-semibold">Starts at: </span>
-                  ) : isEvent === "Recorded" ? (
-                    <span className="font-semibold">Started at: </span>
-                  ) : null}
-                  {formatSlotTimeToLocal(data.slot_time)}
-                </div>
-              </div>
 
-              <div className="text-[#1E1E1E] text-sm">{data.description}</div>
+                <div className="pt-2 pe-10">
+                  <hr />
+                </div>
+
+                <div className="flex gap-x-16 text-sm py-3">
+                  {data.session_type === "session" ? (
+                    <div className="text-[#3E3D3D]">
+                      <span className="font-semibold">Session - </span>{" "}
+                      <span className="font-semibold">Attendee:</span>{" "}
+                      {formatWalletAddress(data.attendees[0].attendee_address)}
+                    </div>
+                  ) : (
+                    <div className="text-[#3E3D3D]">
+                      <span className="font-semibold">Instant Meet</span>{" "}
+                    </div>
+                  )}
+                  <div className="text-[#3E3D3D]">
+                    <span className="font-semibold">Host:</span>{" "}
+                    {formatWalletAddress(data.host_address)}
+                  </div>
+                  <div className="text-[#3E3D3D]">
+                    {isEvent === "Upcoming" ? (
+                      <span className="font-semibold">Starts at: </span>
+                    ) : isEvent === "Recorded" ? (
+                      <span className="font-semibold">Started at: </span>
+                    ) : null}
+                    {formatSlotTimeToLocal(data.slot_time)}
+                  </div>
+                </div>
+
+                <div className="text-[#1E1E1E] text-sm">{data.description}</div>
+              </div>
+            </div>
+
+            <div className="flex items-end">
+              <button
+                className="bg-blue-shade-100 text-white text-sm py-1 px-3 rounded-full font-semibold outline-none"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleAttestationOnchain();
+                }}
+              >
+                Claim
+              </button>
             </div>
           </div>
         ))

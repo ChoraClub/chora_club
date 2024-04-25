@@ -50,7 +50,7 @@ function UserSessions({ isDelegate, selfDelegate }: UserSessionsProps) {
   let dao_name = "";
 
   const getUserMeetingData = async () => {
-    if (chain?.name === "Optimism") {
+    if (chain?.name === "Optimism Sepolia") {
       dao_name = "optimism";
     } else if (chain?.name === "Arbitrum One") {
       dao_name = "arbitrum";
