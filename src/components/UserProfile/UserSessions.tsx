@@ -218,7 +218,7 @@ function UserSessions({ isDelegate, selfDelegate }: UserSessionsProps) {
                 dataLoading={dataLoading}
                 isEvent="Recorded"
                 isOfficeHour={false}
-                isSession="attended"
+                isSession="hosted"
               />
             ))}
           {searchParams.get("session") === "attended" &&

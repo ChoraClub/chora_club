@@ -376,21 +376,6 @@ SessionTileProps) {
           </div>
         </div>
       )}
-
-      {/* {selectedTileIndex !== null && isEvent === "Recorded" ? (
-        <IndividualSessionTileModal
-          title={sessionDetails[selectedTileIndex].title}
-          description={sessionDetails[selectedTileIndex].description}
-          videoUrl={sessionDetails[selectedTileIndex].videoUrl || ""}
-          date={sessionDetails[selectedTileIndex].slot_time}
-          host={sessionDetails[selectedTileIndex].host_address}
-          attendees={sessionDetails[selectedTileIndex].attendees}
-          dao={sessionDetails[selectedTileIndex].dao_name}
-          host_attestation={sessionDetails[selectedTileIndex].uid_host}
-          // attendee_attestation={sessionDetails[selectedTileIndex].uid_attendee}
-          onClose={closeModal}
-        />
-      ) : null} */}
     </div>
   );
 }
