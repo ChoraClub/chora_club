@@ -24,7 +24,7 @@ function AttestationModal({
   const shareOnTwitter = () => {
     const url = encodeURIComponent(`https://app.chora.club/`);
     const text = encodeURIComponent(
-      `Just attended an amazing session on #Web3 in Chora Club! Learned so much and got a deeper understanding of ecosystem. Feeling inspired and ready to dive in!🚀 \n👉 ${decodeURIComponent(
+      `Just attended an amazing session on #Web3 in @ChoraClub! Learned so much and got a deeper understanding of ecosystem. Feeling inspired and ready to dive in!🚀 \n👉 ${decodeURIComponent(
         url
       )}\n\n#choraclub #session #growth`
     );
