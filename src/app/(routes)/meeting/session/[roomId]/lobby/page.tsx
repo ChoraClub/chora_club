@@ -283,7 +283,9 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
           setProfileDetails(filtered[0]);
           setIsLoading(false);
           const imageCid = filtered[0].image;
-          setAvatarUrl(`https://gateway.lighthouse.storage/ipfs/${imageCid}`);
+          if (imageCid) {
+            setAvatarUrl(`https://gateway.lighthouse.storage/ipfs/${imageCid}`);
+          }
           setUserDisplayName(filtered[0].displayName);
         }
 

@@ -226,8 +226,8 @@ const Home = ({ params }: { params: { roomId: string } }) => {
     <>
       {isAllowToEnter ? (
         <section className="bg-white flex h-screen text-slate-100 flex-col justify-between overflow-hidden">
-          <div className="flex w-full h-[90%] pb-4">
-            <div className="relative top-4">
+          <div className="flex w-full h-[90%] pb-4 relative">
+            <div className="absolute top-5 left-5">
               <Tooltip
                 showArrow
                 content={
