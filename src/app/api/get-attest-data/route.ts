@@ -64,7 +64,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
       // For office hours, delegate attestation to hosts (meetingType 3) and participants (meetingType 4)
       await delegateAndSetAttestation(
         data.hosts[0].displayName,
-        roomId,
+        `${roomId}/${data.dao_name}`,
         3,
         data.startTime,
         data.endTime
@@ -72,7 +72,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
       for (const participant of data.participants) {
         await delegateAndSetAttestation(
           participant.displayName,
-          roomId,
+          `${roomId}/${data.dao_name}`,
           4,
           data.startTime,
           data.endTime
@@ -83,7 +83,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
       // For sessions, delegate attestation to hosts (meetingType 1) and participants (meetingType 2)
       await delegateAndSetAttestation(
         data.hosts[0].displayName,
-        roomId,
+        `${roomId}/${data.dao_name}`,
         1,
         data.startTime,
         data.endTime
@@ -91,7 +91,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
       for (const participant of data.participants) {
         await delegateAndSetAttestation(
           participant.displayName,
-          roomId,
+          `${roomId}/${data.dao_name}`,
           2,
           data.startTime,
           data.endTime
