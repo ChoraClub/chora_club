@@ -9,9 +9,11 @@ interface AttestationObject {
 }
 
 function WatchComponentMain({ props }: { props: { id: string } }) {
+  
   const modalRef = useRef<HTMLDivElement>(null);
   const [data, setData] = useState<any>();
   const [collection, setCollection] = useState<any>();
+
   useEffect(() => {
     async function fetchData() {
       try {
@@ -94,20 +96,42 @@ function WatchComponentMain({ props }: { props: { id: string } }) {
                     <td className="font-semibold pr-4">Host:</td>
                     <td>
                       {data.host_address}{" "}
-                      <a
-                        href={
-                          data.dao_name === "optimism" || "Optimism"
-                            ? `https://optimism-sepolia.easscan.org/offchain/attestation/view/${data.uid_host}`
-                            : data.dao_name === "arbitrum" || "Arbitrum"
-                            ? `https://arbitrum.easscan.org/attestation/view/${data.uid_host}`
-                            : ""
-                        }
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{ color: "blue" }}
-                      >
-                        View↗️
-                      </a>
+                      {data.uid_host ? (
+                        <a
+                          href={
+                            data.dao_name === "optimism" || "Optimism"
+                              ? `https://optimism-sepolia.easscan.org/offchain/attestation/view/${data.uid_host}`
+                              : data.dao_name === "arbitrum" || "Arbitrum"
+                              ? `https://arbitrum.easscan.org/attestation/view/${data.uid_host}`
+                              : ""
+                          }
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{ color: "blue" }}
+                        >
+                          Offchain↗️
+                        </a>
+                      ) : (
+                        <></>
+                      )}
+                      {data.onchain_host_uid ? (
+                        <a
+                          href={
+                            data.dao_name === "optimism" || "Optimism"
+                              ? `https://optimism-sepolia.easscan.org/offchain/attestation/view/${data.onchain_host_uid}`
+                              : data.dao_name === "arbitrum" || "Arbitrum"
+                              ? `https://arbitrum.easscan.org/attestation/view/${data.onchain_host_uid}`
+                              : ""
+                          }
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{ color: "blue" }}
+                        >
+                          Onchain↗️
+                        </a>
+                      ) : (
+                        <></>
+                      )}
                     </td>
                   </tr>
                   <tr>
@@ -130,7 +154,26 @@ function WatchComponentMain({ props }: { props: { id: string } }) {
                               style={{ color: "blue" }}
                               className="px-3"
                             >
-                              View↗️
+                              Offchain↗️
+                            </a>
+                          ) : (
+                            <></>
+                          )}
+                          {attendee.onchain_attendee_uid ? (
+                            <a
+                              href={
+                                data.dao_name === "optimism" || "Optimism"
+                                  ? `https://optimism-sepolia.easscan.org/offchain/attestation/view/${attendee.onchain_attendee_uid}`
+                                  : data.dao_name === "arbitrum" || "Arbitrum"
+                                  ? `https://arbitrum.easscan.org/attestation/view/${attendee.onchain_attendee_uid}`
+                                  : ""
+                              }
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              style={{ color: "blue" }}
+                              className="px-3"
+                            >
+                              Onchain↗️
                             </a>
                           ) : (
                             <></>
