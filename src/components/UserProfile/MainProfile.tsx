@@ -166,33 +166,6 @@ function MainProfile() {
     );
   };
 
-  const handleAttestation = async () => {
-    const data = {
-      recipient: "0xbFc4A28D8F1003Bec33f4Fdb7024ad6ad1605AA8",
-      meetingId: "abc-def-ggi",
-      meetingType: 1,
-      startTime: 16452456,
-      endTime: 16452492,
-    };
-
-    console.log(window.location.origin);
-    const headers = {
-      "Content-Type": "application/json",
-      //   Origin: window.location.origin, // Set the Origin header to your frontend URL
-    };
-
-    try {
-      const response = await axios.post("/api/attest-offchain", data, {
-        headers,
-      });
-      console.log(response.data);
-      // Handle response as needed
-    } catch (error) {
-      console.error("Error:", error);
-      // Handle error
-    }
-  };
-
   useEffect(() => {
     const checkDelegateStatus = async () => {
       const addr = await walletClient.getAddresses();

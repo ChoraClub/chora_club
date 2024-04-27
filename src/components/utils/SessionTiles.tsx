@@ -141,9 +141,9 @@ SessionTileProps) {
     let token = "";
 
     if (dao === "optimism") {
-      token = "op";
+      token = "OP";
     } else if (dao === "arbitrum") {
-      token = "arb";
+      token = "ARB";
     }
 
     const data = {
