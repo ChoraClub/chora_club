@@ -7,7 +7,7 @@ async function delegateAttestationOnchain(data: any) {
   myHeaders.append("Content-Type", "application/json");
   const baseUrl = process.env.NEXTAUTH_URL;
   const raw = JSON.stringify(data);
-
+  console.log("raw", raw);
   const requestOptions = {
     method: "POST",
     headers: myHeaders,

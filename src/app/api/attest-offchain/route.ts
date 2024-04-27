@@ -133,7 +133,11 @@ export async function POST(req: NextRequest, res: NextResponse) {
       if (response.data) {
         uploadstatus = true;
       }
-      console.log(response.data);
+      console.log("response data", response.data);
+      console.log(
+        "requestData.meetingId.split",
+        requestData.meetingId.split("/")[0]
+      );
 
       if (requestData.meetingType === 1) {
         const client = await MongoClient.connect(process.env.MONGODB_URI!, {
@@ -142,9 +146,9 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
         const db = client.db();
         const collection = db.collection("meetings");
-
+        console.log("in meeting type 1");
         await collection.findOneAndUpdate(
-          { meetingId: requestData.meetingId },
+          { meetingId: requestData.meetingId.split("/")[0] },
           {
             $set: {
               uid_host: response.data.offchainAttestationId,
@@ -161,10 +165,10 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
         const db = client.db();
         const collection = db.collection("meetings");
-
+        console.log("meeting type 2");
         await collection.findOneAndUpdate(
           {
-            meetingId: requestData.meetingId,
+            meetingId: requestData.meetingId.split("/")[0],
             "attendees.attendee_address": requestData.recipient,
           },
           {
@@ -184,7 +188,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
         const collection = db.collection("office_hours");
 
         await collection.findOneAndUpdate(
-          { meetingId: requestData.meetingId },
+          { meetingId: requestData.meetingId.split("/")[0] },
           {
             $set: {
               uid_host: response.data.offchainAttestationId,
@@ -204,7 +208,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
         await collection.findOneAndUpdate(
           {
-            meetingId: requestData.meetingId,
+            meetingId: requestData.meetingId.split("/")[0],
             "attendees.attendee_address": requestData.recipient,
           },
           {

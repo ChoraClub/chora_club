@@ -126,25 +126,27 @@ function SpecificDelegate({ props }: { props: Type }) {
       //   const address1 = addr[0];
       let delegateTxAddr = "";
       const contractAddress =
-        chain?.name === "Optimism"
+        props.daoDelegates === "optimism"
           ? "0x4200000000000000000000000000000000000042"
-          : chain?.name === "Arbitrum One"
+          : props.daoDelegates === "arbitrum"
           ? "0x912CE59144191C1204E64559FE8253a0e49E6548"
           : "";
-
-      const delegateTx = await publicClient.readContract({
-        address: contractAddress,
-        abi: dao_abi.abi,
-        functionName: "delegates",
-        args: [addressFromUrl],
-        // account: address1,
-      });
-      console.log("Delegate tx", delegateTx);
-      delegateTxAddr = delegateTx;
-
-      if (delegateTxAddr.toLowerCase() === addressFromUrl?.toLowerCase()) {
-        console.log("Delegate comparison: ", delegateTx, addressFromUrl);
-        setSelfDelegate(true);
+      try {
+        const delegateTx = await publicClient.readContract({
+          address: contractAddress,
+          abi: dao_abi.abi,
+          functionName: "delegates",
+          args: [addressFromUrl],
+          // account: address1,
+        });
+        console.log("Delegate tx", delegateTx);
+        delegateTxAddr = delegateTx;
+        if (delegateTxAddr.toLowerCase() === addressFromUrl?.toLowerCase()) {
+          console.log("Delegate comparison: ", delegateTx, addressFromUrl);
+          setSelfDelegate(true);
+        }
+      } catch (error) {
+        console.error("Error in reading contract", error);
       }
     };
     checkDelegateStatus();
@@ -197,7 +199,7 @@ function SpecificDelegate({ props }: { props: Type }) {
       return;
     }
 
-    console.log(walletClient);
+    console.log("walletClient?.chain?.network", walletClient?.chain?.network);
     if (walletClient?.chain == "") {
       toast.error("Please connect your wallet!");
     } else {
@@ -232,7 +234,7 @@ function SpecificDelegate({ props }: { props: Type }) {
           />
         </div>
       )}
-      {!(isPageLoading || (!isDelegate && !selfDelegate)) ? (
+      {!(isPageLoading || !selfDelegate) ? (
         <div className="font-poppins">
           <div className="flex ps-14 py-5 justify-between">
             <div className="flex">

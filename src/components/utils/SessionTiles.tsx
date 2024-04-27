@@ -98,7 +98,7 @@ SessionTileProps) {
   const [isClaiming, setIsClaiming] = useState<{ [index: number]: boolean }>(
     {}
   );
-  const [isClaimed, setIsClaimed] = useState(false);
+  const [isClaimed, setIsClaimed] = useState<{ [index: number]: boolean }>({});
   const provider = new ethers.BrowserProvider(window?.ethereum);
 
   const formatWalletAddress = (address: any) => {
@@ -227,7 +227,7 @@ SessionTileProps) {
           console.log("responseData", responseData);
           if (responseData.success) {
             console.log("On-chain attestation Claimed");
-            setIsClaimed(true);
+            setIsClaimed((prev) => ({ ...prev, [index]: true }));
             setIsClaiming((prev) => ({ ...prev, [index]: false }));
           }
         } catch (e) {
@@ -326,7 +326,7 @@ SessionTileProps) {
                   disabled={
                     !!data.attendees[0].onchain_attendee_uid ||
                     isClaiming[index] ||
-                    isClaimed
+                    isClaimed[index]
                   }
                 >
                   {isClaiming[index] ? (
@@ -340,7 +340,7 @@ SessionTileProps) {
                         ariaLabel="oval-loading"
                       />
                     </div>
-                  ) : data.attendees[0].onchain_attendee_uid || isClaimed ? (
+                  ) : data.attendees[0].onchain_attendee_uid || isClaimed[index] ? (
                     "Claimed"
                   ) : (
                     "Claim"
@@ -363,7 +363,7 @@ SessionTileProps) {
                     });
                   }}
                   disabled={
-                    !!data.onchain_host_uid || isClaiming[index] || isClaimed
+                    !!data.onchain_host_uid || isClaiming[index] || isClaimed[index]
                   }
                 >
                   {isClaiming[index] ? (
@@ -377,7 +377,7 @@ SessionTileProps) {
                         ariaLabel="oval-loading"
                       />
                     </div>
-                  ) : data.onchain_host_uid || isClaimed ? (
+                  ) : data.onchain_host_uid || isClaimed[index] ? (
                     "Claimed"
                   ) : (
                     "Claim"
