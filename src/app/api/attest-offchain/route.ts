@@ -101,8 +101,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
     const offchainAttestation = await offchain.signOffchainAttestation(
       {
-        schema:
-          "0x98a9530fb8d7039c36f78e857b55f1c0e2d4caafa00d05dec37f4abef3e301b2",
+        schema: "0xf9e214a80b66125cad64453abe4cef5263be3a7f01760d0cc72789236fca2b5d",
         recipient: requestData.recipient,
         time: currentTime,
         expirationTime: expirationTime,
