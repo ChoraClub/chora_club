@@ -59,7 +59,7 @@ function DelegateSessions({ props }: { props: Type }) {
 
       const response = await fetch("/api/get-dao-sessions", requestOptions);
       const result = await response.json();
-      // console.log("result in get meetinggggg", result);
+      console.log("result in get meetinggggg", result);
 
       if (result) {
         const resultData = await result;
@@ -95,7 +95,11 @@ function DelegateSessions({ props }: { props: Type }) {
           // console.log("filtered", filteredData);
           setSessionDetails(filteredData);
           setDataLoading(false);
+        } else {
+          setDataLoading(false);
         }
+      } else {
+        setDataLoading(false);
       }
     } catch (error) {
       console.log("error in catch", error);
