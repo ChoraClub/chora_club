@@ -101,7 +101,8 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
     const offchainAttestation = await offchain.signOffchainAttestation(
       {
-        schema: "0xf9e214a80b66125cad64453abe4cef5263be3a7f01760d0cc72789236fca2b5d",
+        schema:
+          "0xf9e214a80b66125cad64453abe4cef5263be3a7f01760d0cc72789236fca2b5d",
         recipient: requestData.recipient,
         time: currentTime,
         expirationTime: expirationTime,
@@ -118,7 +119,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
       signer: await signer.getAddress(),
     };
 
-    const baseUrl = "https://optimism-sepolia.easscan.org";
+    const baseUrl = "https://optimism.easscan.org/";
     const url = baseUrl + createOffchainURL(pkg);
 
     const data = {

@@ -62,7 +62,7 @@ function DelegateSessions({ props }: { props: Type }) {
       console.log("result in get meetinggggg", result);
 
       if (result) {
-        const resultData = await result;
+        const resultData = await result.data;
         // console.log("resultData", resultData);
         if (Array.isArray(resultData)) {
           // setDataLoading(true);
