@@ -22,7 +22,7 @@ function SchedulingSuccessModal({
       `https://app.chora.club/${userAddress}?active=delegatesSession&session=book`
     );
     const text = encodeURIComponent(
-      `Hello Web3 Enthusiasts!🎉\nI've opened up some time slots for sessions on Chora Club!📅\nDon't miss out – book your session now to learn more about Web3 ecosystem! 📝\n👉 ${decodeURIComponent(
+      `Hello Web3 Enthusiasts!🎉\nI've opened up some time slots for sessions on @ChoraClub!📅\nDon't miss out – book your session now to learn more about Web3 ecosystem! 📝\n👉 ${decodeURIComponent(
         url
       )}\n\n#choraclub #sessionbooking`
     );

@@ -7,7 +7,7 @@ async function delegateAttestationOnchain(data: any) {
   myHeaders.append("Content-Type", "application/json");
   const baseUrl = process.env.NEXTAUTH_URL;
   const raw = JSON.stringify(data);
-
+  console.log("raw", raw);
   const requestOptions = {
     method: "POST",
     headers: myHeaders,
@@ -58,13 +58,21 @@ export async function POST(req: NextRequest, res: NextResponse) {
       );
     }
 
+    let token = "";
+
+    if (data.dao_name === "optimism") {
+      token = "OP";
+    } else if (data.dao_name === "arbitrum") {
+      token = "ARB";
+    }
+
     // Delegate attestation on-chain based on meetingType
     if (data.meetingType === "officehours") {
       console.log("Meeting type: officehours");
       // For office hours, delegate attestation to hosts (meetingType 3) and participants (meetingType 4)
       await delegateAndSetAttestation(
         data.hosts[0].displayName,
-        roomId,
+        `${roomId}/${token}`,
         3,
         data.startTime,
         data.endTime
@@ -72,7 +80,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
       for (const participant of data.participants) {
         await delegateAndSetAttestation(
           participant.displayName,
-          roomId,
+          `${roomId}/${token}`,
           4,
           data.startTime,
           data.endTime
@@ -83,7 +91,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
       // For sessions, delegate attestation to hosts (meetingType 1) and participants (meetingType 2)
       await delegateAndSetAttestation(
         data.hosts[0].displayName,
-        roomId,
+        `${roomId}/${token}`,
         1,
         data.startTime,
         data.endTime
@@ -91,7 +99,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
       for (const participant of data.participants) {
         await delegateAndSetAttestation(
           participant.displayName,
-          roomId,
+          `${roomId}/${token}`,
           2,
           data.startTime,
           data.endTime

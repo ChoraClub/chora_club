@@ -77,6 +77,8 @@ interface AttestationDataParams {
   meetingType: number;
   meetingStartTime: number;
   meetingEndTime: number;
+  index: number;
+  dao: string;
 }
 
 function SessionTile({
@@ -93,8 +95,10 @@ SessionTileProps) {
   const [selectedTileIndex, setSelectedTileIndex] = useState<number | null>(
     null
   );
-  const [isClaiming, setIsClaiming] = useState(false);
-  const [isClaimed, setIsClaimed] = useState(false);
+  const [isClaiming, setIsClaiming] = useState<{ [index: number]: boolean }>(
+    {}
+  );
+  const [isClaimed, setIsClaimed] = useState<{ [index: number]: boolean }>({});
   const provider = new ethers.BrowserProvider(window?.ethereum);
 
   const formatWalletAddress = (address: any) => {
@@ -121,8 +125,10 @@ SessionTileProps) {
     meetingType,
     meetingStartTime,
     meetingEndTime,
+    index,
+    dao,
   }: AttestationDataParams) => {
-    setIsClaiming(true);
+    setIsClaiming((prev: any) => ({ ...prev, [index]: true }));
     if (
       typeof window.ethereum === "undefined" ||
       !window.ethereum.isConnected()
@@ -132,10 +138,17 @@ SessionTileProps) {
 
     // const address = await walletClient.getAddresses();
     // console.log(address);
+    let token = "";
+
+    if (dao === "optimism") {
+      token = "OP";
+    } else if (dao === "arbitrum") {
+      token = "ARB";
+    }
 
     const data = {
       recipient: address,
-      meetingId: meetingId,
+      meetingId: `${meetingId}/${token}`,
       meetingType: meetingType,
       startTime: meetingStartTime,
       endTime: meetingEndTime,
@@ -214,18 +227,18 @@ SessionTileProps) {
           console.log("responseData", responseData);
           if (responseData.success) {
             console.log("On-chain attestation Claimed");
-            setIsClaimed(true);
-            setIsClaiming(false);
+            setIsClaimed((prev) => ({ ...prev, [index]: true }));
+            setIsClaiming((prev) => ({ ...prev, [index]: false }));
           }
         } catch (e) {
           console.error(e);
-          setIsClaiming(false);
+          setIsClaiming((prev) => ({ ...prev, [index]: false }));
         }
       }
     } catch (error) {
       // Handle any errors that occur during the fetch operation
       console.error("Error:", error);
-      setIsClaiming(false);
+      setIsClaiming((prev) => ({ ...prev, [index]: false }));
     }
   };
 
@@ -306,15 +319,17 @@ SessionTileProps) {
                       meetingType: 2,
                       meetingStartTime: data.attestations[0].startTime,
                       meetingEndTime: data.attestations[0].endTime,
+                      index,
+                      dao: data.dao_name,
                     });
                   }}
                   disabled={
                     !!data.attendees[0].onchain_attendee_uid ||
-                    isClaiming ||
-                    isClaimed
+                    isClaiming[index] ||
+                    isClaimed[index]
                   }
                 >
-                  {isClaiming ? (
+                  {isClaiming[index] ? (
                     <div className="flex items-center justify-center px-3">
                       <Oval
                         visible={true}
@@ -325,7 +340,7 @@ SessionTileProps) {
                         ariaLabel="oval-loading"
                       />
                     </div>
-                  ) : data.attendees[0].onchain_attendee_uid || isClaimed ? (
+                  ) : data.attendees[0].onchain_attendee_uid || isClaimed[index] ? (
                     "Claimed"
                   ) : (
                     "Claim"
@@ -343,11 +358,15 @@ SessionTileProps) {
                       meetingType: 1,
                       meetingStartTime: data.attestations[0].startTime,
                       meetingEndTime: data.attestations[0].endTime,
+                      index,
+                      dao: data.dao_name,
                     });
                   }}
-                  disabled={!!data.onchain_host_uid || isClaiming || isClaimed}
+                  disabled={
+                    !!data.onchain_host_uid || isClaiming[index] || isClaimed[index]
+                  }
                 >
-                  {isClaiming ? (
+                  {isClaiming[index] ? (
                     <div className="flex items-center justify-center px-3">
                       <Oval
                         visible={true}
@@ -358,7 +377,7 @@ SessionTileProps) {
                         ariaLabel="oval-loading"
                       />
                     </div>
-                  ) : data.onchain_host_uid || isClaimed ? (
+                  ) : data.onchain_host_uid || isClaimed[index] ? (
                     "Claimed"
                   ) : (
                     "Claim"
