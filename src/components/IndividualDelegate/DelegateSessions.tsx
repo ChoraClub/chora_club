@@ -204,6 +204,7 @@ function DelegateSessions({ props }: { props: Type }) {
                 dataLoading={dataLoading}
                 isEvent="Upcoming"
                 isOfficeHour={false}
+                isSession=""
               />
             ))}
           {searchParams.get("session") === "hosted" &&
@@ -224,6 +225,7 @@ function DelegateSessions({ props }: { props: Type }) {
                 dataLoading={dataLoading}
                 isEvent="Recorded"
                 isOfficeHour={false}
+                isSession=""
               />
             ))}
           {searchParams.get("session") === "attended" &&
@@ -244,6 +246,7 @@ function DelegateSessions({ props }: { props: Type }) {
                 dataLoading={dataLoading}
                 isEvent="Recorded"
                 isOfficeHour={false}
+                isSession=""
               />
             ))}
         </div>
