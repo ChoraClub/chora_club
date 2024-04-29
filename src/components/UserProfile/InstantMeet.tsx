@@ -14,13 +14,13 @@ import { useAccount } from "wagmi";
 import { useNetwork } from "wagmi";
 import Image from "next/image";
 import { Tooltip } from "@nextui-org/react";
-import img1 from "@/assets/ic_baseline-connect-without-contact.png";
-import img2 from "@/assets/mingcute_link-fill.png";
-import img3 from "@/assets/wpf_video-call.png";
-import img4 from "@/assets/fluent_call-12-filled.png";
-import img5 from "@/assets/ic_baseline-screen-share.png";
-import img6 from "@/assets/lets-icons_chat-fill.png";
-import img7 from "@/assets/30470b0e3425c3f272688a1af1437d3b 1.png";
+import connectImg from "@/assets/images/instant-meet/connect.png";
+import accessImg from "@/assets/images/instant-meet/quick-access.png";
+import videoImg from "@/assets/images/instant-meet/video-call.png";
+import audioImg from "@/assets/images/instant-meet/audio-call.png";
+import screenImg from "@/assets/images/instant-meet/screen-share.png";
+import chatImg from "@/assets/images/instant-meet/chat.png";
+import heroImg from "@/assets/images/instant-meet/instant-meet-hero.svg";
 
 interface instantMeetProps {
   isDelegate: boolean;
@@ -121,37 +121,37 @@ function InstantMeet({ isDelegate, selfDelegate }: instantMeetProps) {
 
   const block = [
     {
-      image: img1,
+      image: connectImg,
       title: "Connect with Others Instantly",
       description:
         "Engage with yourself in an instant meeting and share the link with the people you want to connect with. Experience the following features for a comprehensive virtual meeting experience.",
     },
     {
-      image: img2,
+      image: accessImg,
       title: "Quick Access to DAO Links",
       description:
         "Access the quick links of DAO directly within the meeting itself,making it easier to reference and share relevant information during your session.",
     },
     {
-      image: img3,
+      image: videoImg,
       title: "Video Call",
       description:
         " Connect seamlessly and engage face-to-face with crisp and clear video quality, bringing your virtual meetings to life.",
     },
     {
-      image: img4,
+      image: audioImg,
       title: "Audio Call",
       description:
         "Experience crystal-clear audio that ensures smooth and effective communication with all participants, enhancing the meeting experience.",
     },
     {
-      image: img5,
+      image: screenImg,
       title: "Screen Sharing",
       description:
         "Effortlessly share your screen to showcase documents, presentations,or any other content, making collaboration more interactive and dynamic.",
     },
     {
-      image: img6,
+      image: chatImg,
       title: "Chat",
       description:
         "Foster real-time communication by sending text messages to participants within the meeting, allowing for quick exchanges and enhanced collaboration.",
@@ -169,7 +169,7 @@ function InstantMeet({ isDelegate, selfDelegate }: instantMeetProps) {
                   Start an Instant Meeting
                 </div>
 
-                <div className="grid grid-cols-3 grid-rows-2 text-sm gap-8 font-semibold pt-8 text-[#3E3D3D] text-center">
+                <div className="grid grid-cols-3 grid-rows-2 text-sm gap-11 font-semibold pt-8 text-[#3E3D3D] text-center">
                   {block.map((data, index) => (
                     <Tooltip
                       key={index}
@@ -184,11 +184,11 @@ function InstantMeet({ isDelegate, selfDelegate }: instantMeetProps) {
                       className="group w-fit"
                     >
                       <div>
-                        <div className="group border rounded-3xl bg-[#E5E5EA] flex items-center justify-center p-10">
+                        <div className="group border rounded-3xl bg-[#E5E5EA] flex items-center justify-center p-8">
                           <Image
                             alt="{image}"
-                            height={70}
-                            width={70}
+                            height={60}
+                            width={60}
                             src={data.image}
                             className=" transition duration-300 ease-in-out transform hover:scale-105"
                           />
@@ -202,21 +202,19 @@ function InstantMeet({ isDelegate, selfDelegate }: instantMeetProps) {
                 </div>
               </div>
             </div>
-            <div className="col-span-3 flex flex-col justify-center items-center px-6">
+            <div className="col-span-3 flex flex-col px-6">
               <div className="">
-                <Image alt="img7" src={img7} />
+                <Image alt="img7" src={heroImg} />
               </div>
-              <div className="text-center mt-24">
+              <div className="text-center transition-transform transform hover:scale-105 duration-300">
                 <button
-                  className="bg-blue-shade-200 p-4 rounded-full text-white font-semibold"
+                  className="bg-blue-shade-200 py-3 px-6 rounded-full text-white font-semibold"
                   onClick={onOpen}
                 >
                   Start an instant meet
                 </button>
               </div>
             </div>
-
-            {/* <div className="absolute top-0 bottom-0 left-[55%] bg-slate-300 w-px"></div> */}
           </div>
         </div>
       </div>
