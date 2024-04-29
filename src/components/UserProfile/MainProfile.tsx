@@ -1026,7 +1026,7 @@ function MainProfile() {
               Office Hours
             </button>
 
-            {selfDelegate === false && (
+            {selfDelegate === true && (
               <button
                 className={`border-b-2 py-4 px-2 outline-none ${
                   searchParams.get("active") === "instant-meet"
@@ -1088,7 +1088,7 @@ function MainProfile() {
               ""
             )}
 
-            {selfDelegate === false &&
+            {selfDelegate === true &&
             searchParams.get("active") === "instant-meet" ? (
               <InstantMeet
                 isDelegate={isDelegate}
