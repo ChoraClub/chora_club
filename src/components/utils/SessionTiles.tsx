@@ -185,7 +185,7 @@ SessionTileProps) {
       console.log("obj created");
       console.log("eas obj", eas);
       const schemaUID =
-        "0x98a9530fb8d7039c36f78e857b55f1c0e2d4caafa00d05dec37f4abef3e301b2";
+        "0xf9e214a80b66125cad64453abe4cef5263be3a7f01760d0cc72789236fca2b5d";
       const tx = await eas.attestByDelegation({
         schema: schemaUID,
         data: {
@@ -197,7 +197,7 @@ SessionTileProps) {
           data: attestationObject.delegatedAttestation.message.data,
         },
         signature: attestationObject.delegatedAttestation.signature,
-        attester: "0x8dEa0ad941d577e356745d758b30Fa11EFa28E80",
+        attester: "0x7B2C5f70d66Ac12A25cE4c851903436545F1b741",
       });
       const newAttestationUID = await tx.wait();
       console.log("New attestation UID: ", newAttestationUID);

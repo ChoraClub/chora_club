@@ -119,7 +119,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
       signer: await signer.getAddress(),
     };
 
-    const baseUrl = "https://optimism.easscan.org/";
+    const baseUrl = "https://optimism.easscan.org";
     const url = baseUrl + createOffchainURL(pkg);
 
     const data = {
