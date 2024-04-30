@@ -126,9 +126,9 @@ function SpecificDelegate({ props }: { props: Type }) {
       //   const address1 = addr[0];
       let delegateTxAddr = "";
       const contractAddress =
-        props.daoDelegates === "optimism"
+        chain?.name === "Optimism"
           ? "0x4200000000000000000000000000000000000042"
-          : props.daoDelegates === "arbitrum"
+          : chain?.name === "Arbitrum One"
           ? "0x912CE59144191C1204E64559FE8253a0e49E6548"
           : "";
       try {
@@ -191,9 +191,9 @@ function SpecificDelegate({ props }: { props: Type }) {
 
     let chainAddress;
 
-    if (props.daoDelegates === "optimism") {
+    if (chain?.name === "Optimism") {
       chainAddress = "0x4200000000000000000000000000000000000042";
-    } else if (props.daoDelegates === "arbitrum") {
+    } else if (chain?.name === "Arbitrum One") {
       chainAddress = "0x912CE59144191C1204E64559FE8253a0e49E6548";
     } else {
       return;
@@ -234,7 +234,7 @@ function SpecificDelegate({ props }: { props: Type }) {
           />
         </div>
       )}
-      {!(isPageLoading || !selfDelegate) ? (
+      {!(isPageLoading || (!isDelegate && !selfDelegate)) ? (
         <div className="font-poppins">
           <div className="flex ps-14 py-5 justify-between">
             <div className="flex">
