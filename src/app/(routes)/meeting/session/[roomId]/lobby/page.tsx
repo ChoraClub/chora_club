@@ -29,6 +29,8 @@ import { Role } from "@huddle01/server-sdk/auth";
 import { Oval, TailSpin } from "react-loader-spinner";
 import Link from "next/link";
 import { RxCross2 } from "react-icons/rx";
+import record from "@/assets/images/instant-meet/record.svg";
+import arrow from "@/assets/images/instant-meet/arrow.svg";
 
 type lobbyProps = {};
 
@@ -321,15 +323,15 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
           {popupVisibility && (
             <div className="flex items-center justify-center">
               <div className="absolute bg-white text-[#3E3D3D] flex justify-center items-center py-2 font-poppins font-semibold w-1/4 rounded-md top-6 drop-shadow-xl">
-              <div className="flex absolute left-2">
-                <Image
-                  alt="record-left"
-                  width={25}
-                  height={25}
-                  src="/images/Record.svg"
-                  className="w-5 h-5 ml-2"
-                />
-              </div>
+                <div className="flex absolute left-2">
+                  <Image
+                    alt="record-left"
+                    width={25}
+                    height={25}
+                    src={record}
+                    className="w-5 h-5 ml-2"
+                  />
+                </div>
                 <div className="">This meeting is being recorded.</div>
                 <div className="flex absolute right-2">
                   <button
@@ -344,7 +346,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
           )}
           <main className="flex h-screen flex-col items-center justify-center bg-lobby text-slate-100 font-poppins">
             <div className="flex flex-col items-center justify-center gap-4 w-1/3 mt-14">
-            <div className="text-center flex items-center justify-center bg-slate-100 w-full rounded-2xl py-28">
+              <div className="text-center flex items-center justify-center bg-slate-100 w-full rounded-2xl py-28">
                 <div className="relative">
                   <Image
                     src={avatarUrl}
@@ -468,7 +470,9 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
               <div className="flex items-center w-1/2">
                 <button
                   className={`flex items-center justify-center text-slate-100 font-bold rounded-full p-4 mt-2 w-full ${
-                    isLoading ? "bg-blue-500" : "bg-blue-shade-200"
+                    isLoading
+                      ? "bg-blue-500"
+                      : "bg-blue-shade-200 transition-transform transform hover:scale-105 duration-300"
                   }`}
                   onClick={handleStartSpaces}
                   disabled={isLoading}
@@ -479,8 +483,8 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
                       alt="narrow-right"
                       width={30}
                       height={30}
-                      src="/images/maki_arrow.svg"
-                    className="w-5 h-5 ml-2"
+                      src={arrow}
+                      className="w-5 h-5 ml-2"
                     />
                   )}
                 </button>

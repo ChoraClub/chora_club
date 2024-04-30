@@ -89,7 +89,7 @@ function AttendingUserSessions() {
                 : "";
             });
           }
-          console.log("filtered", filteredData);
+          console.log("filtered in attending", filteredData);
           setSessionDetails(filteredData);
           setPageLoading(false);
         }

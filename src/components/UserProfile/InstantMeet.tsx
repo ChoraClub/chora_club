@@ -8,7 +8,7 @@ import {
   useDisclosure,
 } from "@nextui-org/react";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Oval } from "react-loader-spinner";
 import { useAccount } from "wagmi";
 import { useNetwork } from "wagmi";
@@ -29,7 +29,6 @@ interface instantMeetProps {
 
 function InstantMeet({ isDelegate, selfDelegate }: instantMeetProps) {
   const [modalData, setModalData] = useState({
-    dao_name: "",
     title: "",
     description: "",
   });
@@ -38,6 +37,7 @@ function InstantMeet({ isDelegate, selfDelegate }: instantMeetProps) {
   const { address } = useAccount();
   const { chain, chains } = useNetwork();
   const [isScheduling, setIsScheduling] = useState(false);
+  const [daoName, setDaoName] = useState<string>();
   const router = useRouter();
 
   const handleModalInputChange = (
@@ -77,7 +77,7 @@ function InstantMeet({ isDelegate, selfDelegate }: instantMeetProps) {
     console.log("Modal details: ", modalData);
 
     const requestData = {
-      dao_name: modalData.dao_name,
+      dao_name: daoName,
       slot_time: dateInfo,
       title: modalData.title,
       description: modalData.description,
@@ -113,11 +113,18 @@ function InstantMeet({ isDelegate, selfDelegate }: instantMeetProps) {
       console.error("Error:", error);
     }
     setModalData({
-      dao_name: "",
       title: "",
       description: "",
     });
   };
+
+  useEffect(() => {
+    if (chain?.name === "Optimism") {
+      setDaoName("optimism");
+    } else if (chain?.name === "Arbitrum One") {
+      setDaoName("arbitrum");
+    }
+  }, [chain]);
 
   const block = [
     {
@@ -254,19 +261,10 @@ function InstantMeet({ isDelegate, selfDelegate }: instantMeetProps) {
                 required
               />
 
-              <div className="px-1 font-medium">Select DAO:</div>
-              <select
-                required
-                className="outline-none bg-[#D9D9D945] rounded-md px-2 py-1 text-sm"
-                onChange={handleModalInputChange}
-                name="dao_name"
-              >
-                <option selected disabled>
-                  Select DAO
-                </option>
-                <option value="optimism">Optimism</option>
-                <option value="arbitrum">Arbitrum</option>
-              </select>
+              <div className="px-1 font-medium">Selected DAO:</div>
+              <div className="outline-none bg-[#D9D9D945] rounded-md px-2 py-1 text-sm capitalize">
+                {daoName}
+              </div>
             </ModalBody>
             <ModalFooter>
               <Button
