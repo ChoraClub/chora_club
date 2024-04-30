@@ -110,13 +110,14 @@ function SpecificDelegate({ props }: { props: Type }) {
             `https://discord.com/${details.data.delegate.githubHandle}`
           );
         }
+        setIsPageLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
+        setIsPageLoading(false);
       }
     };
 
     fetchData();
-    setIsPageLoading(false);
   }, []);
 
   useEffect(() => {
@@ -145,12 +146,13 @@ function SpecificDelegate({ props }: { props: Type }) {
           console.log("Delegate comparison: ", delegateTx, addressFromUrl);
           setSelfDelegate(true);
         }
+        setIsPageLoading(false);
       } catch (error) {
         console.error("Error in reading contract", error);
+        setIsPageLoading(false);
       }
     };
     checkDelegateStatus();
-    setIsPageLoading(false);
   }, []);
 
   // if (isPageLoading) {

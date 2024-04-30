@@ -198,6 +198,8 @@ function InstantMeet({ isDelegate, selfDelegate }: instantMeetProps) {
                             width={60}
                             src={data.image}
                             className=" transition duration-300 ease-in-out transform hover:scale-105"
+                            quality={100}
+                            priority
                           />
                         </div>
                         <div className="p-2">
@@ -211,7 +213,7 @@ function InstantMeet({ isDelegate, selfDelegate }: instantMeetProps) {
             </div>
             <div className="col-span-3 flex flex-col px-6">
               <div className="">
-                <Image alt="img7" src={heroImg} />
+                <Image alt="img7" src={heroImg} quality={100} priority />
               </div>
               <div className="text-center transition-transform transform hover:scale-105 duration-300">
                 <button

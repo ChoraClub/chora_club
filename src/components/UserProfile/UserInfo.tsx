@@ -156,9 +156,7 @@ function UserInfo({
             ) {
               officehoursHostingCount++;
             }
-            {
-              officehoursHostingCount++;
-            }
+
             // console.log("office hours host count: ", officehoursHostingCount);
             setOfficehoursHostCount(officehoursHostingCount);
             setOfficeHoursHostedLoading(false);

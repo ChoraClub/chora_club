@@ -248,10 +248,16 @@ SessionTileProps) {
         sessionDetails.map((data: SessionData, index: any) => (
           <div
             key={index}
-            className="flex p-5 rounded-[2rem] cursor-pointer justify-between"
+            className={`flex p-5 rounded-[2rem] cursor-pointer justify-between ${
+              isEvent === "Recorded" ? "cursor-pointer" : ""
+            }`}
             style={{ boxShadow: "0px 4px 26.7px 0px rgba(0, 0, 0, 0.10)" }}
             // onClick={() => openModal(index)}
-            onClick={() => router.push(`/watch/${data.meetingId}`)}
+            onClick={
+              isEvent === "Recorded"
+                ? () => router.push(`/watch/${data.meetingId}`)
+                : () => null
+            }
           >
             <div className="flex">
               <Image
@@ -340,7 +346,8 @@ SessionTileProps) {
                         ariaLabel="oval-loading"
                       />
                     </div>
-                  ) : data.attendees[0].onchain_attendee_uid || isClaimed[index] ? (
+                  ) : data.attendees[0].onchain_attendee_uid ||
+                    isClaimed[index] ? (
                     "Claimed"
                   ) : (
                     "Claim"
@@ -363,7 +370,9 @@ SessionTileProps) {
                     });
                   }}
                   disabled={
-                    !!data.onchain_host_uid || isClaiming[index] || isClaimed[index]
+                    !!data.onchain_host_uid ||
+                    isClaiming[index] ||
+                    isClaimed[index]
                   }
                 >
                   {isClaiming[index] ? (
