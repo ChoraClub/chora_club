@@ -42,15 +42,15 @@ interface MyError {
 // const allowedOrigin = "http://localhost:3000";
 const allowedOrigin = process.env.NEXTAUTH_URL;
 
-const url = process.env.NEXT_PUBLIC_ATTESTATION_URL;
-// Set up your ethers provider and signer
-const provider = new ethers.JsonRpcProvider(url, undefined, {
-  staticNetwork: true,
-});
-const privateKey = process.env.PVT_KEY ?? "";
-const signer = new ethers.Wallet(privateKey, provider);
-const eas = new EAS("0x4200000000000000000000000000000000000021");
-eas.connect(signer);
+// const url = process.env.NEXT_PUBLIC_ATTESTATION_URL;
+// // Set up your ethers provider and signer
+// const provider = new ethers.JsonRpcProvider(url, undefined, {
+//   staticNetwork: true,
+// });
+// const privateKey = process.env.PVT_KEY ?? "";
+// const signer = new ethers.Wallet(privateKey, provider);
+// const eas = new EAS("0x4200000000000000000000000000000000000021");
+// eas.connect(signer);
 
 export async function POST(req: NextRequest, res: NextResponse) {
   const origin = req.headers.get("Origin");
@@ -69,6 +69,23 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
   try {
     console.log("log2");
+
+    const atstUrl =
+      requestData.daoName === "optimism"
+        ? process.env.NEXT_PUBLIC_OP_ATTESTATION_URL
+        : requestData.daoName === "arbitrum"
+        ? process.env.NEXT_PUBLIC_ARB_ATTESTATION_URL
+        : "";
+
+    // Set up your ethers provider and signer
+    const provider = new ethers.JsonRpcProvider(atstUrl, undefined, {
+      staticNetwork: true,
+    });
+    const privateKey = process.env.PVT_KEY ?? "";
+    const signer = new ethers.Wallet(privateKey, provider);
+    const eas = new EAS("0x4200000000000000000000000000000000000021");
+    eas.connect(signer);
+
     // Your initialization code remains the same
     const offchain = await eas.getOffchain();
     console.log(offchain);
