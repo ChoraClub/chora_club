@@ -152,6 +152,7 @@ SessionTileProps) {
       meetingType: meetingType,
       startTime: meetingStartTime,
       endTime: meetingEndTime,
+      daoName: dao,
     };
 
     // Configure the request options
