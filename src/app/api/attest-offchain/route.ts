@@ -31,6 +31,7 @@ interface AttestOffchainRequestBody {
   meetingType: number;
   startTime: number;
   endTime: number;
+  daoName: string;
 }
 
 interface MyError {
@@ -119,7 +120,13 @@ export async function POST(req: NextRequest, res: NextResponse) {
       signer: await signer.getAddress(),
     };
 
-    const baseUrl = "https://optimism.easscan.org";
+    let baseUrl = "";
+
+    if (requestData.daoName === "optimism") {
+      baseUrl = "https://optimism.easscan.org";
+    } else if (requestData.daoName) {
+      baseUrl = "https://arbitrum.easscan.org";
+    }
     const url = baseUrl + createOffchainURL(pkg);
 
     const data = {

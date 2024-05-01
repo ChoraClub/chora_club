@@ -101,7 +101,7 @@ function WatchComponentMain({ props }: { props: { id: string } }) {
                             data.dao_name === "optimism" || "Optimism"
                               ? `https://optimism.easscan.org/offchain/attestation/view/${data.uid_host}`
                               : data.dao_name === "arbitrum" || "Arbitrum"
-                              ? `https://optimism.easscan.org/offchain/attestation/view/${data.uid_host}`
+                              ? `https://arbitrum.easscan.org"/offchain/attestation/view/${data.uid_host}`
                               : ""
                           }
                           target="_blank"
@@ -119,7 +119,7 @@ function WatchComponentMain({ props }: { props: { id: string } }) {
                             data.dao_name === "optimism" || "Optimism"
                               ? `https://optimism.easscan.org/attestation/view/${data.onchain_host_uid}`
                               : data.dao_name === "arbitrum" || "Arbitrum"
-                              ? `https://optimism.easscan.org/attestation/view/${data.onchain_host_uid}`
+                              ? `https://arbitrum.easscan.org/attestation/view/${data.onchain_host_uid}`
                               : ""
                           }
                           target="_blank"
@@ -145,7 +145,7 @@ function WatchComponentMain({ props }: { props: { id: string } }) {
                                 data.dao_name === "optimism" || "Optimism"
                                   ? `https://optimism.easscan.org/offchain/attestation/view/${attendee.attendee_uid}`
                                   : data.dao_name === "arbitrum" || "Arbitrum"
-                                  ? `https://optimism.easscan.org/offchain/attestation/view/${attendee.attendee_uid}`
+                                  ? `https://arbitrum.easscan.org/offchain/attestation/view/${attendee.attendee_uid}`
                                   : ""
                               }
                               target="_blank"
@@ -164,7 +164,7 @@ function WatchComponentMain({ props }: { props: { id: string } }) {
                                 data.dao_name === "optimism" || "Optimism"
                                   ? `https://optimism.easscan.org/attestation/view/${attendee.onchain_attendee_uid}`
                                   : data.dao_name === "arbitrum" || "Arbitrum"
-                                  ? `https://optimism.easscan.org/attestation/view/${attendee.onchain_attendee_uid}`
+                                  ? `https://arbitrum.easscan.org/attestation/view/${attendee.onchain_attendee_uid}`
                                   : ""
                               }
                               target="_blank"

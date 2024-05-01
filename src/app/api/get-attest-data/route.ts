@@ -75,7 +75,8 @@ export async function POST(req: NextRequest, res: NextResponse) {
         `${roomId}/${token}`,
         3,
         data.startTime,
-        data.endTime
+        data.endTime,
+        data.dao_name
       );
       for (const participant of data.participants) {
         await delegateAndSetAttestation(
@@ -83,7 +84,8 @@ export async function POST(req: NextRequest, res: NextResponse) {
           `${roomId}/${token}`,
           4,
           data.startTime,
-          data.endTime
+          data.endTime,
+          data.dao_name
         );
       }
     } else if (data.meetingType === "session") {
@@ -94,7 +96,8 @@ export async function POST(req: NextRequest, res: NextResponse) {
         `${roomId}/${token}`,
         1,
         data.startTime,
-        data.endTime
+        data.endTime,
+        data.dao_name
       );
       for (const participant of data.participants) {
         await delegateAndSetAttestation(
@@ -102,7 +105,8 @@ export async function POST(req: NextRequest, res: NextResponse) {
           `${roomId}/${token}`,
           2,
           data.startTime,
-          data.endTime
+          data.endTime,
+          data.dao_name
         );
       }
     }
@@ -129,7 +133,8 @@ async function delegateAndSetAttestation(
   meetingId: string,
   meetingType: number,
   startTime: number,
-  endTime: number
+  endTime: number,
+  daoName: string
 ) {
   await delegateAttestationOnchain({
     recipient,
@@ -137,5 +142,6 @@ async function delegateAndSetAttestation(
     meetingType,
     startTime,
     endTime,
+    daoName,
   });
 }
