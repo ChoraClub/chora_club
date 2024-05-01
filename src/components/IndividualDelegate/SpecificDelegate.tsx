@@ -344,10 +344,8 @@ function SpecificDelegate({ props }: { props: Type }) {
 
                 <div className="flex items-center py-1">
                   <div>
-                    {props.individualDelegate.substring(0, 6)} ...{" "}
-                    {props.individualDelegate.substring(
-                      props.individualDelegate.length - 4
-                    )}
+                    {props.individualDelegate.slice(0, 6)} ...{" "}
+                    {props.individualDelegate.slice(-4)}
                   </div>
 
                   <Tooltip
