@@ -139,11 +139,14 @@ SessionTileProps) {
     // const address = await walletClient.getAddresses();
     // console.log(address);
     let token = "";
+    let EASContractAddress = "";
 
     if (dao === "optimism") {
       token = "OP";
+      EASContractAddress = "0x4200000000000000000000000000000000000021";
     } else if (dao === "arbitrum") {
       token = "ARB";
+      EASContractAddress = "0xbD75f629A22Dc1ceD33dDA0b68c546A1c035c458";
     }
 
     const data = {
@@ -178,7 +181,7 @@ SessionTileProps) {
       const attestationObject = await res.json();
 
       // console.log(attestationObject);
-      const EASContractAddress = "0x4200000000000000000000000000000000000021";
+
       const eas = new EAS(EASContractAddress);
       const signer = await provider.getSigner();
       console.log("the wallet2 obj", signer);

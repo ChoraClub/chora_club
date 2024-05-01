@@ -76,16 +76,25 @@ export async function POST(req: NextRequest, res: NextResponse) {
         : requestData.daoName === "arbitrum"
         ? process.env.NEXT_PUBLIC_ARB_ATTESTATION_URL
         : "";
-
+    console.log("atstUrl", atstUrl);
     // Set up your ethers provider and signer
     const provider = new ethers.JsonRpcProvider(atstUrl, undefined, {
       staticNetwork: true,
     });
     const privateKey = process.env.PVT_KEY ?? "";
     const signer = new ethers.Wallet(privateKey, provider);
-    const eas = new EAS("0x4200000000000000000000000000000000000021");
-    eas.connect(signer);
+    console.log("signer", signer);
 
+    const EASContractAddress =
+      requestData.daoName === "optimism"
+        ? "0x4200000000000000000000000000000000000021"
+        : requestData.daoName === "arbitrum"
+        ? "0xbD75f629A22Dc1ceD33dDA0b68c546A1c035c458"
+        : "";
+    const eas = new EAS(EASContractAddress);
+
+    eas.connect(signer);
+    console.log("Connected");
     // Your initialization code remains the same
     const offchain = await eas.getOffchain();
     console.log(offchain);

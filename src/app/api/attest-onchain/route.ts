@@ -83,7 +83,13 @@ export async function POST(req: NextRequest, res: NextResponse) {
     });
     const privateKey = process.env.PVT_KEY ?? "";
     const signer = new ethers.Wallet(privateKey, provider);
-    const eas = new EAS("0x4200000000000000000000000000000000000021");
+    const EASContractAddress =
+      requestData.daoName === "optimism"
+        ? "0x4200000000000000000000000000000000000021"
+        : requestData.daoName === "arbitrum"
+        ? "0xbD75f629A22Dc1ceD33dDA0b68c546A1c035c458"
+        : "";
+    const eas = new EAS(EASContractAddress);
     eas.connect(signer);
 
     const schemaEncoder = new SchemaEncoder(
