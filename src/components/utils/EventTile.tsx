@@ -31,7 +31,7 @@ interface TileProps {
     meetingId: string;
     dao_name: string;
     booking_status: string;
-    meeting_status: boolean;
+    meeting_status: string;
     joined_status: boolean;
     attendees: Attendee[];
     host_address: string;
