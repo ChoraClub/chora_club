@@ -301,10 +301,10 @@
   dependencies:
     hardhat "2.22.1"
 
-"@ethereum-attestation-service/eas-sdk@^2.1.2":
-  version "2.1.2"
-  resolved "https://registry.yarnpkg.com/@ethereum-attestation-service/eas-sdk/-/eas-sdk-2.1.2.tgz#4aba0fe11c9d1fd449b1b6a6ad3a3af7e055c8e7"
-  integrity sha512-c+hQgPrVuMcSRqaiRqf0HIvtfLODA9IHcFf2NYMM6P06p7XAFu78nfSfijE7qCwHtIgJLvfI4Jm3vkuVzhv3bw==
+"@ethereum-attestation-service/eas-sdk@^2.1.4":
+  version "2.1.4"
+  resolved "https://registry.yarnpkg.com/@ethereum-attestation-service/eas-sdk/-/eas-sdk-2.1.4.tgz#f034d64b4dbc234eb4c97933c6839420119b8c9f"
+  integrity sha512-y35b6EQVEsZojbhv8TM//kp4OlwJi5SfApsNkRPxpivWWpOT2kOSCHoOj6oAtEyOC4EJ9sTx/ssgSok1c7jdRA==
   dependencies:
     "@ethereum-attestation-service/eas-contracts" "1.4.1"
     ethers "^6.11.1"
@@ -10079,6 +10079,7 @@ workerpool@6.2.1:
   integrity sha512-ILEIE97kDZvF9Wb9f6h5aXK4swSlKGUcOEGiIYb2OOu/IrDU9iwj0fD//SsA6E5ibwJxpEvhullJY4Sl4GcpAw==
 
 "wrap-ansi-cjs@npm:wrap-ansi@^7.0.0", wrap-ansi@^7.0.0:
+  name wrap-ansi-cjs
   version "7.0.0"
   resolved "https://registry.npmjs.org/wrap-ansi/-/wrap-ansi-7.0.0.tgz"
   integrity sha512-YVGIj2kamLSTxw6NsZjoBxfSwsn0ycdesmc4p+Q21c5zPuZ1pl+NfxVdxPtdHvmNVOQ6XSYG4AUtyt/Fi7D16Q==
