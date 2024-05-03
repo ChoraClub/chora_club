@@ -15,7 +15,8 @@ const nextConfig = {
       "s3.hj",
       "gateway.lighthouse.storage",
       "static.tally.xyz",
-      "ugc.production.linktr.ee"
+      "ugc.production.linktr.ee",
+      'i.imgur.com'
     ],
   },
   reactStrictMode: false,

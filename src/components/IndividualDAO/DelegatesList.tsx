@@ -19,6 +19,7 @@ import dao_abi from "../../artifacts/Dao.sol/GovernanceToken.json";
 import { useAccount } from "wagmi";
 import WalletAndPublicClient from "@/helpers/signer";
 
+
 function DelegatesList({ props }: { props: string }) {
   const [delegateData, setDelegateData] = useState<any>({ delegates: [] });
   const { openChainModal } = useChainModal();
@@ -36,6 +37,8 @@ function DelegatesList({ props }: { props: string }) {
   const searchParams = useSearchParams();
   const [isShowing, setIsShowing] = useState(true);
   const [isSearching, setIsSearching] = useState<boolean>(false);
+  const [circlePosition, setCirclePosition] = useState({ x: 0, y: 0 });
+  const [clickedTileIndex,setClickedTileIndex]=useState(null);
 
   const handleClose = () => {
     setIsShowing(false);
@@ -129,6 +132,22 @@ function DelegatesList({ props }: { props: string }) {
     copy(addr);
     toast("Address Copied");
   };
+  const handleMouseMove = (event:any,index:any) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+
+    setCirclePosition({ x, y });
+    setClickedTileIndex(index);
+    console.log(circlePosition);
+      
+    setTimeout(() => {
+      setClickedTileIndex(null);
+    }, 1500); // Adjust the time as needed
+
+
+  };
+
 
   const WalletOpen = async (to: string) => {
     const adr = await walletClient.getAddresses();
@@ -302,19 +321,33 @@ function DelegatesList({ props }: { props: string }) {
             />
           </div>
         ) : delegateData.delegates.length > 0 ? (
-          <div>
-            <div className="grid min-[475px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-10 ">
+          <div> 
+            <div className="grid min-[475px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-10">
               {delegateData.delegates.map((daos: any, index: number) => (
                 <div
-                  onClick={() =>
+                  onClick={(event) =>{
+                    handleMouseMove(event,index);
                     router.push(`/${props}/${daos.publicAddress}?active=info  `)
-                  }
+                  }}
                   key={index}
                   style={{
                     boxShadow: "0px 4px 50.8px 0px rgba(0, 0, 0, 0.11)",
                   }}
-                  className="px-5 py-7 rounded-2xl flex flex-col justify-between cursor-pointer"
+                  
+                  className="px-5 py-7 rounded-2xl flex flex-col justify-between cursor-pointer relative"
                 >
+                  {clickedTileIndex === index && (
+                    <div
+                    className="absolute bg-blue-200 rounded-full animate-ping"
+                    style={{
+                    width: "30px",
+                    height: "30px",
+                    left: `${circlePosition.x -10}px`,
+                    top: `${circlePosition.y - 10}px`,
+                    zIndex: "9999",
+                   }}
+                   ></div>
+                  )}
                   <div>
                     <div className="flex justify-center relative">
                       <Image
@@ -423,6 +456,7 @@ function DelegatesList({ props }: { props: string }) {
                 </div>
               ))}
             </div>
+            
             {isDataLoading && (
               <div className="flex items-center justify-center my-4">
                 <RotatingLines

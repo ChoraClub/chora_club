@@ -10,6 +10,7 @@ import { ImCross } from "react-icons/im";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { FaCirclePlus } from "react-icons/fa6";
 import Link from "next/link";
+import ButtonWithCircle from "../Circle/ButtonWithCircle";
 
 function ExploreDAOs() {
   const dao_info = [
@@ -25,6 +26,8 @@ function ExploreDAOs() {
   const [showNotification, setShowNotification] = useState(true);
   const [isPageLoading, setIsPageLoading] = useState(true);
   const [isHovered, setIsHovered] = useState(false);
+  const [circlePosition, setCirclePosition] = useState({ x: 0, y: 0 });
+  const [IshowCircle,SetCircleShow]=useState(false);
 
   useEffect(() => {
     const storedStatus = sessionStorage.getItem("notificationStatus");
@@ -59,6 +62,20 @@ function ExploreDAOs() {
     setStatus(false);
     localStorage.setItem("hasSeenNotification", "true");
   };
+  // const coursercall=(event)=>{
+  //   const rect = event.currentTarget.getBoundingClientRect();
+  //   const x = event.clientX - rect.left;
+  //   const y = event.clientY - rect.top;
+
+  //   setCirclePosition({ x, y });
+  //   SetCircleShow(true);
+  //   console.log(circlePosition);
+      
+  //   setTimeout(() => {
+  //     SetCircleShow(false);
+  //   }, 1000); // Adjust the time as needed
+
+  // }
 
   return (
     <div className="pt-6 pl-14 pr-6">
@@ -86,9 +103,13 @@ function ExploreDAOs() {
           <div className="text-blue-shade-200 font-medium text-4xl font-quanty pb-4">
             Explore DAOs
           </div>
+          
           <div>
-            <ConnectButton />
+          <ButtonWithCircle>
+            <ConnectButton/>
+          </ButtonWithCircle>
           </div>
+          
         </div>
 
         <div

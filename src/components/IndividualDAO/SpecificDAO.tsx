@@ -8,6 +8,7 @@ import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import OPLogo from "@/assets/images/daos/op.png";
 import ARBLogo from "@/assets/images/daos/arbitrum.jpg";
+import ButtonWithCircle from "../Circle/ButtonWithCircle";
 
 const desc = {
   optimism:
@@ -160,7 +161,9 @@ function SpecificDAO({ props }: { props: { daoDelegates: string } }) {
           </div>
 
           <div>
+            <ButtonWithCircle>
             <ConnectButton />
+            </ButtonWithCircle>
           </div>
         </div>
         <div className="py-5 pr-8">
