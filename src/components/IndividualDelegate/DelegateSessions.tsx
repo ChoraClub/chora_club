@@ -48,6 +48,7 @@ function DelegateSessions({ props }: { props: Type }) {
 
       const raw = JSON.stringify({
         dao_name: dao_name,
+        address: props.individualDelegate,
       });
       // console.log("raw", raw);
       const requestOptions: any = {

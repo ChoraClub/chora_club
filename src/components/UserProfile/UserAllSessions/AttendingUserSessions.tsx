@@ -70,23 +70,14 @@ function AttendingUserSessions() {
           let filteredData: any = resultData;
           if (searchParams.get("session") === "attending") {
             filteredData = resultData.filter((session: Session) => {
-              return session.attendees?.some(
-                (attendee) => attendee.attendee_address === address
-              ) &&
+              return (
+                // session.attendees?.some(
+                //   (attendee) => attendee.attendee_address === address
+                // ) &&
                 session.meeting_status !== "Recorded" &&
-                // chain?.name === "Optimism"
-                // ? session.dao_name === "optimism"
-                // : chain?.name === "Arbitrum One"
-                // ? session.dao_name === "arbitrum"
-                // : ""
-                // &&
                 new Date(session.slot_time).toLocaleString() >=
-                  currentSlot.toLocaleString() &&
-                chain?.name === "Optimism"
-                ? session.dao_name === "optimism"
-                : chain?.name === "Arbitrum One"
-                ? session.dao_name === "arbitrum"
-                : "";
+                  currentSlot.toLocaleString()
+              );
             });
           }
           console.log("filtered in attending", filteredData);
@@ -94,21 +85,6 @@ function AttendingUserSessions() {
           setPageLoading(false);
         }
       }
-
-      // if (result.success) {
-      //   let filteredData: any = result.data;
-      //   filteredData = result.data.filter((session: any) => {
-      //     return chain?.name === "Optimism"
-      //       ? session.dao_name === "optimism"
-      //       : chain?.name === "Arbitrum One"
-      //       ? session.dao_name === "arbitrum"
-      //       : "";
-      //   });
-      //   setSessionDetails(filteredData);
-      //   setPageLoading(false);
-      // } else {
-      //   setPageLoading(false);
-      // }
     } catch (error) {
       console.log("error in catch", error);
     }
