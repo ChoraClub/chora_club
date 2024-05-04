@@ -15,7 +15,7 @@ function DelegateSessionsMain() {
 
   return (
     <>
-      <div className="pt-6 pl-14 pr-6">
+      <div className="py-10 pl-14 pr-6">
         <div className="flex justify-between pe-10">
           <div className="flex font-quanty font-medium text-4xl text-blue-shade-200 pb-4 items-center">
             <div>

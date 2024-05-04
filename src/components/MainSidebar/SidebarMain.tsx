@@ -77,7 +77,12 @@ function Sidebar() {
     <div className="py-6 h-full">
       <div className="flex flex-col h-full justify-between">
         <div className="flex flex-col items-center gap-y-4 pb-5">
-          <Image src={logo} alt={"image"} width={40}></Image>
+          <Image
+            src={logo}
+            alt={"image"}
+            width={40}
+            className="xl:w-11 xl:h-11 2xl:w-14 2xl:h-14 2.5xl:w-16 2.5xl:h-16"
+          ></Image>
           <Tooltip
             content="DAOs"
             placement="right"
@@ -90,7 +95,7 @@ function Sidebar() {
                 src={rocket}
                 alt={"image"}
                 width={40}
-                className={`cursor-pointer ${
+                className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-14 2xl:h-14 2.5xl:w-16 2.5xl:h-16 ${
                   pathname.endsWith(`/`)
                     ? "border-white border-2 rounded-full"
                     : ""
@@ -110,7 +115,7 @@ function Sidebar() {
                 src={office}
                 alt={"image"}
                 width={40}
-                className={`cursor-pointer  ${
+                className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-14 2xl:h-14 2.5xl:w-16 2.5xl:h-16 ${
                   pathname.includes(`/office-hours`)
                     ? "border-white border-2 rounded-full"
                     : ""
@@ -131,7 +136,7 @@ function Sidebar() {
                 alt={"image"}
                 width={40}
                 height={40}
-                className={`cursor-pointer  ${
+                className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-14 2xl:h-14 2.5xl:w-16 2.5xl:h-16 ${
                   pathname.includes(`/available-delegates`)
                     ? "border-white border-2 rounded-full"
                     : ""
@@ -173,7 +178,7 @@ function Sidebar() {
                         width={80}
                         height={80}
                         alt="image"
-                        className={`w-10 h-10 rounded-full cursor-pointer ${
+                        className={`w-10 h-10 xl:w-11 xl:h-11 2xl:w-14 2xl:h-14 2.5xl:w-16 2.5xl:h-16 rounded-full cursor-pointer ${
                           pathname.includes(`/${data[0]}`)
                             ? "border-white border-[2.5px]"
                             : ""
@@ -198,7 +203,12 @@ function Sidebar() {
             closeDelay={1}
           >
             <Link href={"https://docs.chora.club/"} target="_blank">
-              <Image src={gitbook} alt={"image"} width={40} />
+              <Image
+                src={gitbook}
+                alt={"image"}
+                width={40}
+                className="xl:w-11 xl:h-11 2xl:w-14 2xl:h-14 2.5xl:w-16 2.5xl:h-16"
+              />
             </Link>
           </Tooltip>
 
@@ -214,7 +224,7 @@ function Sidebar() {
                   src={user}
                   alt={"image"}
                   width={40}
-                  className="cursor-pointer"
+                  className="cursor-pointer xl:w-11 xl:h-11 2xl:w-14 2xl:h-14 2.5xl:w-16 2.5xl:h-16"
                 />
               ) : (
                 <ConnectWallet />
@@ -231,7 +241,7 @@ function Sidebar() {
                 src={user}
                 alt={"image"}
                 width={40}
-                className={`cursor-pointer`}
+                className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-14 2xl:h-14 2.5xl:w-16 2.5xl:h-16`}
                 onClick={() => router.push(`/profile/${address}?active=info`)}
               />
             </Tooltip>

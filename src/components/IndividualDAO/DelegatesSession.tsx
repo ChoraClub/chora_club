@@ -56,6 +56,7 @@ function DelegatesSession({ props }: { props: string }) {
           redirect: "follow",
           body: JSON.stringify({
             dao_name: dao_name,
+            address: "",
           }),
         };
 

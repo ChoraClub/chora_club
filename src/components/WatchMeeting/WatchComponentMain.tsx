@@ -98,10 +98,10 @@ function WatchComponentMain({ props }: { props: { id: string } }) {
                       {data.uid_host ? (
                         <a
                           href={
-                            data.dao_name === "optimism" || "Optimism"
+                            data.dao_name === ("optimism" || "Optimism")
                               ? `https://optimism.easscan.org/offchain/attestation/view/${data.uid_host}`
-                              : data.dao_name === "arbitrum" || "Arbitrum"
-                              ? `https://optimism.easscan.org/offchain/attestation/view/${data.uid_host}`
+                              : data.dao_name === ("arbitrum" || "Arbitrum")
+                              ? `https://arbitrum.easscan.org"/offchain/attestation/view/${data.uid_host}`
                               : ""
                           }
                           target="_blank"
@@ -116,10 +116,10 @@ function WatchComponentMain({ props }: { props: { id: string } }) {
                       {data.onchain_host_uid ? (
                         <a
                           href={
-                            data.dao_name === "optimism" || "Optimism"
+                            data.dao_name === ("optimism" || "Optimism")
                               ? `https://optimism.easscan.org/attestation/view/${data.onchain_host_uid}`
-                              : data.dao_name === "arbitrum" || "Arbitrum"
-                              ? `https://optimism.easscan.org/attestation/view/${data.onchain_host_uid}`
+                              : data.dao_name === ("arbitrum" || "Arbitrum")
+                              ? `https://arbitrum.easscan.org/attestation/view/${data.onchain_host_uid}`
                               : ""
                           }
                           target="_blank"
@@ -142,10 +142,10 @@ function WatchComponentMain({ props }: { props: { id: string } }) {
                           {attendee.attendee_uid ? (
                             <a
                               href={
-                                data.dao_name === "optimism" || "Optimism"
+                                data.dao_name === ("optimism" || "Optimism")
                                   ? `https://optimism.easscan.org/offchain/attestation/view/${attendee.attendee_uid}`
-                                  : data.dao_name === "arbitrum" || "Arbitrum"
-                                  ? `https://optimism.easscan.org/offchain/attestation/view/${attendee.attendee_uid}`
+                                  : data.dao_name === ("arbitrum" || "Arbitrum")
+                                  ? `https://arbitrum.easscan.org/offchain/attestation/view/${attendee.attendee_uid}`
                                   : ""
                               }
                               target="_blank"
@@ -161,10 +161,10 @@ function WatchComponentMain({ props }: { props: { id: string } }) {
                           {attendee.onchain_attendee_uid ? (
                             <a
                               href={
-                                data.dao_name === "optimism" || "Optimism"
+                                data.dao_name === ("optimism" || "Optimism")
                                   ? `https://optimism.easscan.org/attestation/view/${attendee.onchain_attendee_uid}`
-                                  : data.dao_name === "arbitrum" || "Arbitrum"
-                                  ? `https://optimism.easscan.org/attestation/view/${attendee.onchain_attendee_uid}`
+                                  : data.dao_name === ("arbitrum" || "Arbitrum")
+                                  ? `https://arbitrum.easscan.org/attestation/view/${attendee.onchain_attendee_uid}`
                                   : ""
                               }
                               target="_blank"

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { DateTime } from "luxon";
-import { useAccount } from "wagmi";
+import { useAccount, useNetwork } from "wagmi";
 import toast, { Toaster } from "react-hot-toast";
 import { Oval } from "react-loader-spinner";
 import { FaCircleInfo } from "react-icons/fa6";
@@ -30,8 +30,8 @@ function ScheduledUserSessions() {
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
   const [allowedDates, setAllowedDates] = useState<any>([]);
-  const [daoName, setDaoName] = useState("optimism");
-
+  const [daoName, setDaoName] = useState("");
+  const { chain, chains } = useNetwork();
   const [utcStartTime, setUtcStartTime] = useState("");
   const [utcEndTime, setUtcEndTime] = useState("");
 
@@ -275,6 +275,14 @@ function ScheduledUserSessions() {
     setModalOpen(false);
   };
 
+  useEffect(() => {
+    if (chain && chain?.name === "Optimism") {
+      setDaoName("optimism");
+    } else if (chain && chain?.name === "Arbitrum One") {
+      setDaoName("arbitrum");
+    }
+  }, [chain, chain?.name]);
+
   return (
     <>
       <div
@@ -302,14 +310,15 @@ function ScheduledUserSessions() {
               </span>
             </Tooltip>
           </label>
-          <select
-            value={daoName}
-            onChange={(e) => setDaoName(e.target.value)}
-            className="border border-gray-300 rounded px-3 py-2 mt-1 w-full"
+          <div
+            // value={daoName}
+            // onChange={(e) => setDaoName(e.target.value)}
+            className="border border-gray-300 rounded px-3 py-2 mt-1 w-full capitalize"
           >
-            <option value="optimism">Optimism</option>
-            <option value="arbitrum">Arbitrum</option>
-          </select>
+            {daoName}
+            {/* <option value="optimism">Optimism</option>
+            <option value="arbitrum">Arbitrum</option> */}
+          </div>
         </div>
 
         <div className="mb-4">
@@ -373,7 +382,6 @@ function ScheduledUserSessions() {
           />
         </div>
 
-       
         <div className="flex flex-col mb-4">
           <div className="">
             <label className="text-gray-700 font-semibold flex items-center">

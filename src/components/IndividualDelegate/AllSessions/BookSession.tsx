@@ -178,6 +178,7 @@ function BookSession({ props }: { props: Type }) {
       description: modalData.description,
       host_address: host_address,
       attendees: [{ attendee_address: address }],
+      meeting_status: "",
       booking_status: "Pending",
       session_type: "session",
     };

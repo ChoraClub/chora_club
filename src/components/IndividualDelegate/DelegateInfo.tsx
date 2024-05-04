@@ -13,8 +13,8 @@ interface Type {
   individualDelegate: string;
 }
 
-function DelegateInfo({ props }: { props: Type }) {
-  const [description, setDescription] = useState<string>();
+function DelegateInfo({ props, desc }: { props: Type; desc: string }) {
+  const [karmaDescription, setKarmaDescription] = useState<string>();
   const [loading, setLoading] = useState(true);
   const [isDataLoading, setDataLoading] = useState(true);
   const router = useRouter();
@@ -231,7 +231,7 @@ function DelegateInfo({ props }: { props: Type }) {
         const details = await res.json();
         // console.log("Desc: ", details.data.delegatePitch.customFields[1].value);
         setLoading(false);
-        setDescription(details.data.delegatePitch.customFields[1].value);
+        setKarmaDescription(details.data.delegatePitch.customFields[1].value);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -300,7 +300,7 @@ function DelegateInfo({ props }: { props: Type }) {
       <div
         style={{ boxShadow: "0px 4px 30.9px 0px rgba(0, 0, 0, 0.12)" }}
         className={`rounded-xl my-7 me-32 py-6 px-7 text-sm ${
-          description ? "" : "min-h-48"
+          desc && karmaDescription ? "" : "min-h-52"
         }`}
       >
         {loading ? (
@@ -313,8 +313,10 @@ function DelegateInfo({ props }: { props: Type }) {
               ariaLabel="oval-loading"
             />
           </div>
-        ) : description ? (
-          description
+        ) : desc ? (
+          desc
+        ) : karmaDescription ? (
+          karmaDescription
         ) : (
           <div className="font-semibold text-base flex justify-center">
             Delegate has not provided a description

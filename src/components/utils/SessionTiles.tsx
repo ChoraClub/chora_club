@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Image, { StaticImageData } from "next/image";
 import { Oval } from "react-loader-spinner";
 import text2 from "@/assets/images/daos/texture2.png";
@@ -15,6 +15,7 @@ import {
 } from "@ethereum-attestation-service/eas-sdk";
 import { ethers } from "ethers";
 import { useNetwork, useAccount } from "wagmi";
+import styles from "./Tile.module.css";
 
 type Attendee = {
   attendee_address: string;
@@ -51,7 +52,7 @@ interface SessionData {
   meetingId: string;
   dao_name: string;
   booking_status: string;
-  meeting_status: boolean;
+  meeting_status: string;
   joined_status: boolean;
   attendees: Attendee[];
   host_address: string;
@@ -119,6 +120,16 @@ SessionTileProps) {
   };
 
   const [pageLoading, setPageLoading] = useState(true);
+  const [applyStyles, setApplyStyles] = useState(true);
+  const [expanded, setExpanded] = useState<{ [index: number]: boolean }>({});
+
+  const handleDescription = () => {
+    setApplyStyles(!applyStyles);
+  };
+
+  const toggleDescription = (index: number) => {
+    setExpanded((prev) => ({ ...prev, [index]: !prev[index] }));
+  };
 
   const handleAttestationOnchain = async ({
     meetingId,
@@ -139,11 +150,14 @@ SessionTileProps) {
     // const address = await walletClient.getAddresses();
     // console.log(address);
     let token = "";
+    let EASContractAddress = "";
 
     if (dao === "optimism") {
       token = "OP";
+      EASContractAddress = "0x4200000000000000000000000000000000000021";
     } else if (dao === "arbitrum") {
       token = "ARB";
+      EASContractAddress = "0xbD75f629A22Dc1ceD33dDA0b68c546A1c035c458";
     }
 
     const data = {
@@ -152,6 +166,7 @@ SessionTileProps) {
       meetingType: meetingType,
       startTime: meetingStartTime,
       endTime: meetingEndTime,
+      daoName: dao,
     };
 
     // Configure the request options
@@ -177,7 +192,7 @@ SessionTileProps) {
       const attestationObject = await res.json();
 
       // console.log(attestationObject);
-      const EASContractAddress = "0x4200000000000000000000000000000000000021";
+
       const eas = new EAS(EASContractAddress);
       const signer = await provider.getSigner();
       console.log("the wallet2 obj", signer);
@@ -185,7 +200,7 @@ SessionTileProps) {
       console.log("obj created");
       console.log("eas obj", eas);
       const schemaUID =
-        "0x98a9530fb8d7039c36f78e857b55f1c0e2d4caafa00d05dec37f4abef3e301b2";
+        "0xf9e214a80b66125cad64453abe4cef5263be3a7f01760d0cc72789236fca2b5d";
       const tx = await eas.attestByDelegation({
         schema: schemaUID,
         data: {
@@ -197,7 +212,7 @@ SessionTileProps) {
           data: attestationObject.delegatedAttestation.message.data,
         },
         signature: attestationObject.delegatedAttestation.signature,
-        attester: "0x8dEa0ad941d577e356745d758b30Fa11EFa28E80",
+        attester: "0x7B2C5f70d66Ac12A25cE4c851903436545F1b741",
       });
       const newAttestationUID = await tx.wait();
       console.log("New attestation UID: ", newAttestationUID);
@@ -242,16 +257,39 @@ SessionTileProps) {
     }
   };
 
+  const [isTextOverflow, setIsTextOverflow] = useState<{
+    [index: number]: boolean;
+  }>({});
+  const descriptionRefs = useRef<Array<HTMLDivElement | null>>([]);
+
+  useEffect(() => {
+    descriptionRefs.current.forEach((ref, index) => {
+      if (ref) {
+        const isOverflowing = ref.scrollHeight > ref.clientHeight;
+        setIsTextOverflow((prev) => ({
+          ...prev,
+          [index]: isOverflowing,
+        }));
+      }
+    });
+  }, [sessionDetails]);
+
   return (
     <div className="space-y-6">
       {sessionDetails.length > 0 ? (
         sessionDetails.map((data: SessionData, index: any) => (
           <div
             key={index}
-            className="flex p-5 rounded-[2rem] cursor-pointer justify-between"
+            className={`flex p-5 rounded-[2rem] cursor-pointer justify-between ${
+              isEvent === "Recorded" ? "cursor-pointer" : ""
+            }`}
             style={{ boxShadow: "0px 4px 26.7px 0px rgba(0, 0, 0, 0.10)" }}
             // onClick={() => openModal(index)}
-            onClick={() => router.push(`/watch/${data.meetingId}`)}
+            onClick={
+              isEvent === "Recorded"
+                ? () => router.push(`/watch/${data.meetingId}`)
+                : () => null
+            }
           >
             <div className="flex">
               <Image
@@ -304,7 +342,17 @@ SessionTileProps) {
                   </div>
                 </div>
 
-                <div className="text-[#1E1E1E] text-sm">{data.description}</div>
+                <div
+                  className={`text-[#1E1E1E] text-sm ${
+                    expanded[index] ? "" : `${styles.desc} cursor-pointer`
+                  }`}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    toggleDescription(index);
+                  }}
+                >
+                  {data.description}
+                </div>
               </div>
             </div>
 
@@ -340,7 +388,8 @@ SessionTileProps) {
                         ariaLabel="oval-loading"
                       />
                     </div>
-                  ) : data.attendees[0].onchain_attendee_uid || isClaimed[index] ? (
+                  ) : data.attendees[0].onchain_attendee_uid ||
+                    isClaimed[index] ? (
                     "Claimed"
                   ) : (
                     "Claim"
@@ -363,7 +412,9 @@ SessionTileProps) {
                     });
                   }}
                   disabled={
-                    !!data.onchain_host_uid || isClaiming[index] || isClaimed[index]
+                    !!data.onchain_host_uid ||
+                    isClaiming[index] ||
+                    isClaimed[index]
                   }
                 >
                   {isClaiming[index] ? (

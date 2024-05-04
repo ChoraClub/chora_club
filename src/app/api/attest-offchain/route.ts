@@ -31,6 +31,7 @@ interface AttestOffchainRequestBody {
   meetingType: number;
   startTime: number;
   endTime: number;
+  daoName: string;
 }
 
 interface MyError {
@@ -41,15 +42,15 @@ interface MyError {
 // const allowedOrigin = "http://localhost:3000";
 const allowedOrigin = process.env.NEXTAUTH_URL;
 
-const url = process.env.NEXT_PUBLIC_ATTESTATION_URL;
-// Set up your ethers provider and signer
-const provider = new ethers.JsonRpcProvider(url, undefined, {
-  staticNetwork: true,
-});
-const privateKey = process.env.PVT_KEY ?? "";
-const signer = new ethers.Wallet(privateKey, provider);
-const eas = new EAS("0x4200000000000000000000000000000000000021");
-eas.connect(signer);
+// const url = process.env.NEXT_PUBLIC_ATTESTATION_URL;
+// // Set up your ethers provider and signer
+// const provider = new ethers.JsonRpcProvider(url, undefined, {
+//   staticNetwork: true,
+// });
+// const privateKey = process.env.PVT_KEY ?? "";
+// const signer = new ethers.Wallet(privateKey, provider);
+// const eas = new EAS("0x4200000000000000000000000000000000000021");
+// eas.connect(signer);
 
 export async function POST(req: NextRequest, res: NextResponse) {
   const origin = req.headers.get("Origin");
@@ -68,6 +69,32 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
   try {
     console.log("log2");
+
+    const atstUrl =
+      requestData.daoName === "optimism"
+        ? process.env.NEXT_PUBLIC_OP_ATTESTATION_URL
+        : requestData.daoName === "arbitrum"
+        ? process.env.NEXT_PUBLIC_ARB_ATTESTATION_URL
+        : "";
+    console.log("atstUrl", atstUrl);
+    // Set up your ethers provider and signer
+    const provider = new ethers.JsonRpcProvider(atstUrl, undefined, {
+      staticNetwork: true,
+    });
+    const privateKey = process.env.PVT_KEY ?? "";
+    const signer = new ethers.Wallet(privateKey, provider);
+    console.log("signer", signer);
+
+    const EASContractAddress =
+      requestData.daoName === "optimism"
+        ? "0x4200000000000000000000000000000000000021"
+        : requestData.daoName === "arbitrum"
+        ? "0xbD75f629A22Dc1ceD33dDA0b68c546A1c035c458"
+        : "";
+    const eas = new EAS(EASContractAddress);
+
+    eas.connect(signer);
+    console.log("Connected");
     // Your initialization code remains the same
     const offchain = await eas.getOffchain();
     console.log(offchain);
@@ -101,7 +128,8 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
     const offchainAttestation = await offchain.signOffchainAttestation(
       {
-        schema: "0xf9e214a80b66125cad64453abe4cef5263be3a7f01760d0cc72789236fca2b5d",
+        schema:
+          "0xf9e214a80b66125cad64453abe4cef5263be3a7f01760d0cc72789236fca2b5d",
         recipient: requestData.recipient,
         time: currentTime,
         expirationTime: expirationTime,
@@ -118,7 +146,13 @@ export async function POST(req: NextRequest, res: NextResponse) {
       signer: await signer.getAddress(),
     };
 
-    const baseUrl = "https://optimism-sepolia.easscan.org";
+    let baseUrl = "";
+
+    if (requestData.daoName === "optimism") {
+      baseUrl = "https://optimism.easscan.org";
+    } else if (requestData.daoName) {
+      baseUrl = "https://arbitrum.easscan.org";
+    }
     const url = baseUrl + createOffchainURL(pkg);
 
     const data = {

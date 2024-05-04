@@ -34,6 +34,36 @@ const quanty = localFonts({
 //     icon: ["/favicon.png"],
 //   },
 // };
+export const metadata: Metadata = {
+  metadataBase: new URL("https://app.chora.club/"),
+  title: "Chora Club",
+  description: "Discover. Learn. Engage.",
+  icons: {
+    icon: ["/favicon.png"],
+  },
+  openGraph: {
+    title: "Chora Club",
+    description: "Discover. Learn. Engage.",
+    url: "https://app.chora.club/",
+    siteName: "Chora Club",
+    images: [
+      {
+        url: "https://gateway.lighthouse.storage/ipfs/QmZmWxpdhQZnag8HZtwZPLR5wtK2jjfgsTBMpNpmijtZ5x",
+        width: 800,
+        height: 600,
+        alt: "img",
+      },
+      {
+        url: "https://gateway.lighthouse.storage/ipfs/QmZmWxpdhQZnag8HZtwZPLR5wtK2jjfgsTBMpNpmijtZ5x",
+        width: 1800,
+        height: 1600,
+        alt: "img",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+};
 
 export default function RootLayout({
   children,

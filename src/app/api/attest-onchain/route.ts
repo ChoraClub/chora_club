@@ -24,12 +24,13 @@ interface MeetingRequestBody {
   uid_user: string;
 }
 
-interface AttestOffchainRequestBody {
+interface AttestOnchainRequestBody {
   recipient: string;
   meetingId: string;
   meetingType: number;
   startTime: number;
   endTime: number;
+  daoName: string;
 }
 
 interface MyError {
@@ -40,15 +41,15 @@ interface MyError {
 // const allowedOrigin = "http://localhost:3000";
 const allowedOrigin = process.env.NEXTAUTH_URL;
 
-const url = process.env.NEXT_PUBLIC_ATTESTATION_URL;
-// Set up your ethers provider and signer
-const provider = new ethers.JsonRpcProvider(url, undefined, {
-  staticNetwork: true,
-});
-const privateKey = process.env.PVT_KEY ?? "";
-const signer = new ethers.Wallet(privateKey, provider);
-const eas = new EAS("0x4200000000000000000000000000000000000021");
-eas.connect(signer);
+// const url = process.env.NEXT_PUBLIC_ATTESTATION_URL;
+// // Set up your ethers provider and signer
+// const provider = new ethers.JsonRpcProvider(url, undefined, {
+//   staticNetwork: true,
+// });
+// const privateKey = process.env.PVT_KEY ?? "";
+// const signer = new ethers.Wallet(privateKey, provider);
+// const eas = new EAS("0x4200000000000000000000000000000000000021");
+// eas.connect(signer);
 
 export async function POST(req: NextRequest, res: NextResponse) {
   const origin = req.headers.get("Origin");
@@ -62,13 +63,34 @@ export async function POST(req: NextRequest, res: NextResponse) {
   (BigInt.prototype as any).toJSON = function () {
     return this.toString();
   };
-  const requestData = (await req.json()) as AttestOffchainRequestBody;
+  const requestData = (await req.json()) as AttestOnchainRequestBody;
   // Your validation logic here
 
   console.log("request data: ", requestData);
 
   try {
     console.log("log2");
+    const atstUrl =
+      requestData.daoName === "optimism"
+        ? process.env.NEXT_PUBLIC_OP_ATTESTATION_URL
+        : requestData.daoName === "arbitrum"
+        ? process.env.NEXT_PUBLIC_ARB_ATTESTATION_URL
+        : "";
+
+    // Set up your ethers provider and signer
+    const provider = new ethers.JsonRpcProvider(atstUrl, undefined, {
+      staticNetwork: true,
+    });
+    const privateKey = process.env.PVT_KEY ?? "";
+    const signer = new ethers.Wallet(privateKey, provider);
+    const EASContractAddress =
+      requestData.daoName === "optimism"
+        ? "0x4200000000000000000000000000000000000021"
+        : requestData.daoName === "arbitrum"
+        ? "0xbD75f629A22Dc1ceD33dDA0b68c546A1c035c458"
+        : "";
+    const eas = new EAS(EASContractAddress);
+    eas.connect(signer);
 
     const schemaEncoder = new SchemaEncoder(
       "bytes32 MeetingId,uint8 MeetingType,uint32 StartTime,uint32 EndTime"

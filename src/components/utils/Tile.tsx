@@ -92,7 +92,11 @@ function Tile({
               }`}
               style={{ boxShadow: "0px 4px 26.7px 0px rgba(0, 0, 0, 0.10)" }}
               // onClick={() => openModal(index)}
-              onClick={() => router.push(`/watch/${data.meetingId}`)}
+              onClick={
+                isEvent === "Recorded"
+                  ? () => router.push(`/watch/${data.meetingId}`)
+                  : () => null
+              }
             >
               <div className="flex">
                 <Image
