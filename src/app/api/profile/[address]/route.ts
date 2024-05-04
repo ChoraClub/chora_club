@@ -60,8 +60,13 @@ export async function POST(
     const address = req.url.split("profile/")[1];
 
     // Find documents based on address
-    // console.log("Finding documents for address:", address);
-    const documents = await collection.find({ address, daoName }).toArray();
+    console.log("Finding documents for address:", address, daoName);
+    const documents = await collection
+      .find({
+        address: { $regex: `^${address}$`, $options: "i" },
+        daoName: daoName,
+      })
+      .toArray();
     // console.log("Documents found:", documents);
 
     client.close();

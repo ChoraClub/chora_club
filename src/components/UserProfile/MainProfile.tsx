@@ -345,14 +345,6 @@ function MainProfile() {
             "Data not found in the database, fetching from third-party API"
           );
           // Data not found in the database, fetch data from the third-party API
-          let dao = "";
-          if (chain && chain?.name === "Optimism") {
-            dao = "optimism";
-          } else if (chain && chain?.name === "Arbitrum One") {
-            dao = "arbitrum";
-          } else {
-            return;
-          }
 
           const res = await fetch(
             `https://api.karmahq.xyz/api/dao/find-delegate?dao=${dao}&user=${address}`

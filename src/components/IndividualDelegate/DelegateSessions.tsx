@@ -18,7 +18,7 @@ interface Session {
   host_address: string;
   joined_status: string;
   meetingId: string;
-  meeting_status: "Upcoming" | "Recorded" | "Denied";
+  meeting_status: "Upcoming" | "Recorded" | "Denied" | "";
   slot_time: string;
   title: string;
   attendees: Attendee[];
@@ -72,14 +72,18 @@ function DelegateSessions({ props }: { props: Type }) {
             filteredData = resultData.filter((session: Session) => {
               return session.meeting_status === "Upcoming";
             });
+            console.log("upcoming filtered: ", filteredData);
+            setSessionDetails(filteredData);
           } else if (searchParams.get("session") === "hosted") {
             setDataLoading(true);
             filteredData = resultData.filter((session: Session) => {
               return (
                 session.meeting_status === "Recorded" &&
-                session.host_address === props.individualDelegate
+                session.host_address.toLowerCase() === props.individualDelegate
               );
             });
+            console.log("hosted filtered: ", filteredData);
+            setSessionDetails(filteredData);
           } else if (searchParams.get("session") === "attended") {
             setDataLoading(true);
             filteredData = resultData.filter((session: Session) => {
@@ -91,9 +95,11 @@ function DelegateSessions({ props }: { props: Type }) {
                 )
               );
             });
+            console.log("attended filtered: ", filteredData);
+            setSessionDetails(filteredData);
           }
           // console.log("filtered", filteredData);
-          setSessionDetails(filteredData);
+          // setSessionDetails(filteredData);
           setDataLoading(false);
         } else {
           setDataLoading(false);

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Image, { StaticImageData } from "next/image";
 import { Oval } from "react-loader-spinner";
 import text2 from "@/assets/images/daos/texture2.png";
@@ -15,6 +15,7 @@ import {
 } from "@ethereum-attestation-service/eas-sdk";
 import { ethers } from "ethers";
 import { useNetwork, useAccount } from "wagmi";
+import styles from "./Tile.module.css";
 
 type Attendee = {
   attendee_address: string;
@@ -51,7 +52,7 @@ interface SessionData {
   meetingId: string;
   dao_name: string;
   booking_status: string;
-  meeting_status: boolean;
+  meeting_status: string;
   joined_status: boolean;
   attendees: Attendee[];
   host_address: string;
@@ -119,6 +120,16 @@ SessionTileProps) {
   };
 
   const [pageLoading, setPageLoading] = useState(true);
+  const [applyStyles, setApplyStyles] = useState(true);
+  const [expanded, setExpanded] = useState<{ [index: number]: boolean }>({});
+
+  const handleDescription = () => {
+    setApplyStyles(!applyStyles);
+  };
+
+  const toggleDescription = (index: number) => {
+    setExpanded((prev) => ({ ...prev, [index]: !prev[index] }));
+  };
 
   const handleAttestationOnchain = async ({
     meetingId,
@@ -246,6 +257,23 @@ SessionTileProps) {
     }
   };
 
+  const [isTextOverflow, setIsTextOverflow] = useState<{
+    [index: number]: boolean;
+  }>({});
+  const descriptionRefs = useRef<Array<HTMLDivElement | null>>([]);
+
+  useEffect(() => {
+    descriptionRefs.current.forEach((ref, index) => {
+      if (ref) {
+        const isOverflowing = ref.scrollHeight > ref.clientHeight;
+        setIsTextOverflow((prev) => ({
+          ...prev,
+          [index]: isOverflowing,
+        }));
+      }
+    });
+  }, [sessionDetails]);
+
   return (
     <div className="space-y-6">
       {sessionDetails.length > 0 ? (
@@ -314,7 +342,17 @@ SessionTileProps) {
                   </div>
                 </div>
 
-                <div className="text-[#1E1E1E] text-sm">{data.description}</div>
+                <div
+                  className={`text-[#1E1E1E] text-sm ${
+                    expanded[index] ? "" : `${styles.desc} cursor-pointer`
+                  }`}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    toggleDescription(index);
+                  }}
+                >
+                  {data.description}
+                </div>
               </div>
             </div>
 
