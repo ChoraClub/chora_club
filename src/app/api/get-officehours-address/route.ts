@@ -27,7 +27,9 @@ export async function POST(req: NextRequest, res: NextResponse<OfficeHours[]>) {
     const collection = db.collection<OfficeHours>("office_hours");
 
     // Find office hours documents based on the provided dao_name
-    const officeHours = await collection.find({ host_address: address }).toArray();
+    const officeHours = await collection
+      .find({ host_address: { $regex: new RegExp(`^${address}$`, "i") } })
+      .toArray();
 
     client.close();
 

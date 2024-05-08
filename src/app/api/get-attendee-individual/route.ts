@@ -40,7 +40,9 @@ export async function POST(req: NextRequest, res: NextResponse<OfficeHours[]>) {
     // Find office hours documents based on the provided attendee_address
     const officeHours = await collection
       .find({
-        "attendees.attendee_address": attendee_address,
+        "attendees.attendee_address": {
+          $regex: new RegExp(`^${attendee_address}$`, "i"),
+        },
       })
       .toArray();
 

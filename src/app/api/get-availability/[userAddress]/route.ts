@@ -19,7 +19,11 @@ export async function GET(request: NextRequest, res: NextResponse) {
 
     // Find documents based on userAddress
     // console.log("Finding documents for user:", userAddress);
-    const documents = await collection.find({ userAddress }).toArray();
+    const documents = await collection
+      .find({
+        userAddress: { $regex: new RegExp(`^${userAddress}$`, "i") },
+      })
+      .toArray();
     // console.log("Documents found:", documents);
 
     client.close();

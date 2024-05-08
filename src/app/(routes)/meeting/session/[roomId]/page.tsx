@@ -34,26 +34,6 @@ import copy from "copy-to-clipboard";
 // import Chat from '@/components/Chat/Chat';
 
 const Home = ({ params }: { params: { roomId: string } }) => {
-  const [modalOpen, setModalOpen] = useState(false);
-
-  const handleModalClose = () => {
-    // console.log("Popup Closed");
-    setModalOpen(false); // Close the modal
-    // Push the router after the modal is closed
-
-    push(`/meeting/session/${params.roomId}/lobby`);
-    // console.log("Popup 3");
-  };
-
-  const displayPopup = async () => {
-    setModalOpen(true);
-  };
-
-  const { state } = useRoom({
-    onLeave: () => {
-      displayPopup();
-    },
-  });
   const { push } = useRouter();
   // const { changePeerRole } = useAcl();
   const [requestedPeerId, setRequestedPeerId] = useState("");
@@ -81,6 +61,19 @@ const Home = ({ params }: { params: { roomId: string } }) => {
   const [meetingDetailsVisible, setMeetingDetailsVisible] = useState(true);
 
   const path = usePathname();
+
+  const [modalOpen, setModalOpen] = useState(false);
+
+  const handleModalClose = () => {
+    setModalOpen(false);
+    push(`/meeting/session/${params.roomId}/lobby`);
+  };
+
+  const { state } = useRoom({
+    onLeave: () => {
+      setModalOpen(true);
+    },
+  });
 
   useEffect(() => {
     const myHeaders = new Headers();
@@ -226,35 +219,36 @@ const Home = ({ params }: { params: { roomId: string } }) => {
     <>
       {isAllowToEnter ? (
         <section className="bg-white flex h-screen text-slate-100 flex-col justify-between overflow-hidden">
-          <div className="flex w-full h-[90%] pb-4 relative">
-            <div className="absolute top-5 left-5">
-              <Tooltip
-                showArrow
-                content={
-                  <div className="font-poppins">
-                    This meeting is being recorded
-                  </div>
-                }
-                placement="right"
-                className="rounded-md bg-opacity-90 max-w-96"
-                closeDelay={1}
-              >
-                <span>
-                  <PiRecordFill color="#c42727" size={22} />
-                </span>
-              </Tooltip>
-            </div>
-            <GridLayout />
-            <Sidebar />
-            <div className="absolute right-4 bottom-20">
-              {Role.HOST
-                ? showAcceptRequest && (
-                    <AcceptRequest peerId={requestedPeerId} />
-                  )
-                : null}
-            </div>
-            {isChatOpen && <Chat />}
-            {/* {meetingDetailsVisible && (
+          <>
+            <div className="flex w-full h-[90%] pb-4 relative">
+              <div className="absolute top-5 left-5">
+                <Tooltip
+                  showArrow
+                  content={
+                    <div className="font-poppins">
+                      This meeting is being recorded
+                    </div>
+                  }
+                  placement="right"
+                  className="rounded-md bg-opacity-90 max-w-96"
+                  closeDelay={1}
+                >
+                  <span>
+                    <PiRecordFill color="#c42727" size={22} />
+                  </span>
+                </Tooltip>
+              </div>
+              <GridLayout />
+              <Sidebar />
+              <div className="absolute right-4 bottom-20">
+                {Role.HOST
+                  ? showAcceptRequest && (
+                      <AcceptRequest peerId={requestedPeerId} />
+                    )
+                  : null}
+              </div>
+              {isChatOpen && <Chat />}
+              {/* {meetingDetailsVisible && (
               <div className="absolute bottom-20 bg-white shadow-md p-4 rounded-lg text-black">
                 <div className="flex justify-between items-center mb-2">
                   <h3 className="text-lg font-semibold">
@@ -287,13 +281,14 @@ const Home = ({ params }: { params: { roomId: string } }) => {
                 <div className="text-sm py-2">Joined in as {address}</div>
               </div>
             )} */}
-          </div>
+            </div>
 
-          <BottomBar />
-          <Prompts />
-          {modalOpen && (
+            <BottomBar />
+            <Prompts />
+          </>
+          {/* {modalOpen && (
             <AttestationModal isOpen={modalOpen} onClose={handleModalClose} />
-          )}
+          )} */}
         </section>
       ) : (
         <>
@@ -340,6 +335,9 @@ const Home = ({ params }: { params: { roomId: string } }) => {
             </>
           )}
         </>
+      )}
+      {modalOpen && (
+        <AttestationModal isOpen={modalOpen} onClose={handleModalClose} />
       )}
     </>
   );

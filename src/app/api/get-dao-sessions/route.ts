@@ -4,7 +4,7 @@ import { MongoClient, MongoClientOptions } from "mongodb";
 export async function POST(req: NextRequest, res: NextResponse) {
   const { dao_name, address } = await req.json();
   // console.log(dao_name, address);
-  
+
   try {
     const client = await MongoClient.connect(process.env.MONGODB_URI!, {
       dbName: `chora-club`,
@@ -17,7 +17,10 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
     // Check if address is provided
     if (address !== "") {
-      query = { dao_name: dao_name, host_address: address };
+      query = {
+        dao_name: dao_name,
+        host_address: { $regex: new RegExp(`^${address}$`, "i") },
+      };
     }
 
     const documents = await collection.find(query).toArray();
