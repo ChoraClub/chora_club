@@ -37,8 +37,8 @@ function DelegatesList({ props }: { props: string }) {
   const searchParams = useSearchParams();
   const [isShowing, setIsShowing] = useState(true);
   const [isSearching, setIsSearching] = useState<boolean>(false);
-  const [circlePosition, setCirclePosition] = useState({ x: 0, y: 0 });
-  const [clickedTileIndex,setClickedTileIndex]=useState(null);
+  // const [circlePosition, setCirclePosition] = useState({ x: 0, y: 0 });
+  // const [clickedTileIndex,setClickedTileIndex]=useState(null);
 
   const handleClose = () => {
     setIsShowing(false);
@@ -132,21 +132,21 @@ function DelegatesList({ props }: { props: string }) {
     copy(addr);
     toast("Address Copied");
   };
-  const handleMouseMove = (event:any,index:any) => {
-    const rect = event.currentTarget.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
+  // const handleMouseMove = (event:any,index:any) => {
+  //   const rect = event.currentTarget.getBoundingClientRect();
+  //   const x = event.clientX - rect.left;
+  //   const y = event.clientY - rect.top;
 
-    setCirclePosition({ x, y });
-    setClickedTileIndex(index);
-    console.log(circlePosition);
+  //   setCirclePosition({ x, y });
+  //   setClickedTileIndex(index);
+  //   console.log(circlePosition);
       
-    setTimeout(() => {
-      setClickedTileIndex(null);
-    }, 1500); // Adjust the time as needed
+  //   setTimeout(() => {
+  //     setClickedTileIndex(null);
+  //   }, 1500); // Adjust the time as needed
 
 
-  };
+  // };
 
 
   const WalletOpen = async (to: string) => {
@@ -326,7 +326,7 @@ function DelegatesList({ props }: { props: string }) {
               {delegateData.delegates.map((daos: any, index: number) => (
                 <div
                   onClick={(event) =>{
-                    handleMouseMove(event,index);
+                    // handleMouseMove(event,index);
                     router.push(`/${props}/${daos.publicAddress}?active=info  `)
                   }}
                   key={index}
@@ -336,7 +336,7 @@ function DelegatesList({ props }: { props: string }) {
                   
                   className="px-5 py-7 rounded-2xl flex flex-col justify-between cursor-pointer relative"
                 >
-                  {clickedTileIndex === index && (
+                  {/* {clickedTileIndex === index && (
                     <div
                     className="absolute bg-blue-200 rounded-full animate-ping"
                     style={{
@@ -347,7 +347,7 @@ function DelegatesList({ props }: { props: string }) {
                     zIndex: "9999",
                    }}
                    ></div>
-                  )}
+                  )} */}
                   <div>
                     <div className="flex justify-center relative">
                       <Image

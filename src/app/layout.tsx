@@ -1,4 +1,3 @@
-"use client";
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import localFonts from "next/font/local";
@@ -10,7 +9,6 @@ import HuddleContextProvider from "@/components/ClientComponents/HuddleContextPr
 import { useEffect } from "react";
 import FeedbackTile from "@/components/utils/FeedbackTile";
 import Script from "next/script";
-import ButtonWithCircle from "@/components/Circle/ButtonWithCircle";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -82,8 +80,7 @@ export default function RootLayout({
           'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
           })(window,document,'script','dataLayer','GTM-W5684W77');
           `,
-          }}
-        ></script>
+          }}></script>
       </head>
       <body className={`${quanty.variable} ${poppins.variable}`}>
         <noscript
@@ -100,7 +97,6 @@ export default function RootLayout({
         />
         <RootProviders>
           <HuddleContextProvider>
-            {/* <ButtonWithCircle> */}
             <div className="flex">
               <div className="fixed w-[6%] bg-blue-shade-100 h-screen mr-4 lg:mr-8 ">
                 <SidebarMain />
@@ -110,7 +106,6 @@ export default function RootLayout({
                 <div>{children}</div>
               </div>
             </div>
-            {/* </ButtonWithCircle> */}
           </HuddleContextProvider>
         </RootProviders>
       </body>

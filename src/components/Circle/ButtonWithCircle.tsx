@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+"use client";
+import React, { useState, useEffect } from "react";
 
 const ButtonWithCircle = ({ children }) => {
   const [circlePosition, setCirclePosition] = useState({ x: 0, y: 0 });
@@ -17,17 +18,17 @@ const ButtonWithCircle = ({ children }) => {
   };
 
   return (
-    <div className="relative" onClick={(event)=>handleClick(event)}>
+    <div className="relative h-full" onClick={(event) => handleClick(event)}>
       {children}
       {showCircle && (
         <div
           className="absolute bg-blue-200 rounded-full animate-ping"
           style={{
-            width: '20px',
-            height: '20px',
+            width: "20px",
+            height: "20px",
             left: `${circlePosition.x - 10}px`,
             top: `${circlePosition.y - 10}px`,
-            zIndex: '9999',
+            zIndex: "9999",
           }}
         />
       )}

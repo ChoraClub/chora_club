@@ -1,4 +1,3 @@
-"use client";
 import Image, { StaticImageData } from "next/image";
 import React, { useEffect, useState } from "react";
 import DelegatesList from "./DelegatesList";
@@ -161,9 +160,7 @@ function SpecificDAO({ props }: { props: { daoDelegates: string } }) {
           </div>
 
           <div>
-            <ButtonWithCircle>
             <ConnectButton />
-            </ButtonWithCircle>
           </div>
         </div>
         <div className="py-5 pr-8">
