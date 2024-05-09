@@ -159,10 +159,14 @@ function BookSession({ props }: { props: Type }) {
 
   const handleScheduled = async (data: any) => {
     if (isConnected) {
-      setIsScheduling(true);
-      setScheduleErr("");
-      setDateInfo(data);
-      onOpen();
+      if (host_address === address) {
+        toast("Delegates can not book their own sessions!");
+      } else {
+        setIsScheduling(true);
+        setScheduleErr("");
+        setDateInfo(data);
+        onOpen();
+      }
     } else {
       if (openConnectModal) {
         openConnectModal();
