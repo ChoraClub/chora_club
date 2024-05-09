@@ -149,20 +149,47 @@ function ScheduledUserSessions() {
     return result;
   };
 
-  const handleRemoveDate = (dateToRemove: any) => {
-    const updatedDates = allData.filter(
-      (item: any) => item.date !== dateToRemove
-    );
-    setAllData(updatedDates);
-    const updatedDateAndRanges = dateAndRanges.filter(
-      (item: any) => item.date !== dateToRemove
-    );
-    setDateAndRanges(updatedDateAndRanges);
+  // const handleRemoveDate = (dateToRemove: any, timeRanges: any) => {
+  //   console.log("dateToRemove", dateToRemove);
+  //   console.log("timeRanges", timeRanges);
+  //   const updatedDates = allData.filter(
+  //     (item: any) => item.date !== dateToRemove
+  //   );
+  //   setAllData(updatedDates);
+  //   const updatedDateAndRanges = dateAndRanges.filter(
+  //     (item: any) => item.date !== dateToRemove
+  //   );
+  //   setDateAndRanges(updatedDateAndRanges);
 
-    const updatedAllowedDates = allowedDates.filter(
-      (date: any) => date !== dateToRemove
+  //   const updatedAllowedDates = allowedDates.filter(
+  //     (date: any) => date !== dateToRemove
+  //   );
+  //   setAllowedDates(updatedAllowedDates);
+  // };
+
+  const handleRemoveDate = (
+    dateToRemove: string,
+    timeRangesToRemove: any[]
+  ) => {
+    const indexToRemove = allData.findIndex(
+      (item: any) =>
+        item.date === dateToRemove &&
+        JSON.stringify(item.timeRanges) === JSON.stringify(timeRangesToRemove)
     );
-    setAllowedDates(updatedAllowedDates);
+
+    if (indexToRemove !== -1) {
+      const updatedDates = [...allData];
+      updatedDates.splice(indexToRemove, 1);
+      setAllData(updatedDates);
+
+      const updatedDateAndRanges = [...dateAndRanges];
+      updatedDateAndRanges.splice(indexToRemove, 1);
+      setDateAndRanges(updatedDateAndRanges);
+
+      const updatedAllowedDates = [...allowedDates];
+      updatedAllowedDates.splice(indexToRemove, 1);
+      setAllowedDates(updatedAllowedDates);
+    }
   };
 
   const handleAddSelectedDate = async () => {
@@ -458,7 +485,8 @@ function ScheduledUserSessions() {
                   })
                   .join(", ")}
                 <button
-                  onClick={() => handleRemoveDate(item.date)}
+                  disabled={createSessionLoading}
+                  onClick={() => handleRemoveDate(item.date, item.timeRanges)}
                   className="text-red-600 ml-2"
                 >
                   Remove
