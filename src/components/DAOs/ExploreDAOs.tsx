@@ -10,6 +10,7 @@ import { ImCross } from "react-icons/im";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { FaCirclePlus } from "react-icons/fa6";
 import Link from "next/link";
+import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
 
 function ExploreDAOs() {
   const dao_info = [
@@ -87,7 +88,8 @@ function ExploreDAOs() {
             Explore DAOs
           </div>
           <div>
-            <ConnectButton />
+            <ConnectWalletWithENS />
+            {/* <ConnectButton /> */}
           </div>
         </div>
 
