@@ -67,7 +67,7 @@ const LocalGridCard: FC = () => {
 
   return (
     <div
-      className={`flex h-full w-full justify-between rounded-xl text-white p-4 gap-6 ${
+      className={`flex h-full w-full justify-between rounded-xl text-white p-4 gap-6 transition duration-1000 ease-in-out ${
         role && ["host", "coHost", "speaker"].includes(role) ? "" : ""
       }`}
     >

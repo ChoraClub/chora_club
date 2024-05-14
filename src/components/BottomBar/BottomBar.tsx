@@ -217,9 +217,11 @@ const BottomBar: React.FC<BottomBarProps> = () => {
     if (endMeet === "leave") {
       leaveRoom();
       setIsLoading(false);
+      setShowLeaveDropDown(false);
     } else if (endMeet === "close") {
       closeRoom();
       setIsLoading(false);
+      setShowLeaveDropDown(false);
     } else {
       return;
     }
@@ -527,7 +529,7 @@ const BottomBar: React.FC<BottomBarProps> = () => {
             {role === "host" && (
               <Strip
                 type="close"
-                title={isLoading ? "Leaving...." : "End spaces for all"}
+                title={isLoading ? "Leaving..." : "End spaces for all"}
                 variant="danger"
                 onClick={() => handleEndCall("close")}
               />

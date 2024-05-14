@@ -22,7 +22,7 @@ interface Session {
   host_address: string;
   joined_status: string;
   meetingId: string;
-  meeting_status: "Upcoming" | "Recorded" | "Denied";
+  meeting_status: "Upcoming" | "Recorded" | "Denied" | "";
   slot_time: string;
   title: string;
   attendees: Attendee[];
@@ -79,8 +79,9 @@ function AttendingUserSessions() {
                   currentSlot.toLocaleString()
               );
             });
+            console.log("filtered data in attending: ", filteredData);
           }
-          console.log("filtered in attending", filteredData);
+          // console.log("filtered in attending", filteredData);
           setSessionDetails(filteredData);
           setPageLoading(false);
         }

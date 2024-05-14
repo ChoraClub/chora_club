@@ -26,7 +26,7 @@ function DelegateInfo({ props, desc }: { props: Type; desc: string }) {
   const [isSessionAttendedLoading, setSessionAttendedLoading] = useState(true);
   const [isOfficeHoursHostedLoading, setOfficeHoursHostedLoading] =
     useState(true);
-  const [isOfficeHourseAttendedLoading, setOfficeHoursAttendedLoading] =
+  const [isOfficeHoursAttendedLoading, setOfficeHoursAttendedLoading] =
     useState(true);
   const [activeButton, setActiveButton] = useState("onchain");
 
@@ -229,7 +229,7 @@ function DelegateInfo({ props, desc }: { props: Type; desc: string }) {
           `https://api.karmahq.xyz/api/forum-user/${props.daoDelegates}/delegate-pitch/${props.individualDelegate}`
         );
         const details = await res.json();
-        // console.log("Desc: ", details.data.delegatePitch.customFields[1].value);
+        console.log("Desc: ", details.data.delegatePitch.customFields[1].value);
         setLoading(false);
         setKarmaDescription(details.data.delegatePitch.customFields[1].value);
       } catch (error) {
@@ -239,6 +239,9 @@ function DelegateInfo({ props, desc }: { props: Type; desc: string }) {
 
     fetchData();
   }, []);
+
+  console.log("desc from karma: ", karmaDescription);
+  console.log("desc from db: ", desc);
 
   return (
     <div>
@@ -276,7 +279,7 @@ function DelegateInfo({ props, desc }: { props: Type; desc: string }) {
                 {isSessionHostedLoading &&
                 isSessionAttendedLoading &&
                 isOfficeHoursHostedLoading &&
-                isOfficeHourseAttendedLoading ? (
+                isOfficeHoursAttendedLoading ? (
                   <div className="flex items-center justify-center">
                     <RotatingLines
                       visible={true}
@@ -313,7 +316,7 @@ function DelegateInfo({ props, desc }: { props: Type; desc: string }) {
               ariaLabel="oval-loading"
             />
           </div>
-        ) : desc ? (
+        ) : desc !== "" ? (
           desc
         ) : karmaDescription ? (
           karmaDescription

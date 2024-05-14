@@ -83,7 +83,7 @@ function Sidebar() {
               src={logo}
               alt={"image"}
               width={40}
-              className="xl:w-11 xl:h-11 2xl:w-14 2xl:h-14 2.5xl:w-16 2.5xl:h-16"></Image>
+              className="xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14"></Image>
             <Tooltip
               content="DAOs"
               placement="right"
@@ -95,7 +95,7 @@ function Sidebar() {
                   src={rocket}
                   alt={"image"}
                   width={40}
-                  className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-14 2xl:h-14 2.5xl:w-16 2.5xl:h-16 ${
+                  className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 ${
                     pathname.endsWith(`/`)
                       ? "border-white border-2 rounded-full"
                       : ""
@@ -113,7 +113,7 @@ function Sidebar() {
                   src={office}
                   alt={"image"}
                   width={40}
-                  className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-14 2xl:h-14 2.5xl:w-16 2.5xl:h-16 ${
+                  className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 ${
                     pathname.includes(`/office-hours`)
                       ? "border-white border-2 rounded-full"
                       : ""
@@ -132,7 +132,7 @@ function Sidebar() {
                   alt={"image"}
                   width={40}
                   height={40}
-                  className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-14 2xl:h-14 2.5xl:w-16 2.5xl:h-16 ${
+                  className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 ${
                     pathname.includes(`/available-delegates`)
                       ? "border-white border-2 rounded-full"
                       : ""
@@ -169,7 +169,7 @@ function Sidebar() {
                             width={80}
                             height={80}
                             alt="image"
-                            className={`w-10 h-10 xl:w-11 xl:h-11 2xl:w-14 2xl:h-14 2.5xl:w-16 2.5xl:h-16 rounded-full cursor-pointer ${
+                            className={`w-10 h-10 xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 rounded-full cursor-pointer ${
                               pathname.includes(`/${data[0]}`)
                                 ? "border-white border-[2.5px]"
                                 : ""
@@ -196,7 +196,7 @@ function Sidebar() {
                   src={gitbook}
                   alt={"image"}
                   width={40}
-                  className="xl:w-11 xl:h-11 2xl:w-14 2xl:h-14 2.5xl:w-16 2.5xl:h-16"
+                  className="xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14"
                 />
               </Link>
             </Tooltip>
@@ -212,7 +212,7 @@ function Sidebar() {
                     src={user}
                     alt={"image"}
                     width={40}
-                    className="cursor-pointer xl:w-11 xl:h-11 2xl:w-14 2xl:h-14 2.5xl:w-16 2.5xl:h-16"
+                    className="cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14"
                   />
                 ) : (
                   <ConnectWallet />
@@ -228,7 +228,7 @@ function Sidebar() {
                   src={user}
                   alt={"image"}
                   width={40}
-                  className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-14 2xl:h-14 2.5xl:w-16 2.5xl:h-16`}
+                  className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14`}
                   onClick={() => router.push(`/profile/${address}?active=info`)}
                 />
               </Tooltip>
