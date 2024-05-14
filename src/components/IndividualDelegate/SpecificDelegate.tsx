@@ -176,21 +176,72 @@ function SpecificDelegate({ props }: { props: Type }) {
     toast("Address Copied");
   };
 
+  // const handleDelegateVotes = async (to: string) => {
+  //   // if (
+  //   //   typeof window.ethereum === "undefined" ||
+  //   //   !window.ethereum.isConnected()
+  //   // ) {
+  //   //   console.log("not connected");
+  //   // }
+
+  //   const address = await walletClient.getAddresses();
+  //   console.log(address);
+  //   const address1 = address[0];
+  //   console.log(address1);
+
+  //   let chainAddress;
+
+  //   if (chain?.name === "Optimism") {
+  //     chainAddress = "0x4200000000000000000000000000000000000042";
+  //   } else if (chain?.name === "Arbitrum One") {
+  //     chainAddress = "0x912CE59144191C1204E64559FE8253a0e49E6548";
+  //   } else {
+  //     return;
+  //   }
+
+  //   console.log("walletClient?.chain?.network", walletClient?.chain?.network);
+  //   if (walletClient?.chain ==="") {
+  //     toast.error("Please connect your wallet!");
+  //   } else {
+  //     if (walletClient?.chain?.network === props.daoDelegates) {
+  //       const delegateTx = await walletClient.writeContract({
+  //         address: chainAddress,
+  //         abi: dao_abi.abi,
+  //         functionName: "delegate",
+  //         args: [to],
+  //         account: address1,
+  //       });
+  //       console.log(delegateTx);
+  //     } else {
+  //       toast.error("Please switch to appropriate network to delegate!");
+  //       if (openChainModal) {
+  //         openChainModal();
+  //       }
+  //     }
+  //   }
+  // };
   const handleDelegateVotes = async (to: string) => {
-    if (
-      typeof window.ethereum === "undefined" ||
-      !window.ethereum.isConnected()
-    ) {
-      console.log("not connected");
+    let address;
+    let address1;
+  
+    try {
+      address = await walletClient.getAddresses();
+      address1 = address[0];
+    } catch (error) {
+      console.error("Error getting addresses:", error);
+      toast.error("Please connect your MetaMask wallet!");
+      return;
     }
-
-    const address = await walletClient.getAddresses();
+  
+    if (!address1) {
+      toast.error("Please connect your MetaMask wallet!");
+      return;
+    }
+  
     console.log(address);
-    const address1 = address[0];
     console.log(address1);
-
+  
     let chainAddress;
-
     if (chain?.name === "Optimism") {
       chainAddress = "0x4200000000000000000000000000000000000042";
     } else if (chain?.name === "Arbitrum One") {
@@ -198,9 +249,10 @@ function SpecificDelegate({ props }: { props: Type }) {
     } else {
       return;
     }
-
+  
     console.log("walletClient?.chain?.network", walletClient?.chain?.network);
-    if (walletClient?.chain == "") {
+  
+    if (walletClient?.chain === "") {
       toast.error("Please connect your wallet!");
     } else {
       if (walletClient?.chain?.network === props.daoDelegates) {
@@ -211,9 +263,11 @@ function SpecificDelegate({ props }: { props: Type }) {
           args: [to],
           account: address1,
         });
+  
         console.log(delegateTx);
       } else {
         toast.error("Please switch to appropriate network to delegate!");
+  
         if (openChainModal) {
           openChainModal();
         }
