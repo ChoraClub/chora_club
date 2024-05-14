@@ -25,6 +25,13 @@ const quanty = localFonts({
   variable: "--font-quanty",
 });
 
+// export const metadata: Metadata = {
+//   title: "Chora Club",
+//   description: "Discover. Learn. Engage.",
+//   icons: {
+//     icon: ["/favicon.png"],
+//   },
+// };
 export const metadata: Metadata = {
   metadataBase: new URL("https://app.chora.club/"),
   title: "Chora Club",
@@ -73,8 +80,7 @@ export default function RootLayout({
           'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
           })(window,document,'script','dataLayer','GTM-W5684W77');
           `,
-          }}
-        ></script>
+          }}></script>
       </head>
       <body className={`${quanty.variable} ${poppins.variable}`}>
         <noscript
