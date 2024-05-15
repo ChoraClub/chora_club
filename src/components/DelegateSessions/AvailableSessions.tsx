@@ -147,10 +147,20 @@ function AvailableSessions() {
 
   const handleSearchChange = (query: string) => {
     setSearchQuery(query);
-    const filtered: any = APIData.session.filter((item: any) =>
-      item.userAddress.toLowerCase().includes(query.toLowerCase())
-    );
-    setDaoInfo(filtered);
+    if (query) {
+      const filtered = APIData.filter((item: any) => {
+        // Convert both query and userAddress to lowercase for case-insensitive matching
+        const lowercaseQuery = query.toLowerCase();
+        const lowercaseAddress = item.session.userAddress.toLowerCase();
+
+        // Check if the lowercase userAddress includes the lowercase query
+        return lowercaseAddress.includes(lowercaseQuery);
+      });
+
+      setDaoInfo(filtered);
+    } else {
+      setDaoInfo(APIData);
+    }
   };
 
   const handleDaoChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
