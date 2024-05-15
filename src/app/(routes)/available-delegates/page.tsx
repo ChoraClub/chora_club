@@ -1,6 +1,7 @@
 import React from "react";
 import DelegateSessionsMain from "@/components/DelegateSessions/DelegateSessionsMain";
 import type { Metadata } from "next";
+import ButtonWithCircle from "@/components/Circle/ButtonWithCircle";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://app.chora.club/"),
@@ -34,7 +35,9 @@ export const metadata: Metadata = {
 function page() {
   return (
     <>
+    <ButtonWithCircle>
       <DelegateSessionsMain />
+      </ButtonWithCircle>
     </>
   );
 }
