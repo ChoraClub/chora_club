@@ -27,10 +27,20 @@ function ConnectWalletWithENS() {
           chain &&
           (!authenticationStatus || authenticationStatus === "authenticated");
 
-        useEffect(() => {
-          const name = getEnsName(account?.address, account?.displayName);
-          setDisplayAddress(name);
-        }, []);
+        // useEffect(() => {
+        //   const name = getEnsName(account?.address, account?.displayName);
+        //   setDisplayAddress(name);
+        // }, []);
+
+        if (account && !displayAddress) {
+          (async () => {
+            const displayName = await getEnsName(
+              account.address,
+              account.displayName
+            );
+            setDisplayAddress(displayName);
+          })();
+        }
 
         return (
           <div

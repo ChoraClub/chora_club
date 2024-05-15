@@ -1,11 +1,11 @@
 "use client";
 import React, { useState, useEffect } from "react";
 
-const ButtonWithCircle = ({ children }) => {
+const ButtonWithCircle = ({ children }: {children : any}) => {
   const [circlePosition, setCirclePosition] = useState({ x: 0, y: 0 });
   const [showCircle, setShowCircle] = useState(false);
 
-  const handleClick = (event) => {
+  const handleClick = (event: any) => {
     const rect = event.currentTarget.getBoundingClientRect();
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
@@ -18,7 +18,10 @@ const ButtonWithCircle = ({ children }) => {
   };
 
   return (
-    <div className="relative h-full" onClick={(event) => handleClick(event)}>
+    <div
+      className="relative h-full overflow-hidden"
+      onClick={(event) => handleClick(event)}
+    >
       {children}
       {showCircle && (
         <div
