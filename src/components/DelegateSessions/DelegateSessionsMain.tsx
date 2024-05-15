@@ -7,6 +7,7 @@ import AvailableSessions from "./AvailableSessions";
 import RecordedSessions from "./RecordedSessions";
 import { FaCircleInfo } from "react-icons/fa6";
 import { Tooltip } from "@nextui-org/react";
+import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
 
 function DelegateSessionsMain() {
   const router = useRouter();
@@ -36,7 +37,7 @@ function DelegateSessionsMain() {
             </div>
           </div>
           <div>
-            <ConnectButton />
+            <ConnectWalletWithENS />
           </div>
         </div>
 

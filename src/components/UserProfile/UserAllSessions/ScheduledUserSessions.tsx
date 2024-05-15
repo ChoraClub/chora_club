@@ -88,6 +88,8 @@ function ScheduledUserSessions() {
       setCreateSessionLoading(false);
     }
     setAllData([]);
+    setAllowedDates([]);
+    setDateAndRanges([]);
   };
 
   const getUTCTime = async (

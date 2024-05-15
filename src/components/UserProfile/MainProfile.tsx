@@ -40,6 +40,7 @@ import lighthouse from "@lighthouse-web3/sdk";
 import InstantMeet from "./InstantMeet";
 import { useSession } from "next-auth/react";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
+import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
 
 function MainProfile() {
   const { isConnected, address } = useAccount();
@@ -966,7 +967,7 @@ function MainProfile() {
               </div>
             </div>
             <div>
-              <ConnectButton />
+              <ConnectWalletWithENS />
             </div>
           </div>
 

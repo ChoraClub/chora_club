@@ -25,6 +25,7 @@ import OPLogo from "@/assets/images/daos/op.png";
 import ArbLogo from "@/assets/images/daos/arbCir.png";
 import ccLogo from "@/assets/images/daos/CC.png";
 import { Oval } from "react-loader-spinner";
+import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
 import {
   SchemaEncoder,
   SchemaRegistry,
@@ -521,7 +522,7 @@ function SpecificDelegate({ props }: { props: Type }) {
               </div>
             </div>
             <div className="pr-[2.2rem]">
-              <ConnectButton />
+              <ConnectWalletWithENS />
             </div>
           </div>
 

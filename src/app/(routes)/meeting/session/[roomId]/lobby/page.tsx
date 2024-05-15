@@ -31,6 +31,7 @@ import Link from "next/link";
 import { RxCross2 } from "react-icons/rx";
 import record from "@/assets/images/instant-meet/record.svg";
 import arrow from "@/assets/images/instant-meet/arrow.svg";
+import ConnectWalletWithENS from "@/components/ConnectWallet/ConnectWalletWithENS";
 
 type lobbyProps = {};
 
@@ -423,7 +424,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
                   </FeatCommon>
                 </div>
               </div>
-              {isDisconnected ? <ConnectButton /> : null}
+              {isDisconnected ? <ConnectWalletWithENS /> : null}
               <div className="flex items-center w-full flex-col">
                 <div className="flex flex-col justify-center w-full gap-1 text-[#3E3D3D] font-semibold">
                   Display name
