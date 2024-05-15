@@ -9,7 +9,6 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@apollo/client": "^3.9.4",
     "@ethereum-attestation-service/eas-sdk": "^2.1.4",
     "@huddle01/react": "^2.0.3",
     "@huddle01/server-sdk": "^2.0.1",
@@ -26,7 +25,6 @@
     "luxon": "^3.4.4",
     "moment": "^2.30.1",
     "mongodb": "^6.3.0",
-    "moussejs": "^1.0.5",
     "next": "^14.2.3",
     "next-auth": "^4.22.1",
     "pino-pretty": "^10.3.1",
