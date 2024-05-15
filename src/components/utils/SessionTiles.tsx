@@ -13,9 +13,10 @@ import {
   ZERO_BYTES32,
   NO_EXPIRATION,
 } from "@ethereum-attestation-service/eas-sdk";
-import { ethers } from "ethers";
 import { useNetwork, useAccount } from "wagmi";
 import styles from "./Tile.module.css";
+// import { ethers } from "ethers";
+const { ethers } = require("ethers");
 
 type Attendee = {
   attendee_address: string;
@@ -100,7 +101,11 @@ SessionTileProps) {
     {}
   );
   const [isClaimed, setIsClaimed] = useState<{ [index: number]: boolean }>({});
-  const provider = new ethers.BrowserProvider(window?.ethereum);
+  // const provider = new ethers.BrowserProvider(window?.ethereum);
+  const provider =
+    window.ethereum && window.ethereum.isConnected()
+      ? new ethers.providers.Web3Provider(window.ethereum)
+      : null;
 
   const formatWalletAddress = (address: any) => {
     if (typeof address !== "string" || address.length <= 10) return address;
