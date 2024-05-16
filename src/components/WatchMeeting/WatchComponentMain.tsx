@@ -101,7 +101,7 @@ function WatchComponentMain({ props }: { props: { id: string } }) {
                             data.dao_name === ("optimism" || "Optimism")
                               ? `https://optimism.easscan.org/offchain/attestation/view/${data.uid_host}`
                               : data.dao_name === ("arbitrum" || "Arbitrum")
-                              ? `https://arbitrum.easscan.org"/offchain/attestation/view/${data.uid_host}`
+                              ? `https://arbitrum.easscan.org/offchain/attestation/view/${data.uid_host}`
                               : ""
                           }
                           target="_blank"
@@ -134,7 +134,7 @@ function WatchComponentMain({ props }: { props: { id: string } }) {
                     </td>
                   </tr>
                   <tr>
-                    <td className="font-semibold pr-4">Attendee:</td>
+                    <td className="font-semibold pr-4">Guest:</td>
                     <td>
                       {data.attendees?.map((attendee: any, index: any) => (
                         <li className="list-decimal" key={index}>

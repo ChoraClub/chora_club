@@ -330,7 +330,7 @@ SessionTileProps) {
                   {data.session_type === "session" ? (
                     <div className="text-[#3E3D3D]">
                       <span className="font-semibold">Session - </span>{" "}
-                      <span className="font-semibold">Attendee:</span>{" "}
+                      <span className="font-semibold">Guest:</span>{" "}
                       {formatWalletAddress(data.attendees[0].attendee_address)}
                     </div>
                   ) : (

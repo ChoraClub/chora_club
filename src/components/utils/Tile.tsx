@@ -143,7 +143,7 @@ function Tile({
                   ) : (
                     <div className="flex gap-x-16 text-sm py-3">
                       <div className="text-[#3E3D3D]">
-                        <span className="font-semibold">Attendee:</span>{" "}
+                        <span className="font-semibold">Guest:</span>{" "}
                         {data.attendee.substring(0, 10)}...
                       </div>
                       <div className="text-[#3E3D3D]">
