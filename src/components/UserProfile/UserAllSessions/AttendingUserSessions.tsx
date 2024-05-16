@@ -22,7 +22,7 @@ interface Session {
   host_address: string;
   joined_status: string;
   meetingId: string;
-  meeting_status: "Upcoming" | "Recorded" | "Denied";
+  meeting_status: "Upcoming" | "Recorded" | "Denied" | "";
   slot_time: string;
   title: string;
   attendees: Attendee[];
@@ -62,45 +62,30 @@ function AttendingUserSessions() {
       if (result.success) {
         // setSessionDetails(result.data);
         const resultData = await result.data;
-        // console.log("resultData", resultData);
+        console.log("resultData", resultData);
         setPageLoading(true);
-        // const currentTime = new Date();
-        // const currentSlot = new Date(currentTime.getTime() + 60 * 60 * 1000);
+        const currentTime = new Date();
+        const currentSlot = new Date(currentTime.getTime() - 60 * 60 * 1000);
         if (Array.isArray(resultData)) {
           let filteredData: any = resultData;
           if (searchParams.get("session") === "attending") {
             filteredData = resultData.filter((session: Session) => {
-              return session.attendees?.some(
-                (attendee) => attendee.attendee_address === address
-              ) &&
+              return (
+                // session.attendees?.some(
+                //   (attendee) => attendee.attendee_address === address
+                // ) &&
                 session.meeting_status !== "Recorded" &&
-                chain?.name === "Optimism"
-                ? session.dao_name === "optimism"
-                : chain?.name === "Arbitrum One"
-                ? session.dao_name === "arbitrum"
-                : "";
+                new Date(session.slot_time).toLocaleString() >=
+                  currentSlot.toLocaleString()
+              );
             });
+            console.log("filtered data in attending: ", filteredData);
           }
-          console.log("filtered", filteredData);
+          // console.log("filtered in attending", filteredData);
           setSessionDetails(filteredData);
           setPageLoading(false);
         }
       }
-
-      // if (result.success) {
-      //   let filteredData: any = result.data;
-      //   filteredData = result.data.filter((session: any) => {
-      //     return chain?.name === "Optimism"
-      //       ? session.dao_name === "optimism"
-      //       : chain?.name === "Arbitrum One"
-      //       ? session.dao_name === "arbitrum"
-      //       : "";
-      //   });
-      //   setSessionDetails(filteredData);
-      //   setPageLoading(false);
-      // } else {
-      //   setPageLoading(false);
-      // }
     } catch (error) {
       console.log("error in catch", error);
     }

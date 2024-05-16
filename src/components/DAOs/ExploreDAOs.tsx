@@ -10,6 +10,8 @@ import { ImCross } from "react-icons/im";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { FaCirclePlus } from "react-icons/fa6";
 import Link from "next/link";
+import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
+import ButtonWithCircle from "../Circle/ButtonWithCircle";
 
 function ExploreDAOs() {
   const dao_info = [
@@ -25,6 +27,8 @@ function ExploreDAOs() {
   const [showNotification, setShowNotification] = useState(true);
   const [isPageLoading, setIsPageLoading] = useState(true);
   const [isHovered, setIsHovered] = useState(false);
+  const [circlePosition, setCirclePosition] = useState({ x: 0, y: 0 });
+  const [IshowCircle, SetCircleShow] = useState(false);
 
   useEffect(() => {
     const storedStatus = sessionStorage.getItem("notificationStatus");
@@ -59,50 +63,45 @@ function ExploreDAOs() {
     setStatus(false);
     localStorage.setItem("hasSeenNotification", "true");
   };
+  // const coursercall=(event)=>{
+  //   const rect = event.currentTarget.getBoundingClientRect();
+  //   const x = event.clientX - rect.left;
+  //   const y = event.clientY - rect.top;
+
+  //   setCirclePosition({ x, y });
+  //   SetCircleShow(true);
+  //   console.log(circlePosition);
+
+  //   setTimeout(() => {
+  //     SetCircleShow(false);
+  //   }, 1000); // Adjust the time as needed
+
+  // }
 
   return (
-    <div className="pt-6 pl-14 pr-6">
-      {showNotification && !isPageLoading && (
-        <div
-          className={`flex absolute items-center justify-center bottom-9 rounded-full font-poppins text-sm font-medium left-[34%] w-[32rem] ${
-            status ? "" : "hidden"
-          }`}
-        >
-          <div className="py-2 bg-blue-shade-100 text-white rounded-full px-7">
-            To ensure optimal user experience, please note that our site is
-            designed to be responsive on desktop devices.
-          </div>
-          <div
-            className="bg-red-600 hover:bg-red-700 p-2 rounded-full cursor-pointer ml-3"
-            onClick={handleCloseNotification}
-          >
-            <ImCross color="#fff" size={10} />
-          </div>
-        </div>
-      )}
-
+    <div className="pt-6 pl-14 pr-6 min-h-screen">
       <div className="">
         <div className="flex justify-between pe-10">
           <div className="text-blue-shade-200 font-medium text-4xl font-quanty pb-4">
             Explore DAOs
           </div>
+
           <div>
-            <ConnectButton />
+            <ConnectWalletWithENS />
+            {/* <ConnectButton /> */}
           </div>
         </div>
 
         <div
           style={{ background: "rgba(238, 237, 237, 0.36)" }}
-          className="flex border-[0.5px] border-black w-fit rounded-full my-3 font-poppins"
-        >
+          className="flex border-[0.5px] border-black w-fit rounded-full my-3 font-poppins">
           <input
             type="text"
             placeholder="Search DAOs"
             style={{ background: "rgba(238, 237, 237, 0.36)" }}
             className="pl-5 rounded-full outline-none"
             value={searchQuery}
-            onChange={(e) => handleSearchChange(e.target.value)}
-          ></input>
+            onChange={(e) => handleSearchChange(e.target.value)}></input>
           <span className="flex items-center bg-black rounded-full px-6 py-3">
             <Image src={search} alt="search" width={20} />
           </span>
@@ -115,15 +114,13 @@ function ExploreDAOs() {
                 key={daos.name}
                 style={{ boxShadow: "0px 4px 50.8px 0px rgba(0, 0, 0, 0.11)" }}
                 className="px-5 py-7 rounded-2xl cursor-pointer"
-                onClick={() => handleClick(daos.name, daos.img)}
-              >
+                onClick={() => handleClick(daos.name, daos.img)}>
                 <div className="flex justify-center">
                   <Image
                     src={daos.img}
                     alt="Image not found"
                     width={80}
-                    className="rounded-full"
-                  ></Image>
+                    className="rounded-full"></Image>
                 </div>
                 <div className="text-center">
                   <div className="py-3">
@@ -146,8 +143,7 @@ function ExploreDAOs() {
             style={{ boxShadow: "0px 4px 50.8px 0px rgba(0, 0, 0, 0.11)" }}
             className={`px-5 py-7 rounded-2xl cursor-pointer flex items-center justify-center relative transition-all duration-250 ease-in-out ${
               isHovered ? "border-2 border-gray-600" : ""
-            }`}
-          >
+            }`}>
             <div className="">
               <FaCirclePlus
                 size={70}
@@ -163,8 +159,7 @@ function ExploreDAOs() {
               target="_blank"
               className={`absolute inset-0 flex items-center justify-center bottom-0  ${
                 isHovered ? "block" : "hidden"
-              }`}
-            >
+              }`}>
               <span className="text-xl font-semibold text-slate-800">
                 Add your DAO
               </span>
@@ -172,6 +167,22 @@ function ExploreDAOs() {
           </div>
         </div>
       </div>
+      {showNotification && !isPageLoading && (
+        <div
+          className={`flex fixed items-center justify-center bottom-9 rounded-full font-poppins text-sm font-medium left-[34%] w-[32rem] ${
+            status ? "" : "hidden"
+          }`}>
+          <div className="py-2 bg-blue-shade-100 text-white rounded-full px-7">
+            To ensure optimal user experience, please note that our site is
+            designed to be responsive on desktop devices.
+          </div>
+          <div
+            className="bg-red-600 hover:bg-red-700 p-2 rounded-full cursor-pointer ml-3"
+            onClick={handleCloseNotification}>
+            <ImCross color="#fff" size={10} />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

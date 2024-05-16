@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, ReactEventHandler } from "react";
 import { DateTime } from "luxon";
-import { useAccount } from "wagmi";
+import { useAccount, useNetwork } from "wagmi";
 import toast, { Toaster } from "react-hot-toast";
 import { Oval } from "react-loader-spinner";
 import { FaCircleInfo } from "react-icons/fa6";
@@ -31,10 +31,11 @@ function ScheduledUserSessions() {
   const [endMinute, setEndMinute] = useState("");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
+  const [allowedDates, setAllowedDates] = useState<any>([]);
+  const [daoName, setDaoName] = useState("");
+  const { chain, chains } = useNetwork();
   const [utcStartTime, setUtcStartTime] = useState("");
   const [utcEndTime, setUtcEndTime] = useState("");
-  const [allowedDates, setAllowedDates] = useState<any>([]);
-  const [daoName, setDaoName] = useState("optimism");
   const [allData, setAllData] = useState<any>([]);
   const [createSessionLoading, setCreateSessionLoading] = useState<any>();
   const [startTimeOptions, setStartTimeOptions] = useState([]);
@@ -242,20 +243,47 @@ function ScheduledUserSessions() {
     return result;
   };
 
-  const handleRemoveDate = (dateToRemove: any) => {
-    const updatedDates = allData.filter(
-      (item: any) => item.date !== dateToRemove
-    );
-    setAllData(updatedDates);
-    const updatedDateAndRanges = dateAndRanges.filter(
-      (item: any) => item.date !== dateToRemove
-    );
-    setDateAndRanges(updatedDateAndRanges);
+  // const handleRemoveDate = (dateToRemove: any, timeRanges: any) => {
+  //   console.log("dateToRemove", dateToRemove);
+  //   console.log("timeRanges", timeRanges);
+  //   const updatedDates = allData.filter(
+  //     (item: any) => item.date !== dateToRemove
+  //   );
+  //   setAllData(updatedDates);
+  //   const updatedDateAndRanges = dateAndRanges.filter(
+  //     (item: any) => item.date !== dateToRemove
+  //   );
+  //   setDateAndRanges(updatedDateAndRanges);
 
-    const updatedAllowedDates = allowedDates.filter(
-      (date: any) => date !== dateToRemove
+  //   const updatedAllowedDates = allowedDates.filter(
+  //     (date: any) => date !== dateToRemove
+  //   );
+  //   setAllowedDates(updatedAllowedDates);
+  // };
+
+  const handleRemoveDate = (
+    dateToRemove: string,
+    timeRangesToRemove: any[]
+  ) => {
+    const indexToRemove = allData.findIndex(
+      (item: any) =>
+        item.date === dateToRemove &&
+        JSON.stringify(item.timeRanges) === JSON.stringify(timeRangesToRemove)
     );
-    setAllowedDates(updatedAllowedDates);
+
+    if (indexToRemove !== -1) {
+      const updatedDates = [...allData];
+      updatedDates.splice(indexToRemove, 1);
+      setAllData(updatedDates);
+
+      const updatedDateAndRanges = [...dateAndRanges];
+      updatedDateAndRanges.splice(indexToRemove, 1);
+      setDateAndRanges(updatedDateAndRanges);
+
+      const updatedAllowedDates = [...allowedDates];
+      updatedAllowedDates.splice(indexToRemove, 1);
+      setAllowedDates(updatedAllowedDates);
+    }
   };
 
   const handleAddSelectedDate = async () => {
@@ -432,6 +460,14 @@ function ScheduledUserSessions() {
     setShowGetMailModal(false);
   };
 
+  useEffect(() => {
+    if (chain && chain?.name === "Optimism") {
+      setDaoName("optimism");
+    } else if (chain && chain?.name === "Arbitrum One") {
+      setDaoName("arbitrum");
+    }
+  }, [chain, chain?.name]);
+
   return (
     <>
       <div
@@ -459,14 +495,15 @@ function ScheduledUserSessions() {
               </span>
             </Tooltip>
           </label>
-          <select
-            value={daoName}
-            onChange={(e) => setDaoName(e.target.value)}
-            className="border border-gray-300 rounded px-3 py-2 mt-1 w-full"
+          <div
+            // value={daoName}
+            // onChange={(e) => setDaoName(e.target.value)}
+            className="border border-gray-300 rounded px-3 py-2 mt-1 w-full capitalize"
           >
-            <option value="optimism">Optimism</option>
-            <option value="arbitrum">Arbitrum</option>
-          </select>
+            {daoName}
+            {/* <option value="optimism">Optimism</option>
+            <option value="arbitrum">Arbitrum</option> */}
+          </div>
         </div>
 
         <div className="mb-4">
@@ -606,7 +643,8 @@ function ScheduledUserSessions() {
                   })
                   .join(", ")}
                 <button
-                  onClick={() => handleRemoveDate(item.date)}
+                  disabled={createSessionLoading}
+                  onClick={() => handleRemoveDate(item.date, item.timeRanges)}
                   className="text-red-600 ml-2"
                 >
                   Remove

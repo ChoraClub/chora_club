@@ -29,6 +29,7 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { Role } from "@huddle01/server-sdk/auth";
 import { Oval, TailSpin } from "react-loader-spinner";
 import Link from "next/link";
+import ConnectWalletWithENS from "@/components/ConnectWallet/ConnectWalletWithENS";
 
 type lobbyProps = {};
 
@@ -274,7 +275,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
                 </FeatCommon>
               </div>
             </div>
-            {isDisconnected ? <ConnectButton /> : null}
+            {isDisconnected ? <ConnectWalletWithENS /> : null}
             <div className="flex items-center w-full flex-col">
               <div className="flex flex-col justify-center w-full gap-1 text-black">
                 Set a display name

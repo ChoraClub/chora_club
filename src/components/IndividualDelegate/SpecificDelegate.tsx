@@ -25,6 +25,17 @@ import OPLogo from "@/assets/images/daos/op.png";
 import ArbLogo from "@/assets/images/daos/arbCir.png";
 import ccLogo from "@/assets/images/daos/CC.png";
 import { Oval } from "react-loader-spinner";
+import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
+import {
+  SchemaEncoder,
+  SchemaRegistry,
+  createOffchainURL,
+  EAS,
+  Delegated,
+  ZERO_BYTES32,
+  NO_EXPIRATION,
+} from "@ethereum-attestation-service/eas-sdk";
+import { ethers } from "ethers";
 
 interface Type {
   daoDelegates: string;
@@ -41,15 +52,30 @@ function SpecificDelegate({ props }: { props: Type }) {
   const path = usePathname();
   console.log(path);
   const searchParams = useSearchParams();
-  const [twitter, setTwitter] = useState("");
-  const [discord, setDiscord] = useState("");
-  const [discourse, setDiscourse] = useState("");
-  const [github, setGithub] = useState("");
   const [selfDelegate, setSelfDelegate] = useState<boolean>();
   const [isDelegate, setIsDelegate] = useState<boolean>();
   const addressFromUrl = path.split("/")[2];
   const [isPageLoading, setIsPageLoading] = useState(true);
   console.log("Props", props.daoDelegates);
+  const [displayName, setDisplayName] = useState("");
+  const [displayImage, setDisplayImage] = useState("");
+  const [description, setDescription] = useState("");
+  // const provider = new ethers.BrowserProvider(window?.ethereum);
+
+  const [karmaSocials, setKarmaSocials] = useState({
+    twitter: "",
+    discord: "",
+    discourse: "",
+    github: "",
+  });
+
+  const [socials, setSocials] = useState({
+    twitter: "",
+    discord: "",
+    discourse: "",
+    github: "",
+  });
+
   useEffect(() => {
     console.log("Network", chain?.network);
     const fetchData = async () => {
@@ -68,50 +94,36 @@ function SpecificDelegate({ props }: { props: Type }) {
           setIsDelegate(true);
         }
 
-        if (details.data.delegate.twitterHandle != null) {
-          setTwitter(
-            `https://twitter.com/${details.data.delegate.twitterHandle}`
-          );
-        }
+        setKarmaSocials({
+          twitter: details.data.delegate.twitterHandle
+            ? details.data.delegate.twitterHandle
+            : "",
+          discourse: details.data.delegate.discourseHandle
+            ? details.data.delegate.discourseHandle
+            : "",
+          discord: details.data.delegate.discordHandle
+            ? details.data.delegate.discordHandle
+            : "",
+          github: details.data.delegate.githubHandle
+            ? details.data.delegate.githubHandle
+            : "",
+        });
 
-        if (details.data.delegate.discourseHandle != null) {
-          if (props.daoDelegates === "optimism") {
-            setDiscourse(
-              `https://gov.optimism.io/u/${details.data.delegate.discourseHandle}`
-            );
-          }
-          if (props.daoDelegates === "arbitrum") {
-            setDiscourse(
-              `https://forum.arbitrum.foundation/u/${details.data.delegate.discourseHandle}`
-            );
-          }
-        }
-
-        if (details.data.delegate.discordHandle != null) {
-          setDiscord(
-            `https://discord.com/${details.data.delegate.discordHandle}`
-          );
-        }
-
-        if (details.data.delegate.githubHandle != null) {
-          setGithub(
-            `https://discord.com/${details.data.delegate.githubHandle}`
-          );
-        }
+        setIsPageLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
+        setIsPageLoading(false);
       }
     };
 
     fetchData();
-    setIsPageLoading(false);
   }, []);
 
   useEffect(() => {
     const checkDelegateStatus = async () => {
       setIsPageLoading(true);
-      const addr = await walletClient.getAddresses();
-      const address1 = addr[0];
+      //   const addr = await walletClient.getAddresses();
+      //   const address1 = addr[0];
       let delegateTxAddr = "";
       const contractAddress =
         chain?.name === "Optimism"
@@ -119,24 +131,27 @@ function SpecificDelegate({ props }: { props: Type }) {
           : chain?.name === "Arbitrum One"
           ? "0x912CE59144191C1204E64559FE8253a0e49E6548"
           : "";
-      console.log(walletClient);
-      const delegateTx = await publicClient.readContract({
-        address: contractAddress,
-        abi: dao_abi.abi,
-        functionName: "delegates",
-        args: [addressFromUrl],
-        // account: address1,
-      });
-      console.log("Delegate tx", delegateTx);
-      delegateTxAddr = delegateTx;
-
-      if (delegateTxAddr.toLowerCase() === addressFromUrl?.toLowerCase()) {
-        console.log("Delegate comparison: ", delegateTx, addressFromUrl);
-        setSelfDelegate(true);
+      try {
+        const delegateTx = await publicClient.readContract({
+          address: contractAddress,
+          abi: dao_abi.abi,
+          functionName: "delegates",
+          args: [addressFromUrl],
+          // account: address1,
+        });
+        console.log("Delegate tx", delegateTx);
+        delegateTxAddr = delegateTx;
+        if (delegateTxAddr.toLowerCase() === addressFromUrl?.toLowerCase()) {
+          console.log("Delegate comparison: ", delegateTx, addressFromUrl);
+          setSelfDelegate(true);
+        }
+        setIsPageLoading(false);
+      } catch (error) {
+        console.error("Error in reading contract", error);
+        setIsPageLoading(false);
       }
     };
     checkDelegateStatus();
-    setIsPageLoading(false);
   }, []);
 
   // if (isPageLoading) {
@@ -162,34 +177,86 @@ function SpecificDelegate({ props }: { props: Type }) {
     toast("Address Copied");
   };
 
+  // const handleDelegateVotes = async (to: string) => {
+  //   // if (
+  //   //   typeof window.ethereum === "undefined" ||
+  //   //   !window.ethereum.isConnected()
+  //   // ) {
+  //   //   console.log("not connected");
+  //   // }
+
+  //   const address = await walletClient.getAddresses();
+  //   console.log(address);
+  //   const address1 = address[0];
+  //   console.log(address1);
+
+  //   let chainAddress;
+
+  //   if (chain?.name === "Optimism") {
+  //     chainAddress = "0x4200000000000000000000000000000000000042";
+  //   } else if (chain?.name === "Arbitrum One") {
+  //     chainAddress = "0x912CE59144191C1204E64559FE8253a0e49E6548";
+  //   } else {
+  //     return;
+  //   }
+
+  //   console.log("walletClient?.chain?.network", walletClient?.chain?.network);
+  //   if (walletClient?.chain ==="") {
+  //     toast.error("Please connect your wallet!");
+  //   } else {
+  //     if (walletClient?.chain?.network === props.daoDelegates) {
+  //       const delegateTx = await walletClient.writeContract({
+  //         address: chainAddress,
+  //         abi: dao_abi.abi,
+  //         functionName: "delegate",
+  //         args: [to],
+  //         account: address1,
+  //       });
+  //       console.log(delegateTx);
+  //     } else {
+  //       toast.error("Please switch to appropriate network to delegate!");
+  //       if (openChainModal) {
+  //         openChainModal();
+  //       }
+  //     }
+  //   }
+  // };
   const handleDelegateVotes = async (to: string) => {
-    if (
-      typeof window.ethereum === "undefined" ||
-      !window.ethereum.isConnected()
-    ) {
-      console.log("not connected");
+    let address;
+    let address1;
+  
+    try {
+      address = await walletClient.getAddresses();
+      address1 = address[0];
+    } catch (error) {
+      console.error("Error getting addresses:", error);
+      toast.error("Please connect your MetaMask wallet!");
+      return;
     }
-
-    const address = await walletClient.getAddresses();
+  
+    if (!address1) {
+      toast.error("Please connect your MetaMask wallet!");
+      return;
+    }
+  
     console.log(address);
-    const address1 = address[0];
     console.log(address1);
-
+  
     let chainAddress;
-
-    if (props.daoDelegates === "optimism") {
+    if (chain?.name === "Optimism") {
       chainAddress = "0x4200000000000000000000000000000000000042";
-    } else if (props.daoDelegates === "arbitrum") {
+    } else if (chain?.name === "Arbitrum One") {
       chainAddress = "0x912CE59144191C1204E64559FE8253a0e49E6548";
     } else {
       return;
     }
-
-    console.log(walletClient);
-    if (walletClient.chain == "") {
+  
+    console.log("walletClient?.chain?.network", walletClient?.chain?.network);
+  
+    if (walletClient?.chain === "") {
       toast.error("Please connect your wallet!");
     } else {
-      if (walletClient.chain?.network === props.daoDelegates) {
+      if (walletClient?.chain?.network === props.daoDelegates) {
         const delegateTx = await walletClient.writeContract({
           address: chainAddress,
           abi: dao_abi.abi,
@@ -197,15 +264,93 @@ function SpecificDelegate({ props }: { props: Type }) {
           args: [to],
           account: address1,
         });
+  
         console.log(delegateTx);
       } else {
         toast.error("Please switch to appropriate network to delegate!");
+  
         if (openChainModal) {
           openChainModal();
         }
       }
     }
   };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch data from your backend API to check if the address exists
+
+        console.log("Fetching from DB");
+        // const dbResponse = await axios.get(`/api/profile/${address}`);
+
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+
+        const raw = JSON.stringify({
+          address: props.individualDelegate,
+          daoName: props.daoDelegates,
+        });
+
+        const requestOptions: any = {
+          method: "POST",
+          headers: myHeaders,
+          body: raw,
+          redirect: "follow",
+        };
+        const res = await fetch(
+          `/api/profile/${props.individualDelegate}`,
+          requestOptions
+        );
+
+        const dbResponse = await res.json();
+        console.log("db Response", dbResponse);
+        if (
+          dbResponse &&
+          Array.isArray(dbResponse.data) &&
+          dbResponse.data.length > 0
+        ) {
+          // Iterate over each item in the response data array
+          for (const item of dbResponse.data) {
+            // Check if address and daoName match
+            // console.log("Item: ", item);
+
+            // if (
+            //   item.daoName === dao &&
+            //   item.address === props.individualDelegate
+            // ) {
+            // console.log("Data found in the database", item);
+            // Data found in the database, set the state accordingly
+            // setResponseFromDB(true);
+            setDisplayImage(item.image);
+            setDescription(item.description);
+            setDisplayName(item.displayName);
+            // setEmailId(item.emailId);
+
+            setSocials({
+              twitter: item.socialHandles.twitter,
+              discord: item.socialHandles.discord,
+              discourse: item.socialHandles.discourse,
+              github: item.socialHandles.github,
+            });
+            // Exit the loop since we found a match
+            //   break;
+            // }
+          }
+        } else {
+          console.log(
+            "Data not found in the database, fetching from third-party API"
+          );
+          // Data not found in the database, fetch data from the third-party API
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, [chain, props.individualDelegate]);
+
   return (
     <>
       {isPageLoading && (
@@ -242,18 +387,20 @@ function SpecificDelegate({ props }: { props: Type }) {
                   <div className="flex justify-center items-center w-40 h-40">
                     <Image
                       src={
-                        delegateInfo?.profilePicture ||
-                        (props.daoDelegates === "optimism"
-                          ? OPLogo
-                          : props.daoDelegates === "arbitrum"
-                          ? ArbLogo
-                          : ccLogo)
+                        displayImage
+                          ? `https://gateway.lighthouse.storage/ipfs/${displayImage}`
+                          : delegateInfo?.profilePicture ||
+                            (props.daoDelegates === "optimism"
+                              ? OPLogo
+                              : props.daoDelegates === "arbitrum"
+                              ? ArbLogo
+                              : ccLogo)
                       }
                       alt="user"
                       width={256}
                       height={256}
                       className={
-                        delegateInfo?.profilePicture
+                        displayImage || delegateInfo?.profilePicture
                           ? "w-40 h-40 rounded-3xl"
                           : "w-20 h-20 rounded-3xl"
                       }
@@ -276,17 +423,28 @@ function SpecificDelegate({ props }: { props: Type }) {
               <div className="px-4">
                 <div className=" flex items-center py-1">
                   <div className="font-bold text-lg pr-4">
-                    {delegateInfo?.ensName ? (
-                      delegateInfo?.ensName
-                    ) : (
-                      <>{props.individualDelegate.substring(0, 12)}... </>
-                    )}
+                    {displayName ||
+                      (delegateInfo?.ensName ? (
+                        delegateInfo?.ensName
+                      ) : (
+                        <>
+                          {props.individualDelegate.slice(0, 6)}...
+                          {props.individualDelegate.slice(-4)}
+                        </>
+                      ))}
                   </div>
                   <div className="flex gap-3">
+                    {/* {socials.discord + socials.discourse + socials.github + socials.twitter} */}
                     <Link
-                      href={twitter}
+                      href={
+                        socials.twitter
+                          ? `https://twitter.com/${socials.twitter}`
+                          : karmaSocials.twitter
+                      }
                       className={`border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 ${
-                        twitter == "" ? "hidden" : ""
+                        socials.twitter == "" && karmaSocials.twitter == ""
+                          ? "hidden"
+                          : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
                       target="_blank"
@@ -294,9 +452,19 @@ function SpecificDelegate({ props }: { props: Type }) {
                       <FaXTwitter color="#7C7C7C" size={12} />
                     </Link>
                     <Link
-                      href={discourse}
+                      href={
+                        socials.discourse
+                          ? props.daoDelegates === "optimism"
+                            ? `https://gov.optimism.io/u/${socials.discourse}`
+                            : props.daoDelegates === "arbitrum"
+                            ? `https://forum.arbitrum.foundation/u/${socials.discourse}`
+                            : ""
+                          : karmaSocials.discourse
+                      }
                       className={`border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1  ${
-                        discourse == "" ? "hidden" : ""
+                        socials.discourse == "" && karmaSocials.discourse == ""
+                          ? "hidden"
+                          : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
                       target="_blank"
@@ -304,9 +472,15 @@ function SpecificDelegate({ props }: { props: Type }) {
                       <BiSolidMessageRoundedDetail color="#7C7C7C" size={12} />
                     </Link>
                     <Link
-                      href={discord}
+                      href={
+                        socials.discord
+                          ? `https://discord.com/${socials.discord}`
+                          : karmaSocials.discord
+                      }
                       className={`border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 ${
-                        discord == "" ? "hidden" : ""
+                        socials.discord == "" && karmaSocials.discord == ""
+                          ? "hidden"
+                          : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
                       target="_blank"
@@ -314,9 +488,15 @@ function SpecificDelegate({ props }: { props: Type }) {
                       <FaDiscord color="#7C7C7C" size={12} />
                     </Link>
                     <Link
-                      href={github}
+                      href={
+                        socials.github
+                          ? `https://github.com/${socials.github}`
+                          : karmaSocials.github
+                      }
                       className={`border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 ${
-                        github == "" ? "hidden" : ""
+                        socials.github == "" && karmaSocials.github == ""
+                          ? "hidden"
+                          : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
                       target="_blank"
@@ -328,10 +508,8 @@ function SpecificDelegate({ props }: { props: Type }) {
 
                 <div className="flex items-center py-1">
                   <div>
-                    {props.individualDelegate.substring(0, 6)} ...{" "}
-                    {props.individualDelegate.substring(
-                      props.individualDelegate.length - 4
-                    )}
+                    {props.individualDelegate.slice(0, 6)} ...{" "}
+                    {props.individualDelegate.slice(-4)}
                   </div>
 
                   <Tooltip
@@ -365,7 +543,9 @@ function SpecificDelegate({ props }: { props: Type }) {
                 <div className="flex gap-4 py-1">
                   <div className="text-[#4F4F4F] border-[0.5px] border-[#D9D9D9] rounded-md px-3 py-1">
                     <span className="text-blue-shade-200 font-semibold">
-                      {formatNumber(Number(delegateInfo?.delegatedVotes))}
+                      {delegateInfo?.delegatedVotes
+                        ? formatNumber(Number(delegateInfo?.delegatedVotes))
+                        : 0}
                       &nbsp;
                     </span>
                     delegated tokens
@@ -373,7 +553,11 @@ function SpecificDelegate({ props }: { props: Type }) {
                   <div className="text-[#4F4F4F] border-[0.5px] border-[#D9D9D9] rounded-md px-3 py-1">
                     Delegated from
                     <span className="text-blue-shade-200 font-semibold">
-                      &nbsp;{formatNumber(delegateInfo?.delegatorCount)}&nbsp;
+                      &nbsp;
+                      {delegateInfo?.delegatorCount
+                        ? formatNumber(delegateInfo?.delegatorCount)
+                        : 0}
+                      &nbsp;
                     </span>
                     Addresses
                   </div>
@@ -392,7 +576,7 @@ function SpecificDelegate({ props }: { props: Type }) {
               </div>
             </div>
             <div className="pr-[2.2rem]">
-              <ConnectButton />
+              <ConnectWalletWithENS />
             </div>
           </div>
 
@@ -418,12 +602,11 @@ function SpecificDelegate({ props }: { props: Type }) {
               Past Votes
             </button>
             <button
-              className={`bor
-          der-b-2 py-4 px-2 ${
-            searchParams.get("active") === "delegatesSession"
-              ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
-              : "border-transparent"
-          }`}
+              className={`border-b-2 py-4 px-2 ${
+                searchParams.get("active") === "delegatesSession"
+                  ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
+                  : "border-transparent"
+              }`}
               onClick={() =>
                 router.push(path + "?active=delegatesSession&session=book")
               }
@@ -446,7 +629,7 @@ function SpecificDelegate({ props }: { props: Type }) {
 
           <div className="py-6 ps-16">
             {searchParams.get("active") === "info" && (
-              <DelegateInfo props={props} />
+              <DelegateInfo props={props} desc={description} />
             )}
             {searchParams.get("active") === "pastVotes" && (
               <DelegateVotes props={props} />

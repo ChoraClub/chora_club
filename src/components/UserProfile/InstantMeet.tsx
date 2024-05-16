@@ -8,10 +8,19 @@ import {
   useDisclosure,
 } from "@nextui-org/react";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Oval } from "react-loader-spinner";
 import { useAccount } from "wagmi";
 import { useNetwork } from "wagmi";
+import Image from "next/image";
+import { Tooltip } from "@nextui-org/react";
+import connectImg from "@/assets/images/instant-meet/connect.png";
+import accessImg from "@/assets/images/instant-meet/quick-access.png";
+import videoImg from "@/assets/images/instant-meet/video-call.png";
+import audioImg from "@/assets/images/instant-meet/audio-call.png";
+import screenImg from "@/assets/images/instant-meet/screen-share.png";
+import chatImg from "@/assets/images/instant-meet/chat.png";
+import heroImg from "@/assets/images/instant-meet/instant-meet-hero.svg";
 
 interface instantMeetProps {
   isDelegate: boolean;
@@ -20,7 +29,6 @@ interface instantMeetProps {
 
 function InstantMeet({ isDelegate, selfDelegate }: instantMeetProps) {
   const [modalData, setModalData] = useState({
-    dao_name: "",
     title: "",
     description: "",
   });
@@ -29,6 +37,7 @@ function InstantMeet({ isDelegate, selfDelegate }: instantMeetProps) {
   const { address } = useAccount();
   const { chain, chains } = useNetwork();
   const [isScheduling, setIsScheduling] = useState(false);
+  const [daoName, setDaoName] = useState<string>();
   const router = useRouter();
 
   const handleModalInputChange = (
@@ -68,7 +77,7 @@ function InstantMeet({ isDelegate, selfDelegate }: instantMeetProps) {
     console.log("Modal details: ", modalData);
 
     const requestData = {
-      dao_name: modalData.dao_name,
+      dao_name: daoName,
       slot_time: dateInfo,
       title: modalData.title,
       description: modalData.description,
@@ -104,76 +113,120 @@ function InstantMeet({ isDelegate, selfDelegate }: instantMeetProps) {
       console.error("Error:", error);
     }
     setModalData({
-      dao_name: "",
       title: "",
       description: "",
     });
   };
 
+  useEffect(() => {
+    if (chain?.name === "Optimism") {
+      setDaoName("optimism");
+    } else if (chain?.name === "Arbitrum One") {
+      setDaoName("arbitrum");
+    }
+  }, [chain]);
+
+  const block = [
+    {
+      image: connectImg,
+      title: "Connect with Others Instantly",
+      description:
+        "Engage with yourself in an instant meeting and share the link with the people you want to connect with. Experience the following features for a comprehensive virtual meeting experience.",
+    },
+    {
+      image: accessImg,
+      title: "Quick Access to DAO Links",
+      description:
+        "Access the quick links of DAO directly within the meeting itself,making it easier to reference and share relevant information during your session.",
+    },
+    {
+      image: videoImg,
+      title: "Video Call",
+      description:
+        " Connect seamlessly and engage face-to-face with crisp and clear video quality, bringing your virtual meetings to life.",
+    },
+    {
+      image: audioImg,
+      title: "Audio Call",
+      description:
+        "Experience crystal-clear audio that ensures smooth and effective communication with all participants, enhancing the meeting experience.",
+    },
+    {
+      image: screenImg,
+      title: "Screen Sharing",
+      description:
+        "Effortlessly share your screen to showcase documents, presentations,or any other content, making collaboration more interactive and dynamic.",
+    },
+    {
+      image: chatImg,
+      title: "Chat",
+      description:
+        "Foster real-time communication by sending text messages to participants within the meeting, allowing for quick exchanges and enhanced collaboration.",
+    },
+  ];
+
   return (
     <div>
       <div className="pb-4 pr-12">
-        <div className="text-blue-shade-100 text-xl font-semibold pb-1">
-          Start an Instant Meeting
-        </div>
-        <div className="font-semibold pb-3">Connect with Others Instantly</div>
+        <div className="">
+          <div className="grid grid-cols-7 rounded-3xl border-solid border-2 border-[#F9F9F9]-900">
+            <div className="col-span-4 border-solid border-r-2 border-[#F9F9F9]-900">
+              <div className="p-14">
+                <div className="text-[#3E3D3D] text-3xl font-semibold font-poppins text-center">
+                  Start an Instant Meeting
+                </div>
 
-        <div className="pb-3">
-          Engage with yourself in an instant meeting and share the link with the
-          people you want to connect with. Experience the following features for
-          a comprehensive virtual meeting experience:
-        </div>
-
-        <div className="pb-2">
-          <span className="font-semibold">Quick Access to DAO Links: </span>{" "}
-          <span>
-            Access the quick links of DAO directly within the meeting itself,
-            making it easier to reference and share relevant information during
-            your session.
-          </span>
-        </div>
-
-        <div className="pb-2">
-          <span className="font-semibold">Video Call: </span>{" "}
-          <span>
-            Connect seamlessly and engage face-to-face with crisp and clear
-            video quality, bringing your virtual meetings to life.
-          </span>
-        </div>
-
-        <div className="pb-2">
-          <span className="font-semibold">Audio Call: </span>{" "}
-          <span>
-            Experience crystal-clear audio that ensures smooth and effective
-            communication with all participants, enhancing the meeting
-            experience.
-          </span>
-        </div>
-
-        <div className="pb-2">
-          <span className="font-semibold">Screen Sharing: </span>{" "}
-          <span>
-            Effortlessly share your screen to showcase documents, presentations,
-            or any other content, making collaboration more interactive and
-            dynamic.
-          </span>
-        </div>
-
-        <div className="pb-2">
-          <span className="font-semibold">Chat: </span>{" "}
-          <span>
-            Foster real-time communication by sending text messages to
-            participants within the meeting, allowing for quick exchanges and
-            enhanced collaboration.
-          </span>
+                <div className="grid grid-cols-3 grid-rows-2 text-sm gap-11 font-semibold pt-8 text-[#3E3D3D] text-center">
+                  {block.map((data, index) => (
+                    <Tooltip
+                      key={index}
+                      content={
+                        <div className="px-1 py-2 w-80">
+                          <div className="font-poppins text-[#7C7C7C]">
+                            {data.description}
+                          </div>
+                        </div>
+                      }
+                      placement="right"
+                      className="group w-fit"
+                    >
+                      <div>
+                        <div className="group border rounded-3xl bg-[#E5E5EA] flex items-center justify-center p-8">
+                          <Image
+                            alt="{image}"
+                            height={60}
+                            width={60}
+                            src={data.image}
+                            className=" transition duration-300 ease-in-out transform hover:scale-105"
+                            quality={100}
+                            priority
+                          />
+                        </div>
+                        <div className="p-2">
+                          <span className="">{data.title}</span>
+                        </div>
+                      </div>
+                    </Tooltip>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <div className="col-span-3 flex flex-col px-6">
+              <div className="">
+                <Image alt="img7" src={heroImg} quality={100} priority />
+              </div>
+              <div className="text-center transition-transform transform hover:scale-105 duration-300">
+                <button
+                  className="bg-blue-shade-200 py-3 px-6 rounded-full text-white font-semibold"
+                  onClick={onOpen}
+                >
+                  Start an instant meet
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-      <button
-        className="bg-blue-shade-200 text-white px-4 py-2 rounded-md font-semibold"
-        onClick={onOpen}
-      >
-        Start an instant meet
-      </button>
 
       <Modal
         isOpen={isOpen}
@@ -210,19 +263,10 @@ function InstantMeet({ isDelegate, selfDelegate }: instantMeetProps) {
                 required
               />
 
-              <div className="px-1 font-medium">Select DAO:</div>
-              <select
-                required
-                className="outline-none bg-[#D9D9D945] rounded-md px-2 py-1 text-sm"
-                onChange={handleModalInputChange}
-                name="dao_name"
-              >
-                <option selected disabled>
-                  Select DAO
-                </option>
-                <option value="optimism">Optimism</option>
-                <option value="arbitrum">Arbitrum</option>
-              </select>
+              <div className="px-1 font-medium">Selected DAO:</div>
+              <div className="outline-none bg-[#D9D9D945] rounded-md px-2 py-1 text-sm capitalize">
+                {daoName}
+              </div>
             </ModalBody>
             <ModalFooter>
               <Button

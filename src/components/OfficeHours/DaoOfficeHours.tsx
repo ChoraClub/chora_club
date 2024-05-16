@@ -10,6 +10,8 @@ import { StaticImageData } from "next/image";
 import Tile from "../utils/Tile";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { Oval } from "react-loader-spinner";
+import { Tooltip } from "@nextui-org/react";
+import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
 
 interface Type {
   img: StaticImageData;
@@ -132,10 +134,24 @@ function DaoOfficeHours() {
     <div className="pt-6 pl-14 pr-6">
       <div className="flex justify-between pe-10">
         <div className="font-quanty font-medium text-4xl text-blue-shade-200 pb-4">
-          Office Hours
+          <Tooltip
+            showArrow
+            content={
+              <div className="font-poppins">
+                Find all the current, upcoming, and past office hours hosted by
+                different DAOs, and easily search them by using Title or Host
+                Address.
+              </div>
+            }
+            placement="right"
+            className="rounded-md bg-opacity-90 max-w-96"
+            closeDelay={1}
+          >
+            <div>Office Hours</div>
+          </Tooltip>
         </div>
         <div>
-          <ConnectButton />
+          <ConnectWalletWithENS />
         </div>
       </div>
 
@@ -175,18 +191,18 @@ function DaoOfficeHours() {
 
         <div
           style={{ background: "rgba(238, 237, 237, 0.36)" }}
-          className="flex border-[0.5px] border-black w-fit rounded-full my-8 font-poppins"
+          className="flex border-[0.5px] border-black w-1/3 rounded-full my-8 font-poppins"
         >
           <input
             type="text"
-            placeholder="Search by title "
+            placeholder="Search by title or host address"
             style={{ background: "rgba(238, 237, 237, 0.36)" }}
-            className="pl-5 rounded-full outline-none"
+            className="pl-5 rounded-full outline-none w-full py-2"
             value={searchQuery}
             onChange={(e) => handleSearchChange(e.target.value)}
           ></input>
-          <span className="flex items-center bg-black rounded-full px-5 py-2">
-            <Image src={search} alt="search" width={20} />
+          <span className="flex items-center bg-black rounded-full px-6 py-2">
+            <Image src={search} alt="search" width={22} />
           </span>
         </div>
 

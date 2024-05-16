@@ -13,8 +13,8 @@ interface Type {
   individualDelegate: string;
 }
 
-function DelegateInfo({ props }: { props: Type }) {
-  const [description, setDescription] = useState<string>();
+function DelegateInfo({ props, desc }: { props: Type; desc: string }) {
+  const [karmaDescription, setKarmaDescription] = useState<string>();
   const [loading, setLoading] = useState(true);
   const [isDataLoading, setDataLoading] = useState(true);
   const router = useRouter();
@@ -22,12 +22,40 @@ function DelegateInfo({ props }: { props: Type }) {
   const [sessionAttendCount, setSessionAttendCount] = useState(0);
   const [officehoursHostCount, setOfficehoursHostCount] = useState(0);
   const [officehoursAttendCount, setOfficehoursAttendCount] = useState(0);
-  let sessionHostingCount = 0;
-  let sessionAttendingCount = 0;
-  let officehoursHostingCount = 0;
-  let officehoursAttendingCount = 0;
+  const [isSessionHostedLoading, setSessionHostedLoading] = useState(true);
+  const [isSessionAttendedLoading, setSessionAttendedLoading] = useState(true);
+  const [isOfficeHoursHostedLoading, setOfficeHoursHostedLoading] =
+    useState(true);
+  const [isOfficeHoursAttendedLoading, setOfficeHoursAttendedLoading] =
+    useState(true);
+  const [activeButton, setActiveButton] = useState("onchain");
 
   useEffect(() => {
+    if (activeButton === "onchain") {
+      fetchAttestation("onchain");
+    } else if (activeButton === "offchain") {
+      fetchAttestation("offchain");
+    }
+  }, [activeButton, props.individualDelegate, props.daoDelegates]);
+
+  const fetchAttestation = async (buttonType: string) => {
+    let sessionHostingCount = 0;
+    let sessionAttendingCount = 0;
+    let officehoursHostingCount = 0;
+    let officehoursAttendingCount = 0;
+
+    setActiveButton(buttonType);
+    setSessionHostedLoading(true);
+    setSessionAttendedLoading(true);
+    setOfficeHoursHostedLoading(true);
+    setOfficeHoursAttendedLoading(true);
+
+    const host_uid_key =
+      buttonType === "onchain" ? "onchain_host_uid" : "uid_host";
+
+    const attendee_uid_key =
+      buttonType === "onchain" ? "onchain_uid_attendee" : "attendee_uid";
+
     const sessionHosted = async () => {
       try {
         const response = await fetch(
@@ -44,25 +72,17 @@ function DelegateInfo({ props }: { props: Type }) {
           result.data.forEach((item: any) => {
             if (
               item.meeting_status === "Recorded" &&
-              item.dao_name === "optimism" &&
-              item.uid_host &&
-              props.daoDelegates == "optimism"
-            ) {
-              sessionHostingCount++;
-            } else if (
-              item.meeting_status === "Recorded" &&
-              item.dao_name === "arbitrum" &&
-              item.uid_host &&
-              props.daoDelegates == "arbitrum"
+              item.dao_name === props.daoDelegates &&
+              item[host_uid_key]
             ) {
               sessionHostingCount++;
             }
             // console.log("op host count: ", sessionHostingCount);
             setSessionHostCount(sessionHostingCount);
-            setDataLoading(false);
+            setSessionHostedLoading(false);
           });
         } else {
-          setDataLoading(false);
+          setSessionHostedLoading(false);
         }
       } catch (e) {
         console.log("Error: ", e);
@@ -88,25 +108,17 @@ function DelegateInfo({ props }: { props: Type }) {
           result.data.forEach((item: any) => {
             if (
               item.meeting_status === "Recorded" &&
-              item.dao_name === "optimism" &&
-              item.uid_attendee &&
-              props.daoDelegates == "optimism"
-            ) {
-              sessionAttendingCount++;
-            } else if (
-              item.meeting_status === "Recorded" &&
-              item.dao_name === "arbitrum" &&
-              item.uid_attendee &&
-              props.daoDelegates == "arbitrum"
+              item.dao_name === props.daoDelegates &&
+              item.attendees.some((attendee: any) => attendee[attendee_uid_key])
             ) {
               sessionAttendingCount++;
             }
             // console.log("op attended count: ", sessionAttendingCount);
             setSessionAttendCount(sessionAttendingCount);
-            setDataLoading(false);
+            setSessionAttendedLoading(false);
           });
         } else {
-          setDataLoading(false);
+          setSessionAttendedLoading(false);
         }
       } catch (e) {
         console.log("Error: ", e);
@@ -130,25 +142,17 @@ function DelegateInfo({ props }: { props: Type }) {
           result.forEach((item: any) => {
             if (
               item.meeting_status === "inactive" &&
-              item.dao_name === "Optimism" &&
-              item.uid_host &&
-              props.daoDelegates == "optimism"
-            ) {
-              officehoursHostingCount++;
-            } else if (
-              item.meeting_status === "inactive" &&
-              item.dao_name === "Arbitrum" &&
-              item.uid_host &&
-              props.daoDelegates == "arbitrum"
+              item.dao_name === props.daoDelegates &&
+              item[host_uid_key]
             ) {
               officehoursHostingCount++;
             }
             // console.log("office hours host count: ", officehoursHostingCount);
             setOfficehoursHostCount(officehoursHostingCount);
-            setDataLoading(false);
+            setOfficeHoursHostedLoading(false);
           });
         } else {
-          setDataLoading(false);
+          setOfficeHoursHostedLoading(false);
         }
       } catch (e) {
         console.log("Error: ", e);
@@ -172,25 +176,17 @@ function DelegateInfo({ props }: { props: Type }) {
           result.forEach((item: any) => {
             if (
               item.meeting_status === "inactive" &&
-              item.dao_name === "Optimism" &&
-              item.attendees.some((attendee: any) => attendee.attendee_uid) &&
-              props.daoDelegates == "optimism"
-            ) {
-              officehoursAttendingCount++;
-            } else if (
-              item.meeting_status === "inactive" &&
-              item.dao_name === "Arbitrum" &&
-              item.attendees.some((attendee: any) => attendee.attendee_uid) &&
-              props.daoDelegates == "arbitrum"
+              item.dao_name === props.daoDelegates &&
+              item.attendees.some((attendee: any) => attendee[attendee_uid_key])
             ) {
               officehoursAttendingCount++;
             }
             // console.log("officehours attended: ", officehoursAttendingCount);
             setOfficehoursAttendCount(officehoursAttendingCount);
-            setDataLoading(false);
+            setOfficeHoursAttendedLoading(false);
           });
         } else {
-          setDataLoading(false);
+          setOfficeHoursAttendedLoading(false);
         }
       } catch (e) {
         console.log("Error: ", e);
@@ -201,7 +197,7 @@ function DelegateInfo({ props }: { props: Type }) {
     sessionAttended();
     officeHoursHosted();
     officeHoursAttended();
-  }, [props.individualDelegate, props.daoDelegates]);
+  };
 
   const details = [
     {
@@ -233,9 +229,9 @@ function DelegateInfo({ props }: { props: Type }) {
           `https://api.karmahq.xyz/api/forum-user/${props.daoDelegates}/delegate-pitch/${props.individualDelegate}`
         );
         const details = await res.json();
-        // console.log("Desc: ", details.data.delegatePitch.customFields[1].value);
+        console.log("Desc: ", details.data.delegatePitch.customFields[1].value);
         setLoading(false);
-        setDescription(details.data.delegatePitch.customFields[1].value);
+        setKarmaDescription(details.data.delegatePitch.customFields[1].value);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -244,8 +240,33 @@ function DelegateInfo({ props }: { props: Type }) {
     fetchData();
   }, []);
 
+  console.log("desc from karma: ", karmaDescription);
+  console.log("desc from db: ", desc);
+
   return (
     <div>
+      <div className="flex w-fit gap-16 border-1 border-[#7C7C7C] px-6 rounded-xl text-sm mb-6">
+        <button
+          className={`py-2 ${
+            activeButton === "onchain"
+              ? "text-[#3E3D3D] font-bold"
+              : "text-[#7C7C7C]"
+          } `}
+          onClick={() => fetchAttestation("onchain")}
+        >
+          Onchain
+        </button>
+        <button
+          className={`py-2 ${
+            activeButton === "offchain"
+              ? "text-[#3E3D3D] font-bold"
+              : "text-[#7C7C7C]"
+          }`}
+          onClick={() => fetchAttestation("offchain")}
+        >
+          Offchain
+        </button>
+      </div>
       <div className="grid grid-cols-4 pe-32 gap-10">
         {details.length > 0 ? (
           details.map((key, index) => (
@@ -255,7 +276,10 @@ function DelegateInfo({ props }: { props: Type }) {
               onClick={() => router.push(`${key.ref}`)}
             >
               <div className="font-semibold text-3xl text-center pb-2">
-                {isDataLoading ? (
+                {isSessionHostedLoading &&
+                isSessionAttendedLoading &&
+                isOfficeHoursHostedLoading &&
+                isOfficeHoursAttendedLoading ? (
                   <div className="flex items-center justify-center">
                     <RotatingLines
                       visible={true}
@@ -279,7 +303,7 @@ function DelegateInfo({ props }: { props: Type }) {
       <div
         style={{ boxShadow: "0px 4px 30.9px 0px rgba(0, 0, 0, 0.12)" }}
         className={`rounded-xl my-7 me-32 py-6 px-7 text-sm ${
-          description ? "" : "min-h-48"
+          desc && karmaDescription ? "" : "min-h-52"
         }`}
       >
         {loading ? (
@@ -292,8 +316,10 @@ function DelegateInfo({ props }: { props: Type }) {
               ariaLabel="oval-loading"
             />
           </div>
-        ) : description ? (
-          description
+        ) : desc !== "" ? (
+          desc
+        ) : karmaDescription ? (
+          karmaDescription
         ) : (
           <div className="font-semibold text-base flex justify-center">
             Delegate has not provided a description

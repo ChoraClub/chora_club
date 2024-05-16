@@ -23,7 +23,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
     // Find documents based on user_address
     // console.log("Finding documents for user:", user_address);
     const documents = await collection
-      .find({ "attendees.attendee_address": user_address, dao_name: dao_name })
+      .find({ "attendees.attendee_address": { $regex: new RegExp(`^${user_address}$`, "i") }, dao_name: dao_name })
       .toArray();
     // console.log("Documents found:", documents);
 

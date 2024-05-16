@@ -49,41 +49,128 @@ export async function GET(req: NextRequest, res: NextResponse) {
   }
 }
 
-export async function POST(req: NextRequest, res: NextResponse) {
-  try {
-    const { date } = await req.json();
-    // console.log("date:", date);
+// export async function POST(req: NextRequest, res: NextResponse) {
+//   try {
+//     const { date } = await req.json();
+//     // console.log("date:", date);
 
-    // Connect to MongoDB
+//     // Connect to MongoDB
+//     const client = await MongoClient.connect(process.env.MONGODB_URI!, {
+//       dbName: `chora-club`,
+//     } as MongoClientOptions);
+
+//     // Access the collection
+//     const db = client.db();
+//     // console.log("connected");
+
+//     const collection = db.collection("scheduling");
+
+//     // const currentDate = date.split("T")[0];
+
+//     // const documents = await collection.find().toArray();
+//     // console.log("currentDate", date);
+//     const documents = await collection
+//       .find({ allowedDates: { $gte: date } })
+//       .toArray();
+
+//     client.close();
+
+//     // Return the found documents
+//     return NextResponse.json(
+//       { success: true, data: documents },
+//       { status: 200 }
+//     );
+//   } catch (error) {
+//     console.error("Error retrieving data in get availability:", error);
+//     return NextResponse.json(
+//       { success: false, error: "Internal Server Error" },
+//       { status: 500 }
+//     );
+//   }
+// }
+
+export async function POST(req: NextRequest, res: NextResponse<Type[]>) {
+  try {
+    const { dao_name, userAddress } = await req.json();
+
+    console.log("Initial Data start=========");
+    console.log("dao_name", dao_name);
+    console.log("userAddress", userAddress);
+    console.log("Initial Data end=========");
+
     const client = await MongoClient.connect(process.env.MONGODB_URI!, {
       dbName: `chora-club`,
     } as MongoClientOptions);
 
-    // Access the collection
     const db = client.db();
-    // console.log("connected");
-
+    const delegatesCollection = db.collection("delegates");
     const collection = db.collection("scheduling");
 
-    // const currentDate = date.split("T")[0];
+    const currentDate = new Date();
+    console.log("currentDate", currentDate);
+    const currentTime = currentDate.toUTCString().toLocaleString();
+    console.log("currentTime", currentTime);
+    let newDate = currentDate.toLocaleDateString();
+    if (newDate.length !== 10 || !newDate.match(/^\d{4}-\d{2}-\d{2}$/)) {
+      const year = currentDate.getFullYear();
+      const month = String(currentDate.getMonth() + 1).padStart(2, "0");
+      const day = String(currentDate.getDate()).padStart(2, "0");
+      newDate = `${year}-${month}-${day}`;
+    }
+    console.log("newDate", newDate);
+    const query: any = {
+      dao_name: dao_name,
+      userAddress: userAddress,
+      "dateAndRanges.date": { $gte: newDate },
+    };
 
-    // const documents = await collection.find().toArray();
-    // console.log("currentDate", date);
-    const documents = await collection
-      .find({ allowedDates: { $gte: date } })
-      .toArray();
+    const sessionData = await collection.find(query).toArray();
+
+    sessionData.forEach((session: any) => {
+      session.dateAndRanges = session.dateAndRanges.filter((dateRange: any) => {
+        return (
+          new Date(dateRange.date) >= new Date(newDate) &&
+          (dateRange.date === newDate
+            ? dateRange.formattedUTCTime_endTime >= currentTime
+            : new Date(dateRange.date) >= new Date(newDate))
+        );
+      });
+
+      // session.allowedDates = session.allowedDates.filter((date: any) => {
+      //   return session.dateAndRanges.some(
+      //     (dateRange: any) => dateRange.date === date
+      //   );
+      // });
+
+      session.allowedDates = [...new Set(session.allowedDates)].filter(
+        (date: any) => {
+          // Check if any of the dateAndRanges contain this date
+          return session.dateAndRanges.some(
+            (dateRange: any) => dateRange.date === date
+          );
+        }
+      );
+    });
+
+    let finalSessionData = sessionData.filter(
+      (session) => session.dateAndRanges.length > 0
+    );
+
+    console.log("finalSessionData", finalSessionData);
 
     client.close();
 
-    // Return the found documents
     return NextResponse.json(
-      { success: true, data: documents },
+      { success: true, data: finalSessionData },
       { status: 200 }
     );
   } catch (error) {
-    console.error("Error retrieving data in get availability:", error);
+    console.error(
+      `Error fetching filtered Session Data in availability:`,
+      error
+    );
     return NextResponse.json(
-      { success: false, error: "Internal Server Error" },
+      { error: "Internal Server Error" },
       { status: 500 }
     );
   }

@@ -18,7 +18,7 @@ interface Session {
   host_address: string;
   joined_status: string;
   meetingId: string;
-  meeting_status: "Upcoming" | "Recorded" | "Denied";
+  meeting_status: "Upcoming" | "Recorded" | "Denied" | "";
   slot_time: string;
   title: string;
   user_address: string;
@@ -41,30 +41,35 @@ function BookedUserSessions() {
         },
       });
       const result = await response.json();
-      // console.log("result in get meeting", result);
-      let filteredData: any = result.data;
+      console.log("result in get meeting", result);
       if (result.success) {
-        const currentTime = new Date();
-        const currentSlot = new Date(currentTime.getTime() + 60 * 60 * 1000);
-        if (chain?.name === "Optimism") {
-          filteredData = result.data.filter(
-            (session: Session) =>
-              session.dao_name === "optimism" &&
-              session.meeting_status !== "Recorded" &&
-              new Date(session.slot_time).toLocaleString() <
-                currentSlot.toLocaleString()
-          );
-        } else if (chain?.name === "Arbitrum One") {
-          filteredData = result.data.filter(
-            (session: Session) =>
-              session.dao_name === "arbitrum" &&
-              session.meeting_status !== "Recorded" &&
-              new Date(session.slot_time).toLocaleString() <
-                currentSlot.toLocaleString()
-          );
+        const resultData = await result.data;
+        if (Array.isArray(resultData)) {
+          const currentTime = new Date();
+          const currentSlot = new Date(currentTime.getTime() - 60 * 60 * 1000);
+          let filteredData: any = resultData;
+          if (chain?.name === "Optimism") {
+            filteredData = resultData.filter(
+              (session: Session) =>
+                session.dao_name === "optimism" &&
+                session.meeting_status !== "Recorded" &&
+                new Date(session.slot_time).toLocaleString() >=
+                  currentSlot.toLocaleString()
+            );
+          } else if (chain?.name === "Arbitrum One") {
+            filteredData = resultData.filter(
+              (session: Session) =>
+                session.dao_name === "arbitrum" &&
+                session.meeting_status !== "Recorded" &&
+                new Date(session.slot_time).toLocaleString() >=
+                  currentSlot.toLocaleString()
+            );
+          }
+          setSessionDetails(filteredData);
+          setPageLoading(false);
+        } else {
+          setPageLoading(false);
         }
-        setSessionDetails(filteredData);
-        setPageLoading(false);
       } else {
         setPageLoading(false);
       }
