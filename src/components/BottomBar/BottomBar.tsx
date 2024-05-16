@@ -222,9 +222,11 @@ const BottomBar: React.FC<BottomBarProps> = () => {
     if (endMeet === "leave") {
       leaveRoom();
       setIsLoading(false);
+      setShowLeaveDropDown(false);
     } else if (endMeet === "close") {
       closeRoom();
       setIsLoading(false);
+      setShowLeaveDropDown(false);
     } else {
       return;
     }
@@ -238,6 +240,13 @@ const BottomBar: React.FC<BottomBarProps> = () => {
       meetingType = 0;
     }
 
+    let dao_name = "";
+    if (chain?.name === "Optimism") {
+      dao_name = "optimism";
+    } else if (chain?.name === "Arbitrum One") {
+      dao_name = "arbitrum";
+    }
+
     try {
       const requestOptions = {
         method: "POST",
@@ -247,6 +256,7 @@ const BottomBar: React.FC<BottomBarProps> = () => {
         body: JSON.stringify({
           roomId: roomId,
           meetingType: meetingType,
+          dao_name: dao_name,
         }),
       };
       // console.log("req optionnnn", requestOptions);
@@ -524,7 +534,7 @@ const BottomBar: React.FC<BottomBarProps> = () => {
             {role === "host" && (
               <Strip
                 type="close"
-                title={isLoading ? "Leaving...." : "End spaces for all"}
+                title={isLoading ? "Leaving..." : "End spaces for all"}
                 variant="danger"
                 onClick={() => handleEndCall("close")}
               />

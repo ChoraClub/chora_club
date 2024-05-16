@@ -1,8 +1,5 @@
 import React, { useState, useEffect } from "react";
-import Image from "next/image";
 import { RxCross2 } from "react-icons/rx";
-import Link from "next/link";
-import img from "@/assets/images/daos/attestation.png";
 import Confetti from "react-confetti";
 import { BsTwitterX } from "react-icons/bs";
 
@@ -18,8 +15,9 @@ function SchedulingSuccessModal({
   // const { width, height } = useWindowSize();
   const shareOnTwitter = () => {
     const userAddress = data.userAddress;
+    const dao_name = data.dao_name;
     const url = encodeURIComponent(
-      `https://app.chora.club/${userAddress}?active=delegatesSession&session=book`
+      `https://app.chora.club/${dao_name}/${userAddress}?active=delegatesSession&session=book`
     );
     const text = encodeURIComponent(
       `Hello Web3 Enthusiasts!🎉\nI've opened up some time slots for sessions on @ChoraClub!📅\nDon't miss out – book your session now to learn more about Web3 ecosystem! 📝\n👉 ${decodeURIComponent(

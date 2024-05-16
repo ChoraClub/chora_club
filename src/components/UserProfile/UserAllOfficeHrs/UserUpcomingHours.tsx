@@ -12,7 +12,7 @@ import {
   useDisclosure,
 } from "@nextui-org/react";
 import { Tooltip } from "@nextui-org/react";
-import { FaPencil } from "react-icons/fa6"; // Importing the pencil icon
+import { FaPencil, FaRegShareFromSquare } from "react-icons/fa6"; // Importing the pencil icon
 import { FiEdit } from "react-icons/fi";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { FaSpinner } from "react-icons/fa"; // Importing the spinner icon
@@ -260,6 +260,17 @@ function UserUpcomingHours() {
 
               <div className="flex flex-col justify-between">
                 <div className="flex gap-2">
+                  <Tooltip content="Share" placement="top" showArrow>
+                    <span
+                      className="border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 cursor-pointer"
+                      style={{
+                        backgroundColor: "rgba(217, 217, 217, 0.42)",
+                      }}
+                      onClick={() => null}
+                    >
+                      <FaRegShareFromSquare color="#3e3d3d" size={13} />
+                    </span>
+                  </Tooltip>
                   <Tooltip content="Edit" placement="top" showArrow>
                     <span
                       className="border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 cursor-pointer"

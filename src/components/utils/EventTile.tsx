@@ -31,7 +31,7 @@ interface TileProps {
     meetingId: string;
     dao_name: string;
     booking_status: string;
-    meeting_status: boolean;
+    meeting_status: string;
     joined_status: boolean;
     attendees: Attendee[];
     host_address: string;
@@ -58,13 +58,13 @@ const createRandomRoom = async () => {
 
 function EventTile({ tileIndex, data, isEvent }: TileProps) {
   const [isPageLoading, setIsPageLoading] = useState(true);
-  const [isConfirmSlotLoading, setIsConfirmSlotLoading] = useState(true);
+  const [isConfirmSlotLoading, setIsConfirmSlotLoading] = useState(false);
   const router = useRouter();
   const [startLoading, setStartLoading] = useState(false);
 
   useEffect(() => {
     setIsPageLoading(false);
-    setIsConfirmSlotLoading(false);
+    // setIsConfirmSlotLoading(false);
   }, [data, isPageLoading]);
 
   const formatWalletAddress = (address: any) => {
@@ -119,7 +119,7 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
         setTimeout(() => {
           setIsPageLoading(false);
           setIsConfirmSlotLoading(false);
-        }, 1000);
+        }, 4000);
         console.log("status updated");
       }
     } catch (error) {
@@ -161,7 +161,7 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
               {data.session_type === "session" ? (
                 <div className="text-[#3E3D3D]">
                   <span className="font-semibold">Session - </span>{" "}
-                  <span className="font-semibold">Attendee:</span>{" "}
+                  <span className="font-semibold">Guest:</span>{" "}
                   {formatWalletAddress(data.attendees[0].attendee_address)}
                 </div>
               ) : (
@@ -199,13 +199,13 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
           {isEvent === "Book" ? (
             data.booking_status === "Approved" ? (
               <div className="flex justify-end ">
-                {startLoading ? (
+                {startLoading || isConfirmSlotLoading ? (
                   <div className="flex items-center justify-center">
                     <Oval
                       visible={true}
-                      height="20"
-                      width="20"
-                      color="#fff"
+                      height="30"
+                      width="30"
+                      color="#0500FF"
                       secondaryColor="#cdccff"
                       ariaLabel="oval-loading"
                     />

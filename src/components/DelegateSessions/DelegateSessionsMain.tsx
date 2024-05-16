@@ -7,6 +7,7 @@ import AvailableSessions from "./AvailableSessions";
 import RecordedSessions from "./RecordedSessions";
 import { FaCircleInfo } from "react-icons/fa6";
 import { Tooltip } from "@nextui-org/react";
+import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
 
 function DelegateSessionsMain() {
   const router = useRouter();
@@ -18,7 +19,7 @@ function DelegateSessionsMain() {
       <div className="">
         <div className="flex justify-between pt-6 pl-14 pr-14">
           <div className="flex font-quanty font-medium text-4xl text-blue-shade-200 pb-4 items-center">
-            <div>
+            {/* <div>
               <Tooltip
                 showArrow
                 content={
@@ -33,11 +34,11 @@ function DelegateSessionsMain() {
               >
                 <div> Available Delegates</div>
               </Tooltip>
-            </div> 
+            </div>  */}
             Sessions
           </div>
           <div>
-            <ConnectButton />
+            <ConnectWalletWithENS />
           </div>
         </div>
 
@@ -89,7 +90,7 @@ function DelegateSessionsMain() {
           </button>
         </div>
 
-        <div className="py-6 ps-16">
+        <div className="py-6 pl-14 pr-6">
           {searchParams.get("active") === "recordedSessions" ? (
             <RecordedSessions />
           ) : (

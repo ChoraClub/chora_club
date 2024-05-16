@@ -53,8 +53,8 @@ export async function POST(req: NextRequest, res: NextResponse) {
     const {
       roomId,
       meetingType,
-    }: // video_uri,
-    { roomId: string; meetingType: number; video_uri: string } =
+      dao_name,
+    }: { roomId: string; meetingType: number; dao_name: string } =
       await req.json();
 
     if (!roomId) {
@@ -254,6 +254,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
       endTime: latestEndTimeEpoch,
       meetingType: meetingTypeName,
       attestation: "pending",
+      dao_name: dao_name,
       // video_uri,
     };
 
@@ -280,6 +281,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
         startTime: earliestStartTimeEpoch,
         endTime: latestEndTimeEpoch,
         meetingType: meetingTypeName,
+        dao_name: dao_name,
       },
       { status: 200 }
     );

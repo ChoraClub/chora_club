@@ -35,6 +35,7 @@ export async function POST(req: NextRequest, res: NextResponse<Type[]>) {
 
     const db = client.db();
     const collection = db.collection("scheduling");
+    const delegatesCollection = db.collection("delegates");
 
     // const newDate = new Date().toISOString().split("T")[0];
 
@@ -81,41 +82,6 @@ export async function POST(req: NextRequest, res: NextResponse<Type[]>) {
       console.log("startTimeToSend", startTimeToSend);
       console.log("endTimeToSend", endTimeToSend);
     }
-
-    // const currentDate = new Date();
-    // let newDate = currentDate.toLocaleDateString();
-    // if (newDate.length !== 10 || !newDate.match(/^\d{4}-\d{2}-\d{2}$/)) {
-    //   const year = currentDate.getFullYear();
-    //   const month = String(currentDate.getMonth() + 1).padStart(2, "0");
-    //   const day = String(currentDate.getDate()).padStart(2, "0");
-    //   newDate = `${year}-${month}-${day}`;
-    // }
-
-    // console.log("currentDate", newDate);
-
-    // const startDateTime = (await startTime)
-    //   ? new Date(`${date ? date : newDate} ${startTime}:00`)
-    //   : null;
-
-    // const endDateTime = (await endTime)
-    //   ? new Date(`${date ? date : newDate} ${endTime}:00`)
-    //   : null;
-
-    // console.log("startDateTime", startDateTime);
-    // console.log("endDateTime", endDateTime);
-
-    // const startTimeToSend = startDateTime
-    //   ?.toISOString()
-    //   .split("T")[1]
-    //   .substring(0, 5);
-
-    // const endTimeToSend = endDateTime
-    //   ?.toISOString()
-    //   .split("T")[1]
-    //   .substring(0, 5);
-
-    // console.log("startTimeToSend", startTimeToSend);
-    // console.log("endTimeToSend", endTimeToSend);
 
     let query: any = {
       "dateAndRanges.date": { $gte: newDate },
@@ -185,10 +151,29 @@ export async function POST(req: NextRequest, res: NextResponse<Type[]>) {
 
     console.log("finalSessionData", finalSessionData);
 
+    // Iterate through each meeting document
+    const mergedData = await Promise.all(
+      finalSessionData.map(async (session) => {
+        // Extract address and dao_name from the meeting
+        const { userAddress, dao_name } = session;
+
+        // Query delegates collection based on address and dao_name
+        const userInfo = await delegatesCollection
+          .find({
+            address: userAddress,
+            daoName: dao_name,
+          })
+          .toArray();
+
+        // Return merged data
+        return { session, userInfo };
+      })
+    );
+
     client.close();
 
     return NextResponse.json(
-      { success: true, data: finalSessionData, fetchedData: sessionData },
+      { success: true, data: mergedData, fetchedData: sessionData },
       { status: 200 }
     );
   } catch (error) {

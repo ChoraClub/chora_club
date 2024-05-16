@@ -11,6 +11,7 @@ import Tile from "../utils/Tile";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { Oval } from "react-loader-spinner";
 import { Tooltip } from "@nextui-org/react";
+import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
 
 interface Type {
   img: StaticImageData;
@@ -150,7 +151,7 @@ function DaoOfficeHours() {
           </Tooltip>
         </div>
         <div>
-          <ConnectButton />
+          <ConnectWalletWithENS />
         </div>
       </div>
 

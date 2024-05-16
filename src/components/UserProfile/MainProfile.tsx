@@ -40,6 +40,7 @@ import lighthouse from "@lighthouse-web3/sdk";
 import InstantMeet from "./InstantMeet";
 import { useSession } from "next-auth/react";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
+import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
 
 function MainProfile() {
   const { isConnected, address } = useAccount();
@@ -144,33 +145,6 @@ function MainProfile() {
     console.log(
       "Visit at https://gateway.lighthouse.storage/ipfs/" + output.data.Hash
     );
-  };
-
-  const handleAttestation = async () => {
-    const data = {
-      recipient: "0xbFc4A28D8F1003Bec33f4Fdb7024ad6ad1605AA8",
-      meetingId: "abc-def-ggi",
-      meetingType: 1,
-      startTime: 16452456,
-      endTime: 16452492,
-    };
-
-    console.log(window.location.origin);
-    const headers = {
-      "Content-Type": "application/json",
-      //   Origin: window.location.origin, // Set the Origin header to your frontend URL
-    };
-
-    try {
-      const response = await axios.post("/api/attest-offchain", data, {
-        headers,
-      });
-      console.log(response.data);
-      // Handle response as needed
-    } catch (error) {
-      console.error("Error:", error);
-      // Handle error
-    }
   };
 
   useEffect(() => {
@@ -944,7 +918,7 @@ function MainProfile() {
               </div>
             </div>
             <div>
-              <ConnectButton />
+              <ConnectWalletWithENS />
             </div>
           </div>
 
@@ -1060,6 +1034,7 @@ function MainProfile() {
             ) : (
               ""
             )}
+
             {selfDelegate === true &&
             searchParams.get("active") === "instant-meet" ? (
               <InstantMeet

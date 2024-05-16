@@ -10,6 +10,8 @@ import { ImCross } from "react-icons/im";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { FaCirclePlus } from "react-icons/fa6";
 import Link from "next/link";
+import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
+import ButtonWithCircle from "../Circle/ButtonWithCircle";
 
 function ExploreDAOs() {
   const dao_info = [
@@ -59,6 +61,8 @@ function ExploreDAOs() {
 
     fetchData();
   }, [isPageLoading]);
+  const [circlePosition, setCirclePosition] = useState({ x: 0, y: 0 });
+  const [IshowCircle, SetCircleShow] = useState(false);
 
   useEffect(() => {
     const storedStatus = sessionStorage.getItem("notificationStatus");
@@ -93,35 +97,32 @@ function ExploreDAOs() {
     setStatus(false);
     localStorage.setItem("hasSeenNotification", "true");
   };
+  // const coursercall=(event)=>{
+  //   const rect = event.currentTarget.getBoundingClientRect();
+  //   const x = event.clientX - rect.left;
+  //   const y = event.clientY - rect.top;
+
+  //   setCirclePosition({ x, y });
+  //   SetCircleShow(true);
+  //   console.log(circlePosition);
+
+  //   setTimeout(() => {
+  //     SetCircleShow(false);
+  //   }, 1000); // Adjust the time as needed
+
+  // }
 
   return (
-    <div className="pt-6 pl-14 pr-6">
-      {showNotification && !isPageLoading && (
-        <div
-          className={`flex absolute items-center justify-center bottom-9 rounded-full font-poppins text-sm font-medium left-[34%] w-[32rem] ${
-            status ? "" : "hidden"
-          }`}
-        >
-          <div className="py-2 bg-blue-shade-100 text-white rounded-full px-7">
-            To ensure optimal user experience, please note that our site is
-            designed to be responsive on desktop devices.
-          </div>
-          <div
-            className="bg-red-600 hover:bg-red-700 p-2 rounded-full cursor-pointer ml-3"
-            onClick={handleCloseNotification}
-          >
-            <ImCross color="#fff" size={10} />
-          </div>
-        </div>
-      )}
-
+    <div className="pt-6 pl-14 pr-6 min-h-screen">
       <div className="">
         <div className="flex justify-between pe-10">
           <div className="text-blue-shade-200 font-medium text-4xl font-quanty pb-4">
             Explore DAOs
           </div>
+
           <div>
-            <ConnectButton />
+            <ConnectWalletWithENS />
+            {/* <ConnectButton /> */}
           </div>
         </div>
 
@@ -138,7 +139,7 @@ function ExploreDAOs() {
             onChange={(e) => handleSearchChange(e.target.value)}
           ></input>
           <span className="flex items-center bg-black rounded-full px-6 py-3">
-            <Image src={search} alt="search" width={20} />
+            <Image src={search} alt="search" width={20} height={20} />
           </span>
         </div>
 
@@ -157,7 +158,6 @@ function ExploreDAOs() {
                     alt="Image not found"
                     width={80}
                     height={80}
-                    priority
                     className="rounded-full"
                   ></Image>
                 </div>
@@ -211,6 +211,24 @@ function ExploreDAOs() {
           </div>
         </div>
       </div>
+      {showNotification && (
+        <div
+          className={`flex fixed items-center justify-center bottom-9 rounded-full font-poppins text-sm font-medium left-[34%] w-[32rem] ${
+            status ? "" : "hidden"
+          }`}
+        >
+          <div className="py-2 bg-blue-shade-100 text-white rounded-full px-7">
+            To ensure optimal user experience, please note that our site is
+            designed to be responsive on desktop devices.
+          </div>
+          <div
+            className="bg-red-600 hover:bg-red-700 p-2 rounded-full cursor-pointer ml-3"
+            onClick={handleCloseNotification}
+          >
+            <ImCross color="#fff" size={10} />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
