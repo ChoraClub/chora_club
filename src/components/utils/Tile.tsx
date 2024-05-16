@@ -92,7 +92,11 @@ function Tile({
               }`}
               style={{ boxShadow: "0px 4px 26.7px 0px rgba(0, 0, 0, 0.10)" }}
               // onClick={() => openModal(index)}
-              onClick={() => router.push(`/watch/${data.meetingId}`)}
+              onClick={
+                isEvent === "Recorded"
+                  ? () => router.push(`/watch/${data.meetingId}`)
+                  : () => null
+              }
             >
               <div className="flex">
                 <Image
@@ -139,7 +143,7 @@ function Tile({
                   ) : (
                     <div className="flex gap-x-16 text-sm py-3">
                       <div className="text-[#3E3D3D]">
-                        <span className="font-semibold">Attendee:</span>{" "}
+                        <span className="font-semibold">Guest:</span>{" "}
                         {data.attendee.substring(0, 10)}...
                       </div>
                       <div className="text-[#3E3D3D]">

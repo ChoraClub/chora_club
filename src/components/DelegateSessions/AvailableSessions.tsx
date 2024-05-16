@@ -13,7 +13,7 @@ import arbImg from "@/assets/images/daos/arbitrum.jpg";
 import { FaCircleInfo } from "react-icons/fa6";
 import { Tooltip } from "@nextui-org/react";
 import text1 from "@/assets/images/daos/texture1.png";
-import clockIcn from "@/assets/icon_clock.png";
+import clockIcn from "@/assets/images/daos/icon_clock.png";
 import ccLogo from "@/assets/images/daos/CC.png";
 import OPLogo from "@/assets/images/daos/op.png";
 import ArbLogo from "@/assets/images/daos/arbCir.png";
@@ -40,7 +40,7 @@ function AvailableSessions() {
   const path = usePathname();
   const searchParams = useSearchParams();
   const [daoInfo, setDaoInfo] = useState<Array<Type>>([]);
-  const [APIData, setAPIData] = useState<Array<Type>>([]);
+  const [APIData, setAPIData] = useState<any>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isPageLoading, setIsPageLoading] = useState(true);
   const [selectedDao, setSelectedDao] = useState<any>(null);
@@ -147,12 +147,20 @@ function AvailableSessions() {
 
   const handleSearchChange = (query: string) => {
     setSearchQuery(query);
-    const filtered: any = APIData.filter(
-      (item) =>
-        item.ensName?.toLowerCase().includes(query.toLowerCase()) ||
-        item.userAddress.toLowerCase().includes(query.toLowerCase())
-    );
-    setDaoInfo(filtered);
+    if (query) {
+      const filtered = APIData.filter((item: any) => {
+        // Convert both query and userAddress to lowercase for case-insensitive matching
+        const lowercaseQuery = query.toLowerCase();
+        const lowercaseAddress = item.session.userAddress.toLowerCase();
+
+        // Check if the lowercase userAddress includes the lowercase query
+        return lowercaseAddress.includes(lowercaseQuery);
+      });
+
+      setDaoInfo(filtered);
+    } else {
+      setDaoInfo(APIData);
+    }
   };
 
   const handleDaoChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -266,7 +274,7 @@ function AvailableSessions() {
         </div>
 
         <div className="flex items-center">
-        <Tooltip
+          <Tooltip
             showArrow
             content={
               <div className="font-poppins">
@@ -277,24 +285,21 @@ function AvailableSessions() {
             className="rounded-md bg-opacity-90"
             closeDelay={1}
           >
-          <select
-            value={selectedDao}
-            // onChange={(e) => setSelectedDao(e.target.value)}
-            onChange={handleDaoChange}
-            className="px-3 py-2 rounded-md shadow"
-          >
-            <option value="All-DAOS">All DAOS</option>
-            <option value="optimism">Optimism</option>
-            <option value="arbitrum">Arbitrum</option>
-          </select>
-        
+            <select
+              value={selectedDao}
+              // onChange={(e) => setSelectedDao(e.target.value)}
+              onChange={handleDaoChange}
+              className="px-3 py-2 rounded-md shadow"
+            >
+              <option value="All-DAOS">All DAOS</option>
+              <option value="optimism">Optimism</option>
+              <option value="arbitrum">Arbitrum</option>
+            </select>
           </Tooltip>
         </div>
 
-        
-
         <div className="flex items-center">
-        <Tooltip
+          <Tooltip
             showArrow
             content={
               <div className="font-poppins">
@@ -305,67 +310,65 @@ function AvailableSessions() {
             className="rounded-md bg-opacity-90"
             closeDelay={1}
           >
-          <input
-            type="date"
-            value={selectedDate}
-            onChange={handleDateChange}
-            min={formattedDate}
-            // onChange={(e) => setSelectedDate(e.target.value)}
-            className="px-3 py-2 shadow mr-1 rounded-md"
-          />
+            <input
+              type="date"
+              value={selectedDate}
+              onChange={handleDateChange}
+              min={formattedDate}
+              // onChange={(e) => setSelectedDate(e.target.value)}
+              className="px-3 py-2 shadow mr-1 rounded-md"
+            />
           </Tooltip>
         </div>
 
         <Tooltip
-            showArrow
-            content={
-              <div className="font-poppins">
-                Select a time to view available Delegates for that specific
-                time.
-              </div>
-            }
-            placement="bottom"
-            className="rounded-md bg-opacity-90"
-            closeDelay={1}
-          >
-        <div className="flex items-center select-container">
-          <select
-            value={startTime || "Start Time"}
-            onChange={handleStartTimeChange}
-            className="px-3 py-2 rounded-md shadow mr-1"
-          >
-            <option disabled>Start Time</option>
-            {timeOptions.map((time) => (
-              <option key={time} value={time}>
-                {time}
-              </option>
-            ))}
-          </select>
-          <span>&nbsp;to</span>
-          <select
-            value={endTime || "End Time"}
-            onChange={handleEndTimeChange}
-            className="px-3 py-2 rounded-md shadow ml-2"
-          >
-            <option disabled>End Time</option>
-            {timeOptions.map((time) => (
-              <option key={time} value={time}>
-                {time}
-              </option>
-            ))}
-          </select>
-          {(startTime || endTime) && (
-            <button
-              onClick={handleClearTime}
-              className="ml-2 text-red-500 px-3 py-1 rounded-md border border-red-500 hover:bg-red-500 hover:text-white focus:outline-none focus:ring-2 focus:ring-red-500"
+          showArrow
+          content={
+            <div className="font-poppins">
+              Select a time to view available Delegates for that specific time.
+            </div>
+          }
+          placement="bottom"
+          className="rounded-md bg-opacity-90"
+          closeDelay={1}
+        >
+          <div className="flex items-center select-container">
+            <select
+              value={startTime || "Start Time"}
+              onChange={handleStartTimeChange}
+              className="px-3 py-2 rounded-md shadow mr-1"
             >
-              Clear Time
-            </button>
-          )}
-        </div>
+              <option disabled>Start Time</option>
+              {timeOptions.map((time) => (
+                <option key={time} value={time}>
+                  {time}
+                </option>
+              ))}
+            </select>
+            <span>&nbsp;to</span>
+            <select
+              value={endTime || "End Time"}
+              onChange={handleEndTimeChange}
+              className="px-3 py-2 rounded-md shadow ml-2"
+            >
+              <option disabled>End Time</option>
+              {timeOptions.map((time) => (
+                <option key={time} value={time}>
+                  {time}
+                </option>
+              ))}
+            </select>
+            {(startTime || endTime) && (
+              <button
+                onClick={handleClearTime}
+                className="ml-2 text-red-500 px-3 py-1 rounded-md border border-red-500 hover:bg-red-500 hover:text-white focus:outline-none focus:ring-2 focus:ring-red-500"
+              >
+                Clear Time
+              </button>
+            )}
+          </div>
         </Tooltip>
       </div>
-      
 
       <div className="pt-8 font-poppins">
         {isPageLoading ? (
@@ -401,11 +404,11 @@ function AvailableSessions() {
                       <div className="flex justify-center items-center w-32 h-32">
                         <Image
                           src={
-                            daos.profilePicture
-                              ? `https://gateway.lighthouse.storage/ipfs/${daos.profilePicture}`
-                              : daos.dao_name === "optimism"
+                            daos.userInfo[0].image
+                              ? `https://gateway.lighthouse.storage/ipfs/${daos.userInfo[0].image}`
+                              : daos.session.dao_name === "optimism"
                               ? OPLogo
-                              : daos.dao_name === "arbitrum"
+                              : daos.session.dao_name === "arbitrum"
                               ? ArbLogo
                               : ccLogo
                           }
@@ -413,7 +416,7 @@ function AvailableSessions() {
                           width={256}
                           height={256}
                           className={
-                            daos?.profilePicture
+                            daos?.userInfo[0]?.image
                               ? "w-32 h-32 rounded-3xl"
                               : "w-20 h-20 rounded-3xl"
                           }
@@ -436,18 +439,17 @@ function AvailableSessions() {
 
                   <div className="w-3/4 ml-4">
                     <div className="text-[#3E3D3D] text-lg font-semibold mb-1">
-                      {daos.ensName && daos.ensName.length > 15
-                        ? daos.ensName.slice(0, 15) + "..."
-                        : daos.ensName ||
-                          daos.userAddress.slice(0, 6) +
-                            "..." +
-                            daos.userAddress.slice(-4)}
+                      {daos.userInfo[0].displayName
+                        ? daos.userInfo[0].displayName
+                        : daos.session.userAddress.slice(0, 6) +
+                          "..." +
+                          daos.session.userAddress.slice(-4)}
                     </div>
                     <div className="text-sm flex">
                       <div>
-                        {daos.userAddress.slice(0, 6) +
+                        {daos.session.userAddress.slice(0, 6) +
                           "..." +
-                          daos.userAddress.slice(-4)}
+                          daos.session.userAddress.slice(-4)}
                       </div>
                       <div className="items-center">
                         <Tooltip
@@ -461,7 +463,9 @@ function AvailableSessions() {
                             color="#3E3D3D"
                           >
                             <IoCopy
-                              onClick={() => handleCopy(`${daos.userAddress}`)}
+                              onClick={() =>
+                                handleCopy(`${daos.session.userAddress}`)
+                              }
                             />
                           </div>
                         </Tooltip>
@@ -480,7 +484,7 @@ function AvailableSessions() {
                       </div>
                     </div>
                     <div className="mt-2 bg-[#1E1E1E] border border-[#1E1E1E] text-white rounded-md text-xs px-5 py-1 font-semibold w-fit capitalize">
-                      {daos.dao_name}
+                      {daos.session.dao_name}
                     </div>
                     <div>
                       <div
@@ -493,7 +497,7 @@ function AvailableSessions() {
                         }}
                       >
                         <div style={{ display: "flex" }}>
-                          {daos.dateAndRanges
+                          {daos.session.dateAndRanges
                             .flatMap((dateRange: any) => dateRange.date)
                             .filter(
                               (date: any, index: any, self: any) =>
@@ -527,7 +531,8 @@ function AvailableSessions() {
                   />
                   <div className="w-[60%]">
                     <span className="text-base font-semibold text-[#0500FF] ml-1">
-                      Available for {`${daos.timeSlotSizeMinutes}`} minutes
+                      Available for {`${daos.session.timeSlotSizeMinutes}`}{" "}
+                      minutes
                     </span>
                   </div>
                   <div className="w-[40%] flex justify-end ">
@@ -545,7 +550,7 @@ function AvailableSessions() {
                     <button
                       onClick={() =>
                         router.push(
-                          `/${daos.dao_name}/${daos.userAddress}?active=delegatesSession&session=book`
+                          `/${daos.session.dao_name}/${daos.session.userAddress}?active=delegatesSession&session=book`
                         )
                       }
                       className="bg-black text-white py-4 px-6 rounded-[36px] text-sm w-[11rem] hover:bg-[#333333] focus:outline-none focus:ring-2 focus:ring-gray-400 font-medium"

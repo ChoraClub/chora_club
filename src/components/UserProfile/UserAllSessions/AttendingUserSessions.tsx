@@ -22,7 +22,7 @@ interface Session {
   host_address: string;
   joined_status: string;
   meetingId: string;
-  meeting_status: "Upcoming" | "Recorded" | "Denied";
+  meeting_status: "Upcoming" | "Recorded" | "Denied" | "";
   slot_time: string;
   title: string;
   attendees: Attendee[];
@@ -64,17 +64,15 @@ function AttendingUserSessions({ daoName }: { daoName: string }) {
           if (searchParams.get("session") === "attending") {
             filteredData = resultData.filter((session: Session) => {
               return (
-                session.attendees?.some(
-                  (attendee) => attendee.attendee_address === address
-                ) &&
                 session.meeting_status !== "Recorded" &&
                 new Date(session.slot_time).toLocaleString() >=
-                  currentSlot.toLocaleString() &&
-                session.dao_name === daoName
+                  currentSlot.toLocaleString()
+                // && session.dao_name === daoName
               );
             });
+            console.log("filtered data in attending: ", filteredData);
           }
-          console.log("filtered", filteredData);
+          // console.log("filtered in attending", filteredData);
           setSessionDetails(filteredData);
           setPageLoading(false);
         }

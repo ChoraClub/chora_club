@@ -14,9 +14,9 @@ interface MeetingRequestBody {
   attendees: Attendee[];
   slot_time: string;
   meetingId: string;
-  meeting_status: boolean;
+  meeting_status: string;
   joined_status: boolean;
-  booking_status: boolean;
+  booking_status: string;
   dao_name: string;
   title: string;
   description: string;
@@ -32,9 +32,9 @@ interface MeetingResponseBody {
     attendees: Attendee[];
     slot_time: string;
     meetingId: string;
-    meeting_status: boolean;
+    meeting_status: string;
     joined_status: boolean;
-    booking_status: boolean;
+    booking_status: string;
     dao_name: string;
     title: string;
     description: string;

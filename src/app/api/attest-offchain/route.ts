@@ -31,6 +31,7 @@ interface AttestOffchainRequestBody {
   meetingType: number;
   startTime: number;
   endTime: number;
+  daoName: string;
 }
 
 interface MyError {
@@ -41,15 +42,15 @@ interface MyError {
 // const allowedOrigin = "http://localhost:3000";
 const allowedOrigin = process.env.NEXTAUTH_URL;
 
-const url = process.env.NEXT_PUBLIC_ATTESTATION_URL;
-// Set up your ethers provider and signer
-const provider = new ethers.JsonRpcProvider(url, undefined, {
-  staticNetwork: true,
-});
-const privateKey = process.env.PVT_KEY ?? "";
-const signer = new ethers.Wallet(privateKey, provider);
-const eas = new EAS("0x4200000000000000000000000000000000000021");
-eas.connect(signer);
+// const url = process.env.NEXT_PUBLIC_ATTESTATION_URL;
+// // Set up your ethers provider and signer
+// const provider = new ethers.JsonRpcProvider(url, undefined, {
+//   staticNetwork: true,
+// });
+// const privateKey = process.env.PVT_KEY ?? "";
+// const signer = new ethers.Wallet(privateKey, provider);
+// const eas = new EAS("0x4200000000000000000000000000000000000021");
+// eas.connect(signer);
 
 export async function POST(req: NextRequest, res: NextResponse) {
   const origin = req.headers.get("Origin");
@@ -68,11 +69,37 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
   try {
     console.log("log2");
+
+    const atstUrl =
+      requestData.daoName === "optimism"
+        ? process.env.NEXT_PUBLIC_OP_ATTESTATION_URL
+        : requestData.daoName === "arbitrum"
+        ? process.env.NEXT_PUBLIC_ARB_ATTESTATION_URL
+        : "";
+    console.log("atstUrl", atstUrl);
+    // Set up your ethers provider and signer
+    const provider = new ethers.JsonRpcProvider(atstUrl, undefined, {
+      staticNetwork: true,
+    });
+    const privateKey = process.env.PVT_KEY ?? "";
+    const signer = new ethers.Wallet(privateKey, provider);
+    console.log("signer", signer);
+
+    const EASContractAddress =
+      requestData.daoName === "optimism"
+        ? "0x4200000000000000000000000000000000000021"
+        : requestData.daoName === "arbitrum"
+        ? "0xbD75f629A22Dc1ceD33dDA0b68c546A1c035c458"
+        : "";
+    const eas = new EAS(EASContractAddress);
+
+    eas.connect(signer);
+    console.log("Connected");
     // Your initialization code remains the same
     const offchain = await eas.getOffchain();
     console.log(offchain);
     const schemaEncoder = new SchemaEncoder(
-      "bytes16 MeetingId,uint8 MeetingType,uint32 StartTime,uint32 EndTime"
+      "bytes32 MeetingId,uint8 MeetingType,uint32 StartTime,uint32 EndTime"
     );
 
     console.log(schemaEncoder);
@@ -80,8 +107,8 @@ export async function POST(req: NextRequest, res: NextResponse) {
     const encodedData = schemaEncoder.encodeData([
       {
         name: "MeetingId",
-        value: bytesToHex(stringToBytes(requestData.meetingId), { size: 16 }),
-        type: "bytes16",
+        value: bytesToHex(stringToBytes(requestData.meetingId), { size: 32 }),
+        type: "bytes32",
       },
       { name: "MeetingType", value: requestData.meetingType, type: "uint8" },
       { name: "StartTime", value: requestData.startTime, type: "uint32" },
@@ -102,7 +129,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
     const offchainAttestation = await offchain.signOffchainAttestation(
       {
         schema:
-          "0x2d76910b8e40f8a4c63bed0c179df62335b11831669efec456ade30ca034b65f",
+          "0xf9e214a80b66125cad64453abe4cef5263be3a7f01760d0cc72789236fca2b5d",
         recipient: requestData.recipient,
         time: currentTime,
         expirationTime: expirationTime,
@@ -119,7 +146,13 @@ export async function POST(req: NextRequest, res: NextResponse) {
       signer: await signer.getAddress(),
     };
 
-    const baseUrl = "https://optimism-sepolia.easscan.org";
+    let baseUrl = "";
+
+    if (requestData.daoName === "optimism") {
+      baseUrl = "https://optimism.easscan.org";
+    } else if (requestData.daoName) {
+      baseUrl = "https://arbitrum.easscan.org";
+    }
     const url = baseUrl + createOffchainURL(pkg);
 
     const data = {
@@ -133,7 +166,11 @@ export async function POST(req: NextRequest, res: NextResponse) {
       if (response.data) {
         uploadstatus = true;
       }
-      console.log(response.data);
+      console.log("response data", response.data);
+      console.log(
+        "requestData.meetingId.split",
+        requestData.meetingId.split("/")[0]
+      );
 
       if (requestData.meetingType === 1) {
         const client = await MongoClient.connect(process.env.MONGODB_URI!, {
@@ -142,9 +179,9 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
         const db = client.db();
         const collection = db.collection("meetings");
-
+        console.log("in meeting type 1");
         await collection.findOneAndUpdate(
-          { meetingId: requestData.meetingId },
+          { meetingId: requestData.meetingId.split("/")[0] },
           {
             $set: {
               uid_host: response.data.offchainAttestationId,
@@ -161,10 +198,10 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
         const db = client.db();
         const collection = db.collection("meetings");
-
+        console.log("meeting type 2");
         await collection.findOneAndUpdate(
           {
-            meetingId: requestData.meetingId,
+            meetingId: requestData.meetingId.split("/")[0],
             "attendees.attendee_address": requestData.recipient,
           },
           {
@@ -184,7 +221,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
         const collection = db.collection("office_hours");
 
         await collection.findOneAndUpdate(
-          { meetingId: requestData.meetingId },
+          { meetingId: requestData.meetingId.split("/")[0] },
           {
             $set: {
               uid_host: response.data.offchainAttestationId,
@@ -204,7 +241,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
         await collection.findOneAndUpdate(
           {
-            meetingId: requestData.meetingId,
+            meetingId: requestData.meetingId.split("/")[0],
             "attendees.attendee_address": requestData.recipient,
           },
           {

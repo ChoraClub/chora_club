@@ -36,7 +36,12 @@ function UserInfo({
   const [desc, setDesc] = useState<string>();
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const [isDataLoading, setDataLoading] = useState(true);
+  const [isSessionHostedLoading, setSessionHostedLoading] = useState(true);
+  const [isSessionAttendedLoading, setSessionAttendedLoading] = useState(true);
+  const [isOfficeHoursHostedLoading, setOfficeHoursHostedLoading] =
+    useState(true);
+  const [isOfficeHourseAttendedLoading, setOfficeHoursAttendedLoading] =
+    useState(true);
   const [sessionHostCount, setSessionHostCount] = useState(0);
   const [sessionAttendCount, setSessionAttendCount] = useState(0);
   const [officehoursHostCount, setOfficehoursHostCount] = useState(0);
@@ -46,8 +51,32 @@ function UserInfo({
   let officehoursHostingCount = 0;
   let officehoursAttendingCount = 0;
   let dao_name = daoName;
+  const [activeButton, setActiveButton] = useState("onchain");
 
-  useEffect(() => {
+  const fetchAttestation = async (buttonType: string) => {
+    let sessionHostingCount = 0;
+    let sessionAttendingCount = 0;
+    let officehoursHostingCount = 0;
+    let officehoursAttendingCount = 0;
+
+    setActiveButton(buttonType);
+    setSessionHostedLoading(true);
+    setSessionAttendedLoading(true);
+    setOfficeHoursHostedLoading(true);
+    setOfficeHoursAttendedLoading(true);
+
+    if (chain?.name === "Optimism") {
+      dao_name = "optimism";
+    } else if (chain?.name === "Arbitrum One") {
+      dao_name = "arbitrum";
+    }
+
+    const host_uid_key =
+      buttonType === "onchain" ? "onchain_host_uid" : "uid_host";
+
+    const attendee_uid_key =
+      buttonType === "onchain" ? "onchain_uid_attendee" : "attendee_uid";
+
     const sessionHosted = async () => {
       try {
         const response = await fetch(`/api/get-meeting/${address}`, {
@@ -59,18 +88,19 @@ function UserInfo({
         const result = await response.json();
         if (result.success) {
           result.data.forEach((item: any) => {
+            console.log("item uid: ", item[host_uid_key], host_uid_key);
             if (
               item.meeting_status === "Recorded" &&
-              item.dao_name === daoName &&
-              item.uid_host
+              item.dao_name === dao_name &&
+              item[host_uid_key]
             ) {
               sessionHostingCount++;
             }
             setSessionHostCount(sessionHostingCount);
-            setDataLoading(false);
+            setSessionHostedLoading(false);
           });
         } else {
-          setDataLoading(false);
+          setSessionHostedLoading(false);
         }
       } catch (e) {
         console.log("Error: ", e);
@@ -93,16 +123,16 @@ function UserInfo({
           result.data.forEach((item: any) => {
             if (
               item.meeting_status === "Recorded" &&
-              item.dao_name === daoName &&
-              item.attendees.some((attendee: any) => attendee.attendee_uid)
+              item.dao_name === dao_name &&
+              item.attendees.some((attendee: any) => attendee[attendee_uid_key])
             ) {
               sessionAttendingCount++;
             }
             setSessionAttendCount(sessionAttendingCount);
-            setDataLoading(false);
+            setSessionAttendedLoading(false);
           });
         } else {
-          setDataLoading(false);
+          setSessionAttendedLoading(false);
         }
       } catch (e) {
         console.log("Error: ", e);
@@ -126,17 +156,18 @@ function UserInfo({
           result.forEach((item: any) => {
             if (
               item.meeting_status === "inactive" &&
-              item.dao_name === daoName &&
-              item.uid_host
+              item.dao_name === dao_name &&
+              item[host_uid_key]
             ) {
               officehoursHostingCount++;
             }
 
+            // console.log("office hours host count: ", officehoursHostingCount);
             setOfficehoursHostCount(officehoursHostingCount);
-            setDataLoading(false);
+            setOfficeHoursHostedLoading(false);
           });
         } else {
-          setDataLoading(false);
+          setOfficeHoursHostedLoading(false);
         }
       } catch (e) {
         console.log("Error: ", e);
@@ -160,17 +191,17 @@ function UserInfo({
           result.forEach((item: any) => {
             if (
               item.meeting_status === "inactive" &&
-              item.dao_name === daoName &&
-              item.attendees.some((attendee: any) => attendee.attendee_uid)
+              item.dao_name === dao_name &&
+              item.attendees.some((attendee: any) => attendee[attendee_uid_key])
             ) {
               officehoursAttendingCount++;
             }
 
             setOfficehoursAttendCount(officehoursAttendingCount);
-            setDataLoading(false);
+            setOfficeHoursAttendedLoading(false);
           });
         } else {
-          setDataLoading(false);
+          setOfficeHoursAttendedLoading(false);
         }
       } catch (e) {
         console.log("Error: ", e);
@@ -181,7 +212,15 @@ function UserInfo({
     sessionAttended();
     officeHoursHosted();
     officeHoursAttended();
-  }, [address, chain]);
+  };
+
+  useEffect(() => {
+    if (activeButton === "onchain") {
+      fetchAttestation("onchain");
+    } else if (activeButton === "offchain") {
+      fetchAttestation("offchain");
+    }
+  }, [activeButton, address, chain]);
 
   const blocks = [
     {
@@ -221,6 +260,28 @@ function UserInfo({
 
   return (
     <div className="pt-4">
+      <div className="flex w-fit gap-16 border-1 border-[#7C7C7C] px-6 rounded-xl text-sm mb-6">
+        <button
+          className={`py-2 ${
+            activeButton === "onchain"
+              ? "text-[#3E3D3D] font-bold"
+              : "text-[#7C7C7C]"
+          } `}
+          onClick={() => fetchAttestation("onchain")}
+        >
+          Onchain
+        </button>
+        <button
+          className={`py-2 ${
+            activeButton === "offchain"
+              ? "text-[#3E3D3D] font-bold"
+              : "text-[#7C7C7C]"
+          }`}
+          onClick={() => fetchAttestation("offchain")}
+        >
+          Offchain
+        </button>
+      </div>
       <div className="grid grid-cols-4 pe-32 gap-10">
         {blocks.length > 0 ? (
           blocks.map((key, index) => (
@@ -238,7 +299,10 @@ function UserInfo({
               }
             >
               <div className="font-semibold text-3xl text-center pb-2">
-                {isDataLoading ? (
+                {isSessionHostedLoading &&
+                isSessionAttendedLoading &&
+                isOfficeHoursHostedLoading &&
+                isOfficeHourseAttendedLoading ? (
                   <div className="flex items-center justify-center">
                     <RotatingLines
                       visible={true}

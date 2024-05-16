@@ -13,13 +13,37 @@ import { SessionProvider } from "next-auth/react";
 // import { useTheme } from "next-themes";
 
 import { configureChains, createConfig, WagmiConfig } from "wagmi";
-import { mainnet, optimism, arbitrum } from "wagmi/chains";
+import { optimism, arbitrum } from "wagmi/chains";
 import { publicProvider } from "wagmi/providers/public";
 
 interface RainbowKitProviderProps {
   children: ReactNode;
   autoConnect?: boolean;
 }
+
+const optimsimSepolia = {
+  id: 11155420,
+  name: "Optimism Sepolia",
+  network: "Optimism Sepolia testnet",
+  nativeCurrency: {
+    decimals: 18,
+    name: "Ethereum",
+    symbol: "ETH",
+  },
+  rpcUrls: {
+    public: {
+      http: [
+        "https://opt-sepolia.g.alchemy.com/v2/BZr3W1fqQEy2wnrcDQf1z4hiGCOhcHfp",
+      ],
+    },
+    default: {
+      http: [
+        "https://opt-sepolia.g.alchemy.com/v2/BZr3W1fqQEy2wnrcDQf1z4hiGCOhcHfp",
+      ],
+    },
+  },
+  testnet: true,
+};
 
 const { chains, publicClient, webSocketPublicClient } = configureChains(
   [optimism, arbitrum],

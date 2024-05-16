@@ -1,0 +1,17 @@
+.connectWalletBtn {
+  display: inline-block;
+  padding: 12px 24px;
+  border-radius: 30px;
+  background-color: #0070f3;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+  text-align: center;
+}
+
+/* .connectWalletBtn {
+  background-color: #0060d3;
+  transition: background-color 0.3s ease;
+
+} */

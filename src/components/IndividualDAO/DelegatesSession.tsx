@@ -54,6 +54,7 @@ function DelegatesSession({ props }: { props: string }) {
           redirect: "follow",
           body: JSON.stringify({
             dao_name: dao_name,
+            address: "",
           }),
         };
 
@@ -217,7 +218,7 @@ function DelegatesSession({ props }: { props: string }) {
                 dataLoading={dataLoading}
                 isEvent="Recorded"
                 isOfficeHour={false}
-                // query={searchQuery}
+                isSession={""}
               />
             ))}
         </div>

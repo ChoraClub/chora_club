@@ -201,7 +201,7 @@ function RecordedSessions() {
                   {hoveredVideo === index ? (
                     <div className="relative">
                       <video
-                        ref={(el) => (videoRefs.current[index] = el)}
+                        ref={(el: any) => (videoRefs.current[index] = el)}
                         autoPlay
                         loop
                         onLoadedMetadata={(e) => handleLoadedMetadata(index, e)}
@@ -234,9 +234,19 @@ function RecordedSessions() {
                     <div className="bg-[#F5F5F5] flex items-center py-1 px-3 rounded-md gap-2">
                       <div>
                         {data.session.dao_name === "optimism" ? (
-                          <Image src={oplogo} alt="image" width={20} />
+                          <Image
+                            src={oplogo}
+                            alt="image"
+                            width={20}
+                            className="rounded-full"
+                          />
                         ) : data.session.dao_name === "arbitrum" ? (
-                          <Image src={arblogo} alt="image" width={20} />
+                          <Image
+                            src={arblogo}
+                            alt="image"
+                            width={20}
+                            className="rounded-full"
+                          />
                         ) : (
                           ""
                         )}
