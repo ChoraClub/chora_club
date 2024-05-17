@@ -77,8 +77,8 @@ export async function POST(
         },
         {
           $push: {
-            allowedDates: { $each: allowedDates },
-            dateAndRanges: { $each: dateAndRanges },
+            allowedDates: { $each: [allowedDates] },
+            dateAndRanges: { $each: [dateAndRanges] },
           },
           $set: {
             updatedAt: new Date(),
