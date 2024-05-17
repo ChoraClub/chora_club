@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
+import { useRouter } from "next-nprogress-bar";
 
 import { useAccount } from "wagmi";
 

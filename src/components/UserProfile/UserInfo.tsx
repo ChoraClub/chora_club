@@ -1,4 +1,5 @@
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
+import { useRouter } from "next-nprogress-bar";
 import React, { ChangeEvent, useState, useEffect } from "react";
 import { Oval, RotatingLines } from "react-loader-spinner";
 import { useAccount } from "wagmi";

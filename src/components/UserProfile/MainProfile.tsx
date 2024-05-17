@@ -14,7 +14,8 @@ import UserSessions from "./UserSessions";
 import UserOfficeHours from "./UserOfficeHours";
 import ClaimNFTs from "./ClaimNFTs";
 import { FaPencil } from "react-icons/fa6";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
+import { useRouter } from "next-nprogress-bar";
 import toast, { Toaster } from "react-hot-toast";
 import Link from "next/link";
 import OPLogo from "@/assets/images/daos/op.png";
@@ -882,39 +883,39 @@ function MainProfile() {
                       </div>
                     )
                   : null}
-
-                {selfDelegate === false ? (
-                  <div className="pt-2 flex gap-5">
-                    {/* pass address of whom you want to delegate the voting power to */}
-                    <button
-                      className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
-                      onClick={() => handleDelegateVotes(`${address}`)}
-                    >
-                      Become Delegate
-                    </button>
-                    {/* <button
+                <div className="flex items-center gap-4 pt-2">
+                  {selfDelegate === false ? (
+                    <div className="flex gap-5">
+                      {/* pass address of whom you want to delegate the voting power to */}
+                      <button
+                        className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
+                        onClick={() => handleDelegateVotes(`${address}`)}
+                      >
+                        Become Delegate
+                      </button>
+                      {/* <button
                       className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
                       onClick={() => handleAttestation()}
-                    >
+                      >
                       Attest
                     </button> */}
-
-                    <div className="">
-                      <select
-                        value={daoName}
-                        onChange={(e) => setDaoName(e.target.value)}
-                        className="outline-none border border-blue-shade-200 text-blue-shade-200 rounded-full py-2 px-3"
-                      >
-                        <option value="optimism" className="text-gray-700">
-                          Optimism
-                        </option>
-                        <option value="arbitrum" className="text-gray-700">
-                          Arbitrum
-                        </option>
-                      </select>
                     </div>
+                  ) : null}
+                  <div className="">
+                    <select
+                      value={daoName}
+                      onChange={(e) => setDaoName(e.target.value)}
+                      className="outline-none border border-blue-shade-200 text-blue-shade-200 rounded-full py-2 px-3"
+                    >
+                      <option value="optimism" className="text-gray-700">
+                        Optimism
+                      </option>
+                      <option value="arbitrum" className="text-gray-700">
+                        Arbitrum
+                      </option>
+                    </select>
                   </div>
-                ) : null}
+                </div>
               </div>
             </div>
             <div>

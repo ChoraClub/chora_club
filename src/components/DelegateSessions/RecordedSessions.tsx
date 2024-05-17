@@ -11,8 +11,9 @@ import toast from "react-hot-toast";
 import copy from "copy-to-clipboard";
 import styles from "./RecordedSessions.module.css";
 import { Oval } from "react-loader-spinner";
-import { useRouter } from "next/navigation";
-import {parseISO} from "date-fns";
+// import { useRouter } from "next/navigation";
+import { useRouter } from "next-nprogress-bar";
+import { parseISO } from "date-fns";
 // const { parseISO } = require("date-fns");
 import Head from "next/head";
 
@@ -257,7 +258,7 @@ function RecordedSessions() {
                     </div>
                     <div className="bg-[#F5F5F5] py-1 px-3 rounded-md">
                       {formatTimeAgo(data.session.slot_time)}
-                    </div> 
+                    </div>
                   </div>
                   <div className="flex items-center gap-2 py-1 ps-3 text-sm">
                     <div>

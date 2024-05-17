@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
+import { useRouter } from "next-nprogress-bar";
 import AvailableSessions from "./AvailableSessions";
 import RecordedSessions from "./RecordedSessions";
 import { FaCircleInfo } from "react-icons/fa6";

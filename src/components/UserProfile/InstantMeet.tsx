@@ -7,7 +7,8 @@ import {
   ModalHeader,
   useDisclosure,
 } from "@nextui-org/react";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
+import { useRouter } from "next-nprogress-bar";
 import React, { useEffect, useState } from "react";
 import { Oval } from "react-loader-spinner";
 import { useAccount } from "wagmi";
