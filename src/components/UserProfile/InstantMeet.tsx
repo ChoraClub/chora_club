@@ -38,7 +38,7 @@ function InstantMeet({ isDelegate, selfDelegate, daoName }: instantMeetProps) {
   const { address } = useAccount();
   const { chain, chains } = useNetwork();
   const [isScheduling, setIsScheduling] = useState(false);
-  const [daoName, setDaoName] = useState<string>();
+  // const [daoName, setDaoName] = useState<string>();
   const router = useRouter();
 
   const handleModalInputChange = (
@@ -119,13 +119,13 @@ function InstantMeet({ isDelegate, selfDelegate, daoName }: instantMeetProps) {
     });
   };
 
-  useEffect(() => {
-    if (chain?.name === "Optimism") {
-      setDaoName("optimism");
-    } else if (chain?.name === "Arbitrum One") {
-      setDaoName("arbitrum");
-    }
-  }, [chain]);
+  // useEffect(() => {
+  //   if (chain?.name === "Optimism") {
+  //     setDaoName("optimism");
+  //   } else if (chain?.name === "Arbitrum One") {
+  //     setDaoName("arbitrum");
+  //   }
+  // }, [chain]);
 
   const block = [
     {

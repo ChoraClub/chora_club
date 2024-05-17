@@ -58,7 +58,14 @@ export async function PUT(req: NextRequest, res: NextResponse) {
     if (uniqueAttendees.length > 0) {
       const updatedDocument = await collection.updateOne(
         { meetingId },
-        { $push: { attendees: { $each: uniqueAttendees } } }
+        {
+          /* @ts-ignore */
+          $push: {
+            attendees: {
+              $each: uniqueAttendees,
+            },
+          },
+        }
       );
 
       if (updatedDocument.modifiedCount !== 1) {

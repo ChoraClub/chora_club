@@ -41,7 +41,7 @@ function LocalScreenShareGrid() {
     //   <div className="col-span-3 bg-slate-200 rounded-lg text-black">
         <video
           className="aspect-video w-full h-full rounded-lg"
-          ref={(screenShareRef) =>
+          ref={(screenShareRef: any) =>
             screenShareRef && (screenShareRef.srcObject = shareStream)
           }
           autoPlay

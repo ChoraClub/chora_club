@@ -102,8 +102,11 @@ function WatchSessionList() {
 
   return (
     <div className="font-poppins border rounded-xl space-y-3">
-      {block.map((data) => (
-        <div className="grid grid-cols-3 items-center gap-3 border border-[#D9D9D9] rounded-xl">
+      {block.map((data, index) => (
+        <div
+          key={index}
+          className="grid grid-cols-3 items-center gap-3 border border-[#D9D9D9] rounded-xl"
+        >
           <div className="h-28 grid-cols-1">
             <Image
               src={data.image}
