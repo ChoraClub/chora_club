@@ -55,11 +55,18 @@ function ScheduledUserSessions() {
 
   const checkUser = async () => {
     try {
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+
+      const raw = JSON.stringify({
+        address: address,
+        daoName: daoName,
+      });
+
       const requestOptions: any = {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        method: "POST",
+        headers: myHeaders,
+        body: raw,
         redirect: "follow",
       };
       const response = await fetch(`/api/profile/${address}`, requestOptions);
@@ -82,6 +89,7 @@ function ScheduledUserSessions() {
               if (isValid) {
                 setMailId(item.emailId);
                 setContinueAPICalling(true);
+                setHasEmailID(true);
                 console.log("emailId:", item.emailId);
                 return true;
               } else {
@@ -414,6 +422,7 @@ function ScheduledUserSessions() {
             const raw = JSON.stringify({
               address: address,
               emailId: mailId,
+              daoName: daoName,
             });
 
             const requestOptions: any = {

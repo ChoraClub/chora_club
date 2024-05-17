@@ -14,7 +14,7 @@ import LocalScreenShareGrid from "../GridCard/LocalScreenShareGrid";
 function ScreenSharingPort() {
   const { peerIds } = usePeerIds({
     roles: ["host", "listener", "speaker"],
-    labels: ["screen-share-video"]
+    labels: ["screen-share-video"],
   });
   const { peerId: localPeerId, role: localPeerRole } = useLocalPeer();
 
@@ -75,7 +75,7 @@ function ScreenSharingPort() {
           {videoTrack && (
             <video
               className="aspect-video w-full h-full rounded-lg"
-              ref={(screenShareRef) =>
+              ref={(screenShareRef: any) =>
                 screenShareRef && (screenShareRef.srcObject = shareStream)
               }
               autoPlay

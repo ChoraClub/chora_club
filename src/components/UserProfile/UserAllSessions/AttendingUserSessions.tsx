@@ -29,22 +29,15 @@ interface Session {
   _id: string;
 }
 
-function AttendingUserSessions() {
+function AttendingUserSessions({ daoName }: { daoName: string }) {
   const router = useRouter();
   const path = usePathname();
   const searchParams = useSearchParams();
   const { address } = useAccount();
   const [sessionDetails, setSessionDetails] = useState([]);
   const [pageLoading, setPageLoading] = useState(true);
-  const { chain, chains } = useNetwork();
-  let dao_name = "";
 
   const getUserMeetingData = async () => {
-    if (chain?.name === "Optimism") {
-      dao_name = "optimism";
-    } else if (chain?.name === "Arbitrum One") {
-      dao_name = "arbitrum";
-    }
     try {
       const response = await fetch(`/api/get-session-data/${address}`, {
         method: "POST",
@@ -52,7 +45,7 @@ function AttendingUserSessions() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          dao_name: dao_name,
+          dao_name: daoName,
         }),
       });
 
@@ -71,12 +64,10 @@ function AttendingUserSessions() {
           if (searchParams.get("session") === "attending") {
             filteredData = resultData.filter((session: Session) => {
               return (
-                // session.attendees?.some(
-                //   (attendee) => attendee.attendee_address === address
-                // ) &&
                 session.meeting_status !== "Recorded" &&
                 new Date(session.slot_time).toLocaleString() >=
                   currentSlot.toLocaleString()
+                // && session.dao_name === daoName
               );
             });
             console.log("filtered data in attending: ", filteredData);

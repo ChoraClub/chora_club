@@ -14,116 +14,122 @@ interface Type {
   individualDelegate: string;
 }
 
-const op_client = createClient({
-  url: "https://api.thegraph.com/subgraphs/name/show-karma/dao-onchain-voting-optimism",
-  exchanges: [cacheExchange, fetchExchange],
-});
-
-const arb_client = createClient({
-  url: "https://api.thegraph.com/subgraphs/name/show-karma/onchain-voting-arbitrum",
-  exchanges: [cacheExchange, fetchExchange],
-});
-
 function DelegateVotes({ props }: { props: Type }) {
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [first, setfirst] = useState<boolean>(false);
+  const [first, setFirst] = useState<boolean>(false);
   const [graphData, setGraphData] = useState<any>([]);
   const [pageData, setPageData] = useState<any>([]);
   const [isPageLoading, setIsPageLoading] = useState(true);
   const [openDesc, setOpenDesc] = useState<boolean[]>([]);
   const [supportCounts, setSupportCounts] = useState({ 0: 0, 1: 0, 2: 0 });
 
-  const opQuery = gql`
-    query Votes($address: String!) {
-      votes(
-        orderBy: timestamp
-        orderDirection: desc
-        where: { user: $address, organization: "optimism.eth" }
-      ) {
-        id
-        proposal {
-          id
-          description
-          timestamp
-        }
-        organization {
-          id
-        }
-        solution
-        timestamp
-        support
-      }
-    }
-  `;
+  const [clientURL, setClientURL] = useState<string>("");
+  const [client, setClient] = useState<any>(null);
 
-  const arbQuery = gql`
-    query Votes($address: String!) {
-      votes(
-        orderBy: timestamp
-        orderDirection: desc
-        where: { user: $address, organization: "arbitrum.eth" }
-      ) {
-        id
-        proposal {
-          id
-          description
-          timestamp
-        }
-        organization {
-          id
-        }
-        solution
-        timestamp
-        support
+  useEffect(() => {
+    setIsPageLoading(false);
+  }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setIsPageLoading(true);
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+
+        const requestOptions: RequestInit = {
+          method: "GET",
+          headers: myHeaders,
+        };
+
+        const response = await fetch(
+          `/api/get-dao-details/${props.daoDelegates}`,
+          requestOptions
+        );
+        const result = await response.json();
+
+        // console.log(
+        //   "dao-details",
+        //   result.data[0].api_links.subgraph.past_votes
+        // );
+        setClientURL(result.data[0].api_links.subgraph.past_votes);
+        setIsPageLoading(false);
+      } catch (error) {
+        console.error(error);
+        setIsPageLoading(false);
       }
+    };
+
+    fetchData();
+  }, [props.daoDelegates, props.individualDelegate]);
+
+  useEffect(() => {
+    if (clientURL) {
+      const newClient = createClient({
+        url: clientURL,
+        exchanges: [cacheExchange, fetchExchange],
+      });
+      setClient(newClient);
     }
-  `;
+  }, [clientURL]);
 
   useEffect(() => {
     const fetchGraphData = async () => {
-      if (props.daoDelegates == "optimism") {
-       
-        const op_gqdata: any = await op_client.query(opQuery, {
-          address: props.individualDelegate,
-        });
-        console.log("Urql: ", op_gqdata.data.votes);
-        setGraphData(op_gqdata.data.votes);
+      if (client && props.daoDelegates) {
+        try {
+          setIsPageLoading(true);
+          const query = gql`
+            query Votes($address: String!) {
+              votes(
+                orderBy: timestamp
+                orderDirection: desc
+                where: { user: $address, organization: "${props.daoDelegates}.eth" }
+              ) {
+                id
+                proposal {
+                  id
+                  description
+                  timestamp
+                }
+                organization {
+                  id
+                }
+                solution
+                timestamp
+                support
+              }
+            }
+          `;
 
-        const op_counts = op_gqdata.data.votes.reduce(
-          (acc: any, curr: any) => {
-            const support = curr.support;
-            acc[support] = (acc[support] || 0) + 1;
-            return acc;
-          },
-          { 0: 0, 1: 0, 2: 0 }
-        );
-        setSupportCounts(op_counts);
-        setfirst(true);
-      } else if (props.daoDelegates == "arbitrum") {
-        const arb_gqdata: any = await arb_client.query(arbQuery, {
-          address: props.individualDelegate,
-        });
-        console.log("Arb gq data: ", arb_gqdata);
-        setGraphData(arb_gqdata.data.votes);
+          const gqdata: any = await client.query(query, {
+            address: props.individualDelegate,
+          });
+          console.log("Urql: ", gqdata.data.votes);
+          setGraphData(gqdata.data.votes);
 
-        const arb_counts = arb_gqdata.data.votes.reduce(
-          (acc: any, curr: any) => {
-            const support = curr.support;
-            acc[support] = (acc[support] || 0) + 1;
-            return acc;
-          },
-          { 0: 0, 1: 0, 2: 0 }
-        );
-        setSupportCounts(arb_counts);
-        setfirst(true);
+          const op_counts = gqdata.data.votes.reduce(
+            (acc: any, curr: any) => {
+              const support = curr.support;
+              acc[support] = (acc[support] || 0) + 1;
+              return acc;
+            },
+            { 0: 0, 1: 0, 2: 0 }
+          );
+          setSupportCounts(op_counts);
+          setFirst(true);
+          setIsPageLoading(false);
+        } catch (error) {
+          console.error(error);
+          setIsPageLoading(false);
+        }
       } else {
         setGraphData([]);
-        setfirst(false);
+        setFirst(false);
       }
     };
 
     fetchGraphData();
-  }, [props]);
+  }, [client, props.daoDelegates, props.individualDelegate]);
 
   const totalData: number = graphData.length;
   const dataPerPage: number = 5;

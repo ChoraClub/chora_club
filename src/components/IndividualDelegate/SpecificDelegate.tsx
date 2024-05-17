@@ -646,7 +646,7 @@ function SpecificDelegate({ props }: { props: Type }) {
         !isPageLoading &&
         !isDelegate &&
         !selfDelegate && (
-          <div className="flex flex-col justify-center items-center mt-5">
+          <div className="flex flex-col justify-center items-center w-full h-screen">
             <div className="text-5xl">☹️</div>{" "}
             <div className="pt-4 font-semibold text-lg">
               Oops, no such result available!

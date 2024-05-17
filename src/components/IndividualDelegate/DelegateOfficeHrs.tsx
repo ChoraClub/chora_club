@@ -28,8 +28,8 @@ function DelegateOfficeHrs({ props }: { props: Type }) {
 
   const [sessionDetails, setSessionDetails] = useState([]);
   const [dataLoading, setDataLoading] = useState(true);
-  const dao_name =
-    props.daoDelegates.charAt(0).toUpperCase() + props.daoDelegates.slice(1);
+  const dao_name = props.daoDelegates;
+  // props.daoDelegates.charAt(0).toUpperCase() + props.daoDelegates.slice(1);
 
   useEffect(() => {
     const fetchData = async () => {

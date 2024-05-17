@@ -135,10 +135,10 @@ function WatchSession({
               </div>
               <Link
                 href={
-                  data.dao_name === "optimism" || "Optimism"
-                    ? `https://optimism-sepolia.easscan.org/offchain/attestation/view/${data.uid_host}`
-                    : data.dao_name === "arbitrum" || "Arbitrum"
-                    ? `https://arbitrum.easscan.org/attestation/view/${data.uid_host}`
+                  data.dao_name === ("optimism" || "Optimism")
+                    ? `https://optimism.easscan.org/offchain/attestation/view/${data.uid_host}`
+                    : data.dao_name === ("arbitrum" || "Arbitrum")
+                    ? `https://arbitrum.easscan.org/offchain/attestation/view/${data.uid_host}`
                     : ""
                 }
                 target="_blank"
@@ -236,10 +236,10 @@ function WatchSession({
                       {attendee.attendee_uid ? (
                         <Link
                           href={
-                            data.dao_name === "optimism" || "Optimism"
-                              ? `https://optimism-sepolia.easscan.org/offchain/attestation/view/${attendee.attendee_uid}`
-                              : data.dao_name === "arbitrum" || "Arbitrum"
-                              ? `https://arbitrum.easscan.org/attestation/view/${attendee.attendee_uid}`
+                            data.dao_name === ("optimism" || "Optimism")
+                              ? `https://optimism.easscan.org/offchain/attestation/view/${attendee.attendee_uid}`
+                              : data.dao_name === ("arbitrum" || "Arbitrum")
+                              ? `https://arbitrum.easscan.org/offchain/attestation/view/${attendee.attendee_uid}`
                               : ""
                           }
                           target="_blank"

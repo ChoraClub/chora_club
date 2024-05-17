@@ -21,7 +21,8 @@ function OfficeHours({ props }: { props: string }) {
   const router = useRouter();
   const path = usePathname();
   const searchParams = useSearchParams();
-  const dao_name = props.charAt(0).toUpperCase() + props.slice(1);
+  const dao_name = props;
+  // const dao_name = props.charAt(0).toUpperCase() + props.slice(1);
 
   const [sessionDetails, setSessionDetails] = useState([]);
   const [tempDetails, setTempDetails] = useState([]);
