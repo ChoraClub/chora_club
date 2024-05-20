@@ -39,9 +39,11 @@ export const ConnectWallet = () => {
                 return (
                   <button onClick={openConnectModal} type="button">
                     <Image
+                      className="cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14"
                       src={wallet}
                       alt="image"
-                      style={{ width: "40px", height: "40px" }}
+                      width={40}
+                      // style={{ width: "40px", height: "40px" }}
                     />
                   </button>
                 );
@@ -88,9 +90,11 @@ export const ConnectWallet = () => {
                       ? ` (${account.displayBalance})`
                       : ""} */}
                     <Image
+                      className="cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14"
                       src={wallet}
                       alt=""
-                      style={{ width: "40px", height: "40px" }}
+                      width={40}
+                      // style={{ width: "40px", height: "40px" }}
                     />
                   </button>
                 </div>

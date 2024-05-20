@@ -3,7 +3,8 @@
 import React, { useState, useEffect } from "react";
 import search from "@/assets/images/daos/search.png";
 import Image from "next/image";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
+import { useRouter } from "next-nprogress-bar";
 import text1 from "@/assets/images/daos/texture1.png";
 import text2 from "@/assets/images/daos/texture2.png";
 import { StaticImageData } from "next/image";
