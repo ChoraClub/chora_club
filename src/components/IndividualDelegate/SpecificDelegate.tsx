@@ -225,7 +225,7 @@ function SpecificDelegate({ props }: { props: Type }) {
   const handleDelegateVotes = async (to: string) => {
     let address;
     let address1;
-  
+
     try {
       address = await walletClient.getAddresses();
       address1 = address[0];
@@ -234,15 +234,15 @@ function SpecificDelegate({ props }: { props: Type }) {
       toast.error("Please connect your MetaMask wallet!");
       return;
     }
-  
+
     if (!address1) {
       toast.error("Please connect your MetaMask wallet!");
       return;
     }
-  
+
     console.log(address);
     console.log(address1);
-  
+
     let chainAddress;
     if (chain?.name === "Optimism") {
       chainAddress = "0x4200000000000000000000000000000000000042";
@@ -251,9 +251,9 @@ function SpecificDelegate({ props }: { props: Type }) {
     } else {
       return;
     }
-  
+
     console.log("walletClient?.chain?.network", walletClient?.chain?.network);
-  
+
     if (walletClient?.chain === "") {
       toast.error("Please connect your wallet!");
     } else {
@@ -265,11 +265,11 @@ function SpecificDelegate({ props }: { props: Type }) {
           args: [to],
           account: address1,
         });
-  
+
         console.log(delegateTx);
       } else {
         toast.error("Please switch to appropriate network to delegate!");
-  
+
         if (openChainModal) {
           openChainModal();
         }

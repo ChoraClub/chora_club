@@ -16,6 +16,7 @@ interface Type {
 
 function DelegateInfo({ props, desc }: { props: Type; desc: string }) {
   const [karmaDescription, setKarmaDescription] = useState<string>();
+  const [opAgoraDescription, setOpAgoraDescription] = useState<string>();
   const [loading, setLoading] = useState(true);
   const [isDataLoading, setDataLoading] = useState(true);
   const router = useRouter();
@@ -30,6 +31,8 @@ function DelegateInfo({ props, desc }: { props: Type; desc: string }) {
   const [isOfficeHoursAttendedLoading, setOfficeHoursAttendedLoading] =
     useState(true);
   const [activeButton, setActiveButton] = useState("onchain");
+  const [loadingOpAgora, setLoadingOpAgora] = useState(true);
+  const [loadingKarma, setLoadingKarma] = useState(true);
 
   useEffect(() => {
     if (activeButton === "onchain") {
@@ -222,20 +225,70 @@ function DelegateInfo({ props, desc }: { props: Type; desc: string }) {
       ref: `/${props.daoDelegates}/${props.individualDelegate}?active=officeHours&hours=attended`,
     },
   ];
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setLoadingOpAgora(true);
+        console.log(props.individualDelegate);
+        const res = await fetch(
+          `/api/get-statement?individualDelegate=${props.individualDelegate}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            // body: JSON.stringify({ individualDelegate: props.individualDelegate }),
+          }
+        );
+
+        if (!res.ok) {
+          throw new Error("Failed to fetch data");
+        }
+
+        const data = await res.json();
+        const statement = data.statement.payload.delegateStatement;
+        console.log("statement", statement);
+        setOpAgoraDescription(statement);
+        setLoadingOpAgora(false);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setLoadingOpAgora(false);
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [props.individualDelegate]);
+
+  const renderParagraphs = (text: string) => {
+    return text
+      .split("\n")
+      .filter((paragraph) => paragraph.trim() !== "")
+      .map((paragraph, index) => (
+        <p key={index} className="mb-3">
+          {paragraph}
+        </p>
+      ));
+  };
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setLoadingKarma(true);
+        setLoading(true);
         const res = await fetch(
           `https://api.karmahq.xyz/api/forum-user/${props.daoDelegates}/delegate-pitch/${props.individualDelegate}`
         );
         const details = await res.json();
         console.log("Desc: ", details.data.delegatePitch.customFields[1].value);
-        console.log("Response: ", res);
-        setLoading(false);
         setKarmaDescription(details.data.delegatePitch.customFields[1].value);
+        setLoadingKarma(false);
+        setLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
+        setLoadingKarma(false);
+        setLoading(false);
       }
       setLoading(false);
     };
@@ -306,10 +359,10 @@ function DelegateInfo({ props, desc }: { props: Type; desc: string }) {
       <div
         style={{ boxShadow: "0px 4px 30.9px 0px rgba(0, 0, 0, 0.12)" }}
         className={`rounded-xl my-7 me-32 py-6 px-7 text-sm ${
-          desc && karmaDescription ? "" : "min-h-52"
+          desc && opAgoraDescription && karmaDescription ? "" : "min-h-52"
         }`}
       >
-        {loading ? (
+        {loadingOpAgora || loadingKarma || loading ? (
           <div className="flex pt-6 justify-center">
             <ThreeDots
               visible={true}
@@ -321,6 +374,8 @@ function DelegateInfo({ props, desc }: { props: Type; desc: string }) {
           </div>
         ) : desc !== "" ? (
           desc
+        ) : opAgoraDescription ? ( // Check for opAgoraDescription
+          renderParagraphs(opAgoraDescription)
         ) : karmaDescription ? (
           karmaDescription
         ) : (

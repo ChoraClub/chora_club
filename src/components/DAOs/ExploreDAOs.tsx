@@ -12,7 +12,6 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { FaCirclePlus } from "react-icons/fa6";
 import Link from "next/link";
 import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
-import ButtonWithCircle from "../Circle/ButtonWithCircle";
 
 function ExploreDAOs() {
   const dao_info = [

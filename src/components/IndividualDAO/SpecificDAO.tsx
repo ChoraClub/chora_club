@@ -1,3 +1,4 @@
+"use client";
 import Image, { StaticImageData } from "next/image";
 import React, { useEffect, useState } from "react";
 import DelegatesList from "./DelegatesList";
@@ -9,7 +10,6 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import OPLogo from "@/assets/images/daos/op.png";
 import ARBLogo from "@/assets/images/daos/arbitrum.jpg";
 import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
-import ButtonWithCircle from "../Circle/ButtonWithCircle";
 
 function SpecificDAO({ props }: { props: { daoDelegates: string } }) {
   const router = useRouter();

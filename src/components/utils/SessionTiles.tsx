@@ -3,7 +3,7 @@ import Image, { StaticImageData } from "next/image";
 import { Oval } from "react-loader-spinner";
 import text2 from "@/assets/images/daos/texture2.png";
 import IndividualSessionTileModal from "./IndividualSessionTileModal";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useRouter } from "next-nprogress-bar";
 import {
   SchemaEncoder,
