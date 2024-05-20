@@ -9,6 +9,10 @@ import { FaCircleInfo } from "react-icons/fa6";
 import { Tooltip } from "@nextui-org/react";
 import SchedulingSuccessModal from "./SchedulingSuccessModal";
 
+import Image from "next/image";
+
+import AvailableUserSessions from "./AvailableUserSessions";
+
 interface dataToStore {
   userAddress: `0x${string}` | undefined | null;
   timeSlotSizeMinutes: number;
@@ -314,112 +318,23 @@ function ScheduledUserSessions() {
 
   return (
     <>
-      <div
-        style={{ boxShadow: "0px 4px 50.8px 0px rgba(0, 0, 0, 0.11)" }}
-        className="max-w-lg mx-auto mt-2 p-8 bg-white rounded-2xl"
-      >
-        <div className="mb-4">
-          <label className="text-gray-700 font-semibold flex items-center">
-            Select DAO Name:
-            <Tooltip
-              showArrow
-              content={
-                <div className="font-poppins">
-                  DAO for which the session is to be created. The attestations
-                  will be issued for the selected DAO. The attendees of this
-                  session will seek questions related to the selected DAO.
-                </div>
-              }
-              placement="right"
-              className="rounded-md bg-opacity-90"
-              closeDelay={1}
-            >
-              <span className="px-2 justify-end">
-                <FaCircleInfo className="cursor-pointer" />
-              </span>
-            </Tooltip>
-          </label>
-          <div
-            // value={daoName}
-            // onChange={(e) => setDaoName(e.target.value)}
-            className="border border-gray-300 rounded px-3 py-2 mt-1 w-full capitalize"
-          >
-            {daoName}
-            {/* <option value="optimism">Optimism</option>
-            <option value="arbitrum">Arbitrum</option> */}
-          </div>
-        </div>
-
-        <div className="mb-4">
-          <label className="text-gray-700 font-semibold flex items-center">
-            Select Time Slot Size:
-            <Tooltip
-              showArrow
-              content={
-                <div className="font-poppins">
-                  The duration for which you would be able to take the session.
-                  The preferred duration is 30 minutes. And note that the
-                  selected time slot size will apply to all the selected dates
-                  of your sessions.
-                </div>
-              }
-              placement="right"
-              className="rounded-md bg-opacity-90"
-              closeDelay={1}
-            >
-              <span className="px-2 justify-end">
-                <FaCircleInfo className="cursor-pointer" />
-              </span>
-            </Tooltip>
-          </label>
-          <select
-            value={timeSlotSizeMinutes}
-            onChange={(e) => setTimeSlotSizeMinutes(Number(e.target.value))}
-            className="border border-gray-300 rounded px-3 py-2 mt-1 w-full"
-          >
-            <option value={15}>15 minutes</option>
-            <option value={30}>30 minutes</option>
-            <option value={45}>45 minutes</option>
-          </select>
-        </div>
-
-        <div className="mb-4">
-          <label className="text-gray-700 font-semibold flex items-center">
-            Select Date:
-            <Tooltip
-              showArrow
-              content={
-                <div className="font-poppins">
-                  It is based on your timezone.
-                </div>
-              }
-              placement="right"
-              className="rounded-md bg-opacity-90"
-              closeDelay={1}
-            >
-              <span className="px-2 justify-end">
-                <FaCircleInfo className="cursor-pointer" />
-              </span>
-            </Tooltip>
-          </label>
-          <input
-            type="date"
-            value={selectedDate}
-            onChange={(e) => setSelectedDate(e.target.value)}
-            className="border border-gray-300 rounded px-3 py-2 mt-1 w-full"
-            min={formattedDate}
-          />
-        </div>
-
-        <div className="flex flex-col mb-4">
-          <div className="">
+      <div className="flex justify-center gap-20">
+        {/* First box- left side */}
+        <div
+          style={{ boxShadow: "0px 4px 50.8px 0px rgba(0, 0, 0, 0.11)" }}
+          className="max-w-lg  mt-2 p-8 bg-white rounded-2xl"
+          // className="max-w-lg mx-auto mt-2 p-8 bg-white rounded-2xl"
+        >
+          <div className="mb-4">
             <label className="text-gray-700 font-semibold flex items-center">
-              Select Available Time:
+              Select DAO Name:
               <Tooltip
                 showArrow
                 content={
                   <div className="font-poppins">
-                    Session start time and end time based on your timezone.
+                    DAO for which the session is to be created. The attestations
+                    will be issued for the selected DAO. The attendees of this
+                    session will seek questions related to the selected DAO.
                   </div>
                 }
                 placement="right"
@@ -431,106 +346,206 @@ function ScheduledUserSessions() {
                 </span>
               </Tooltip>
             </label>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="text-gray-500 mt-1">Start Time</label>
-              <select
-                className="border border-gray-300 rounded px-3 py-2 mt-1 w-full"
-                value={selectedStartTime}
-                onChange={(e) => handleStartTimeChange(e)}
-              >
-                {startTimeOptions.map((time) => (
-                  <option key={time} value={time}>
-                    {time}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="text-gray-500 mt-1">End Time</label>
-              <select
-                className="border border-gray-300 rounded px-3 py-2 mt-1 w-full"
-                value={selectedEndTime}
-                onChange={(e) => handleEndTimeChange(e)}
-              >
-                {endTimeOptions.map((time) => (
-                  <option key={time} value={time}>
-                    {time}
-                  </option>
-                ))}
-              </select>
+            <div
+              // value={daoName}
+              // onChange={(e) => setDaoName(e.target.value)}
+              className="border border-gray-300 rounded px-3 py-2 mt-1 w-full capitalize"
+            >
+              {daoName}
+              {/* <option value="optimism">Optimism</option>
+              <option value="arbitrum">Arbitrum</option> */}
             </div>
           </div>
-        </div>
 
-        <button
-          onClick={handleAddSelectedDate}
-          className="bg-blue-shade-100 hover:bg-blue-shade-200 text-white font-bold py-2 px-4 rounded"
-        >
-          Add Session
-        </button>
+          <div className="mb-4">
+            <label className="text-gray-700 font-semibold flex items-center">
+              Select Time Slot Size:
+              <Tooltip
+                showArrow
+                content={
+                  <div className="font-poppins">
+                    The duration for which you would be able to take the
+                    session. The preferred duration is 30 minutes. And note that
+                    the selected time slot size will apply to all the selected
+                    dates of your sessions.
+                  </div>
+                }
+                placement="right"
+                className="rounded-md bg-opacity-90"
+                closeDelay={1}
+              >
+                <span className="px-2 justify-end">
+                  <FaCircleInfo className="cursor-pointer" />
+                </span>
+              </Tooltip>
+            </label>
+            <select
+              value={timeSlotSizeMinutes}
+              onChange={(e) => setTimeSlotSizeMinutes(Number(e.target.value))}
+              className="border border-gray-300 rounded px-3 py-2 mt-1 w-full"
+            >
+              <option value={15}>15 minutes</option>
+              <option value={30}>30 minutes</option>
+              <option value={45}>45 minutes</option>
+            </select>
+          </div>
 
-        <div className="mt-6">
-          <h3 className="text-lg font-semibold mb-2">
-            Selected Dates for Session:
-          </h3>
-          <ul>
-            {allData.map((item: any, index: any) => (
-              <li key={index} className="mb-1">
-                <span className="font-semibold">{index + 1}.</span> {item.date}{" "}
-                -{" "}
-                {item.timeRanges
-                  .map((time: any) => {
-                    const [startHour, startMinute, endHour, endMinute] = time;
-                    return `${startHour}:${startMinute} to ${endHour}:${endMinute}`;
-                  })
-                  .join(", ")}
-                <button
-                  disabled={createSessionLoading}
-                  onClick={() => handleRemoveDate(item.date, item.timeRanges)}
-                  className="text-red-600 ml-2"
+          <div className="mb-4">
+            <label className="text-gray-700 font-semibold flex items-center">
+              Select Date:
+              <Tooltip
+                showArrow
+                content={
+                  <div className="font-poppins">
+                    It is based on your timezone.
+                  </div>
+                }
+                placement="right"
+                className="rounded-md bg-opacity-90"
+                closeDelay={1}
+              >
+                <span className="px-2 justify-end">
+                  <FaCircleInfo className="cursor-pointer" />
+                </span>
+              </Tooltip>
+            </label>
+            <input
+              type="date"
+              value={selectedDate}
+              onChange={(e) => setSelectedDate(e.target.value)}
+              className="border border-gray-300 rounded px-3 py-2 mt-1 w-full"
+              min={formattedDate}
+            />
+          </div>
+
+          <div className="flex flex-col mb-4">
+            <div className="">
+              <label className="text-gray-700 font-semibold flex items-center">
+                Select Available Time:
+                <Tooltip
+                  showArrow
+                  content={
+                    <div className="font-poppins">
+                      Session start time and end time based on your timezone.
+                    </div>
+                  }
+                  placement="right"
+                  className="rounded-md bg-opacity-90"
+                  closeDelay={1}
                 >
-                  Remove
-                </button>
-              </li>
-            ))}
-          </ul>
+                  <span className="px-2 justify-end">
+                    <FaCircleInfo className="cursor-pointer" />
+                  </span>
+                </Tooltip>
+              </label>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-gray-500 mt-1">Start Time</label>
+                <select
+                  className="border border-gray-300 rounded px-3 py-2 mt-1 w-full"
+                  value={selectedStartTime}
+                  onChange={(e) => handleStartTimeChange(e)}
+                >
+                  {startTimeOptions.map((time) => (
+                    <option key={time} value={time}>
+                      {time}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="text-gray-500 mt-1">End Time</label>
+                <select
+                  className="border border-gray-300 rounded px-3 py-2 mt-1 w-full"
+                  value={selectedEndTime}
+                  onChange={(e) => handleEndTimeChange(e)}
+                >
+                  {endTimeOptions.map((time) => (
+                    <option key={time} value={time}>
+                      {time}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <button
+            onClick={handleAddSelectedDate}
+            className="bg-blue-shade-100 hover:bg-blue-shade-200 text-white font-bold py-2 px-4 rounded"
+          >
+            Add Session
+          </button>
+
+          <div className="mt-6">
+            <h3 className="text-lg font-semibold mb-2">
+              Selected Dates for Session:
+            </h3>
+            <ul>
+              {allData.map((item: any, index: any) => (
+                <li key={index} className="mb-1">
+                  <span className="font-semibold">{index + 1}.</span>{" "}
+                  {item.date} -{" "}
+                  {item.timeRanges
+                    .map((time: any) => {
+                      const [startHour, startMinute, endHour, endMinute] = time;
+                      return `${startHour}:${startMinute} to ${endHour}:${endMinute}`;
+                    })
+                    .join(", ")}
+                  <button
+                    disabled={createSessionLoading}
+                    onClick={() => handleRemoveDate(item.date, item.timeRanges)}
+                    className="text-red-600 ml-2"
+                  >
+                    Remove
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <button
+            onClick={() => handleApplyWithCheck()}
+            className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-4 w-[160px]"
+            disabled={createSessionLoading}
+          >
+            {createSessionLoading ? (
+              <div className="flex items-center justify-center">
+                <Oval
+                  visible={true}
+                  height="28"
+                  width="28"
+                  color="#2A5D30"
+                  secondaryColor="#cdccff"
+                  ariaLabel="oval-loading"
+                />
+              </div>
+            ) : (
+              <>Create Session</>
+            )}
+          </button>
+
+          <Toaster
+            toastOptions={{
+              style: {
+                fontSize: "14px",
+                backgroundColor: "#3E3D3D",
+                color: "#fff",
+                boxShadow: "none",
+                borderRadius: "50px",
+                padding: "3px 5px",
+              },
+            }}
+          />
         </div>
 
-        <button
-          onClick={() => handleApplyWithCheck()}
-          className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-4 w-[160px]"
-          disabled={createSessionLoading}
-        >
-          {createSessionLoading ? (
-            <div className="flex items-center justify-center">
-              <Oval
-                visible={true}
-                height="28"
-                width="28"
-                color="#2A5D30"
-                secondaryColor="#cdccff"
-                ariaLabel="oval-loading"
-              />
-            </div>
-          ) : (
-            <>Create Session</>
-          )}
-        </button>
-
-        <Toaster
-          toastOptions={{
-            style: {
-              fontSize: "14px",
-              backgroundColor: "#333",
-              color: "#fff",
-              borderRadius: "8px",
-              padding: "12px",
-            },
-          }}
-        />
+        {/* Second box- right side */}
+        {/* <div>
+          <AvailableUserSessions />
+        </div> */}
       </div>
+
       {modalOpen && (
         <SchedulingSuccessModal
           isOpen={modalOpen}
