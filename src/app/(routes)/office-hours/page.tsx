@@ -1,7 +1,6 @@
 import DaoOfficeHours from "@/components/OfficeHours/DaoOfficeHours";
 import React from "react";
 import type { Metadata } from "next";
-import ButtonWithCircle from "@/components/Circle/ButtonWithCircle";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://app.chora.club/"),
@@ -35,9 +34,7 @@ export const metadata: Metadata = {
 function page() {
   return (
     <div>
-      <ButtonWithCircle>
         <DaoOfficeHours />
-      </ButtonWithCircle>
     </div>
   );
 }

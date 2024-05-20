@@ -268,6 +268,7 @@ console.log('statement', statement);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
+      setLoading(false);
     };
 
     fetchData();
