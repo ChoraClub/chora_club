@@ -15,6 +15,7 @@ interface Type {
 
 function DelegateInfo({ props, desc }: { props: Type; desc: string }) {
   const [karmaDescription, setKarmaDescription] = useState<string>();
+  const [opagoraDescription, setOpagoraDescription] = useState<string>();
   const [loading, setLoading] = useState(true);
   const [isDataLoading, setDataLoading] = useState(true);
   const router = useRouter();
@@ -221,6 +222,38 @@ function DelegateInfo({ props, desc }: { props: Type; desc: string }) {
       ref: `/${props.daoDelegates}/${props.individualDelegate}?active=officeHours&hours=attended`,
     },
   ];
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        console.log(props.individualDelegate)
+        const res = await fetch(`/api/get-statement?individualDelegate=${props.individualDelegate}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          // body: JSON.stringify({ individualDelegate: props.individualDelegate }),
+        });
+
+        if (!res.ok) {
+          throw new Error('Failed to fetch data');
+        }
+ 
+        const data = await res.json();
+        const statement = data.statement.payload.delegateStatement;
+console.log('statement', statement);
+        setOpagoraDescription(statement);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+    fetchData();
+  }, [props.individualDelegate]);
+  
+  const renderParagraphs = (text: string) => {
+    return text.split('\n').filter(paragraph => paragraph.trim() !== '').map((paragraph, index) => (
+      <p key={index} className="mb-3">{paragraph}</p>
+    ));
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -303,7 +336,7 @@ function DelegateInfo({ props, desc }: { props: Type; desc: string }) {
       <div
         style={{ boxShadow: "0px 4px 30.9px 0px rgba(0, 0, 0, 0.12)" }}
         className={`rounded-xl my-7 me-32 py-6 px-7 text-sm ${
-          desc && karmaDescription ? "" : "min-h-52"
+          desc && opagoraDescription && karmaDescription ? "" : "min-h-52"
         }`}
       >
         {loading ? (
@@ -318,7 +351,9 @@ function DelegateInfo({ props, desc }: { props: Type; desc: string }) {
           </div>
         ) : desc !== "" ? (
           desc
-        ) : karmaDescription ? (
+        ) : opagoraDescription ? ( // Check for opagoraDescription 
+        renderParagraphs(opagoraDescription)
+      ) : karmaDescription ? (
           karmaDescription
         ) : (
           <div className="font-semibold text-base flex justify-center">
