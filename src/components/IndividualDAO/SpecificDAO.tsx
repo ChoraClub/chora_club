@@ -1,3 +1,4 @@
+"use client";
 import Image, { StaticImageData } from "next/image";
 import React, { useEffect, useState } from "react";
 import DelegatesList from "./DelegatesList";
