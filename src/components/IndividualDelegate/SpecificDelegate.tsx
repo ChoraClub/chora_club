@@ -12,7 +12,8 @@ import DelegateOfficeHrs from "./DelegateOfficeHrs";
 import copy from "copy-to-clipboard";
 import { Tooltip } from "@nextui-org/react";
 import { StaticImport } from "next/dist/shared/lib/get-img-props";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
+import { useRouter } from "next-nprogress-bar";
 import Link from "next/link";
 import toast, { Toaster } from "react-hot-toast";
 // import { Provider, cacheExchange, createClient, fetchExchange } from "urql";
@@ -224,7 +225,7 @@ function SpecificDelegate({ props }: { props: Type }) {
   const handleDelegateVotes = async (to: string) => {
     let address;
     let address1;
-  
+
     try {
       address = await walletClient.getAddresses();
       address1 = address[0];
@@ -233,15 +234,15 @@ function SpecificDelegate({ props }: { props: Type }) {
       toast.error("Please connect your MetaMask wallet!");
       return;
     }
-  
+
     if (!address1) {
       toast.error("Please connect your MetaMask wallet!");
       return;
     }
-  
+
     console.log(address);
     console.log(address1);
-  
+
     let chainAddress;
     if (chain?.name === "Optimism") {
       chainAddress = "0x4200000000000000000000000000000000000042";
@@ -250,9 +251,9 @@ function SpecificDelegate({ props }: { props: Type }) {
     } else {
       return;
     }
-  
+
     console.log("walletClient?.chain?.network", walletClient?.chain?.network);
-  
+
     if (walletClient?.chain === "") {
       toast.error("Please connect your wallet!");
     } else {
@@ -264,11 +265,11 @@ function SpecificDelegate({ props }: { props: Type }) {
           args: [to],
           account: address1,
         });
-  
+
         console.log(delegateTx);
       } else {
         toast.error("Please switch to appropriate network to delegate!");
-  
+
         if (openChainModal) {
           openChainModal();
         }
