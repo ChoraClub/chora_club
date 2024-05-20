@@ -231,11 +231,13 @@ function DelegateInfo({ props, desc }: { props: Type; desc: string }) {
         );
         const details = await res.json();
         console.log("Desc: ", details.data.delegatePitch.customFields[1].value);
+        console.log("Response: ", res);
         setLoading(false);
         setKarmaDescription(details.data.delegatePitch.customFields[1].value);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
+      setLoading(false);
     };
 
     fetchData();

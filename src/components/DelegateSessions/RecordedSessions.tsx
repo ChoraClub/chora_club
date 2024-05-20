@@ -264,8 +264,9 @@ function RecordedSessions() {
                     <div>
                       <Image
                         src={
-                          `https://gateway.lighthouse.storage/ipfs/${data.userInfo.image}` ||
-                          user
+                          data.userInfo?.image
+                            ? `https://gateway.lighthouse.storage/ipfs/${data.userInfo.image}`
+                            : user
                         }
                         alt="image"
                         width={20}

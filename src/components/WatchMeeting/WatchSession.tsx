@@ -122,7 +122,11 @@ function WatchSession({
             <div className="flex items-center gap-2 ">
               <div>
                 <Image
-                  src={`https://gateway.lighthouse.storage/ipfs/${data.hostProfileInfo.image}`}
+                  src={
+                    data.hostProfileInfo?.image
+                      ? `https://gateway.lighthouse.storage/ipfs/${data.hostProfileInfo.image}`
+                      : user
+                  }
                   alt="image"
                   width={20}
                   height={20}
@@ -217,7 +221,7 @@ function WatchSession({
                       <div>
                         <Image
                           src={
-                            attendee.profileInfo.image
+                            attendee.profileInfo?.image
                               ? `https://gateway.lighthouse.storage/ipfs/${attendee.profileInfo.image}`
                               : user
                           }
