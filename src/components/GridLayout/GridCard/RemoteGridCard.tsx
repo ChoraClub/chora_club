@@ -125,7 +125,7 @@ const GridCard: React.FC<GridCardProps> = ({ peerId }) => {
               playsInline
               controls
               className="aspect-video w-full"
-              ref={(screenRef) =>
+              ref={(screenRef: any) =>
                 screenRef && (screenRef.srcObject = screenShareVideoStream)
               }
             />

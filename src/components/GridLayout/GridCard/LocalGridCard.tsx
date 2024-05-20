@@ -123,7 +123,7 @@ const LocalGridCard: FC = () => {
             <div className={stream ? "col-span-1" : "col-span-2"}>
               <video
                 className="aspect-video w-full h-full"
-                ref={(screenShareRef) =>
+                ref={(screenShareRef: any) =>
                   screenShareRef && (screenShareRef.srcObject = shareStream)
                 }
                 autoPlay

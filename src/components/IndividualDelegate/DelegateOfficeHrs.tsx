@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
+import { useRouter } from "next-nprogress-bar";
 import text1 from "@/assets/images/daos/texture1.png";
 import Tile from "../utils/Tile";
 import { Oval } from "react-loader-spinner";

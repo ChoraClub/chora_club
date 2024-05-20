@@ -76,6 +76,7 @@ export async function POST(
           _id: existingDocument._id,
         },
         {
+          /* @ts-ignore */
           $push: {
             allowedDates: { $each: allowedDates },
             dateAndRanges: { $each: dateAndRanges },
