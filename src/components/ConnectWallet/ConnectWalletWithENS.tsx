@@ -34,10 +34,7 @@ function ConnectWalletWithENS() {
 
         if (account && !displayAddress) {
           (async () => {
-            const displayName = await getEnsName(
-              account.address,
-              account.displayName
-            );
+            const displayName = await getEnsName(account.address);
             setDisplayAddress(displayName);
           })();
         }
