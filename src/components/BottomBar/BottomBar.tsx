@@ -9,7 +9,6 @@ import { BasicIcons, NestedBasicIcons } from "@/assets/BasicIcons";
 import { cn } from "@/components/utils/helpers";
 import Dropdown from "../common/Dropdown";
 import EmojiTray from "../EmojiTray/EmojiTray";
-import { useRouter } from "next/navigation";
 import {
   useLocalPeer,
   useLocalAudio,

@@ -9,6 +9,7 @@ import HuddleContextProvider from "@/components/ClientComponents/HuddleContextPr
 import { useEffect } from "react";
 import FeedbackTile from "@/components/utils/FeedbackTile";
 import Script from "next/script";
+import ProgressBarProvider from "@/components/ProgressBarProvider/ProgressBarProvider";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -80,7 +81,8 @@ export default function RootLayout({
           'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
           })(window,document,'script','dataLayer','GTM-W5684W77');
           `,
-          }}></script>
+          }}
+        ></script>
       </head>
       <body className={`${quanty.variable} ${poppins.variable}`}>
         <noscript
@@ -95,19 +97,21 @@ export default function RootLayout({
         `,
           }}
         />
-        <RootProviders>
-          <HuddleContextProvider>
-            <div className="flex">
-              <div className="fixed w-[6%] bg-blue-shade-100 h-screen">
-                <SidebarMain />
+        <ProgressBarProvider>
+          <RootProviders>
+            <HuddleContextProvider>
+              <div className="flex">
+                <div className="fixed w-[6%] bg-blue-shade-100 h-screen mr-4 lg:mr-8 ">
+                  <SidebarMain />
+                </div>
+                <div className="w-[94%] ml-auto">
+                  <FeedbackTile />
+                  <div>{children}</div>
+                </div>
               </div>
-              <div className="w-[94%] ml-auto">
-                <FeedbackTile />
-                <div>{children}</div>
-              </div>
-            </div>
-          </HuddleContextProvider>
-        </RootProviders>
+            </HuddleContextProvider>
+          </RootProviders>
+        </ProgressBarProvider>
       </body>
     </html>
   );

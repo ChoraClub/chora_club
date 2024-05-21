@@ -17,7 +17,8 @@ import {
   useDisclosure,
 } from "@nextui-org/react";
 import styles from "./Tile.module.css";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation";
+import { useRouter } from "next-nprogress-bar";
 
 interface Type {
   img: StaticImageData;

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import AvailableSessions from "./AvailableSessions";
 import RecordedSessions from "./RecordedSessions";
 import { FaCircleInfo } from "react-icons/fa6";
@@ -10,7 +10,6 @@ import { Tooltip } from "@nextui-org/react";
 import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
 
 function DelegateSessionsMain() {
-  const router = useRouter();
   const path = usePathname();
   const searchParams = useSearchParams();
 

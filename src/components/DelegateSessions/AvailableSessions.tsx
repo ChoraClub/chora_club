@@ -3,7 +3,8 @@
 import React, { useState, useEffect } from "react";
 import search from "@/assets/images/daos/search.png";
 import Image, { StaticImageData } from "next/image";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
+import { useRouter } from "next-nprogress-bar";
 import { Oval } from "react-loader-spinner";
 import { IoCopy } from "react-icons/io5";
 import copy from "copy-to-clipboard";

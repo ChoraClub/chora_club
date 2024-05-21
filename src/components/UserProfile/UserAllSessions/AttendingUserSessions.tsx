@@ -7,7 +7,8 @@ import Image from "next/image";
 import { Tooltip } from "@nextui-org/react";
 import EventTile from "../../utils/EventTile";
 import { useAccount, useNetwork } from "wagmi";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
+import { useRouter } from "next-nprogress-bar";
 import { Oval } from "react-loader-spinner";
 
 type Attendee = {
