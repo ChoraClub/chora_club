@@ -7,7 +7,7 @@ import arblogo from "@/assets/images/daos/arbitrum.jpg";
 import user from "@/assets/images/daos/user3.png";
 import { Tooltip } from "@nextui-org/react";
 import { IoCopy } from "react-icons/io5";
-import toast from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
 import copy from "copy-to-clipboard";
 import styles from "./RecordedSessions.module.css";
 import { Oval } from "react-loader-spinner";
@@ -16,6 +16,7 @@ import { useRouter } from "next-nprogress-bar";
 import { parseISO } from "date-fns";
 // const { parseISO } = require("date-fns");
 import Head from "next/head";
+import { getEnsName, getEnsNameOfUser } from "../ConnectWallet/ENSResolver";
 
 function RecordedSessions() {
   // const parseISO = dateFns;
@@ -35,6 +36,7 @@ function RecordedSessions() {
   const [hoveredVideo, setHoveredVideo] = useState<number | null>(null); // Track which video is hovered
   const videoRefs = useRef<any>([]);
   const [videoDurations, setVideoDurations] = useState<any>({});
+  const [ensNames, setEnsNames] = useState<any>({});
 
   useEffect(() => {
     const getRecordedMeetings = async () => {
@@ -144,6 +146,25 @@ function RecordedSessions() {
     return formattedDuration;
   };
 
+  useEffect(() => {
+    const fetchEnsNames = async () => {
+      const ensNamesMap: any = {};
+      for (const data of meetingData) {
+        const ensName = await getEnsName(
+          data.session.host_address.toLowerCase()
+        );
+        if (ensName) {
+          ensNamesMap[data.session.host_address] = ensName;
+        }
+      }
+      setEnsNames(ensNamesMap);
+    };
+
+    if (meetingData.length > 0) {
+      fetchEnsNames();
+    }
+  }, [meetingData]);
+
   return (
     <>
       <div className="pe-10">
@@ -202,27 +223,27 @@ function RecordedSessions() {
                   className={`w-full h-44 rounded-t-3xl bg-black object-cover object-center ${styles.container}`}
                 >
                   {hoveredVideo === index ? (
-                    <div className="relative">
-                      <video
-                        ref={(el: any) => (videoRefs.current[index] = el)}
-                        autoPlay
-                        loop
-                        onLoadedMetadata={(e) => handleLoadedMetadata(index, e)}
-                        src={data.session.video_uri}
-                        className="w-full h-44 rounded-t-3xl"
-                      ></video>
-                      <div className={styles.videoTimeline}>
-                        <div className={styles.progressArea}>
-                          <div
-                            id={`progressBar-${index}`}
-                            className={styles.progressBar}
-                          ></div>
-                        </div>
-                        <div className="absolute right-1 bottom-3 text-white text-xs bg-white px-1 bg-opacity-30 rounded-sm">
-                          {formatVideoDuration(videoDurations[index] || 0)}
-                        </div>
+                  <div className="relative">
+                    <video
+                      ref={(el: any) => (videoRefs.current[index] = el)}
+                      autoPlay
+                      loop
+                      onLoadedMetadata={(e) => handleLoadedMetadata(index, e)}
+                      src={data.session.video_uri}
+                      className="w-full h-44 rounded-t-3xl"
+                    ></video>
+                    <div className={styles.videoTimeline}>
+                      <div className={styles.progressArea}>
+                        <div
+                          id={`progressBar-${index}`}
+                          className={styles.progressBar}
+                        ></div>
+                      </div>
+                      <div className="absolute right-1 bottom-3 text-white text-xs bg-white px-1 bg-opacity-30 rounded-sm">
+                        {formatVideoDuration(videoDurations[index] || 0)}
                       </div>
                     </div>
+                  </div>
                   ) : (
                     <Image
                       src={texture1}
@@ -274,10 +295,7 @@ function RecordedSessions() {
                         className="rounded-full"
                       />
                     </div>
-                    <div>
-                      {data.session.host_address.slice(0, 6)}...
-                      {data.session.host_address.slice(-4)}
-                    </div>
+                    <div>{ensNames[data.session.host_address]}</div>
                     <div>
                       <Tooltip
                         content="Copy"
@@ -289,7 +307,7 @@ function RecordedSessions() {
                           <IoCopy
                             onClick={(event) => {
                               event.stopPropagation();
-                              handleCopy(data.address);
+                              handleCopy(data.session.host_address);
                             }}
                           />
                         </span>
@@ -302,6 +320,18 @@ function RecordedSessions() {
           </div>
         )}
       </div>
+      <Toaster
+        toastOptions={{
+          style: {
+            fontSize: "14px",
+            backgroundColor: "#3E3D3D",
+            color: "#fff",
+            boxShadow: "none",
+            borderRadius: "50px",
+            padding: "3px 5px",
+          },
+        }}
+      />
     </>
   );
 }
