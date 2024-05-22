@@ -1,22 +1,22 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: [
-      "l2beat.com",
-      "s3.amazonaws.com",
-      "raw.githubusercontent.com",
-      "pbs.twimg.com",
-      "cdn.stamp.fyi",
-      "ltdfoto.ru",
-      "cdn.discordapp.com",
-      "i.ibb.co",
-      "img.redbull.com",
-      "www.google.com",
-      "s3.hj",
-      "gateway.lighthouse.storage",
-      "static.tally.xyz",
-      "ugc.production.linktr.ee",
-      "i.imgur.com"
+    remotePatterns: [
+      { hostname: "l2beat.com" },
+      { hostname: "s3.amazonaws.com" },
+      { hostname: "raw.githubusercontent.com" },
+      { hostname: "pbs.twimg.com" },
+      { hostname: "cdn.stamp.fyi" },
+      { hostname: "ltdfoto.ru" },
+      { hostname: "cdn.discordapp.com" },
+      { hostname: "i.ibb.co" },
+      { hostname: "img.redbull.com" },
+      { hostname: "www.google.com" },
+      { hostname: "s3.hj" },
+      { hostname: "gateway.lighthouse.storage" },
+      { hostname: "static.tally.xyz" },
+      { hostname: "ugc.production.linktr.ee" },
+      { hostname: "i.imgur.com" },
     ],
   },
   reactStrictMode: false,

@@ -5,23 +5,23 @@ import { FaPencil } from "react-icons/fa6";
 import toast, { Toaster } from "react-hot-toast";
 import { useNetwork, useAccount } from "wagmi";
 
-function AvailableUserSessions() {
+function AvailableUserSessions({ daoName }: { daoName: string }) {
   const { address, isConnected } = useAccount();
   const { chain } = useNetwork();
   const [data, setData] = useState([]);
-  const [daoName, setDaoName] = useState<string>("");
+  // const [daoName, setDaoName] = useState<string>("");
   const [dataLoading, setDataLoading] = useState<Boolean>();
 
-  useEffect(() => {
-    if (address && isConnected) {
-      if (chain?.name === "Optimism") {
-        setDaoName("optimism");
-      } else if (chain?.name === "Arbitrum One") {
-        setDaoName("arbitrum");
-      }
-    }
-    console.log("daoName", daoName);
-  }, [chain, address, isConnected]);
+  // useEffect(() => {
+  //   if (address && isConnected) {
+  //     if (chain?.name === "Optimism") {
+  //       setDaoName("optimism");
+  //     } else if (chain?.name === "Arbitrum One") {
+  //       setDaoName("arbitrum");
+  //     }
+  //   }
+  //   console.log("daoName", daoName);
+  // }, [chain, address, isConnected]);
 
   useEffect(() => {
     const fetchData = async () => {

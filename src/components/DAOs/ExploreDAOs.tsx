@@ -94,37 +94,42 @@ function ExploreDAOs() {
 
         <div
           style={{ background: "rgba(238, 237, 237, 0.36)" }}
-          className="flex border-[0.5px] border-black w-fit rounded-full my-3 font-poppins">
+          className="flex border-[0.5px] border-black w-fit rounded-full my-3 font-poppins"
+        >
           <input
             type="text"
             placeholder="Search DAOs"
             style={{ background: "rgba(238, 237, 237, 0.36)" }}
             className="pl-5 rounded-full outline-none"
             value={searchQuery}
-            onChange={(e) => handleSearchChange(e.target.value)}></input>
+            onChange={(e) => handleSearchChange(e.target.value)}
+          ></input>
           <span className="flex items-center bg-black rounded-full px-6 py-3">
-            <Image src={search} alt="search" width={20} />
+            <Image src={search} alt="search" width={20} height={20} />
           </span>
         </div>
 
         <div className="grid min-[475px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-10 py-8 font-poppins">
           {daoInfo.length > 0 ? (
-            daoInfo.map((daos, index) => (
+            daoInfo.map((daos: any, index: any) => (
               <div
                 key={daos.name}
                 style={{ boxShadow: "0px 4px 50.8px 0px rgba(0, 0, 0, 0.11)" }}
                 className="px-5 py-7 rounded-2xl cursor-pointer"
-                onClick={() => handleClick(daos.name, daos.img)}>
+                onClick={() => handleClick(daos.name, daos.img)}
+              >
                 <div className="flex justify-center">
                   <Image
                     src={daos.img}
                     alt="Image not found"
                     width={80}
-                    className="rounded-full"></Image>
+                    height={80}
+                    className="rounded-full"
+                  ></Image>
                 </div>
                 <div className="text-center">
                   <div className="py-3">
-                    <div className="font-semibold">{daos.name}</div>
+                    <div className="font-semibold capitalize">{daos.name}</div>
                     <div className="text-sm bg-[#F2F2F2] py-2 rounded-md mt-3">
                       {daos.value} Participants
                     </div>
@@ -143,7 +148,8 @@ function ExploreDAOs() {
             style={{ boxShadow: "0px 4px 50.8px 0px rgba(0, 0, 0, 0.11)" }}
             className={`px-5 py-7 rounded-2xl cursor-pointer flex items-center justify-center relative transition-all duration-250 ease-in-out ${
               isHovered ? "border-2 border-gray-600" : ""
-            }`}>
+            }`}
+          >
             <div className="">
               <FaCirclePlus
                 size={70}
@@ -159,7 +165,8 @@ function ExploreDAOs() {
               target="_blank"
               className={`absolute inset-0 flex items-center justify-center bottom-0  ${
                 isHovered ? "block" : "hidden"
-              }`}>
+              }`}
+            >
               <span className="text-xl font-semibold text-slate-800">
                 Add your DAO
               </span>

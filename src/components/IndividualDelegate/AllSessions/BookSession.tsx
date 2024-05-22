@@ -6,7 +6,7 @@ import { useAccount } from "wagmi";
 import { DateTime, Duration } from "luxon";
 import dateFns from "date-fns";
 import { useSession } from "next-auth/react";
-import { Oval } from "react-loader-spinner";
+import { Oval, ThreeDots } from "react-loader-spinner";
 import styled from "styled-components";
 import {
   Modal,
@@ -21,6 +21,9 @@ import toast, { Toaster } from "react-hot-toast";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import SchedulingSuccessModal from "@/components/UserProfile/UserAllSessions/SchedulingSuccessModal";
 import BookingSuccessModal from "./BookingSuccessModal";
+import AddEmailModal from "@/components/utils/AddEmailModal";
+import { RxCross2 } from "react-icons/rx";
+import { MdCancel } from "react-icons/md";
 interface Type {
   daoDelegates: string;
   individualDelegate: string;
@@ -34,6 +37,7 @@ const StyledTimePickerContainer = styled.div`
 function BookSession({ props }: { props: Type }) {
   const { openConnectModal } = useConnectModal();
   // const host_address = "0x3013bb4E03a7B81106D69C10710EaE148C8410E1";
+  const daoName = props.daoDelegates;
   const host_address = props.individualDelegate;
   const { isConnected, address } = useAccount();
   const { data: session, status } = useSession();
@@ -58,6 +62,27 @@ function BookSession({ props }: { props: Type }) {
   const [slotTimes, setSlotTimes] = useState<any[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
 
+  const [mailId, setMailId] = useState<string>();
+  const [hasEmailID, setHasEmailID] = useState<Boolean>();
+  const [showGetMailModal, setShowGetMailModal] = useState<Boolean>();
+  const [isValidEmail, setIsValidEmail] = useState(true);
+  const [continueAPICalling, setContinueAPICalling] = useState<Boolean>(false);
+  const [userRejected, setUserRejected] = useState<Boolean>();
+  const [addingEmail, setAddingEmail] = useState<boolean>();
+
+  useEffect(() => {
+    // Lock scrolling when the modal is open
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [isOpen]);
+
   useEffect(() => {
     const loadingTimeout = setTimeout(() => {
       setIsLoading(false);
@@ -70,9 +95,8 @@ function BookSession({ props }: { props: Type }) {
     // setIsPageLoading(false);
     // }, 1000);
     // }
-
+    // onOpen();
     // setIsPageLoading(false);
-
     return () => {
       clearTimeout(loadingTimeout);
     };
@@ -171,6 +195,112 @@ function BookSession({ props }: { props: Type }) {
       if (openConnectModal) {
         openConnectModal();
       }
+    }
+  };
+
+  useEffect(() => {
+    console.log("userRejected in useEffect", userRejected);
+    const hasRejected = JSON.parse(
+      sessionStorage.getItem("bookingMailRejected") || "false"
+    );
+    console.log("hasRejected in useEffect", hasRejected);
+    setUserRejected(hasRejected);
+  }, [userRejected, sessionStorage.getItem("bookingMailRejected")]);
+
+  useEffect(() => {
+    // checkUser();
+    console.log("continueAPICalling", continueAPICalling);
+    if (continueAPICalling) {
+      apiCall();
+    }
+  }, [continueAPICalling]);
+
+  const checkUser = async () => {
+    try {
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+
+      const raw = JSON.stringify({
+        address: address,
+        daoName: daoName,
+      });
+
+      const requestOptions: any = {
+        method: "POST",
+        headers: myHeaders,
+        body: raw,
+        redirect: "follow",
+      };
+      const response = await fetch(`/api/profile/${address}`, requestOptions);
+      const result = await response.json();
+      console.log("result", result);
+      if (Array.isArray(result.data) && result.data.length > 0) {
+        console.log("inside array");
+        // Iterate over each item in the response data array
+        for (const item of result.data) {
+          console.log("item::", item);
+          // Check if address and daoName match
+          if (item.address === address) {
+            if (item.emailId === null || item.emailId === "") {
+              console.log("NO emailId found");
+              setHasEmailID(false);
+              return false;
+            } else if (item.emailId) {
+              const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+              const isValid = emailPattern.test(item.emailId);
+              if (isValid) {
+                setMailId(item.emailId);
+                setContinueAPICalling(true);
+                setHasEmailID(true);
+                console.log("emailId:", item.emailId);
+                return true;
+              } else {
+                setContinueAPICalling(false);
+                return false;
+              }
+            }
+          }
+        }
+      }
+    } catch (error) {
+      console.log("Error", error);
+    }
+  };
+
+  const checkBeforeApiCall = async () => {
+    if (modalData.title.length > 0 && modalData.description.length > 0) {
+      try {
+        setConfirmSave(true);
+        const checkUserMail = await checkUser();
+        const userRejectedLocal: any = await sessionStorage.getItem(
+          "bookingMailRejected"
+        );
+        // setUserRejected(userRejectedLocal);
+        console.log("userRejectedLocal", userRejectedLocal);
+        console.log("checkUserMail in handleApplyWithCheck", checkUserMail);
+        console.log("userRejected in handleApplyWithCheck", userRejected);
+        if (!checkUserMail && (!userRejected || !userRejectedLocal)) {
+          setShowGetMailModal(true);
+        } else {
+          console.log("inside else condition!!!!!");
+          console.log("continueAPICalling", continueAPICalling);
+          console.log("!continueAPICalling", !continueAPICalling);
+          if (!continueAPICalling || continueAPICalling === false) {
+            // console.log("inside if(!continueAPICalling)", !continueAPICalling);
+            setContinueAPICalling(true);
+          } else if (continueAPICalling) {
+            apiCall();
+          }
+        }
+        console.log("inside handleApplyWithCheck");
+        // if (continueAPICalling) {
+        //   handleApplyButtonClick();
+        // }
+      } catch (error) {
+        console.log("error:", error);
+      }
+    } else {
+      toast.error("Please enter title or description!");
     }
   };
 
@@ -315,6 +445,79 @@ function BookSession({ props }: { props: Type }) {
     setModalOpen(false);
   };
 
+  const handleEmailChange = (email: string) => {
+    setMailId(email);
+    setIsValidEmail(validateEmail(email));
+  };
+
+  const validateEmail = (email: string) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
+
+  useEffect(() => {
+    console.log("mailId", mailId);
+  }, [mailId]);
+
+  const handleSubmit = async () => {
+    if (address) {
+      if (mailId && (mailId !== "" || mailId !== undefined)) {
+        if (isValidEmail) {
+          try {
+            setAddingEmail(true);
+            const myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+
+            const raw = JSON.stringify({
+              address: address,
+              emailId: mailId,
+              daoName: daoName,
+            });
+
+            const requestOptions: any = {
+              method: "PUT",
+              headers: myHeaders,
+              body: raw,
+              redirect: "follow",
+            };
+
+            const response = await fetch("/api/profile", requestOptions);
+            const result = await response.json();
+            if (result.success) {
+              setContinueAPICalling(true);
+              setAddingEmail(false);
+            }
+            console.log("result", result);
+            console.log("Email submitted:", mailId);
+            // Optionally, close the modal
+            // handleGetMailModalClose();
+            setShowGetMailModal(false);
+          } catch (error) {
+            console.log("Error", error);
+            setAddingEmail(false);
+          }
+        } else {
+          toast.error("Enter Valid Email");
+          setShowGetMailModal(true);
+          console.log("Error");
+        }
+      } else {
+        toast.error("Enter Valid Email");
+        setShowGetMailModal(true);
+        console.log("Error");
+      }
+    }
+  };
+
+  const handleGetMailModalClose = () => {
+    if (!userRejected) {
+      sessionStorage.setItem("bookingMailRejected", JSON.stringify(true));
+      setUserRejected(true);
+    }
+    setContinueAPICalling(true);
+    setShowGetMailModal(false);
+  };
+
   return (
     <>
       {isPageLoading ? (
@@ -356,79 +559,150 @@ function BookSession({ props }: { props: Type }) {
         </div>
       )}
 
-      <Modal
-        isOpen={isOpen}
-        onClose={() => {
-          onClose();
-          setIsScheduling(false);
-        }}
-        className="font-poppins"
-      >
-        <ModalContent>
-          <>
-            <ModalHeader className="flex flex-col gap-1">
-              Book your slot for {props.daoDelegates}
-            </ModalHeader>
-            <ModalBody>
-              <div className="px-1 font-medium">Title:</div>
-              <input
-                type="text"
-                name="title"
-                value={modalData.title}
-                onChange={handleModalInputChange}
-                placeholder="Explain Governance"
-                className="outline-none bg-[#D9D9D945] rounded-md px-2 py-1 text-sm"
-                required
-              />
-
-              <div className="px-1 font-medium">Description:</div>
-              <textarea
-                name="description"
-                value={modalData.description}
-                onChange={handleModalInputChange}
-                placeholder="Please share anything that will help prepare for our meeting."
-                className="outline-none bg-[#D9D9D945] rounded-md px-2 py-1 text-sm"
-                required
-              />
-            </ModalBody>
-            <ModalFooter>
-              <Button
-                color="default"
-                onClick={() => {
-                  onClose();
-                  setIsScheduling(false);
-                }}
-              >
-                Close
-              </Button>
-              <Button
-                color="primary"
-                onClick={apiCall}
-                isDisabled={confirmSave}
-              >
-                {confirmSave ? (
-                  <div className="flex items-center justify-center">
-                    <Oval
-                      visible={true}
-                      height="30"
-                      width="30"
-                      color="#0500FF"
-                      secondaryColor="#cdccff"
-                      ariaLabel="oval-loading"
-                    />
+      {isOpen && (
+        <div
+          className="font-poppins z-[70] fixed inset-0 flex items-center justify-center backdrop-blur-md"
+          style={{ boxShadow: " 0px 0px 45px -17px rgba(0,0,0,0.75)" }}
+        >
+          <div className="bg-white rounded-[41px] overflow-hidden shadow-lg w-1/2">
+            <div className="relative">
+              <div className="flex flex-col gap-1 text-white bg-[#292929] p-4 py-7">
+                <h2 className="text-lg font-semibold mx-4">
+                  Book your slot for {props.daoDelegates}
+                  <button
+                    className="absolute right-7"
+                    onClick={() => {
+                      onClose();
+                      setIsScheduling(false);
+                    }}
+                  >
+                    <MdCancel size={28} color="white" />
+                  </button>
+                </h2>
+              </div>
+              <div className="px-8 py-4">
+                <div className="mt-4">
+                  <label className="block mb-2 font-semibold">Title:</label>
+                  <input
+                    type="text"
+                    name="title"
+                    value={modalData.title}
+                    onChange={handleModalInputChange}
+                    placeholder="Explain Governance"
+                    className="w-full px-4 py-2 border rounded-xl bg-[#D9D9D945]"
+                    required
+                  />
+                </div>
+                <div className="mt-4">
+                  <label className="block mb-2 font-semibold">
+                    Description:
+                  </label>
+                  <textarea
+                    name="description"
+                    value={modalData.description}
+                    onChange={handleModalInputChange}
+                    placeholder="Please share anything that will help prepare for our meeting."
+                    className="w-full px-4 py-2 border rounded-xl bg-[#D9D9D945]"
+                    required
+                  />
+                </div>
+                {showGetMailModal && (
+                  <div className="mt-4 border rounded-xl p-4 relative">
+                    <button
+                      className="absolute top-2 right-3"
+                      onClick={handleGetMailModalClose}
+                    >
+                      <MdCancel size={25} />
+                    </button>
+                    <h2 className="text-blue-shade-200 font-semibold text-base">
+                      Get Notified About Your Session Request
+                    </h2>
+                    <p className="text-gray-500 text-sm">
+                      Add your email address to get notified when the delegate
+                      approves or rejects your session request.
+                    </p>
+                    <div className="mt-2 flex rounded-3xl p-2 bg-[#D9D9D945]">
+                      <input
+                        type="text"
+                        value={mailId || ""}
+                        placeholder="Enter email address"
+                        onChange={(e) => handleEmailChange(e.target.value)}
+                        className="flex-1 px-4 py-2 rounded-3xl bg-transparent mr-1"
+                      />
+                      <button
+                        onClick={handleSubmit}
+                        className="bg-black text-white px-8 py-3 rounded-3xl hover:bg-gray-900"
+                        disabled={addingEmail}
+                      >
+                        {addingEmail ? (
+                          <div className="flex items-center justify-center px-3 py-[0.15rem]">
+                            <ThreeDots
+                              visible={true}
+                              height="20"
+                              width="50"
+                              color="#ffffff"
+                              radius="9"
+                              ariaLabel="three-dots-loading"
+                              wrapperStyle={{}}
+                              wrapperClass=""
+                            />
+                          </div>
+                        ) : (
+                          <>Notify Me</>
+                        )}
+                      </button>
+                    </div>
+                    <div className="text-blue-shade-100 text-xs italic mt-2 ps-3">
+                      You can also add your email address later from your
+                      profile. Cancel or submit email to continue booking.
+                    </div>
                   </div>
-                ) : (
-                  <>Save</>
                 )}
-              </Button>
-            </ModalFooter>
-          </>
-        </ModalContent>
-      </Modal>
+              </div>
+              <div className="flex justify-center px-8 py-4 ">
+                {/* <button className="text-gray-600" onClick={onClose}>
+                Cancel
+              </button> */}
+                <button
+                  className="bg-blue-shade-200 text-white px-8 py-3 font-semibold rounded-full"
+                  onClick={checkBeforeApiCall}
+                  disabled={confirmSave}
+                >
+                  {confirmSave ? (
+                    <div className="flex items-center">
+                      <Oval
+                        visible={true}
+                        height="20"
+                        width="20"
+                        color="#0500FF"
+                        secondaryColor="#cdccff"
+                        ariaLabel="oval-loading"
+                      />
+                    </div>
+                  ) : (
+                    <>Save</>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {modalOpen && (
         <BookingSuccessModal isOpen={modalOpen} onClose={handleModalClose} />
       )}
+
+      {/* {showGetMailModal && (
+        <AddEmailModal
+          isOpen={showGetMailModal}
+          onClose={handleGetMailModalClose}
+          onEmailChange={handleEmailChange}
+          onSubmit={handleSubmit}
+          mailId={mailId}
+          isValidEmail={isValidEmail}
+        />
+      )} */}
     </>
   );
 }

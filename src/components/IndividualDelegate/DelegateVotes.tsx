@@ -26,7 +26,7 @@ const arb_client = createClient({
 
 function DelegateVotes({ props }: { props: Type }) {
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [first, setfirst] = useState<boolean>(false);
+  const [first, setFirst] = useState<boolean>(false);
   const [graphData, setGraphData] = useState<any>([]);
   const [pageData, setPageData] = useState<any>([]);
   const [isPageLoading, setIsPageLoading] = useState(true);
@@ -57,48 +57,48 @@ function DelegateVotes({ props }: { props: Type }) {
   `;
 
   const arbQuery = gql`
-    query Votes($address: String!) {
-      votes(
-        orderBy: timestamp
-        orderDirection: desc
+            query Votes($address: String!) {
+              votes(
+                orderBy: timestamp
+                orderDirection: desc
         where: { user: $address, organization: "arbitrum.eth" }
-      ) {
-        id
-        proposal {
-          id
-          description
-          timestamp
-        }
-        organization {
-          id
-        }
-        solution
-        timestamp
-        support
-      }
-    }
-  `;
+              ) {
+                id
+                proposal {
+                  id
+                  description
+                  timestamp
+                }
+                organization {
+                  id
+                }
+                solution
+                timestamp
+                support
+              }
+            }
+          `;
 
   useEffect(() => {
     const fetchGraphData = async () => {
       if (props.daoDelegates == "optimism") {
        
         const op_gqdata: any = await op_client.query(opQuery, {
-          address: props.individualDelegate,
-        });
+            address: props.individualDelegate,
+          });
         console.log("Urql: ", op_gqdata.data.votes);
         setGraphData(op_gqdata.data.votes);
 
         const op_counts = op_gqdata.data.votes.reduce(
-          (acc: any, curr: any) => {
-            const support = curr.support;
-            acc[support] = (acc[support] || 0) + 1;
-            return acc;
-          },
-          { 0: 0, 1: 0, 2: 0 }
-        );
-        setSupportCounts(op_counts);
-        setfirst(true);
+            (acc: any, curr: any) => {
+              const support = curr.support;
+              acc[support] = (acc[support] || 0) + 1;
+              return acc;
+            },
+            { 0: 0, 1: 0, 2: 0 }
+          );
+          setSupportCounts(op_counts);
+          setFirst(true);
       } else if (props.daoDelegates == "arbitrum") {
         const arb_gqdata: any = await arb_client.query(arbQuery, {
           address: props.individualDelegate,
@@ -115,10 +115,10 @@ function DelegateVotes({ props }: { props: Type }) {
           { 0: 0, 1: 0, 2: 0 }
         );
         setSupportCounts(arb_counts);
-        setfirst(true);
+        setFirst(true);
       } else {
         setGraphData([]);
-        setfirst(false);
+        setFirst(false);
       }
     };
 

@@ -13,6 +13,7 @@ interface userInfoProps {
   karmaDesc: string;
   isDelegate: boolean;
   isSelfDelegate: boolean;
+  daoName: string;
 }
 
 function UserInfo({
@@ -23,6 +24,7 @@ function UserInfo({
   isDelegate,
   isSelfDelegate,
   karmaDesc,
+  daoName,
 }: userInfoProps) {
   const { address } = useAccount();
   // const address = "0x5e349eca2dc61abcd9dd99ce94d04136151a09ee";
@@ -45,8 +47,12 @@ function UserInfo({
   const [sessionAttendCount, setSessionAttendCount] = useState(0);
   const [officehoursHostCount, setOfficehoursHostCount] = useState(0);
   const [officehoursAttendCount, setOfficehoursAttendCount] = useState(0);
+  let sessionHostingCount = 0;
+  let sessionAttendingCount = 0;
+  let officehoursHostingCount = 0;
+  let officehoursAttendingCount = 0;
+  let dao_name = daoName;
   const [activeButton, setActiveButton] = useState("onchain");
-  let dao_name = "";
 
   const fetchAttestation = async (buttonType: string) => {
     let sessionHostingCount = 0;
@@ -123,7 +129,6 @@ function UserInfo({
             ) {
               sessionAttendingCount++;
             }
-            // console.log("op attended count: ", sessionAttendingCount);
             setSessionAttendCount(sessionAttendingCount);
             setSessionAttendedLoading(false);
           });
@@ -192,7 +197,7 @@ function UserInfo({
             ) {
               officehoursAttendingCount++;
             }
-            // console.log("officehours attended: ", officehoursAttendingCount);
+
             setOfficehoursAttendCount(officehoursAttendingCount);
             setOfficeHoursAttendedLoading(false);
           });

@@ -66,40 +66,11 @@ function SpecificDAO({ props }: { props: { daoDelegates: string } }) {
       JSON.stringify({ ...localData, [formatted]: [formatted, option.image] })
     );
 
-    // Redirect or perform other actions based on the selected DAO
-    switch (option.value) {
-      case "optimism":
-        router.push("/optimism?active=delegatesList");
-        break;
-      case "arbitrum":
-        router.push("/arbitrum?active=delegatesList");
-        break;
-      default:
-        break;
-    }
+    router.push(`/${name}?active=delegatesList`);
   };
 
   return (
     <div className="font-poppins py-6" id="secondSection">
-      {/* <div className="px-8 pb-5">
-        <div className="flex justify-between pe-10">
-          <div className="capitalize text-4xl text-blue-shade-100">
-            {props.daoDelegates}
-          </div>
-          <div>
-            <ConnectButton />
-          </div>
-        </div>
-
-        <div className="py-5 pr-8">
-          {props.daoDelegates === "optimism"
-            ? desc.optimism
-            : props.daoDelegates === "arbitrum"
-            ? desc.arbitrum
-            : null}
-        </div>
-      </div> */}
-
       <div className="pr-8 pb-5 pl-16">
         <div className="flex items-center justify-between pe-10">
           <div
@@ -110,8 +81,8 @@ function SpecificDAO({ props }: { props: { daoDelegates: string } }) {
             <div>
               <div
                 className="capitalize text-4xl text-blue-shade-100 bg-white-200 outline-none cursor-pointer flex items-center justify-between transition duration-500"
-                onMouseEnter={handleMouseEnter}
-                onMouseLeave={handleMouseLeave}
+                // onMouseEnter={handleMouseEnter}
+                // onMouseLeave={handleMouseLeave}
               >
                 <div className="mr-5 flex items-center">
                   {selectedOption.label}
@@ -143,7 +114,7 @@ function SpecificDAO({ props }: { props: { daoDelegates: string } }) {
                   onMouseEnter={handleMouseEnter}
                   onMouseLeave={handleMouseLeave}
                 >
-                  {options.map((option, index) => (
+                  {options.map((option: any, index: number) => (
                     <div key={index}>
                       <div
                         className={`option flex items-center cursor-pointer px-3 py-2 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 capitalize ${
