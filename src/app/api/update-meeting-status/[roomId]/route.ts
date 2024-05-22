@@ -1,14 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { MongoClient, MongoClientOptions } from "mongodb";
+import { connectDB } from "@/config/connectDB";
 
 export async function PUT(req: NextRequest, res: NextResponse) {
   const { meetingId, meetingType } = await req.json();
   // const meetingId = req.url.split("update-meeting-status/")[1];
   try {
     // Connect to MongoDB database
-    const client = await MongoClient.connect(process.env.MONGODB_URI!, {
-      dbName: "chora-club",
-    } as MongoClientOptions);
+    const client = await connectDB();
 
     const collectionName =
       meetingType === "session" ? "meetings" : "office_hours";

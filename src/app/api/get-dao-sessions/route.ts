@@ -1,14 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { MongoClient, MongoClientOptions } from "mongodb";
+import { connectDB } from "@/config/connectDB";
 
 export async function POST(req: NextRequest, res: NextResponse) {
   const { dao_name, address } = await req.json();
   // console.log(dao_name, address);
 
   try {
-    const client = await MongoClient.connect(process.env.MONGODB_URI!, {
-      dbName: `chora-club`,
-    } as MongoClientOptions);
+    const client = await connectDB();
 
     const db = client.db();
     const collection = db.collection("meetings");

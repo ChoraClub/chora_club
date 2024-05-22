@@ -1,5 +1,4 @@
-import { MongoClient, MongoClientOptions } from "mongodb";
-
+import { connectDB } from "@/config/connectDB";
 import { NextResponse, NextRequest } from "next/server";
 
 interface OfficeHours {
@@ -35,9 +34,7 @@ export async function POST(
   try {
     const { meetingId } = await req.json();
 
-    const client = await MongoClient.connect(process.env.MONGODB_URI!, {
-      dbName: `chora-club`,
-    } as MongoClientOptions);
+    const client = await connectDB();
 
     const db = client.db();
 

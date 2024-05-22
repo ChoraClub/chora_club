@@ -1,4 +1,4 @@
-import { MongoClient, MongoClientOptions } from "mongodb";
+import { connectDB } from "@/config/connectDB";
 import { NextResponse, NextRequest } from "next/server";
 import { sendMail, compileBookedSessionTemplate } from "@/libs/mail";
 
@@ -55,9 +55,7 @@ export async function POST(
 
   try {
     // Connect to MongoDB
-    const client = await MongoClient.connect(process.env.MONGODB_URI!, {
-      dbName: `chora-club`,
-    } as MongoClientOptions);
+    const client = await connectDB();
 
     // Access the collection
     const db = client.db();
@@ -215,9 +213,7 @@ export async function GET(
   try {
     // Connect to MongoDB
     // console.log("Connecting to MongoDB...");
-    const client = await MongoClient.connect(process.env.MONGODB_URI!, {
-      dbName: `chora-club`,
-    } as MongoClientOptions);
+    const client = await connectDB();
     // console.log("Connected to MongoDB");
 
     // Access the collection

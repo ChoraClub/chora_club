@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { MongoClient, MongoClientOptions } from "mongodb";
+import { connectDB } from "@/config/connectDB";
 
 export async function POST(req: NextRequest, res: NextResponse) {
   const { roomId, meetingType } = await req.json(); // Assuming the request body contains the roomId and meetingType
@@ -19,10 +19,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
   try {
     // Connect to MongoDB
-    client = await MongoClient.connect(process.env.MONGODB_URI!, {
-      dbName: `chora-club`,
-    } as MongoClientOptions);
-
+    client = await connectDB();
     // Access the appropriate collection based on meetingType
     const collectionName =
       meetingType === "session" ? "meetings" : "office_hours";

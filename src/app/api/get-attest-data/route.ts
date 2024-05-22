@@ -1,5 +1,4 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import { MongoClient, MongoClientOptions } from "mongodb";
+import { connectDB } from "@/config/connectDB";
 import { NextRequest, NextResponse } from "next/server";
 
 async function delegateAttestationOnchain(data: any) {
@@ -34,9 +33,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
   try {
     // Connect to MongoDB
-    const client = await MongoClient.connect(process.env.MONGODB_URI!, {
-      dbName: `chora-club`,
-    } as MongoClientOptions);
+    const client = await connectDB();
     console.log("Connected to MongoDB");
 
     const db = client.db();
