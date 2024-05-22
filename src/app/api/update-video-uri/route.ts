@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { MongoClient } from "mongodb";
+import { connectDB } from "@/config/connectDB";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest, res: NextApiResponse) {
@@ -7,7 +7,7 @@ export async function POST(req: NextRequest, res: NextApiResponse) {
 
   try {
     // Connect to MongoDB
-    const client = await MongoClient.connect(process.env.MONGODB_URI!, {});
+    const client = await connectDB();
     const db = client.db();
 
     // Update video_uri in office_hours collection

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { MongoClient, MongoClientOptions } from "mongodb";
+import { connectDB } from "@/config/connectDB";
 
 // Define the response body type
 interface Type {
@@ -21,9 +21,7 @@ interface Type {
 export async function GET(req: NextRequest, res: NextResponse) {
   try {
     // Connect to MongoDB
-    const client = await MongoClient.connect(process.env.MONGODB_URI!, {
-      dbName: `chora-club`,
-    } as MongoClientOptions);
+    const client = await connectDB();
 
     // Access the collection
     const db = client.db();
@@ -55,9 +53,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
 //     // console.log("date:", date);
 
 //     // Connect to MongoDB
-//     const client = await MongoClient.connect(process.env.MONGODB_URI!, {
-//       dbName: `chora-club`,
-//     } as MongoClientOptions);
+//     const client = await connectDB();
 
 //     // Access the collection
 //     const db = client.db();
@@ -98,9 +94,7 @@ export async function POST(req: NextRequest, res: NextResponse<Type[]>) {
     console.log("userAddress", userAddress);
     console.log("Initial Data end=========");
 
-    const client = await MongoClient.connect(process.env.MONGODB_URI!, {
-      dbName: `chora-club`,
-    } as MongoClientOptions);
+    const client = await connectDB();
 
     const db = client.db();
     const delegatesCollection = db.collection("delegates");
