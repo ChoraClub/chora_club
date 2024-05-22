@@ -1,4 +1,4 @@
-import { MongoClient, MongoClientOptions } from "mongodb";
+import { connectDB } from "@/config/connectDB";
 import { NextRequest, NextResponse } from "next/server";
 
 // Define the response body type
@@ -29,9 +29,7 @@ export async function POST(req: NextRequest, res: NextResponse<OfficeHours[]>) {
     }
 
     // Connect to MongoDB database
-    const client = await MongoClient.connect(process.env.MONGODB_URI!, {
-      dbName: "chora-club",
-    } as MongoClientOptions);
+    const client = await connectDB();
 
     // Access the collection
     const db = client.db();

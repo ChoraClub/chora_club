@@ -322,7 +322,7 @@ function ScheduledUserSessions() {
         {/* First box- left side */}
         <div
           style={{ boxShadow: "0px 4px 50.8px 0px rgba(0, 0, 0, 0.11)" }}
-          className="max-w-lg  mt-2 p-8 bg-white rounded-2xl"
+          className="min-w-xl h-fit mt-2 p-8 bg-white rounded-2xl"
           // className="max-w-lg mx-auto mt-2 p-8 bg-white rounded-2xl"
         >
           <div className="mb-4">
@@ -541,9 +541,9 @@ function ScheduledUserSessions() {
         </div>
 
         {/* Second box- right side */}
-        {/* <div>
+        <div>
           <AvailableUserSessions />
-        </div> */}
+        </div>
       </div>
 
       {modalOpen && (

@@ -1,4 +1,4 @@
-import { MongoClient, MongoClientOptions } from "mongodb";
+import { connectDB } from "@/config/connectDB";
 import { NextApiRequest, NextApiResponse } from "next";
 import { NextResponse, NextRequest } from "next/server";
 
@@ -40,9 +40,7 @@ export async function PUT(
     console.log("Generated roomId:", roomId);
 
     // Connect to your MongoDB database
-    const client = await MongoClient.connect(process.env.MONGODB_URI!, {
-      dbName: `chora-club`,
-    } as MongoClientOptions);
+    const client = await connectDB();
 
     const db = client.db();
     const collection = db.collection("office_hours");
@@ -96,9 +94,7 @@ export async function GET(req: NextRequest, res: NextResponse<OfficeHours[]>) {
       );
     }
 
-    const client = await MongoClient.connect(process.env.MONGODB_URI!, {
-      dbName: `chora-club`,
-    } as MongoClientOptions);
+    const client = await connectDB();
 
     const db = client.db();
     const collection = db.collection("office_hours");

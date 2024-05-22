@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { MongoClient, MongoClientOptions } from "mongodb";
+import { connectDB } from "@/config/connectDB";
 
 interface Meeting {
   meetingId: string;
@@ -227,9 +227,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
     console.log("Earliest Start Time:", new Date(earliestStartTime));
     console.log("Latest End Time:", new Date(latestEndTime));
 
-    const client = await MongoClient.connect(process.env.MONGODB_URI!, {
-      dbName: `chora-club`,
-    } as MongoClientOptions);
+    const client = await connectDB();
 
     // Access the collection
     const db = client.db();

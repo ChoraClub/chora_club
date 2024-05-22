@@ -1,6 +1,7 @@
 // Import necessary modules and interfaces
 import { MongoClient, MongoClientOptions, ObjectId } from "mongodb";
 import { NextResponse, NextRequest } from "next/server";
+import { connectDB } from "@/config/connectDB";
 
 interface UpdateBookingStatusResponse {
   success: boolean;
@@ -29,9 +30,7 @@ export async function PUT(
 
     // Connect to MongoDB database
     // console.log("Connecting to MongoDB...");
-    const client = await MongoClient.connect(process.env.MONGODB_URI!, {
-      dbName: `chora-club`,
-    } as MongoClientOptions);
+    const client = await connectDB();
     // console.log("Connected to MongoDB");
 
     // Access the collection
