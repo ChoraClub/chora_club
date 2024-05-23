@@ -11,11 +11,14 @@ import toast from "react-hot-toast";
 import copy from "copy-to-clipboard";
 import styles from "./RecordedSessions.module.css";
 import { Oval } from "react-loader-spinner";
-import { useRouter } from "next/navigation";
-import { formatDistanceToNow, parseISO } from "date-fns";
+// import { useRouter } from "next/navigation";
+import { useRouter } from "next-nprogress-bar";
+import { parseISO } from "date-fns";
+// const { parseISO } = require("date-fns");
 import Head from "next/head";
 
 function RecordedSessions() {
+  // const parseISO = dateFns;
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [meetingData, setMeetingData] = useState<any>([]);
@@ -85,18 +88,18 @@ function RecordedSessions() {
     }
   };
 
-  // const handleTimeUpdate = (video: HTMLVideoElement, index: number) => {
-  //   const duration = video.duration;
-  //   const currentTime = video.currentTime;
-  //   const progressBar = document.querySelectorAll(".progress-bar")[index];
+  const handleTimeUpdate = (video: HTMLVideoElement, index: number) => {
+    const duration = video.duration;
+    const currentTime = video.currentTime;
+    const progressBar = document.querySelectorAll(".progress-bar")[index];
 
-  //   if (progressBar) {
-  //     const progressDiv = progressBar as HTMLDivElement;
-  //     const percentage = (currentTime / duration) * 100;
-  //     console.log("percentage: ", percentage);
-  //     progressDiv.style.width = `${percentage}%`;
-  //   }
-  // };
+    if (progressBar) {
+      const progressDiv = progressBar as HTMLDivElement;
+      const percentage = (currentTime / duration) * 100;
+      console.log("percentage: ", percentage);
+      progressDiv.style.width = `${percentage}%`;
+    }
+  };
 
   useEffect(() => {
     if (hoveredVideo !== null && videoRefs.current[hoveredVideo]) {
@@ -261,8 +264,9 @@ function RecordedSessions() {
                     <div>
                       <Image
                         src={
-                          `https://gateway.lighthouse.storage/ipfs/${data.userInfo.image}` ||
-                          user
+                          data.userInfo?.image
+                            ? `https://gateway.lighthouse.storage/ipfs/${data.userInfo.image}`
+                            : user
                         }
                         alt="image"
                         width={20}

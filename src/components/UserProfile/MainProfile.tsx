@@ -169,10 +169,16 @@ function MainProfile() {
       const addr = await walletClient.getAddresses();
       const address1 = addr[0];
       let delegateTxAddr = "";
+      // const contractAddress =
+      //   daoName === "optimism"
+      //     ? "0x4200000000000000000000000000000000000042"
+      //     : daoName === "arbitrum"
+      //     ? "0x912CE59144191C1204E64559FE8253a0e49E6548"
+      //     : "";
       const contractAddress =
-        daoName === "optimism"
+        chain?.name === "Optimism"
           ? "0x4200000000000000000000000000000000000042"
-          : daoName === "arbitrum"
+          : chain?.name === "Arbitrum One"
           ? "0x912CE59144191C1204E64559FE8253a0e49E6548"
           : "";
       console.log(walletClient);
@@ -192,10 +198,12 @@ function MainProfile() {
       if (delegateTxAddr.toLowerCase() === address?.toLowerCase()) {
         console.log("Delegate comparison: ", delegateTx, address);
         setSelfDelegate(true);
+      } else {
+        setSelfDelegate(false);
       }
     };
     checkDelegateStatus();
-  }, [address, daoName]);
+  }, [address, daoName, selfDelegate]);
 
   // Pass the address of whom you want to delegate the voting power to
   const handleDelegateVotes = async (to: string) => {
@@ -868,8 +876,8 @@ function MainProfile() {
                     }}
                   />
                 </div>
-                {votes
-                  ? selfDelegate === true && (
+                {selfDelegate === true
+                  ? votes && (
                       <div className="flex gap-4 py-1">
                         <div className="text-[#4F4F4F] border-[0.5px] border-[#D9D9D9] rounded-md px-3 py-1">
                           <span className="text-blue-shade-200 font-semibold">

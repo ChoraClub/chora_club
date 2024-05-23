@@ -75,7 +75,7 @@ function ScreenSharingPort() {
           {videoTrack && (
             <video
               className="aspect-video w-full h-full rounded-lg"
-              ref={(screenShareRef) =>
+              ref={(screenShareRef: any) =>
                 screenShareRef && (screenShareRef.srcObject = shareStream)
               }
               autoPlay
