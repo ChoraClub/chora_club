@@ -1,4 +1,4 @@
-import { MongoClient, MongoClientOptions } from "mongodb";
+import { connectDB } from "@/config/connectDB";
 import { NextApiRequest, NextApiResponse } from "next";
 import { NextResponse, NextRequest } from "next/server";
 
@@ -59,9 +59,7 @@ export async function POST(
   try {
     // Connect to your MongoDB database
     // console.log("Connecting to MongoDB...");
-    const client = await MongoClient.connect(process.env.MONGODB_URI!, {
-      dbName: `chora-club`,
-    } as MongoClientOptions);
+    const client = await connectDB();
     // console.log("Connected to MongoDB");
 
     // Access the collection
@@ -136,9 +134,7 @@ export async function PUT(
   try {
     // Connect to your MongoDB database
     console.log("Connecting to MongoDB...");
-    const client = await MongoClient.connect(process.env.MONGODB_URI!, {
-      dbName: `chora-club`,
-    } as MongoClientOptions);
+    const client = await connectDB();
     console.log("Connected to MongoDB");
 
     // Access the collection

@@ -8,7 +8,7 @@ import {
 import { ethers } from "ethers";
 import { stringToBytes, bytesToHex } from "viem";
 import axios from "axios";
-import { MongoClient, MongoClientOptions } from "mongodb";
+import { connectDB } from "@/config/connectDB";
 
 interface MeetingRequestBody {
   host_address: string;
@@ -173,9 +173,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
       );
 
       if (requestData.meetingType === 1) {
-        const client = await MongoClient.connect(process.env.MONGODB_URI!, {
-          dbName: `chora-club`,
-        } as MongoClientOptions);
+        const client = await connectDB();
 
         const db = client.db();
         const collection = db.collection("meetings");
@@ -192,9 +190,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
         client.close();
       } else if (requestData.meetingType === 2) {
-        const client = await MongoClient.connect(process.env.MONGODB_URI!, {
-          dbName: `chora-club`,
-        } as MongoClientOptions);
+        const client = await connectDB();
 
         const db = client.db();
         const collection = db.collection("meetings");
@@ -213,9 +209,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
         client.close();
       } else if (requestData.meetingType === 3) {
-        const client = await MongoClient.connect(process.env.MONGODB_URI!, {
-          dbName: `chora-club`,
-        } as MongoClientOptions);
+        const client = await connectDB();
 
         const db = client.db();
         const collection = db.collection("office_hours");
@@ -232,9 +226,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
         client.close();
       } else if (requestData.meetingType === 4) {
-        const client = await MongoClient.connect(process.env.MONGODB_URI!, {
-          dbName: `chora-club`,
-        } as MongoClientOptions);
+        const client = await connectDB();
 
         const db = client.db();
         const collection = db.collection("office_hours");

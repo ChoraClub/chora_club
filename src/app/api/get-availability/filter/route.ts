@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { MongoClient, MongoClientOptions } from "mongodb";
+import { connectDB } from "@/config/connectDB";
 import { DateTime } from "luxon";
 
 interface Type {
@@ -29,9 +29,7 @@ export async function POST(req: NextRequest, res: NextResponse<Type[]>) {
     console.log("endTime", endTime);
     console.log("Initial Data end=========");
 
-    const client = await MongoClient.connect(process.env.MONGODB_URI!, {
-      dbName: `chora-club`,
-    } as MongoClientOptions);
+    const client = await connectDB();
 
     const db = client.db();
     const collection = db.collection("scheduling");

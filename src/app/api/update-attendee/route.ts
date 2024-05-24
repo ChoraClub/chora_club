@@ -1,4 +1,4 @@
-import { MongoClient, MongoClientOptions } from "mongodb";
+import { connectDB } from "@/config/connectDB";
 import { NextRequest, NextResponse } from "next/server";
 
 // Define the type for an individual attendee
@@ -18,9 +18,7 @@ export async function PUT(req: NextRequest, res: NextResponse) {
 
   try {
     console.log("Connecting to MongoDB...");
-    const client = await MongoClient.connect(process.env.MONGODB_URI!, {
-      dbName: `chora-club`,
-    } as MongoClientOptions);
+    const client = await connectDB();
     console.log("Connected to MongoDB");
 
     const db = client.db();
