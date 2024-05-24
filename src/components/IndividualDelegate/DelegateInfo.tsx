@@ -374,7 +374,7 @@ function DelegateInfo({ props, desc }: { props: Type; desc: string }) {
           </div>
         ) : desc !== "" ? (
           desc
-        ) : opAgoraDescription ? ( // Check for opAgoraDescription
+        ) :props.daoDelegates === 'optimism' && opAgoraDescription ? ( // Check for opAgoraDescription
           renderParagraphs(opAgoraDescription)
         ) : karmaDescription ? (
           karmaDescription
