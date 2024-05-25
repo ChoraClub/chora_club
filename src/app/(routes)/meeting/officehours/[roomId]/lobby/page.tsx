@@ -323,10 +323,11 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
             toastOptions={{
               style: {
                 fontSize: "14px",
-                backgroundColor: "#333",
+                backgroundColor: "#3E3D3D",
                 color: "#fff",
-                borderRadius: "8px",
-                padding: "12px",
+                boxShadow: "none",
+                borderRadius: "50px",
+                padding: "3px 5px",
               },
             }}
           />

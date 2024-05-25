@@ -22,16 +22,21 @@ export async function GET(req: NextRequest, res: NextResponse) {
     const mergedData = await Promise.all(
       meetings.map(async (session) => {
         // Extract address and dao_name from the meeting
-        const { host_address, dao_name } = session;
+        const { host_address, dao_name, attendees } = session;
 
         // Query delegates collection based on address and dao_name
-        const userInfo = await delegatesCollection.findOne({
+        const hostInfo = await delegatesCollection.findOne({
           address: host_address,
           daoName: dao_name,
         });
 
+        const guestInfo = await delegatesCollection.findOne({
+          address: attendees[0].attendee_address,
+          daoName: dao_name,
+        });
+
         // Return merged data
-        return { session, userInfo };
+        return { session, hostInfo, guestInfo };
       })
     );
 

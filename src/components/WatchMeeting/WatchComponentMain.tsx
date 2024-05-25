@@ -71,7 +71,7 @@ function WatchComponentMain({ props }: { props: { id: string } }) {
             </div>
             <ConnectButton />
           </div>
-          <div className="flex py-4 items-center gap-4 font-poppins sticky top-0 z-50 bg-white">
+          {/* <div className="flex py-4 items-center gap-4 font-poppins sticky top-0 z-50 bg-white">
             <div
               style={{ background: "rgba(238, 237, 237, 0.36)" }}
               className="flex border-[0.5px] border-black w-1/3 rounded-full"
@@ -99,7 +99,7 @@ function WatchComponentMain({ props }: { props: { id: string } }) {
                 Arbitrum
               </button>
             </div>
-          </div>
+          </div> */}
 
           <div className="grid grid-cols-3 gap-4 pt-6 relative">
             <div className="sticky top-10 z-10 col-span-2 space-y-5 font-poppins pb-10 ">

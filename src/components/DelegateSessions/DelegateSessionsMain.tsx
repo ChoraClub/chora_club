@@ -8,10 +8,12 @@ import RecordedSessions from "./RecordedSessions";
 import { FaCircleInfo } from "react-icons/fa6";
 import { Tooltip } from "@nextui-org/react";
 import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
+import { useRouter } from "next-nprogress-bar";
 
 function DelegateSessionsMain() {
   const path = usePathname();
   const searchParams = useSearchParams();
+  const router = useRouter();
 
   return (
     <>

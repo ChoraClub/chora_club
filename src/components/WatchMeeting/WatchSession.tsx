@@ -12,6 +12,7 @@ import Link from "next/link";
 import VideoJS from "@/components/utils/VideoJs";
 import videojs from "video.js";
 import { parseISO } from "date-fns";
+import ReportOptionModal from "./ReportOptionModal";
 
 interface ProfileInfo {
   _id: string;
@@ -85,6 +86,7 @@ function WatchSession({
   collection: string;
 }) {
   const [showPopup, setShowPopup] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
 
   const formatTimeAgo = (utcTime: string): string => {
     const parsedTime = parseISO(utcTime);
@@ -111,6 +113,11 @@ function WatchSession({
       const years = Math.round(differenceInSeconds / 31536000);
       return `${years} year${years === 1 ? "" : "s"} ago`;
     }
+  };
+
+  const handleModalClose = () => {
+    console.log("Popup Closed");
+    setModalOpen(false);
   };
 
   return (
@@ -180,7 +187,7 @@ function WatchSession({
               <div>
                 <PiFlagFill color="#FF0000" size={20} />
               </div>
-              <div className="text-[#FF0000]">Report</div>
+              <div className="text-[#FF0000]" onClick={() =>setModalOpen(true)}>Report</div>
             </div>
             <div className="flex items-center gap-1 cursor-pointer">
               <div className="scale-x-[-1]">
@@ -264,6 +271,9 @@ function WatchSession({
           {data.description}
         </div>
       </div>
+      {modalOpen && (
+        <ReportOptionModal isOpen={modalOpen} onClose={handleModalClose} />
+      )}
     </div>
   );
 }
