@@ -56,6 +56,7 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
   const [continueAPICalling, setContinueAPICalling] = useState<Boolean>(false);
   const [userRejected, setUserRejected] = useState<Boolean>();
   const [addingEmail, setAddingEmail] = useState<boolean>();
+  const [scheduledSuccess, setScheduledSuccess] = useState<boolean>()
 
   const checkUser = async () => {
     try {
@@ -193,6 +194,9 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
         setSuccessModalOpen(true);
         setCreateSessionLoading(false);
         setContinueAPICalling(false);
+        setScheduledSuccess(true)
+      } else {
+        setScheduledSuccess(false)
       }
     } catch (error) {
       console.error("Error:", error);
@@ -707,7 +711,7 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
 
         {/* Second box- right side */}
         <div>
-          <AvailableUserSessions daoName={daoName} />
+          <AvailableUserSessions daoName={daoName} scheduledSuccess={scheduledSuccess}/>
         </div>
       </div>
 

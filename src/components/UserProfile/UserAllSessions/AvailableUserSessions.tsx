@@ -5,23 +5,29 @@ import { FaPencil } from "react-icons/fa6";
 import toast, { Toaster } from "react-hot-toast";
 import { useNetwork, useAccount } from "wagmi";
 
-function AvailableUserSessions() {
+function AvailableUserSessions({
+  daoName,
+  scheduledSuccess,
+}: {
+  daoName: string;
+  scheduledSuccess: boolean | undefined;
+}) {
   const { address, isConnected } = useAccount();
   const { chain } = useNetwork();
   const [data, setData] = useState([]);
-  const [daoName, setDaoName] = useState<string>("");
-  const [dataLoading, setDataLoading] = useState<Boolean>();
+  // const [daoName, setDaoName] = useState<string>("");
+  const [dataLoading, setDataLoading] = useState<Boolean>(false);
 
-  useEffect(() => {
-    if (address && isConnected) {
-      if (chain?.name === "Optimism") {
-        setDaoName("optimism");
-      } else if (chain?.name === "Arbitrum One") {
-        setDaoName("arbitrum");
-      }
-    }
-    console.log("daoName", daoName);
-  }, [chain, address, isConnected]);
+  // useEffect(() => {
+  //   if (address && isConnected) {
+  //     if (chain?.name === "Optimism") {
+  //       setDaoName("optimism");
+  //     } else if (chain?.name === "Arbitrum One") {
+  //       setDaoName("arbitrum");
+  //     }
+  //   }
+  //   console.log("daoName", daoName);
+  // }, [chain, address, isConnected]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -54,9 +60,8 @@ function AvailableUserSessions() {
         setDataLoading(false);
       }
     };
-
     fetchData();
-  }, [daoName, address]);
+  }, [daoName, address, scheduledSuccess]);
 
   return (
     <div
@@ -77,6 +82,7 @@ function AvailableUserSessions() {
               address={address}
               dao_name={daoName}
               data={data.filter((item: any) => item.timeSlotSizeMinutes === 15)}
+              setData={setData}
             />
           )}
           {data.some((item: any) => item.timeSlotSizeMinutes === 30) && (
@@ -86,6 +92,7 @@ function AvailableUserSessions() {
               address={address}
               dao_name={daoName}
               data={data.filter((item: any) => item.timeSlotSizeMinutes === 30)}
+              setData={setData}
             />
           )}
           {data.some((item: any) => item.timeSlotSizeMinutes === 45) && (
@@ -95,6 +102,7 @@ function AvailableUserSessions() {
               address={address}
               dao_name={daoName}
               data={data.filter((item: any) => item.timeSlotSizeMinutes === 45)}
+              setData={setData}
             />
           )}
         </>
@@ -119,11 +127,22 @@ function AvailableUserSessions() {
 
 export default AvailableUserSessions;
 
-function TimeSlotTable({ title, data, slotSize, address, dao_name }: any) {
+function TimeSlotTable({
+  title,
+  data,
+  slotSize,
+  address,
+  dao_name,
+  setData,
+}: any) {
+  const [deleting, setDeleting] = useState<string | null>(null);
+
   const handleButtonClick = () => {
     toast("Coming soon 🚀");
   };
+
   const handleDeleteButtonClick = async ({ date, startTime, endTime }: any) => {
+    setDeleting(date);
     try {
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
@@ -147,10 +166,34 @@ function TimeSlotTable({ title, data, slotSize, address, dao_name }: any) {
       const response = await fetch("/api/get-availability", requestOptions);
       const result = await response.json();
       if (result.success) {
-        console.log("success");
+        toast.success("Deleted successfully!");
+        setData((prevData: any) =>
+          prevData
+            .map((item: any) => ({
+              ...item,
+              dateAndRanges: item.dateAndRanges.map((range: any) => ({
+                ...range,
+                timeRanges: range.timeRanges.filter(
+                  (timeRange: any) =>
+                    !(
+                      timeRange.startTime === startTime &&
+                      timeRange.endTime === endTime
+                    )
+                ),
+              })),
+            }))
+            .filter((item: any) =>
+              item.dateAndRanges.some(
+                (range: any) => range.timeRanges.length > 0
+              )
+            )
+        );
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
+      toast.error("Failed to delete.");
+    } finally {
+      setDeleting(null);
     }
   };
 
@@ -212,7 +255,6 @@ function TimeSlotTable({ title, data, slotSize, address, dao_name }: any) {
                       : "bg-white"
                   } row`}
                 >
-                  {/* <td className="px-4 py-2">{index + 1}.</td> */}
                   <td className="px-4 py-2">
                     {convertUTCToLocalDate(dateRange.date)}
                   </td>
@@ -236,8 +278,15 @@ function TimeSlotTable({ title, data, slotSize, address, dao_name }: any) {
                             endTime: dateRange.utcTime_endTime,
                           });
                         }}
+                        disabled={deleting === dateRange.date}
                       >
-                        <ImBin className="text-red-600" />
+                        <ImBin
+                          className={`text-red-600 ${
+                            deleting === dateRange.date
+                              ? "opacity-50 cursor-not-allowed"
+                              : ""
+                          }`}
+                        />
                       </button>
                     </div>
                   </td>
