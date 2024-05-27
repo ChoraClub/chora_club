@@ -47,44 +47,6 @@ export async function GET(req: NextRequest, res: NextResponse) {
   }
 }
 
-// export async function POST(req: NextRequest, res: NextResponse) {
-//   try {
-//     const { date } = await req.json();
-//     // console.log("date:", date);
-
-//     // Connect to MongoDB
-//     const client = await connectDB();
-
-//     // Access the collection
-//     const db = client.db();
-//     // console.log("connected");
-
-//     const collection = db.collection("scheduling");
-
-//     // const currentDate = date.split("T")[0];
-
-//     // const documents = await collection.find().toArray();
-//     // console.log("currentDate", date);
-//     const documents = await collection
-//       .find({ allowedDates: { $gte: date } })
-//       .toArray();
-
-//     client.close();
-
-//     // Return the found documents
-//     return NextResponse.json(
-//       { success: true, data: documents },
-//       { status: 200 }
-//     );
-//   } catch (error) {
-//     console.error("Error retrieving data in get availability:", error);
-//     return NextResponse.json(
-//       { success: false, error: "Internal Server Error" },
-//       { status: 500 }
-//     );
-//   }
-// }
-
 export async function POST(req: NextRequest, res: NextResponse<Type[]>) {
   try {
     const { dao_name, userAddress } = await req.json();
@@ -163,6 +125,79 @@ export async function POST(req: NextRequest, res: NextResponse<Type[]>) {
       `Error fetching filtered Session Data in availability:`,
       error
     );
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(req: NextRequest, res: NextResponse<Type[]>) {
+  try {
+    const {
+      dao_name,
+      userAddress,
+      timeSlotSizeMinutes,
+      date,
+      startTime,
+      endTime,
+    } = await req.json();
+
+    console.log("Initial Data start=========");
+    console.log("dao_name", dao_name);
+    console.log("userAddress", userAddress);
+    console.log("timeSlotSizeMinutes", timeSlotSizeMinutes);
+    console.log("date", date);
+    console.log("startTime", startTime);
+    console.log("endTime", endTime);
+    console.log("Initial Data end=========");
+
+    const client = await connectDB();
+    const db = client.db();
+    const collection = db.collection("scheduling");
+
+    const query = { dao_name, userAddress };
+    const document = await collection.findOne(query);
+
+    if (!document) {
+      client.close();
+      return NextResponse.json(
+        { error: "Document not found" },
+        { status: 404 }
+      );
+    }
+
+    // Filter out the dateAndRanges entry
+    document.dateAndRanges = document.dateAndRanges.filter((range: any) => {
+      return !(
+        range.date === date &&
+        range.utcTime_startTime === startTime &&
+        range.utcTime_endTime === endTime
+      );
+    });
+
+    // Update allowedDates
+    document.allowedDates = [
+      ...new Set(document.dateAndRanges.map((range: any) => range.date)),
+    ];
+
+    await collection.updateOne(query, {
+      $set: {
+        dateAndRanges: document.dateAndRanges,
+        allowedDates: document.allowedDates,
+      },
+    });
+
+    console.log("Updated Document", document);
+
+    client.close();
+
+    return NextResponse.json(
+      { success: true, data: document },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error(`Error updating document:`, error);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }

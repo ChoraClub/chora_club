@@ -73,18 +73,27 @@ function AvailableUserSessions() {
           {data.some((item: any) => item.timeSlotSizeMinutes === 15) && (
             <TimeSlotTable
               title="15 Minutes"
+              slotSize={15}
+              address={address}
+              dao_name={daoName}
               data={data.filter((item: any) => item.timeSlotSizeMinutes === 15)}
             />
           )}
           {data.some((item: any) => item.timeSlotSizeMinutes === 30) && (
             <TimeSlotTable
               title="30 Minutes"
+              slotSize={30}
+              address={address}
+              dao_name={daoName}
               data={data.filter((item: any) => item.timeSlotSizeMinutes === 30)}
             />
           )}
           {data.some((item: any) => item.timeSlotSizeMinutes === 45) && (
             <TimeSlotTable
               title="45 Minutes"
+              slotSize={45}
+              address={address}
+              dao_name={daoName}
               data={data.filter((item: any) => item.timeSlotSizeMinutes === 45)}
             />
           )}
@@ -110,62 +119,39 @@ function AvailableUserSessions() {
 
 export default AvailableUserSessions;
 
-let dateAndRanges: any = [];
-let allowedDates: any = [];
-let data: any = [];
-
-if (data) {
-  // console.log("APIData", APIData)
-  data.forEach((item: any) => {
-    // console.log("item", item)
-    dateAndRanges.push(...item.dateAndRanges);
-    allowedDates.push(...item.allowedDates);
-  });
-
-  dateAndRanges.forEach((range: any) => {
-    range.date = new Date(range.date);
-    range.formattedUTCTime_startTime = new Date(
-      range.formattedUTCTime_startTime
-    );
-    range.formattedUTCTime_endTime = new Date(range.formattedUTCTime_endTime);
-
-    const timeOptions = { hour: "2-digit", minute: "2-digit", hour12: false };
-    const formattedStartTime =
-      range.formattedUTCTime_startTime.toLocaleTimeString(
-        undefined,
-        timeOptions
-      );
-    const formattedEndTime = range.formattedUTCTime_endTime.toLocaleTimeString(
-      undefined,
-      timeOptions
-    );
-
-    range.utcTime_startTime = formattedStartTime;
-    range.utcTime_endTime = formattedEndTime;
-
-    const [startHourTime, startMinuteTime] = formattedStartTime.split(":");
-    const [endHourTime, endMinuteTime] = formattedEndTime.split(":");
-
-    range.timeRanges = [
-      [startHourTime, startMinuteTime, endHourTime, endMinuteTime],
-    ];
-  });
-
-  allowedDates = [
-    ...new Set(
-      dateAndRanges.flatMap(
-        ({ formattedUTCTime_startTime, formattedUTCTime_endTime }: any) => [
-          formattedUTCTime_startTime,
-          formattedUTCTime_endTime,
-        ]
-      )
-    ),
-  ];
-}
-
-function TimeSlotTable({ title, data }: { title: any; data: any }) {
+function TimeSlotTable({ title, data, slotSize, address, dao_name }: any) {
   const handleButtonClick = () => {
     toast("Coming soon 🚀");
+  };
+  const handleDeleteButtonClick = async ({ date, startTime, endTime }: any) => {
+    try {
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+
+      const raw = JSON.stringify({
+        dao_name: dao_name,
+        userAddress: address,
+        timeSlotSizeMinutes: slotSize,
+        date: date,
+        startTime: startTime,
+        endTime: endTime,
+      });
+
+      const requestOptions: any = {
+        method: "DELETE",
+        headers: myHeaders,
+        body: raw,
+        redirect: "follow",
+      };
+
+      const response = await fetch("/api/get-availability", requestOptions);
+      const result = await response.json();
+      if (result.success) {
+        console.log("success");
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   console.log("data:::", data);
@@ -243,7 +229,13 @@ function TimeSlotTable({ title, data }: { title: any; data: any }) {
                       </button>
                       <button
                         className="cursor-pointer"
-                        onClick={handleButtonClick}
+                        onClick={() => {
+                          handleDeleteButtonClick({
+                            date: dateRange.date,
+                            startTime: dateRange.utcTime_startTime,
+                            endTime: dateRange.utcTime_endTime,
+                          });
+                        }}
                       >
                         <ImBin className="text-red-600" />
                       </button>
