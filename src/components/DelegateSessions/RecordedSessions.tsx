@@ -1,4 +1,4 @@
-import Image from "next/image";
+import Image, { StaticImageData } from "next/image";
 import React, { useEffect, useRef, useState } from "react";
 import search from "@/assets/images/daos/search.png";
 import texture1 from "@/assets/images/daos/texture1.png";
@@ -15,6 +15,31 @@ import { parseISO } from "date-fns";
 // const { parseISO } = require("date-fns");
 import Head from "next/head";
 import { useRouter } from "next-nprogress-bar";
+import user1 from "@/assets/images/user/user1.svg"
+import user2 from "@/assets/images/user/user2.svg"
+import user3 from "@/assets/images/user/user3.svg"
+import user4 from "@/assets/images/user/user4.svg"
+import user5 from "@/assets/images/user/user5.svg"
+import user6 from "@/assets/images/user/user6.svg"
+import user7 from "@/assets/images/user/user7.svg"
+import user8 from "@/assets/images/user/user8.svg"
+import user9 from "@/assets/images/user/user9.svg"
+
+
+interface SessionData {
+  session: {
+    attendees: {
+      attendee_address: string;
+    }[];
+    host_address: string;
+  };
+  guestInfo: {
+    image: string | null;
+  };
+  hostInfo: {
+    image: string | null;
+  };
+}
 
 function RecordedSessions() {
   // const parseISO = dateFns;
@@ -180,6 +205,47 @@ function RecordedSessions() {
     }
   };
 
+  // Create an array of user images
+  const userImages = [user1, user2, user3, user4, user5, user6, user7, user8, user9];
+
+ // State to store the randomly selected user images
+ const [randomUserImages, setRandomUserImages] = useState<{ [key: string]: StaticImageData }>(
+  {}
+);
+const [usedIndices, setUsedIndices] = useState<Set<number>>(new Set());
+
+// Function to get a random user image
+const getRandomUserImage = (): StaticImageData => {
+  let randomIndex;
+  do {
+    randomIndex = Math.floor(Math.random() * userImages.length);
+  } while (usedIndices.has(randomIndex));
+
+  usedIndices.add(randomIndex);
+  return userImages[randomIndex];
+};
+
+// Effect to set the random user image when the component mounts
+useEffect(() => {
+  const newRandomUserImages: { [key: string]: StaticImageData } = {
+    ...randomUserImages,
+  };
+
+  meetingData.forEach((data: SessionData) => {
+    const guestAddress = data.session.attendees[0].attendee_address;
+    const hostAddress = data.session.host_address;
+    if (!data.guestInfo?.image && !newRandomUserImages[guestAddress]) {
+      newRandomUserImages[guestAddress] = getRandomUserImage();
+    }
+    if (!data.hostInfo?.image && !newRandomUserImages[hostAddress]) {
+      newRandomUserImages[hostAddress] = getRandomUserImage();
+    }
+  });
+
+  setRandomUserImages(newRandomUserImages);
+}, [meetingData]);
+
+
   return (
     <>
       <div className="pe-10">
@@ -330,7 +396,7 @@ function RecordedSessions() {
                           src={
                             data.hostInfo?.image
                               ? `https://gateway.lighthouse.storage/ipfs/${data.hostInfo.image}`
-                              : user
+                              : randomUserImages[data.session.host_address]
                           }
                           alt="image"
                           width={20}
@@ -366,7 +432,7 @@ function RecordedSessions() {
                           src={
                             data.guestInfo?.image
                               ? `https://gateway.lighthouse.storage/ipfs/${data.guestInfo.image}`
-                              : user
+                              : randomUserImages[data.session.attendees[0].attendee_address]
                           }
                           alt="image"
                           width={20}

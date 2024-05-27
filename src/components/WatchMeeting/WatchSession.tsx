@@ -125,10 +125,33 @@ function WatchSession({
     setIsExpanded(!isExpanded);
   };
 
+  const getLineCount = (text: string) => {
+    const lines = text.split('\n');
+    return lines.length;
+  };
+
+  // const getLineCount = (text: string) => {
+  //   if (typeof text !== 'string') {
+  //     return 0;
+  //   }
+  
+  //   const lines = text.split('\n');
+  //   let lineCount = 0;
+  
+  //   for (let line of lines) {
+  //     line = line.trim();
+  //     if (line.length > 0) {
+  //       lineCount++;
+  //     }
+  //   }
+  
+  //   return lineCount;
+  // };
+
   return (
     <div className="">
       <div className="rounded-3xl border border-[#CCCCCC] bg-[#F2F2F2]">
-        <div className="px-6 pt-4 pb-4 border-b border-[#CCCCCC]">
+        <div className={`px-6 pt-4 pb-4 ${data.description.length>0?"border-b":""}  border-[#CCCCCC]`}>
           <div className="text-lg font-semibold pb-3">{data.title}</div>
           <div className="flex justify-between text-sm pe-4 pb-4">
             <div className="flex items-center gap-2 ">
@@ -238,7 +261,7 @@ function WatchSession({
                       <div>
                         <Image
                           src={
-                            attendee.profileInfo.image
+                            attendee.profileInfo?.image
                               ? `https://gateway.lighthouse.storage/ipfs/${attendee.profileInfo.image}`
                               : user
                           }
@@ -281,7 +304,9 @@ function WatchSession({
           </div>
         </div>
 
+        {data.description.length > 0 && (
         <div className={`px-6 pt-4 pb-4 rounded-b-3xl bg-white text-[#1E1E1E]`}>
+          <>
           <div
             className={`${
               isExpanded ? "max-h-full" : "max-h-24 line-clamp-3"
@@ -289,13 +314,17 @@ function WatchSession({
           >
             {data.description}
           </div>
+          {getLineCount(data.description) > 3 && (
           <button
             className="text-sm text-blue-shade-200 mt-2"
             onClick={toggleExpansion}
           >
             {isExpanded ? "View Less" : "View More"}
           </button>
+          )}
+          </>
         </div>
+        )}
       </div>
       {modalOpen && (
         <ReportOptionModal isOpen={modalOpen} onClose={handleModalClose} />
