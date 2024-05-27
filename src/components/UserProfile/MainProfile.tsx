@@ -42,6 +42,7 @@ import InstantMeet from "./InstantMeet";
 import { useSession } from "next-auth/react";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
+import { getEnsNameOfUser } from "../ConnectWallet/ENSResolver";
 
 function MainProfile() {
   const { isConnected, address } = useAccount();
@@ -76,6 +77,7 @@ function MainProfile() {
   const [isPageLoading, setIsPageLoading] = useState(true);
   const [selfDelegate, setSelfDelegate] = useState(false);
   const [daoName, setDaoName] = useState("optimism");
+  const [displayEnsName, setDisplayEnsName] = useState<string>();
 
   interface ProgressData {
     total: any;
@@ -586,6 +588,14 @@ function MainProfile() {
     fetchData();
   }, [chain, address, daoName]);
 
+  useEffect(() => {
+    const fetchEnsName = async () => {
+      const ensName = await getEnsNameOfUser(address);
+      setDisplayEnsName(ensName);
+    };
+    fetchEnsName();
+  }, [chain, address]);
+
   return (
     <>
       {!isPageLoading ? (
@@ -642,14 +652,13 @@ function MainProfile() {
               <div className="px-4">
                 <div className=" flex items-center py-1">
                   <div className="font-bold text-lg pr-4">
-                    {ensName || profileDetails?.ensName ? (
-                      ensName || profileDetails?.ensName
+                    {displayEnsName || ensName || profileDetails?.ensName ? (
+                      displayEnsName || ensName || profileDetails?.ensName
                     ) : displayName ? (
                       displayName
                     ) : (
                       <>
-                        {`${address}`.substring(0, 6)} ...{" "}
-                        {`${address}`.substring(`${address}`.length - 4)}
+                        {`${address}`.slice(0, 6)} ... {`${address}`.slice(-4)}
                       </>
                     )}
                   </div>
@@ -825,8 +834,7 @@ function MainProfile() {
 
                 <div className="flex items-center py-1">
                   <div>
-                    {`${address}`.substring(0, 6)} ...{" "}
-                    {`${address}`.substring(`${address}`.length - 4)}
+                    {`${address}`.slice(0, 6)} ... {`${address}`.slice(-4)}
                   </div>
 
                   <Tooltip
@@ -883,39 +891,39 @@ function MainProfile() {
                       </div>
                     )
                   : null}
-
-                {selfDelegate === false ? (
-                  <div className="pt-2 flex gap-5">
-                    {/* pass address of whom you want to delegate the voting power to */}
-                    <button
-                      className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
-                      onClick={() => handleDelegateVotes(`${address}`)}
-                    >
-                      Become Delegate
-                    </button>
-                    {/* <button
+                <div className="flex items-center gap-4 pt-2">
+                  {selfDelegate === false ? (
+                    <div className="flex gap-5">
+                      {/* pass address of whom you want to delegate the voting power to */}
+                      <button
+                        className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
+                        onClick={() => handleDelegateVotes(`${address}`)}
+                      >
+                        Become Delegate
+                      </button>
+                      {/* <button
                       className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
                       onClick={() => handleAttestation()}
-                    >
+                      >
                       Attest
                     </button> */}
-
-                    <div className="">
-                      <select
-                        value={daoName}
-                        onChange={(e) => setDaoName(e.target.value)}
-                        className="outline-none border border-blue-shade-200 text-blue-shade-200 rounded-full py-2 px-3"
-                      >
-                        <option value="optimism" className="text-gray-700">
-                          Optimism
-                        </option>
-                        <option value="arbitrum" className="text-gray-700">
-                          Arbitrum
-                        </option>
-                      </select>
                     </div>
+                  ) : null}
+                  <div className="">
+                    <select
+                      value={daoName}
+                      onChange={(e) => setDaoName(e.target.value)}
+                      className="outline-none border border-blue-shade-200 text-blue-shade-200 rounded-full py-2 px-3"
+                    >
+                      <option value="optimism" className="text-gray-700">
+                        Optimism
+                      </option>
+                      <option value="arbitrum" className="text-gray-700">
+                        Arbitrum
+                      </option>
+                    </select>
                   </div>
-                ) : null}
+                </div>
               </div>
             </div>
             <div>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import user from "@/assets/images/daos/user3.png";
 import view from "@/assets/images/daos/view.png";
 import Image from "next/image";
@@ -13,6 +13,8 @@ import VideoJS from "@/components/utils/VideoJs";
 import videojs from "video.js";
 import { parseISO } from "date-fns";
 import ReportOptionModal from "./ReportOptionModal";
+import { getEnsName } from "../ConnectWallet/ENSResolver";
+import { useRouter } from "next-nprogress-bar";
 
 interface ProfileInfo {
   _id: string;
@@ -88,6 +90,8 @@ function WatchSession({
   const [showPopup, setShowPopup] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [ensHostName, setEnsHostName] = useState<string | null>(null);
+  const router = useRouter();
 
   const formatTimeAgo = (utcTime: string): string => {
     const parsedTime = parseISO(utcTime);
@@ -125,89 +129,103 @@ function WatchSession({
     setIsExpanded(!isExpanded);
   };
 
+  useEffect(() => {
+    const fetchEnsName = async () => {
+      const name = await getEnsName(data.host_address.toLowerCase());
+      setEnsHostName(name);
+    };
+
+    fetchEnsName();
+  }, [data.host_address]);
+
   return (
     <div className="">
       <div className="rounded-3xl border border-[#CCCCCC] bg-[#F2F2F2]">
         <div className="px-6 pt-4 pb-4 border-b border-[#CCCCCC]">
           <div className="text-lg font-semibold pb-3">{data.title}</div>
           <div className="flex justify-between text-sm pe-4 pb-4">
-            <div className="flex items-center gap-2 ">
-              <div>
-                <Image
-                  src={
-                    data.hostProfileInfo?.image
-                      ? `https://gateway.lighthouse.storage/ipfs/${data.hostProfileInfo.image}`
-                      : user
+            <div className="flex gap-6">
+              <div className="flex items-center gap-2 ">
+                <div>
+                  <Image
+                    src={
+                      data.hostProfileInfo?.image
+                        ? `https://gateway.lighthouse.storage/ipfs/${data.hostProfileInfo.image}`
+                        : user
+                    }
+                    alt="image"
+                    width={20}
+                    height={20}
+                    className="rounded-full"
+                    priority
+                  />
+                </div>
+                <div
+                  className="text-[#292929] font-semibold"
+                  // onClick={() => router.push(`${process.env.NEXTAUTH_URL}/${data.dao_name}/${data.host_address}?active=info`)}
+                >
+                  {ensHostName}
+                </div>
+                <Link
+                  href={
+                    data.dao_name === ("optimism" || "Optimism")
+                      ? `https://optimism.easscan.org/offchain/attestation/view/${data.uid_host}`
+                      : data.dao_name === ("arbitrum" || "Arbitrum")
+                      ? `https://arbitrum.easscan.org/offchain/attestation/view/${data.uid_host}`
+                      : ""
                   }
-                  alt="image"
-                  width={20}
-                  height={20}
-                  className="rounded-full"
-                  priority
-                />
+                  target="_blank"
+                >
+                  <Image src={view} alt="image" width={15} priority />
+                </Link>
               </div>
-              <div className="text-[#292929] font-semibold">
-                {data.host_address}
-              </div>
-              <Link
-                href={
-                  data.dao_name === ("optimism" || "Optimism")
-                    ? `https://optimism.easscan.org/offchain/attestation/view/${data.uid_host}`
-                    : data.dao_name === ("arbitrum" || "Arbitrum")
-                    ? `https://arbitrum.easscan.org/offchain/attestation/view/${data.uid_host}`
-                    : ""
-                }
-                target="_blank"
-              >
-                <Image src={view} alt="image" width={15} priority />
-              </Link>
-            </div>
 
-            <div className="flex items-center gap-1">
-              {data.dao_name === "optimism" ? (
-                <Image
-                  src={oplogo}
-                  alt="image"
-                  width={20}
-                  className="rounded-full"
-                />
-              ) : data.dao_name === "arbitrum" ? (
-                <Image
-                  src={arblogo}
-                  alt="image"
-                  width={20}
-                  className="rounded-full"
-                />
-              ) : (
-                ""
-              )}
-              <div className="text-[#292929] font-semibold capitalize">
-                {data.dao_name}
+              <div className="flex items-center gap-1">
+                {data.dao_name === "optimism" ? (
+                  <Image
+                    src={oplogo}
+                    alt="image"
+                    width={20}
+                    className="rounded-full"
+                  />
+                ) : data.dao_name === "arbitrum" ? (
+                  <Image
+                    src={arblogo}
+                    alt="image"
+                    width={20}
+                    className="rounded-full"
+                  />
+                ) : (
+                  ""
+                )}
+                <div className="text-[#292929] font-semibold capitalize">
+                  {data.dao_name}
+                </div>
               </div>
             </div>
 
-            <div className="flex items-center gap-1">
-              <Image src={time} alt="image" width={20} priority />
-              <div className="text-[#1E1E1E]">
-                {formatTimeAgo(data.slot_time)}
-              </div>
-            </div>
-            <div className="flex items-center gap-1 cursor-pointer">
-              <div>
-                <PiFlagFill color="#FF0000" size={20} />
+            <div className="flex gap-6">
+              <div className="flex items-center gap-1">
+                <Image src={time} alt="image" width={20} priority />
+                <div className="text-[#1E1E1E]">
+                  {formatTimeAgo(data.slot_time)}
+                </div>
               </div>
               <div
-                className="text-[#FF0000]"
+                className="flex items-center gap-1 cursor-pointer"
                 onClick={() => setModalOpen(true)}
               >
-                Report
+                <div>
+                  <PiFlagFill color="#FF0000" size={20} />
+                </div>
+                <div className="text-[#FF0000]">Report</div>
               </div>
-            </div>
-            <div className="flex items-center gap-1 cursor-pointer">
-              <div className="scale-x-[-1]">
-                <BiSolidShare size={20} />
+              <div className="flex items-center gap-1 cursor-pointer">
+                <div className="scale-x-[-1]">
+                  <BiSolidShare size={20} />
+                </div>
+                <div className="text-[#1E1E1E]">Share</div>
               </div>
-              <div className="text-[#1E1E1E]">Share</div>
             </div>
           </div>
 
@@ -238,7 +256,7 @@ function WatchSession({
                       <div>
                         <Image
                           src={
-                            attendee.profileInfo.image
+                            attendee.profileInfo?.image
                               ? `https://gateway.lighthouse.storage/ipfs/${attendee.profileInfo.image}`
                               : user
                           }

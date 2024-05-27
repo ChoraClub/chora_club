@@ -12,9 +12,10 @@ import copy from "copy-to-clipboard";
 import styles from "./RecordedSessions.module.css";
 import { Oval } from "react-loader-spinner";
 import { parseISO } from "date-fns";
-// const { parseISO } = require("date-fns");
-import Head from "next/head";
+// import { useRouter } from "next/navigation";
 import { useRouter } from "next-nprogress-bar";
+import Head from "next/head";
+import { getEnsName, getEnsNameOfUser } from "../ConnectWallet/ENSResolver";
 
 function RecordedSessions() {
   // const parseISO = dateFns;
@@ -29,6 +30,8 @@ function RecordedSessions() {
   const [videoDurations, setVideoDurations] = useState<any>({});
   const [searchMeetingData, setSearchMeetingData] = useState<any>([]);
   const [activeButton, setActiveButton] = useState("all");
+  const [ensHostNames, setEnsHostNames] = useState<any>({});
+  const [ensGuestNames, setEnsGuestNames] = useState<any>({});
 
   const handleCopy = (addr: string) => {
     copy(addr);
@@ -179,6 +182,46 @@ function RecordedSessions() {
       setMeetingData(searchMeetingData);
     }
   };
+
+  useEffect(() => {
+    const fetchEnsNames = async () => {
+      const ensNamesMap: any = {};
+      for (const data of meetingData) {
+        const ensName = await getEnsName(
+          data.session.host_address.toLowerCase()
+        );
+        if (ensName) {
+          ensNamesMap[data.session.host_address] = ensName;
+        }
+      }
+      console.log("ensNamesMap", ensNamesMap);
+      setEnsHostNames(ensNamesMap);
+    };
+
+    if (meetingData.length > 0) {
+      fetchEnsNames();
+    }
+  }, [meetingData]);
+
+  useEffect(() => {
+    const fetchEnsNames = async () => {
+      const ensNamesMap: any = {};
+      for (const data of meetingData) {
+        const ensName = await getEnsName(
+          data.session.attendees[0].attendee_address.toLowerCase()
+        );
+        if (ensName) {
+          ensNamesMap[data.session.attendees[0].attendee_address] = ensName;
+        }
+      }
+      console.log("guest ensNamesMap", ensNamesMap);
+      setEnsGuestNames(ensNamesMap);
+    };
+
+    if (meetingData.length > 0) {
+      fetchEnsNames();
+    }
+  }, [meetingData]);
 
   return (
     <>
@@ -338,10 +381,7 @@ function RecordedSessions() {
                           className="rounded-full"
                         />
                       </div>
-                      <div>
-                        Host: {data.session.host_address.slice(0, 4)}...
-                        {data.session.host_address.slice(-4)}
-                      </div>
+                      <div>Host: {ensHostNames[data.session.host_address]}</div>
                       <div>
                         <Tooltip
                           content="Copy"
@@ -375,11 +415,12 @@ function RecordedSessions() {
                         />
                       </div>
                       <div>
-                        {" "}
                         Guest:{" "}
-                        {data.session.attendees[0].attendee_address.slice(0, 4)}
-                        ...
-                        {data.session.attendees[0].attendee_address.slice(-4)}
+                        {
+                          ensGuestNames[
+                            data.session.attendees[0].attendee_address
+                          ]
+                        }
                       </div>
                       <div>
                         <Tooltip
