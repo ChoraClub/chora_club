@@ -31,13 +31,11 @@ function ConnectWalletWithENS() {
         //   const name = getEnsName(account?.address, account?.displayName);
         //   setDisplayAddress(name);
         // }, []);
+        console.log("account: ", account?.address);
 
-        if (account && !displayAddress) {
+        if (account) {
           (async () => {
-            const displayName = await getEnsName(
-              account.address,
-              account.displayName
-            );
+            const displayName = await getEnsName(account.address);
             setDisplayAddress(displayName);
           })();
         }
@@ -148,7 +146,7 @@ function ConnectWalletWithENS() {
                         )}
                       </div>
                     )}
-                    {chain.name}
+                    {/* {chain.name} */}
                     <svg
                       fill="#000000"
                       height="25px"

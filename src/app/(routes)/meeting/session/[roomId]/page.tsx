@@ -14,7 +14,7 @@ import {
   useHuddle01,
   useDataMessage,
 } from "@huddle01/react/hooks";
-import { usePathname} from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useRouter } from "next-nprogress-bar";
 import AcceptRequest from "@/components/Modals/AcceptRequest";
 import useStore from "@/components/store/slices";

@@ -121,25 +121,27 @@ export async function POST(
         }
       }
 
-      const userAddress = attendees[0].attendee_address;
-      const documentsForUserEmail = await delegateCollection
-        .find({ address: userAddress })
-        .toArray();
-      for (const document of documentsForUserEmail) {
-        const emailId = document.emailId;
-        if (emailId && emailId !== "" && emailId !== undefined) {
-          try {
-            await sendMail({
-              to: emailId,
-              name: "Chora Club",
-              subject: "Session Booked",
-              body: compileBookedSessionTemplate(
-                "You have Booked a Session.",
-                "Please wait till the delegate approves the meeting."
-              ),
-            });
-          } catch (error) {
-            console.error("Error sending mail:", error);
+      if (session_type === "session") {
+        const userAddress = attendees[0].attendee_address;
+        const documentsForUserEmail = await delegateCollection
+          .find({ address: userAddress })
+          .toArray();
+        for (const document of documentsForUserEmail) {
+          const emailId = document.emailId;
+          if (emailId && emailId !== "" && emailId !== undefined) {
+            try {
+              await sendMail({
+                to: emailId,
+                name: "Chora Club",
+                subject: "Session Booked",
+                body: compileBookedSessionTemplate(
+                  "You have Booked a Session.",
+                  "Please wait till the delegate approves the meeting."
+                ),
+              });
+            } catch (error) {
+              console.error("Error sending mail:", error);
+            }
           }
         }
       }
