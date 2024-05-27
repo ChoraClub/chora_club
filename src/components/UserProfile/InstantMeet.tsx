@@ -15,17 +15,17 @@ import { useNetwork } from "wagmi";
 import Image from "next/image";
 import { Tooltip } from "@nextui-org/react";
 import connectImg from "@/assets/images/instant-meet/connect.png";
-import connetImghover from "@/assets/images/instant-meet/ic_baseline-connect-without-contact-hover.svg";
+import connectImghover from "@/assets/images/instant-meet/connectHover.svg";
 import accessImg from "@/assets/images/instant-meet/quick-access.png";
-import accessImghover from "@/assets/images/instant-meet/mingcute_link-fill-hover.svg";
+import accessImghover from "@/assets/images/instant-meet/accessImghover.svg";
 import videoImg from "@/assets/images/instant-meet/video-call.png";
-import videoImghover from "@/assets/images/instant-meet/wpf_video-call-hover.svg";
+import videoImghover from "@/assets/images/instant-meet/videoImghover.svg";
 import audioImg from "@/assets/images/instant-meet/audio-call.png";
-import audioImghover from "@/assets/images/instant-meet/fluent_call-12-filled-hover.svg";
+import audioImghover from "@/assets/images/instant-meet/audioImghover.svg";
 import screenImg from "@/assets/images/instant-meet/screen-share.png";
-import screenImghover from "@/assets/images/instant-meet/ic_baseline-screen-share-hover.svg";
+import screenImghover from "@/assets/images/instant-meet/screenImghover.svg";
 import chatImg from "@/assets/images/instant-meet/chat.png";
-import chatImghover from "@/assets/images/instant-meet/lets-icons_chat-fill-hover.svg";
+import chatImghover from "@/assets/images/instant-meet/chatImghover.svg";
 import heroImg from "@/assets/images/instant-meet/instant-meet-hero.svg";
 
 interface instantMeetProps {
@@ -135,7 +135,7 @@ function InstantMeet({ isDelegate, selfDelegate }: instantMeetProps) {
   const block = [
     {
       image: connectImg,
-      hoverImage: connetImghover,
+      hoverImage: connectImghover,
       title: "Connect with Others Instantly",
       description:
         "Engage with yourself in an instant meeting and share the link with the people you want to connect with. Experience the following features for a comprehensive virtual meeting experience.",
@@ -218,7 +218,8 @@ function InstantMeet({ isDelegate, selfDelegate }: instantMeetProps) {
                             },
                           },
                         },
-                      }}>
+                      }}
+                    >
                       <div>
                         <div className="group border rounded-3xl bg-[#E5E5EA] flex items-center justify-center p-8 hover:bg-blue-shade-100 hover:shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
                           <Image
@@ -256,7 +257,8 @@ function InstantMeet({ isDelegate, selfDelegate }: instantMeetProps) {
               <div className="text-center transition-transform transform hover:scale-105 duration-300">
                 <button
                   className="bg-blue-shade-200 py-3 px-6 rounded-full text-white font-semibold"
-                  onClick={onOpen}>
+                  onClick={onOpen}
+                >
                   Start an instant meet
                 </button>
               </div>
@@ -271,7 +273,8 @@ function InstantMeet({ isDelegate, selfDelegate }: instantMeetProps) {
           onClose();
           // setIsScheduling(false);
         }}
-        className="font-poppins">
+        className="font-poppins"
+      >
         <ModalContent>
           <>
             <ModalHeader className="flex flex-col gap-1">
@@ -310,13 +313,15 @@ function InstantMeet({ isDelegate, selfDelegate }: instantMeetProps) {
                 onClick={() => {
                   onClose();
                   // setIsScheduling(false);
-                }}>
+                }}
+              >
                 Close
               </Button>
               <Button
                 color="primary"
                 onClick={startInstantMeet}
-                isDisabled={confirmSave}>
+                isDisabled={confirmSave}
+              >
                 {confirmSave ? (
                   <div className="flex items-center justify-center">
                     <Oval

@@ -294,7 +294,7 @@ function BookSession({ props }: { props: Type }) {
         // Check if the slot is booked
         const isBooked = bookedSlots.some((bookedSlot: any) => {
           return (
-            dateFns.isSameDay(startTime, bookedSlot) &&
+            dateFns?.isSameDay(startTime, bookedSlot) &&
             slotTime.getHours() === bookedSlot.getHours() &&
             slotTime.getMinutes() === bookedSlot.getMinutes()
           );
