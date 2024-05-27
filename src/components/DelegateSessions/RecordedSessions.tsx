@@ -186,13 +186,13 @@ function RecordedSessions() {
         <div className="flex my-4 items-center gap-4 font-poppins">
           <div
             style={{ background: "rgba(238, 237, 237, 0.36)" }}
-            className="flex border-[0.5px] border-black w-fit rounded-full"
+            className="flex border-[0.5px] border-black w-1/3 rounded-full"
           >
             <input
               type="text"
-              placeholder="Search"
+              placeholder="Search by title and host address"
               style={{ background: "rgba(238, 237, 237, 0.36)" }}
-              className="pl-5 rounded-full outline-none"
+              className="pl-5 rounded-full outline-none w-full"
               value={searchQuery}
               onChange={(e) => handleSearchChange(e.target.value)}
             ></input>
@@ -339,7 +339,7 @@ function RecordedSessions() {
                         />
                       </div>
                       <div>
-                        Host: {data.session.host_address.slice(0, 6)}...
+                        Host: {data.session.host_address.slice(0, 4)}...
                         {data.session.host_address.slice(-4)}
                       </div>
                       <div>
@@ -377,7 +377,7 @@ function RecordedSessions() {
                       <div>
                         {" "}
                         Guest:{" "}
-                        {data.session.attendees[0].attendee_address.slice(0, 6)}
+                        {data.session.attendees[0].attendee_address.slice(0, 4)}
                         ...
                         {data.session.attendees[0].attendee_address.slice(-4)}
                       </div>

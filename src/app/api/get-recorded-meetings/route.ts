@@ -16,6 +16,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
     // Fetch all documents from the meetings collection
     const meetings = await meetingsCollection
       .find({ meeting_status: "Recorded" })
+      .sort({ slot_time: -1 })
       .toArray();
 
     // Iterate through each meeting document

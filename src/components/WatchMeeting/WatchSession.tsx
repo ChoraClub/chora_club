@@ -87,6 +87,7 @@ function WatchSession({
 }) {
   const [showPopup, setShowPopup] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const formatTimeAgo = (utcTime: string): string => {
     const parsedTime = parseISO(utcTime);
@@ -120,6 +121,10 @@ function WatchSession({
     setModalOpen(false);
   };
 
+  const toggleExpansion = () => {
+    setIsExpanded(!isExpanded);
+  };
+
   return (
     <div className="">
       <div className="rounded-3xl border border-[#CCCCCC] bg-[#F2F2F2]">
@@ -129,7 +134,11 @@ function WatchSession({
             <div className="flex items-center gap-2 ">
               <div>
                 <Image
-                  src={`https://gateway.lighthouse.storage/ipfs/${data.hostProfileInfo.image}`}
+                  src={
+                    data.hostProfileInfo?.image
+                      ? `https://gateway.lighthouse.storage/ipfs/${data.hostProfileInfo.image}`
+                      : user
+                  }
                   alt="image"
                   width={20}
                   height={20}
@@ -187,7 +196,12 @@ function WatchSession({
               <div>
                 <PiFlagFill color="#FF0000" size={20} />
               </div>
-              <div className="text-[#FF0000]" onClick={() =>setModalOpen(true)}>Report</div>
+              <div
+                className="text-[#FF0000]"
+                onClick={() => setModalOpen(true)}
+              >
+                Report
+              </div>
             </div>
             <div className="flex items-center gap-1 cursor-pointer">
               <div className="scale-x-[-1]">
@@ -267,8 +281,20 @@ function WatchSession({
           </div>
         </div>
 
-        <div className="px-6 pt-4 pb-4 rounded-b-3xl bg-white text-[#1E1E1E]">
-          {data.description}
+        <div className={`px-6 pt-4 pb-4 rounded-b-3xl bg-white text-[#1E1E1E]`}>
+          <div
+            className={`${
+              isExpanded ? "max-h-full" : "max-h-24 line-clamp-3"
+            } transition-[max-height] duration-500 ease-in-out `}
+          >
+            {data.description}
+          </div>
+          <button
+            className="text-sm text-blue-shade-200 mt-2"
+            onClick={toggleExpansion}
+          >
+            {isExpanded ? "View Less" : "View More"}
+          </button>
         </div>
       </div>
       {modalOpen && (
