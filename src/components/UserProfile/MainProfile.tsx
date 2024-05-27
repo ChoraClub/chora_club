@@ -212,9 +212,14 @@ function MainProfile() {
       const address1 = addr[0];
 
       const contractAddress =
-        daoName === "optimism"
+        // daoName === "optimism"
+        //   ? "0x4200000000000000000000000000000000000042"
+        //   : daoName === "arbitrum"
+        //   ? "0x912CE59144191C1204E64559FE8253a0e49E6548"
+        //   : "";
+        chain?.name === "Optimism"
           ? "0x4200000000000000000000000000000000000042"
-          : daoName === "arbitrum"
+          : chain?.name === "Arbitrum One"
           ? "0x912CE59144191C1204E64559FE8253a0e49E6548"
           : "";
       console.log("Contract", contractAddress);
@@ -293,7 +298,13 @@ function MainProfile() {
     const fetchData = async () => {
       try {
         // Fetch data from your backend API to check if the address exists
-        let dao = daoName;
+        // let dao = daoName;
+        let dao =
+          chain?.name === "Optimism"
+            ? "optimism"
+            : chain?.name === "Arbitrum One"
+            ? "arbitrum"
+            : "";
         console.log("Fetching from DB");
         // const dbResponse = await axios.get(`/api/profile/${address}`);
 
@@ -344,7 +355,12 @@ function MainProfile() {
             "Data not found in the database, fetching from third-party API"
           );
           // Data not found in the database, fetch data from the third-party API
-          let dao = daoName;
+          let dao =
+            chain?.name === "Optimism"
+              ? "optimism"
+              : chain?.name === "Arbitrum One"
+              ? "arbitrum"
+              : "";
           const res = await fetch(
             `https://api.karmahq.xyz/api/dao/find-delegate?dao=${dao}&user=${address}`
           );
@@ -401,7 +417,13 @@ function MainProfile() {
     };
 
     fetchData();
-  }, [daoName, chain, address, searchParams.get("session") === "schedule"]);
+  }, [
+    daoName,
+    chain,
+    address,
+    searchParams.get("session") === "schedule",
+    chain?.name,
+  ]);
 
   useEffect(() => {
     setIsPageLoading(false);
@@ -445,7 +467,12 @@ function MainProfile() {
   const checkDelegateExists = async (address: any) => {
     try {
       // Make a request to your backend API to check if the address exists
-      let dao = daoName;
+      let dao =
+        chain?.name === "Optimism"
+          ? "optimism"
+          : chain?.name === "Arbitrum One"
+          ? "arbitrum"
+          : "";
       console.log("Checking");
 
       const myHeaders = new Headers();
@@ -487,7 +514,12 @@ function MainProfile() {
   const handleAdd = async (newDescription?: string) => {
     try {
       // Call the POST API function for adding a new delegate
-      let dao = daoName;
+      let dao =
+        chain?.name === "Optimism"
+          ? "optimism"
+          : chain?.name === "Arbitrum One"
+          ? "arbitrum"
+          : "";
       console.log("Adding the delegate..");
       const response = await axios.post("/api/profile", {
         address: address,
@@ -528,7 +560,12 @@ function MainProfile() {
     try {
       // Call the PUT API function for updating an existing delegate
 
-      let dao = daoName;
+      let dao =
+        chain?.name === "Optimism"
+          ? "optimism"
+          : chain?.name === "Arbitrum One"
+          ? "arbitrum"
+          : "";
       console.log("Updating");
       console.log("Inside Updating Description", newDescription);
       const response: any = await axios.put("/api/profile", {
@@ -567,7 +604,12 @@ function MainProfile() {
     const fetchData = async () => {
       console.log("Description", description);
       try {
-        let dao = daoName;
+        let dao =
+          chain?.name === "Optimism"
+            ? "optimism"
+            : chain?.name === "Arbitrum One"
+            ? "arbitrum"
+            : "";
         console.log("Fetching Data...");
         const res = await fetch(
           `https://api.karmahq.xyz/api/dao/find-delegate?dao=${dao}&user=${address}`
@@ -608,7 +650,7 @@ function MainProfile() {
     };
 
     fetchData();
-  }, [chain, address, daoName]);
+  }, [chain, address, daoName, chain?.name]);
 
   return (
     <>
