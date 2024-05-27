@@ -11,6 +11,15 @@ import { useRouter } from "next-nprogress-bar";
 import Link from "next/link";
 import text1 from "@/assets/images/daos/texture1.png";
 import text2 from "@/assets/images/daos/texture2.png";
+import {
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Button,
+  useDisclosure,
+} from "@nextui-org/react";
 interface RoomDetails {
   message: string;
   data: {
@@ -62,6 +71,9 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
   const [isConfirmSlotLoading, setIsConfirmSlotLoading] = useState(false);
   const router = useRouter();
   const [startLoading, setStartLoading] = useState(false);
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [rejectionReason, setRejectionReason] = useState("");
+  const [isModalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
     setIsPageLoading(false);
@@ -129,13 +141,61 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
     }
   };
 
+  /*
+
+<Modal
+      isOpen={isOpen}
+      onClose={() => {
+        onClose();
+        setRejectionReason('');
+      }}
+      className="font-poppins"
+    >
+      <ModalContent className="bg-blue-500">
+        <ModalHeader className="flex flex-col gap-1">
+          Reason for Rejection
+        </ModalHeader>
+        <ModalBody>
+          <textarea
+            name="rejectionReason"
+            value={rejectionReason}
+            onChange={(e) => setRejectionReason(e.target.value)}
+            placeholder="Give a reason for rejecting the session"
+            className="outline-none bg-[#D9D9D945] rounded-md px-2 py-1 text-sm w-full"
+            required
+          />
+        </ModalBody>
+        <ModalFooter>
+          <Button
+            color="default"
+            onClick={() => {
+              onClose();
+              setRejectionReason('');
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            color="red"
+            onClick={handleReject}
+          >
+            Reject
+          </Button>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
+
+
+
+
+  */
+
   return (
     <>
       <div
         key={tileIndex}
         className="flex justify-between p-5 rounded-[2rem]"
-        style={{ boxShadow: "0px 4px 26.7px 0px rgba(0, 0, 0, 0.10)" }}
-      >
+        style={{ boxShadow: "0px 4px 26.7px 0px rgba(0, 0, 0, 0.10)" }}>
         <div className="flex">
           <Image
             src={data.img || text1}
@@ -192,9 +252,9 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
                 : data.booking_status === "Rejected"
                 ? "border border-red-600 text-red-600"
                 : "border border-yellow-500 text-yellow-500"
-            }`}
-          >
+            }`}>
             {data.booking_status}
+            {/* Approve */}
           </div>
 
           {isEvent === "Book" ? (
@@ -216,8 +276,7 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
                     content="Start Session"
                     placement="top"
                     closeDelay={1}
-                    showArrow
-                  >
+                    showArrow>
                     <span className="cursor-pointer">
                       <FaCirclePlay
                         size={35}
@@ -251,8 +310,7 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
                     content="Approve"
                     placement="top"
                     closeDelay={1}
-                    showArrow
-                  >
+                    showArrow>
                     <span className="cursor-pointer">
                       <FaCircleCheck
                         onClick={() => confirmSlot(data._id, "Approved")}
@@ -266,16 +324,57 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
                     content="Reject"
                     placement="top"
                     closeDelay={1}
-                    showArrow
-                  >
+                    showArrow>
                     <span className="cursor-pointer">
                       <FaCircleXmark
-                        onClick={() => confirmSlot(data._id, "Rejected")}
+                        onClick={() => setModalOpen(true)}
                         size={28}
                         color="#b91c1c"
                       />
                     </span>
                   </Tooltip>
+                  <div>
+                    {isModalOpen && (
+                      <div className="absolute inset-0 backdrop-blur-md">
+                        <Modal
+                          isOpen={isModalOpen}
+                          onClose={() => {
+                            setModalOpen(false);
+                            setRejectionReason("");
+                          }}
+                          className="font-poppins">
+                          <ModalContent className="bg-white">
+                            <ModalHeader className="flex flex-col gap-1 text-center">
+                              Reason for Rejection
+                            </ModalHeader>
+                            <ModalBody>
+                              <textarea
+                                name="rejectionReason"
+                                value={rejectionReason}
+                                onChange={(e) =>
+                                  setRejectionReason(e.target.value)
+                                }
+                                placeholder="Give a reason for rejecting the session"
+                                className="outline-none bg-[#D9D9D945] rounded-md px-2 py-1 text-sm w-full"
+                                required
+                              />
+                            </ModalBody>
+                            <ModalFooter>
+                              <Button
+                                color="default"
+                                onClick={() => {
+                                  setModalOpen(false);
+                                  setRejectionReason("");
+                                }}>
+                                Cancel
+                              </Button>
+                              <Button color="danger">Reject</Button>
+                            </ModalFooter>
+                          </ModalContent>
+                        </Modal>
+                      </div>
+                    )}
+                  </div>
                 </div>
               )
             ) : null
@@ -286,8 +385,7 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
                   setStartLoading(true);
                   router.push(`/meeting/session/${data.meetingId}/lobby`);
                 }}
-                className="text-center bg-blue-shade-100 rounded-full font-bold text-white py-2 text-xs cursor-pointer"
-              >
+                className="text-center bg-blue-shade-100 rounded-full font-bold text-white py-2 text-xs cursor-pointer">
                 {startLoading ? (
                   <div className="flex justify-center items-center">
                     <Oval

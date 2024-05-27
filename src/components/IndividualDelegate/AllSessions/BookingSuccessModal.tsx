@@ -33,6 +33,11 @@ function BookingSuccessModal({
   const toggleModal = () => {
     onClose();
   };
+  const redirecttoAttending = () => {
+    // const url = `http://localhost:3000/profile/${address}?active=sessions&session=attending`;
+    // window.location.href = url;
+    console.log("redirect");
+  };
 
   useEffect(() => {
     // Lock scrolling when the modal is open
@@ -54,8 +59,7 @@ function BookingSuccessModal({
           <div className="fixed inset-0 z-50 flex items-center justify-center font-poppins">
             <div
               className="absolute inset-0 backdrop-blur-md"
-              onClick={toggleModal}
-            ></div>
+              onClick={toggleModal}></div>
             <div className="z-50 bg-white rounded-3xl max-w-5xl border-2 overflow-hidden">
               <Confetti recycle={false} />
               <div className="flex justify-between items-center px-8 py-4 border-b">
@@ -64,25 +68,30 @@ function BookingSuccessModal({
                 </h2>
                 <button
                   className="text-gray-500 hover:text-gray-800"
-                  onClick={toggleModal}
-                >
+                  onClick={toggleModal}>
                   <RxCross2 size={20} />
                 </button>
               </div>
               <div className="p-8 text-gray-900">
                 <p className="mb-4">
-                  Your session is booked! Please wait for confirmation from the
-                  delegate&apos;s side.
+                  {/* Your session is booked! Please wait for confirmation from the
+                  delegate&apos;s side. */}
+                  Your session is successfully booked and confirmed! Get ready
+                  for an engaging experience.
                 </p>
                 <p className="mb-8">
                   Share the news of your learnings on Twitter!&nbsp;📣
                 </p>
 
-                <div className="flex justify-center">
+                <div className="flex justify-between">
+                  <button
+                    className="bg-blue-shade-200 text-white rounded-full px-4 py-2 flex items-center space-x-1"
+                    onClick={redirecttoAttending}>
+                    🚀 Let's Go!
+                  </button>
                   <button
                     className="bg-black text-white rounded-full px-4 py-2 flex items-center space-x-1"
-                    onClick={shareOnTwitter}
-                  >
+                    onClick={shareOnTwitter}>
                     Share on Twitter
                     <BsTwitterX className="ml-2" />
                   </button>
