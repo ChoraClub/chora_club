@@ -10,14 +10,14 @@ import wallet from "@/assets/images/sidebar/wallet.png";
 import gitbook from "@/assets/images/sidebar/gitbook.png";
 import user from "@/assets/images/sidebar/user.png";
 import styles from "./sidebar.module.css";
-import { usePathname } from "next/navigation";
-import { useRouter } from "next-nprogress-bar";
+import { usePathname, useRouter } from "next/navigation";
 import { Badge, Tooltip } from "@nextui-org/react";
 import { IoClose } from "react-icons/io5";
 import Link from "next/link";
 import { ConnectWallet } from "../ConnectWallet/ConnectWallet";
 import { useSession } from "next-auth/react";
 import { useAccount } from "wagmi";
+import ButtonWithCircle from "../Circle/ButtonWithCircle";
 
 function Sidebar() {
   const router = useRouter();
@@ -75,202 +75,183 @@ function Sidebar() {
   };
 
   return (
-    <div className="py-6 h-full">
-      <div className="flex flex-col h-full justify-between">
-        <div className="flex flex-col items-center gap-y-4 pb-5">
-          <Image
-            src={logo}
-            alt={"image"}
-            width={40}
-            className="xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14"
-          ></Image>
-          <Tooltip
-            content="DAOs"
-            placement="right"
-            className="rounded-md bg-opacity-90"
-            closeDelay={1}
-          >
-            <Link href={"/"}>
-              <Image
-                priority
-                src={rocket}
-                alt={"image"}
-                width={40}
-                className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 ${
-                  pathname.endsWith(`/`)
-                    ? "border-white border-2 rounded-full"
-                    : ""
-                }`}
-              ></Image>
-            </Link>
-          </Tooltip>
-          <Tooltip
-            content="Office Hours"
-            placement="right"
-            className="rounded-md bg-opacity-90"
-            closeDelay={1}
-          >
-            <Link href={"/office-hours?hours=ongoing"}>
-              <Image
-                priority
-                src={office}
-                alt={"image"}
-                width={40}
-                className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 ${
-                  pathname.includes(`/office-hours`)
-                    ? "border-white border-2 rounded-full"
-                    : ""
-                }`}
-              ></Image>
-            </Link>
-          </Tooltip>
-          {/* <Tooltip
-            content="Available Delegates"
-            placement="right"
-            className="rounded-md bg-opacity-90"
-            closeDelay={1}
-          >
-            <Link href={"/available-delegates"}>
-              <Image
-                priority
-                src={sessionIcn}
-                alt={"image"}
-                width={40}
-                height={40}
-                className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 ${
-                  pathname.includes(`/available-delegates`)
-                    ? "border-white border-2 rounded-full"
-                    : ""
-                }`}
-              ></Image>
-            </Link>
-          </Tooltip> */}
-          <Tooltip
-            content="Sessions"
-            placement="right"
-            className="rounded-md bg-opacity-90"
-            closeDelay={1}
-          >
-            <Link href={"/sessions?active=recordedSessions"}>
-              <Image
-                priority
-                src={sessionIcn}
-                alt={"image"}
-                width={40}
-                height={40}
-                className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 ${
-                  pathname.includes(`/sessions`)
-                    ? "border-white border-2 rounded-full"
-                    : ""
-                }`}
-              ></Image>
-            </Link>
-          </Tooltip>
-        </div>
-        <div className="h-full">
-          <div
-            className={`flex flex-col items-center gap-y-4 py-7 h-full bg-blue-shade-300 rounded-2xl overflow-y-auto ${styles.scrollbar}`}
-          >
-            {storedDao ? (
-              storedDao.map((data, index) => (
-                <div
-                  key={index}
-                  className="flex flex-col items-center"
-                  onMouseOver={() => handleMouseOver(index)}
-                  onMouseOut={() => handleMouseOut(index)}
-                >
-                  <Badge
-                    isInvisible={!badgeVisiblity[index]}
-                    content={<IoClose />}
-                    className="p-[0.1rem] cursor-pointer border-blue-shade-300"
-                    color="danger"
-                    size="sm"
-                    onClick={() => handleBadgeClick(data[0])}
-                  >
-                    <Tooltip
-                      content={<div className="capitalize">{data[0]}</div>}
-                      placement="right"
-                      className="rounded-md bg-opacity-90"
-                      closeDelay={1}
-                    >
-                      <Link href={`/${data[0]}?active=delegatesList`}>
-                        <Image
-                          key={index}
-                          src={data[1]}
-                          width={80}
-                          height={80}
-                          alt="image"
-                          className={`w-10 h-10 xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 rounded-full cursor-pointer ${
-                            pathname.includes(`/${data[0]}`)
-                              ? "border-white border-[2.5px]"
-                              : ""
-                          }`}
-                          priority={true}
-                        ></Image>
-                      </Link>
-                    </Tooltip>
-                  </Badge>
-                </div>
-              ))
-            ) : (
-              <></>
-            )}
-          </div>
-        </div>
-        <div className="flex flex-col items-center gap-y-4 pt-5">
-          <Tooltip
-            content={<div className="capitalize">Git Book</div>}
-            placement="right"
-            className="rounded-md bg-opacity-90"
-            closeDelay={1}
-          >
-            <Link href={"https://docs.chora.club/"} target="_blank">
-              <Image
-                src={gitbook}
-                alt={"image"}
-                width={40}
-                className="xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14"
-              />
-            </Link>
-          </Tooltip>
-
-          {!isConnected && !session ? (
+    <>
+      <div className="py-6 h-full">
+        <div className="flex flex-col h-full justify-between">
+          <div className="flex flex-col items-center gap-y-4 pb-5">
+            <Image
+              src={logo}
+              alt={"image"}
+              width={40}
+              className="xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14"
+            ></Image>
             <Tooltip
-              content={<div className="capitalize">Wallet</div>}
+              content="DAOs"
               placement="right"
               className="rounded-md bg-opacity-90"
               closeDelay={1}
             >
-              {isPageLoading || sessionLoading ? (
+              <Link href={"/"}>
+                <Image
+                  priority
+                  src={rocket}
+                  alt={"image"}
+                  width={40}
+                  className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 ${
+                    pathname.endsWith(`/`)
+                      ? "border-white border-2 rounded-full"
+                      : ""
+                  }`}
+                ></Image>
+              </Link>
+            </Tooltip>
+            <Tooltip
+              content="Office Hours"
+              placement="right"
+              className="rounded-md bg-opacity-90"
+              closeDelay={1}
+            >
+              <Link href={"/office-hours?hours=ongoing"}>
+                <Image
+                  priority
+                  src={office}
+                  alt={"image"}
+                  width={40}
+                  className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 ${
+                    pathname.includes(`/office-hours`)
+                      ? "border-white border-2 rounded-full"
+                      : ""
+                  }`}
+                ></Image>
+              </Link>
+            </Tooltip>
+            <Tooltip
+              content="Sessions"
+              placement="right"
+              className="rounded-md bg-opacity-90"
+              closeDelay={1}
+            >
+              <Link href={"/sessions?active=recordedSessions"}>
+                <Image
+                  priority
+                  src={sessionIcn}
+                  alt={"image"}
+                  width={40}
+                  height={40}
+                  className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 ${
+                    pathname.includes(`/sessions`)
+                      ? "border-white border-2 rounded-full"
+                      : ""
+                  }`}
+                ></Image>
+              </Link>
+            </Tooltip>
+          </div>
+          <div className="h-full">
+            <div
+              className={`flex flex-col items-center gap-y-4 py-7 h-full bg-blue-shade-300 rounded-2xl overflow-y-auto ${styles.scrollbar}`}
+            >
+              {storedDao ? (
+                storedDao.map((data, index) => (
+                  <div
+                    key={index}
+                    className="flex flex-col items-center"
+                    onMouseOver={() => handleMouseOver(index)}
+                    onMouseOut={() => handleMouseOut(index)}
+                  >
+                    <Badge
+                      isInvisible={!badgeVisiblity[index]}
+                      content={<IoClose />}
+                      className="p-[0.1rem] cursor-pointer border-blue-shade-300"
+                      color="danger"
+                      size="sm"
+                      onClick={() => handleBadgeClick(data[0])}
+                    >
+                      <Tooltip
+                        content={<div className="capitalize">{data[0]}</div>}
+                        placement="right"
+                        className="rounded-md bg-opacity-90"
+                        closeDelay={1}
+                      >
+                        <Link href={`/${data[0]}?active=delegatesList`}>
+                          <Image
+                            key={index}
+                            src={data[1]}
+                            width={80}
+                            height={80}
+                            alt="image"
+                            className={`w-10 h-10 xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 rounded-full cursor-pointer ${
+                              pathname.includes(`/${data[0]}`)
+                                ? "border-white border-[2.5px]"
+                                : ""
+                            }`}
+                            priority={true}
+                          ></Image>
+                        </Link>
+                      </Tooltip>
+                    </Badge>
+                  </div>
+                ))
+              ) : (
+                <></>
+              )}
+            </div>
+          </div>
+          <div className="flex flex-col items-center gap-y-4 pt-5">
+            <Tooltip
+              content={<div className="capitalize">Git Book</div>}
+              placement="right"
+              className="rounded-md bg-opacity-90"
+              closeDelay={1}
+            >
+              <Link href={"https://docs.chora.club/"} target="_blank">
+                <Image
+                  src={gitbook}
+                  alt={"image"}
+                  width={40}
+                  className="xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14"
+                />
+              </Link>
+            </Tooltip>
+
+            {!isConnected && !session ? (
+              <Tooltip
+                content={<div className="capitalize">Wallet</div>}
+                placement="right"
+                className="rounded-md bg-opacity-90"
+                closeDelay={1}
+              >
+                {isPageLoading || sessionLoading ? (
+                  <Image
+                    src={user}
+                    alt={"image"}
+                    width={40}
+                    className="cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14"
+                  />
+                ) : (
+                  <ConnectWallet />
+                )}
+              </Tooltip>
+            ) : (
+              <Tooltip
+                content={<div className="capitalize">Profile</div>}
+                placement="right"
+                className="rounded-md bg-opacity-90"
+                closeDelay={1}
+              >
                 <Image
                   src={user}
                   alt={"image"}
                   width={40}
-                  className="cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14"
+                  className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14`}
+                  onClick={() => router.push(`/profile/${address}?active=info`)}
                 />
-              ) : (
-                <ConnectWallet />
-              )}
-            </Tooltip>
-          ) : (
-            <Tooltip
-              content={<div className="capitalize">Profile</div>}
-              placement="right"
-              className="rounded-md bg-opacity-90"
-              closeDelay={1}
-            >
-              <Image
-                src={user}
-                alt={"image"}
-                width={40}
-                className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14`}
-                onClick={() => router.push(`/profile/${address}?active=info`)}
-              />
-            </Tooltip>
-          )}
+              </Tooltip>
+            )}
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 

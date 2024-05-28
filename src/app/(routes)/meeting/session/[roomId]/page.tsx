@@ -10,12 +10,11 @@ import Prompts from "@/components/common/Prompts";
 import {
   useRoom,
   useLocalPeer,
-  useLocalAudio,
   usePeerIds,
   useHuddle01,
   useDataMessage,
 } from "@huddle01/react/hooks";
-import { usePathname} from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useRouter } from "next-nprogress-bar";
 import AcceptRequest from "@/components/Modals/AcceptRequest";
 import useStore from "@/components/store/slices";
@@ -24,12 +23,10 @@ import { Role } from "@huddle01/server-sdk/auth";
 import Chat from "@/components/Chat/Chat";
 import { useAccount } from "wagmi";
 import AttestationModal from "@/components/utils/AttestationModal";
-import { Oval, TailSpin } from "react-loader-spinner";
+import { TailSpin } from "react-loader-spinner";
 import Link from "next/link";
 import { PiRecordFill } from "react-icons/pi";
 import { Tooltip } from "@nextui-org/react";
-import { RxCross2 } from "react-icons/rx";
-import { IoCopy } from "react-icons/io5";
 import copy from "copy-to-clipboard";
 
 // import Chat from '@/components/Chat/Chat';

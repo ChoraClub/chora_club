@@ -77,8 +77,8 @@ export async function POST(
         {
           /* @ts-ignore */
           $push: {
-            allowedDates: { $each: allowedDates },
-            dateAndRanges: { $each: dateAndRanges },
+            allowedDates: { $each: [allowedDates] },
+            dateAndRanges: { $each: [dateAndRanges] },
           },
           $set: {
             updatedAt: new Date(),
@@ -97,7 +97,6 @@ export async function POST(
       const documentsForEmail = await delegateCollection
         .find({ address: userAddress })
         .toArray();
-
 
       for (const document of documentsForEmail) {
         const emailId = document.emailId;
