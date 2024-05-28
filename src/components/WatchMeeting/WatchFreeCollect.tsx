@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useRef, useState, useEffect} from "react";
 import Image from "next/image";
 import op from "@/assets/images/daos/op.png";
 import upArrow from "@/assets/images/watchmeeting/up-arrow.svg";
@@ -87,8 +87,7 @@ const WatchFreeCollect = () => {
             </button> */}
 
         <button
-          className={`text-white bg-black rounded-full py-5 px-6 text-xs font-semibold my-6 ${
-            styles["blob-btn"]
+          className={`text-white bg-black rounded-full py-5 px-6 text-xs font-semibold my-6 ${styles["blob-btn"]
           } ${isOpen ? "bg-black-shade-700" : ""}`}
           onClick={() => setIsOpen((prev) => !prev)}
         >
@@ -104,12 +103,15 @@ const WatchFreeCollect = () => {
         </button>
       </div>
 
+
+{/* collect menu */}
       <div
         className={`w-full font-poppins ${styles.slideDown} ${
           isOpen ? styles.open : ""
-        }  `}
+        }  `} 
       >
-        {isOpen && (
+    
+        {(isOpen || !isOpen) && ( 
           <div className="w-full font-poppins">
             <p className="mx-6 font-normal text-xs mb-2 text-black-shade-500">
               Pay Using
@@ -156,7 +158,7 @@ const WatchFreeCollect = () => {
             </div>
             <div className="flex justify-center items-center my-4">
               <div
-                className="flex p-1 rounded-full border border-blue-shade-500 w-fit justify-center items-center cursor-pointer hover:bg-blue-shade-100"
+                className="flex p-1 rounded-full border border-blue-shade-500 w-fit justify-center items-center cursor-pointer hover:bg-blue-shade-700"
                 onClick={() => setIsOpen((prev) => !prev)}
               >
                 {/* <Image src={upArrow} alt="" width={24} height={24} className="hover:fill-blue-shade-100"/> */}
