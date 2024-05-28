@@ -13,6 +13,7 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { Oval } from "react-loader-spinner";
 import { Tooltip } from "@nextui-org/react";
 import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
+import { RxCross2 } from "react-icons/rx";
 
 interface Type {
   img: StaticImageData;
@@ -44,6 +45,7 @@ function DaoOfficeHours() {
 
   const [sessionDetails, setSessionDetails] = useState<Type[]>([]);
   const [dataLoading, setDataLoading] = useState(true);
+  const [showComingSoon, setShowComingSoon] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -155,6 +157,21 @@ function DaoOfficeHours() {
           <ConnectWalletWithENS />
         </div>
       </div>
+
+      {showComingSoon && (
+        <div className="flex items-center w-fit bg-yellow-100 border border-yellow-400 rounded-full px-3 py-1 font-poppins">
+          <p className="text-sm text-yellow-700 mr-2">
+            Office hours are currently being developed. In the meantime, please
+            enjoy our 1:1 sessions.
+          </p>
+          <button
+            onClick={() => setShowComingSoon(false)}
+            className="text-yellow-700 hover:text-yellow-800 ps-3"
+          >
+            <RxCross2 size={18} />
+          </button>
+        </div>
+      )}
 
       <div className="pr-32 pt-4 font-poppins">
         <div className="flex gap-16 border-1 border-[#7C7C7C] pl-6 rounded-xl">
