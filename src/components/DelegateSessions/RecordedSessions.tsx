@@ -11,19 +11,19 @@ import toast, { Toaster } from "react-hot-toast";
 import copy from "copy-to-clipboard";
 import styles from "./RecordedSessions.module.css";
 import { Oval } from "react-loader-spinner";
+// const { parseISO } = require("date-fns");
 import { parseISO } from "date-fns";
 // import { useRouter } from "next/navigation";
 import { useRouter } from "next-nprogress-bar";
-import user1 from "@/assets/images/user/user1.svg"
-import user2 from "@/assets/images/user/user2.svg"
-import user3 from "@/assets/images/user/user3.svg"
-import user4 from "@/assets/images/user/user4.svg"
-import user5 from "@/assets/images/user/user5.svg"
-import user6 from "@/assets/images/user/user6.svg"
-import user7 from "@/assets/images/user/user7.svg"
-import user8 from "@/assets/images/user/user8.svg"
-import user9 from "@/assets/images/user/user9.svg"
-
+import user1 from "@/assets/images/user/user1.svg";
+import user2 from "@/assets/images/user/user2.svg";
+import user3 from "@/assets/images/user/user3.svg";
+import user4 from "@/assets/images/user/user4.svg";
+import user5 from "@/assets/images/user/user5.svg";
+import user6 from "@/assets/images/user/user6.svg";
+import user7 from "@/assets/images/user/user7.svg";
+import user8 from "@/assets/images/user/user8.svg";
+import user9 from "@/assets/images/user/user9.svg";
 
 interface SessionData {
   session: {
@@ -209,45 +209,54 @@ function RecordedSessions() {
   };
 
   // Create an array of user images
-  const userImages = [user1, user2, user3, user4, user5, user6, user7, user8, user9];
+  const userImages = [
+    user1,
+    user2,
+    user3,
+    user4,
+    user5,
+    user6,
+    user7,
+    user8,
+    user9,
+  ];
 
- // State to store the randomly selected user images
- const [randomUserImages, setRandomUserImages] = useState<{ [key: string]: StaticImageData }>(
-  {}
-);
-const [usedIndices, setUsedIndices] = useState<Set<number>>(new Set());
+  // State to store the randomly selected user images
+  const [randomUserImages, setRandomUserImages] = useState<{
+    [key: string]: StaticImageData;
+  }>({});
+  const [usedIndices, setUsedIndices] = useState<Set<number>>(new Set());
 
-// Function to get a random user image
-const getRandomUserImage = (): StaticImageData => {
-  let randomIndex;
-  do {
-    randomIndex = Math.floor(Math.random() * userImages.length);
-  } while (usedIndices.has(randomIndex));
+  // Function to get a random user image
+  const getRandomUserImage = (): StaticImageData => {
+    let randomIndex;
+    do {
+      randomIndex = Math.floor(Math.random() * userImages.length);
+    } while (usedIndices.has(randomIndex));
 
-  usedIndices.add(randomIndex);
-  return userImages[randomIndex];
-};
-
-// Effect to set the random user image when the component mounts
-useEffect(() => {
-  const newRandomUserImages: { [key: string]: StaticImageData } = {
-    ...randomUserImages,
+    usedIndices.add(randomIndex);
+    return userImages[randomIndex];
   };
 
-  meetingData.forEach((data: SessionData) => {
-    const guestAddress = data.session.attendees[0].attendee_address;
-    const hostAddress = data.session.host_address;
-    if (!data.guestInfo?.image && !newRandomUserImages[guestAddress]) {
-      newRandomUserImages[guestAddress] = getRandomUserImage();
-    }
-    if (!data.hostInfo?.image && !newRandomUserImages[hostAddress]) {
-      newRandomUserImages[hostAddress] = getRandomUserImage();
-    }
-  });
+  // Effect to set the random user image when the component mounts
+  useEffect(() => {
+    const newRandomUserImages: { [key: string]: StaticImageData } = {
+      ...randomUserImages,
+    };
 
-  setRandomUserImages(newRandomUserImages);
-}, [meetingData]);
+    meetingData.forEach((data: SessionData) => {
+      const guestAddress = data.session.attendees[0].attendee_address;
+      const hostAddress = data.session.host_address;
+      if (!data.guestInfo?.image && !newRandomUserImages[guestAddress]) {
+        newRandomUserImages[guestAddress] = getRandomUserImage();
+      }
+      if (!data.hostInfo?.image && !newRandomUserImages[hostAddress]) {
+        newRandomUserImages[hostAddress] = getRandomUserImage();
+      }
+    });
 
+    setRandomUserImages(newRandomUserImages);
+  }, [meetingData]);
 
   useEffect(() => {
     const fetchEnsNames = async () => {
@@ -376,7 +385,7 @@ useEffect(() => {
                         muted
                         onLoadedMetadata={(e) => handleLoadedMetadata(index, e)}
                         src={data.session.video_uri}
-                        className="w-full h-44 rounded-t-3xl"
+                        className="w-full h-44 rounded-t-3xl object-cover"
                       ></video>
                       <div className={styles.videoTimeline}>
                         <div className={styles.progressArea}>
@@ -396,7 +405,7 @@ useEffect(() => {
                       muted
                       onLoadedMetadata={(e) => handleLoadedMetadata(index, e)}
                       src={data.session.video_uri}
-                      className="w-full h-44 rounded-t-3xl"
+                      className="w-full h-44 rounded-t-3xl object-cover"
                     ></video>
                   )}
                   <div className="absolute right-2 bottom-2 text-white text-xs bg-white px-1 bg-opacity-30 rounded-sm">
@@ -472,7 +481,9 @@ useEffect(() => {
                           src={
                             data.guestInfo?.image
                               ? `https://gateway.lighthouse.storage/ipfs/${data.guestInfo.image}`
-                              : randomUserImages[data.session.attendees[0].attendee_address]
+                              : randomUserImages[
+                                  data.session.attendees[0].attendee_address
+                                ]
                           }
                           alt="image"
                           width={20}

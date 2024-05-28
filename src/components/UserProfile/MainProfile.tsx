@@ -42,7 +42,6 @@ import InstantMeet from "./InstantMeet";
 import { useSession } from "next-auth/react";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
-import { getEnsNameOfUser } from "../ConnectWallet/ENSResolver";
 
 function MainProfile() {
   const { isConnected, address } = useAccount();
@@ -77,12 +76,27 @@ function MainProfile() {
   const [isPageLoading, setIsPageLoading] = useState(true);
   const [selfDelegate, setSelfDelegate] = useState(false);
   const [daoName, setDaoName] = useState("optimism");
-  const [displayEnsName, setDisplayEnsName] = useState<string>();
 
   interface ProgressData {
     total: any;
     uploaded: any;
   }
+
+  // useEffect(() => {
+  //   if (chain?.name === "Optimism") {
+  //     setDaoName("optimism");
+  //   } else if (chain?.name === "Arbitrum One") {
+  //     setDaoName("arbitrum");
+  //   }
+  //   console.log("daoName", daoName);
+  // }, [chain, daoName]);
+  useEffect(() => {
+    if (chain && chain?.name === "Optimism") {
+      setDaoName("optimism");
+    } else if (chain && chain?.name === "Arbitrum One") {
+      setDaoName("arbitrum");
+    }
+  }, [chain, chain?.name]);
 
   useEffect(() => {
     // console.log("path", path);
@@ -155,10 +169,16 @@ function MainProfile() {
       const addr = await walletClient.getAddresses();
       const address1 = addr[0];
       let delegateTxAddr = "";
+      // const contractAddress =
+      //   daoName === "optimism"
+      //     ? "0x4200000000000000000000000000000000000042"
+      //     : daoName === "arbitrum"
+      //     ? "0x912CE59144191C1204E64559FE8253a0e49E6548"
+      //     : "";
       const contractAddress =
-        daoName === "optimism"
+        chain?.name === "Optimism"
           ? "0x4200000000000000000000000000000000000042"
-          : daoName === "arbitrum"
+          : chain?.name === "Arbitrum One"
           ? "0x912CE59144191C1204E64559FE8253a0e49E6548"
           : "";
       console.log(walletClient);
@@ -178,10 +198,12 @@ function MainProfile() {
       if (delegateTxAddr.toLowerCase() === address?.toLowerCase()) {
         console.log("Delegate comparison: ", delegateTx, address);
         setSelfDelegate(true);
+      } else {
+        setSelfDelegate(false);
       }
     };
     checkDelegateStatus();
-  }, [address]);
+  }, [address, daoName, selfDelegate]);
 
   // Pass the address of whom you want to delegate the voting power to
   const handleDelegateVotes = async (to: string) => {
@@ -190,9 +212,14 @@ function MainProfile() {
       const address1 = addr[0];
 
       const contractAddress =
-        daoName === "optimism"
+        // daoName === "optimism"
+        //   ? "0x4200000000000000000000000000000000000042"
+        //   : daoName === "arbitrum"
+        //   ? "0x912CE59144191C1204E64559FE8253a0e49E6548"
+        //   : "";
+        chain?.name === "Optimism"
           ? "0x4200000000000000000000000000000000000042"
-          : daoName === "arbitrum"
+          : chain?.name === "Arbitrum One"
           ? "0x912CE59144191C1204E64559FE8253a0e49E6548"
           : "";
       console.log("Contract", contractAddress);
@@ -271,7 +298,13 @@ function MainProfile() {
     const fetchData = async () => {
       try {
         // Fetch data from your backend API to check if the address exists
-        let dao = daoName;
+        // let dao = daoName;
+        let dao =
+          chain?.name === "Optimism"
+            ? "optimism"
+            : chain?.name === "Arbitrum One"
+            ? "arbitrum"
+            : "";
         console.log("Fetching from DB");
         // const dbResponse = await axios.get(`/api/profile/${address}`);
 
@@ -322,7 +355,12 @@ function MainProfile() {
             "Data not found in the database, fetching from third-party API"
           );
           // Data not found in the database, fetch data from the third-party API
-          let dao = daoName;
+          let dao =
+            chain?.name === "Optimism"
+              ? "optimism"
+              : chain?.name === "Arbitrum One"
+              ? "arbitrum"
+              : "";
           const res = await fetch(
             `https://api.karmahq.xyz/api/dao/find-delegate?dao=${dao}&user=${address}`
           );
@@ -379,7 +417,13 @@ function MainProfile() {
     };
 
     fetchData();
-  }, [daoName, chain, address, searchParams.get("session") === "schedule"]);
+  }, [
+    daoName,
+    chain,
+    address,
+    searchParams.get("session") === "schedule",
+    chain?.name,
+  ]);
 
   useEffect(() => {
     setIsPageLoading(false);
@@ -423,7 +467,12 @@ function MainProfile() {
   const checkDelegateExists = async (address: any) => {
     try {
       // Make a request to your backend API to check if the address exists
-      let dao = daoName;
+      let dao =
+        chain?.name === "Optimism"
+          ? "optimism"
+          : chain?.name === "Arbitrum One"
+          ? "arbitrum"
+          : "";
       console.log("Checking");
 
       const myHeaders = new Headers();
@@ -465,7 +514,12 @@ function MainProfile() {
   const handleAdd = async (newDescription?: string) => {
     try {
       // Call the POST API function for adding a new delegate
-      let dao = daoName;
+      let dao =
+        chain?.name === "Optimism"
+          ? "optimism"
+          : chain?.name === "Arbitrum One"
+          ? "arbitrum"
+          : "";
       console.log("Adding the delegate..");
       const response = await axios.post("/api/profile", {
         address: address,
@@ -506,7 +560,12 @@ function MainProfile() {
     try {
       // Call the PUT API function for updating an existing delegate
 
-      let dao = daoName;
+      let dao =
+        chain?.name === "Optimism"
+          ? "optimism"
+          : chain?.name === "Arbitrum One"
+          ? "arbitrum"
+          : "";
       console.log("Updating");
       console.log("Inside Updating Description", newDescription);
       const response: any = await axios.put("/api/profile", {
@@ -545,7 +604,12 @@ function MainProfile() {
     const fetchData = async () => {
       console.log("Description", description);
       try {
-        let dao = daoName;
+        let dao =
+          chain?.name === "Optimism"
+            ? "optimism"
+            : chain?.name === "Arbitrum One"
+            ? "arbitrum"
+            : "";
         console.log("Fetching Data...");
         const res = await fetch(
           `https://api.karmahq.xyz/api/dao/find-delegate?dao=${dao}&user=${address}`
@@ -586,15 +650,7 @@ function MainProfile() {
     };
 
     fetchData();
-  }, [chain, address, daoName]);
-
-  useEffect(() => {
-    const fetchEnsName = async () => {
-      const ensName = await getEnsNameOfUser(address);
-      setDisplayEnsName(ensName);
-    };
-    fetchEnsName();
-  }, [chain, address]);
+  }, [chain, address, daoName, chain?.name]);
 
   return (
     <>
@@ -652,13 +708,14 @@ function MainProfile() {
               <div className="px-4">
                 <div className=" flex items-center py-1">
                   <div className="font-bold text-lg pr-4">
-                    {displayEnsName || ensName || profileDetails?.ensName ? (
-                      displayEnsName || ensName || profileDetails?.ensName
+                    {ensName || profileDetails?.ensName ? (
+                      ensName || profileDetails?.ensName
                     ) : displayName ? (
                       displayName
                     ) : (
                       <>
-                        {`${address}`.slice(0, 6)} ... {`${address}`.slice(-4)}
+                        {`${address}`.substring(0, 6)} ...{" "}
+                        {`${address}`.substring(`${address}`.length - 4)}
                       </>
                     )}
                   </div>
@@ -834,7 +891,8 @@ function MainProfile() {
 
                 <div className="flex items-center py-1">
                   <div>
-                    {`${address}`.slice(0, 6)} ... {`${address}`.slice(-4)}
+                    {`${address}`.substring(0, 6)} ...{" "}
+                    {`${address}`.substring(`${address}`.length - 4)}
                   </div>
 
                   <Tooltip
@@ -860,8 +918,8 @@ function MainProfile() {
                     }}
                   />
                 </div>
-                {votes
-                  ? selfDelegate === true && (
+                {selfDelegate === true
+                  ? votes && (
                       <div className="flex gap-4 py-1">
                         <div className="text-[#4F4F4F] border-[0.5px] border-[#D9D9D9] rounded-md px-3 py-1">
                           <span className="text-blue-shade-200 font-semibold">
@@ -891,39 +949,33 @@ function MainProfile() {
                       </div>
                     )
                   : null}
-                <div className="flex items-center gap-4 pt-2">
-                  {selfDelegate === false ? (
-                    <div className="flex gap-5">
-                      {/* pass address of whom you want to delegate the voting power to */}
-                      <button
-                        className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
-                        onClick={() => handleDelegateVotes(`${address}`)}
-                      >
-                        Become Delegate
-                      </button>
-                      {/* <button
+
+                {selfDelegate === false ? (
+                  <div className="pt-2 flex gap-5">
+                    {/* pass address of whom you want to delegate the voting power to */}
+                    <button
                       className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
-                      onClick={() => handleAttestation()}
-                      >
-                      Attest
-                    </button> */}
-                    </div>
-                  ) : null}
-                  <div className="">
-                    <select
-                      value={daoName}
-                      onChange={(e) => setDaoName(e.target.value)}
-                      className="outline-none border border-blue-shade-200 text-blue-shade-200 rounded-full py-2 px-3"
+                      onClick={() => handleDelegateVotes(`${address}`)}
                     >
-                      <option value="optimism" className="text-gray-700">
-                        Optimism
-                      </option>
-                      <option value="arbitrum" className="text-gray-700">
-                        Arbitrum
-                      </option>
-                    </select>
+                      Become Delegate
+                    </button>
+
+                    {/* <div className="">
+                      <select
+                        value={daoName}
+                        onChange={(e) => setDaoName(e.target.value)}
+                        className="outline-none border border-blue-shade-200 text-blue-shade-200 rounded-full py-2 px-3"
+                      >
+                        <option value="optimism" className="text-gray-700">
+                          Optimism
+                        </option>
+                        <option value="arbitrum" className="text-gray-700">
+                          Arbitrum
+                        </option>
+                      </select>
+                    </div> */}
                   </div>
-                </div>
+                ) : null}
               </div>
             </div>
             <div>

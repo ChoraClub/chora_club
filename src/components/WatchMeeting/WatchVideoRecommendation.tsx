@@ -67,8 +67,11 @@ const WatchVideoRecommendation = () => {
       </div>
 
       <div className="grid grid-cols-3 gap-3 py-4 font-poppins">
-        {videoRecommendations.map((data) => (
-          <div className="border border-black-shade-400 rounded-[30px] relative">
+        {videoRecommendations.map((data, index) => (
+          <div
+            key={index}
+            className="border border-black-shade-400 rounded-[30px] relative"
+          >
             <div className="">
               <Image
                 src={video}

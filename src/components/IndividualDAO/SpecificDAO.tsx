@@ -11,68 +11,39 @@ import OPLogo from "@/assets/images/daos/op.png";
 import ARBLogo from "@/assets/images/daos/arbitrum.jpg";
 import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
 
+const desc = {
+  optimism:
+    "Optimism DAO is the heart of the Optimism network, an innovative layer 2 solution for faster, cheaper transactions on Ethereum. Think of it as a community-driven engine, where token holders govern upgrades, fees, and the overall direction of the Optimism ecosystem. With a focus on scaling Ethereum effectively and sustainably, Optimism DAO is building a brighter future for blockchain technology.",
+
+  arbitrum:
+    "The Arbitrum DAO is a decentralized autonomous organization (DAO) built on the Ethereum blockchain. At its core, the Arbitrum DAO is a community-driven governance mechanism that allows $ARB token holders to propose and vote on changes to the organization and the technologies it governs.",
+};
+
 function SpecificDAO({ props }: { props: { daoDelegates: string } }) {
   const router = useRouter();
   const path = usePathname();
   const daoname = path.slice(1);
   const searchParams = useSearchParams();
-  const [isPageLoading, setIsPageLoading] = useState(true);
-  const [desc, setDesc] = useState();
+
+  const logoMapping: any = {
+    optimism: OPLogo,
+    arbitrum: ARBLogo,
+    // Add more mappings as needed
+  };
+
+  const selectedLogo = logoMapping[daoname] || OPLogo;
+
   const [isOpen, setIsOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState({
     value: daoname,
     label: daoname,
+    image: selectedLogo,
   });
 
-  const [options, setOptions] = useState<any>([]);
-
-  useEffect(() => {
-    // setIsPageLoading(false);
-    const setDescFunction = async () => {
-      setIsPageLoading(true);
-      const data = await options?.find(
-        (option: any) => option.value === props.daoDelegates
-      )?.desc;
-      setDesc(data);
-      setIsPageLoading(false);
-    };
-    setDescFunction();
-    setIsPageLoading(false);
-  }, [isPageLoading, options, desc]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setIsPageLoading(true);
-        const myHeaders = new Headers();
-        myHeaders.append("Content-Type", "application/json");
-
-        const requestOptions: RequestInit = {
-          method: "GET",
-          headers: myHeaders,
-        };
-
-        const response = await fetch("/api/get-dao-details", requestOptions);
-        const result = await response.json();
-
-        const fetchedDaoInfo = await result.data.map((dao: any) => ({
-          value: dao.dao_name,
-          label: dao.dao_name,
-          image: dao.logo,
-          desc: dao.description,
-        }));
-        setOptions(fetchedDaoInfo);
-
-        // console.log("dao-details", result.data);
-        setIsPageLoading(false);
-      } catch (error) {
-        console.error(error);
-        setIsPageLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [isPageLoading]);
+  const options = [
+    { value: "optimism", label: "optimism", image: OPLogo },
+    { value: "arbitrum", label: "arbitrum", image: ARBLogo },
+  ];
 
   const handleMouseEnter = () => {
     setIsOpen(true);
@@ -166,7 +137,11 @@ function SpecificDAO({ props }: { props: { daoDelegates: string } }) {
           </div>
         </div>
         <div className="py-5 pr-8">
-          {isPageLoading ? <>Loading...</> : desc || <>Loading...</>}
+          {props.daoDelegates === "optimism"
+            ? desc.optimism
+            : props.daoDelegates === "arbitrum"
+            ? desc.arbitrum
+            : null}
         </div>
       </div>
 

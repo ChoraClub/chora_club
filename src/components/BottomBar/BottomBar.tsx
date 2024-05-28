@@ -30,7 +30,6 @@ import { FaCircleInfo } from "react-icons/fa6";
 import { RxCross2 } from "react-icons/rx";
 import { IoCopy } from "react-icons/io5";
 import copy from "copy-to-clipboard";
-import { Role } from "@huddle01/server-sdk/auth";
 
 type BottomBarProps = {};
 
@@ -43,11 +42,7 @@ const BottomBar: React.FC<BottomBarProps> = () => {
   // console.log(roomId);
   console.log("Value: ", meetingCategory);
 
-  const { peerIds } = usePeerIds({
-    roles: ["host", "listener", "speaker"],
-  });
-  // const {peerIds } = usePeerIds([Role.BOT])
-  console.log("peer id of host: ", peerIds);
+  const { peerIds } = usePeerIds();
 
   const { leaveRoom, closeRoom, state } = useRoom();
 
@@ -458,7 +453,7 @@ const BottomBar: React.FC<BottomBarProps> = () => {
             {NestedBasicIcons.active.mic}
           </button>
         )}
-        {(role === "host" || "listener" || "speaker") &&
+        {role === "host" &&
           meetingCategory === "session" &&
           (!isVideoOn ? (
             <button
@@ -481,7 +476,7 @@ const BottomBar: React.FC<BottomBarProps> = () => {
               {NestedBasicIcons.active.video}
             </button>
           ))}
-        {(role === "host" || "listener" || "speaker") &&
+        {role === "host" &&
           meetingCategory === "session" &&
           (!videoTrack ? (
             <button
@@ -564,7 +559,7 @@ const BottomBar: React.FC<BottomBarProps> = () => {
         </div>
 
         {meetingDetailsVisible && (
-          <div className="absolute bottom-20 right-2 bg-white shadow-md px-8 py-4 rounded-lg text-black">
+          <div className="absolute bottom-24 right-6 bg-white shadow-md p-4 rounded-lg text-black">
             <div className="flex justify-between items-center mb-2">
               <h3 className="text-lg font-semibold">
                 Your meeting&apos;s ready
@@ -607,7 +602,12 @@ const BottomBar: React.FC<BottomBarProps> = () => {
           }}
         >
           {BasicIcons.peers}
-          <span className="text-black">{peerIds.length + 1}</span>
+          <span className="text-black">
+            {
+              Object.keys(peerIds).filter((peerId) => peerId !== localPeerId)
+                .length
+            }
+          </span>
         </OutlineButton>
         <OutlineButton
           className="ml-auto flex items-center gap-3 border-[#0500FF] relative"

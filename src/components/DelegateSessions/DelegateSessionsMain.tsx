@@ -10,12 +10,11 @@ import { FaCircleInfo } from "react-icons/fa6";
 import { Tooltip } from "@nextui-org/react";
 import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
 
-
 function DelegateSessionsMain() {
+  const router = useRouter();
   const path = usePathname();
   const searchParams = useSearchParams();
-  const router = useRouter();
-  
+
   return (
     <>
       <div className="">

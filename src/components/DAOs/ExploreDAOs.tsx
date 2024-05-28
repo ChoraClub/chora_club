@@ -19,48 +19,14 @@ function ExploreDAOs() {
     { name: "Arbitrum", value: "294k", img: arb_logo },
   ];
 
-  const [daoInfo, setDaoInfo] = useState<any>([]);
+  const [daoInfo, setDaoInfo] = useState(dao_info);
   const [searchQuery, setSearchQuery] = useState("");
   const [status, setStatus] = useState(true);
-  const [APIData, setAPIData] = useState([]);
+
   const router = useRouter();
   const [showNotification, setShowNotification] = useState(true);
-  const [isHovered, setIsHovered] = useState(false);
   const [isPageLoading, setIsPageLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setIsPageLoading(true);
-        const myHeaders = new Headers();
-        myHeaders.append("Content-Type", "application/json");
-
-        const requestOptions: RequestInit = {
-          method: "GET",
-          headers: myHeaders,
-        };
-
-        const response = await fetch("/api/get-dao-details", requestOptions);
-        const result = await response.json();
-
-        const fetchedDaoInfo = await result.data.map((dao: any) => ({
-          name: dao.dao_name,
-          value: dao.number_of_delegates,
-          img: dao.logo,
-        }));
-
-        setDaoInfo(fetchedDaoInfo);
-        setAPIData(fetchedDaoInfo);
-        console.log("dao-details", result.data);
-        setIsPageLoading(false);
-      } catch (error) {
-        console.error(error);
-        setIsPageLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [isPageLoading]);
+  const [isHovered, setIsHovered] = useState(false);
   const [circlePosition, setCirclePosition] = useState({ x: 0, y: 0 });
   const [IshowCircle, SetCircleShow] = useState(false);
 
@@ -77,7 +43,7 @@ function ExploreDAOs() {
 
   const handleSearchChange = (query: string) => {
     setSearchQuery(query);
-    const filtered = APIData.filter((item: any) =>
+    const filtered = dao_info.filter((item) =>
       item.name.toLowerCase().startsWith(query.toLowerCase())
     );
     setDaoInfo(filtered);
@@ -171,21 +137,18 @@ function ExploreDAOs() {
                 </div>
               </div>
             ))
-          ) : isPageLoading ? (
-            <></>
           ) : (
             <div className="pl-3 text-xl font-semibold">
               No such Dao available
             </div>
           )}
-
           <div
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
             style={{ boxShadow: "0px 4px 50.8px 0px rgba(0, 0, 0, 0.11)" }}
             className={`px-5 py-7 rounded-2xl cursor-pointer flex items-center justify-center relative transition-all duration-250 ease-in-out ${
               isHovered ? "border-2 border-gray-600" : ""
-            } min-h-[14rem]`}
+            }`}
           >
             <div className="">
               <FaCirclePlus
@@ -211,20 +174,18 @@ function ExploreDAOs() {
           </div>
         </div>
       </div>
-      {showNotification && (
+      {showNotification && !isPageLoading && (
         <div
           className={`flex fixed items-center justify-center bottom-9 rounded-full font-poppins text-sm font-medium left-[34%] w-[32rem] ${
             status ? "" : "hidden"
-          }`}
-        >
+          }`}>
           <div className="py-2 bg-blue-shade-100 text-white rounded-full px-7">
             To ensure optimal user experience, please note that our site is
             designed to be responsive on desktop devices.
           </div>
           <div
             className="bg-red-600 hover:bg-red-700 p-2 rounded-full cursor-pointer ml-3"
-            onClick={handleCloseNotification}
-          >
+            onClick={handleCloseNotification}>
             <ImCross color="#fff" size={10} />
           </div>
         </div>

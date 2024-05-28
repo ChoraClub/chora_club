@@ -10,13 +10,14 @@ import wallet from "@/assets/images/sidebar/wallet.png";
 import gitbook from "@/assets/images/sidebar/gitbook.png";
 import user from "@/assets/images/sidebar/user.png";
 import styles from "./sidebar.module.css";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { Badge, Tooltip } from "@nextui-org/react";
 import { IoClose } from "react-icons/io5";
 import Link from "next/link";
 import { ConnectWallet } from "../ConnectWallet/ConnectWallet";
 import { useSession } from "next-auth/react";
 import { useAccount } from "wagmi";
+import { useRouter } from "next-nprogress-bar";
 import ButtonWithCircle from "../Circle/ButtonWithCircle";
 
 function Sidebar() {

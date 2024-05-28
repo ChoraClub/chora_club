@@ -204,7 +204,7 @@ function UserSessions({
         <div className="py-10">
           {selfDelegate === true &&
             searchParams.get("session") === "schedule" && (
-              <ScheduledUserSessions />
+              <ScheduledUserSessions daoName={daoName} />
             )}
           {selfDelegate === true && searchParams.get("session") === "book" && (
             <BookedUserSessions daoName={daoName} />

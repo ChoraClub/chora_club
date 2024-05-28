@@ -1,8 +1,8 @@
 // Import necessary modules and interfaces
 import { MongoClient, MongoClientOptions, ObjectId } from "mongodb";
 import { NextResponse, NextRequest } from "next/server";
-import { sendMail, compileBookedSessionTemplate } from "@/libs/mail";
 import { connectDB } from "@/config/connectDB";
+import { sendMail, compileBookedSessionTemplate } from "@/libs/mail";
 
 interface UpdateBookingStatusResponse {
   success: boolean;

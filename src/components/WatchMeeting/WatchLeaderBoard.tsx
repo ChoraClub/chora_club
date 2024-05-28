@@ -156,7 +156,10 @@ const WatchLeaderBoard = () => {
         </div>
         <div className="flex flex-col gap-2">
           {leaderBoard.slice(0, 5).map((data, index) => (
-            <div className="grid grid-cols-7 py-3 bg-black-shade-300 rounded-xl items-center">
+            <div
+              key={index}
+              className="grid grid-cols-7 py-3 bg-black-shade-300 rounded-xl items-center"
+            >
               <div className="flex items-center ml-4 col-span-3">
                 <Image
                   src={data.smallEmoji}
@@ -219,7 +222,10 @@ const WatchLeaderBoard = () => {
             </div>
             <div className={`flex-grow overflow-y-auto ${styles.scrollbar}`}>
               {leaderBoard.map((data, index) => (
-                <div className="flex py-3 bg-black-shade-300 rounded-xl items-center mb-2 mr-3">
+                <div
+                  key={index}
+                  className="flex py-3 bg-black-shade-300 rounded-xl items-center mb-2 mr-3"
+                >
                   <div
                     className="basis-1/2 font-medium text-sm ml-7"
                     style={{ color: data.color }}
