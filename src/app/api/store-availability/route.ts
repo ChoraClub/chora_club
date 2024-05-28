@@ -1,5 +1,6 @@
 import { connectDB } from "@/config/connectDB";
 import { NextResponse, NextRequest } from "next/server";
+import { sendMail, compileBookedSessionTemplate } from "@/libs/mail";
 
 // Define the request body type
 interface StoreAvailabilityRequestBody {
@@ -69,15 +70,15 @@ export async function POST(
 
     if (existingDocument) {
       // Update the existing document by pushing new allowedDates and dateAndRanges
-      await collection.updateOne(
+      const result = await collection.updateOne(
         {
           _id: existingDocument._id,
         },
         {
           /* @ts-ignore */
           $push: {
-            allowedDates: { $each: allowedDates },
-            dateAndRanges: { $each: dateAndRanges },
+            allowedDates: { $each: [allowedDates] },
+            dateAndRanges: { $each: [dateAndRanges] },
           },
           $set: {
             updatedAt: new Date(),
@@ -85,10 +86,45 @@ export async function POST(
         }
       );
 
+      console.log("result", result);
+
       // Retrieve the updated document
       const updatedDocument = await collection.findOne({
         _id: existingDocument._id,
       });
+
+      const delegateCollection = db.collection("delegates");
+      const documentsForEmail = await delegateCollection
+        .find({ address: userAddress })
+        .toArray();
+
+      for (const document of documentsForEmail) {
+        const emailId = document.emailId;
+        if (emailId && emailId !== "" && emailId !== undefined) {
+          try {
+            await sendMail({
+              to: emailId,
+              name: "Chora Club",
+              subject: "Session Scheduled",
+              body: compileBookedSessionTemplate(
+                "Your session has been Scheduled.",
+                "Please wait till the users books any session."
+              ),
+            });
+
+            // return NextResponse.json(
+            //   { success: true, result: "Email sent successfully!" },
+            //   { status: 200 }
+            // );
+          } catch (error) {
+            console.error("Error sending mail:", error);
+            // return NextResponse.json(
+            //   { error: "Internal Server Error" },
+            //   { status: 500 }
+            // );
+          }
+        }
+      }
 
       client.close();
 
@@ -109,12 +145,45 @@ export async function POST(
       });
 
       client.close();
-
+      console.log("result", result);
       if (result.insertedId) {
         // Retrieve the inserted document using the insertedId
         const insertedDocument = await collection.findOne({
           _id: result.insertedId,
         });
+
+        const delegateCollection = db.collection("delegates");
+        const documentsForEmail = await delegateCollection
+          .find({ address: userAddress })
+          .toArray();
+
+        for (const document of documentsForEmail) {
+          const emailId = document.emailId;
+          if (emailId && emailId !== "" && emailId !== undefined) {
+            try {
+              await sendMail({
+                to: emailId,
+                name: "Chora Club",
+                subject: "Session Scheduled",
+                body: compileBookedSessionTemplate(
+                  "Your session has been Scheduled.",
+                  "Please wait till the users books any session."
+                ),
+              });
+
+              return NextResponse.json(
+                { success: true, result: "Email sent successfully!" },
+                { status: 200 }
+              );
+            } catch (error) {
+              console.error("Error sending mail:", error);
+              // return NextResponse.json(
+              //   { error: "Internal Server Error" },
+              //   { status: 500 }
+              // );
+            }
+          }
+        }
 
         return NextResponse.json(
           { success: true, data: insertedDocument },

@@ -19,6 +19,7 @@ import ccLogo from "@/assets/images/daos/CC.png";
 import OPLogo from "@/assets/images/daos/op.png";
 import ArbLogo from "@/assets/images/daos/arbCir.png";
 import "@/components/DelegateSessions/DelegateSessionsMain.module.css";
+import { getEnsNameOfUser } from "../ConnectWallet/ENSResolver";
 
 interface Type {
   ensName: string;
@@ -48,6 +49,7 @@ function AvailableSessions() {
   const [selectedDate, setSelectedDate] = useState<any>(null);
   const [startTime, setStartTime] = useState<any>(null);
   const [endTime, setEndTime] = useState<any>(null);
+  const [ensNames, setEnsNames] = useState<any>({});
 
   useEffect(() => {
     setIsPageLoading(false);
@@ -249,8 +251,32 @@ function AvailableSessions() {
 
   // console.log("currentDate", currentDate);
 
+  useEffect(() => {
+    const fetchEnsNames = async () => {
+      console.log("dao info: ", daoInfo);
+      const addresses = daoInfo.map((dao: any) => dao.userInfo[0].address);
+      console.log("addresses: ", addresses);
+      const names = await Promise.all(
+        addresses.map(async (address) => {
+          const ensName = await getEnsNameOfUser(address);
+          return { address, ensName };
+        })
+      );
+      const ensNameMap: { [address: string]: string } = {};
+      names.forEach(({ address, ensName }) => {
+        ensNameMap[address] = ensName;
+      });
+      console.log("ens name: ", ensNameMap);
+      setEnsNames(ensNameMap);
+    };
+
+    if (daoInfo.length > 0) {
+      fetchEnsNames();
+    }
+  }, [daoInfo]);
+
   return (
-    <>
+    <div className="pe-10">
       <div className="flex gap-7 bg-[#D9D9D945] p-4 mt-4 rounded-2xl font-poppins">
         <div
           style={{ background: "rgba(238, 237, 237, 0.36)" }}
@@ -440,9 +466,9 @@ function AvailableSessions() {
 
                   <div className="w-3/4 ml-4">
                     <div className="text-[#3E3D3D] text-lg font-semibold mb-1">
-                      {daos.userInfo[0].displayName
-                        ? daos.userInfo[0].displayName
-                        : daos.session.userAddress.slice(0, 6) +
+                      {ensNames[daos.userInfo[0].address] ||
+                        daos.userInfo[0].displayName ||
+                        daos.session.userAddress.slice(0, 6) +
                           "..." +
                           daos.session.userAddress.slice(-4)}
                     </div>
@@ -572,7 +598,7 @@ function AvailableSessions() {
           </div>
         )}
       </div>
-    </>
+    </div>
   );
 }
 

@@ -1,0 +1,19 @@
+.video-js {
+  border-radius: 1.2rem;
+  font-family: "../assets/fonts/quanty.ttf";
+  object-fit: cover !important;
+}
+
+.vjs-tech {
+  border-radius: 1.2rem;
+  object-fit: cover !important;
+}
+
+.vjs-control-bar {
+  border-bottom-left-radius: 1.2rem;
+  border-bottom-right-radius: 1.2rem;
+  height: 2.6rem !important;
+  padding-top: 0.3rem;
+  /* margin-top: auto;
+  margin-bottom: auto; */
+}

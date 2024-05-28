@@ -27,16 +27,7 @@ import ArbLogo from "@/assets/images/daos/arbCir.png";
 import ccLogo from "@/assets/images/daos/CC.png";
 import { Oval } from "react-loader-spinner";
 import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
-import {
-  SchemaEncoder,
-  SchemaRegistry,
-  createOffchainURL,
-  EAS,
-  Delegated,
-  ZERO_BYTES32,
-  NO_EXPIRATION,
-} from "@ethereum-attestation-service/eas-sdk";
-import { ethers } from "ethers";
+import { getEnsNameOfUser } from "../ConnectWallet/ENSResolver";
 
 interface Type {
   daoDelegates: string;
@@ -62,6 +53,7 @@ function SpecificDelegate({ props }: { props: Type }) {
   const [displayImage, setDisplayImage] = useState("");
   const [description, setDescription] = useState("");
   // const provider = new ethers.BrowserProvider(window?.ethereum);
+  const [displayEnsName, setDisplayEnsName] = useState<string>();
 
   const [karmaSocials, setKarmaSocials] = useState({
     twitter: "",
@@ -178,50 +170,6 @@ function SpecificDelegate({ props }: { props: Type }) {
     toast("Address Copied");
   };
 
-  // const handleDelegateVotes = async (to: string) => {
-  //   // if (
-  //   //   typeof window.ethereum === "undefined" ||
-  //   //   !window.ethereum.isConnected()
-  //   // ) {
-  //   //   console.log("not connected");
-  //   // }
-
-  //   const address = await walletClient.getAddresses();
-  //   console.log(address);
-  //   const address1 = address[0];
-  //   console.log(address1);
-
-  //   let chainAddress;
-
-  //   if (chain?.name === "Optimism") {
-  //     chainAddress = "0x4200000000000000000000000000000000000042";
-  //   } else if (chain?.name === "Arbitrum One") {
-  //     chainAddress = "0x912CE59144191C1204E64559FE8253a0e49E6548";
-  //   } else {
-  //     return;
-  //   }
-
-  //   console.log("walletClient?.chain?.network", walletClient?.chain?.network);
-  //   if (walletClient?.chain ==="") {
-  //     toast.error("Please connect your wallet!");
-  //   } else {
-  //     if (walletClient?.chain?.network === props.daoDelegates) {
-  //       const delegateTx = await walletClient.writeContract({
-  //         address: chainAddress,
-  //         abi: dao_abi.abi,
-  //         functionName: "delegate",
-  //         args: [to],
-  //         account: address1,
-  //       });
-  //       console.log(delegateTx);
-  //     } else {
-  //       toast.error("Please switch to appropriate network to delegate!");
-  //       if (openChainModal) {
-  //         openChainModal();
-  //       }
-  //     }
-  //   }
-  // };
   const handleDelegateVotes = async (to: string) => {
     let address;
     let address1;
@@ -352,6 +300,14 @@ function SpecificDelegate({ props }: { props: Type }) {
     fetchData();
   }, [chain, props.individualDelegate]);
 
+  useEffect(() => {
+    const fetchEnsName = async () => {
+      const ensName = await getEnsNameOfUser(props.individualDelegate);
+      setDisplayEnsName(ensName);
+    };
+    fetchEnsName();
+  }, [chain, props.individualDelegate]);
+
   return (
     <>
       {isPageLoading && (
@@ -424,15 +380,12 @@ function SpecificDelegate({ props }: { props: Type }) {
               <div className="px-4">
                 <div className=" flex items-center py-1">
                   <div className="font-bold text-lg pr-4">
-                    {displayName ||
-                      (delegateInfo?.ensName ? (
-                        delegateInfo?.ensName
-                      ) : (
-                        <>
-                          {props.individualDelegate.slice(0, 6)}...
-                          {props.individualDelegate.slice(-4)}
-                        </>
-                      ))}
+                    {displayEnsName || delegateInfo?.ensName || displayName || (
+                      <>
+                        {props.individualDelegate.slice(0, 6)}...
+                        {props.individualDelegate.slice(-4)}
+                      </>
+                    )}
                   </div>
                   <div className="flex gap-3">
                     {/* {socials.discord + socials.discourse + socials.github + socials.twitter} */}
@@ -647,7 +600,7 @@ function SpecificDelegate({ props }: { props: Type }) {
         !isPageLoading &&
         !isDelegate &&
         !selfDelegate && (
-          <div className="flex flex-col justify-center items-center mt-5">
+          <div className="flex flex-col justify-center items-center w-full h-screen">
             <div className="text-5xl">☹️</div>{" "}
             <div className="pt-4 font-semibold text-lg">
               Oops, no such result available!

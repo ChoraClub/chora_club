@@ -101,7 +101,7 @@ export default function RootLayout({
           <RootProviders>
             <HuddleContextProvider>
               <div className="flex">
-                <div className="fixed w-[6%] bg-blue-shade-100 h-screen mr-4 lg:mr-8 ">
+                <div className="fixed w-[6%] bg-blue-shade-100 h-screen">
                   <SidebarMain />
                 </div>
                 <div className="w-[94%] ml-auto">
