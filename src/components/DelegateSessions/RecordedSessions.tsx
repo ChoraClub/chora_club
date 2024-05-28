@@ -385,7 +385,7 @@ function RecordedSessions() {
                         muted
                         onLoadedMetadata={(e) => handleLoadedMetadata(index, e)}
                         src={data.session.video_uri}
-                        className="w-full h-44 rounded-t-3xl"
+                        className="w-full h-44 rounded-t-3xl object-cover"
                       ></video>
                       <div className={styles.videoTimeline}>
                         <div className={styles.progressArea}>
@@ -405,7 +405,7 @@ function RecordedSessions() {
                       muted
                       onLoadedMetadata={(e) => handleLoadedMetadata(index, e)}
                       src={data.session.video_uri}
-                      className="w-full h-44 rounded-t-3xl"
+                      className="w-full h-44 rounded-t-3xl object-cover"
                     ></video>
                   )}
                   <div className="absolute right-2 bottom-2 text-white text-xs bg-white px-1 bg-opacity-30 rounded-sm">
