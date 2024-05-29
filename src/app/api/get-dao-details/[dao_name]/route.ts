@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { MongoClient, MongoClientOptions } from "mongodb";
+import { connectDB } from "@/config/connectDB";
 
 type Params = {
   dao_name: string;
@@ -11,9 +12,7 @@ export async function GET(req: NextRequest, context: { params: Params }) {
   try {
     // Connect to MongoDB
     console.log("Connecting to MongoDB...");
-    const client = await MongoClient.connect(process.env.MONGODB_URI!, {
-      dbName: `chora-club`,
-    } as MongoClientOptions);
+    const client = await connectDB();
     console.log("Connected to MongoDB");
 
     // Access both collections
