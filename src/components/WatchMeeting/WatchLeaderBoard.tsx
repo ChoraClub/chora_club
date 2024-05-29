@@ -25,7 +25,7 @@ const WatchLeaderBoard = () => {
       smallEmoji: emoji1,
       text: "Top #1",
       img: user1,
-      name: "Viem.eth",
+      name: "Viem",
       color: "#4773F0",
       bgColor: "#EAECFF",
     },
@@ -33,7 +33,7 @@ const WatchLeaderBoard = () => {
       smallEmoji: emoji2,
       text: "Top #2",
       img: user2,
-      name: "Jame.eth",
+      name: "Jame",
       color: "#A573E5",
       bgColor: "#F2E8FF",
     },
@@ -41,7 +41,7 @@ const WatchLeaderBoard = () => {
       smallEmoji: emoji3,
       text: "Top #3",
       img: user3,
-      name: "Doe.eth",
+      name: "Doe",
       color: "#1FA1FF",
       bgColor: "#EAF1FF",
     },
@@ -49,7 +49,7 @@ const WatchLeaderBoard = () => {
       smallEmoji: emoji4,
       text: "First Collector",
       img: user4,
-      name: "Joe.eth",
+      name: "Joe",
       color: "#FF8A00",
       bgColor: "#FFF4EA",
     },
@@ -57,7 +57,7 @@ const WatchLeaderBoard = () => {
       smallEmoji: emoji5,
       text: "Most Recent",
       img: user5,
-      name: "Jane.eth",
+      name: "Jane",
       color: "#FF8A00",
       bgColor: "#FFF4EA",
     },
@@ -65,7 +65,7 @@ const WatchLeaderBoard = () => {
       smallEmoji: emoji1,
       text: "Top #6",
       img: user1,
-      name: "Viem.eth",
+      name: "Viem",
       color: "#4773F0",
       bgColor: "#EAECFF",
     },
@@ -73,7 +73,7 @@ const WatchLeaderBoard = () => {
       smallEmoji: emoji1,
       text: "Top #7",
       img: user2,
-      name: "Jame.eth",
+      name: "Jame",
       color: "#A573E5",
       bgColor: "#F2E8FF",
     },
@@ -81,7 +81,7 @@ const WatchLeaderBoard = () => {
       smallEmoji: emoji1,
       text: "Top #8",
       img: user3,
-      name: "Doe.eth",
+      name: "Doe",
       color: "#1FA1FF",
       bgColor: "#EAF1FF",
     },
@@ -89,7 +89,7 @@ const WatchLeaderBoard = () => {
       smallEmoji: emoji1,
       text: "Top #9",
       img: user4,
-      name: "Joe.eth",
+      name: "Joe",
       color: "#FF8A00",
       bgColor: "#FFF4EA",
     },
@@ -97,7 +97,7 @@ const WatchLeaderBoard = () => {
       smallEmoji: emoji1,
       text: "Top #10",
       img: user5,
-      name: "Jane.eth",
+      name: "Jane",
       color: "#FF8A00",
       bgColor: "#FFF4EA",
     },
@@ -132,7 +132,7 @@ const WatchLeaderBoard = () => {
         )} */}
         <div className="flex justify-between items-center mb-5">
           <div className="flex">
-            <p className="text-lg font-medium text-blue-shade-100 ml-5">
+            <p className="xl:text-base 1.7xl:text-lg font-medium text-blue-shade-100 ml-5">
               🏆LeaderBoard
             </p>
             {showComingSoon && (
@@ -158,7 +158,7 @@ const WatchLeaderBoard = () => {
           {leaderBoard.slice(0, 5).map((data, index) => (
             <div
               key={index}
-              className="grid grid-cols-7 py-3 bg-black-shade-300 rounded-xl items-center"
+              className="grid grid-cols-7 py-3 bg-black-shade-300 rounded-xl items-center w-full"
             >
               <div className="flex items-center ml-4 col-span-3">
                 <Image
@@ -166,10 +166,10 @@ const WatchLeaderBoard = () => {
                   alt=""
                   width={26}
                   height={26}
-                  className="mr-2"
+                  className="xl:mr-2 mr-1"
                 />
                 <div
-                  className={`font-medium text-sm`}
+                  className={`font-medium 1.7xl:text-sm text-xs`}
                   style={{ color: data.color }}
                 >
                   {data.text}
@@ -181,12 +181,12 @@ const WatchLeaderBoard = () => {
                   alt=""
                   width={39}
                   height={39}
-                  className="mr-2"
+                  className="xl:mr-2 mr-1 ml-3 xl:ml-0"
                 />
-                <p className="font-normal text-base">{data.name}</p>
+                <p className="font-normal 1.7xl:text-base text-sm">{data.name}</p>
               </div>
               <div
-                className={` border rounded-[9px] font-normal text-[13px] py-1 px-6 w-fit h-fit col-span-2 ml-8 flex justify-center items-center`}
+                className={` border rounded-[9px] font-normal text-[13px] py-1 px-6 w-fit h-fit col-span-2 1.7xl:ml-8 ml-3 flex justify-center items-center`}
                 style={{
                   backgroundColor: data.bgColor,
                   borderColor: data.color,

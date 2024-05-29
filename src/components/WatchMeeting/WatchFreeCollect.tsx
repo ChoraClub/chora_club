@@ -19,7 +19,7 @@ const WatchFreeCollect = () => {
       fill="white"
       width="32"
       height="32"
-      style={{ background: "blue", borderRadius: "50%", padding: "4px" }}
+      style={{ background: "blue", borderRadius: "50%", padding: "4px" , cursor:"pointer"}}
       onClick={()=>setNumber(number+1)}
     >
       <path
@@ -37,7 +37,7 @@ const WatchFreeCollect = () => {
       fill="white"
       width="32"
       height="32"
-      style={{ background: "blue", borderRadius: "50%", padding: "4px" }}
+      style={{ background: "blue", borderRadius: "50%", padding: "4px" , cursor:"pointer"}}
       onClick={()=>setNumber(number>1?number-1:1)}
     >
       <path
@@ -51,7 +51,7 @@ const WatchFreeCollect = () => {
     <div className="rounded-3xl border border-black-shade-200 font-poppins ">
       <div className="flex justify-between items-center w-full rounded-t-3xl bg-blue-shade-400 py-3 px-6">
         <div className="flex">
-          <p className="font-medium text-lg text-blue-shade-100">💸Free</p>
+          <p className="font-medium xl:text-base 1.7xl:text-lg text-blue-shade-100">💸Free</p>
           {showComingSoon && (
             <div className="flex items-center bg-yellow-100 border border-yellow-400 rounded-full px-2 ml-4">
               <p className="text-sm text-yellow-700 mr-2">Coming Soon</p>
@@ -71,10 +71,10 @@ const WatchFreeCollect = () => {
         </div>
       </div>
       <div className="w-full h-[0.1px] bg-black-shade-200"></div>
-      <div className="grid grid-cols-2 px-6">
+      <div className="grid grid-cols-2 1.5lg:px-6 px-3">
         <div className="flex items-center">
           <MinusIcon/>
-          <div className="bg-black-shade-200 py-1 px-4 mx-3 rounded w-12 flex justify-center">{number}</div>
+          <div className="bg-black-shade-200 py-1 px-4 1.5lg:mx-3 mx-1.5 rounded w-12 flex justify-center">{number}</div>
           <PlusIcon />
         </div>
 
@@ -89,7 +89,7 @@ const WatchFreeCollect = () => {
             </button> */}
 
         <button
-          className={`text-white bg-black rounded-full py-5 px-6 text-xs font-semibold my-6 ${styles["blob-btn"]
+          className={`text-white bg-black rounded-full 1.5lg:py-5 py-3 1.5lg:px-6 px-0.5 text-xs font-semibold my-6 ${styles["blob-btn"]
           } ${isOpen ? "bg-black-shade-700" : ""}`}
           onClick={() => setIsOpen((prev) => !prev)}
         >
