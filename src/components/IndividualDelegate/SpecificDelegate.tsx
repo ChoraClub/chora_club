@@ -380,7 +380,7 @@ function SpecificDelegate({ props }: { props: Type }) {
               <div className="px-4">
                 <div className=" flex items-center py-1">
                   <div className="font-bold text-lg pr-4">
-                    {displayEnsName || delegateInfo?.ensName || displayName || (
+                    {delegateInfo?.ensName || displayEnsName || displayName || (
                       <>
                         {props.individualDelegate.slice(0, 6)}...
                         {props.individualDelegate.slice(-4)}
