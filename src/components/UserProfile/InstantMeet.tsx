@@ -15,25 +15,26 @@ import { useNetwork } from "wagmi";
 import Image from "next/image";
 import { Tooltip } from "@nextui-org/react";
 import connectImg from "@/assets/images/instant-meet/connect.png";
-import connetImghover from "@/assets/images/instant-meet/ic_baseline-connect-without-contact-hover.svg";
+import connectImghover from "@/assets/images/instant-meet/connectHover.svg";
 import accessImg from "@/assets/images/instant-meet/quick-access.png";
-import accessImghover from "@/assets/images/instant-meet/mingcute_link-fill-hover.svg";
+import accessImghover from "@/assets/images/instant-meet/accessImghover.svg";
 import videoImg from "@/assets/images/instant-meet/video-call.png";
-import videoImghover from "@/assets/images/instant-meet/wpf_video-call-hover.svg";
+import videoImghover from "@/assets/images/instant-meet/videoImghover.svg";
 import audioImg from "@/assets/images/instant-meet/audio-call.png";
-import audioImghover from "@/assets/images/instant-meet/fluent_call-12-filled-hover.svg";
+import audioImghover from "@/assets/images/instant-meet/audioImghover.svg";
 import screenImg from "@/assets/images/instant-meet/screen-share.png";
-import screenImghover from "@/assets/images/instant-meet/ic_baseline-screen-share-hover.svg";
+import screenImghover from "@/assets/images/instant-meet/screenImghover.svg";
 import chatImg from "@/assets/images/instant-meet/chat.png";
-import chatImghover from "@/assets/images/instant-meet/lets-icons_chat-fill-hover.svg";
+import chatImghover from "@/assets/images/instant-meet/chatImghover.svg";
 import heroImg from "@/assets/images/instant-meet/instant-meet-hero.svg";
 
 interface instantMeetProps {
   isDelegate: boolean;
   selfDelegate: boolean;
+  daoName: string;
 }
 
-function InstantMeet({ isDelegate, selfDelegate }: instantMeetProps) {
+function InstantMeet({ isDelegate, selfDelegate, daoName }: instantMeetProps) {
   const [modalData, setModalData] = useState({
     title: "",
     description: "",
@@ -43,7 +44,7 @@ function InstantMeet({ isDelegate, selfDelegate }: instantMeetProps) {
   const { address } = useAccount();
   const { chain, chains } = useNetwork();
   const [isScheduling, setIsScheduling] = useState(false);
-  const [daoName, setDaoName] = useState<string>();
+  // const [daoName, setDaoName] = useState<string>();
   const router = useRouter();
 
   const handleModalInputChange = (
@@ -124,18 +125,18 @@ function InstantMeet({ isDelegate, selfDelegate }: instantMeetProps) {
     });
   };
 
-  useEffect(() => {
-    if (chain?.name === "Optimism") {
-      setDaoName("optimism");
-    } else if (chain?.name === "Arbitrum One") {
-      setDaoName("arbitrum");
-    }
-  }, [chain]);
+  // useEffect(() => {
+  //   if (chain?.name === "Optimism") {
+  //     setDaoName("optimism");
+  //   } else if (chain?.name === "Arbitrum One") {
+  //     setDaoName("arbitrum");
+  //   }
+  // }, [chain]);
 
   const block = [
     {
       image: connectImg,
-      hoverImage: connetImghover,
+      hoverImage: connectImghover,
       title: "Connect with Others Instantly",
       description:
         "Engage with yourself in an instant meeting and share the link with the people you want to connect with. Experience the following features for a comprehensive virtual meeting experience.",
@@ -218,7 +219,8 @@ function InstantMeet({ isDelegate, selfDelegate }: instantMeetProps) {
                             },
                           },
                         },
-                      }}>
+                      }}
+                    >
                       <div>
                         <div className="group border rounded-3xl bg-[#E5E5EA] flex items-center justify-center p-8 hover:bg-blue-shade-100 hover:shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
                           <Image

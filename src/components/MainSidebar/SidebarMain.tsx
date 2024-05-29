@@ -124,7 +124,7 @@ function Sidebar() {
               ></Image>
             </Link>
           </Tooltip>
-          <Tooltip
+          {/* <Tooltip
             content="Available Delegates"
             placement="right"
             className="rounded-md bg-opacity-90"
@@ -139,6 +139,27 @@ function Sidebar() {
                 height={40}
                 className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 ${
                   pathname.includes(`/available-delegates`)
+                    ? "border-white border-2 rounded-full"
+                    : ""
+                }`}
+              ></Image>
+            </Link>
+          </Tooltip> */}
+          <Tooltip
+            content="Sessions"
+            placement="right"
+            className="rounded-md bg-opacity-90"
+            closeDelay={1}
+          >
+            <Link href={"/sessions?active=recordedSessions"}>
+              <Image
+                priority
+                src={sessionIcn}
+                alt={"image"}
+                width={40}
+                height={40}
+                className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 ${
+                  pathname.includes(`/sessions`)
                     ? "border-white border-2 rounded-full"
                     : ""
                 }`}

@@ -2,6 +2,7 @@
 import { MongoClient, MongoClientOptions, ObjectId } from "mongodb";
 import { NextResponse, NextRequest } from "next/server";
 import { connectDB } from "@/config/connectDB";
+import { sendMail, compileBookedSessionTemplate } from "@/libs/mail";
 
 interface UpdateBookingStatusResponse {
   success: boolean;
@@ -13,7 +14,8 @@ export async function PUT(
   res: NextResponse<UpdateBookingStatusResponse>
 ) {
   try {
-    const { id, meeting_status, booking_status, meetingId } = await req.json();
+    const { id, meeting_status, booking_status, meetingId, rejectionReason } =
+      await req.json();
 
     // Validate the ID and booking_status
     if (
@@ -39,16 +41,69 @@ export async function PUT(
 
     // Update the booking status of the meeting with the provided ID
     // console.log(`Updating booking status for meeting with ID ${id}...`);
+    console.log("meeting_status", meeting_status);
+    console.log("booking_status", booking_status);
+    console.log("meetingId", meetingId);
     const updateResult = await collection.updateOne(
       { _id: new ObjectId(id) },
-      { $set: { meeting_status, booking_status, meetingId } }
+      { $set: { meeting_status, booking_status, meetingId, rejectionReason } }
     );
 
-    // console.log("Meeting booking status updated:", updateResult);
+    console.log("Meeting booking status updated:", updateResult);
 
     // Check if the document was successfully updated
     if (updateResult.modifiedCount === 0) {
       throw new Error("No meeting found for the provided ID");
+    }
+    const meeting = await collection.findOne({ _id: new ObjectId(id) });
+
+    if (!meeting) {
+      throw new Error("Meeting not found after update");
+    }
+
+    const { host_address, attendees } = meeting;
+
+    // Assuming attendees is an array and you want the address of the first attendee
+    const attendeeAddress =
+      attendees.length > 0 ? attendees[0].attendee_address : null;
+
+    console.log("host_address", host_address);
+    console.log("attendeeAddress", attendeeAddress);
+
+    const delegateCollection = db.collection("delegates");
+    const documentsForUserEmail = await delegateCollection
+      .find({ address: attendeeAddress })
+      .toArray();
+    for (const document of documentsForUserEmail) {
+      const emailId = document.emailId;
+      if (emailId && emailId !== "" && emailId !== undefined) {
+        if (booking_status === "Approved") {
+          try {
+            await sendMail({
+              to: emailId,
+              name: "Chora Club",
+              subject: "Session Booked",
+              body: compileBookedSessionTemplate(
+                "Your Session has been Approved.",
+                "The Session you have booked has been approved by the delegate."
+              ),
+            });
+          } catch (error) {
+            console.error("Error sending mail:", error);
+          }
+        } else if (booking_status === "Rejected") {
+          try {
+            await sendMail({
+              to: emailId,
+              name: "Chora Club",
+              subject: "Session Rejected",
+              body: `The session you have booked has been rejected by the delegate due to following reason: ${rejectionReason}`,
+            });
+          } catch (error) {
+            console.error("Error sending mail:", error);
+          }
+        }
+      }
     }
 
     client.close();

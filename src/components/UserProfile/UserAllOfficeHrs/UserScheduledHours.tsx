@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useAccount, useNetwork } from "wagmi";
 import toast, { Toaster } from "react-hot-toast";
 
-const UserScheduledHours: React.FC = () => {
+const UserScheduledHours = ({ daoName }: { daoName: string }) => {
   const [selectedDate, setSelectedDate] = useState<string>("");
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
@@ -56,7 +56,7 @@ const UserScheduledHours: React.FC = () => {
           title,
           description,
           meeting_status: "active",
-          dao_name: chain?.name,
+          dao_name: daoName,
           meetingId: roomId, // Pass the roomId as meetingId
         }),
       });

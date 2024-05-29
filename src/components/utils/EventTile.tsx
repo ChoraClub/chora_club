@@ -73,7 +73,6 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
   const [startLoading, setStartLoading] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [rejectionReason, setRejectionReason] = useState("");
-  const [isModalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
     setIsPageLoading(false);
@@ -94,6 +93,7 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
     // console.log("confirmSlot clicked");
     // console.log("id:", id);
     // console.log("status:", status);
+    setStartLoading(true);
     try {
       setIsConfirmSlotLoading(true);
       let roomId = null;
@@ -115,6 +115,7 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
         meeting_status: meeting_status,
         booking_status: status,
         meetingId: roomId,
+        rejectionReason: rejectionReason,
       });
 
       const requestOptions = await {
@@ -129,6 +130,7 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
       const result = await response.json();
       if (result.success) {
         toast(`You ${status} the booking.`);
+        setStartLoading(false);
         setTimeout(() => {
           setIsPageLoading(false);
           setIsConfirmSlotLoading(false);
@@ -140,56 +142,6 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
       console.error(error);
     }
   };
-
-  /*
-
-<Modal
-      isOpen={isOpen}
-      onClose={() => {
-        onClose();
-        setRejectionReason('');
-      }}
-      className="font-poppins"
-    >
-      <ModalContent className="bg-blue-500">
-        <ModalHeader className="flex flex-col gap-1">
-          Reason for Rejection
-        </ModalHeader>
-        <ModalBody>
-          <textarea
-            name="rejectionReason"
-            value={rejectionReason}
-            onChange={(e) => setRejectionReason(e.target.value)}
-            placeholder="Give a reason for rejecting the session"
-            className="outline-none bg-[#D9D9D945] rounded-md px-2 py-1 text-sm w-full"
-            required
-          />
-        </ModalBody>
-        <ModalFooter>
-          <Button
-            color="default"
-            onClick={() => {
-              onClose();
-              setRejectionReason('');
-            }}
-          >
-            Cancel
-          </Button>
-          <Button
-            color="red"
-            onClick={handleReject}
-          >
-            Reject
-          </Button>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
-
-
-
-
-  */
-
   return (
     <>
       <div
@@ -259,7 +211,7 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
 
           {isEvent === "Book" ? (
             data.booking_status === "Approved" ? (
-              <div className="flex justify-end ">
+              <div className="flex justify-between ">
                 {startLoading || isConfirmSlotLoading ? (
                   <div className="flex items-center justify-center">
                     <Oval
@@ -291,6 +243,68 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
                     </span>
                   </Tooltip>
                 )}
+                <Tooltip
+                  content="Reject Session"
+                  placement="top"
+                  closeDelay={1}
+                  showArrow>
+                  <span className="cursor-pointer">
+                    <FaCircleXmark onClick={onOpen} size={35} color="#b91c1c" />
+                  </span>
+                </Tooltip>
+                {isOpen && (
+                  <div className="font-poppins z-[70] fixed inset-0 flex items-center justify-center backdrop-blur-md">
+                    <div className="bg-white rounded-[41px] overflow-hidden shadow-lg w-1/2">
+                      <div className="relative">
+                        <div className="flex flex-col gap-1 text-white bg-[#292929] p-4 py-7">
+                          <h2 className="text-lg font-semibold mx-4">
+                            Reason for Rejection
+                          </h2>
+                        </div>
+                        <div className="px-8 py-4">
+                          <div className="mt-4">
+                            <label className="block mb-2 font-semibold">
+                              Rejection Reason:
+                            </label>
+                            <textarea
+                              name="rejectionReason"
+                              value={rejectionReason}
+                              onChange={(e) =>
+                                setRejectionReason(e.target.value)
+                              }
+                              placeholder="Give a reason for rejecting the session"
+                              className="w-full px-4 py-2 border rounded-xl bg-[#D9D9D945]"
+                              required
+                            />
+                          </div>
+                        </div>
+                        <div className="flex justify-end px-8 py-4">
+                          <button
+                            className="bg-gray-300 text-gray-700 px-8 py-3 font-semibold rounded-full mr-4"
+                            onClick={onClose}>
+                            Cancel
+                          </button>
+                          <button
+                            className="bg-red-500 text-white px-8 py-3 font-semibold rounded-full"
+                            onClick={() => confirmSlot(data._id, "Rejected")}>
+                            {startLoading ? (
+                              <Oval
+                                visible={true}
+                                height="20"
+                                width="20"
+                                color="black"
+                                secondaryColor="#cdccff"
+                                ariaLabel="oval-loading"
+                              />
+                            ) : (
+                              "Reject"
+                            )}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             ) : data.booking_status === "Pending" ? (
               isConfirmSlotLoading ? (
@@ -319,62 +333,6 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
                       />
                     </span>
                   </Tooltip>
-
-                  <Tooltip
-                    content="Reject"
-                    placement="top"
-                    closeDelay={1}
-                    showArrow>
-                    <span className="cursor-pointer">
-                      <FaCircleXmark
-                        onClick={() => setModalOpen(true)}
-                        size={28}
-                        color="#b91c1c"
-                      />
-                    </span>
-                  </Tooltip>
-                  <div>
-                    {isModalOpen && (
-                      <div className="absolute inset-0 backdrop-blur-md">
-                        <Modal
-                          isOpen={isModalOpen}
-                          onClose={() => {
-                            setModalOpen(false);
-                            setRejectionReason("");
-                          }}
-                          className="font-poppins">
-                          <ModalContent className="bg-white">
-                            <ModalHeader className="flex flex-col gap-1 text-center">
-                              Reason for Rejection
-                            </ModalHeader>
-                            <ModalBody>
-                              <textarea
-                                name="rejectionReason"
-                                value={rejectionReason}
-                                onChange={(e) =>
-                                  setRejectionReason(e.target.value)
-                                }
-                                placeholder="Give a reason for rejecting the session"
-                                className="outline-none bg-[#D9D9D945] rounded-md px-2 py-1 text-sm w-full"
-                                required
-                              />
-                            </ModalBody>
-                            <ModalFooter>
-                              <Button
-                                color="default"
-                                onClick={() => {
-                                  setModalOpen(false);
-                                  setRejectionReason("");
-                                }}>
-                                Cancel
-                              </Button>
-                              <Button color="danger">Reject</Button>
-                            </ModalFooter>
-                          </ModalContent>
-                        </Modal>
-                      </div>
-                    )}
-                  </div>
                 </div>
               )
             ) : null

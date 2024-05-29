@@ -1,6 +1,7 @@
 import { connectDB } from "@/config/connectDB";
 import { NextApiRequest, NextApiResponse } from "next";
 import { NextResponse, NextRequest } from "next/server";
+import { sendMail, compileBookedSessionTemplate } from "@/libs/mail";
 
 type Attendee = {
   attendee_address: string;
@@ -87,7 +88,6 @@ export async function POST(
     });
     // console.log("Meeting document inserted:", result);
 
-    client.close();
     // console.log("MongoDB connection closed");
 
     if (result.insertedId) {
@@ -96,6 +96,55 @@ export async function POST(
       const insertedDocument = await collection.findOne({
         _id: result.insertedId,
       });
+
+      const delegateCollection = db.collection("delegates");
+      const documentsForHostEmail = await delegateCollection
+        .find({ address: host_address })
+        .toArray();
+
+      for (const document of documentsForHostEmail) {
+        const emailId = document.emailId;
+        if (emailId && emailId !== "" && emailId !== undefined) {
+          try {
+            await sendMail({
+              to: emailId,
+              name: "Chora Club",
+              subject: "Session Booked",
+              body: compileBookedSessionTemplate(
+                "Your session has been Booked.",
+                "You can Approve or Reject."
+              ),
+            });
+          } catch (error) {
+            console.error("Error sending mail:", error);
+          }
+        }
+      }
+
+      const userAddress = attendees[0].attendee_address;
+      const documentsForUserEmail = await delegateCollection
+        .find({ address: userAddress })
+        .toArray();
+      for (const document of documentsForUserEmail) {
+        const emailId = document.emailId;
+        if (emailId && emailId !== "" && emailId !== undefined) {
+          try {
+            await sendMail({
+              to: emailId,
+              name: "Chora Club",
+              subject: "Session Booked",
+              body: compileBookedSessionTemplate(
+                "🎉 Hooray! Your session is officially booked! ",
+                "Get ready for an amazing experience."
+              ),
+            });
+          } catch (error) {
+            console.error("Error sending mail:", error);
+          }
+        }
+      }
+
+      client.close();
       // console.log("Inserted document retrieved");
       return NextResponse.json(
         { success: true, result: insertedDocument },
