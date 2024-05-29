@@ -11,7 +11,7 @@ import { RxCross2 } from "react-icons/rx";
 const WatchFreeCollect = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [showComingSoon, setShowComingSoon] = useState(true);
-
+  const [number, setNumber]=useState(1);
   const PlusIcon = () => (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -20,6 +20,7 @@ const WatchFreeCollect = () => {
       width="32"
       height="32"
       style={{ background: "blue", borderRadius: "50%", padding: "4px" }}
+      onClick={()=>setNumber(number+1)}
     >
       <path
         fillRule="evenodd"
@@ -37,6 +38,7 @@ const WatchFreeCollect = () => {
       width="32"
       height="32"
       style={{ background: "blue", borderRadius: "50%", padding: "4px" }}
+      onClick={()=>setNumber(number>1?number-1:1)}
     >
       <path
         fillRule="evenodd"
@@ -71,9 +73,9 @@ const WatchFreeCollect = () => {
       <div className="w-full h-[0.1px] bg-black-shade-200"></div>
       <div className="grid grid-cols-2 px-6">
         <div className="flex items-center">
+          <MinusIcon/>
+          <div className="bg-black-shade-200 py-1 px-4 mx-3 rounded w-12 flex justify-center">{number}</div>
           <PlusIcon />
-          <div className="bg-black-shade-200 py-1 px-4 mx-3 rounded">01</div>
-          <MinusIcon />
         </div>
 
         {/* <button
