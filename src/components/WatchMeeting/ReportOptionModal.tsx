@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState , useEffect} from "react";
 import { RxCross2 } from "react-icons/rx";
 import ReportAddionalDetailsModal from "./ReportAddionalDetailsModal";
 
@@ -52,6 +52,24 @@ function ReportOptionModal({
       />
     );
   }
+
+  useEffect(() => {
+    if (isOpen) {
+      const scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollPosition}px`;
+
+      document.body.style.overflow = 'hidden';
+
+      return () => {
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.overflow = '';
+        window.scrollTo(0, scrollPosition);
+      };
+    }
+  }, [isOpen]);
 
   return (
     <div>

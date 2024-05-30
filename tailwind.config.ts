@@ -39,6 +39,7 @@ const config: Config = {
         "black-shade-800": "#EDEDED",
         "black-shade-900": "#B9B9B9",
         "green-shade-100": "#00CE78",
+        "green-shade-200": "#25d366",
 
       },
       fontFamily: {
