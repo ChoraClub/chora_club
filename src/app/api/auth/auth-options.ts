@@ -2,6 +2,7 @@ import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { getCsrfToken } from "next-auth/react";
 import { SiweMessage } from "siwe";
+import { BASE_URL } from "@/config/constants";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -25,7 +26,7 @@ export const authOptions: NextAuthOptions = {
             JSON.parse(credentials?.message || "{}")
           );
 
-          const nextAuthUrl = new URL(process.env.NEXTAUTH_URL as string);
+          const nextAuthUrl = new URL(BASE_URL as string);
           // console.log("credentials", credentials);
           // console.log("req", req);
           // console.log("siwe", siwe);

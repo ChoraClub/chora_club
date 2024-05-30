@@ -10,19 +10,14 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import OPLogo from "@/assets/images/daos/op.png";
 import ARBLogo from "@/assets/images/daos/arbitrum.jpg";
 import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
+import { dao_details } from "@/config/daoDetails";
 
-const desc = {
-  optimism:
-    "Optimism DAO is the heart of the Optimism network, an innovative layer 2 solution for faster, cheaper transactions on Ethereum. Think of it as a community-driven engine, where token holders govern upgrades, fees, and the overall direction of the Optimism ecosystem. With a focus on scaling Ethereum effectively and sustainably, Optimism DAO is building a brighter future for blockchain technology.",
-
-  arbitrum:
-    "The Arbitrum DAO is a decentralized autonomous organization (DAO) built on the Ethereum blockchain. At its core, the Arbitrum DAO is a community-driven governance mechanism that allows $ARB token holders to propose and vote on changes to the organization and the technologies it governs.",
-};
+const desc = dao_details;
 
 function SpecificDAO({ props }: { props: { daoDelegates: string } }) {
   const router = useRouter();
   const path = usePathname();
-  const daoname = path.slice(1);
+  const dao_name = path.slice(1);
   const searchParams = useSearchParams();
 
   const logoMapping: any = {
@@ -31,12 +26,12 @@ function SpecificDAO({ props }: { props: { daoDelegates: string } }) {
     // Add more mappings as needed
   };
 
-  const selectedLogo = logoMapping[daoname] || OPLogo;
+  const selectedLogo = logoMapping[dao_name] || OPLogo;
 
   const [isOpen, setIsOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState({
-    value: daoname,
-    label: daoname,
+    value: dao_name,
+    label: dao_name,
     image: selectedLogo,
   });
 
@@ -118,7 +113,7 @@ function SpecificDAO({ props }: { props: { daoDelegates: string } }) {
                     <div key={index}>
                       <div
                         className={`option flex items-center cursor-pointer px-3 py-2 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 capitalize ${
-                          option.label === daoname ? "text-blue-shade-100" : ""
+                          option.label === dao_name ? "text-blue-shade-100" : ""
                         }`}
                         onClick={() => selectOption(option)}
                       >
@@ -138,9 +133,9 @@ function SpecificDAO({ props }: { props: { daoDelegates: string } }) {
         </div>
         <div className="py-5 pr-8">
           {props.daoDelegates === "optimism"
-            ? desc.optimism
+            ? desc.optimism.description
             : props.daoDelegates === "arbitrum"
-            ? desc.arbitrum
+            ? desc.arbitrum.description
             : null}
         </div>
       </div>

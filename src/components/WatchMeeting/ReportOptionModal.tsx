@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { RxCross2 } from "react-icons/rx";
-import ReportAddionalDetailsModal from "./ReportAddionalDetailsModal";
+import ReportAddionalDetailsModal from "./ReportAdditionalDetailsModal";
+import ReportAdditionalDetailsModal from "./ReportAdditionalDetailsModal";
 
 type ReportCategory =
   | "Sexual content"
@@ -46,7 +47,7 @@ function ReportOptionModal({
 
   if (showAdditionalDetails) {
     return (
-      <ReportAddionalDetailsModal
+      <ReportAdditionalDetailsModal
         category={selectedCategory!}
         onClose={onClose}
       />

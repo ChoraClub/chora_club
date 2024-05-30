@@ -12,12 +12,22 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { FaCirclePlus } from "react-icons/fa6";
 import Link from "next/link";
 import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
+import { dao_details } from "@/config/daoDetails";
 
 function ExploreDAOs() {
-  const dao_info = [
-    { name: "Optimism", value: "193K", img: op_logo },
-    { name: "Arbitrum", value: "294k", img: arb_logo },
-  ];
+  // const dao_info = [
+  //   { name: "Optimism", value: "193K", img: op_logo },
+  //   { name: "Arbitrum", value: "294k", img: arb_logo },
+  // ];
+
+  const dao_info = Object.keys(dao_details).map((key) => {
+    const dao = dao_details[key];
+    return {
+      name: dao.title,
+      value: dao.number_of_delegates,
+      img: dao.logo,
+    };
+  });
 
   const [daoInfo, setDaoInfo] = useState(dao_info);
   const [searchQuery, setSearchQuery] = useState("");
@@ -178,14 +188,16 @@ function ExploreDAOs() {
         <div
           className={`flex fixed items-center justify-center bottom-9 rounded-full font-poppins text-sm font-medium left-[34%] w-[32rem] ${
             status ? "" : "hidden"
-          }`}>
+          }`}
+        >
           <div className="py-2 bg-blue-shade-100 text-white rounded-full px-7">
             To ensure optimal user experience, please note that our site is
             designed to be responsive on desktop devices.
           </div>
           <div
             className="bg-red-600 hover:bg-red-700 p-2 rounded-full cursor-pointer ml-3"
-            onClick={handleCloseNotification}>
+            onClick={handleCloseNotification}
+          >
             <ImCross color="#fff" size={10} />
           </div>
         </div>

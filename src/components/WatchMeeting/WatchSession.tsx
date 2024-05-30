@@ -16,6 +16,7 @@ import ReportOptionModal from "./ReportOptionModal";
 import { getEnsName } from "../ConnectWallet/ENSResolver";
 import { useRouter } from "next-nprogress-bar";
 import "./WatchSession.module.css";
+import { BASE_URL } from "@/config/constants";
 
 interface ProfileInfo {
   _id: string;
@@ -197,7 +198,7 @@ function WatchSession({
                 </div>
                 <div
                   className="text-[#292929] font-semibold"
-                  // onClick={() => router.push(`${process.env.NEXTAUTH_URL}/${data.dao_name}/${data.host_address}?active=info`)}
+                  // onClick={() => router.push(`${BASE_URL}/${data.dao_name}/${data.host_address}?active=info`)}
                 >
                   {ensHostName}
                 </div>
@@ -255,7 +256,7 @@ function WatchSession({
                 </div>
                 <div className="text-[#FF0000]">Report</div>
               </div>
-              <div className="flex items-center gap-1 cursor-pointer" onClick={}>
+              <div className="flex items-center gap-1 cursor-pointer">
                 <div className="scale-x-[-1]">
                   <BiSolidShare size={20} />
                 </div>
@@ -334,43 +335,17 @@ function WatchSession({
           </div>
         </div>
 
-        {/* {data.description.length > 0 && (
-        <div className={`px-6 pt-4 pb-4 rounded-b-3xl bg-white text-[#1E1E1E]`}>
-          <>
-          <div
-            className={`${
-              isExpanded ? "max-h-full" : "max-h-24 line-clamp-3"
-            } transition-[max-height] duration-500 ease-in-out `}
-      >
-            {data.description}
-          </div>
-          {getLineCount(data.description) > 3 && (
-          <button
-            className="text-sm text-blue-shade-200 mt-2"
-            onClick={toggleExpansion}
-          >
-            {isExpanded ? "View Less" : "View More"}
-          </button>
-          )}
-          </>
-        </div>
-        )} */}
-
         {data.description.length > 0 && (
           <div
             className={`px-6 pt-4 pb-4 rounded-b-3xl bg-white text-[#1E1E1E]`}
           >
             <>
               <div
-                ref={contentRef}
-                className={`max-h-full transition-max-height duration-500 ease-in-out overflow-hidden ${
+                className={`${
                   isExpanded ? "max-h-full" : "max-h-24 line-clamp-3"
-                }`}
-                style={{
-                  maxHeight: isExpanded ? `${contentHeight}px` : "6rem",
-                }}
+                } transition-[max-height] duration-500 ease-in-out `}
               >
-                <div className="overflow-hidden">{data.description}</div>
+                {data.description}
               </div>
               {getLineCount(data.description) > 3 && (
                 <button
