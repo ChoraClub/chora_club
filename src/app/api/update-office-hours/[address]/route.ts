@@ -1,4 +1,5 @@
 import { connectDB } from "@/config/connectDB";
+import { BASE_URL } from "@/config/constants";
 import { NextApiRequest, NextApiResponse } from "next";
 import { NextResponse, NextRequest } from "next/server";
 
@@ -19,7 +20,7 @@ interface OfficeHours {
   meetingId: string;
 }
 
-const baseUrl = process.env.NEXTAUTH_URL;
+const baseUrl = BASE_URL;
 
 export async function PUT(
   req: NextRequest,

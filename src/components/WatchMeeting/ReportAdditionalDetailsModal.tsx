@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { RxCross2 } from "react-icons/rx";
 
-function ReportAddionalDetailsModal({
+function ReportAdditionalDetailsModal({
   category,
   onClose,
 }: {
@@ -48,14 +48,14 @@ function ReportAddionalDetailsModal({
           <button
             type="button"
             onClick={toggleModal}
-            className="ps-4 pb-2 text-gray-700 rounded hover:text-gray-800 font-semibold"
+            className="ps-4 text-gray-700 rounded hover:text-gray-800 font-semibold"
           >
             Cancel
           </button>
           <button
             type="button"
             onClick={handleReport}
-            className="ps-4 pb-2 text-red-500 hover:text-red-600 font-semibold"
+            className="ps-4 text-red-500 hover:text-red-600 font-semibold"
           >
             Report
           </button>
@@ -65,4 +65,4 @@ function ReportAddionalDetailsModal({
   );
 }
 
-export default ReportAddionalDetailsModal;
+export default ReportAdditionalDetailsModal;
