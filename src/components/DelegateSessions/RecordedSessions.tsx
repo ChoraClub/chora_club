@@ -4,7 +4,7 @@ import search from "@/assets/images/daos/search.png";
 import texture1 from "@/assets/images/daos/texture1.png";
 import oplogo from "@/assets/images/daos/op.png";
 import arblogo from "@/assets/images/daos/arbitrum.jpg";
-import arbcir from "@/assets/images/daos/arbCir.png"
+import arbcir from "@/assets/images/daos/arbCir.png";
 import user from "@/assets/images/daos/user3.png";
 import { Tooltip } from "@nextui-org/react";
 import { IoCopy } from "react-icons/io5";
@@ -338,7 +338,7 @@ function RecordedSessions() {
               }`}
               onClick={() => handleFilters("optimism")}
             >
-              <Image src={oplogo} alt="optimism" width={23} className=""/>
+              <Image src={oplogo} alt="optimism" width={23} className="" />
               Optimism
             </button>
             <button
@@ -349,7 +349,7 @@ function RecordedSessions() {
               }`}
               onClick={() => handleFilters("arbitrum")}
             >
-              <Image src={arbcir} alt="arbitrum" width={23} className=""/>
+              <Image src={arbcir} alt="arbitrum" width={23} className="" />
               Arbitrum
             </button>
           </div>
@@ -416,7 +416,16 @@ function RecordedSessions() {
                   </div>
                 </div>
                 <div className="px-4 py-2">
-                  <div className={`font-semibold py-1 ${styles.truncate}`} style={{ display: "-webkit-box", WebkitBoxOrient: "vertical", WebkitLineClamp: 1 }}>{data.session.title}</div>
+                  <div
+                    className={`font-semibold py-1 ${styles.truncate}`}
+                    style={{
+                      display: "-webkit-box",
+                      WebkitBoxOrient: "vertical",
+                      WebkitLineClamp: 1,
+                    }}
+                  >
+                    {data.session.title}
+                  </div>
                   <div className="flex text-sm gap-3 py-1">
                     <div className="bg-[#F5F5F5] flex items-center py-1 px-3 rounded-md gap-2">
                       <div>
@@ -471,7 +480,7 @@ function RecordedSessions() {
                             <IoCopy
                               onClick={(event) => {
                                 event.stopPropagation();
-                                handleCopy(data.address);
+                                handleCopy(data.session.host_address);
                               }}
                             />
                           </span>
@@ -513,7 +522,9 @@ function RecordedSessions() {
                             <IoCopy
                               onClick={(event) => {
                                 event.stopPropagation();
-                                handleCopy(data.address);
+                                handleCopy(
+                                  data.session.attendees[0].attendee_address
+                                );
                               }}
                             />
                           </span>

@@ -346,13 +346,25 @@ function WatchSession({
             className={`px-6 pt-4 pb-4 rounded-b-3xl bg-white text-[#1E1E1E]`}
           >
             <>
-              <div
+              {/* <div
                 className={`${
                   isExpanded ? "max-h-full" : "max-h-24 line-clamp-3"
                 } transition-[max-height] duration-500 ease-in-out `}
               >
                 {data.description}
+              </div> */}
+               <div
+                ref={contentRef}
+                className={`max-h-full transition-max-height duration-500 ease-in-out overflow-hidden ${
+                  isExpanded ? "max-h-full" : "max-h-24 line-clamp-3"
+                }`}
+                style={{
+                  maxHeight: isExpanded ? `${contentHeight}px` : "6rem",
+                }}
+              >
+                <div className="overflow-hidden">{data.description}</div>
               </div>
+
               {getLineCount(data.description) > 3 && (
                 <button
                   className="text-sm text-blue-shade-200 mt-2"
