@@ -11,6 +11,7 @@ import { useRouter } from "next-nprogress-bar";
 import Link from "next/link";
 import text1 from "@/assets/images/daos/texture1.png";
 import text2 from "@/assets/images/daos/texture2.png";
+import { getEnsName } from "../ConnectWallet/ENSResolver";
 import {
   Modal,
   ModalContent,
@@ -80,8 +81,10 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
   }, [data, isPageLoading]);
 
   const formatWalletAddress = (address: any) => {
-    if (typeof address !== "string" || address.length <= 10) return address;
-    return address.slice(0, 6) + "..." + address.slice(-4);
+    // if (typeof address !== "string" || address.length <= 10) return address;
+    // return address.slice(0, 6) + "..." + address.slice(-4);
+    const ensName = getEnsName(address.toLowerCase());
+    return ensName;
   };
 
   const formatSlotTimeToLocal = (slotTime: any) => {

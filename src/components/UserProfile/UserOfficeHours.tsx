@@ -8,6 +8,7 @@ import Tile from "../utils/Tile";
 import { useNetwork, useAccount } from "wagmi";
 import text1 from "@/assets/images/daos/texture1.png";
 import { Oval } from "react-loader-spinner";
+import { RxCross2 } from "react-icons/rx";
 
 interface UserOfficeHoursProps {
   isDelegate: boolean | undefined;
@@ -39,6 +40,7 @@ function UserOfficeHours({
 
   const [sessionDetails, setSessionDetails] = useState([]);
   const [dataLoading, setDataLoading] = useState(true);
+  const [showComingSoon, setShowComingSoon] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -140,6 +142,20 @@ function UserOfficeHours({
 
   return (
     <div>
+      {showComingSoon && (
+        <div className="flex items-center w-fit bg-yellow-100 border border-yellow-400 rounded-full px-3 py-1 font-poppins">
+          <p className="text-sm text-yellow-700 mr-2">
+            Office hours are currently being developed. In the meantime, please
+            enjoy our 1:1 sessions.
+          </p>
+          <button
+            onClick={() => setShowComingSoon(false)}
+            className="text-yellow-700 hover:text-yellow-800 ps-3"
+          >
+            <RxCross2 size={18} />
+          </button>
+        </div>
+      )}
       <div className="pt-3 pr-32">
         <div className="flex w-fit gap-14 border-1 border-[#7C7C7C] px-6 rounded-xl text-sm">
           {selfDelegate === true && (

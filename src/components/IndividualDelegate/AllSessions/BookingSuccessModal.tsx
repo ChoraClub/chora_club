@@ -89,10 +89,10 @@ function BookingSuccessModal({
                     className="bg-blue-shade-200 text-white rounded-full px-4 py-2 flex items-center space-x-1"
                     onClick={() =>
                       router.push(
-                        `http://localhost:3000/profile/${address}?active=sessions&session=attending`
+                        `/profile/${address}?active=sessions&session=attending`
                       )
                     }>
-                    🚀 Let's Go!
+                    🚀 Let&apos;s Go!
                   </button>
                   <button
                     className="bg-black text-white rounded-full px-4 py-2 flex items-center space-x-1"

@@ -9,6 +9,13 @@ import WatchSessionList from "./WatchSessionList";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import styles from "./WatchSession.module.css";
 import WatchSessionVideo from "./WatchSessionVideo";
+import WatchSocialLinks from "./WatchSocialLinks";
+import { color } from "framer-motion";
+import WatchCollectibleInfo from "./WatchCollectibleInfo";
+import WatchLeaderBoard from "./WatchLeaderBoard";
+import WatchFreeCollect from "./WatchFreeCollect";
+import WatchVideoRecommendation from "./WatchVideoRecommendation";
+import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
 
 interface AttestationObject {
   attendee_address: string;
@@ -69,48 +76,36 @@ function WatchComponentMain({ props }: { props: { id: string } }) {
               <span className="text-black">Chora</span>{" "}
               <span className="text-blue-shade-200">Club</span>
             </div>
-            <ConnectButton />
-          </div>
-          <div className="flex py-4 items-center gap-4 font-poppins sticky top-0 z-50 bg-white">
-            <div
-              style={{ background: "rgba(238, 237, 237, 0.36)" }}
-              className="flex border-[0.5px] border-black w-1/3 rounded-full"
-            >
-              <input
-                type="text"
-                placeholder="Search"
-                style={{ background: "rgba(238, 237, 237, 0.36)" }}
-                className="pl-5 rounded-full outline-none w-full"
-                value={searchQuery}
-                // onChange={(e) => handleSearchChange(e.target.value)}
-              ></input>
-              <span className="flex items-center bg-black rounded-full px-5 py-2">
-                <Image src={search} alt="search" width={20} />
-              </span>
-            </div>
-            <div className="space-x-4">
-              <button className="border border-[#CCCCCC] px-6 py-1 bg-[#8E8E8E] rounded-lg text-lg text-white">
-                All
-              </button>
-              <button className="border border-[#CCCCCC] px-6 py-1 bg-[#F5F5F5] rounded-lg text-lg text-[#3E3D3D]">
-                Optimism
-              </button>
-              <button className="border border-[#CCCCCC] px-6 py-1 bg-[#F5F5F5] rounded-lg text-lg text-[#3E3D3D]">
-                Arbitrum
-              </button>
-            </div>
+            <ConnectWalletWithENS />
           </div>
 
-          <div className="grid grid-cols-3 gap-4 pt-6 relative">
+          <div className="grid grid-cols-3 gap-y-4 gap-x-6 pt-6 relative pr-6">
+            {/* Left side */}
             <div className="sticky top-10 z-10 col-span-2 space-y-5 font-poppins pb-10 ">
               <WatchSessionVideo data={data} collection={collection} />
               <WatchSession data={data} collection={collection} />
+
+              {/* /Video Recommendation */}
+              {/* <WatchVideoRecommendation /> */}
             </div>
+
+            {/* Right side */}
             <div
-              className={`col-span-1 me-5 pb-8 ${styles.customScrollbar}`}
-              // style={{ maxHeight: "calc(100vh - 80px)" }}
+              className={`col-span-1 me-5 pb-8 ${styles.customScrollbar} gap-y-6 flex flex-col`}
             >
-              <WatchSessionList />
+              {/* <WatchSessionList /> */}
+
+              {/* Free */}
+              <WatchFreeCollect />
+
+              {/* Leader BOARD */}
+              <WatchLeaderBoard />
+
+              {/* COLLECTIBLE INFO */}
+              <WatchCollectibleInfo />
+
+              {/* SOCIAL LINKS */}
+              <WatchSocialLinks data={data} collection={collection} />
             </div>
           </div>
         </div>

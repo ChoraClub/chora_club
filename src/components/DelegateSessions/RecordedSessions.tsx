@@ -1,4 +1,4 @@
-import Image from "next/image";
+import Image, { StaticImageData } from "next/image";
 import React, { useEffect, useRef, useState } from "react";
 import search from "@/assets/images/daos/search.png";
 import texture1 from "@/assets/images/daos/texture1.png";
@@ -7,15 +7,40 @@ import arblogo from "@/assets/images/daos/arbitrum.jpg";
 import user from "@/assets/images/daos/user3.png";
 import { Tooltip } from "@nextui-org/react";
 import { IoCopy } from "react-icons/io5";
-import toast from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
 import copy from "copy-to-clipboard";
 import styles from "./RecordedSessions.module.css";
 import { Oval } from "react-loader-spinner";
+// const { parseISO } = require("date-fns");
+import { parseISO } from "date-fns";
 // import { useRouter } from "next/navigation";
 import { useRouter } from "next-nprogress-bar";
-import { parseISO } from "date-fns";
-// const { parseISO } = require("date-fns");
+import user1 from "@/assets/images/user/user1.svg";
+import user2 from "@/assets/images/user/user2.svg";
+import user3 from "@/assets/images/user/user3.svg";
+import user4 from "@/assets/images/user/user4.svg";
+import user5 from "@/assets/images/user/user5.svg";
+import user6 from "@/assets/images/user/user6.svg";
+import user7 from "@/assets/images/user/user7.svg";
+import user8 from "@/assets/images/user/user8.svg";
+import user9 from "@/assets/images/user/user9.svg";
+
+interface SessionData {
+  session: {
+    attendees: {
+      attendee_address: string;
+    }[];
+    host_address: string;
+  };
+  guestInfo: {
+    image: string | null;
+  };
+  hostInfo: {
+    image: string | null;
+  };
+}
 import Head from "next/head";
+import { getEnsName, getEnsNameOfUser } from "../ConnectWallet/ENSResolver";
 
 function RecordedSessions() {
   // const parseISO = dateFns;
@@ -23,18 +48,20 @@ function RecordedSessions() {
   const [isLoading, setIsLoading] = useState(true);
   const [meetingData, setMeetingData] = useState<any>([]);
   const [karmaImage, setKarmaImage] = useState<any>();
+  const [displayIFrame, setDisplayIFrame] = useState<number | null>(null);
+  const router = useRouter();
+  const [hoveredVideo, setHoveredVideo] = useState<number | null>(null); // Track which video is hovered
+  const videoRefs = useRef<any>([]);
+  const [videoDurations, setVideoDurations] = useState<any>({});
+  const [searchMeetingData, setSearchMeetingData] = useState<any>([]);
+  const [activeButton, setActiveButton] = useState("all");
+  const [ensHostNames, setEnsHostNames] = useState<any>({});
+  const [ensGuestNames, setEnsGuestNames] = useState<any>({});
 
   const handleCopy = (addr: string) => {
     copy(addr);
     toast("Address Copied");
   };
-
-  const [displayIFrame, setDisplayIFrame] = useState<number | null>(null);
-
-  const router = useRouter();
-  const [hoveredVideo, setHoveredVideo] = useState<number | null>(null); // Track which video is hovered
-  const videoRefs = useRef<any>([]);
-  const [videoDurations, setVideoDurations] = useState<any>({});
 
   useEffect(() => {
     const getRecordedMeetings = async () => {
@@ -50,8 +77,9 @@ function RecordedSessions() {
         // console.log("result data: ", resultData);
 
         if (resultData.success) {
-          // console.log("result data: ", resultData.data);
+          console.log("result data: ", resultData.data);
           setMeetingData(resultData.data);
+          setSearchMeetingData(resultData.data);
           setIsLoading(false);
         }
       } catch (error) {
@@ -59,7 +87,7 @@ function RecordedSessions() {
       }
     };
     getRecordedMeetings();
-  }, [meetingData]);
+  }, []);
 
   const formatTimeAgo = (utcTime: string): string => {
     const parsedTime = parseISO(utcTime);
@@ -144,33 +172,181 @@ function RecordedSessions() {
     return formattedDuration;
   };
 
+  const handleSearchChange = (query: string) => {
+    setSearchQuery(query);
+    if (query) {
+      const filtered = searchMeetingData.filter((item: any) => {
+        // Convert both query and userAddress to lowercase for case-insensitive matching
+        const lowercaseQuery = query.toLowerCase();
+        const lowercaseAddress = item.session.host_address.toLowerCase();
+        const lowercaseTitle = item.session.title.toLowerCase();
+
+        // Check if the lowercase userAddress includes the lowercase query
+        return (
+          lowercaseAddress.includes(lowercaseQuery) ||
+          lowercaseTitle.includes(lowercaseQuery)
+        );
+      });
+
+      setMeetingData(filtered);
+    } else {
+      setMeetingData(searchMeetingData);
+    }
+  };
+
+  const handleFilters = (params: string) => {
+    if (params) {
+      setActiveButton(params);
+      const filtered = searchMeetingData.filter((item: any) => {
+        return item.session.dao_name.includes(params);
+      });
+
+      setMeetingData(filtered);
+    } else {
+      setActiveButton("all");
+      setMeetingData(searchMeetingData);
+    }
+  };
+
+  // Create an array of user images
+  const userImages = [
+    user1,
+    user2,
+    user3,
+    user4,
+    user5,
+    user6,
+    user7,
+    user8,
+    user9,
+  ];
+
+  // State to store the randomly selected user images
+  const [randomUserImages, setRandomUserImages] = useState<{
+    [key: string]: StaticImageData;
+  }>({});
+  const [usedIndices, setUsedIndices] = useState<Set<number>>(new Set());
+
+  // Function to get a random user image
+  const getRandomUserImage = (): StaticImageData => {
+    let randomIndex;
+    do {
+      randomIndex = Math.floor(Math.random() * userImages.length);
+    } while (usedIndices.has(randomIndex));
+
+    usedIndices.add(randomIndex);
+    return userImages[randomIndex];
+  };
+
+  // Effect to set the random user image when the component mounts
+  useEffect(() => {
+    const newRandomUserImages: { [key: string]: StaticImageData } = {
+      ...randomUserImages,
+    };
+
+    meetingData.forEach((data: SessionData) => {
+      const guestAddress = data.session.attendees[0].attendee_address;
+      const hostAddress = data.session.host_address;
+      if (!data.guestInfo?.image && !newRandomUserImages[guestAddress]) {
+        newRandomUserImages[guestAddress] = getRandomUserImage();
+      }
+      if (!data.hostInfo?.image && !newRandomUserImages[hostAddress]) {
+        newRandomUserImages[hostAddress] = getRandomUserImage();
+      }
+    });
+
+    setRandomUserImages(newRandomUserImages);
+  }, [meetingData]);
+
+  useEffect(() => {
+    const fetchEnsNames = async () => {
+      const ensNamesMap: any = {};
+      for (const data of meetingData) {
+        const ensName = await getEnsName(
+          data.session.host_address.toLowerCase()
+        );
+        if (ensName) {
+          ensNamesMap[data.session.host_address] = ensName;
+        }
+      }
+      console.log("ensNamesMap", ensNamesMap);
+      setEnsHostNames(ensNamesMap);
+    };
+
+    if (meetingData.length > 0) {
+      fetchEnsNames();
+    }
+  }, [meetingData]);
+
+  useEffect(() => {
+    const fetchEnsNames = async () => {
+      const ensNamesMap: any = {};
+      for (const data of meetingData) {
+        const ensName = await getEnsName(
+          data.session.attendees[0].attendee_address.toLowerCase()
+        );
+        if (ensName) {
+          ensNamesMap[data.session.attendees[0].attendee_address] = ensName;
+        }
+      }
+      console.log("guest ensNamesMap", ensNamesMap);
+      setEnsGuestNames(ensNamesMap);
+    };
+
+    if (meetingData.length > 0) {
+      fetchEnsNames();
+    }
+  }, [meetingData]);
+
   return (
     <>
       <div className="pe-10">
         <div className="flex my-4 items-center gap-4 font-poppins">
           <div
             style={{ background: "rgba(238, 237, 237, 0.36)" }}
-            className="flex border-[0.5px] border-black w-fit rounded-full">
+            className="flex border-[0.5px] border-black w-1/3 rounded-full"
+          >
             <input
               type="text"
-              placeholder="Search"
+              placeholder="Search by title and host address"
               style={{ background: "rgba(238, 237, 237, 0.36)" }}
-              className="pl-5 rounded-full outline-none"
+              className="pl-5 rounded-full outline-none w-full"
               value={searchQuery}
-              // onChange={(e) => handleSearchChange(e.target.value)}
+              onChange={(e) => handleSearchChange(e.target.value)}
             ></input>
             <span className="flex items-center bg-black rounded-full px-5 py-2">
               <Image src={search} alt="search" width={20} />
             </span>
           </div>
           <div className="space-x-4">
-            <button className="border border-[#CCCCCC] px-6 py-1 bg-[#8E8E8E] rounded-lg text-lg text-white">
+            <button
+              className={`border border-[#CCCCCC] px-6 py-1 rounded-lg text-lg ${
+                activeButton === "all"
+                  ? "bg-[#8E8E8E] text-white"
+                  : "bg-[#F5F5F5] text-[#3E3D3D]"
+              }`}
+              onClick={() => handleFilters("")}
+            >
               All
             </button>
-            <button className="border border-[#CCCCCC] px-6 py-1 bg-[#F5F5F5] rounded-lg text-lg text-[#3E3D3D]">
+            <button
+              className={`border border-[#CCCCCC] px-6 py-1  rounded-lg text-lg ${
+                activeButton === "optimism"
+                  ? "bg-[#8E8E8E] text-white"
+                  : "bg-[#F5F5F5] text-[#3E3D3D]"
+              }`}
+              onClick={() => handleFilters("optimism")}
+            >
               Optimism
             </button>
-            <button className="border border-[#CCCCCC] px-6 py-1 bg-[#F5F5F5] rounded-lg text-lg text-[#3E3D3D]">
+            <button
+              className={`border border-[#CCCCCC] px-6 py-1 rounded-lg text-lg ${
+                activeButton === "arbitrum"
+                  ? "bg-[#8E8E8E] text-white"
+                  : "bg-[#F5F5F5] text-[#3E3D3D]"
+              }`}
+              onClick={() => handleFilters("arbitrum")}
+            >
               Arbitrum
             </button>
           </div>
@@ -187,7 +363,7 @@ function RecordedSessions() {
               ariaLabel="oval-loading"
             />
           </div>
-        ) : (
+        ) : meetingData && meetingData.length > 0 ? (
           <div className="grid min-[475px]:grid-cols- md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-10 py-8 font-poppins">
             {meetingData.map((data: any, index: number) => (
               <div
@@ -197,34 +373,43 @@ function RecordedSessions() {
                 onMouseEnter={() => setHoveredVideo(index)}
                 onMouseLeave={() => setHoveredVideo(null)}>
                 <div
-                  className={`w-full h-44 rounded-t-3xl bg-black object-cover object-center ${styles.container}`}>
+                  className={`w-full h-44 rounded-t-3xl bg-black object-cover object-center ${styles.container}`}
+                >
                   {hoveredVideo === index ? (
                     <div className="relative">
                       <video
                         ref={(el: any) => (videoRefs.current[index] = el)}
                         autoPlay
                         loop
+                        muted
                         onLoadedMetadata={(e) => handleLoadedMetadata(index, e)}
                         src={data.session.video_uri}
-                        className="w-full h-44 rounded-t-3xl"></video>
+                        className="w-full h-44 rounded-t-3xl object-cover"
+                      ></video>
                       <div className={styles.videoTimeline}>
                         <div className={styles.progressArea}>
                           <div
                             id={`progressBar-${index}`}
-                            className={styles.progressBar}></div>
-                        </div>
-                        <div className="absolute right-1 bottom-3 text-white text-xs bg-white px-1 bg-opacity-30 rounded-sm">
-                          {formatVideoDuration(videoDurations[index] || 0)}
+                            className={styles.progressBar}
+                          ></div>
                         </div>
                       </div>
                     </div>
                   ) : (
-                    <Image
-                      src={texture1}
-                      alt="video-thumbnail"
+                    <video
+                      poster={`https://gateway.lighthouse.storage/ipfs/${data.session.thumbnail_image}`}
+                      // poster="https://gateway.lighthouse.storage/ipfs/Qmb1JZZieFSENkoYpVD7HRzi61rQCDfVER3fhnxCvmL1DB"
+                      ref={(el: any) => (videoRefs.current[index] = el)}
+                      loop
+                      muted
+                      onLoadedMetadata={(e) => handleLoadedMetadata(index, e)}
+                      src={data.session.video_uri}
                       className="w-full h-44 rounded-t-3xl object-cover"
-                    />
+                    ></video>
                   )}
+                  <div className="absolute right-2 bottom-2 text-white text-xs bg-white px-1 bg-opacity-30 rounded-sm">
+                    {formatVideoDuration(videoDurations[index] || 0)}
+                  </div>
                 </div>
                 <div className="px-4 py-2">
                   <div className="font-semibold py-1">{data.session.title}</div>
@@ -255,47 +440,108 @@ function RecordedSessions() {
                       {formatTimeAgo(data.session.slot_time)}
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 py-1 ps-3 text-sm">
-                    <div>
-                      <Image
-                        src={
-                          data.userInfo?.image
-                            ? `https://gateway.lighthouse.storage/ipfs/${data.userInfo.image}`
-                            : user
+                  <div className="">
+                    <div className="flex items-center gap-2 py-1 ps-3 text-sm">
+                      <div>
+                        <Image
+                          src={
+                            data.hostInfo?.image
+                              ? `https://gateway.lighthouse.storage/ipfs/${data.hostInfo.image}`
+                              : randomUserImages[data.session.host_address]
+                          }
+                          alt="image"
+                          width={20}
+                          height={20}
+                          className="rounded-full"
+                        />
+                      </div>
+                      <div>Host: {ensHostNames[data.session.host_address]}</div>
+                      <div>
+                        <Tooltip
+                          content="Copy"
+                          placement="right"
+                          closeDelay={1}
+                          showArrow
+                        >
+                          <span className="cursor-pointer text-sm">
+                            <IoCopy
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                handleCopy(data.address);
+                              }}
+                            />
+                          </span>
+                        </Tooltip>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 py-1 ps-3 text-sm">
+                      <div className="">
+                        <Image
+                          src={
+                            data.guestInfo?.image
+                              ? `https://gateway.lighthouse.storage/ipfs/${data.guestInfo.image}`
+                              : randomUserImages[
+                                  data.session.attendees[0].attendee_address
+                                ]
+                          }
+                          alt="image"
+                          width={20}
+                          height={20}
+                          className="h-5 w-5 rounded-full object-cover object-center"
+                        />
+                      </div>
+                      <div>
+                        Guest:{" "}
+                        {
+                          ensGuestNames[
+                            data.session.attendees[0].attendee_address
+                          ]
                         }
-                        alt="image"
-                        width={20}
-                        height={20}
-                        className="rounded-full"
-                      />
-                    </div>
-                    <div>
-                      {data.session.host_address.slice(0, 6)}...
-                      {data.session.host_address.slice(-4)}
-                    </div>
-                    <div>
-                      <Tooltip
-                        content="Copy"
-                        placement="right"
-                        closeDelay={1}
-                        showArrow>
-                        <span className="cursor-pointer text-sm">
-                          <IoCopy
-                            onClick={(event) => {
-                              event.stopPropagation();
-                              handleCopy(data.address);
-                            }}
-                          />
-                        </span>
-                      </Tooltip>
+                      </div>
+                      <div>
+                        <Tooltip
+                          content="Copy"
+                          placement="right"
+                          closeDelay={1}
+                          showArrow
+                        >
+                          <span className="cursor-pointer text-sm">
+                            <IoCopy
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                handleCopy(data.address);
+                              }}
+                            />
+                          </span>
+                        </Tooltip>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             ))}
           </div>
+        ) : (
+          <div className="flex flex-col justify-center items-center pt-10">
+            <div className="text-5xl">☹️</div>{" "}
+            <div className="pt-4 font-semibold text-lg">
+              Oops, no such result available!
+            </div>
+          </div>
         )}
       </div>
+      <Toaster
+        toastOptions={{
+          style: {
+            fontSize: "14px",
+            backgroundColor: "#3E3D3D",
+            color: "#fff",
+            boxShadow: "none",
+            borderRadius: "50px",
+            padding: "3px 5px",
+          },
+        }}
+      />
     </>
   );
 }

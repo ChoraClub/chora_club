@@ -17,6 +17,7 @@ import {
 import { useNetwork, useAccount } from "wagmi";
 import styles from "./Tile.module.css";
 import { ethers } from "ethers";
+import { getEnsName } from "../ConnectWallet/ENSResolver";
 // const { ethers } = require("ethers");
 
 type Attendee = {
@@ -115,6 +116,8 @@ SessionTileProps) {
   const formatWalletAddress = (address: any) => {
     if (typeof address !== "string" || address.length <= 10) return address;
     return address.slice(0, 6) + "..." + address.slice(-4);
+    // const ensName = getEnsName(address.toLowerCase());
+    // return ensName;
   };
   const formatSlotTimeToLocal = (slotTime: any) => {
     const date = new Date(slotTime);

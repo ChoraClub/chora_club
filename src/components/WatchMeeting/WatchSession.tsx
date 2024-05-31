@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import user from "@/assets/images/daos/user3.png";
 import view from "@/assets/images/daos/view.png";
 import Image from "next/image";
@@ -12,6 +12,10 @@ import Link from "next/link";
 import VideoJS from "@/components/utils/VideoJs";
 import videojs from "video.js";
 import { parseISO } from "date-fns";
+import ReportOptionModal from "./ReportOptionModal";
+import { getEnsName } from "../ConnectWallet/ENSResolver";
+import { useRouter } from "next-nprogress-bar";
+import { BASE_URL } from "@/config/constants";
 
 interface ProfileInfo {
   _id: string;
@@ -85,6 +89,10 @@ function WatchSession({
   collection: string;
 }) {
   const [showPopup, setShowPopup] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [ensHostName, setEnsHostName] = useState<string | null>(null);
+  const router = useRouter();
 
   const formatTimeAgo = (utcTime: string): string => {
     const parsedTime = parseISO(utcTime);
@@ -113,70 +121,138 @@ function WatchSession({
     }
   };
 
+  const handleModalClose = () => {
+    console.log("Popup Closed");
+    setModalOpen(false);
+  };
+
+  const toggleExpansion = () => {
+    setIsExpanded(!isExpanded);
+  };
+
+  const getLineCount = (text: string) => {
+    const lines = text.split("\n");
+    return lines.length;
+  };
+
+  // const getLineCount = (text: string) => {
+  //   if (typeof text !== 'string') {
+  //     return 0;
+  //   }
+
+  //   const lines = text.split('\n');
+  //   let lineCount = 0;
+
+  //   for (let line of lines) {
+  //     line = line.trim();
+  //     if (line.length > 0) {
+  //       lineCount++;
+  //     }
+  //   }
+
+  //   return lineCount;
+  // };
+  useEffect(() => {
+    const fetchEnsName = async () => {
+      const name = await getEnsName(data.host_address.toLowerCase());
+      setEnsHostName(name);
+    };
+
+    fetchEnsName();
+  }, [data.host_address]);
+
   return (
     <div className="">
       <div className="rounded-3xl border border-[#CCCCCC] bg-[#F2F2F2]">
-        <div className="px-6 pt-4 pb-4 border-b border-[#CCCCCC]">
+        <div
+          className={`px-6 pt-4 pb-4 ${
+            data.description.length > 0 ? "border-b" : ""
+          }  border-[#CCCCCC]`}
+        >
           <div className="text-lg font-semibold pb-3">{data.title}</div>
           <div className="flex justify-between text-sm pe-4 pb-4">
-            <div className="flex items-center gap-2 ">
-              <div>
-                <Image
-                  src={`https://gateway.lighthouse.storage/ipfs/${data.hostProfileInfo.image}`}
-                  alt="image"
-                  width={20}
-                  height={20}
-                  className="rounded-full"
-                  priority
-                />
+            <div className="flex gap-6">
+              <div className="flex items-center gap-2 ">
+                <div>
+                  <Image
+                    src={
+                      data.hostProfileInfo?.image
+                        ? `https://gateway.lighthouse.storage/ipfs/${data.hostProfileInfo.image}`
+                        : user
+                    }
+                    alt="image"
+                    width={20}
+                    height={20}
+                    className="rounded-full"
+                    priority
+                  />
+                </div>
+                <div
+                  className="text-[#292929] font-semibold"
+                  // onClick={() => router.push(`${BASE_URL}/${data.dao_name}/${data.host_address}?active=info`)}
+                >
+                  {ensHostName}
+                </div>
+                <Link
+                  href={
+                    data.dao_name === ("optimism" || "Optimism")
+                      ? `https://optimism.easscan.org/offchain/attestation/view/${data.uid_host}`
+                      : data.dao_name === ("arbitrum" || "Arbitrum")
+                      ? `https://arbitrum.easscan.org/offchain/attestation/view/${data.uid_host}`
+                      : ""
+                  }
+                  target="_blank"
+                >
+                  <Image src={view} alt="image" width={15} priority />
+                </Link>
               </div>
-              <div className="text-[#292929] font-semibold">
-                {data.host_address}
+
+              <div className="flex items-center gap-1">
+                {data.dao_name === "optimism" ? (
+                  <Image
+                    src={oplogo}
+                    alt="image"
+                    width={20}
+                    className="rounded-full"
+                  />
+                ) : data.dao_name === "arbitrum" ? (
+                  <Image
+                    src={arblogo}
+                    alt="image"
+                    width={20}
+                    className="rounded-full"
+                  />
+                ) : (
+                  ""
+                )}
+                <div className="text-[#292929] font-semibold capitalize">
+                  {data.dao_name}
+                </div>
               </div>
-              <Link
-                href={
-                  data.dao_name === ("optimism" || "Optimism")
-                    ? `https://optimism.easscan.org/offchain/attestation/view/${data.uid_host}`
-                    : data.dao_name === ("arbitrum" || "Arbitrum")
-                    ? `https://arbitrum.easscan.org/offchain/attestation/view/${data.uid_host}`
-                    : ""
-                }
-                target="_blank"
+            </div>
+
+            <div className="flex gap-6">
+              <div className="flex items-center gap-1">
+                <Image src={time} alt="image" width={20} priority />
+                <div className="text-[#1E1E1E]">
+                  {formatTimeAgo(data.slot_time)}
+                </div>
+              </div>
+              <div
+                className="flex items-center gap-1 cursor-pointer"
+                onClick={() => setModalOpen(true)}
               >
-                <Image src={view} alt="image" width={15} priority />
-              </Link>
-            </div>
-
-            <div className="flex items-center gap-1">
-              {data.dao_name === "optimism" ? (
-                <Image src={oplogo} alt="image" width={20} />
-              ) : data.dao_name === "arbitrum" ? (
-                <Image src={arblogo} alt="image" width={20} />
-              ) : (
-                ""
-              )}
-              <div className="text-[#292929] font-semibold capitalize">
-                {data.dao_name}
+                <div>
+                  <PiFlagFill color="#FF0000" size={20} />
+                </div>
+                <div className="text-[#FF0000]">Report</div>
               </div>
-            </div>
-
-            <div className="flex items-center gap-1">
-              <Image src={time} alt="image" width={20} priority />
-              <div className="text-[#1E1E1E]">
-                {formatTimeAgo(data.slot_time)}
+              <div className="flex items-center gap-1 cursor-pointer">
+                <div className="scale-x-[-1]">
+                  <BiSolidShare size={20} />
+                </div>
+                <div className="text-[#1E1E1E]">Share</div>
               </div>
-            </div>
-            <div className="flex items-center gap-1 cursor-pointer">
-              <div>
-                <PiFlagFill color="#FF0000" size={20} />
-              </div>
-              <div className="text-[#FF0000]">Report</div>
-            </div>
-            <div className="flex items-center gap-1 cursor-pointer">
-              <div className="scale-x-[-1]">
-                <BiSolidShare size={20} />
-              </div>
-              <div className="text-[#1E1E1E]">Share</div>
             </div>
           </div>
 
@@ -207,8 +283,9 @@ function WatchSession({
                       <div>
                         <Image
                           src={
-                            `https://gateway.lighthouse.storage/ipfs/${attendee.profileInfo.image}` ||
-                            user
+                            attendee.profileInfo?.image
+                              ? `https://gateway.lighthouse.storage/ipfs/${attendee.profileInfo.image}`
+                              : user
                           }
                           alt="image"
                           width={18}
@@ -249,10 +326,33 @@ function WatchSession({
           </div>
         </div>
 
-        <div className="px-6 pt-4 pb-4 rounded-b-3xl bg-white text-[#1E1E1E]">
-          {data.description}
-        </div>
+        {data.description.length > 0 && (
+          <div
+            className={`px-6 pt-4 pb-4 rounded-b-3xl bg-white text-[#1E1E1E]`}
+          >
+            <>
+              <div
+                className={`${
+                  isExpanded ? "max-h-full" : "max-h-24 line-clamp-3"
+                } transition-[max-height] duration-500 ease-in-out `}
+              >
+                {data.description}
+              </div>
+              {getLineCount(data.description) > 3 && (
+                <button
+                  className="text-sm text-blue-shade-200 mt-2"
+                  onClick={toggleExpansion}
+                >
+                  {isExpanded ? "View Less" : "View More"}
+                </button>
+              )}
+            </>
+          </div>
+        )}
       </div>
+      {modalOpen && (
+        <ReportOptionModal isOpen={modalOpen} onClose={handleModalClose} />
+      )}
     </div>
   );
 }
