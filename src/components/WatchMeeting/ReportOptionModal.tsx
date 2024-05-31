@@ -54,21 +54,16 @@ function ReportOptionModal({
   }
 
   useEffect(() => {
+    // Lock scrolling when the modal is open
     if (isOpen) {
-      const scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
-
-      document.body.style.position = 'fixed';
-      document.body.style.top = `-${scrollPosition}px`;
-
-      document.body.style.overflow = 'hidden';
-
-      return () => {
-        document.body.style.position = '';
-        document.body.style.top = '';
-        document.body.style.overflow = '';
-        window.scrollTo(0, scrollPosition);
-      };
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
     }
+
+    return () => {
+      document.body.style.overflow = "auto";
+    };
   }, [isOpen]);
 
   return (
