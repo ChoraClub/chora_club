@@ -440,14 +440,14 @@ function BookSession({ props }: { props: Type }) {
         slotTime.getTime() >= startTime.getTime() &&
         slotTime.getTime() <= endTime.getTime()
       ) {
-          // Check if the slot is booked
-          const isBooked = bookedSlots.some((bookedSlot: any) => {
-            return (
-              dateFns?.isSameDay(startTime, bookedSlot) &&
-              slotTime.getHours() === bookedSlot.getHours() &&
-              slotTime.getMinutes() === bookedSlot.getMinutes()
-            );
-          });
+        // Check if the slot is booked
+        const isBooked = bookedSlots.some((bookedSlot: any) => {
+          return (
+            dateFns?.isSameDay(startTime, bookedSlot) &&
+            slotTime.getHours() === bookedSlot.getHours() &&
+            slotTime.getMinutes() === bookedSlot.getMinutes()
+          );
+        });
 
         // If the slot is not booked, return true
         if (!isBooked) {

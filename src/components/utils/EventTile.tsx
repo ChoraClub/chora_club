@@ -20,6 +20,7 @@ import {
   Button,
   useDisclosure,
 } from "@nextui-org/react";
+import { getEnsName } from "../ConnectWallet/ENSResolver";
 interface RoomDetails {
   message: string;
   data: {
@@ -80,8 +81,10 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
   }, [data, isPageLoading]);
 
   const formatWalletAddress = (address: any) => {
-    if (typeof address !== "string" || address.length <= 10) return address;
-    return address.slice(0, 6) + "..." + address.slice(-4);
+    // if (typeof address !== "string" || address.length <= 10) return address;
+    // return address.slice(0, 6) + "..." + address.slice(-4);
+    const ensName = getEnsName(address.toLowerCase());
+    return ensName;
   };
 
   const formatSlotTimeToLocal = (slotTime: any) => {

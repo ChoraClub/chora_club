@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/config/connectDB";
+import { BASE_URL } from "@/config/constants";
 
 interface Meeting {
   meetingId: string;
@@ -24,7 +25,7 @@ interface MeetingTimePerEOA {
 
 //   const raw = JSON.stringify({ meetingId, video_uri });
 
-//   const baseUrl = process.env.NEXTAUTH_URL;
+//   const baseUrl = BASE_URL;
 
 //   const requestOptions = {
 //     method: "POST",
@@ -88,7 +89,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
       headers: myHeaders,
       body: raw,
     };
-    const baseUrl = process.env.NEXTAUTH_URL;
+    const baseUrl = BASE_URL;
     const hostResponse = await fetch(`${baseUrl}/api/get-host`, requestOptions);
     const hostData = await hostResponse.json();
     console.log("Host Data:", hostData);

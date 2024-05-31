@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { MongoClient, MongoClientOptions } from "mongodb";
+import { connectDB } from "@/config/connectDB";
 
 interface Links {
   forum: string;
@@ -36,9 +37,7 @@ interface DAOData {
 export async function GET(req: NextRequest, res: NextResponse<DAOData>) {
   try {
     // Connect to MongoDB
-    const client = await MongoClient.connect(process.env.MONGODB_URI!, {
-      dbName: `chora-club`,
-    } as MongoClientOptions);
+    const client = await connectDB();
 
     // Access the collection
     const db = client.db();

@@ -98,7 +98,6 @@ export async function POST(
         .find({ address: userAddress })
         .toArray();
 
-
       for (const document of documentsForEmail) {
         const emailId = document.emailId;
         if (emailId && emailId !== "" && emailId !== undefined) {
