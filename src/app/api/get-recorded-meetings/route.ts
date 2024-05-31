@@ -27,7 +27,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
         // Query delegates collection based on address and dao_name
         const userInfo = await delegatesCollection.findOne({
           address: host_address,
-          daoName: dao_name,
+          // daoName: dao_name,
         });
 
         // Return merged data
