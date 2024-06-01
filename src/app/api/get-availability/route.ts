@@ -59,7 +59,6 @@ export async function POST(req: NextRequest, res: NextResponse<Type[]>) {
     const client = await connectDB();
 
     const db = client.db();
-    const delegatesCollection = db.collection("delegates");
     const collection = db.collection("scheduling");
 
     const currentDate = new Date();
