@@ -16,6 +16,7 @@ import ReportOptionModal from "./ReportOptionModal";
 import { getEnsName } from "../ConnectWallet/ENSResolver";
 import { useRouter } from "next-nprogress-bar";
 import { BASE_URL } from "@/config/constants";
+import { Toaster } from "react-hot-toast";
 
 interface ProfileInfo {
   _id: string;
@@ -351,8 +352,25 @@ function WatchSession({
         )}
       </div>
       {modalOpen && (
-        <ReportOptionModal isOpen={modalOpen} onClose={handleModalClose} />
+        <ReportOptionModal
+          data={data}
+          collection={collection}
+          isOpen={modalOpen}
+          onClose={handleModalClose}
+        />
       )}
+      <Toaster
+        toastOptions={{
+          style: {
+            fontSize: "14px",
+            backgroundColor: "#3E3D3D",
+            color: "#fff",
+            boxShadow: "none",
+            borderRadius: "50px",
+            padding: "3px 5px",
+          },
+        }}
+      />
     </div>
   );
 }

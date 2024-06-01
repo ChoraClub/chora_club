@@ -156,7 +156,7 @@ export async function DELETE(req: NextRequest, res: NextResponse<Type[]>) {
     const db = client.db();
     const collection = db.collection("scheduling");
 
-    const query = { dao_name, userAddress };
+    const query = { dao_name, userAddress, timeSlotSizeMinutes };
     const document = await collection.findOne(query);
 
     if (!document) {

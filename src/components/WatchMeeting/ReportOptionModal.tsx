@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { RxCross2 } from "react-icons/rx";
-import ReportAddionalDetailsModal from "./ReportAdditionalDetailsModal";
 import ReportAdditionalDetailsModal from "./ReportAdditionalDetailsModal";
+import { Toaster } from "react-hot-toast";
 
 type ReportCategory =
   | "Sexual content"
@@ -14,12 +14,18 @@ type ReportCategory =
   | "Promotes terrorism";
 
 function ReportOptionModal({
+  data,
+  collection,
   isOpen,
   onClose,
 }: {
+  data: any;
+  collection: any;
   isOpen: boolean;
   onClose: () => void;
 }) {
+  console.log("data", data);
+  console.log("collection", collection);
   const toggleModal = () => {
     onClose();
   };
@@ -47,10 +53,14 @@ function ReportOptionModal({
 
   if (showAdditionalDetails) {
     return (
-      <ReportAdditionalDetailsModal
-        category={selectedCategory!}
-        onClose={onClose}
-      />
+      <>
+        <ReportAdditionalDetailsModal
+          data={data}
+          collection={collection}
+          category={selectedCategory!}
+          onClose={onClose}
+        />
+      </>
     );
   }
 
