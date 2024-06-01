@@ -11,10 +11,7 @@ import { useRouter } from "next-nprogress-bar";
 import Link from "next/link";
 import text1 from "@/assets/images/daos/texture1.png";
 import text2 from "@/assets/images/daos/texture2.png";
-<<<<<<< HEAD
 import { getEnsName } from "../ConnectWallet/ENSResolver";
-=======
->>>>>>> c960405ff82261dfed3bcc74b782c1f93d03fb4c
 import {
   Modal,
   ModalContent,
@@ -24,10 +21,6 @@ import {
   Button,
   useDisclosure,
 } from "@nextui-org/react";
-<<<<<<< HEAD
-=======
-import { getEnsName } from "../ConnectWallet/ENSResolver";
->>>>>>> c960405ff82261dfed3bcc74b782c1f93d03fb4c
 interface RoomDetails {
   message: string;
   data: {
