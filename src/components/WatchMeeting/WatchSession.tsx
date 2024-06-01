@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import user from "@/assets/images/daos/user3.png";
 import view from "@/assets/images/daos/view.png";
 import Image from "next/image";
@@ -15,6 +15,8 @@ import { parseISO } from "date-fns";
 import ReportOptionModal from "./ReportOptionModal";
 import { getEnsName } from "../ConnectWallet/ENSResolver";
 import { useRouter } from "next-nprogress-bar";
+import "./WatchSession.module.css";
+import ShareMediaModal from './ShareMediaModal'
 import { BASE_URL } from "@/config/constants";
 import { Toaster } from "react-hot-toast";
 
@@ -92,8 +94,21 @@ function WatchSession({
   const [showPopup, setShowPopup] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [contentHeight, setContentHeight] = useState(0);
   const [ensHostName, setEnsHostName] = useState<string | null>(null);
+  const [shareModal,setShareModal]=useState(false);
   const router = useRouter();
+
+  const handleShareClose =()=>{
+    setShareModal(false);
+  }
+
+  useEffect(() => {
+    if (contentRef.current) {
+      setContentHeight(isExpanded ? contentRef.current.scrollHeight : 0);
+    }
+  }, [data.description, isExpanded]);
 
   const formatTimeAgo = (utcTime: string): string => {
     const parsedTime = parseISO(utcTime);
@@ -248,7 +263,7 @@ function WatchSession({
                 </div>
                 <div className="text-[#FF0000]">Report</div>
               </div>
-              <div className="flex items-center gap-1 cursor-pointer">
+              <div className="flex items-center gap-1 cursor-pointer" onClick={()=>setShareModal(true)}>
                 <div className="scale-x-[-1]">
                   <BiSolidShare size={20} />
                 </div>
@@ -262,7 +277,7 @@ function WatchSession({
               className="flex items-center border border-[#8E8E8E] bg-white w-fit rounded-md px-3 font-medium py-1 gap-2 cursor-pointer"
               onClick={() => setShowPopup(!showPopup)}
             >
-              <div className="text-[#292929] text-sm">Attendee</div>
+              <div className="text-[#292929] text-sm">Guest</div>
               <div
                 className={
                   showPopup
@@ -332,13 +347,25 @@ function WatchSession({
             className={`px-6 pt-4 pb-4 rounded-b-3xl bg-white text-[#1E1E1E]`}
           >
             <>
-              <div
+              {/* <div
                 className={`${
                   isExpanded ? "max-h-full" : "max-h-24 line-clamp-3"
                 } transition-[max-height] duration-500 ease-in-out `}
               >
                 {data.description}
+              </div> */}
+               <div
+                ref={contentRef}
+                className={`max-h-full transition-max-height duration-500 ease-in-out overflow-hidden ${
+                  isExpanded ? "max-h-full" : "max-h-24 line-clamp-3"
+                }`}
+                style={{
+                  maxHeight: isExpanded ? `${contentHeight}px` : "6rem",
+                }}
+              >
+                <div className="overflow-hidden">{data.description}</div>
               </div>
+
               {getLineCount(data.description) > 3 && (
                 <button
                   className="text-sm text-blue-shade-200 mt-2"
@@ -371,6 +398,10 @@ function WatchSession({
           },
         }}
       />
+
+      {shareModal && (
+        <ShareMediaModal isOpen={shareModal} onClose={handleShareClose}/>
+      )}
     </div>
   );
 }

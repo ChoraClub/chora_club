@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState , useEffect} from "react";
 import { RxCross2 } from "react-icons/rx";
 import ReportAdditionalDetailsModal from "./ReportAdditionalDetailsModal";
 import { Toaster } from "react-hot-toast";
@@ -63,6 +63,19 @@ function ReportOptionModal({
       </>
     );
   }
+
+  useEffect(() => {
+    // Lock scrolling when the modal is open
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [isOpen]);
 
   return (
     <div>

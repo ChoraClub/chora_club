@@ -35,7 +35,7 @@
 }
 
 .scrollbar::-webkit-scrollbar-thumb {
-  background-color: white; /* Color of the thumb (scrollbar handle) */
+  background-color: #888; /* Color of the thumb (scrollbar handle) */
   border-radius: 20px; /* Rounded corners for the thumb */
   height: 40px;
   border-left: 1px solid #C6D7FF;
@@ -52,7 +52,7 @@
 
 .slideDown.open {
   max-height: 500px;
-}
+} 
 
 .buttons {
   margin-top: 50px;
@@ -179,4 +179,8 @@
   .blob-btn:hover .blob-btn__blob {
     transform: translateZ(0) scale(1.4);
   }
+}
+
+.transition-max-height {
+  transition: max-height 0.5s ease-in-out;
 }
