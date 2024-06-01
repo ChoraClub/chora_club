@@ -400,7 +400,7 @@ function WatchSession({
       />
 
       {shareModal && (
-        <ShareMediaModal isOpen={shareModal} onClose={handleShareClose}/>
+        <ShareMediaModal isOpen={shareModal} onClose={handleShareClose} data={data}/>
       )}
     </div>
   );

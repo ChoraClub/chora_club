@@ -15,9 +15,11 @@ import { RiTwitterXLine } from "react-icons/ri";
 function ShareMediaModal({
   isOpen,
   onClose,
+  data,
 }: {
   isOpen: boolean;
   onClose: () => void;
+  data: any;
 }) {
   const toggleModal = () => {
     onClose();
@@ -25,6 +27,8 @@ function ShareMediaModal({
 
   const [link, setLink] = useState("");
   const [copySuccess, setCopySuccess] = useState(false);
+
+  console.log("data::", data);
 
   useEffect(() => {
     setLink(window.location.href);
@@ -56,9 +60,9 @@ function ShareMediaModal({
   const shareOnTwitter = () => {
     const url = encodeURIComponent(link);
     const text = encodeURIComponent(
-      `Hello Geeks! 🎉\nJust booked my session on @ChoraClub and can't wait to learn more about the #Web3 ecosystem from the experienced Delegate!🌐\n👉 ${decodeURIComponent(
+      `${data.title} ${decodeURIComponent(
         url
-      )}\n\n#choraclub #session #growth`
+      )} via @ChoraClub\n\n#choraclub #session #growth`
     );
 
     // Twitter share URL
