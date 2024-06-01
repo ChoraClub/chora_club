@@ -322,7 +322,7 @@ function SpecificDelegate({ props }: { props: Type }) {
           />
         </div>
       )}
-      {!(isPageLoading || (!isDelegate && !selfDelegate)) ? (
+      {!(isPageLoading || (!isDelegate && selfDelegate)) ? (
         <div className="font-poppins">
           <div className="flex ps-14 py-5 justify-between">
             <div className="flex">
@@ -338,8 +338,7 @@ function SpecificDelegate({ props }: { props: Type }) {
                 style={{
                   backgroundColor: "#fcfcfc",
                   border: "2px solid #E9E9E9 ",
-                }}
-              >
+                }}>
                 <div className="w-40 h-40 flex items-center justify-content ">
                   <div className="flex justify-center items-center w-40 h-40">
                     <Image
@@ -401,8 +400,7 @@ function SpecificDelegate({ props }: { props: Type }) {
                           : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                      target="_blank"
-                    >
+                      target="_blank">
                       <FaXTwitter color="#7C7C7C" size={12} />
                     </Link>
                     <Link
@@ -421,8 +419,7 @@ function SpecificDelegate({ props }: { props: Type }) {
                           : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                      target="_blank"
-                    >
+                      target="_blank">
                       <BiSolidMessageRoundedDetail color="#7C7C7C" size={12} />
                     </Link>
                     <Link
@@ -437,8 +434,7 @@ function SpecificDelegate({ props }: { props: Type }) {
                           : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                      target="_blank"
-                    >
+                      target="_blank">
                       <FaDiscord color="#7C7C7C" size={12} />
                     </Link>
                     <Link
@@ -453,8 +449,7 @@ function SpecificDelegate({ props }: { props: Type }) {
                           : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                      target="_blank"
-                    >
+                      target="_blank">
                       <FaGithub color="#7C7C7C" size={12} />
                     </Link>
                   </div>
@@ -470,8 +465,7 @@ function SpecificDelegate({ props }: { props: Type }) {
                     content="Copy"
                     placement="right"
                     closeDelay={1}
-                    showArrow
-                  >
+                    showArrow>
                     <span className="px-2 cursor-pointer" color="#3E3D3D">
                       <IoCopy
                         onClick={() => handleCopy(props.individualDelegate)}
@@ -522,8 +516,7 @@ function SpecificDelegate({ props }: { props: Type }) {
                     className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
                     onClick={() =>
                       handleDelegateVotes(`${props.individualDelegate}`)
-                    }
-                  >
+                    }>
                     Delegate
                   </button>
                 </div>
@@ -541,8 +534,7 @@ function SpecificDelegate({ props }: { props: Type }) {
                   ? " border-blue-shade-200 text-blue-shade-200 font-semibold"
                   : "border-transparent"
               }`}
-              onClick={() => router.push(path + "?active=info")}
-            >
+              onClick={() => router.push(path + "?active=info")}>
               Info
             </button>
             <button
@@ -551,8 +543,7 @@ function SpecificDelegate({ props }: { props: Type }) {
                   ? "text-blue-shade-200 font-semibold border-blue-shade-200"
                   : "border-transparent"
               }`}
-              onClick={() => router.push(path + "?active=pastVotes")}
-            >
+              onClick={() => router.push(path + "?active=pastVotes")}>
               Past Votes
             </button>
             <button
@@ -563,8 +554,7 @@ function SpecificDelegate({ props }: { props: Type }) {
               }`}
               onClick={() =>
                 router.push(path + "?active=delegatesSession&session=book")
-              }
-            >
+              }>
               Sessions
             </button>
             <button
@@ -575,8 +565,7 @@ function SpecificDelegate({ props }: { props: Type }) {
               }`}
               onClick={() =>
                 router.push(path + "?active=officeHours&hours=ongoing")
-              }
-            >
+              }>
               Office Hours
             </button>
           </div>
