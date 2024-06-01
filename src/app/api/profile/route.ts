@@ -242,6 +242,7 @@ export async function PUT(
             networks: networks[0],
           },
         };
+        /* @ts-ignore */
         await collection.updateOne({ address: document.address }, updateQuery);
       }
     }
