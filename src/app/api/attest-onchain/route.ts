@@ -8,6 +8,7 @@ import {
 } from "@ethereum-attestation-service/eas-sdk";
 import { ethers } from "ethers";
 import { stringToBytes, bytesToHex } from "viem";
+import { BASE_URL } from "@/config/constants";
 
 interface MeetingRequestBody {
   host_address: string;
@@ -39,7 +40,7 @@ interface MyError {
 }
 
 // const allowedOrigin = "http://localhost:3000";
-const allowedOrigin = process.env.NEXTAUTH_URL;
+const allowedOrigin = BASE_URL;
 
 // const url = process.env.NEXT_PUBLIC_ATTESTATION_URL;
 // // Set up your ethers provider and signer

@@ -126,7 +126,7 @@ const WatchSocialLinks = ({
         <div className="flex flex-col gap-2">
           {socialLinks && socialLinks.length > 0 ? (
             socialLinks.map((link, index) => (
-              <Link href={link.handles} key={index}>
+              <Link href={link.handles} key={index} target="_blank">
                 <div className="flex rounded-full border border-blue-shade-100 bg-white py-2 hover:bg-blue-shade-400">
                   <Image
                     src={link.img}

@@ -1,10 +1,11 @@
 import { connectDB } from "@/config/connectDB";
+import { BASE_URL } from "@/config/constants";
 import { NextRequest, NextResponse } from "next/server";
 
 async function delegateAttestationOnchain(data: any) {
   const myHeaders = new Headers();
   myHeaders.append("Content-Type", "application/json");
-  const baseUrl = process.env.NEXTAUTH_URL;
+  const baseUrl = BASE_URL;
   const raw = JSON.stringify(data);
   console.log("raw", raw);
   const requestOptions = {
