@@ -59,7 +59,6 @@ export async function POST(req: NextRequest, res: NextResponse<Type[]>) {
     const client = await connectDB();
 
     const db = client.db();
-    const delegatesCollection = db.collection("delegates");
     const collection = db.collection("scheduling");
 
     const currentDate = new Date();
@@ -156,7 +155,7 @@ export async function DELETE(req: NextRequest, res: NextResponse<Type[]>) {
     const db = client.db();
     const collection = db.collection("scheduling");
 
-    const query = { dao_name, userAddress };
+    const query = { dao_name, userAddress, timeSlotSizeMinutes };
     const document = await collection.findOne(query);
 
     if (!document) {

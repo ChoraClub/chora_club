@@ -12,12 +12,14 @@ import { FaFacebook } from "react-icons/fa";
 import { FaXTwitter, FaWhatsapp } from "react-icons/fa6";
 import { RiTwitterXLine } from "react-icons/ri";
 
-function ReportOptionModal({
+function ShareMediaModal({
   isOpen,
   onClose,
+  data,
 }: {
   isOpen: boolean;
   onClose: () => void;
+  data: any;
 }) {
   const toggleModal = () => {
     onClose();
@@ -25,6 +27,8 @@ function ReportOptionModal({
 
   const [link, setLink] = useState("");
   const [copySuccess, setCopySuccess] = useState(false);
+
+  console.log("data::", data);
 
   useEffect(() => {
     setLink(window.location.href);
@@ -43,22 +47,22 @@ function ReportOptionModal({
     };
   }, [isOpen]);
 
-  const shareOnWhatsapp = () =>{
-    toast("Coming soon🚀")
-  }
-  const shareOnFacebook = () =>{
-    toast("Coming soon🚀")
-  }
-  const shareOnMail = () =>{
-    toast("Coming soon🚀")
-  }
+  const shareOnWhatsapp = () => {
+    toast("Coming soon🚀");
+  };
+  const shareOnFacebook = () => {
+    toast("Coming soon🚀");
+  };
+  const shareOnMail = () => {
+    toast("Coming soon🚀");
+  };
 
   const shareOnTwitter = () => {
     const url = encodeURIComponent(link);
     const text = encodeURIComponent(
-      `Hello Geeks! 🎉\nJust booked my session on @ChoraClub and can't wait to learn more about the #Web3 ecosystem from the experienced Delegate!🌐\n👉 ${decodeURIComponent(
+      `${data.title} ${decodeURIComponent(
         url
-      )}\n\n#choraclub #session #growth`
+      )} via @ChoraClub\n\n#choraclub #session #growth`
     );
 
     // Twitter share URL
@@ -67,7 +71,6 @@ function ReportOptionModal({
     // Open Twitter share dialog
     window.open(twitterUrl, "_blank");
   };
-
 
   const handleCopy = async () => {
     try {
@@ -99,7 +102,10 @@ function ReportOptionModal({
             Share
           </p>
           <div className="flex gap-4 justify-center items-center my-5">
-            <div className="bg-green-shade-200 rounded-full size-[72px]  flex justify-center items-center cursor-pointer" onClick={shareOnWhatsapp}>
+            <div
+              className="bg-green-shade-200 rounded-full size-[72px]  flex justify-center items-center cursor-pointer"
+              onClick={shareOnWhatsapp}
+            >
               <FaWhatsapp className="text-white bg-green-shade-200 size-10 " />
             </div>
             <div onClick={shareOnFacebook}>
@@ -111,7 +117,10 @@ function ReportOptionModal({
             >
               <RiTwitterXLine className="text-white bg-black size-10 " />
             </div>
-            <div className="bg-black-shade-900 rounded-full size-[72px] p-3 flex justify-center items-center cursor-pointer" onClick={shareOnMail}>
+            <div
+              className="bg-black-shade-900 rounded-full size-[72px] p-3 flex justify-center items-center cursor-pointer"
+              onClick={shareOnMail}
+            >
               <TbMailFilled className="text-white size-8" />
             </div>
           </div>
@@ -144,4 +153,4 @@ function ReportOptionModal({
   );
 }
 
-export default ReportOptionModal;
+export default ShareMediaModal;

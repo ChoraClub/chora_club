@@ -19,6 +19,7 @@ import user7 from "@/assets/images/user/user7.svg";
 import user8 from "@/assets/images/user/user8.svg";
 import user9 from "@/assets/images/user/user9.svg";
 import { parseISO } from "date-fns";
+import { getEnsName } from "../ConnectWallet/ENSResolver";
 
 interface meeting {
   meetingData: any;
@@ -56,6 +57,8 @@ function RecordedSessionsTile({ meetingData }: meeting) {
   const videoRefs = useRef<any>([]);
   const [videoDurations, setVideoDurations] = useState<any>({});
   const router = useRouter();
+  const [ensHostNames, setEnsHostNames] = useState<any>({});
+  const [ensGuestNames, setEnsGuestNames] = useState<any>({});
 
   const handleCopy = (addr: string) => {
     copy(addr);
@@ -199,6 +202,47 @@ function RecordedSessionsTile({ meetingData }: meeting) {
     return formattedDuration;
   };
 
+  useEffect(() => {
+    const fetchEnsNames = async () => {
+      const ensNamesMap: any = {};
+      for (const data of meetingData) {
+        const ensName = await getEnsName(
+          data.session.host_address.toLowerCase()
+        );
+        if (ensName) {
+          ensNamesMap[data.session.host_address] = ensName;
+        }
+      }
+      console.log("ensNamesMap", ensNamesMap);
+      setEnsHostNames(ensNamesMap);
+    };
+
+    if (meetingData.length > 0) {
+      fetchEnsNames();
+    }
+  }, [meetingData]);
+
+  useEffect(() => {
+    const fetchEnsNames = async () => {
+      const ensNamesMap: any = {};
+      for (const data of meetingData) {
+        const ensName = await getEnsName(
+          data.session.attendees[0].attendee_address.toLowerCase()
+        );
+        if (ensName) {
+          ensNamesMap[data.session.attendees[0].attendee_address] = ensName;
+        }
+      }
+      console.log("guest ensNamesMap", ensNamesMap);
+      setEnsGuestNames(ensNamesMap);
+    };
+
+    if (meetingData.length > 0) {
+      fetchEnsNames();
+    }
+  }, [meetingData]);
+
+
   return (
     <>
       {/* {meetingData && meetingData.length > 0 ? ( */}
@@ -298,10 +342,7 @@ function RecordedSessionsTile({ meetingData }: meeting) {
                   </div>
                   <div>
                     Host:{" "}
-                    {`${data.session.host_address.slice(
-                      0,
-                      4
-                    )}...${data.session.host_address.slice(-4)}`}{" "}
+                    {ensHostNames[data.session.host_address]}
                   </div>
                   <div>
                     <Tooltip
@@ -339,12 +380,11 @@ function RecordedSessionsTile({ meetingData }: meeting) {
                   </div>
                   <div>
                     Guest:{" "}
-                    {`${data.session.attendees[0].attendee_address.slice(
-                      0,
-                      4
-                    )}...${data.session.attendees[0].attendee_address.slice(
-                      -4
-                    )}`}
+                    {
+                          ensGuestNames[
+                            data.session.attendees[0].attendee_address
+                          ]
+                        }
                   </div>
                   <div>
                     <Tooltip

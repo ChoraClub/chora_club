@@ -5,7 +5,7 @@ import { DateTime } from "luxon";
 import { useAccount, useNetwork } from "wagmi";
 import toast, { Toaster } from "react-hot-toast";
 import { Oval } from "react-loader-spinner";
-import { FaCircleInfo } from "react-icons/fa6";
+import { FaChevronDown, FaCircleInfo, FaPlus } from "react-icons/fa6";
 import { Tooltip } from "@nextui-org/react";
 import SchedulingSuccessModal from "./SchedulingSuccessModal";
 import { RxCross2 } from "react-icons/rx";
@@ -56,7 +56,7 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
   const [continueAPICalling, setContinueAPICalling] = useState<Boolean>(false);
   const [userRejected, setUserRejected] = useState<Boolean>();
   const [addingEmail, setAddingEmail] = useState<boolean>();
-  const [scheduledSuccess, setScheduledSuccess] = useState<boolean>()
+  const [scheduledSuccess, setScheduledSuccess] = useState<boolean>();
 
   const checkUser = async () => {
     try {
@@ -194,9 +194,9 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
         setSuccessModalOpen(true);
         setCreateSessionLoading(false);
         setContinueAPICalling(false);
-        setScheduledSuccess(true)
+        setScheduledSuccess(true);
       } else {
-        setScheduledSuccess(false)
+        setScheduledSuccess(false);
       }
     } catch (error) {
       console.error("Error:", error);
@@ -487,42 +487,31 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
 
   return (
     <>
-      <div className="flex justify-center gap-20">
+      <div className="flex flex-col md:flex-row justify-center gap-8 md:gap-20 p-4">
         {/* First box- left side */}
-        <div
-          style={{ boxShadow: "0px 4px 50.8px 0px rgba(0, 0, 0, 0.11)" }}
-          className="min-w-xl h-fit mt-2 p-8 bg-white rounded-2xl"
-          // className="max-w-lg mx-auto mt-2 p-8 bg-white rounded-2xl"
-        >
+        <div className="w-full md:w-auto min-w-[34rem] h-fit mt-2 p-8 bg-white rounded-2xl shadow-lg">
           <div className="mb-4">
             <label className="text-gray-700 font-semibold flex items-center">
               Select DAO Name:
               <Tooltip
-                showArrow
                 content={
-                  <div className="font-poppins">
+                  <div className="font-poppins p-2 bg-gray-800 text-white rounded-md">
                     DAO for which the session is to be created. The attestations
                     will be issued for the selected DAO. The attendees of this
                     session will seek questions related to the selected DAO.
                   </div>
                 }
+                showArrow
                 placement="right"
-                className="rounded-md bg-opacity-90"
-                closeDelay={1}
+                delay={1}
               >
-                <span className="px-2 justify-end">
-                  <FaCircleInfo className="cursor-pointer" />
+                <span className="px-2">
+                  <FaCircleInfo className="cursor-pointer text-blue-500" />
                 </span>
               </Tooltip>
             </label>
-            <div
-              // value={daoName}
-              // onChange={(e) => setDaoName(e.target.value)}
-              className="border border-gray-300 rounded px-3 py-2 mt-1 w-full capitalize"
-            >
+            <div className="border border-gray-300 rounded px-3 py-2 mt-1 w-full capitalize">
               {daoName}
-              {/* <option value="optimism">Optimism</option>
-              <option value="arbitrum">Arbitrum</option> */}
             </div>
           </div>
 
@@ -530,21 +519,20 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
             <label className="text-gray-700 font-semibold flex items-center">
               Select Time Slot Size:
               <Tooltip
-                showArrow
                 content={
-                  <div className="font-poppins">
+                  <div className="font-poppins p-2 bg-gray-800 text-white rounded-md">
                     The duration for which you would be able to take the
                     session. The preferred duration is 30 minutes. And note that
                     the selected time slot size will apply to all the selected
                     dates of your sessions.
                   </div>
                 }
+                showArrow
                 placement="right"
-                className="rounded-md bg-opacity-90"
-                closeDelay={1}
+                delay={1}
               >
-                <span className="px-2 justify-end">
-                  <FaCircleInfo className="cursor-pointer" />
+                <span className="px-2">
+                  <FaCircleInfo className="cursor-pointer text-blue-500" />
                 </span>
               </Tooltip>
             </label>
@@ -563,18 +551,17 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
             <label className="text-gray-700 font-semibold flex items-center">
               Select Date:
               <Tooltip
-                showArrow
                 content={
-                  <div className="font-poppins">
+                  <div className="font-poppins p-2 bg-gray-800 text-white rounded-md">
                     It is based on your timezone.
                   </div>
                 }
+                showArrow
                 placement="right"
-                className="rounded-md bg-opacity-90"
-                closeDelay={1}
+                delay={1}
               >
-                <span className="px-2 justify-end">
-                  <FaCircleInfo className="cursor-pointer" />
+                <span className="px-2">
+                  <FaCircleInfo className="cursor-pointer text-blue-500" />
                 </span>
               </Tooltip>
             </label>
@@ -588,110 +575,138 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
           </div>
 
           <div className="flex flex-col mb-4">
-            <div className="">
-              <label className="text-gray-700 font-semibold flex items-center">
-                Select Available Time:
-                <Tooltip
-                  showArrow
-                  content={
-                    <div className="font-poppins">
-                      Session start time and end time based on your timezone.
-                    </div>
-                  }
-                  placement="right"
-                  className="rounded-md bg-opacity-90"
-                  closeDelay={1}
-                >
-                  <span className="px-2 justify-end">
-                    <FaCircleInfo className="cursor-pointer" />
-                  </span>
-                </Tooltip>
-              </label>
-            </div>
+            <label className="text-gray-700 font-semibold flex items-center">
+              Select Available Time:
+              <Tooltip
+                content={
+                  <div className="font-poppins p-2 bg-gray-800 text-white rounded-md">
+                    Session start time and end time based on your timezone.
+                  </div>
+                }
+                showArrow
+                placement="right"
+                delay={1}
+              >
+                <span className="px-2">
+                  <FaCircleInfo className="cursor-pointer text-blue-500" />
+                </span>
+              </Tooltip>
+            </label>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="text-gray-500 mt-1">Start Time</label>
-                <select
-                  className="border border-gray-300 rounded px-3 py-2 mt-1 w-full"
-                  value={selectedStartTime}
-                  onChange={(e) => handleStartTimeChange(e)}
-                >
-                  {startTimeOptions.map((time) => (
-                    <option key={time} value={time}>
-                      {time}
-                    </option>
-                  ))}
-                </select>
+                <div className="relative">
+                  <select
+                    className="appearance-none border border-gray-300 rounded px-3 py-2 mt-1 w-full bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-300 focus:outline-none focus:border-blue-400 dark:focus:border-blue-400 transition duration-300 ease-in-out"
+                    value={selectedStartTime}
+                    onChange={handleStartTimeChange}
+                  >
+                    {startTimeOptions.map((time) => (
+                      <option
+                        key={time}
+                        value={time}
+                        className="py-2 px-4 cursor-pointer hover:bg-blue-100 dark:hover:bg-gray-700"
+                      >
+                        {time}
+                      </option>
+                    ))}
+                  </select>
+                  <FaChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none text-gray-400 dark:text-gray-200" />
+                </div>
               </div>
               <div>
                 <label className="text-gray-500 mt-1">End Time</label>
-                <select
-                  className="border border-gray-300 rounded px-3 py-2 mt-1 w-full"
-                  value={selectedEndTime}
-                  onChange={(e) => handleEndTimeChange(e)}
-                >
-                  {endTimeOptions.map((time) => (
-                    <option key={time} value={time}>
-                      {time}
-                    </option>
-                  ))}
-                </select>
+                <div className="relative">
+                  <select
+                    className="appearance-none border border-gray-300 rounded px-3 py-2 mt-1 w-full bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-300 focus:outline-none focus:border-blue-400 dark:focus:border-blue-400 transition duration-300 ease-in-out"
+                    value={selectedEndTime}
+                    onChange={handleEndTimeChange}
+                  >
+                    {endTimeOptions.map((time) => (
+                      <option
+                        key={time}
+                        value={time}
+                        className="py-2 px-4 cursor-pointer hover:bg-blue-100 dark:hover:bg-gray-700"
+                      >
+                        {time}
+                      </option>
+                    ))}
+                  </select>
+                  <FaChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none text-gray-400 dark:text-gray-200" />
+                </div>
               </div>
             </div>
           </div>
 
           <button
             onClick={handleAddSelectedDate}
-            className="bg-blue-shade-100 hover:bg-blue-shade-200 text-white font-bold py-2 px-4 rounded"
+            className="bg-blue-shade-400 hover:bg-blue-shade-500 text-[#0500FF] font-semibold py-2 px-4 rounded-md shadow-md transition duration-300 ease-in-out"
           >
-            Add Session
+            <span className="flex items-center gap-3">
+              <FaPlus className="" />
+              Add Session
+            </span>
           </button>
 
           <div className="mt-6">
             <h3 className="text-lg font-semibold mb-2">
               Selected Dates for Session:
             </h3>
-            <ul>
+            <div className="grid gap-4">
               {allData.map((item: any, index: any) => (
-                <li key={index} className="mb-1">
-                  <span className="font-semibold">{index + 1}.</span>{" "}
-                  {item.date} -{" "}
-                  {item.timeRanges
-                    .map((time: any) => {
-                      const [startHour, startMinute, endHour, endMinute] = time;
-                      return `${startHour}:${startMinute} to ${endHour}:${endMinute}`;
-                    })
-                    .join(", ")}
+                <div
+                  key={index}
+                  className="bg-white p-4 rounded-lg shadow-md flex justify-between items-center"
+                >
+                  <div>
+                    <p className="font-semibold text-gray-700">{item.date}</p>
+                    <p className="text-gray-600">
+                      {item.timeRanges
+                        .map((time: any) => {
+                          const [startHour, startMinute, endHour, endMinute] =
+                            time;
+                          return `${startHour}:${startMinute} to ${endHour}:${endMinute}`;
+                        })
+                        .join(", ")}
+                    </p>
+                  </div>
                   <button
                     disabled={createSessionLoading}
                     onClick={() => handleRemoveDate(item.date, item.timeRanges)}
-                    className="text-red-600 ml-2"
+                    className={`text-red-600 ml-2 px-3 py-1 rounded-full ${
+                      createSessionLoading
+                        ? "opacity-50 cursor-not-allowed"
+                        : "hover:bg-red-100"
+                    }`}
                   >
                     Remove
                   </button>
-                </li>
+                </div>
               ))}
-            </ul>
+            </div>
           </div>
 
           <button
             onClick={() => handleApplyWithCheck()}
-            className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-4 w-[160px]"
+            className={`${
+              createSessionLoading
+                ? "bg-green-400 cursor-not-allowed"
+                : "bg-green-600 hover:bg-green-700"
+            } text-white font-bold py-3 px-4 rounded-3xl mt-4 w-[160px] flex justify-center items-center`}
             disabled={createSessionLoading}
           >
             {createSessionLoading ? (
-              <div className="flex items-center justify-center">
-                <Oval
-                  visible={true}
-                  height="28"
-                  width="28"
-                  color="#2A5D30"
-                  secondaryColor="#cdccff"
-                  ariaLabel="oval-loading"
-                />
-              </div>
+              <Oval
+                visible={true}
+                height="28"
+                width="28"
+                color="#ffffff"
+                secondaryColor="#cdccff"
+                ariaLabel="oval-loading"
+                wrapperClass="flex justify-center items-center"
+              />
             ) : (
-              <>Create Session</>
+              "Create Session"
             )}
           </button>
 
@@ -710,8 +725,12 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
         </div>
 
         {/* Second box- right side */}
-        <div>
-          <AvailableUserSessions daoName={daoName} scheduledSuccess={scheduledSuccess}/>
+        <div className="w-full md:w-auto">
+          <AvailableUserSessions
+            daoName={daoName}
+            scheduledSuccess={scheduledSuccess}
+            setScheduledSuccess={setScheduledSuccess}
+          />
         </div>
       </div>
 

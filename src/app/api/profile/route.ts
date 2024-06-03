@@ -1,32 +1,74 @@
 import { connectDB } from "@/config/connectDB";
+import { Item } from "@radix-ui/react-dropdown-menu";
 import { NextApiRequest, NextApiResponse } from "next";
 import { NextResponse, NextRequest } from "next/server";
 
-// Define the request body type
+// // Define the request body type
+// interface DelegateRequestBody {
+//   address: string;
+//   image: string;
+//   description: string;
+//   daoName: string;
+//   isDelegate: boolean;
+//   displayName: string;
+//   emailId: string;
+//   socialHandles: {
+//     twitter: string;
+//     discord: string;
+//     discourse: string;
+//     github: string;
+//   };
+// }
+
+type network_details = {
+  dao_name: string;
+  network: string;
+  discourse: string;
+};
+
 interface DelegateRequestBody {
   address: string;
   image: string;
   description: string;
-  daoName: string;
   isDelegate: boolean;
   displayName: string;
   emailId: string;
   socialHandles: {
     twitter: string;
     discord: string;
-    discourse: string;
     github: string;
   };
+  networks: network_details[];
 }
 
 // Define the response body type
+// interface DelegateResponseBody {
+//   success: boolean;
+//   data?: {
+//     id: string;
+//     address: string;
+//     image: string;
+//     daoName: string;
+//     description: string;
+//     isDelegate: boolean;
+//     displayName: string;
+//     emailId: string;
+//     socialHandles: {
+//       twitter: string;
+//       discord: string;
+//       discourse: string;
+//       github: string;
+//     };
+//   } | null;
+//   error?: string;
+// }
+
 interface DelegateResponseBody {
   success: boolean;
   data?: {
     id: string;
     address: string;
     image: string;
-    daoName: string;
     description: string;
     isDelegate: boolean;
     displayName: string;
@@ -34,9 +76,9 @@ interface DelegateResponseBody {
     socialHandles: {
       twitter: string;
       discord: string;
-      discourse: string;
       github: string;
     };
+    networks: network_details[];
   } | null;
   error?: string;
 }
@@ -49,11 +91,11 @@ export async function POST(
     address,
     image,
     description,
-    daoName,
     isDelegate,
     displayName,
     emailId,
     socialHandles,
+    networks,
   }: DelegateRequestBody = await req.json();
 
   try {
@@ -72,11 +114,11 @@ export async function POST(
       address,
       image,
       description,
-      daoName,
       isDelegate,
       displayName,
       emailId,
       socialHandles,
+      networks,
     });
     console.log("Delegate document inserted:", result);
 
@@ -116,9 +158,9 @@ export async function PUT(
     description,
     isDelegate,
     displayName,
-    daoName,
     emailId,
     socialHandles,
+    networks,
   }: DelegateRequestBody = await req.json();
 
   console.log("Received Properties:");
@@ -127,7 +169,7 @@ export async function PUT(
   console.log("description:", description);
   console.log("isDelegate:", isDelegate);
   console.log("displayName:", displayName);
-  console.log("daoName: ", daoName);
+  console.log("networks: ", networks);
   console.log("emailId:", emailId);
   console.log("socialHandles:", socialHandles);
 
@@ -150,10 +192,77 @@ export async function PUT(
     if (emailId !== undefined) updateFields.emailId = emailId;
     if (socialHandles !== undefined) updateFields.socialHandles = socialHandles;
 
+    // const documents = await collection
+    //   .find({
+    //     address: { $regex: `^${address}$`, $options: "i" },
+    //     // daoName: daoName,
+    //   })
+    //   .toArray();
+
+    // let flag=0;
+    // documents[0].networks.map((item: any) => {
+    //   if(item.network==networks[0].network){
+    //     flag=1;
+    //   }
+    // });
+
+    // if(flag==1){
+    //   //update give discourse if user try to update discourse
+    //   console.log('exist call');
+    //   documents[0].networks=networks;
+
+    // }
+    // else{
+    //   console.log('push call');
+    //   documents[0].networks.push(networks);
+    // }
+
+    const documents = await collection
+      .find({ address: { $regex: `^${address}$`, $options: "i" } })
+      .toArray();
+
+    if (documents.length > 0) {
+      const document = documents[0];
+      const existingNetworkIndex = document.networks.findIndex(
+        (item: any) => item.dao_name === networks[0].dao_name
+      );
+
+      if (existingNetworkIndex !== -1) {
+        console.log("exist call");
+        const updateQuery = {
+          $set: {
+            [`networks.${existingNetworkIndex}`]: networks[0],
+          },
+        };
+        await collection.updateOne({ address: document.address }, updateQuery);
+      } else {
+        console.log("push call");
+        const updateQuery = {
+          $push: {
+            networks: networks[0],
+          },
+        };
+        /* @ts-ignore */
+        await collection.updateOne({ address: document.address }, updateQuery);
+      }
+    }
+
+    /*
+
+    step 1 : from front-end check which name is come 
+    step 2 : check into network array of object that chain name is there or not 
+    step 3 : if chain name is alredy there so update that discourse_id only 
+    step 4 : if chain name is not exist into our collection or field network array 
+    step 5 : get details of new chain related details like dao,network,discourse
+    step 6 : push data details to network array of object with different discourse id
+    
+
+    */
+
     // Update the delegate document
     console.log("Updating delegate document...");
     const result = await collection.updateOne(
-      { address: address, daoName: daoName },
+      { address: address },
       { $set: updateFields }
     );
     console.log("Delegate document updated:", result);

@@ -44,6 +44,7 @@ function WatchComponentMain({ props }: { props: { id: string } }) {
           throw new Error("Network response was not ok");
         }
         const result = await response.json();
+        console.log("result::::", result);
         setData(result.data[0]);
         setCollection(result.collection);
         console.log(result.data[0].video_uri.video_uri);

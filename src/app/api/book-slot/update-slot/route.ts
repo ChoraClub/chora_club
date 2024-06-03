@@ -14,7 +14,8 @@ export async function PUT(
   res: NextResponse<UpdateBookingStatusResponse>
 ) {
   try {
-    const { id, meeting_status, booking_status, meetingId } = await req.json();
+    const { id, meeting_status, booking_status, meetingId, rejectionReason } =
+      await req.json();
 
     // Validate the ID and booking_status
     if (
@@ -45,7 +46,7 @@ export async function PUT(
     console.log("meetingId", meetingId);
     const updateResult = await collection.updateOne(
       { _id: new ObjectId(id) },
-      { $set: { meeting_status, booking_status, meetingId } }
+      { $set: { meeting_status, booking_status, meetingId, rejectionReason } }
     );
 
     console.log("Meeting booking status updated:", updateResult);
@@ -96,7 +97,7 @@ export async function PUT(
               to: emailId,
               name: "Chora Club",
               subject: "Session Rejected",
-              body: "The session you have booked has been rejected by the delegate.",
+              body: `The session you have booked has been rejected by the delegate due to following reason: ${rejectionReason}`,
             });
           } catch (error) {
             console.error("Error sending mail:", error);
