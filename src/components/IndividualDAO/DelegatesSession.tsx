@@ -7,6 +7,7 @@ import { useRouter } from "next-nprogress-bar";
 import Tile from "../utils/Tile";
 import SessionTile from "../utils/SessionTiles";
 import { Oval } from "react-loader-spinner";
+import RecordedSessionsTile from "../utils/RecordedSessionsTile";
 import {
   Modal,
   ModalContent,
@@ -221,6 +222,7 @@ function DelegatesSession({ props }: { props: string }) {
                 isOfficeHour={false}
                 isSession={""}
               />
+              // <RecordedSessionsTile meetingData={sessionDetails}/>
             ))}
         </div>
       </div>
