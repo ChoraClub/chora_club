@@ -263,7 +263,7 @@ function DelegateVotes({ props }: { props: Type }) {
   }, [currentPage, graphData]);
 
   const chartData = {
-    labels: [`For: ${supportCounts[1]} votes`, `Against: ${supportCounts[0]} votes`, `Absatin: ${supportCounts[2]} votes`],
+    labels: [`For: ${supportCounts[1]} votes`, `Against: ${supportCounts[0]} votes`, `Abstain: ${supportCounts[2]} votes`],
     datasets: [
       {
         label: "# of Votes",

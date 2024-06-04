@@ -266,7 +266,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
 
         const raw = JSON.stringify({
           address: address,
-          daoName: dao,
+          // daoName: dao,
         });
 
         const requestOptions: any = {

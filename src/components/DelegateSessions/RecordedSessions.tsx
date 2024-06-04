@@ -374,9 +374,10 @@ function RecordedSessions() {
                 className="border border-[#D9D9D9] rounded-3xl cursor-pointer"
                 onClick={() => router.push(`/watch/${data.session.meetingId}`)}
                 onMouseEnter={() => setHoveredVideo(index)}
-                onMouseLeave={() => setHoveredVideo(null)}>
+                onMouseLeave={() => setHoveredVideo(null)}
+              >
                 <div
-                  className={`w-full h-44 rounded-t-3xl bg-black object-cover object-center ${styles.container}`}
+                  className={`w-full h-44 rounded-t-3xl bg-black object-cover object-center relative ${styles.container}`}
                 >
                   {hoveredVideo === index ? (
                     <div className="relative">

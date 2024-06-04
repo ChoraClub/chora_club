@@ -222,7 +222,7 @@ function BookSession({ props }: { props: Type }) {
 
       const raw = JSON.stringify({
         address: address,
-        daoName: daoName,
+        // daoName: daoName,
       });
 
       const requestOptions: any = {
@@ -490,7 +490,7 @@ function BookSession({ props }: { props: Type }) {
             const raw = JSON.stringify({
               address: address,
               emailId: mailId,
-              daoName: daoName,
+              // daoName: daoName,
             });
 
             const requestOptions: any = {
@@ -622,6 +622,7 @@ function BookSession({ props }: { props: Type }) {
                     required
                   />
                 </div>
+
                 {showGetMailModal && (
                   <div className="mt-4 border rounded-xl p-4 relative">
                     <button
