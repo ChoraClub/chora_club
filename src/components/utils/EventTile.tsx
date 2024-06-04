@@ -12,6 +12,15 @@ import Link from "next/link";
 import text1 from "@/assets/images/daos/texture1.png";
 import text2 from "@/assets/images/daos/texture2.png";
 import { getEnsName } from "../ConnectWallet/ENSResolver";
+import {
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Button,
+  useDisclosure,
+} from "@nextui-org/react";
 interface RoomDetails {
   message: string;
   data: {
@@ -63,6 +72,8 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
   const [isConfirmSlotLoading, setIsConfirmSlotLoading] = useState(false);
   const router = useRouter();
   const [startLoading, setStartLoading] = useState(false);
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [rejectionReason, setRejectionReason] = useState("");
 
   useEffect(() => {
     setIsPageLoading(false);
@@ -85,6 +96,7 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
     // console.log("confirmSlot clicked");
     // console.log("id:", id);
     // console.log("status:", status);
+    setStartLoading(true);
     try {
       setIsConfirmSlotLoading(true);
       let roomId = null;
@@ -106,6 +118,7 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
         meeting_status: meeting_status,
         booking_status: status,
         meetingId: roomId,
+        rejectionReason: rejectionReason,
       });
 
       const requestOptions = await {
@@ -120,6 +133,7 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
       const result = await response.json();
       if (result.success) {
         toast(`You ${status} the booking.`);
+        setStartLoading(false);
         setTimeout(() => {
           setIsPageLoading(false);
           setIsConfirmSlotLoading(false);
@@ -131,14 +145,12 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
       console.error(error);
     }
   };
-
   return (
     <>
       <div
         key={tileIndex}
         className="flex justify-between p-5 rounded-[2rem]"
-        style={{ boxShadow: "0px 4px 26.7px 0px rgba(0, 0, 0, 0.10)" }}
-      >
+        style={{ boxShadow: "0px 4px 26.7px 0px rgba(0, 0, 0, 0.10)" }}>
         <div className="flex">
           <Image
             src={data.img || text1}
@@ -195,14 +207,14 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
                 : data.booking_status === "Rejected"
                 ? "border border-red-600 text-red-600"
                 : "border border-yellow-500 text-yellow-500"
-            }`}
-          >
+            }`}>
             {data.booking_status}
+            {/* Approve */}
           </div>
 
           {isEvent === "Book" ? (
             data.booking_status === "Approved" ? (
-              <div className="flex justify-end ">
+              <div className="flex justify-between ">
                 {startLoading || isConfirmSlotLoading ? (
                   <div className="flex items-center justify-center">
                     <Oval
@@ -219,8 +231,7 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
                     content="Start Session"
                     placement="top"
                     closeDelay={1}
-                    showArrow
-                  >
+                    showArrow>
                     <span className="cursor-pointer">
                       <FaCirclePlay
                         size={35}
@@ -234,6 +245,68 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
                       />
                     </span>
                   </Tooltip>
+                )}
+                <Tooltip
+                  content="Reject Session"
+                  placement="top"
+                  closeDelay={1}
+                  showArrow>
+                  <span className="cursor-pointer">
+                    <FaCircleXmark onClick={onOpen} size={35} color="#b91c1c" />
+                  </span>
+                </Tooltip>
+                {isOpen && (
+                  <div className="font-poppins z-[70] fixed inset-0 flex items-center justify-center backdrop-blur-md">
+                    <div className="bg-white rounded-[41px] overflow-hidden shadow-lg w-1/2">
+                      <div className="relative">
+                        <div className="flex flex-col gap-1 text-white bg-[#292929] p-4 py-7">
+                          <h2 className="text-lg font-semibold mx-4">
+                            Reason for Rejection
+                          </h2>
+                        </div>
+                        <div className="px-8 py-4">
+                          <div className="mt-4">
+                            <label className="block mb-2 font-semibold">
+                              Rejection Reason:
+                            </label>
+                            <textarea
+                              name="rejectionReason"
+                              value={rejectionReason}
+                              onChange={(e) =>
+                                setRejectionReason(e.target.value)
+                              }
+                              placeholder="Give a reason for rejecting the session"
+                              className="w-full px-4 py-2 border rounded-xl bg-[#D9D9D945]"
+                              required
+                            />
+                          </div>
+                        </div>
+                        <div className="flex justify-end px-8 py-4">
+                          <button
+                            className="bg-gray-300 text-gray-700 px-8 py-3 font-semibold rounded-full mr-4"
+                            onClick={onClose}>
+                            Cancel
+                          </button>
+                          <button
+                            className="bg-red-500 text-white px-8 py-3 font-semibold rounded-full"
+                            onClick={() => confirmSlot(data._id, "Rejected")}>
+                            {startLoading ? (
+                              <Oval
+                                visible={true}
+                                height="20"
+                                width="20"
+                                color="black"
+                                secondaryColor="#cdccff"
+                                ariaLabel="oval-loading"
+                              />
+                            ) : (
+                              "Reject"
+                            )}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 )}
               </div>
             ) : data.booking_status === "Pending" ? (
@@ -254,28 +327,12 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
                     content="Approve"
                     placement="top"
                     closeDelay={1}
-                    showArrow
-                  >
+                    showArrow>
                     <span className="cursor-pointer">
                       <FaCircleCheck
                         onClick={() => confirmSlot(data._id, "Approved")}
                         size={28}
                         color="#4d7c0f"
-                      />
-                    </span>
-                  </Tooltip>
-
-                  <Tooltip
-                    content="Reject"
-                    placement="top"
-                    closeDelay={1}
-                    showArrow
-                  >
-                    <span className="cursor-pointer">
-                      <FaCircleXmark
-                        onClick={() => confirmSlot(data._id, "Rejected")}
-                        size={28}
-                        color="#b91c1c"
                       />
                     </span>
                   </Tooltip>
@@ -289,8 +346,7 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
                   setStartLoading(true);
                   router.push(`/meeting/session/${data.meetingId}/lobby`);
                 }}
-                className="text-center bg-blue-shade-100 rounded-full font-bold text-white py-2 text-xs cursor-pointer"
-              >
+                className="text-center bg-blue-shade-100 rounded-full font-bold text-white py-2 text-xs cursor-pointer">
                 {startLoading ? (
                   <div className="flex justify-center items-center">
                     <Oval

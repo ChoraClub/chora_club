@@ -58,51 +58,37 @@ function UserSessions({
   const getUserMeetingData = async () => {
     try {
       // setDataLoading(true);
-      // console.log("DAO NAMEEEEEEEEE", daoName);
-      //   const response = await fetch(`/api/get-dao-sessions`, {
-      // if (chain?.name === "Optimism") {
-      //   // dao_name = "optimism";
-      //   setDaoName("optimism");
-      // } else if (chain?.name === "Arbitrum One") {
-      //   // dao_name = "arbitrum";
-      //   setDaoName("arbitrum");
-      // }
-      try {
-        // setDataLoading(true);
-        const response = await fetch(`/api/get-sessions`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            address: address,
-            dao_name: daoName,
-          }),
-        });
+      const response = await fetch(`/api/get-sessions`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          address: address,
+          dao_name: daoName,
+        }),
+      });
 
-        // console.log("Response", response);
+      // console.log("Response", response);
 
-        const result = await response.json();
-        console.log("result", result);
-        if (result.success) {
-          const hostedData = await result.hostedMeetings;
-          console.log("hostedData", hostedData);
-          const attendedData = await result.attendedMeetings;
-          console.log("attendedData", attendedData);
-          setDataLoading(true);
-          if (searchParams.get("session") === "hosted") {
-            setSessionDetails(hostedData);
-            console.log("in session hosted");
-          } else if (searchParams.get("session") === "attended") {
-            setSessionDetails(attendedData);
-          }
-          setDataLoading(false);
+      const result = await response.json();
+      console.log("result", result);
+      if (result.success) {
+        const hostedData = await result.hostedMeetings;
+        console.log("hostedData", hostedData);
+        const attendedData = await result.attendedMeetings;
+        console.log("attendedData", attendedData);
+        setDataLoading(true);
+        if (searchParams.get("session") === "hosted") {
+          setSessionDetails(hostedData);
+          console.log("in session hosted");
+        } else if (searchParams.get("session") === "attended") {
+          setSessionDetails(attendedData);
         }
-      } catch (error) {
-        console.log("error in catch", error);
+        setDataLoading(false);
       }
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      console.log("error in catch", error);
     }
   };
 

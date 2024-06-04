@@ -135,8 +135,8 @@ export async function POST(
                 name: "Chora Club",
                 subject: "Session Booked",
                 body: compileBookedSessionTemplate(
-                  "You have Booked a Session.",
-                  "Please wait till the delegate approves the meeting."
+                  "🎉 Hooray! Your session is officially booked! ",
+                  "Get ready for an amazing experience."
                 ),
               });
             } catch (error) {

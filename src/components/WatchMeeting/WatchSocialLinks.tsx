@@ -119,9 +119,9 @@ const WatchSocialLinks = ({
 
   return (
     <>
-      <div className="font-poppins text-lg  ">
+      <div className="font-poppins 1.7xl:text-lg  text-base">
         <div className="flex mb-5">
-          <p className="font-medium">Social Links</p>
+          <p className="font-medium xl:text-base 1.7xl:text-lg">Social Links</p>
         </div>
         <div className="flex flex-col gap-2">
           {socialLinks && socialLinks.length > 0 ? (

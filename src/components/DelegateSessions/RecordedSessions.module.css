@@ -71,3 +71,9 @@
 .videoTimeline:hover .progressArea .progressBar::before {
   display: block;
 }
+
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  /* white-space: nowrap; */
+}

@@ -11,7 +11,7 @@ function AddEmailModal({
   mailId,
   isValidEmail,
   onEmailChange,
-  onSubmit,
+   onSubmit,
 }: {
   addingEmail?: undefined | boolean;
   isOpen?: Boolean | undefined;

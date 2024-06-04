@@ -159,7 +159,7 @@ export async function POST(req: NextRequest, res: NextResponse<Type[]>) {
         const userInfo = await delegatesCollection
           .find({
             address: userAddress,
-            daoName: dao_name,
+            // daoName: dao_name,
           })
           .toArray();
 
