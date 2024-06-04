@@ -431,7 +431,7 @@ function AvailableSessions() {
                       <div className="flex justify-center items-center w-32 h-32">
                         <Image
                           src={
-                            daos.userInfo[0].image
+                            daos?.userInfo[0]?.image
                               ? `https://gateway.lighthouse.storage/ipfs/${daos.userInfo[0].image}`
                               : daos.session.dao_name === "optimism"
                               ? OPLogo
