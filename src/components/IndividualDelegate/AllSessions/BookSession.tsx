@@ -24,6 +24,7 @@ import BookingSuccessModal from "./BookingSuccessModal";
 import AddEmailModal from "@/components/utils/AddEmailModal";
 import { RxCross2 } from "react-icons/rx";
 import { MdCancel } from "react-icons/md";
+import lighthouse from "@lighthouse-web3/sdk"
 interface Type {
   daoDelegates: string;
   individualDelegate: string;
@@ -69,7 +70,7 @@ function BookSession({ props }: { props: Type }) {
   const [continueAPICalling, setContinueAPICalling] = useState<Boolean>(false);
   const [userRejected, setUserRejected] = useState<Boolean>();
   const [addingEmail, setAddingEmail] = useState<boolean>();
-
+  const [selectedFile, setSelectedFile] = useState("");
   useEffect(() => {
     // Lock scrolling when the modal is open
     if (isOpen) {
@@ -320,14 +321,35 @@ function BookSession({ props }: { props: Type }) {
     // console.log("roomId", roomId);
     return roomId;
   };
+
+  const handleFileChange = (event: any) => {
+    setSelectedFile(event.target.files); // Capture the first file
+  };
+  
+  const uploadImage = async (selectedFile: any) =>{
+    const apiKey = process.env.NEXT_PUBLIC_LIGHTHOUSE_KEY
+    ? process.env.NEXT_PUBLIC_LIGHTHOUSE_KEY
+    : "";
+
+    const output = await lighthouse.upload(selectedFile, apiKey);
+
+    console.log("File Status:", output);
+    console.log("File Status:", output.data.Hash);
+    return output.data.Hash;
+  }
+
   const apiCall = async () => {
     let roomId = await createRandomRoom();
+    
+    let thumbnailHash = await uploadImage(selectedFile);
+    
 
     const requestData = {
       dao_name: props.daoDelegates,
       slot_time: dateInfo,
       title: modalData.title,
       description: modalData.description,
+      thumbnail:thumbnailHash,
       host_address: host_address,
       attendees: [{ attendee_address: address }],
       meeting_status: "",
@@ -615,20 +637,20 @@ function BookSession({ props }: { props: Type }) {
               </div>
               <div className="px-8 py-4">
                 <div className="mt-4">
-                  <label className="block mb-2 font-semibold">Title:</label>
+                  <label className="block mb-2 font-semibold">Title<span style={{color:"red"}}>*</span></label>
                   <input
                     type="text"
                     name="title"
                     value={modalData.title}
                     onChange={handleModalInputChange}
-                    placeholder="Explain Governance"
+                    placeholder="Add title for the session"
                     className="w-full px-4 py-2 border rounded-xl bg-[#D9D9D945]"
                     required
                   />
                 </div>
                 <div className="mt-4">
                   <label className="block mb-2 font-semibold">
-                    Description:
+                    Description<span style={{color:"red"}}>*</span>
                   </label>
                   <textarea
                     name="description"
@@ -639,7 +661,18 @@ function BookSession({ props }: { props: Type }) {
                     required
                   />
                 </div>
-
+                <div className="mt-4">
+                  <label className="block mb-2 font-semibold">
+                    Thumbnail Image
+                  </label>
+                  <input
+                    type="file"
+                    name="image"
+                    accept="image/*"
+                    className="w-full px-4 py-2 border rounded-xl bg-[#D9D9D945]"
+                    onChange={handleFileChange}
+                  />
+                </div>
                 {showGetMailModal && (
                   <div className="mt-4 border rounded-xl p-4 relative">
                     <button
