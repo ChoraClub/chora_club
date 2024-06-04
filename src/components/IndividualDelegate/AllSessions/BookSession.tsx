@@ -426,11 +426,25 @@ function BookSession({ props }: { props: Type }) {
     ];
   }
 
+  function subtractOneMinute(date: any) {
+    // Create a new Date object from the provided date
+    let newDate = new Date(date);
+    // Subtract one minute (60000 milliseconds)
+    newDate.setTime(newDate.getTime() - 60000);
+    return newDate;
+  }
+
   function timeSlotValidator(
     slotTime: any,
     dateAndRanges: any,
     bookedSlots: any
   ) {
+    dateAndRanges = dateAndRanges.map((range: any) => ({
+      formattedUTCTime_startTime: range.formattedUTCTime_startTime,
+      formattedUTCTime_endTime: subtractOneMinute(
+        range.formattedUTCTime_endTime
+      ),
+    }));
     for (const {
       formattedUTCTime_startTime: startTime,
       formattedUTCTime_endTime: endTime,
@@ -559,7 +573,8 @@ function BookSession({ props }: { props: Type }) {
               marginTop: "2rem",
               boxShadow: "0px 4px 50.8px 0px rgba(0, 0, 0, 0.11)",
               width: "fit-content",
-            }}>
+            }}
+          >
             <StyledTimePickerContainer>
               <DayTimeScheduler
                 allowedDates={allowedDates}
@@ -580,7 +595,8 @@ function BookSession({ props }: { props: Type }) {
       {isOpen && (
         <div
           className="font-poppins z-[70] fixed inset-0 flex items-center justify-center backdrop-blur-md"
-          style={{ boxShadow: " 0px 0px 45px -17px rgba(0,0,0,0.75)" }}>
+          style={{ boxShadow: " 0px 0px 45px -17px rgba(0,0,0,0.75)" }}
+        >
           <div className="bg-white rounded-[41px] overflow-hidden shadow-lg w-1/2">
             <div className="relative">
               <div className="flex flex-col gap-1 text-white bg-[#292929] p-4 py-7">
@@ -591,7 +607,8 @@ function BookSession({ props }: { props: Type }) {
                     onClick={() => {
                       onClose();
                       setIsScheduling(false);
-                    }}>
+                    }}
+                  >
                     <MdCancel size={28} color="white" />
                   </button>
                 </h2>
@@ -627,7 +644,8 @@ function BookSession({ props }: { props: Type }) {
                   <div className="mt-4 border rounded-xl p-4 relative">
                     <button
                       className="absolute top-2 right-3"
-                      onClick={handleGetMailModalClose}>
+                      onClick={handleGetMailModalClose}
+                    >
                       <MdCancel size={25} />
                     </button>
                     <h2 className="text-blue-shade-200 font-semibold text-base">
@@ -648,7 +666,8 @@ function BookSession({ props }: { props: Type }) {
                       <button
                         onClick={handleSubmit}
                         className="bg-black text-white px-8 py-3 rounded-3xl hover:bg-gray-900"
-                        disabled={addingEmail}>
+                        disabled={addingEmail}
+                      >
                         {addingEmail ? (
                           <div className="flex items-center justify-center px-3 py-[0.15rem]">
                             <ThreeDots
@@ -681,7 +700,8 @@ function BookSession({ props }: { props: Type }) {
                 <button
                   className="bg-blue-shade-200 text-white px-8 py-3 font-semibold rounded-full"
                   onClick={checkBeforeApiCall}
-                  disabled={confirmSave}>
+                  disabled={confirmSave}
+                >
                   {confirmSave ? (
                     <div className="flex items-center">
                       <Oval
