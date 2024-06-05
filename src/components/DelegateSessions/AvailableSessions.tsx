@@ -466,7 +466,7 @@ function AvailableSessions() {
 
                   <div className="w-3/4 ml-4">
                     <div className="text-[#3E3D3D] text-lg font-semibold mb-1">
-                      {ensNames[daos.userInfo[0].address] ||
+                      {ensNames[daos.userInfo[0]?.address] ||
                         daos.userInfo[0].displayName ||
                         daos.session.userAddress.slice(0, 6) +
                           "..." +

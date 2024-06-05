@@ -495,7 +495,7 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
               Select DAO Name:
               <Tooltip
                 content={
-                  <div className="font-poppins p-2 bg-gray-800 text-white rounded-md">
+                  <div className="font-poppins p-2 max-w-80 text-black rounded-md">
                     DAO for which the session is to be created. The attestations
                     will be issued for the selected DAO. The attendees of this
                     session will seek questions related to the selected DAO.
@@ -520,7 +520,7 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
               Select Time Slot Size:
               <Tooltip
                 content={
-                  <div className="font-poppins p-2 bg-gray-800 text-white rounded-md">
+                  <div className="font-poppins p-2 max-w-80 text-black rounded-md">
                     The duration for which you would be able to take the
                     session. The preferred duration is 30 minutes. And note that
                     the selected time slot size will apply to all the selected
@@ -552,7 +552,7 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
               Select Date:
               <Tooltip
                 content={
-                  <div className="font-poppins p-2 bg-gray-800 text-white rounded-md">
+                  <div className="font-poppins p-2 text-black rounded-md">
                     It is based on your timezone.
                   </div>
                 }
@@ -579,7 +579,7 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
               Select Available Time:
               <Tooltip
                 content={
-                  <div className="font-poppins p-2 bg-gray-800 text-white rounded-md">
+                  <div className="font-poppins p-2 max-w-80 text-black rounded-md">
                     Session start time and end time based on your timezone.
                   </div>
                 }
