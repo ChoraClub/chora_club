@@ -541,9 +541,11 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
               onChange={(e) => setTimeSlotSizeMinutes(Number(e.target.value))}
               className="border border-gray-300 rounded px-3 py-2 mt-1 w-full"
             >
-              <option value={15}>15 minutes</option>
+              {/* <option value={15}>15 minutes</option> */}
               <option value={30}>30 minutes</option>
-              <option value={45}>45 minutes</option>
+              <option value={45} disabled>
+                45 minutes (Under development - It will be live soon)
+              </option>
             </select>
           </div>
 

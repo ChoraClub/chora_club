@@ -64,6 +64,14 @@ function AttendingUserSessions({ daoName }: { daoName: string }) {
           let filteredData: any = resultData;
           if (searchParams.get("session") === "attending") {
             filteredData = resultData.filter((session: Session) => {
+              console.log(
+                "new Date(session.slot_time).toLocaleString()",
+                new Date(session.slot_time).toLocaleString()
+              );
+              console.log(
+                "currentSlot.toLocaleString()",
+                currentSlot.toLocaleString()
+              );
               return (
                 session.meeting_status !== "Recorded" &&
                 new Date(session.slot_time).toLocaleString() >=

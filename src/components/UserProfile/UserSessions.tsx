@@ -110,10 +110,10 @@ function UserSessions({
   // }, [searchParams.get("session")]);
 
   useEffect(() => {
-    if (!selfDelegate && searchParams.get("session") === "schedule") {
+    if (selfDelegate === false && searchParams.get("session") === "schedule") {
       router.replace(path + "?active=sessions&session=attending");
     }
-  }, [isDelegate, selfDelegate]);
+  }, [selfDelegate]);
   return (
     <div>
       <div className="pr-32 pt-3">
