@@ -61,8 +61,9 @@ function AvailableUserSessions({
   }, [daoName, address, scheduledSuccess === true]);
 
   return (
-    <div className="max-w-xl mt-2 p-8 bg-white rounded-2xl shadow-lg min-w-[34rem] min-h-[35rem]">
-      <h1 className="text-[#52648c] font-semibold text-2xl mb-4">
+    // <div className="max-w-xl mt-2 p-8 bg-white rounded-2xl shadow-lg min-w-[34rem] min-h-[35rem]">
+    <div className="">
+      <h1 className="text-[#52648c] font-semibold 1.5lg:text-2xl text-xl mb-4 flex justify-center">
         Your Scheduled Availability
       </h1>
       {dataLoading ? (

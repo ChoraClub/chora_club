@@ -18,6 +18,8 @@ import { useNetwork, useAccount } from "wagmi";
 import styles from "./Tile.module.css";
 import { ethers } from "ethers";
 import { getEnsName } from "../ConnectWallet/ENSResolver";
+import { FaPencil } from "react-icons/fa6";
+import { Tooltip } from "@nextui-org/react";
 // const { ethers } = require("ethers");
 
 type Attendee = {
@@ -382,9 +384,9 @@ SessionTileProps) {
                 </div>
               </div>
 
-              <div className="flex items-end gap-2">
                 {isSession === "attended" &&
                   data.attendees[0]?.attendee_uid && (
+                    <div className="flex items-end gap-2">
                     <button
                       className="bg-blue-shade-100 text-white text-sm py-1 px-3 rounded-full font-semibold outline-none"
                       onClick={(e) => {
@@ -422,16 +424,31 @@ SessionTileProps) {
                         "Claim"
                       )}
                     </button>
+                    </div>
                   )}
 
                 {isSession === "hosted" && data.uid_host && (
-                  <>
-                    <button
+                  <div className="flex flex-col justify-between ">
+                    {/* <button
                       className="bg-blue-shade-100 text-white text-sm py-1 px-5 rounded-full font-semibold outline-none"
                       onClick={handleEditModal}
                     >
                       Edit
-                    </button>
+                    </button> */}
+                    <div className="flex justify-end items-center">
+                    <Tooltip
+                      content="Edit Details"
+                      placement="right"
+                      showArrow>
+                    <span
+                        className="border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 cursor-pointer w-6"
+                        style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
+                        onClick={handleEditModal}
+                        >
+                        <FaPencil color="#3e3d3d" size={12} />
+                      </span>
+                      </Tooltip>
+                          </div>
                     <button
                       className="bg-blue-shade-100 text-white text-sm py-1 px-3 rounded-full font-semibold outline-none"
                       onClick={(e) => {
@@ -468,10 +485,10 @@ SessionTileProps) {
                         "Claim"
                       )}
                     </button>
-                  </>
+                  </div>
                 )}
               </div>
-            </div>
+            
 
 {editOpen && (
   <>
