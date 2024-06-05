@@ -18,7 +18,7 @@ import user6 from "@/assets/images/user/user6.svg";
 import user7 from "@/assets/images/user/user7.svg";
 import user8 from "@/assets/images/user/user8.svg";
 import user9 from "@/assets/images/user/user9.svg";
-import { parseISO } from "date-fns";
+// import { parseISO } from "date-fns";
 import { getEnsName } from "../ConnectWallet/ENSResolver";
 
 interface meeting {
@@ -114,32 +114,32 @@ function RecordedSessionsTile({ meetingData }: meeting) {
     setRandomUserImages(newRandomUserImages);
   }, [meetingData]);
 
-  const formatTimeAgo = (utcTime: string): string => {
-    const parsedTime = parseISO(utcTime);
-    const currentTime = new Date();
-    const differenceInSeconds = Math.abs(
-      (parsedTime.getTime() - currentTime.getTime()) / 1000
-    );
+  // const formatTimeAgo = (utcTime: string): string => {
+  //   const parsedTime = parseISO(utcTime);
+  //   const currentTime = new Date();
+  //   const differenceInSeconds = Math.abs(
+  //     (parsedTime.getTime() - currentTime.getTime()) / 1000
+  //   );
 
-    if (differenceInSeconds < 60) {
-      return "Just now";
-    } else if (differenceInSeconds < 3600) {
-      const minutes = Math.round(differenceInSeconds / 60);
-      return `${minutes} minute${minutes === 1 ? "" : "s"} ago`;
-    } else if (differenceInSeconds < 86400) {
-      const hours = Math.round(differenceInSeconds / 3600);
-      return `${hours} hour${hours === 1 ? "" : "s"} ago`;
-    } else if (differenceInSeconds < 604800) {
-      const days = Math.round(differenceInSeconds / 86400);
-      return `${days} day${days === 1 ? "" : "s"} ago`;
-    } else if (differenceInSeconds < 31536000) {
-      const weeks = Math.round(differenceInSeconds / 604800);
-      return `${weeks} week${weeks === 1 ? "" : "s"} ago`;
-    } else {
-      const years = Math.round(differenceInSeconds / 31536000);
-      return `${years} year${years === 1 ? "" : "s"} ago`;
-    }
-  };
+  //   if (differenceInSeconds < 60) {
+  //     return "Just now";
+  //   } else if (differenceInSeconds < 3600) {
+  //     const minutes = Math.round(differenceInSeconds / 60);
+  //     return `${minutes} minute${minutes === 1 ? "" : "s"} ago`;
+  //   } else if (differenceInSeconds < 86400) {
+  //     const hours = Math.round(differenceInSeconds / 3600);
+  //     return `${hours} hour${hours === 1 ? "" : "s"} ago`;
+  //   } else if (differenceInSeconds < 604800) {
+  //     const days = Math.round(differenceInSeconds / 86400);
+  //     return `${days} day${days === 1 ? "" : "s"} ago`;
+  //   } else if (differenceInSeconds < 31536000) {
+  //     const weeks = Math.round(differenceInSeconds / 604800);
+  //     return `${weeks} week${weeks === 1 ? "" : "s"} ago`;
+  //   } else {
+  //     const years = Math.round(differenceInSeconds / 31536000);
+  //     return `${years} year${years === 1 ? "" : "s"} ago`;
+  //   }
+  // };
 
   const daoLogos = {
     optimism: oplogo,
@@ -321,9 +321,9 @@ function RecordedSessionsTile({ meetingData }: meeting) {
                   </div>
                   <div className="capitalize">{data.session.dao_name}</div>
                 </div>
-                <div className="bg-[#F5F5F5] py-1 px-3 rounded-md">
+                {/* <div className="bg-[#F5F5F5] py-1 px-3 rounded-md">
                   {formatTimeAgo(data.session.slot_time)}
-                </div>
+                </div> */}
               </div>
               <div className="">
                 <div className="flex items-center gap-2 py-1 ps-3 text-sm">

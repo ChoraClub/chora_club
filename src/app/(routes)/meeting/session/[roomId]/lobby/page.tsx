@@ -281,7 +281,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
 
         if (Array.isArray(resultData)) {
           const filtered: any = resultData.filter((data) => {
-            return data.daoName === dao && data.displayName !== "";
+            return data.displayName !== "";
           });
           console.log("filtered profile: ", filtered);
           setProfileDetails(filtered[0]);

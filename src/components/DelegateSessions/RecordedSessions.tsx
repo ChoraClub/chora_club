@@ -12,8 +12,7 @@ import toast, { Toaster } from "react-hot-toast";
 import copy from "copy-to-clipboard";
 import styles from "./RecordedSessions.module.css";
 import { Oval } from "react-loader-spinner";
-// const { parseISO } = require("date-fns");
-import { parseISO } from "date-fns";
+// import { parseISO } from "date-fns";
 // import { useRouter } from "next/navigation";
 import { useRouter } from "next-nprogress-bar";
 import user1 from "@/assets/images/user/user1.svg";
@@ -90,32 +89,32 @@ function RecordedSessions() {
     getRecordedMeetings();
   }, []);
 
-  const formatTimeAgo = (utcTime: string): string => {
-    const parsedTime = parseISO(utcTime);
-    const currentTime = new Date();
-    const differenceInSeconds = Math.abs(
-      (parsedTime.getTime() - currentTime.getTime()) / 1000
-    );
+  // const formatTimeAgo = (utcTime: string): string => {
+  //   const parsedTime = parseISO(utcTime);
+  //   const currentTime = new Date();
+  //   const differenceInSeconds = Math.abs(
+  //     (parsedTime.getTime() - currentTime.getTime()) / 1000
+  //   );
 
-    if (differenceInSeconds < 60) {
-      return "Just now";
-    } else if (differenceInSeconds < 3600) {
-      const minutes = Math.round(differenceInSeconds / 60);
-      return `${minutes} minute${minutes === 1 ? "" : "s"} ago`;
-    } else if (differenceInSeconds < 86400) {
-      const hours = Math.round(differenceInSeconds / 3600);
-      return `${hours} hour${hours === 1 ? "" : "s"} ago`;
-    } else if (differenceInSeconds < 604800) {
-      const days = Math.round(differenceInSeconds / 86400);
-      return `${days} day${days === 1 ? "" : "s"} ago`;
-    } else if (differenceInSeconds < 31536000) {
-      const weeks = Math.round(differenceInSeconds / 604800);
-      return `${weeks} week${weeks === 1 ? "" : "s"} ago`;
-    } else {
-      const years = Math.round(differenceInSeconds / 31536000);
-      return `${years} year${years === 1 ? "" : "s"} ago`;
-    }
-  };
+  //   if (differenceInSeconds < 60) {
+  //     return "Just now";
+  //   } else if (differenceInSeconds < 3600) {
+  //     const minutes = Math.round(differenceInSeconds / 60);
+  //     return `${minutes} minute${minutes === 1 ? "" : "s"} ago`;
+  //   } else if (differenceInSeconds < 86400) {
+  //     const hours = Math.round(differenceInSeconds / 3600);
+  //     return `${hours} hour${hours === 1 ? "" : "s"} ago`;
+  //   } else if (differenceInSeconds < 604800) {
+  //     const days = Math.round(differenceInSeconds / 86400);
+  //     return `${days} day${days === 1 ? "" : "s"} ago`;
+  //   } else if (differenceInSeconds < 31536000) {
+  //     const weeks = Math.round(differenceInSeconds / 604800);
+  //     return `${weeks} week${weeks === 1 ? "" : "s"} ago`;
+  //   } else {
+  //     const years = Math.round(differenceInSeconds / 31536000);
+  //     return `${years} year${years === 1 ? "" : "s"} ago`;
+  //   }
+  // };
 
   // const handleTimeUpdate = (video: HTMLVideoElement, index: number) => {
   //   const duration = video.duration;

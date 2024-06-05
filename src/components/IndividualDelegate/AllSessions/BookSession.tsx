@@ -330,7 +330,7 @@ function BookSession({ props }: { props: Type }) {
       description: modalData.description,
       host_address: host_address,
       attendees: [{ attendee_address: address }],
-      meeting_status: "",
+      meeting_status: "Upcoming",
       booking_status: "Approved",
       session_type: "session",
       meetingId: roomId,
@@ -371,7 +371,7 @@ function BookSession({ props }: { props: Type }) {
     onClose();
   };
 
-  const timeSlotSizeMinutes = 15;
+  const timeSlotSizeMinutes = 30;
   let dateAndRanges: any = [];
   let allowedDates: any = [];
 
@@ -457,7 +457,7 @@ function BookSession({ props }: { props: Type }) {
         // Check if the slot is booked
         const isBooked = bookedSlots.some((bookedSlot: any) => {
           return (
-            dateFns?.isSameDay(startTime, bookedSlot) &&
+            dateFns.isSameDay(startTime, bookedSlot) &&
             slotTime.getHours() === bookedSlot.getHours() &&
             slotTime.getMinutes() === bookedSlot.getMinutes()
           );

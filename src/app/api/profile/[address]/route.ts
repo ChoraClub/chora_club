@@ -95,7 +95,7 @@ export async function POST(
     // console.log("this is url", req.url);
 
     // Extract address from request parameters
-    // const address = req.url.split("profile/")[1];
+    const address = req.url.split("profile/")[1];
 
     // Find documents based on address
     console.log("Finding documents for address:", address);
