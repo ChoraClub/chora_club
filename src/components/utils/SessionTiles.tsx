@@ -18,6 +18,8 @@ import { useNetwork, useAccount } from "wagmi";
 import styles from "./Tile.module.css";
 import { ethers } from "ethers";
 import { getEnsName } from "../ConnectWallet/ENSResolver";
+import lighthouse from "@lighthouse-web3/sdk";
+import toast from "react-hot-toast";
 // const { ethers } = require("ethers");
 
 type Attendee = {
@@ -104,8 +106,15 @@ SessionTileProps) {
   );
   const [isClaimed, setIsClaimed] = useState<{ [index: number]: boolean }>({});
   const [editOpen, setEditOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    title: "",
+    description: "",
+    image: "",
+  });
 
-  const handleEditModal = () => {
+  const handleEditModal = (index: number) => {
+    setSelectedTileIndex(index);
     setEditOpen(true);
   };
   const handleCloseEdit = () => {
@@ -296,223 +305,260 @@ SessionTileProps) {
     });
   }, [sessionDetails]);
 
+  const handleChange = (e: any) => {
+    const { name, value, files } = e.target;
+    console.log("name-value-files", name, value, files);
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: files ? files : value,
+    }));
+  };
+
+  const handleSave = async (sessionData: any) => {
+    // Handle save logic here, such as making an API call
+    setLoading(true);
+    console.log(formData);
+    console.log(sessionData);
+    // Close the modal after saving
+    const progressCallback = async (progressData: any) => {
+      let percentageDone =
+        100 -
+        (
+          ((progressData?.total as any) / progressData?.uploaded) as any
+        )?.toFixed(2);
+      console.log(percentageDone);
+    };
+
+    const apiKey = process.env.NEXT_PUBLIC_LIGHTHOUSE_KEY
+      ? process.env.NEXT_PUBLIC_LIGHTHOUSE_KEY
+      : "";
+    try {
+      const output = await lighthouse.upload(formData.image, apiKey);
+      console.log("image output: ", output.data.Hash);
+
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+
+      const raw = JSON.stringify({
+        meetingId: sessionData.meetingId,
+        host_address: sessionData.host_address,
+        title: formData.title,
+        description: formData.description,
+        thumbnail_image: output.data.Hash,
+      });
+
+      const requestOptions: any = {
+        method: "PUT",
+        headers: myHeaders,
+        body: raw,
+        redirect: "follow",
+      };
+      const response = await fetch(
+        `/api/update-recorded-session`,
+        requestOptions
+      );
+      if (response) {
+        const responseData = await response.json();
+        console.log("responseData: ", responseData);
+        setLoading(false);
+      } else {
+        setLoading(false);
+      }
+
+      handleCloseEdit();
+    } catch (e) {
+      toast.error("Unable to update the data.");
+      setLoading(false);
+      handleCloseEdit();
+    }
+  };
+
   return (
     <>
-      <div className="space-y-6">
+      <div className="">
         {sessionDetails.length > 0 ? (
-          sessionDetails.map((data: SessionData, index: any) => (
+          sessionDetails.map((data: any, index: any) => (
             <>
-            <div
-              key={index}
-              className={`flex p-5 rounded-[2rem] cursor-pointer justify-between ${
-                isEvent === "Recorded" ? "cursor-pointer" : ""
-              }`}
-              style={{ boxShadow: "0px 4px 26.7px 0px rgba(0, 0, 0, 0.10)" }}
-              // onClick={() => openModal(index)}
-              // onClick={
-              //   isEvent === "Recorded"
-              //     ? () => router.push(`/watch/${data.meetingId}`)
-              //     : () => null
-              // }
-            >
-              <div className="flex">
-                <Image
-                  src={text2}
-                  alt="image"
-                  className="w-44 h-44 rounded-3xl border border-[#D9D9D9]"
-                />
+              <div
+                key={index}
+                className={`flex p-5 rounded-[2rem] cursor-pointer justify-between mb-5 ${
+                  isEvent === "Recorded" ? "cursor-pointer" : ""
+                }`}
+                style={{ boxShadow: "0px 4px 26.7px 0px rgba(0, 0, 0, 0.10)" }}
+                // onClick={() => openModal(index)}
+                onClick={
+                  isEvent === "Recorded"
+                    ? () => router.push(`/watch/${data.meetingId}`)
+                    : () => null
+                }
+              >
+                <div className="flex">
+                  <Image
+                    src={
+                      data.thumbnail_image
+                        ? `https://gateway.lighthouse.storage/ipfs/${data.thumbnail_image}`
+                        : text2
+                    }
+                    width={200}
+                    height={200}
+                    alt="image"
+                    className="w-44 h-44 rounded-3xl border border-[#D9D9D9] object-cover object-center"
+                  />
 
-                <div className="ps-6 pe-12 py-1">
-                  <div className="font-semibold text-blue-shade-200 text-xl">
-                    {data.title}
-                  </div>
-
-                  <div className="flex space-x-4 py-2">
-                    <div className="bg-[#1E1E1E] border border-[#1E1E1E] text-white rounded-md text-xs px-5 py-1 font-semibold capitalize">
-                      {data.dao_name}
+                  <div className="ps-6 pe-12 py-1">
+                    <div className="font-semibold text-blue-shade-200 text-xl">
+                      {data.title}
                     </div>
-                    {/* <div className="border border-[#1E1E1E] rounded-md text-[#1E1E1E] text-xs px-5 py-1 font-medium">
+
+                    <div className="flex space-x-4 py-2">
+                      <div className="bg-[#1E1E1E] border border-[#1E1E1E] text-white rounded-md text-xs px-5 py-1 font-semibold capitalize">
+                        {data.dao_name}
+                      </div>
+                      {/* <div className="border border-[#1E1E1E] rounded-md text-[#1E1E1E] text-xs px-5 py-1 font-medium">
                     {data.participant} Participants
                   </div> */}
-                  </div>
-
-                  <div className="pt-2 pe-10">
-                    <hr />
-                  </div>
-
-                  <div className="flex gap-x-16 text-sm py-3">
-                    {data.session_type === "session" ? (
-                      <div className="text-[#3E3D3D]">
-                        <span className="font-semibold">Session - </span>{" "}
-                        <span className="font-semibold">Guest:</span>{" "}
-                        {formatWalletAddress(
-                          data.attendees[0].attendee_address
-                        )}
-                      </div>
-                    ) : (
-                      <div className="text-[#3E3D3D]">
-                        <span className="font-semibold">Instant Meet</span>{" "}
-                      </div>
-                    )}
-                    <div className="text-[#3E3D3D]">
-                      <span className="font-semibold">Host:</span>{" "}
-                      {formatWalletAddress(data.host_address)}
                     </div>
-                    <div className="text-[#3E3D3D]">
-                      {isEvent === "Upcoming" ? (
-                        <span className="font-semibold">Starts at: </span>
-                      ) : isEvent === "Recorded" ? (
-                        <span className="font-semibold">Started at: </span>
-                      ) : null}
-                      {formatSlotTimeToLocal(data.slot_time)}
-                    </div>
-                  </div>
 
-                  <div
-                    className={`text-[#1E1E1E] text-sm ${
-                      expanded[index] ? "" : `${styles.desc} cursor-pointer`
-                    }`}
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      toggleDescription(index);
-                    }}
-                  >
-                    {data.description}
+                    <div className="pt-2 pe-10">
+                      <hr />
+                    </div>
+
+                    <div className="flex gap-x-16 text-sm py-3">
+                      {data.session_type === "session" ? (
+                        <div className="text-[#3E3D3D]">
+                          <span className="font-semibold">Session - </span>{" "}
+                          <span className="font-semibold">Guest:</span>{" "}
+                          {formatWalletAddress(
+                            data.attendees[0].attendee_address
+                          )}
+                        </div>
+                      ) : (
+                        <div className="text-[#3E3D3D]">
+                          <span className="font-semibold">Instant Meet</span>{" "}
+                        </div>
+                      )}
+                      <div className="text-[#3E3D3D]">
+                        <span className="font-semibold">Host:</span>{" "}
+                        {formatWalletAddress(data.host_address)}
+                      </div>
+                      <div className="text-[#3E3D3D]">
+                        {isEvent === "Upcoming" ? (
+                          <span className="font-semibold">Starts at: </span>
+                        ) : isEvent === "Recorded" ? (
+                          <span className="font-semibold">Started at: </span>
+                        ) : null}
+                        {formatSlotTimeToLocal(data.slot_time)}
+                      </div>
+                    </div>
+
+                    <div
+                      className={`text-[#1E1E1E] text-sm ${
+                        expanded[index] ? "" : `${styles.desc} cursor-pointer`
+                      }`}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        toggleDescription(index);
+                      }}
+                    >
+                      {data.description}
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="flex items-end gap-2">
-                {isSession === "attended" &&
-                  data.attendees[0]?.attendee_uid && (
-                    <button
-                      className="bg-blue-shade-100 text-white text-sm py-1 px-3 rounded-full font-semibold outline-none"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleAttestationOnchain({
-                          meetingId: data.meetingId,
-                          meetingType: 2,
-                          meetingStartTime: data.attestations[0].startTime,
-                          meetingEndTime: data.attestations[0].endTime,
-                          index,
-                          dao: data.dao_name,
-                        });
-                      }}
-                      disabled={
-                        !!data.attendees[0].onchain_attendee_uid ||
-                        isClaiming[index] ||
-                        isClaimed[index]
-                      }
-                    >
-                      {isClaiming[index] ? (
-                        <div className="flex items-center justify-center px-3">
-                          <Oval
-                            visible={true}
-                            height="20"
-                            width="20"
-                            color="#fff"
-                            secondaryColor="#cdccff"
-                            ariaLabel="oval-loading"
-                          />
-                        </div>
-                      ) : data.attendees[0].onchain_attendee_uid ||
-                        isClaimed[index] ? (
-                        "Claimed"
-                      ) : (
-                        "Claim"
-                      )}
-                    </button>
+                <div className="flex items-end gap-2">
+                  {isSession === "attended" &&
+                    data.attendees[0]?.attendee_uid && (
+                      <button
+                        className="bg-blue-shade-100 text-white text-sm py-1 px-3 rounded-full font-semibold outline-none"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleAttestationOnchain({
+                            meetingId: data.meetingId,
+                            meetingType: 2,
+                            meetingStartTime: data.attestations[0].startTime,
+                            meetingEndTime: data.attestations[0].endTime,
+                            index,
+                            dao: data.dao_name,
+                          });
+                        }}
+                        disabled={
+                          !!data.attendees[0].onchain_attendee_uid ||
+                          isClaiming[index] ||
+                          isClaimed[index]
+                        }
+                      >
+                        {isClaiming[index] ? (
+                          <div className="flex items-center justify-center px-3">
+                            <Oval
+                              visible={true}
+                              height="20"
+                              width="20"
+                              color="#fff"
+                              secondaryColor="#cdccff"
+                              ariaLabel="oval-loading"
+                            />
+                          </div>
+                        ) : data.attendees[0].onchain_attendee_uid ||
+                          isClaimed[index] ? (
+                          "Claimed"
+                        ) : (
+                          "Claim"
+                        )}
+                      </button>
+                    )}
+
+                  {isSession === "hosted" && data.uid_host && (
+                    <>
+                      <button
+                        className="bg-blue-shade-100 text-white text-sm py-1 px-5 rounded-full font-semibold outline-none"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEditModal(index);
+                        }}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        className="bg-blue-shade-100 text-white text-sm py-1 px-3 rounded-full font-semibold outline-none"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleAttestationOnchain({
+                            meetingId: data.meetingId,
+                            meetingType: 1,
+                            meetingStartTime: data.attestations[0].startTime,
+                            meetingEndTime: data.attestations[0].endTime,
+                            index,
+                            dao: data.dao_name,
+                          });
+                        }}
+                        disabled={
+                          !!data.onchain_host_uid ||
+                          isClaiming[index] ||
+                          isClaimed[index]
+                        }
+                      >
+                        {isClaiming[index] ? (
+                          <div className="flex items-center justify-center px-3">
+                            <Oval
+                              visible={true}
+                              height="20"
+                              width="20"
+                              color="#fff"
+                              secondaryColor="#cdccff"
+                              ariaLabel="oval-loading"
+                            />
+                          </div>
+                        ) : data.onchain_host_uid || isClaimed[index] ? (
+                          "Claimed"
+                        ) : (
+                          "Claim"
+                        )}
+                      </button>
+                    </>
                   )}
-
-                {isSession === "hosted" && data.uid_host && (
-                  <>
-                    <button
-                      className="bg-blue-shade-100 text-white text-sm py-1 px-5 rounded-full font-semibold outline-none"
-                      onClick={handleEditModal}
-                    >
-                      Edit
-                    </button>
-                    <button
-                      className="bg-blue-shade-100 text-white text-sm py-1 px-3 rounded-full font-semibold outline-none"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleAttestationOnchain({
-                          meetingId: data.meetingId,
-                          meetingType: 1,
-                          meetingStartTime: data.attestations[0].startTime,
-                          meetingEndTime: data.attestations[0].endTime,
-                          index,
-                          dao: data.dao_name,
-                        });
-                      }}
-                      disabled={
-                        !!data.onchain_host_uid ||
-                        isClaiming[index] ||
-                        isClaimed[index]
-                      }
-                    >
-                      {isClaiming[index] ? (
-                        <div className="flex items-center justify-center px-3">
-                          <Oval
-                            visible={true}
-                            height="20"
-                            width="20"
-                            color="#fff"
-                            secondaryColor="#cdccff"
-                            ariaLabel="oval-loading"
-                          />
-                        </div>
-                      ) : data.onchain_host_uid || isClaimed[index] ? (
-                        "Claimed"
-                      ) : (
-                        "Claim"
-                      )}
-                    </button>
-                  </>
-                )}
+                </div>
               </div>
-            </div>
-
-{editOpen && (
-  <>
-    <div className="fixed inset-0 flex items-center justify-center z-50  overflow-hidden">
-      <div
-        className="absolute inset-0 backdrop-blur-md"
-        onClick={handleCloseEdit}
-        ></div>
-      <div className="p-7 border z-50 rounded-2xl w-[35vw]  bg-white flex flex-col gap-3">
-        <div className="text-blue-shade-100 flex justify-center items-center text-3xl font-semibold">Edit Session</div>
-        <div className="mt-4">
-          <label className="block mb-2 font-semibold">Title:</label>
-          <input type="text" name="title" placeholder={data.title} className="w-full px-4 py-2 border rounded-lg bg-[#D9D9D945]"/>
-        </div>
-        <div className="mt-2">
-          <label className="block mb-2 font-semibold">Description:</label>
-          <input
-            type="text"
-            name="description"
-            placeholder={data.description}
-            className="w-full px-4 py-2 border rounded-lg bg-[#D9D9D945]"
-            />
-        </div>
-        <div className="mt-2">
-          <label className="block mb-2 font-semibold">Thumbnail Image:</label>
-          <input
-            type="file"
-            name="title"
-            accept="*/image"
-            className="w-full px-4 py-2 border rounded-lg bg-[#D9D9D945]"
-            />
-        </div>
-        <div className="mt-4 flex gap-2 justify-end">
-          <button className="bg-blue-shade-100 rounded-lg py-2 px-4 text-white ">Save</button>
-          <button className="bg-[#D9D9D945] rounded-lg py-2 px-3" onClick={handleCloseEdit} >Cancel</button>
-        </div>
-      </div>
-    </div>
-  </>
-)}
-</>
+            </>
           ))
         ) : (
           <div className="flex flex-col justify-center items-center">
@@ -522,9 +568,84 @@ SessionTileProps) {
             </div>
           </div>
         )}
-
-      
       </div>
+
+      {editOpen && selectedTileIndex !== null && (
+        <>
+          <div className="fixed inset-0 flex items-center justify-center z-50  overflow-hidden">
+            <div
+              className="absolute inset-0 backdrop-blur-md"
+              onClick={handleCloseEdit}
+            ></div>
+            <div className="p-7 border z-50 rounded-2xl w-[35vw]  bg-white flex flex-col gap-3">
+              <div className="text-blue-shade-100 flex justify-center items-center text-3xl font-semibold">
+                Edit Session
+              </div>
+              <div className="mt-4">
+                <label className="block mb-2 font-semibold">Title:</label>
+                <input
+                  type="text"
+                  name="title"
+                  placeholder={sessionDetails[selectedTileIndex].title}
+                  className="w-full px-4 py-2 border rounded-lg bg-[#D9D9D945]"
+                  value={formData.title}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="mt-2">
+                <label className="block mb-2 font-semibold">Description:</label>
+                <textarea
+                  name="description"
+                  placeholder={sessionDetails[selectedTileIndex].description}
+                  className="w-full px-4 py-2 border rounded-lg bg-[#D9D9D945]"
+                  onChange={handleChange}
+                >
+                  {formData.description}
+                </textarea>
+              </div>
+              <div className="mt-2">
+                <label className="block mb-2 font-semibold">
+                  Thumbnail Image:
+                </label>
+                <input
+                  type="file"
+                  name="image"
+                  accept="*/image"
+                  className="w-full px-4 py-2 border rounded-lg bg-[#D9D9D945]"
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="mt-4 flex gap-2 justify-end">
+                <button
+                  className="bg-blue-shade-100 rounded-lg py-2 px-4 text-white"
+                  onClick={() => handleSave(sessionDetails[selectedTileIndex])}
+                >
+                  {loading ? (
+                    <div className="flex items-center justify-center top-10">
+                      <Oval
+                        visible={true}
+                        height="20"
+                        width="20"
+                        color="#0500FF"
+                        secondaryColor="#cdccff"
+                        ariaLabel="oval-loading"
+                      />
+                    </div>
+                  ) : (
+                    <>Save</>
+                  )}
+                </button>
+                <button
+                  className="bg-[#D9D9D945] rounded-lg py-2 px-3"
+                  onClick={handleCloseEdit}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </>
   );
 }
