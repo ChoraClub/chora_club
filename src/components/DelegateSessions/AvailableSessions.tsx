@@ -290,7 +290,7 @@ function AvailableSessions() {
             value={searchQuery}
             onChange={(e) => handleSearchChange(e.target.value)}
           ></input>
-          <span className="flex items-center bg-black rounded-full px-5 py-2">
+          <span className="flex items-center bg-black rounded-full px-5 py-2 cursor-pointer">
             <Image
               className="min-w-[25px]"
               src={search}
@@ -316,7 +316,7 @@ function AvailableSessions() {
               value={selectedDao}
               // onChange={(e) => setSelectedDao(e.target.value)}
               onChange={handleDaoChange}
-              className="px-3 py-2 rounded-md shadow"
+              className="px-3 py-2 rounded-md shadow cursor-pointer"
             >
               <option value="All-DAOS">All DAOs</option>
               <option value="optimism">Optimism</option>
@@ -343,7 +343,7 @@ function AvailableSessions() {
               onChange={handleDateChange}
               min={formattedDate}
               // onChange={(e) => setSelectedDate(e.target.value)}
-              className="px-3 py-2 shadow mr-1 rounded-md"
+              className="px-3 py-2 shadow mr-1 rounded-md cursor-pointer"
             />
           </Tooltip>
         </div>
@@ -363,7 +363,7 @@ function AvailableSessions() {
             <select
               value={startTime || "Start Time"}
               onChange={handleStartTimeChange}
-              className="px-3 py-2 rounded-md shadow mr-1"
+              className="px-3 py-2 rounded-md shadow mr-1 cursor-pointer"
             >
               <option disabled>Start Time</option>
               {timeOptions.map((time) => (
@@ -376,7 +376,7 @@ function AvailableSessions() {
             <select
               value={endTime || "End Time"}
               onChange={handleEndTimeChange}
-              className="px-3 py-2 rounded-md shadow ml-2"
+              className="px-3 py-2 rounded-md shadow ml-2 cursor-pointer"
             >
               <option disabled>End Time</option>
               {timeOptions.map((time) => (
