@@ -1,0 +1,8 @@
+/* Replace .option-class with the actual class or identifier */
+.custom-time-picker-option {
+    cursor: pointer !important;
+}
+
+.boxshadow{
+    box-shadow: 0 2px 4px 2px rgba(0, 0, 0, 0.1);
+}

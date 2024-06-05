@@ -20,6 +20,8 @@ import { ethers } from "ethers";
 import { getEnsName } from "../ConnectWallet/ENSResolver";
 import lighthouse from "@lighthouse-web3/sdk";
 import toast from "react-hot-toast";
+import { FaPencil } from "react-icons/fa6";
+import { Tooltip } from "@nextui-org/react";
 // const { ethers } = require("ethers");
 
 type Attendee = {
@@ -333,9 +335,23 @@ SessionTileProps) {
       ? process.env.NEXT_PUBLIC_LIGHTHOUSE_KEY
       : "";
     try {
-      const output = await lighthouse.upload(formData.image, apiKey);
-      console.log("image output: ", output.data.Hash);
+      let imageCid = "";
+      if (formData.image) {
+        const output = await lighthouse.upload(formData.image, apiKey);
+        imageCid = output.data.Hash;
+        console.log("image output: ", output.data.Hash);
+      }
 
+      if (formData.title === "") {
+        formData.title = sessionData.title;
+      }
+      if (formData.description === "") {
+        formData.description = sessionData.description;
+      }
+
+      if (formData.image === "") {
+        imageCid = sessionData.thumbnail_image;
+      }
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
 
@@ -344,7 +360,7 @@ SessionTileProps) {
         host_address: sessionData.host_address,
         title: formData.title,
         description: formData.description,
-        thumbnail_image: output.data.Hash,
+        thumbnail_image: imageCid,
       });
 
       const requestOptions: any = {
@@ -367,6 +383,7 @@ SessionTileProps) {
 
       handleCloseEdit();
     } catch (e) {
+      console.log("errorrrrrr: ", e);
       toast.error("Unable to update the data.");
       setLoading(false);
       handleCloseEdit();
@@ -465,9 +482,9 @@ SessionTileProps) {
                   </div>
                 </div>
 
-                <div className="flex items-end gap-2">
-                  {isSession === "attended" &&
-                    data.attendees[0]?.attendee_uid && (
+                {isSession === "attended" &&
+                  data.attendees[0]?.attendee_uid && (
+                    <div className="flex items-end gap-2">
                       <button
                         className="bg-blue-shade-100 text-white text-sm py-1 px-3 rounded-full font-semibold outline-none"
                         onClick={(e) => {
@@ -505,58 +522,75 @@ SessionTileProps) {
                           "Claim"
                         )}
                       </button>
-                    )}
-
-                  {isSession === "hosted" && data.uid_host && (
-                    <>
-                      <button
-                        className="bg-blue-shade-100 text-white text-sm py-1 px-5 rounded-full font-semibold outline-none"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleEditModal(index);
-                        }}
-                      >
-                        Edit
-                      </button>
-                      <button
-                        className="bg-blue-shade-100 text-white text-sm py-1 px-3 rounded-full font-semibold outline-none"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleAttestationOnchain({
-                            meetingId: data.meetingId,
-                            meetingType: 1,
-                            meetingStartTime: data.attestations[0].startTime,
-                            meetingEndTime: data.attestations[0].endTime,
-                            index,
-                            dao: data.dao_name,
-                          });
-                        }}
-                        disabled={
-                          !!data.onchain_host_uid ||
-                          isClaiming[index] ||
-                          isClaimed[index]
-                        }
-                      >
-                        {isClaiming[index] ? (
-                          <div className="flex items-center justify-center px-3">
-                            <Oval
-                              visible={true}
-                              height="20"
-                              width="20"
-                              color="#fff"
-                              secondaryColor="#cdccff"
-                              ariaLabel="oval-loading"
-                            />
-                          </div>
-                        ) : data.onchain_host_uid || isClaimed[index] ? (
-                          "Claimed"
-                        ) : (
-                          "Claim"
-                        )}
-                      </button>
-                    </>
+                    </div>
                   )}
-                </div>
+
+                {isSession === "hosted" && data.uid_host && (
+                  <div className="flex flex-col justify-between ">
+                    {/* <button
+                      className="bg-blue-shade-100 text-white text-sm py-1 px-5 rounded-full font-semibold outline-none"
+                      onClick={handleEditModal}
+                    >
+                      Edit
+                    </button> */}
+                    <div className="flex justify-end items-center">
+                      <Tooltip
+                        content="Edit Details"
+                        placement="right"
+                        showArrow
+                      >
+                        <span
+                          className="border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 cursor-pointer w-6"
+                          style={{
+                            backgroundColor: "rgba(217, 217, 217, 0.42)",
+                          }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleEditModal(index);
+                          }}
+                        >
+                          <FaPencil color="#3e3d3d" size={12} />
+                        </span>
+                      </Tooltip>
+                    </div>
+                    <button
+                      className="bg-blue-shade-100 text-white text-sm py-1 px-3 rounded-full font-semibold outline-none"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleAttestationOnchain({
+                          meetingId: data.meetingId,
+                          meetingType: 1,
+                          meetingStartTime: data.attestations[0].startTime,
+                          meetingEndTime: data.attestations[0].endTime,
+                          index,
+                          dao: data.dao_name,
+                        });
+                      }}
+                      disabled={
+                        !!data.onchain_host_uid ||
+                        isClaiming[index] ||
+                        isClaimed[index]
+                      }
+                    >
+                      {isClaiming[index] ? (
+                        <div className="flex items-center justify-center px-3">
+                          <Oval
+                            visible={true}
+                            height="20"
+                            width="20"
+                            color="#fff"
+                            secondaryColor="#cdccff"
+                            ariaLabel="oval-loading"
+                          />
+                        </div>
+                      ) : data.onchain_host_uid || isClaimed[index] ? (
+                        "Claimed"
+                      ) : (
+                        "Claim"
+                      )}
+                    </button>
+                  </div>
+                )}
               </div>
             </>
           ))

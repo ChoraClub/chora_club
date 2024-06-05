@@ -88,11 +88,11 @@ function SchedulingSuccessModal({
               <div className="p-8 text-gray-900">
                 <p className="mb-4">
                   {/* Available session times have been scheduled. */}
-                  One available session created to connect with you.
+                  A session has been created to connect with you.
                 </p>
                 <p className="mb-8">
                   {/* Share on Twitter for users to book their sessions. */}
-                  Thank you for your time to spread the word.
+                  Thank you for helping to spread the word.
                 </p>
                 <div className="flex justify-between">
                   <Tooltip
