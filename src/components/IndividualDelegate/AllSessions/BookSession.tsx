@@ -393,7 +393,7 @@ function BookSession({ props }: { props: Type }) {
     onClose();
   };
 
-  const timeSlotSizeMinutes = 30;
+  const timeSlotSizeMinutes = 15;
   let dateAndRanges: any = [];
   let allowedDates: any = [];
 
