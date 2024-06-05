@@ -238,7 +238,7 @@ function SpecificDelegate({ props }: { props: Type }) {
 
         const raw = JSON.stringify({
           address: props.individualDelegate,
-          daoName: props.daoDelegates,
+          // daoName: props.daoDelegates,
         });
 
         const requestOptions: any = {

@@ -65,7 +65,7 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
 
       const raw = JSON.stringify({
         address: address,
-        daoName: daoName,
+        // daoName: daoName,
       });
 
       const requestOptions: any = {
@@ -430,7 +430,7 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
             const raw = JSON.stringify({
               address: address,
               emailId: mailId,
-              daoName: daoName,
+              // daoName: daoName,
             });
 
             const requestOptions: any = {

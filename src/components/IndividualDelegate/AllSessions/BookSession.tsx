@@ -24,6 +24,7 @@ import BookingSuccessModal from "./BookingSuccessModal";
 import AddEmailModal from "@/components/utils/AddEmailModal";
 import { RxCross2 } from "react-icons/rx";
 import { MdCancel } from "react-icons/md";
+import lighthouse from "@lighthouse-web3/sdk"
 interface Type {
   daoDelegates: string;
   individualDelegate: string;
@@ -69,7 +70,7 @@ function BookSession({ props }: { props: Type }) {
   const [continueAPICalling, setContinueAPICalling] = useState<Boolean>(false);
   const [userRejected, setUserRejected] = useState<Boolean>();
   const [addingEmail, setAddingEmail] = useState<boolean>();
-
+  const [selectedFile, setSelectedFile] = useState("");
   useEffect(() => {
     // Lock scrolling when the modal is open
     if (isOpen) {
@@ -222,7 +223,7 @@ function BookSession({ props }: { props: Type }) {
 
       const raw = JSON.stringify({
         address: address,
-        daoName: daoName,
+        // daoName: daoName,
       });
 
       const requestOptions: any = {
@@ -320,17 +321,38 @@ function BookSession({ props }: { props: Type }) {
     // console.log("roomId", roomId);
     return roomId;
   };
+
+  const handleFileChange = (event: any) => {
+    setSelectedFile(event.target.files); // Capture the first file
+  };
+  
+  const uploadImage = async (selectedFile: any) =>{
+    const apiKey = process.env.NEXT_PUBLIC_LIGHTHOUSE_KEY
+    ? process.env.NEXT_PUBLIC_LIGHTHOUSE_KEY
+    : "";
+
+    const output = await lighthouse.upload(selectedFile, apiKey);
+
+    console.log("File Status:", output);
+    console.log("File Status:", output.data.Hash);
+    return output.data.Hash;
+  }
+
   const apiCall = async () => {
     let roomId = await createRandomRoom();
+    
+    let thumbnailHash = await uploadImage(selectedFile);
+    
 
     const requestData = {
       dao_name: props.daoDelegates,
       slot_time: dateInfo,
       title: modalData.title,
       description: modalData.description,
+      thumbnail:thumbnailHash,
       host_address: host_address,
       attendees: [{ attendee_address: address }],
-      meeting_status: "",
+      meeting_status: "Upcoming",
       booking_status: "Approved",
       session_type: "session",
       meetingId: roomId,
@@ -426,11 +448,25 @@ function BookSession({ props }: { props: Type }) {
     ];
   }
 
+  function subtractOneMinute(date: any) {
+    // Create a new Date object from the provided date
+    let newDate = new Date(date);
+    // Subtract one minute (60000 milliseconds)
+    newDate.setTime(newDate.getTime() - 60000);
+    return newDate;
+  }
+
   function timeSlotValidator(
     slotTime: any,
     dateAndRanges: any,
     bookedSlots: any
   ) {
+    dateAndRanges = dateAndRanges.map((range: any) => ({
+      formattedUTCTime_startTime: range.formattedUTCTime_startTime,
+      formattedUTCTime_endTime: subtractOneMinute(
+        range.formattedUTCTime_endTime
+      ),
+    }));
     for (const {
       formattedUTCTime_startTime: startTime,
       formattedUTCTime_endTime: endTime,
@@ -443,7 +479,7 @@ function BookSession({ props }: { props: Type }) {
         // Check if the slot is booked
         const isBooked = bookedSlots.some((bookedSlot: any) => {
           return (
-            dateFns?.isSameDay(startTime, bookedSlot) &&
+            dateFns.isSameDay(startTime, bookedSlot) &&
             slotTime.getHours() === bookedSlot.getHours() &&
             slotTime.getMinutes() === bookedSlot.getMinutes()
           );
@@ -490,7 +526,7 @@ function BookSession({ props }: { props: Type }) {
             const raw = JSON.stringify({
               address: address,
               emailId: mailId,
-              daoName: daoName,
+              // daoName: daoName,
             });
 
             const requestOptions: any = {
@@ -559,7 +595,8 @@ function BookSession({ props }: { props: Type }) {
               marginTop: "2rem",
               boxShadow: "0px 4px 50.8px 0px rgba(0, 0, 0, 0.11)",
               width: "fit-content",
-            }}>
+            }}
+          >
             <StyledTimePickerContainer>
               <DayTimeScheduler
                 allowedDates={allowedDates}
@@ -580,7 +617,8 @@ function BookSession({ props }: { props: Type }) {
       {isOpen && (
         <div
           className="font-poppins z-[70] fixed inset-0 flex items-center justify-center backdrop-blur-md"
-          style={{ boxShadow: " 0px 0px 45px -17px rgba(0,0,0,0.75)" }}>
+          style={{ boxShadow: " 0px 0px 45px -17px rgba(0,0,0,0.75)" }}
+        >
           <div className="bg-white rounded-[41px] overflow-hidden shadow-lg w-1/2">
             <div className="relative">
               <div className="flex flex-col gap-1 text-white bg-[#292929] p-4 py-7">
@@ -591,27 +629,28 @@ function BookSession({ props }: { props: Type }) {
                     onClick={() => {
                       onClose();
                       setIsScheduling(false);
-                    }}>
+                    }}
+                  >
                     <MdCancel size={28} color="white" />
                   </button>
                 </h2>
               </div>
               <div className="px-8 py-4">
                 <div className="mt-4">
-                  <label className="block mb-2 font-semibold">Title:</label>
+                  <label className="block mb-2 font-semibold">Title<span style={{color:"red"}}>*</span></label>
                   <input
                     type="text"
                     name="title"
                     value={modalData.title}
                     onChange={handleModalInputChange}
-                    placeholder="Explain Governance"
+                    placeholder="Add title for the session"
                     className="w-full px-4 py-2 border rounded-xl bg-[#D9D9D945]"
                     required
                   />
                 </div>
                 <div className="mt-4">
                   <label className="block mb-2 font-semibold">
-                    Description:
+                    Description<span style={{color:"red"}}>*</span>
                   </label>
                   <textarea
                     name="description"
@@ -622,11 +661,24 @@ function BookSession({ props }: { props: Type }) {
                     required
                   />
                 </div>
+                <div className="mt-4">
+                  <label className="block mb-2 font-semibold">
+                    Thumbnail Image
+                  </label>
+                  <input
+                    type="file"
+                    name="image"
+                    accept="image/*"
+                    className="w-full px-4 py-2 border rounded-xl bg-[#D9D9D945]"
+                    onChange={handleFileChange}
+                  />
+                </div>
                 {showGetMailModal && (
                   <div className="mt-4 border rounded-xl p-4 relative">
                     <button
                       className="absolute top-2 right-3"
-                      onClick={handleGetMailModalClose}>
+                      onClick={handleGetMailModalClose}
+                    >
                       <MdCancel size={25} />
                     </button>
                     <h2 className="text-blue-shade-200 font-semibold text-base">
@@ -647,7 +699,8 @@ function BookSession({ props }: { props: Type }) {
                       <button
                         onClick={handleSubmit}
                         className="bg-black text-white px-8 py-3 rounded-3xl hover:bg-gray-900"
-                        disabled={addingEmail}>
+                        disabled={addingEmail}
+                      >
                         {addingEmail ? (
                           <div className="flex items-center justify-center px-3 py-[0.15rem]">
                             <ThreeDots
@@ -680,7 +733,8 @@ function BookSession({ props }: { props: Type }) {
                 <button
                   className="bg-blue-shade-200 text-white px-8 py-3 font-semibold rounded-full"
                   onClick={checkBeforeApiCall}
-                  disabled={confirmSave}>
+                  disabled={confirmSave}
+                >
                   {confirmSave ? (
                     <div className="flex items-center">
                       <Oval
