@@ -194,7 +194,14 @@ function WatchSession({
           <div className="flex justify-between text-sm pe-4 pb-4">
             <div className="flex gap-6">
               <div className="flex items-center gap-2 ">
-                <div>
+                <div
+                  className="flex gap-2 cursor-pointer"
+                  onClick={() =>
+                    router.push(
+                      `/${data.dao_name}/${data.host_address}?active=info`
+                    )
+                  }
+                >
                   <Image
                     src={
                       data.hostProfileInfo?.image
@@ -204,15 +211,12 @@ function WatchSession({
                     alt="image"
                     width={20}
                     height={20}
-                    className="rounded-full"
+                    className="w-5 h-5 rounded-full"
                     priority
                   />
-                </div>
-                <div
-                  className="text-[#292929] font-semibold"
-                  // onClick={() => router.push(`${BASE_URL}/${data.dao_name}/${data.host_address}?active=info`)}
-                >
-                  {ensHostName}
+                  <div className="text-[#292929] font-semibold ">
+                    {ensHostName}
+                  </div>
                 </div>
                 <>
                   <Tooltip
@@ -370,7 +374,7 @@ function WatchSession({
                       </div>
                       <div>
                         {attendee.attendee_address.slice(0, 8) +
-                          "........." +
+                          "..." +
                           attendee.attendee_address.slice(-6)}{" "}
                       </div>
                       {attendee.attendee_uid ? (
