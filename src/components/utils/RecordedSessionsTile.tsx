@@ -20,6 +20,7 @@ import user8 from "@/assets/images/user/user8.svg";
 import user9 from "@/assets/images/user/user9.svg";
 // import { parseISO } from "date-fns";
 import { getEnsName } from "../ConnectWallet/ENSResolver";
+import posterImage from "@/assets/images/daos/thumbnail1.png";
 
 interface meeting {
   meetingData: any;
@@ -114,32 +115,32 @@ function RecordedSessionsTile({ meetingData }: meeting) {
     setRandomUserImages(newRandomUserImages);
   }, [meetingData]);
 
-  // const formatTimeAgo = (utcTime: string): string => {
-  //   const parsedTime = parseISO(utcTime);
-  //   const currentTime = new Date();
-  //   const differenceInSeconds = Math.abs(
-  //     (parsedTime.getTime() - currentTime.getTime()) / 1000
-  //   );
+  const formatTimeAgo = (utcTime: string): string => {
+    const parsedTime = new Date(utcTime);
+    const currentTime = new Date();
+    const differenceInSeconds = Math.abs(
+      (currentTime.getTime() - parsedTime.getTime()) / 1000
+    );
 
-  //   if (differenceInSeconds < 60) {
-  //     return "Just now";
-  //   } else if (differenceInSeconds < 3600) {
-  //     const minutes = Math.round(differenceInSeconds / 60);
-  //     return `${minutes} minute${minutes === 1 ? "" : "s"} ago`;
-  //   } else if (differenceInSeconds < 86400) {
-  //     const hours = Math.round(differenceInSeconds / 3600);
-  //     return `${hours} hour${hours === 1 ? "" : "s"} ago`;
-  //   } else if (differenceInSeconds < 604800) {
-  //     const days = Math.round(differenceInSeconds / 86400);
-  //     return `${days} day${days === 1 ? "" : "s"} ago`;
-  //   } else if (differenceInSeconds < 31536000) {
-  //     const weeks = Math.round(differenceInSeconds / 604800);
-  //     return `${weeks} week${weeks === 1 ? "" : "s"} ago`;
-  //   } else {
-  //     const years = Math.round(differenceInSeconds / 31536000);
-  //     return `${years} year${years === 1 ? "" : "s"} ago`;
-  //   }
-  // };
+    if (differenceInSeconds < 60) {
+      return "Just now";
+    } else if (differenceInSeconds < 3600) {
+      const minutes = Math.round(differenceInSeconds / 60);
+      return `${minutes} minute${minutes === 1 ? "" : "s"} ago`;
+    } else if (differenceInSeconds < 86400) {
+      const hours = Math.round(differenceInSeconds / 3600);
+      return `${hours} hour${hours === 1 ? "" : "s"} ago`;
+    } else if (differenceInSeconds < 604800) {
+      const days = Math.round(differenceInSeconds / 86400);
+      return `${days} day${days === 1 ? "" : "s"} ago`;
+    } else if (differenceInSeconds < 31536000) {
+      const weeks = Math.round(differenceInSeconds / 604800);
+      return `${weeks} week${weeks === 1 ? "" : "s"} ago`;
+    } else {
+      const years = Math.round(differenceInSeconds / 31536000);
+      return `${years} year${years === 1 ? "" : "s"} ago`;
+    }
+  };
 
   const daoLogos = {
     optimism: oplogo,
@@ -242,7 +243,6 @@ function RecordedSessionsTile({ meetingData }: meeting) {
     }
   }, [meetingData]);
 
-
   return (
     <>
       {/* {meetingData && meetingData.length > 0 ? ( */}
@@ -252,8 +252,8 @@ function RecordedSessionsTile({ meetingData }: meeting) {
             key={index}
             className="border border-[#D9D9D9] rounded-3xl cursor-pointer"
             onClick={() => router.push(`/watch/${data.session.meetingId}`)}
-                  onMouseEnter={() => setHoveredVideo(index)}
-                  onMouseLeave={() => setHoveredVideo(null)}
+            onMouseEnter={() => setHoveredVideo(index)}
+            onMouseLeave={() => setHoveredVideo(null)}
           >
             {/* <div
                   className={`w-full h-44 rounded-t-3xl bg-black object-cover object-center relative ${styles.container}`}
@@ -283,7 +283,11 @@ function RecordedSessionsTile({ meetingData }: meeting) {
                 </div>
               ) : (
                 <video
-                  poster={`https://gateway.lighthouse.storage/ipfs/${data.session.thumbnail_image}`}
+                  poster={
+                    data.session.thumbnail_image
+                      ? `https://gateway.lighthouse.storage/ipfs/${data.session.thumbnail_image}`
+                      : "https://gateway.lighthouse.storage/ipfs/QmdzRg9pkRGjjLbQANmHCF6CpKJQNPJkKB3GG1sFp12BHK"
+                  }
                   // poster="https://gateway.lighthouse.storage/ipfs/Qmb1JZZieFSENkoYpVD7HRzi61rQCDfVER3fhnxCvmL1DB"
                   ref={(el: any) => (videoRefs.current[index] = el)}
                   loop
@@ -321,9 +325,9 @@ function RecordedSessionsTile({ meetingData }: meeting) {
                   </div>
                   <div className="capitalize">{data.session.dao_name}</div>
                 </div>
-                {/* <div className="bg-[#F5F5F5] py-1 px-3 rounded-md">
+                <div className="bg-[#F5F5F5] py-1 px-3 rounded-md">
                   {formatTimeAgo(data.session.slot_time)}
-                </div> */}
+                </div>
               </div>
               <div className="">
                 <div className="flex items-center gap-2 py-1 ps-3 text-sm">
@@ -340,10 +344,7 @@ function RecordedSessionsTile({ meetingData }: meeting) {
                       className="rounded-full"
                     />
                   </div>
-                  <div>
-                    Host:{" "}
-                    {ensHostNames[data.session.host_address]}
-                  </div>
+                  <div>Host: {ensHostNames[data.session.host_address]}</div>
                   <div>
                     <Tooltip
                       content="Copy"
@@ -380,11 +381,7 @@ function RecordedSessionsTile({ meetingData }: meeting) {
                   </div>
                   <div>
                     Guest:{" "}
-                    {
-                          ensGuestNames[
-                            data.session.attendees[0].attendee_address
-                          ]
-                        }
+                    {ensGuestNames[data.session.attendees[0].attendee_address]}
                   </div>
                   <div>
                     <Tooltip
