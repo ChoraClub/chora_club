@@ -487,8 +487,19 @@ SessionTileProps) {
                 {isSession === "attended" &&
                   data.attendees[0]?.attendee_uid && (
                     <div className="flex items-end gap-2">
+                      <Tooltip
+                      content={
+                        isClaiming[index]
+                          ? "Claiming Onchain Attestation"
+                          : data.onchain_host_uid || isClaimed[index]
+                          ? "Received Onchain Attestation"
+                          : "Claim Onchain Attestation"
+                      }
+                      placement="bottom"
+                      showArrow
+                    >
                       <button
-                        className="bg-blue-shade-100 text-white text-sm py-1 px-3 rounded-full font-semibold outline-none"
+                        className={`${style.button}`}
                         onClick={(e) => {
                           e.stopPropagation();
                           handleAttestationOnchain({
@@ -520,10 +531,15 @@ SessionTileProps) {
                         ) : data.attendees[0].onchain_attendee_uid ||
                           isClaimed[index] ? (
                           "Claimed"
-                        ) : (
-                          "Claim"
-                        )}
+                        ) : (<>
+                          <div className="flex items-center justify-center translate-y-[1px]">
+                              Claim
+                            </div>
+                            <FaGift className={`${style.icon}`} />
+                        </>
+                      )}
                       </button>
+                      </Tooltip>
                     </div>
                   )}
 
