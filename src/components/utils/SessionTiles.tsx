@@ -402,7 +402,7 @@ SessionTileProps) {
                 key={index}
                 className={`flex p-5 rounded-[2rem] cursor-pointer justify-between mb-5 ${
                   isEvent === "Recorded" ? "cursor-pointer" : ""
-                }`}
+                } ${style.hover}`}
                 style={{ boxShadow: "0px 4px 26.7px 0px rgba(0, 0, 0, 0.10)" }}
                 // onClick={() => openModal(index)}
                 onClick={
@@ -495,7 +495,7 @@ SessionTileProps) {
                           ? "Received Onchain Attestation"
                           : "Claim Onchain Attestation"
                       }
-                      placement="bottom"
+                      placement="top"
                       showArrow
                     >
                       <button
@@ -580,7 +580,7 @@ SessionTileProps) {
                           ? "Received Onchain Attestation"
                           : "Claim Onchain Attestation"
                       }
-                      placement="bottom"
+                      placement="top"
                       showArrow
                     >
                       {/* <button
