@@ -318,7 +318,7 @@ function AvailableSessions() {
               onChange={handleDaoChange}
               className="px-3 py-2 rounded-md shadow cursor-pointer"
             >
-              <option value="All-DAOS">All DAOS</option>
+              <option value="All-DAOS">All DAOs</option>
               <option value="optimism">Optimism</option>
               <option value="arbitrum">Arbitrum</option>
             </select>
