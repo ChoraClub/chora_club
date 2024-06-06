@@ -23,6 +23,8 @@ import toast from "react-hot-toast";
 import { FaPencil } from "react-icons/fa6";
 import { Tooltip } from "@nextui-org/react";
 import { IoCopy } from "react-icons/io5";
+import { FaGift } from "react-icons/fa6";
+import style from "./SessionTiles.module.css";
 // const { ethers } = require("ethers");
 import copy from "copy-to-clipboard";
 
@@ -407,7 +409,7 @@ SessionTileProps) {
                 key={index}
                 className={`flex p-5 rounded-[2rem] cursor-pointer justify-between mb-5 ${
                   isEvent === "Recorded" ? "cursor-pointer" : ""
-                }`}
+                } ${style.hover}`}
                 style={{ boxShadow: "0px 4px 26.7px 0px rgba(0, 0, 0, 0.10)" }}
                 // onClick={() => openModal(index)}
                 onClick={
@@ -530,8 +532,19 @@ SessionTileProps) {
                 {isSession === "attended" &&
                   data.attendees[0]?.attendee_uid && (
                     <div className="flex items-end gap-2">
+                      <Tooltip
+                      content={
+                        isClaiming[index]
+                          ? "Claiming Onchain Attestation"
+                          : data.onchain_host_uid || isClaimed[index]
+                          ? "Received Onchain Attestation"
+                          : "Claim Onchain Attestation"
+                      }
+                      placement="top"
+                      showArrow
+                    >
                       <button
-                        className="bg-blue-shade-100 text-white text-sm py-1 px-3 rounded-full font-semibold outline-none"
+                        className={`${style.button}`}
                         onClick={(e) => {
                           e.stopPropagation();
                           handleAttestationOnchain({
@@ -563,10 +576,15 @@ SessionTileProps) {
                         ) : data.attendees[0].onchain_attendee_uid ||
                           isClaimed[index] ? (
                           "Claimed"
-                        ) : (
-                          "Claim"
-                        )}
+                        ) : (<>
+                          <div className="flex items-center justify-center translate-y-[1px]">
+                              Claim
+                            </div>
+                            <FaGift className={`${style.icon}`} />
+                        </>
+                      )}
                       </button>
+                      </Tooltip>
                     </div>
                   )}
 
@@ -598,8 +616,20 @@ SessionTileProps) {
                         </span>
                       </Tooltip>
                     </div>
-                    <button
-                      className="bg-blue-shade-100 text-white text-sm py-1 px-3 rounded-full font-semibold outline-none"
+
+                    <Tooltip
+                      content={
+                        isClaiming[index]
+                          ? "Claiming Onchain Attestation"
+                          : data.onchain_host_uid || isClaimed[index]
+                          ? "Received Onchain Attestation"
+                          : "Claim Onchain Attestation"
+                      }
+                      placement="top"
+                      showArrow
+                    >
+                      {/* <button
+                      className="bg-blue-shade-100 text-white text-sm py-2 px-4 rounded-full font-semibold outline-none flex gap-1 items-center justify-center"
                       onClick={(e) => {
                         e.stopPropagation();
                         handleAttestationOnchain({
@@ -617,6 +647,7 @@ SessionTileProps) {
                         isClaimed[index]
                       }
                     >
+                      
                       {isClaiming[index] ? (
                         <div className="flex items-center justify-center px-3">
                           <Oval
@@ -631,9 +662,53 @@ SessionTileProps) {
                       ) : data.onchain_host_uid || isClaimed[index] ? (
                         "Claimed"
                       ) : (
-                        "Claim"
+                        <>
+                        <FaGift/> <div className="flex items-center justify-center translate-y-[1px]">Claim</div>
+                        </>
                       )}
-                    </button>
+                    </button> */}
+                      <button
+                        className={`${style.button}`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleAttestationOnchain({
+                            meetingId: data.meetingId,
+                            meetingType: 1,
+                            meetingStartTime: data.attestations[0].startTime,
+                            meetingEndTime: data.attestations[0].endTime,
+                            index,
+                            dao: data.dao_name,
+                          });
+                        }}
+                        disabled={
+                          !!data.onchain_host_uid ||
+                          isClaiming[index] ||
+                          isClaimed[index]
+                        }
+                      >
+                        {isClaiming[index] ? (
+                          <div className="flex items-center justify-center px-3">
+                            <Oval
+                              visible={true}
+                              height="20"
+                              width="20"
+                              color="#fff"
+                              secondaryColor="#cdccff"
+                              ariaLabel="oval-loading"
+                            />
+                          </div>
+                        ) : data.onchain_host_uid || isClaimed[index] ? (
+                          "Claimed"
+                        ) : (
+                          <>
+                            <div className="flex items-center justify-center translate-y-[1px]">
+                              Claim
+                            </div>
+                            <FaGift className={`${style.icon}`} />
+                          </>
+                        )}
+                      </button>
+                    </Tooltip>
                   </div>
                 )}
               </div>
