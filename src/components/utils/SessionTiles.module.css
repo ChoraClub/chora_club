@@ -70,7 +70,7 @@
 
   .hover:hover{
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-  transform: scale(1.02);
+  transform: scale(1.01);
   transition: transform 0.3s ease-in-out;
   /* border: 2px solid black; */
   }
