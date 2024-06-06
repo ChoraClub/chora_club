@@ -9,7 +9,7 @@ export const dao_details: any = {
     description:
       "Optimism DAO is the heart of the Optimism network, an innovative layer 2 solution for faster, cheaper transactions on Ethereum. Think of it as a community-driven engine, where token holders govern upgrades, fees, and the overall direction of the Optimism ecosystem. With a focus on scaling Ethereum effectively and sustainably, Optimism DAO is building a brighter future for blockchain technology.",
     contract_address: "",
-    number_of_delegates: "193k",
+    number_of_delegates: "201k",
     token_name: "OP",
     logo: op_logo,
     // logo: "https://gateway.lighthouse.storage/ipfs/QmXaKNwUxvd4Ksc9R6hd36eBo97e7e7YPDCVuvHwqG4zgQ",
@@ -36,7 +36,7 @@ export const dao_details: any = {
     description:
       "The Arbitrum DAO is a Decentralized Autonomous Organization (DAO) built on the Ethereum blockchain. At its core, the Arbitrum DAO is a community-driven governance mechanism that allows $ARB token holders to propose and vote on changes to the organization and the technologies it governs.",
     contract_address: "",
-    number_of_delegates: "294k",
+    number_of_delegates: "312k",
     token_name: "ARB",
     logo: arb_logo,
     // logo: "https://gateway.lighthouse.storage/ipfs/QmdP6ZkLq4FF8dcvxBs48chqFiXu7Gr8SgPCqMtfr7VA4L",

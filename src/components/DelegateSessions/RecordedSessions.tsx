@@ -43,6 +43,16 @@ import Head from "next/head";
 import { getEnsName, getEnsNameOfUser } from "../ConnectWallet/ENSResolver";
 import RecordedSessionsTile from "../utils/RecordedSessionsTile";
 
+type DaoName = "optimism" | "arbitrum";
+const daoLogos: Record<DaoName, StaticImageData> = {
+  optimism: oplogo,
+  arbitrum: arblogo,
+};
+const getDaoLogo = (daoName: string): StaticImageData => {
+  const normalizedName = daoName.toLowerCase() as DaoName;
+  return daoLogos[normalizedName] || arblogo;
+};
+
 function RecordedSessions() {
   // const parseISO = dateFns;
   const [searchQuery, setSearchQuery] = useState("");
@@ -56,7 +66,8 @@ function RecordedSessions() {
   const [videoDurations, setVideoDurations] = useState<any>({});
   const [searchMeetingData, setSearchMeetingData] = useState<any>([]);
   const [activeButton, setActiveButton] = useState("all");
-
+  const [ensHostNames, setEnsHostNames] = useState<any>({});
+  const [ensGuestNames, setEnsGuestNames] = useState<any>({});
 
   const handleCopy = (addr: string) => {
     copy(addr);
@@ -89,32 +100,32 @@ function RecordedSessions() {
     getRecordedMeetings();
   }, []);
 
-  // const formatTimeAgo = (utcTime: string): string => {
-  //   const parsedTime = parseISO(utcTime);
-  //   const currentTime = new Date();
-  //   const differenceInSeconds = Math.abs(
-  //     (parsedTime.getTime() - currentTime.getTime()) / 1000
-  //   );
+  const formatTimeAgo = (utcTime: string): string => {
+    const parsedTime = new Date(utcTime);
+    const currentTime = new Date();
+    const differenceInSeconds = Math.abs(
+      (currentTime.getTime() - parsedTime.getTime()) / 1000
+    );
 
-  //   if (differenceInSeconds < 60) {
-  //     return "Just now";
-  //   } else if (differenceInSeconds < 3600) {
-  //     const minutes = Math.round(differenceInSeconds / 60);
-  //     return `${minutes} minute${minutes === 1 ? "" : "s"} ago`;
-  //   } else if (differenceInSeconds < 86400) {
-  //     const hours = Math.round(differenceInSeconds / 3600);
-  //     return `${hours} hour${hours === 1 ? "" : "s"} ago`;
-  //   } else if (differenceInSeconds < 604800) {
-  //     const days = Math.round(differenceInSeconds / 86400);
-  //     return `${days} day${days === 1 ? "" : "s"} ago`;
-  //   } else if (differenceInSeconds < 31536000) {
-  //     const weeks = Math.round(differenceInSeconds / 604800);
-  //     return `${weeks} week${weeks === 1 ? "" : "s"} ago`;
-  //   } else {
-  //     const years = Math.round(differenceInSeconds / 31536000);
-  //     return `${years} year${years === 1 ? "" : "s"} ago`;
-  //   }
-  // };
+    if (differenceInSeconds < 60) {
+      return "Just now";
+    } else if (differenceInSeconds < 3600) {
+      const minutes = Math.round(differenceInSeconds / 60);
+      return `${minutes} minute${minutes === 1 ? "" : "s"} ago`;
+    } else if (differenceInSeconds < 86400) {
+      const hours = Math.round(differenceInSeconds / 3600);
+      return `${hours} hour${hours === 1 ? "" : "s"} ago`;
+    } else if (differenceInSeconds < 604800) {
+      const days = Math.round(differenceInSeconds / 86400);
+      return `${days} day${days === 1 ? "" : "s"} ago`;
+    } else if (differenceInSeconds < 31536000) {
+      const weeks = Math.round(differenceInSeconds / 604800);
+      return `${weeks} week${weeks === 1 ? "" : "s"} ago`;
+    } else {
+      const years = Math.round(differenceInSeconds / 31536000);
+      return `${years} year${years === 1 ? "" : "s"} ago`;
+    }
+  };
 
   // const handleTimeUpdate = (video: HTMLVideoElement, index: number) => {
   //   const duration = video.duration;
@@ -129,48 +140,48 @@ function RecordedSessions() {
   //   }
   // };
 
-  // useEffect(() => {
-  //   if (hoveredVideo !== null && videoRefs.current[hoveredVideo]) {
-  //     const videoElement = videoRefs.current[hoveredVideo];
-  //     const progressBar = document.getElementById(
-  //       `progressBar-${hoveredVideo}`
-  //     );
+  useEffect(() => {
+    if (hoveredVideo !== null && videoRefs.current[hoveredVideo]) {
+      const videoElement = videoRefs.current[hoveredVideo];
+      const progressBar = document.getElementById(
+        `progressBar-${hoveredVideo}`
+      );
 
-  //     const handleTimeUpdate = (e: any) => {
-  //       const { currentTime, duration } = e.target;
-  //       const progressPercentage = (currentTime / duration) * 100;
+      const handleTimeUpdate = (e: any) => {
+        const { currentTime, duration } = e.target;
+        const progressPercentage = (currentTime / duration) * 100;
 
-  //       if (progressBar) {
-  //         progressBar.style.width = `${progressPercentage}%`;
-  //       }
-  //     };
+        if (progressBar) {
+          progressBar.style.width = `${progressPercentage}%`;
+        }
+      };
 
-  //     videoElement.addEventListener("timeupdate", handleTimeUpdate);
+      videoElement.addEventListener("timeupdate", handleTimeUpdate);
 
-  //     // Clean up the event listener when the component unmounts or video changes
-  //     return () => {
-  //       videoElement.removeEventListener("timeupdate", handleTimeUpdate);
-  //     };
-  //   }
-  // }, [hoveredVideo]);
+      // Clean up the event listener when the component unmounts or video changes
+      return () => {
+        videoElement.removeEventListener("timeupdate", handleTimeUpdate);
+      };
+    }
+  }, [hoveredVideo]);
 
-  // const handleLoadedMetadata = (index: any, e: any) => {
-  //   const duration = e.target.duration;
-  //   setVideoDurations((prev: any) => ({ ...prev, [index]: duration })); // Store the duration
-  // };
+  const handleLoadedMetadata = (index: any, e: any) => {
+    const duration = e.target.duration;
+    setVideoDurations((prev: any) => ({ ...prev, [index]: duration })); // Store the duration
+  };
 
-  // const formatVideoDuration = (duration: any) => {
-  //   const hours = Math.floor(duration / 3600);
-  //   const minutes = Math.floor((duration % 3600) / 60);
-  //   const seconds = Math.floor(duration % 60);
+  const formatVideoDuration = (duration: any) => {
+    const hours = Math.floor(duration / 3600);
+    const minutes = Math.floor((duration % 3600) / 60);
+    const seconds = Math.floor(duration % 60);
 
-  //   const formattedDuration =
-  //     (hours > 0 ? `${hours}:` : "") +
-  //     `${minutes.toString().padStart(2, "0")}:` +
-  //     `${seconds.toString().padStart(2, "0")}`;
+    const formattedDuration =
+      (hours > 0 ? `${hours}:` : "") +
+      `${minutes.toString().padStart(2, "0")}:` +
+      `${seconds.toString().padStart(2, "0")}`;
 
-  //   return formattedDuration;
-  // };
+    return formattedDuration;
+  };
 
   const handleSearchChange = (query: string) => {
     setSearchQuery(query);
@@ -178,8 +189,8 @@ function RecordedSessions() {
       const filtered = searchMeetingData.filter((item: any) => {
         // Convert both query and userAddress to lowercase for case-insensitive matching
         const lowercaseQuery = query.toLowerCase();
-        const lowercaseAddress = item.session.host_address.toLowerCase();
-        const lowercaseTitle = item.session.title.toLowerCase();
+        const lowercaseAddress = item.host_address.toLowerCase();
+        const lowercaseTitle = item.title.toLowerCase();
 
         // Check if the lowercase userAddress includes the lowercase query
         return (
@@ -198,7 +209,7 @@ function RecordedSessions() {
     if (params) {
       setActiveButton(params);
       const filtered = searchMeetingData.filter((item: any) => {
-        return item.session.dao_name.includes(params);
+        return item.dao_name.includes(params);
       });
 
       setMeetingData(filtered);
@@ -208,7 +219,44 @@ function RecordedSessions() {
     }
   };
 
-  
+  // useEffect(() => {
+  //   const fetchEnsNames = async () => {
+  //     const ensNamesMap: any = {};
+  //     for (const data of meetingData) {
+  //       const ensName = await getEnsName(data.host_address.toLowerCase());
+  //       if (ensName) {
+  //         ensNamesMap[data.host_address] = ensName;
+  //       }
+  //     }
+  //     console.log("ensNamesMap", ensNamesMap);
+  //     setEnsHostNames(ensNamesMap);
+  //   };
+
+  //   if (meetingData.length > 0) {
+  //     fetchEnsNames();
+  //   }
+  // }, [meetingData]);
+
+  // useEffect(() => {
+  //   const fetchEnsNames = async () => {
+  //     const ensNamesMap: any = {};
+  //     for (const data of meetingData) {
+  //       const ensName = await getEnsName(
+  //         data.attendees[0].attendee_address.toLowerCase()
+  //       );
+  //       if (ensName) {
+  //         ensNamesMap[data.attendees[0].attendee_address] = ensName;
+  //       }
+  //     }
+  //     console.log("guest ensNamesMap", ensNamesMap);
+  //     setEnsGuestNames(ensNamesMap);
+  //   };
+
+  //   if (meetingData.length > 0) {
+  //     fetchEnsNames();
+  //   }
+  // }, [meetingData]);
+
   return (
     <>
       <div className="pe-10">
@@ -276,10 +324,178 @@ function RecordedSessions() {
               ariaLabel="oval-loading"
             />
           </div>
-        ) :
-         meetingData && meetingData.length > 0 ? (
-         
-          <RecordedSessionsTile meetingData={meetingData}/>
+        ) : meetingData && meetingData.length > 0 ? (
+          // <RecordedSessionsTile meetingData={meetingData}/>
+          <div className="grid min-[475px]:grid-cols- md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-10 py-8 font-poppins">
+            {meetingData.map((data: any, index: number) => (
+              <div
+                key={index}
+                className="border border-[#D9D9D9] rounded-3xl cursor-pointer"
+                onClick={() => router.push(`/watch/${data.meetingId}`)}
+                onMouseEnter={() => setHoveredVideo(index)}
+                onMouseLeave={() => setHoveredVideo(null)}
+              >
+                {/* <div
+                  className={`w-full h-44 rounded-t-3xl bg-black object-cover object-center relative ${styles.container}`}
+                > */}
+                <div
+                  className={`w-full h-44 rounded-t-3xl bg-black object-cover object-center relative `}
+                >
+                  {hoveredVideo === index ? (
+                    <div className="relative">
+                      <video
+                        ref={(el: any) => (videoRefs.current[index] = el)}
+                        autoPlay
+                        loop
+                        muted
+                        onLoadedMetadata={(e) => handleLoadedMetadata(index, e)}
+                        src={data.video_uri}
+                        className="w-full h-44 rounded-t-3xl object-cover"
+                      ></video>
+                      <div className={styles.videoTimeline}>
+                        <div className={styles.progressArea}>
+                          <div
+                            id={`progressBar-${index}`}
+                            className={styles.progressBar}
+                          ></div>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <video
+                      poster={
+                        data.thumbnail_image
+                          ? `https://gateway.lighthouse.storage/ipfs/${data.thumbnail_image}`
+                          : "https://gateway.lighthouse.storage/ipfs/QmekMpcR49QGSPRAnmJsEgWDvM7JKji8bUT4S4oXmYBHYU"
+                      }
+                      // poster="https://gateway.lighthouse.storage/ipfs/Qmb1JZZieFSENkoYpVD7HRzi61rQCDfVER3fhnxCvmL1DB"
+                      ref={(el: any) => (videoRefs.current[index] = el)}
+                      loop
+                      muted
+                      onLoadedMetadata={(e) => handleLoadedMetadata(index, e)}
+                      src={data.video_uri}
+                      className="w-full h-44 rounded-t-3xl object-cover"
+                    ></video>
+                  )}
+                  <div className="absolute right-2 bottom-2 text-white text-xs bg-white px-1 bg-opacity-30 rounded-sm">
+                    {formatVideoDuration(videoDurations[index] || 0)}
+                  </div>
+                </div>
+                <div className="px-4 py-2">
+                  <div
+                    className={`font-semibold py-1 ${styles.truncate}`}
+                    style={{
+                      display: "-webkit-box",
+                      WebkitBoxOrient: "vertical",
+                      WebkitLineClamp: 1,
+                      overflow: "hidden",
+                    }}
+                  >
+                    {data.title}
+                  </div>
+                  <div className="flex text-sm gap-3 py-1">
+                    <div className="bg-[#F5F5F5] flex items-center py-1 px-3 rounded-md gap-2">
+                      <div>
+                        <Image
+                          src={getDaoLogo(data.dao_name)}
+                          alt="image"
+                          width={20}
+                          height={20}
+                          className="rounded-full"
+                        />
+                      </div>
+                      <div className="capitalize">{data.dao_name}</div>
+                    </div>
+                    <div className="bg-[#F5F5F5] py-1 px-3 rounded-md">
+                      {formatTimeAgo(data.slot_time)}
+                    </div>
+                  </div>
+                  <div className="">
+                    <div className="flex items-center gap-2 py-1 ps-3 text-sm">
+                      <div>
+                        <Image
+                          src={
+                            data.hostInfo?.image
+                              ? `https://gateway.lighthouse.storage/ipfs/${data.hostInfo.image}`
+                              : user1
+                          }
+                          alt="image"
+                          width={20}
+                          height={20}
+                          className="rounded-full"
+                        />
+                      </div>
+                      <div>
+                        Host: {""}
+                        {/* {ensHostNames[data.host_address]} */}
+                        {data.host_address.slice(0, 6) +
+                          "..." +
+                          data.host_address.slice(-4)}
+                      </div>
+                      <div>
+                        <Tooltip
+                          content="Copy"
+                          placement="right"
+                          closeDelay={1}
+                          showArrow
+                        >
+                          <span className="cursor-pointer text-sm">
+                            <IoCopy
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                handleCopy(data.host_address);
+                              }}
+                            />
+                          </span>
+                        </Tooltip>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 py-1 ps-3 text-sm">
+                      <div className="">
+                        <Image
+                          src={
+                            data.guestInfo?.image
+                              ? `https://gateway.lighthouse.storage/ipfs/${data.attendees[0].guestInfo.image}`
+                              : user2
+                          }
+                          alt="image"
+                          width={20}
+                          height={20}
+                          className="h-5 w-5 rounded-full object-cover object-center"
+                        />
+                      </div>
+                      <div>
+                        Guest:{" "}
+                        {/* {ensGuestNames[data.attendees[0].attendee_address]} */}
+                        {data?.attendees[0]?.attendee_address.slice(0, 6) +
+                          "..." +
+                          data?.attendees[0]?.attendee_address.slice(-4)}
+                      </div>
+                      <div>
+                        <Tooltip
+                          content="Copy"
+                          placement="right"
+                          closeDelay={1}
+                          showArrow
+                        >
+                          <span className="cursor-pointer text-sm">
+                            <IoCopy
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                handleCopy(
+                                  data?.attendees[0]?.attendee_address
+                                );
+                              }}
+                            />
+                          </span>
+                        </Tooltip>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         ) : (
           <div className="flex flex-col justify-center items-center pt-10">
             <div className="text-5xl">☹️</div>{" "}
@@ -305,6 +521,4 @@ function RecordedSessions() {
   );
 }
 
-export default RecordedSessions;   
-
-
+export default RecordedSessions;
