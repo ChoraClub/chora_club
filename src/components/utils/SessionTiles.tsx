@@ -22,7 +22,9 @@ import lighthouse from "@lighthouse-web3/sdk";
 import toast from "react-hot-toast";
 import { FaPencil } from "react-icons/fa6";
 import { Tooltip } from "@nextui-org/react";
+import { IoCopy } from "react-icons/io5";
 // const { ethers } = require("ethers");
+import copy from "copy-to-clipboard";
 
 type Attendee = {
   attendee_address: string;
@@ -390,6 +392,11 @@ SessionTileProps) {
     }
   };
 
+  const handleCopy = (addr: string) => {
+    copy(addr);
+    toast("Address Copied");
+  };
+
   return (
     <>
       <div className="">
@@ -442,21 +449,59 @@ SessionTileProps) {
 
                     <div className="flex gap-x-16 text-sm py-3">
                       {data.session_type === "session" ? (
-                        <div className="text-[#3E3D3D]">
+                        <div className="text-[#3E3D3D] flex">
                           <span className="font-semibold">Session - </span>{" "}
                           <span className="font-semibold">Guest:</span>{" "}
                           {formatWalletAddress(
                             data.attendees[0].attendee_address
                           )}
+                          <Tooltip
+                            content="Copy"
+                            placement="right"
+                            closeDelay={1}
+                            showArrow
+                          >
+                            <div
+                              className="pl-2 pt-[2px] cursor-pointer"
+                              color="#3E3D3D"
+                            >
+                              <IoCopy
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleCopy(
+                                    `${data.attendees[0].attendee_address}`
+                                  );
+                                }}
+                              />
+                            </div>
+                          </Tooltip>
                         </div>
                       ) : (
                         <div className="text-[#3E3D3D]">
                           <span className="font-semibold">Instant Meet</span>{" "}
                         </div>
                       )}
-                      <div className="text-[#3E3D3D]">
+                      <div className="text-[#3E3D3D] flex">
                         <span className="font-semibold">Host:</span>{" "}
                         {formatWalletAddress(data.host_address)}
+                        <Tooltip
+                          content="Copy"
+                          placement="right"
+                          closeDelay={1}
+                          showArrow
+                        >
+                          <div
+                            className="pl-2 pt-[2px] cursor-pointer"
+                            color="#3E3D3D"
+                          >
+                            <IoCopy
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleCopy(`${data.host_address}`);
+                              }}
+                            />
+                          </div>
+                        </Tooltip>
                       </div>
                       <div className="text-[#3E3D3D]">
                         {isEvent === "Upcoming" ? (

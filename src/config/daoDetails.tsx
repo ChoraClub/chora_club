@@ -34,7 +34,7 @@ export const dao_details: any = {
     dao_name: "arbitrum",
     chain_name: "Arbitrum One",
     description:
-      "The Arbitrum DAO is a decentralized autonomous organization (DAO) built on the Ethereum blockchain. At its core, the Arbitrum DAO is a community-driven governance mechanism that allows $ARB token holders to propose and vote on changes to the organization and the technologies it governs.",
+      "The Arbitrum DAO is a Decentralized Autonomous Organization (DAO) built on the Ethereum blockchain. At its core, the Arbitrum DAO is a community-driven governance mechanism that allows $ARB token holders to propose and vote on changes to the organization and the technologies it governs.",
     contract_address: "",
     number_of_delegates: "294k",
     token_name: "ARB",
