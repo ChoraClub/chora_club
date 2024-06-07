@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { MongoClient, MongoClientOptions } from "mongodb";
 import { connectDB } from "@/config/connectDB";
+export const revalidate = 0;
 
 export async function GET(req: NextRequest, res: NextResponse) {
   try {
@@ -15,7 +16,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
     // Fetch all documents from the meetings collection
     const meetings = await meetingsCollection
       .find({ meeting_status: "Recorded" })
-      .sort({slot_time: -1})
+      .sort({ slot_time: -1 })
       .toArray();
 
     // Iterate through each meeting document
