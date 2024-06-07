@@ -416,7 +416,7 @@ SessionTileProps) {
                     src={
                       data.thumbnail_image
                         ? `https://gateway.lighthouse.storage/ipfs/${data.thumbnail_image}`
-                        : text2
+                        : "https://gateway.lighthouse.storage/ipfs/QmekMpcR49QGSPRAnmJsEgWDvM7JKji8bUT4S4oXmYBHYU"
                     }
                     width={200}
                     height={200}

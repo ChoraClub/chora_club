@@ -57,14 +57,17 @@ const Home = ({ params }: { params: { roomId: string } }) => {
   const [isAllowToEnter, setIsAllowToEnter] = useState<boolean>();
   const [notAllowedMessage, setNotAllowedMessage] = useState<string>();
   const [meetingDetailsVisible, setMeetingDetailsVisible] = useState(true);
-
+  const [hostAddress, setHostAddress] = useState();
   const path = usePathname();
-
   const [modalOpen, setModalOpen] = useState(false);
 
   const handleModalClose = () => {
     setModalOpen(false);
-    push(`/meeting/session/${params.roomId}/lobby`);
+    if (address === hostAddress) {
+      push(`/profile/${address}?active=sessions&session=hosted`);
+    } else {
+      push(`/profile/${address}?active=sessions&session=attended`);
+    }
   };
 
   const { state } = useRoom({
@@ -93,6 +96,10 @@ const Home = ({ params }: { params: { roomId: string } }) => {
       try {
         const response = await fetch("/api/verify-meeting-id", requestOptions);
         const result = await response.json();
+
+        if (result.success) {
+          setHostAddress(result.data.host_address);
+        }
 
         if (result.success) {
           if (result.message === "Meeting has ended") {

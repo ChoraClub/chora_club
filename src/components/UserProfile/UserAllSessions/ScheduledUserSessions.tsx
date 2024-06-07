@@ -14,7 +14,7 @@ import AddEmailModal from "@/components/utils/AddEmailModal";
 import Image from "next/image";
 
 import AvailableUserSessions from "./AvailableUserSessions";
-import styles from './ScheduleUserSessions.module.css'
+import styles from "./ScheduleUserSessions.module.css";
 
 interface dataToStore {
   userAddress: `0x${string}` | undefined | null;
@@ -27,7 +27,7 @@ interface dataToStore {
 function ScheduledUserSessions({ daoName }: { daoName: string }) {
   const { address } = useAccount();
   // const address = "0x5e349eca2dc61abcd9dd99ce94d04136151a09ee";
-  const [timeSlotSizeMinutes, setTimeSlotSizeMinutes] = useState(15);
+  const [timeSlotSizeMinutes, setTimeSlotSizeMinutes] = useState(30);
   const [selectedDate, setSelectedDate] = useState<any>("");
   const [dateAndRanges, setDateAndRanges] = useState<any>([]);
   const [startHour, setStartHour] = useState("");
@@ -161,7 +161,9 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
         console.log("error:", error);
       }
     } else {
-      toast.error("Please select a time. After selecting, click 'Add Session' and then 'Create Session'");
+      toast.error(
+        "Please select a time. After selecting, click 'Add Session' and then 'Create Session'"
+      );
     }
   };
 
@@ -490,7 +492,9 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
     <>
       <div className="flex flex-col md:flex-row justify-center gap-8 md:gap-10 1.5lg:gap-20 p-4">
         {/* First box- left side */}
-        <div className={`w-full md:w-auto p-8 bg-white rounded-2xl ${styles.boxshadow} basis-1/2`}>
+        <div
+          className={`w-full md:w-auto p-8 bg-white rounded-2xl ${styles.boxshadow} basis-1/2`}
+        >
           <div className="mb-4">
             <label className="text-gray-700 font-semibold flex items-center">
               Select DAO Name:
@@ -539,12 +543,14 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
             </label>
             <select
               value={timeSlotSizeMinutes}
-              onChange={(e) => setTimeSlotSizeMinutes(Number(e.target.value))}
+              onChange={(e: any) => setTimeSlotSizeMinutes(e.target.value)}
               className="border border-gray-300 rounded px-3 py-2 mt-1 w-full cursor-pointer"
             >
-              <option value={15}>15 minutes</option>
+              {/* <option value={15}>15 minutes</option> */}
               <option value={30}>30 minutes</option>
-              <option value={45}>45 minutes</option>
+              <option value={45} disabled>
+                45 minutes (Under development - It will be live soon)
+              </option>
             </select>
           </div>
 
@@ -607,7 +613,6 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
                         key={time}
                         value={time}
                         className={`py-2 px-4 hover:bg-blue-100 dark:hover:bg-gray-700 custom-time-picker-option`}
-                        
                       >
                         {time}
                       </option>
@@ -629,7 +634,7 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
                         key={time}
                         value={time}
                         className={`py-2 px-4 hover:bg-blue-100 dark:hover:bg-gray-700 custom-time-picker-option`}
-                        style={{ cursor: 'pointer' }} 
+                        style={{ cursor: "pointer" }}
                       >
                         {time}
                       </option>
@@ -728,7 +733,9 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
         </div>
 
         {/* Second box- right side */}
-        <div className={`w-full md:w-auto p-8 bg-white rounded-2xl ${styles.boxshadow} basis-1/2`}>
+        <div
+          className={`w-full md:w-auto p-8 bg-white rounded-2xl ${styles.boxshadow} basis-1/2`}
+        >
           <AvailableUserSessions
             daoName={daoName}
             scheduledSuccess={scheduledSuccess}

@@ -286,7 +286,7 @@ function RecordedSessionsTile({ meetingData }: meeting) {
                   poster={
                     data.session.thumbnail_image
                       ? `https://gateway.lighthouse.storage/ipfs/${data.session.thumbnail_image}`
-                      : "https://gateway.lighthouse.storage/ipfs/QmdzRg9pkRGjjLbQANmHCF6CpKJQNPJkKB3GG1sFp12BHK"
+                      : "https://gateway.lighthouse.storage/ipfs/QmekMpcR49QGSPRAnmJsEgWDvM7JKji8bUT4S4oXmYBHYU"
                   }
                   // poster="https://gateway.lighthouse.storage/ipfs/Qmb1JZZieFSENkoYpVD7HRzi61rQCDfVER3fhnxCvmL1DB"
                   ref={(el: any) => (videoRefs.current[index] = el)}
