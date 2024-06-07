@@ -28,6 +28,7 @@ import ccLogo from "@/assets/images/daos/CC.png";
 import { Oval } from "react-loader-spinner";
 import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
 import { getEnsNameOfUser } from "../ConnectWallet/ENSResolver";
+import DelegateTileModal from "../utils/delegateTileModal";
 
 interface Type {
   daoDelegates: string;
@@ -54,6 +55,27 @@ function SpecificDelegate({ props }: { props: Type }) {
   const [description, setDescription] = useState("");
   // const provider = new ethers.BrowserProvider(window?.ethereum);
   const [displayEnsName, setDisplayEnsName] = useState<string>();
+
+  const [delegateOpen, setDelegateOpen] = useState(false);
+
+  const handleDelegateModal = () => {
+    setDelegateOpen(true);
+  };
+  const handleCloseDelegateModal = () => {
+    setDelegateOpen(false);
+  };
+  useEffect(() => {
+    // Lock scrolling when the modal is open
+    if (delegateOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [delegateOpen]);
 
   const [karmaSocials, setKarmaSocials] = useState({
     twitter: "",
@@ -520,9 +542,11 @@ function SpecificDelegate({ props }: { props: Type }) {
                 <div className="pt-2">
                   <button
                     className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
-                    onClick={() =>
-                      handleDelegateVotes(`${props.individualDelegate}`)
-                    }
+                    // onClick={() =>
+                    //   handleDelegateVotes(`${props.individualDelegate}`)
+                    // }
+
+                    onClick={handleDelegateModal}
                   >
                     Delegate
                   </button>
@@ -607,6 +631,35 @@ function SpecificDelegate({ props }: { props: Type }) {
             </div>
           </div>
         )
+      )}
+
+      {delegateOpen && (
+        <DelegateTileModal
+          isOpen={delegateOpen}
+          closeModal={handleCloseDelegateModal}
+          handleDelegateVotes={() =>
+            handleDelegateVotes(`${props.individualDelegate}`)
+          }
+          delegateName={
+            delegateInfo?.ensName ||
+            displayEnsName ||
+            displayName ||
+            (
+              <>
+                {props.individualDelegate.slice(0, 6)}...
+                {props.individualDelegate.slice(-4)}
+              </>
+            )
+          }
+          displayImage={displayImage
+            ? `https://gateway.lighthouse.storage/ipfs/${displayImage}`
+            : delegateInfo?.profilePicture ||
+              (props.daoDelegates === "optimism"
+                ? OPLogo
+                : props.daoDelegates === "arbitrum"
+                ? ArbLogo
+                : ccLogo)}
+        />
       )}
     </>
   );
