@@ -66,23 +66,23 @@ function RecordedSessionsTile({ meetingData }: meeting) {
     toast("Address Copied");
   };
 
-  // const userImages = [
-  //   user1,
-  //   user2,
-  //   user3,
-  //   user4,
-  //   user5,
-  //   user6,
-  //   user7,
-  //   user8,
-  //   user9,
-  // ];
+  const userImages = [
+    user1,
+    user2,
+    user3,
+    user4,
+    user5,
+    user6,
+    user7,
+    user8,
+    user9,
+  ];
 
   // State to store the randomly selected user images
-  // const [randomUserImages, setRandomUserImages] = useState<{
-  //   [key: string]: StaticImageData;
-  // }>({});
-  // const [usedIndices, setUsedIndices] = useState<Set<number>>(new Set());
+  const [randomUserImages, setRandomUserImages] = useState<{
+    [key: string]: StaticImageData;
+  }>({});
+  const [usedIndices, setUsedIndices] = useState<Set<number>>(new Set());
 
   // Function to get a random user image
   // const getRandomUserImage = (): StaticImageData => {
@@ -207,9 +207,7 @@ function RecordedSessionsTile({ meetingData }: meeting) {
     const fetchEnsNames = async () => {
       const ensNamesMap: any = {};
       for (const data of meetingData) {
-        const ensName = await getEnsName(
-          data.host_address.toLowerCase()
-        );
+        const ensName = await getEnsName(data.host_address.toLowerCase());
         if (ensName) {
           ensNamesMap[data.host_address] = ensName;
         }
@@ -228,10 +226,10 @@ function RecordedSessionsTile({ meetingData }: meeting) {
       const ensNamesMap: any = {};
       for (const data of meetingData) {
         const ensName = await getEnsName(
-          data.attendees[0].attendee_address.toLowerCase()
+          data.attendees[0]?.attendee_address.toLowerCase()
         );
         if (ensName) {
-          ensNamesMap[data.attendees[0].attendee_address] = ensName;
+          ensNamesMap[data.attendees[0]?.attendee_address] = ensName;
         }
       }
       console.log("guest ensNamesMap", ensNamesMap);
@@ -363,41 +361,46 @@ function RecordedSessionsTile({ meetingData }: meeting) {
                     </Tooltip>
                   </div>
                 </div>
-                <div className="flex items-center gap-2 py-1 ps-3 text-sm">
-                  <div className="">
-                    <Image
-                      src={
-                        data.guestInfo?.image
-                          ? `https://gateway.lighthouse.storage/ipfs/${data.attendees[0].guestInfo.image}`
-                          : user2
-                      }
-                      alt="image"
-                      width={20}
-                      height={20}
-                      className="h-5 w-5 rounded-full object-cover object-center"
-                    />
+                {data.attendees[0]?.attendee_address ? (
+                  <div className="flex items-center gap-2 py-1 ps-3 text-sm">
+                    <div className="">
+                      <Image
+                        src={
+                          data.guestInfo?.image
+                            ? `https://gateway.lighthouse.storage/ipfs/${data.attendees[0]?.guestInfo.image}`
+                            : user2
+                        }
+                        alt="image"
+                        width={20}
+                        height={20}
+                        className="h-5 w-5 rounded-full object-cover object-center"
+                      />
+                    </div>
+                    <div>
+                      Guest:{" "}
+                      {ensGuestNames[data.attendees[0]?.attendee_address]}
+                    </div>
+                    <div>
+                      <Tooltip
+                        content="Copy"
+                        placement="right"
+                        closeDelay={1}
+                        showArrow
+                      >
+                        <span className="cursor-pointer text-sm">
+                          <IoCopy
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              handleCopy(data.attendees[0]?.attendee_address);
+                            }}
+                          />
+                        </span>
+                      </Tooltip>
+                    </div>
                   </div>
-                  <div>
-                    Guest: {ensGuestNames[data.attendees[0].attendee_address]}
-                  </div>
-                  <div>
-                    <Tooltip
-                      content="Copy"
-                      placement="right"
-                      closeDelay={1}
-                      showArrow
-                    >
-                      <span className="cursor-pointer text-sm">
-                        <IoCopy
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            handleCopy(data.attendees[0].attendee_address);
-                          }}
-                        />
-                      </span>
-                    </Tooltip>
-                  </div>
-                </div>
+                ) : (
+                  ""
+                )}
               </div>
             </div>
           </div>
