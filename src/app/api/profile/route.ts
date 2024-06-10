@@ -221,42 +221,67 @@ export async function PUT(
       .find({ address: { $regex: `^${address}$`, $options: "i" } })
       .toArray();
 
+    // if (documents.length > 0) {
+    //   const document = documents[0];
+    //   const existingNetworkIndex = document.networks.findIndex(
+    //     (item: any) => item.dao_name === networks[0].dao_name
+    //   );
+
+    //   if (existingNetworkIndex !== -1) {
+    //     console.log("exist call");
+    //     const updateQuery = {
+    //       $set: {
+    //         [`networks.${existingNetworkIndex}`]: networks[0],
+    //       },
+    //     };
+    //     await collection.updateOne({ address: document.address }, updateQuery);
+    //   } else {
+    //     console.log("push call");
+    //     const updateQuery = {
+    //       $push: {
+    //         networks: networks[0],
+    //       },
+    //     };
+    //     /* @ts-ignore */
+    //     await collection.updateOne({ address: document.address }, updateQuery);
+    //   }
+    // }
+
     if (documents.length > 0) {
       const document = documents[0];
-      const existingNetworkIndex = document.networks.findIndex(
-        (item: any) => item.dao_name === networks[0].dao_name
-      );
 
-      if (existingNetworkIndex !== -1) {
-        console.log("exist call");
-        const updateQuery = {
-          $set: {
-            [`networks.${existingNetworkIndex}`]: networks[0],
-          },
-        };
-        await collection.updateOne({ address: document.address }, updateQuery);
-      } else {
-        console.log("push call");
-        const updateQuery = {
-          $push: {
-            networks: networks[0],
-          },
-        };
-        await collection.updateOne({ address: document.address }, updateQuery);
+      // Check if networks array is provided and is not empty
+      if (networks?.length > 0) {
+        const existingNetworkIndex = document.networks.findIndex(
+          (item: any) => item.dao_name === networks[0].dao_name
+        );
+
+        if (existingNetworkIndex !== -1) {
+          console.log("exist call");
+          const updateQuery = {
+            $set: {
+              [`networks.${existingNetworkIndex}`]: networks[0],
+            },
+          };
+          await collection.updateOne(
+            { address: document.address },
+            updateQuery
+          );
+        } else {
+          console.log("push call");
+          const updateQuery = {
+            $push: {
+              networks: networks[0],
+            },
+          };
+          await collection.updateOne(
+            { address: document.address },
+            /* @ts-ignore */
+            updateQuery
+          );
+        }
       }
     }
-
-    /*
-
-    step 1 : from front-end check which name is come 
-    step 2 : check into network array of object that chain name is there or not 
-    step 3 : if chain name is alredy there so update that discourse_id only 
-    step 4 : if chain name is not exist into our collection or field network array 
-    step 5 : get details of new chain related details like dao,network,discourse
-    step 6 : push data details to network array of object with different discourse id
-    
-
-    */
 
     // Update the delegate document
     console.log("Updating delegate document...");

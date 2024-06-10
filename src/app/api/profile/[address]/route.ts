@@ -110,7 +110,7 @@ export async function POST(
     client.close();
     // console.log("MongoDB connection closed");
 
-    console.log("Existing called data retrive", documents);
+    console.log("Existing called data retrieve", documents);
 
     // Return the found documents
     return NextResponse.json(

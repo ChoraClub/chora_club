@@ -20,6 +20,7 @@ interface MeetingRequestBody {
   dao_name: string;
   title: string;
   description: string;
+  thumbnail:string;
   session_type: string;
 }
 
@@ -38,6 +39,7 @@ interface MeetingResponseBody {
     dao_name: string;
     title: string;
     description: string;
+    thumbnail: string;
     session_type: string;
   } | null;
   error?: string;
@@ -58,6 +60,7 @@ export async function POST(
     dao_name,
     title,
     description,
+    thumbnail,
     session_type,
   }: MeetingRequestBody = await req.json();
 
@@ -84,6 +87,7 @@ export async function POST(
       dao_name,
       title,
       description,
+      thumbnail,
       session_type,
     });
     // console.log("Meeting document inserted:", result);
@@ -120,6 +124,7 @@ export async function POST(
           }
         }
       }
+
       if (session_type === "session") {
         const userAddress = attendees[0].attendee_address;
         const documentsForUserEmail = await delegateCollection

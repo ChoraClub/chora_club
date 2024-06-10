@@ -132,7 +132,7 @@ const WatchLeaderBoard = () => {
         )} */}
         <div className="flex justify-between items-center mb-5">
           <div className="flex">
-            <p className="text-lg font-medium text-blue-shade-100 ml-5">
+            <p className="xl:text-base 1.7xl:text-lg font-medium text-blue-shade-100 ml-5">
               🏆LeaderBoard
             </p>
             {showComingSoon && (
@@ -158,7 +158,7 @@ const WatchLeaderBoard = () => {
           {leaderBoard.slice(0, 5).map((data, index) => (
             <div
               key={index}
-              className="grid grid-cols-7 py-3 bg-black-shade-300 rounded-xl items-center"
+              className="grid grid-cols-7 py-3 bg-black-shade-300 rounded-xl items-center w-full"
             >
               <div className="flex items-center ml-4 col-span-3">
                 <Image
@@ -166,10 +166,10 @@ const WatchLeaderBoard = () => {
                   alt=""
                   width={26}
                   height={26}
-                  className="mr-2"
+                  className="xl:mr-2 mr-1"
                 />
                 <div
-                  className={`font-medium text-sm`}
+                  className={`font-medium 1.7xl:text-sm text-xs`}
                   style={{ color: data.color }}
                 >
                   {data.text}
@@ -181,12 +181,12 @@ const WatchLeaderBoard = () => {
                   alt=""
                   width={39}
                   height={39}
-                  className="mr-2"
+                  className="xl:mr-2 mr-1 ml-3 xl:ml-0"
                 />
-                <p className="font-normal text-base">{data.name}</p>
+                <p className="font-normal 1.7xl:text-base text-sm">{data.name}</p>
               </div>
               <div
-                className={` border rounded-[9px] font-normal text-[13px] py-1 px-6 w-fit h-fit col-span-2 ml-8 flex justify-center items-center`}
+                className={` border rounded-[9px] font-normal text-[13px] py-1 px-6 w-fit h-fit col-span-2 1.7xl:ml-8 ml-3 flex justify-center items-center`}
                 style={{
                   backgroundColor: data.bgColor,
                   borderColor: data.color,

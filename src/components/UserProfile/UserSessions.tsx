@@ -45,7 +45,6 @@ function UserSessions({
   daoName,
 }: UserSessionsProps) {
   const { address } = useAccount();
-  // const address = "0x5e349eca2dc61abcd9dd99ce94d04136151a09ee";
   const router = useRouter();
   const path = usePathname();
   const searchParams = useSearchParams();
@@ -58,51 +57,37 @@ function UserSessions({
   const getUserMeetingData = async () => {
     try {
       // setDataLoading(true);
-      // console.log("DAO NAMEEEEEEEEE", daoName);
-      //   const response = await fetch(`/api/get-dao-sessions`, {
-      // if (chain?.name === "Optimism") {
-      //   // dao_name = "optimism";
-      //   setDaoName("optimism");
-      // } else if (chain?.name === "Arbitrum One") {
-      //   // dao_name = "arbitrum";
-      //   setDaoName("arbitrum");
-      // }
-      try {
-        // setDataLoading(true);
-        const response = await fetch(`/api/get-sessions`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            address: address,
-            dao_name: daoName,
-          }),
-        });
+      const response = await fetch(`/api/get-sessions`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          address: address,
+          dao_name: daoName,
+        }),
+      });
 
-        // console.log("Response", response);
+      // console.log("Response", response);
 
-        const result = await response.json();
-        console.log("result", result);
-        if (result.success) {
-          const hostedData = await result.hostedMeetings;
-          console.log("hostedData", hostedData);
-          const attendedData = await result.attendedMeetings;
-          console.log("attendedData", attendedData);
-          setDataLoading(true);
-          if (searchParams.get("session") === "hosted") {
-            setSessionDetails(hostedData);
-            console.log("in session hosted");
-          } else if (searchParams.get("session") === "attended") {
-            setSessionDetails(attendedData);
-          }
-          setDataLoading(false);
+      const result = await response.json();
+      console.log("result", result);
+      if (result.success) {
+        const hostedData = await result.hostedMeetings;
+        console.log("hostedData", hostedData);
+        const attendedData = await result.attendedMeetings;
+        console.log("attendedData", attendedData);
+        setDataLoading(true);
+        if (searchParams.get("session") === "hosted") {
+          setSessionDetails(hostedData);
+          console.log("in session hosted");
+        } else if (searchParams.get("session") === "attended") {
+          setSessionDetails(attendedData);
         }
-      } catch (error) {
-        console.log("error in catch", error);
+        setDataLoading(false);
       }
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      console.log("error in catch", error);
     }
   };
 
@@ -124,10 +109,10 @@ function UserSessions({
   // }, [searchParams.get("session")]);
 
   useEffect(() => {
-    if (!selfDelegate && searchParams.get("session") === "schedule") {
+    if (selfDelegate === false && searchParams.get("session") === "schedule") {
       router.replace(path + "?active=sessions&session=attending");
     }
-  }, [isDelegate, selfDelegate]);
+  }, [selfDelegate]);
   return (
     <div>
       <div className="pr-32 pt-3">

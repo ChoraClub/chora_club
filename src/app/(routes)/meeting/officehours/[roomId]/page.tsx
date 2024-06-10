@@ -34,9 +34,11 @@ const Home = ({ params }: { params: { roomId: string } }) => {
 
   const handleModalClose = () => {
     setModalOpen(false); // Close the modal
-    // Push the router after the modal is closed
-
-    push(`/meeting/officehours/${params.roomId}/lobby`);
+    if (address === hostAddress) {
+      push(`/profile/${address}?active=officeHours&hours=hosted`);
+    } else {
+      push(`/profile/${address}?active=officeHours&hours=attended`);
+    }
   };
 
   const displayPopup = async () => {
@@ -71,6 +73,7 @@ const Home = ({ params }: { params: { roomId: string } }) => {
   const { address } = useAccount();
   const [isAllowToEnter, setIsAllowToEnter] = useState<boolean>();
   const [notAllowedMessage, setNotAllowedMessage] = useState<string>();
+  const [hostAddress, setHostAddress] = useState();
 
   useEffect(() => {
     const myHeaders = new Headers();
@@ -92,6 +95,10 @@ const Home = ({ params }: { params: { roomId: string } }) => {
       try {
         const response = await fetch("/api/verify-meeting-id", requestOptions);
         const result = await response.json();
+
+        if (result.success) {
+          setHostAddress(result.data.host_address);
+        }
 
         if (result.success) {
           if (result.message === "Meeting has ended") {

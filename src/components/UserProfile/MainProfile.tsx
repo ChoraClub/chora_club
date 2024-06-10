@@ -45,7 +45,6 @@ import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
 
 function MainProfile() {
   const { isConnected, address } = useAccount();
-  // const address = "0x5e349eca2dc61abcd9dd99ce94d04136151a09ee";
   const { data: session, status } = useSession();
   const { openConnectModal } = useConnectModal();
   const { publicClient, walletClient } = WalletAndPublicClient();
@@ -316,7 +315,7 @@ function MainProfile() {
 
         const raw = JSON.stringify({
           address: address,
-          daoName: dao,
+          // daoName: dao,
         });
 
         const requestOptions: any = {

@@ -12,6 +12,9 @@ const config: Config = {
     extend: {
       screens: {
         "2.5xl": "2100px",
+        "1.5xl":"1350px",
+        "1.7xl":"1450px",
+        "1.5lg":"1200px",
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
@@ -33,7 +36,10 @@ const config: Config = {
         "black-shade-500": "#4F4F4F",
         "black-shade-600": "#F5F5F5",
         "black-shade-700": "#D9D9D9",
+        "black-shade-800": "#EDEDED",
+        "black-shade-900": "#B9B9B9",
         "green-shade-100": "#00CE78",
+        "green-shade-200": "#25d366",
 
       },
       fontFamily: {

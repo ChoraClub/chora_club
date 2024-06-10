@@ -1,21 +1,27 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import user from "@/assets/images/daos/user3.png";
 import view from "@/assets/images/daos/view.png";
 import Image from "next/image";
 import oplogo from "@/assets/images/daos/op.png";
 import arblogo from "@/assets/images/daos/arbitrum.jpg";
 import time from "@/assets/images/daos/time.png";
+import onChain_link from "@/assets/images/watchmeeting/onChain_link.png";
+import offChain_link from "@/assets/images/watchmeeting/offChain_link.png";
 import { PiFlagFill } from "react-icons/pi";
 import { BiSolidShare } from "react-icons/bi";
 import { IoMdArrowDropdown } from "react-icons/io";
 import Link from "next/link";
 import VideoJS from "@/components/utils/VideoJs";
 import videojs from "video.js";
-import { parseISO } from "date-fns";
+// import { parseISO } from "date-fns";
 import ReportOptionModal from "./ReportOptionModal";
 import { getEnsName } from "../ConnectWallet/ENSResolver";
 import { useRouter } from "next-nprogress-bar";
+import "./WatchSession.module.css";
+import ShareMediaModal from "./ShareMediaModal";
 import { BASE_URL } from "@/config/constants";
+import { Toaster } from "react-hot-toast";
+import { Tooltip } from "@nextui-org/react";
 
 interface ProfileInfo {
   _id: string;
@@ -37,6 +43,7 @@ interface Attendee {
   attendee_address: string;
   attendee_uid: string;
   profileInfo: ProfileInfo;
+  onchain_attendee_uid?: string;
 }
 
 interface HostProfileInfo {
@@ -79,6 +86,7 @@ interface Meeting {
     | "Ongoing"; // Assuming meeting status can only be active or inactive
   session_type: string;
   hostProfileInfo: HostProfileInfo;
+  onchain_host_uid?: string;
 }
 
 function WatchSession({
@@ -91,14 +99,27 @@ function WatchSession({
   const [showPopup, setShowPopup] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [contentHeight, setContentHeight] = useState(0);
   const [ensHostName, setEnsHostName] = useState<string | null>(null);
+  const [shareModal, setShareModal] = useState(false);
   const router = useRouter();
 
+  const handleShareClose = () => {
+    setShareModal(false);
+  };
+
+  useEffect(() => {
+    if (contentRef.current) {
+      setContentHeight(isExpanded ? contentRef.current.scrollHeight : 0);
+    }
+  }, [data.description, isExpanded]);
+
   const formatTimeAgo = (utcTime: string): string => {
-    const parsedTime = parseISO(utcTime);
+    const parsedTime = new Date(utcTime);
     const currentTime = new Date();
     const differenceInSeconds = Math.abs(
-      (parsedTime.getTime() - currentTime.getTime()) / 1000
+      (currentTime.getTime() - parsedTime.getTime()) / 1000
     );
 
     if (differenceInSeconds < 60) {
@@ -173,7 +194,14 @@ function WatchSession({
           <div className="flex justify-between text-sm pe-4 pb-4">
             <div className="flex gap-6">
               <div className="flex items-center gap-2 ">
-                <div>
+                <div
+                  className="flex gap-2 cursor-pointer"
+                  onClick={() =>
+                    router.push(
+                      `/${data.dao_name}/${data.host_address}?active=info`
+                    )
+                  }
+                >
                   <Image
                     src={
                       data.hostProfileInfo?.image
@@ -183,28 +211,75 @@ function WatchSession({
                     alt="image"
                     width={20}
                     height={20}
-                    className="rounded-full"
+                    className="w-5 h-5 rounded-full"
                     priority
                   />
+                  <div className="text-[#292929] font-semibold ">
+                    {ensHostName}
+                  </div>
                 </div>
-                <div
-                  className="text-[#292929] font-semibold"
-                  // onClick={() => router.push(`${BASE_URL}/${data.dao_name}/${data.host_address}?active=info`)}
-                >
-                  {ensHostName}
-                </div>
-                <Link
-                  href={
-                    data.dao_name === ("optimism" || "Optimism")
-                      ? `https://optimism.easscan.org/offchain/attestation/view/${data.uid_host}`
-                      : data.dao_name === ("arbitrum" || "Arbitrum")
-                      ? `https://arbitrum.easscan.org/offchain/attestation/view/${data.uid_host}`
-                      : ""
-                  }
-                  target="_blank"
-                >
-                  <Image src={view} alt="image" width={15} priority />
-                </Link>
+                <>
+                  <Tooltip
+                    showArrow
+                    content={
+                      <div className="font-poppins">Offchain Attestation</div>
+                    }
+                    placement="top"
+                    className="rounded-md bg-opacity-90 max-w-96"
+                    closeDelay={1}
+                  >
+                    <Link
+                      href={
+                        data.dao_name === ("optimism" || "Optimism")
+                          ? `https://optimism.easscan.org/offchain/attestation/view/${data.uid_host}`
+                          : data.dao_name === ("arbitrum" || "Arbitrum")
+                          ? `https://arbitrum.easscan.org/offchain/attestation/view/${data.uid_host}`
+                          : ""
+                      }
+                      target="_blank"
+                    >
+                      <Image
+                        src={offChain_link}
+                        alt="image"
+                        className="w-6"
+                        priority
+                        quality={100}
+                      />
+                    </Link>
+                  </Tooltip>
+                </>
+                {data.onchain_host_uid ? (
+                  <Tooltip
+                    showArrow
+                    content={
+                      <div className="font-poppins">Onchain Attestation</div>
+                    }
+                    placement="top"
+                    className="rounded-md bg-opacity-90 max-w-96"
+                    closeDelay={1}
+                  >
+                    <Link
+                      href={
+                        data.dao_name === ("optimism" || "Optimism")
+                          ? `https://optimism.easscan.org/attestation/view/${data.onchain_host_uid}`
+                          : data.dao_name === ("arbitrum" || "Arbitrum")
+                          ? `https://arbitrum.easscan.org/attestation/view/${data.onchain_host_uid}`
+                          : ""
+                      }
+                      target="_blank"
+                    >
+                      <Image
+                        alt="image"
+                        src={onChain_link}
+                        className="w-6"
+                        priority
+                        quality={100}
+                      />
+                    </Link>
+                  </Tooltip>
+                ) : (
+                  <></>
+                )}
               </div>
 
               <div className="flex items-center gap-1">
@@ -247,7 +322,10 @@ function WatchSession({
                 </div>
                 <div className="text-[#FF0000]">Report</div>
               </div>
-              <div className="flex items-center gap-1 cursor-pointer">
+              <div
+                className="flex items-center gap-1 cursor-pointer"
+                onClick={() => setShareModal(true)}
+              >
                 <div className="scale-x-[-1]">
                   <BiSolidShare size={20} />
                 </div>
@@ -261,7 +339,7 @@ function WatchSession({
               className="flex items-center border border-[#8E8E8E] bg-white w-fit rounded-md px-3 font-medium py-1 gap-2 cursor-pointer"
               onClick={() => setShowPopup(!showPopup)}
             >
-              <div className="text-[#292929] text-sm">Attendee</div>
+              <div className="text-[#292929] text-sm">Guest</div>
               <div
                 className={
                   showPopup
@@ -279,39 +357,94 @@ function WatchSession({
               >
                 {data.attendees.map((attendee, index) => (
                   <div key={index}>
-                    <div className="flex items-center text-sm gap-3 px-6  py-[10px]">
-                      <div>
-                        <Image
-                          src={
-                            attendee.profileInfo?.image
-                              ? `https://gateway.lighthouse.storage/ipfs/${attendee.profileInfo.image}`
-                              : user
-                          }
-                          alt="image"
-                          width={18}
-                          height={18}
-                          className="rounded-full"
-                          priority
-                        />
-                      </div>
-                      <div>
-                        {attendee.attendee_address.slice(0, 8) +
-                          "........." +
-                          attendee.attendee_address.slice(-6)}{" "}
+                    <div className="flex items-center text-sm gap-3 px-6  py-[10px] justify-between">
+                      <div className="flex gap-3">
+                        <div>
+                          <Image
+                            src={
+                              attendee.profileInfo?.image
+                                ? `https://gateway.lighthouse.storage/ipfs/${attendee.profileInfo.image}`
+                                : user
+                            }
+                            alt="image"
+                            width={18}
+                            height={18}
+                            className="rounded-full"
+                            priority
+                          />
+                        </div>
+                        <div>
+                          {attendee.attendee_address.slice(0, 6) +
+                            "..." +
+                            attendee.attendee_address.slice(-4)}{" "}
+                        </div>
                       </div>
                       {attendee.attendee_uid ? (
-                        <Link
-                          href={
-                            data.dao_name === ("optimism" || "Optimism")
-                              ? `https://optimism.easscan.org/offchain/attestation/view/${attendee.attendee_uid}`
-                              : data.dao_name === ("arbitrum" || "Arbitrum")
-                              ? `https://arbitrum.easscan.org/offchain/attestation/view/${attendee.attendee_uid}`
-                              : ""
+                        <Tooltip
+                          showArrow
+                          content={
+                            <div className="font-poppins">
+                              Offchain Attestation
+                            </div>
                           }
-                          target="_blank"
+                          placement="top"
+                          className="rounded-md bg-opacity-90 max-w-96"
+                          closeDelay={1}
                         >
-                          <Image src={view} alt="image" width={15} priority />
-                        </Link>
+                          <Link
+                            href={
+                              data.dao_name === ("optimism" || "Optimism")
+                                ? `https://optimism.easscan.org/offchain/attestation/view/${attendee.attendee_uid}`
+                                : data.dao_name === ("arbitrum" || "Arbitrum")
+                                ? `https://arbitrum.easscan.org/offchain/attestation/view/${attendee.attendee_uid}`
+                                : ""
+                            }
+                            target="_blank"
+                          >
+                            <Image
+                              src={offChain_link}
+                              alt="image"
+                              className="w-6"
+                              priority
+                              quality={100}
+                            />
+                          </Link>
+                        </Tooltip>
+                      ) : (
+                        <></>
+                      )}
+
+                      {attendee.onchain_attendee_uid ? (
+                        <Tooltip
+                          showArrow
+                          content={
+                            <div className="font-poppins">
+                              Onchain Attestation
+                            </div>
+                          }
+                          placement="top"
+                          className="rounded-md bg-opacity-90 max-w-96"
+                          closeDelay={1}
+                        >
+                          <Link
+                            href={
+                              data.dao_name === ("optimism" || "Optimism")
+                                ? `https://optimism.easscan.org/attestation/view/${attendee.onchain_attendee_uid}`
+                                : data.dao_name === ("arbitrum" || "Arbitrum")
+                                ? `https://arbitrum.easscan.org/attestation/view/${attendee.onchain_attendee_uid}`
+                                : ""
+                            }
+                            target="_blank"
+                          >
+                            <Image
+                              alt="image"
+                              src={onChain_link}
+                              className="w-6"
+                              priority
+                              quality={100}
+                            />
+                          </Link>
+                        </Tooltip>
                       ) : (
                         <></>
                       )}
@@ -331,13 +464,25 @@ function WatchSession({
             className={`px-6 pt-4 pb-4 rounded-b-3xl bg-white text-[#1E1E1E]`}
           >
             <>
-              <div
+              {/* <div
                 className={`${
                   isExpanded ? "max-h-full" : "max-h-24 line-clamp-3"
                 } transition-[max-height] duration-500 ease-in-out `}
               >
                 {data.description}
+              </div> */}
+              <div
+                ref={contentRef}
+                className={`max-h-full transition-max-height duration-500 ease-in-out overflow-hidden ${
+                  isExpanded ? "max-h-full" : "max-h-24 line-clamp-3"
+                }`}
+                style={{
+                  maxHeight: isExpanded ? `${contentHeight}px` : "6rem",
+                }}
+              >
+                <div className="overflow-hidden">{data.description}</div>
               </div>
+
               {getLineCount(data.description) > 3 && (
                 <button
                   className="text-sm text-blue-shade-200 mt-2"
@@ -351,7 +496,32 @@ function WatchSession({
         )}
       </div>
       {modalOpen && (
-        <ReportOptionModal isOpen={modalOpen} onClose={handleModalClose} />
+        <ReportOptionModal
+          data={data}
+          collection={collection}
+          isOpen={modalOpen}
+          onClose={handleModalClose}
+        />
+      )}
+      <Toaster
+        toastOptions={{
+          style: {
+            fontSize: "14px",
+            backgroundColor: "#3E3D3D",
+            color: "#fff",
+            boxShadow: "none",
+            borderRadius: "50px",
+            padding: "3px 5px",
+          },
+        }}
+      />
+
+      {shareModal && (
+        <ShareMediaModal
+          isOpen={shareModal}
+          onClose={handleShareClose}
+          data={data}
+        />
       )}
     </div>
   );
