@@ -11,7 +11,7 @@ import gitbook from "@/assets/images/sidebar/gitbook.png";
 import user from "@/assets/images/sidebar/user.png";
 import styles from "./sidebar.module.css";
 import { usePathname } from "next/navigation";
-import { Badge, Tooltip } from "@nextui-org/react";
+import { Badge, Tooltip, VisuallyHidden } from "@nextui-org/react";
 import { IoClose } from "react-icons/io5";
 import Link from "next/link";
 import { ConnectWallet } from "../ConnectWallet/ConnectWallet";
@@ -19,8 +19,57 @@ import { useSession } from "next-auth/react";
 import { useAccount } from "wagmi";
 import { useRouter } from "next-nprogress-bar";
 import ButtonWithCircle from "../Circle/ButtonWithCircle";
+import Tour from 'reactour';
+import '@/components/ConnectWallet/ConnectWalletWithENS'
+import './tour.css';
 
 function Sidebar() {
+
+  const [isTourOpen, setIsTourOpen] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+    setIsTourOpen(true); // Open the tour when the component mounts
+  }, []);
+
+  const tourSteps = [
+    {
+      selector: '.wallet',
+      content: 'This is the connect wallet button.',
+    },
+    {
+      selector: '.logo',
+      content: 'This is the Chora Club logo.',
+    },
+    {
+      selector: '.dao',
+      content: 'This button takes you to the DAOs list.',
+    },
+    {
+      selector: '.office',
+      content: 'This button takes you to the office hours page.',
+    },
+    {
+      selector: '.session',
+      content: 'This button takes you to the sessions page.',
+    },
+    {
+      selector: '.gitbook',
+      content: 'This button opens the GitBook documentation.',
+    },
+    {
+      selector: '.profile',
+      content: 'This button opens your profile page.',
+    },
+  ];
+
+  const closeTour = () => {
+    setIsTourOpen(false);
+  };
+
+
+
   const router = useRouter();
   const [storedDao, setStoredDao] = useState<string[]>([]);
   const pathname = usePathname();
@@ -77,6 +126,19 @@ function Sidebar() {
 
   return (
     <>
+       {isClient && (
+        <Tour
+          steps={tourSteps}
+          isOpen={isTourOpen}
+          onRequestClose={closeTour}
+          startAt={0}
+          showNavigation={true}
+          // showBadges={false}
+          showCloseButton={true}
+          showNumber={true}
+          lastStepNextButton={<span>Finish</span>}
+        />
+      )}
       <div className="py-6 h-full">
         <div className="flex flex-col h-full justify-between">
           <div className="flex flex-col items-center gap-y-4 pb-5">
@@ -84,7 +146,7 @@ function Sidebar() {
               src={logo}
               alt={"image"}
               width={40}
-              className="xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14"
+              className="xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 logo"
             ></Image>
             <Tooltip
               content="DAOs"
@@ -98,7 +160,7 @@ function Sidebar() {
                   src={rocket}
                   alt={"image"}
                   width={40}
-                  className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 ${
+                  className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 dao ${
                     pathname.endsWith(`/`)
                       ? "border-white border-2 rounded-full"
                       : ""
@@ -118,7 +180,7 @@ function Sidebar() {
                   src={office}
                   alt={"image"}
                   width={40}
-                  className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 ${
+                  className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 office${
                     pathname.includes(`/office-hours`)
                       ? "border-white border-2 rounded-full"
                       : ""
@@ -139,7 +201,7 @@ function Sidebar() {
                   alt={"image"}
                   width={40}
                   height={40}
-                  className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 ${
+                  className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 session ${
                     pathname.includes(`/sessions`)
                       ? "border-white border-2 rounded-full"
                       : ""
@@ -210,7 +272,7 @@ function Sidebar() {
                   src={gitbook}
                   alt={"image"}
                   width={40}
-                  className="xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14"
+                  className="xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 gitbook"
                 />
               </Link>
             </Tooltip>
@@ -244,7 +306,7 @@ function Sidebar() {
                   src={user}
                   alt={"image"}
                   width={40}
-                  className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14`}
+                  className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 profile`}
                   onClick={() => router.push(`/profile/${address}?active=info`)}
                 />
               </Tooltip>

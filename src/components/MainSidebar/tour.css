@@ -1,0 +1,26 @@
+/* tour.css */
+.reactour__helper {
+    background-color: rgba(0, 0, 0, 0.7) !important;
+    border-radius: 10px !important;
+    color: white !important;
+  }
+  
+  .reactour__overlay {
+    background-color: rgba(0, 0, 0, 0.6) !important;
+  }
+
+  .reactour__close{
+      /* background-color: blue !important; */
+      /* padding: 10px !important; */
+      border-radius: 50% !important;
+      display: flex !important;
+      color: white !important;
+      top: 15px !important;
+      right: 15px !important;
+  }
+  .kVEayH{
+    border-radius: 50% !important;
+  }
+  .sc-htpNat:hover{
+    color: white !important;
+  }
