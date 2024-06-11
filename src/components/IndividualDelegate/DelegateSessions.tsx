@@ -151,7 +151,7 @@ function DelegateSessions({ props }: { props: Type }) {
           >
             Ongoing
           </button> */}
-          <button
+          {/* <button
             className={`py-2 ${
               searchParams.get("session") === "upcoming"
                 ? "text-[#3E3D3D] font-bold"
@@ -162,7 +162,7 @@ function DelegateSessions({ props }: { props: Type }) {
             }
           >
             Upcoming
-          </button>
+          </button> */}
           <button
             className={`py-2 ${
               searchParams.get("session") === "hosted"
@@ -198,7 +198,7 @@ function DelegateSessions({ props }: { props: Type }) {
             <Tile sessionDetails={sessionDetails} dataLoading={dataLoading} isEvent="Ongoing" isOfficeHour={false} />
             </>
           )} */}
-          {searchParams.get("session") === "upcoming" &&
+          {/* {searchParams.get("session") === "upcoming" &&
             (dataLoading ? (
               <div className="flex items-center justify-center">
                 <Oval
@@ -218,7 +218,7 @@ function DelegateSessions({ props }: { props: Type }) {
                 isOfficeHour={false}
                 isSession=""
               />
-            ))}
+            ))} */}
           {searchParams.get("session") === "hosted" &&
             (dataLoading ? (
               <div className="flex items-center justify-center">

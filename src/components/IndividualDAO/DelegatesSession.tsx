@@ -134,13 +134,13 @@ function DelegatesSession({ props }: { props: string }) {
     <div className="font-poppins">
       <div
         style={{ background: "rgba(238, 237, 237, 0.36)" }}
-        className="flex border-[0.5px] border-black w-fit rounded-full my-4 font-poppins"
+        className="flex border-[0.5px] border-black w-1/3 rounded-full my-4 font-poppins"
       >
         <input
           type="text"
-          placeholder="Search"
+          placeholder="Search by title and host address"
           style={{ background: "rgba(238, 237, 237, 0.36)" }}
-          className="pl-5 rounded-full outline-none"
+          className="pl-5 rounded-full outline-none w-full"
           value={searchQuery}
           onChange={(e) => handleSearchChange(e.target.value)}
         ></input>

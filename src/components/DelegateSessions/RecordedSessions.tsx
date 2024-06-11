@@ -178,8 +178,8 @@ function RecordedSessions() {
       const filtered = searchMeetingData.filter((item: any) => {
         // Convert both query and userAddress to lowercase for case-insensitive matching
         const lowercaseQuery = query.toLowerCase();
-        const lowercaseAddress = item.session.host_address.toLowerCase();
-        const lowercaseTitle = item.session.title.toLowerCase();
+        const lowercaseAddress = item.host_address.toLowerCase();
+        const lowercaseTitle = item.title.toLowerCase();
 
         // Check if the lowercase userAddress includes the lowercase query
         return (
@@ -198,7 +198,7 @@ function RecordedSessions() {
     if (params) {
       setActiveButton(params);
       const filtered = searchMeetingData.filter((item: any) => {
-        return item.session.dao_name.includes(params);
+        return item.dao_name.includes(params);
       });
 
       setMeetingData(filtered);
@@ -306,5 +306,4 @@ function RecordedSessions() {
 }
 
 export default RecordedSessions;   
-
 
