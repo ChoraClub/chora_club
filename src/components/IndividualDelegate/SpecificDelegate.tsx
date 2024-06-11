@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import user from "@/assets/images/daos/profile.png";
 import { FaXTwitter, FaDiscord, FaGithub } from "react-icons/fa6";
 import { BiSolidMessageRoundedDetail } from "react-icons/bi";
@@ -16,12 +16,12 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { useRouter } from "next-nprogress-bar";
 import Link from "next/link";
 import toast, { Toaster } from "react-hot-toast";
-// import { Provider, cacheExchange, createClient, fetchExchange } from "urql";
+import { Provider, cacheExchange, createClient, fetchExchange,gql } from "urql";
 import WalletAndPublicClient from "@/helpers/signer";
 import dao_abi from "../../artifacts/Dao.sol/GovernanceToken.json";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useConnectModal, useChainModal } from "@rainbow-me/rainbowkit";
-import { useNetwork } from "wagmi";
+import { useAccount, useNetwork } from "wagmi";
 import OPLogo from "@/assets/images/daos/op.png";
 import ArbLogo from "@/assets/images/daos/arbCir.png";
 import ccLogo from "@/assets/images/daos/CC.png";
@@ -34,6 +34,23 @@ interface Type {
   daoDelegates: string;
   individualDelegate: string;
 }
+
+const client = createClient({
+  url: "https://api.studio.thegraph.com/query/68573/op/version/latest",
+  exchanges: [cacheExchange, fetchExchange],
+});
+const DELEGATE_CHANGED_QUERY = gql`
+  query MyQuery($delegator: String!) {
+    delegateChangeds(
+      orderBy: blockTimestamp
+      orderDirection: desc
+      where: { delegator: $delegator }
+      first: 1
+    ) {
+      toDelegate
+    }
+  }
+`;
 
 function SpecificDelegate({ props }: { props: Type }) {
   const { publicClient, walletClient } = WalletAndPublicClient();
@@ -55,10 +72,33 @@ function SpecificDelegate({ props }: { props: Type }) {
   const [description, setDescription] = useState("");
   // const provider = new ethers.BrowserProvider(window?.ethereum);
   const [displayEnsName, setDisplayEnsName] = useState<string>();
+  const [delegate, setDelegate] = useState("");
+  const [same , setSame] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const [delegateOpen, setDelegateOpen] = useState(false);
+  const address = useAccount();
+ 
 
-  const handleDelegateModal = () => {
+  const handleDelegateModal =async () => {
+    setDelegateOpen(true);
+    setLoading(true);
+    try {
+      
+      const { data } = await client.query(DELEGATE_CHANGED_QUERY, {delegator: address});
+      const ens = await getEnsNameOfUser(data.delegateChangeds[0]?.toDelegate);
+      const delegate=data.delegateChangeds[0]?.toDelegate;
+      console.log("individualDelegate",props.individualDelegate);
+      setSame(delegate===props.individualDelegate)
+      ens ? setDelegate(ens) : setDelegate(delegate.slice(0, 6) + "..."+ delegate.slice(-4));
+      setError(null);
+    } catch (err:any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+
     setDelegateOpen(true);
   };
   const handleCloseDelegateModal = () => {
@@ -632,18 +672,19 @@ function SpecificDelegate({ props }: { props: Type }) {
           </div>
         )
       )}
-
-      {delegateOpen && (
+{console.log("Delegate", delegate)}
+     {delegateOpen && (
         <DelegateTileModal
           isOpen={delegateOpen}
           closeModal={handleCloseDelegateModal}
           handleDelegateVotes={() =>
             handleDelegateVotes(`${props.individualDelegate}`)
           }
+          fromDelegate={delegate ? delegate : "N/A"}
           delegateName={
             delegateInfo?.ensName ||
             displayEnsName ||
-            displayName ||
+            // displayName ||
             (
               <>
                 {props.individualDelegate.slice(0, 6)}...
@@ -659,6 +700,7 @@ function SpecificDelegate({ props }: { props: Type }) {
                 : props.daoDelegates === "arbitrum"
                 ? ArbLogo
                 : ccLogo)}
+            addressCheck={same}
         />
       )}
     </>

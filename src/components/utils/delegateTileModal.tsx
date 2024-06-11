@@ -7,11 +7,13 @@ interface delegate{
   isOpen:boolean,
   closeModal:any,
   handleDelegateVotes:any,
+  fromDelegate:any,
   delegateName:String,
-  displayImage:any
+  displayImage:any,
+  addressCheck:boolean
 }
 
-function DelegateTile ({isOpen,closeModal, handleDelegateVotes, delegateName,displayImage}:delegate) {
+function DelegateTile ({isOpen,closeModal, handleDelegateVotes, fromDelegate ,delegateName,displayImage,addressCheck}:delegate) {
 
   const [isLoading, setIsLoading] = useState(true);
 
@@ -34,6 +36,7 @@ function DelegateTile ({isOpen,closeModal, handleDelegateVotes, delegateName,dis
       </div>
     );
   }
+  console.log("deleeeeee",addressCheck)
   return (
   <>
     <div className="fixed inset-0 flex items-center justify-center z-50  overflow-hidden font-poppins">
@@ -50,7 +53,7 @@ function DelegateTile ({isOpen,closeModal, handleDelegateVotes, delegateName,dis
                     <Image src={user} alt="" className='size-10 mx-2'/>
                     <div className=''>
                         <p className='mt-2 text-sm font-medium'>Currently delegated to</p>
-                        <p className='mb-2 font-semibold'>N/A</p>
+                        <p className='mb-2 font-semibold'>{fromDelegate}</p>
                     </div>
                 </div>
                 <div className='w-full border-[0.5px] border-black-shade-900 flex items-center justify-center h-0'>
@@ -64,7 +67,13 @@ function DelegateTile ({isOpen,closeModal, handleDelegateVotes, delegateName,dis
                     </div>
                 </div>
             </div>
-            <button className='bg-blue-shade-100 text-white rounded-md py-1.5 font-medium font-poppins' onClick={handleDelegateVotes}>Delegate</button>
+        <button
+          className={`rounded-md py-1.5 font-medium font-poppins ${addressCheck ? 'bg-grey-shade-50 text-grey' : 'bg-blue-shade-100 text-white'}`}
+          onClick={handleDelegateVotes}
+          disabled={addressCheck}
+        >
+         {addressCheck ? 'You cannot delegate to the same address again' : 'Delegate'}
+        </button>
           </div>
           </div>
           </>
