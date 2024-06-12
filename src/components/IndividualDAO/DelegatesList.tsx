@@ -257,7 +257,7 @@ function DelegatesList({ props }: { props: string }) {
           style={{ width: "80%" }}
         >
           <span>
-          We apologize for the inconvenience; we're currently working on sourcing accurate data and it will be available soon.
+          We apologize for the inconvenience; we&apos;re currently working on sourcing accurate data and it will be available soon.
           </span>{" "}
           &nbsp;
           {/* <a
