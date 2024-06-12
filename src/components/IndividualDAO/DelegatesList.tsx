@@ -257,18 +257,17 @@ function DelegatesList({ props }: { props: string }) {
           style={{ width: "80%" }}
         >
           <span>
-            Data of the Delegates is retrieved from Karma API. Find out how they
-            empower communities.
+          We apologize for the inconvenience; we're currently working on sourcing accurate data and it will be available soon.
           </span>{" "}
           &nbsp;
-          <a
+          {/* <a
             href="http://karmahq.xyz"
             target="_blank"
             rel="noopener noreferrer"
             className="text-blue-500 font-medium hover:underline"
           >
             Click Here!🚀
-          </a>
+          </a> */}
           <button
             className="flex ml-auto items-center justify-center p-1 text-gray-500 hover:text-red-500 bg-white border border-gray-300 rounded-md"
             onClick={handleClose}
