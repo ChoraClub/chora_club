@@ -29,24 +29,8 @@ import { Placement } from "react-joyride";
 function Sidebar() {
   const [isTourOpen, setIsTourOpen] = useState(false);
   // const [isClient, setIsClient] = useState(false);
-  const [hasSeenTour, setHasSeenTour] = useState(false);
+  const [hasSeenTour, setHasSeenTour] = useState(true);
 
-  useEffect(() => {
-    
-    // setIsClient(true);
-    const tourSeen = localStorage.getItem('hasSeenTour');
-    // setIsTourOpen(true); // Open the tour when the component mounts
-    const seenTour = JSON.parse(
-      sessionStorage.getItem("seenTour") || "false"
-    )
-    setHasSeenTour(seenTour)
-
-  }, []);
-
-  const closeTour = () => {
-    setHasSeenTour(true);
-    sessionStorage.setItem("seenTour", JSON.stringify(true));
-  };
 
   const tourSteps = [
     {
@@ -273,19 +257,38 @@ function Sidebar() {
     updatedVisibility[index] = false;
     setBadgeVisibility(updatedVisibility);
   };
+  
+  const closeTour = () => {
+    setIsTourOpen(false);
+    setHasSeenTour(true);
+    sessionStorage.setItem("tourSeen", JSON.stringify(true));
+  };
 
+  useEffect(() => {
+    const tourSeen = JSON.parse(sessionStorage.getItem("tourSeen") || "false");
+    setHasSeenTour(tourSeen);
+    if (!tourSeen) {
+      setIsTourOpen(true);
+    }
+  }, []);
+
+ 
   return (
     <>
-      {!hasSeenTour && (
+{!hasSeenTour && (
         <Joyride
           steps={tourSteps}
-          // open={isTourOpen}
-          {...(isTourOpen ? { open: isTourOpen } : {})}
-          callback={closeTour}
+          run={isTourOpen}
+          callback={data => {
+            const { status } = data;
+            const finishedStatuses = ['finished', 'skipped'];
+            if (finishedStatuses.includes(status)) {
+              closeTour();
+            }
+          }}
           continuous={true}
           showSkipButton={true}
           hideCloseButton
-          // showNavigation={true}
           showProgress
           locale={{
             back: "Back",
@@ -296,7 +299,7 @@ function Sidebar() {
           }}
           styles={tourStyles}
         />
-      )}  
+      )}
       <div className="py-6 h-full">
         <div className="flex flex-col h-full justify-between">
           <div className="flex flex-col items-center gap-y-4 pb-5">
