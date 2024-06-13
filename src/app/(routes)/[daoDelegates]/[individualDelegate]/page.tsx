@@ -36,7 +36,10 @@ export async function generateMetadata({
     params.individualDelegate
   );
 
-  const avatar = (await fetchEnsAvatar(params.individualDelegate)) || IMAGE_URL;
+  // const avatar = (await fetchEnsAvatar(params.individualDelegate)) || IMAGE_URL;
+  const [avatar] = await Promise.all([
+    await fetchEnsAvatar(params.individualDelegate),
+  ]);
   const dao_name = params.daoDelegates;
   const tokenName = "Optimism";
 
@@ -49,14 +52,13 @@ export async function generateMetadata({
   const preview = `${BASE_URL}/api/images/og/ccTest?${imgParams.join(
     "&"
   )}&address=${ensOrTruncatedAddress}`;
-  // const title = `${ensOrTruncatedAddress} on Agora`;
-  // const description = `See what ${ensOrTruncatedAddress} believes and how they vote on ${tokenName} governance.`;
+
   const frameMetadata = getFrameMetadata({
     buttons: [
       {
         label: "Delegate",
         action: "tx",
-        target: `${BASE_URL}/api/transaction`,
+        target: `https://farcaster-frames-ivory.vercel.app/api/transaction`,
       },
     ],
     image: preview,
@@ -65,10 +67,10 @@ export async function generateMetadata({
 
   return {
     title: name,
-    description: "Check if you're eligible for a free mint",
+    description: "Chora Club",
     openGraph: {
       title: name,
-      description: "Check if you're eligible for a free mint",
+      description: "Delegate",
       images: [preview],
     },
     other: {

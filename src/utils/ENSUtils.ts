@@ -54,7 +54,7 @@ export async function getMetaAddressOrEnsName(
   const fetchedEnsName = await getEnsName(address);
   const karmaEnsName = details.data.delegate?.ensName;
   const ensName = karmaEnsName || fetchedEnsName;
-  return karmaEnsName;
+  return ensName ? ensName : truncateAddress(address);
 }
 
 export async function getMetaProfileImage() {}
@@ -97,5 +97,6 @@ export async function fetchEnsAvatar(address: string) {
     return avatar;
   } catch (error) {
     console.error(`Error fetching ENS details for address ${address}:`, error);
+    return null;
   }
 }

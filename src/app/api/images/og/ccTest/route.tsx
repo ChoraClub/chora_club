@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { ImageResponse } from "next/og";
+import { IMAGE_URL } from "@/config/constants";
 export const revalidate = 0;
 
 export const runtime = "edge";
@@ -13,7 +14,18 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
 
   const address = searchParams.get("address") || "";
+  const avatar = searchParams.get("avatar") || "";
   const dao_name = searchParams.get("dao_name") || "";
+
+  let icon = "";
+
+  if (dao_name === "optimism") {
+    icon =
+      "https://gateway.lighthouse.storage/ipfs/QmXaKNwUxvd4Ksc9R6hd36eBo97e7e7YPDCVuvHwqG4zgQ";
+  } else if (dao_name === "arbitrum") {
+    icon =
+      "https://gateway.lighthouse.storage/ipfs/QmdP6ZkLq4FF8dcvxBs48chqFiXu7Gr8SgPCqMtfr7VA4L";
+  }
 
   const main = await fetch(new URL("../assets/main.jpg", import.meta.url)).then(
     (res) => res.arrayBuffer()
@@ -22,7 +34,6 @@ export async function GET(req: NextRequest) {
   return new ImageResponse(
     (
       <div
-        className="font-poppins"
         style={{
           display: "flex",
           height: "100%",
@@ -46,11 +57,23 @@ export async function GET(req: NextRequest) {
             paddingLeft: "17%",
           }}
         >
-          <div style={{ display: "flex" }}>
+          <div style={{ display: "flex", gap: "20px" }}>
+            {avatar && (
+              <img
+                /*@ts-ignore */
+                src={avatar}
+                alt="Profile"
+                style={{
+                  width: "120px",
+                  height: "120px",
+                  borderRadius: "50%",
+                }}
+              />
+            )}
             <img
               /*@ts-ignore */
-              src="https://gateway.lighthouse.storage/ipfs/QmUsAYs3PwJoetYko6iDN36t43W9xWXYFCjAk1ahq9CBfA"
-              alt="Profile"
+              src={icon}
+              alt="icon"
               style={{
                 width: "120px",
                 height: "120px",
@@ -63,7 +86,7 @@ export async function GET(req: NextRequest) {
               textAlign: "left",
               display: "flex",
               flexDirection: "column",
-              width: "400px",
+              width: "420px",
               fontWeight: 600,
             }}
           >
@@ -88,7 +111,8 @@ export async function GET(req: NextRequest) {
                   justifyContent: "center",
                   backgroundColor: "#0500FF",
                   color: "white",
-                  fontSize: "28px",
+                  fontSize: "22px",
+                  textTransform: "capitalize",
                 }}
               >
                 {dao_name}
@@ -114,7 +138,7 @@ export async function GET(req: NextRequest) {
                   justifyContent: "center",
                   backgroundColor: "#0500FF",
                   color: "white",
-                  fontSize: "28px",
+                  fontSize: "22px",
                 }}
               >
                 {address}
