@@ -19,56 +19,206 @@ import { useSession } from "next-auth/react";
 import { useAccount } from "wagmi";
 import { useRouter } from "next-nprogress-bar";
 import ButtonWithCircle from "../Circle/ButtonWithCircle";
-import Tour from 'reactour';
-import '@/components/ConnectWallet/ConnectWalletWithENS'
-import './tour.css';
+import Tour from "reactour";
+import "@/components/ConnectWallet/ConnectWalletWithENS";
+import "./tour.css";
+import Joyride from "react-joyride";
+import { title } from "process";
+import { Placement } from "react-joyride";
 
 function Sidebar() {
-
   const [isTourOpen, setIsTourOpen] = useState(false);
-  const [isClient, setIsClient] = useState(false);
+  // const [isClient, setIsClient] = useState(false);
+  const [hasSeenTour, setHasSeenTour] = useState(false);
 
   useEffect(() => {
-    setIsClient(true);
-    setIsTourOpen(true); // Open the tour when the component mounts
+    
+    // setIsClient(true);
+    const tourSeen = localStorage.getItem('hasSeenTour');
+    // setIsTourOpen(true); // Open the tour when the component mounts
+    const seenTour = JSON.parse(
+      sessionStorage.getItem("seenTour") || "false"
+    )
+    setHasSeenTour(seenTour)
+
   }, []);
+
+  const closeTour = () => {
+    setHasSeenTour(true);
+    sessionStorage.setItem("seenTour", JSON.stringify(true));
+  };
 
   const tourSteps = [
     {
-      selector: '.wallet',
-      content: 'This is the connect wallet button.',
+      target: "body",
+      content: (
+        <p className="text-black-shade-1000 text-left font-normal text-base font-poppins">
+          Let's take a quick tour of Chora Club.
+        </p>
+      ),
+      disableBeacon: true,
+      placement: "center" as Placement,
+      title: (
+        <h1 className="text-blue-shade-100 text-left font-semibold text-xl font-poppins ml-[10px]">
+          WELCOME!
+        </h1>
+      ),
+      locale: {
+        skip: <p className="font-poppins font-semibold text-[13px]">Skip</p>,
+      },
     },
     {
-      selector: '.logo',
-      content: 'This is the Chora Club logo.',
+      target: ".wallet",
+      content: (
+        <p className="text-black-shade-1000 text-left font-normal text-base font-poppins">
+          Connect your wallet to get started.
+        </p>
+      ),
+      disableBeacon: true,
+      placement: "bottom" as Placement,
+      title: (
+        <h1 className="text-blue-shade-100 text-left font-semibold text-xl font-poppins ml-[10px]">
+          CONNECT WALLET
+        </h1>
+      ),
     },
     {
-      selector: '.dao',
-      content: 'This button takes you to the DAOs list.',
+      target: ".dao",
+      content: (
+        <p className="text-black-shade-1000 text-left font-normal text-base font-poppins">
+          Discover all the DAOs listed on your platform.
+        </p>
+      ),
+      disableBeacon: true,
+      placement: "bottom" as Placement,
+      title: (
+        <h1 className="text-blue-shade-100 text-left font-semibold text-xl font-poppins ml-[10px]">
+          EXPLORE DAOs
+        </h1>
+      ),
     },
     {
-      selector: '.office',
-      content: 'This button takes you to the office hours page.',
+      target: ".office",
+      content: (
+        <p className="text-black-shade-1000 text-left font-normal text-base font-poppins">
+          View ongoing, upcoming, and recorded office hours taken on Chora Club.
+        </p>
+      ),
+      disableBeacon: true,
+      placement: "bottom" as Placement,
+      title: (
+        <h1 className="text-blue-shade-100 text-left font-semibold text-xl font-poppins ml-[10px]">
+          OFFICE HOURS
+        </h1>
+      ),
     },
     {
-      selector: '.session',
-      content: 'This button takes you to the sessions page.',
+      target: ".session",
+      content: (
+        <p className="text-black-shade-1000 text-left font-normal text-base font-poppins">
+          Watch recorded sessions and connect with available delegates.
+        </p>
+      ),
+      disableBeacon: true,
+      placement: "bottom" as Placement,
+      title: (
+        <h1 className="text-blue-shade-100 text-left font-semibold text-xl font-poppins ml-[10px]">
+          SESSIONS
+        </h1>
+      ),
     },
     {
-      selector: '.gitbook',
-      content: 'This button opens the GitBook documentation.',
+      target: ".gitbook",
+      content: (
+        <p className="text-black-shade-1000 text-left font-normal text-base font-poppins">
+          Access detailed information and feature updates in our Gitbook.
+        </p>
+      ),
+      disableBeacon: true,
+      placement: "bottom" as Placement,
+      title: (
+        <h1 className="text-blue-shade-100 text-left font-semibold text-xl font-poppins ml-[10px]">
+          GITBOOK DOC
+        </h1>
+      ),
     },
     {
-      selector: '.profile',
-      content: 'This button opens your profile page.',
+      target: "body",
+      content: (
+        <p className="text-black-shade-1000 text-left font-normal text-base font-poppins">
+          You're all set! Begin your web3 journey now.
+        </p>
+      ),
+      disableBeacon: true,
+      placement: "center" as Placement,
+      bodyClass: "tour-step-background",
+      locale: { skip: "Skip" },
+      // title: (
+      //   <h1 className="text-blue-shade-100 text-left font-semibold text-xl font-poppins ml-[10px]">
+      //     PROFILE
+      //   </h1>
+      // ),
     },
   ];
 
-  const closeTour = () => {
-    setIsTourOpen(false);
+ 
+
+  const tourStyles = {
+    options: {
+      arrowColor: "#0077b6",
+      backgroundColor: "#ffffff",
+      overlayColor: "rgba(0, 0, 0, 0.6)",
+      primaryColor: "#0077b6",
+      textColor: "#000000",
+      width: 350,
+      zIndex: 1000,
+      showArrow: false,
+    },
+    floaterStyles: {
+      arrow: {
+        display: "none",
+      },
+    },
+    tooltipStyles: {
+      color: "#000000",
+      fontSize: "16px",
+      padding: "20px",
+      textAlign: "left !important",
+    },
+    buttonStyles: {
+      primaryButton: {
+        backgroundColor: "#004DFF !important", // Next button background color
+        color: "#ffffff", // Next button text color
+        borderRadius: "20px", // Next button border radius
+        padding: "8px 16px", // Next button padding
+        fontSize: "14px", // Next button font size
+      },
+      secondaryButton: {
+        backgroundColor: "#ffffff", // Back button background color
+        color: "#004DFF", // Back button text color
+        borderRadius: "20px", // Back button border radius
+        border: "2px solid #004DFF", // Back button border
+        padding: "8px 16px", // Back button padding
+        fontSize: "14px", // Back button font size
+      },
+      skipButton: {
+        color: "#004DFF", // Skip button text color
+        fontSize: "14px", // Skip button font size
+        textDecoration: "underline", // Skip button text decoration
+      },
+    },
+    titleStyles: {
+      color: "blue !important",
+      fontSize: "20px",
+      fontWeight: "bold",
+      textAlign: "left !important",
+    },
+    tooltipContentStyles: {
+      color: "#808080", // Change the content color to gray
+      fontSize: "16px",
+      textAlign: "left", // Add this line to align the content to the left
+    },
   };
-
-
 
   const router = useRouter();
   const [storedDao, setStoredDao] = useState<string[]>([]);
@@ -126,19 +276,27 @@ function Sidebar() {
 
   return (
     <>
-       {isClient && (
-        <Tour
+      {!hasSeenTour && (
+        <Joyride
           steps={tourSteps}
-          isOpen={isTourOpen}
-          onRequestClose={closeTour}
-          startAt={0}
-          showNavigation={true}
-          // showBadges={false}
-          showCloseButton={true}
-          showNumber={true}
-          lastStepNextButton={<span>Finish</span>}
+          // open={isTourOpen}
+          {...(isTourOpen ? { open: isTourOpen } : {})}
+          callback={closeTour}
+          continuous={true}
+          showSkipButton={true}
+          hideCloseButton
+          // showNavigation={true}
+          showProgress
+          locale={{
+            back: "Back",
+            close: "Close",
+            last: "Finish",
+            next: "Next",
+            skip: "Skip",
+          }}
+          styles={tourStyles}
         />
-      )}
+      )}  
       <div className="py-6 h-full">
         <div className="flex flex-col h-full justify-between">
           <div className="flex flex-col items-center gap-y-4 pb-5">
@@ -289,7 +447,7 @@ function Sidebar() {
                     src={user}
                     alt={"image"}
                     width={40}
-                    className="cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14"
+                    className="cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 "
                   />
                 ) : (
                   <ConnectWallet />
