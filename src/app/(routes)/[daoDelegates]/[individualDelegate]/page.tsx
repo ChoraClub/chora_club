@@ -1,11 +1,13 @@
 import SpecificDelegate from "@/components/IndividualDelegate/SpecificDelegate";
-import { BASE_URL } from "@/config/constants";
+import { BASE_URL, IMAGE_URL } from "@/config/constants";
 import {
   processAddressOrEnsName,
   resolveENSProfileImage,
+  getMetaAddressOrEnsName,
+  fetchEnsAvatar,
 } from "@/utils/ENSUtils";
 import { Metadata } from "next";
-import React from "react";
+import React, { useEffect } from "react";
 import { getFrameMetadata } from "@coinbase/onchainkit/core";
 
 interface Type {
@@ -20,15 +22,21 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const name = "Chora Club";
 
-  const address = params.individualDelegate;
-  const ensOrTruncatedAddress = await processAddressOrEnsName(
+  const address = await getMetaAddressOrEnsName(
+    params.daoDelegates,
     params.individualDelegate
   );
 
-  const [avatar] = await Promise.all([
-    resolveENSProfileImage(address || params.individualDelegate),
-  ]);
+  // const ensOrTruncatedAddress = await processAddressOrEnsName(
+  //   params.individualDelegate
+  // );
 
+  const ensOrTruncatedAddress = await getMetaAddressOrEnsName(
+    params.daoDelegates,
+    params.individualDelegate
+  );
+
+  const avatar = (await fetchEnsAvatar(params.individualDelegate)) || IMAGE_URL;
   const dao_name = params.daoDelegates;
   const tokenName = "Optimism";
 

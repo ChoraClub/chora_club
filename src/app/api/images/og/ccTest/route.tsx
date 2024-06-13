@@ -22,6 +22,7 @@ export async function GET(req: NextRequest) {
   return new ImageResponse(
     (
       <div
+        className="font-poppins"
         style={{
           display: "flex",
           height: "100%",
