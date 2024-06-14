@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@coinbase/onchainkit": "^0.20.1",
     "@ethereum-attestation-service/eas-sdk": "^2.1.4",
     "@huddle01/react": "^2.0.14",
     "@huddle01/server-sdk": "^2.2.2",
