@@ -20,6 +20,12 @@ import dao_abi from "../../artifacts/Dao.sol/GovernanceToken.json";
 import { useAccount } from "wagmi";
 import WalletAndPublicClient from "@/helpers/signer";
 import { getEnsNameOfUser } from "../ConnectWallet/ENSResolver";
+import {
+  processAddressOrEnsName,
+  resolveENSProfileImage,
+  getMetaAddressOrEnsName,
+  fetchEnsAvatar,
+} from "@/utils/ENSUtils";
 
 
 function DelegatesList({ props }: { props: string }) {
@@ -87,11 +93,13 @@ function DelegatesList({ props }: { props: string }) {
            formattedDelegates = await Promise.all(
             daoInfo.map(async (delegate: any) => {
               const ensName = await getEnsNameOfUser(delegate._id);
+              // const profilePicture= await fetchEnsAvatar(delegate._id);
               return {
                 delegate: delegate._id,
                 adjustedBalance: delegate.adjustedBalance,
                 newBalance: delegate.newBalance,
                 ensName: ensName,
+                // profilePicture:profilePicture,
               };
             })
           );
