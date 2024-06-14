@@ -19,6 +19,7 @@ import { useConnectModal, useChainModal } from "@rainbow-me/rainbowkit";
 import dao_abi from "../../artifacts/Dao.sol/GovernanceToken.json";
 import { useAccount } from "wagmi";
 import WalletAndPublicClient from "@/helpers/signer";
+import { getEnsNameOfUser } from "../ConnectWallet/ENSResolver";
 
 
 function DelegatesList({ props }: { props: string }) {
@@ -58,16 +59,58 @@ function DelegatesList({ props }: { props: string }) {
       try {
         setDataLoading(true);
         // console.log("Current page: ", currentPage);
-        const res = await fetch(
-          `https://api.karmahq.xyz/api/dao/delegates?name=${props}&offset=${currentPage}&order=desc&field=delegatedVotes&period=lifetime&pageSize=20&statuses=active,inactive,withdrawn,recognized`
+        const res = await fetch( props === "arbitrum" ?
+          `https://api.karmahq.xyz/api/dao/delegates?name=${props}&offset=${currentPage}&order=desc&field=delegatedVotes&period=lifetime&pageSize=20&statuses=active,inactive,withdrawn,recognized` : `/api/get-delegatelist`
         );
-        const daoInfo = await res.json().then((delegates) => delegates.data);
+
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+
+        const daoInfo: any = await res.json();
+        console.log(daoInfo)
+        let formattedDelegates;
+        if(props==="arbitrum"){
+           formattedDelegates = await Promise.all(
+            daoInfo.data.delegates.map(async (delegate: any) => {
+              // const ensName = await getEnsNameOfUser(delegate.publicAddress);
+              return {
+                delegate: delegate.publicAddress,
+                adjustedBalance: delegate.voteWeight,
+                newBalance: delegate.voteWeight,
+                ensName: delegate.ensName,
+              };
+            })
+          );
+        }else{
+
+           formattedDelegates = await Promise.all(
+            daoInfo.map(async (delegate: any) => {
+              const ensName = await getEnsNameOfUser(delegate._id);
+              return {
+                delegate: delegate._id,
+                adjustedBalance: delegate.adjustedBalance,
+                newBalance: delegate.newBalance,
+                ensName: ensName,
+              };
+            })
+          );
+        }
+  console.log(formattedDelegates)
         setDelegateData((prevData: any) => ({
-          delegates: [...prevData.delegates, ...daoInfo.delegates],
+          delegates: [...prevData.delegates, ...formattedDelegates],
         }));
+  
         setTempData((prevData: any) => ({
-          delegates: [...prevData.delegates, ...daoInfo.delegates],
+          delegates: [...prevData.delegates, ...formattedDelegates],
         }));
+        // setDelegateData((prevData: any) => ({
+        //   delegates: [...prevData._id, ...daoInfo._id],
+        // }));
+        // setTempData((prevData: any) => ({
+        //   delegates: [...prevData.delegates, ...daoInfo.delegates],
+        // }));
+        // setTempData({delegate:daoInfo._id});
         setDataLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -92,15 +135,41 @@ function DelegatesList({ props }: { props: string }) {
       window.removeEventListener("scroll", handleScroll);
 
       const res = await fetch(
-        `https://api.karmahq.xyz/api/dao/search-delegate?user=${query}&pageSize=10&offset=0&period=lifetime&order=desc&dao=${props}`
+        `/api/get-delegatelist?user=${query}`
+        // `https://api.karmahq.xyz/api/dao/search-delegate?user=${query}&pageSize=10&offset=0&period=lifetime&order=desc&dao=${props}`
       );
-      const filtered = await res.json().then((delegates) => delegates.data);
-
+      console.log("res: ", res);
+      const filtered: any = await res.json();
+      const formattedDelegates = await Promise.all(
+        filtered.map(async (delegate: any) => {
+          const ensName = await getEnsNameOfUser(delegate._id);
+          return {
+            delegate: delegate._id,
+            adjustedBalance: delegate.adjustedBalance,
+            newBalance: delegate.newBalance,
+            ensName: ensName,
+          };
+        })
+      );
+      console.log(formattedDelegates);
+      // const formattedDelegates = await Promise.all(
+      //   filtered.map(async (delegate: any) => {
+      //     // const ensName = await getEnsNameOfUser(delegate._id);
+      //     return {
+      //       delegate: delegate._id,
+      //       adjustedBalance: delegate.adjustedBalance,
+      //       newBalance: delegate.newBalance,
+      //       // ensName: ensName,
+      //     };
+      //   }))
+      // const filtered = await res.json().then((delegates) => delegates._id);
+// console.log("Filtered Data: ", query, filtered);
       // console.log("Filtered Data: ", query, filtered);
-      setDelegateData({ delegates: filtered.delegates });
+      setDelegateData({ delegates: [...formattedDelegates] });
+
       setPageLoading(false);
     } else {
-      // console.log("in else");
+      console.log("in else");
       setIsSearching(false);
       setDelegateData({ ...delegateData, delegates: tempData.delegates });
       setPageLoading(false);
@@ -283,7 +352,7 @@ function DelegatesList({ props }: { props: string }) {
         >
           <input
             type="text"
-            placeholder="Search by Address or ENS Name"
+            placeholder="Search by Address"
             style={{ background: "rgba(238, 237, 237, 0.36)" }}
             className="pl-5 pr-3 rounded-full outline-none w-full"
             value={searchQuery}
@@ -320,16 +389,18 @@ function DelegatesList({ props }: { props: string }) {
               ariaLabel="oval-loading"
             />
           </div>
-        ) : delegateData.delegates.length > 0 ? (
+        ) : delegateData.delegates?.length > 0 ? (
           <div> 
             <div className="grid min-[475px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-10">
-              {delegateData.delegates.map((daos: any, index: number) => (
+            {console.log("data............",delegateData)}
+              {delegateData.delegates.map((delegate: any, index: number) => (
                 <div
-                  onClick={(event) =>{
-                    // handleMouseMove(event,index);
-                    router.push(`/${props}/${daos.publicAddress}?active=info  `)
-                  }}
-                  key={index}
+                onClick={(event) =>{
+                  // handleMouseMove(event,index);
+                  router.push(`/${props}/${delegate.delegate}?active=info  `)
+                }}
+            
+                key={index}
                   style={{
                     boxShadow: "0px 4px 50.8px 0px rgba(0, 0, 0, 0.11)",
                   }}
@@ -350,15 +421,16 @@ function DelegatesList({ props }: { props: string }) {
                   )} */}
                   <div>
                     <div className="flex justify-center relative">
+                      
                       <Image
                         src={
-                          daos.profilePicture == null
+                          delegate.profilePicture == null
                             ? props == "optimism"
                               ? OPLogo
                               : props == "arbitrum"
                               ? ARBLogo
                               : ""
-                            : daos.profilePicture
+                            : delegate.profilePicture
                         }
                         alt="Image not found"
                         width={80}
@@ -383,24 +455,29 @@ function DelegatesList({ props }: { props: string }) {
                         <div
                           className={`font-semibold overflow-hidden ${styles.desc}`}
                         >
-                          {daos.ensName == null ? (
+                          {!delegate.ensName ? (
                             <span>
-                              {daos.publicAddress.slice(0, 6) +
+                              {
+                              delegate.delegate?.slice(0, 6) +
                                 "..." +
-                                daos.publicAddress.slice(-4)}
+                                delegate.delegate?.slice(-4)
+                                }
                             </span>
                           ) : (
                             <span>
-                              {daos.ensName.length > 15
-                                ? daos.ensName.slice(0, 15) + "..."
-                                : daos.ensName}
+                              {delegate.ensName ==="[693c70956042e4295f0c73589e9ac0850b5b7d276a02639b83331ec323549b88].sismo.eth" ? "lindajxie.eth" : delegate.ensName.length > 15
+                                ? delegate.ensName.slice(0, 15) + "..."
+                                : delegate.ensName}
+                              {/* {delegate.ensName.length > 15
+                                ? delegate.ensName.slice(0, 15) + "..."
+                                : delegate.ensName} */}
                             </span>
                           )}
                         </div>
                         <div className="flex justify-center items-center gap-2 pb-2 pt-1">
-                          {daos.publicAddress.slice(0, 6) +
+                           {delegate.delegate?.slice(0, 6) +
                             "..." +
-                            daos.publicAddress.slice(-4)}
+                            delegate.delegate?.slice(-4)} 
                           <Tooltip
                             content="Copy"
                             placement="right"
@@ -411,7 +488,7 @@ function DelegatesList({ props }: { props: string }) {
                               <IoCopy
                                 onClick={(event) => {
                                   event.stopPropagation();
-                                  handleCopy(daos.publicAddress);
+                                  handleCopy(delegate.delegate);
                                 }}
                               />
                             </span>
@@ -419,7 +496,7 @@ function DelegatesList({ props }: { props: string }) {
                         </div>
                         <div className="text-sm border border-[#D9D9D9] py-2 px-1 rounded-lg w-full">
                           <span className="text-blue-shade-200 font-semibold">
-                            {formatNumber(daos.delegatedVotes)}&nbsp;
+                            {formatNumber(delegate.adjustedBalance)}&nbsp;
                           </span>
                           delegated tokens
                         </div>
@@ -432,7 +509,7 @@ function DelegatesList({ props }: { props: string }) {
                         className="bg-blue-shade-100 text-white font-poppins w-full rounded-[4px] text-sm py-1 font-medium"
                         onClick={(event) => {
                           event.stopPropagation(); // Prevent event propagation to parent container
-                          WalletOpen(daos.publicAddress);
+                          WalletOpen(delegate.delegate);
                         }}
                       >
                         Delegate
