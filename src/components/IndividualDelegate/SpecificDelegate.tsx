@@ -16,10 +16,16 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { useRouter } from "next-nprogress-bar";
 import Link from "next/link";
 import toast, { Toaster } from "react-hot-toast";
-import { Provider, cacheExchange, createClient, fetchExchange,gql } from "urql";
+import {
+  Provider,
+  cacheExchange,
+  createClient,
+  fetchExchange,
+  gql,
+} from "urql";
 import WalletAndPublicClient from "@/helpers/signer";
 import dao_abi from "../../artifacts/Dao.sol/GovernanceToken.json";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
+// import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useConnectModal, useChainModal } from "@rainbow-me/rainbowkit";
 import { useAccount, useNetwork } from "wagmi";
 import OPLogo from "@/assets/images/daos/op.png";
@@ -60,6 +66,7 @@ function SpecificDelegate({ props }: { props: Type }) {
   const [delegateInfo, setDelegateInfo] = useState<any>();
   const router = useRouter();
   const path = usePathname();
+  const { openConnectModal } = useConnectModal();
   console.log(path);
   const searchParams = useSearchParams();
   const [selfDelegate, setSelfDelegate] = useState<boolean>();
@@ -73,33 +80,47 @@ function SpecificDelegate({ props }: { props: Type }) {
   // const provider = new ethers.BrowserProvider(window?.ethereum);
   const [displayEnsName, setDisplayEnsName] = useState<string>();
   const [delegate, setDelegate] = useState("");
-  const [same , setSame] = useState(false);
+  const [same, setSame] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const [delegateOpen, setDelegateOpen] = useState(false);
   const address = useAccount();
- 
+  const { isConnected } = useAccount();
 
-  const handleDelegateModal =async () => {
-    setDelegateOpen(true);
-    setLoading(true);
-    try {
-      
-      const { data } = await client.query(DELEGATE_CHANGED_QUERY, {delegator: address});
-      const ens = await getEnsNameOfUser(data.delegateChangeds[0]?.toDelegate);
-      const delegate=data.delegateChangeds[0]?.toDelegate;
-      console.log("individualDelegate",props.individualDelegate);
-      setSame(delegate===props.individualDelegate)
-      ens ? setDelegate(ens) : setDelegate(delegate.slice(0, 6) + "..."+ delegate.slice(-4));
-      setError(null);
-    } catch (err:any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
+  const handleDelegateModal = async () => {
+  
+      if (!isConnected) {
+        if (openConnectModal) {
+          openConnectModal();
+        }
+      } else {
+        console.log(address);
+        setDelegateOpen(true);
+        setLoading(true);
+        try {
+          const { data } = await client.query(DELEGATE_CHANGED_QUERY, {
+            delegator: address,
+          });
+          const ens = await getEnsNameOfUser(
+            data.delegateChangeds[0]?.toDelegate
+          );
+          const delegate = data.delegateChangeds[0]?.toDelegate;
+          console.log("individualDelegate", props.individualDelegate);
+          setSame(delegate === props.individualDelegate);
+          ens
+            ? setDelegate(ens)
+            : setDelegate(delegate.slice(0, 6) + "..." + delegate.slice(-4));
+          setError(null);
+        } catch (err: any) {
+          setError(err.message);
+        } finally {
+          setLoading(false);
+        }
 
-    setDelegateOpen(true);
+        setDelegateOpen(true);
+      }
+    
   };
   const handleCloseDelegateModal = () => {
     setDelegateOpen(false);
@@ -672,8 +693,8 @@ function SpecificDelegate({ props }: { props: Type }) {
           </div>
         )
       )}
-{console.log("Delegate", delegate)}
-     {delegateOpen && (
+      {console.log("Delegate", delegate)}
+      {delegateOpen && (
         <DelegateTileModal
           isOpen={delegateOpen}
           closeModal={handleCloseDelegateModal}
@@ -683,24 +704,25 @@ function SpecificDelegate({ props }: { props: Type }) {
           fromDelegate={delegate ? delegate : "N/A"}
           delegateName={
             delegateInfo?.ensName ||
-            displayEnsName ||
-            // displayName ||
-            (
+            displayEnsName || (
+              // displayName ||
               <>
                 {props.individualDelegate.slice(0, 6)}...
                 {props.individualDelegate.slice(-4)}
               </>
             )
           }
-          displayImage={displayImage
-            ? `https://gateway.lighthouse.storage/ipfs/${displayImage}`
-            : delegateInfo?.profilePicture ||
-              (props.daoDelegates === "optimism"
-                ? OPLogo
-                : props.daoDelegates === "arbitrum"
-                ? ArbLogo
-                : ccLogo)}
-            addressCheck={same}
+          displayImage={
+            displayImage
+              ? `https://gateway.lighthouse.storage/ipfs/${displayImage}`
+              : delegateInfo?.profilePicture ||
+                (props.daoDelegates === "optimism"
+                  ? OPLogo
+                  : props.daoDelegates === "arbitrum"
+                  ? ArbLogo
+                  : ccLogo)
+          }
+          addressCheck={same}
         />
       )}
     </>
