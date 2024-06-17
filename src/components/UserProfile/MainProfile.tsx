@@ -7,13 +7,14 @@ import { Tooltip } from "@nextui-org/react";
 import user from "@/assets/images/daos/user3.png";
 import { FaXTwitter, FaDiscord, FaGithub } from "react-icons/fa6";
 import { BiSolidMessageRoundedDetail } from "react-icons/bi";
-import { IoCopy } from "react-icons/io5";
+import { IoCopy, IoShareSocialSharp } from "react-icons/io5";
 import UserInfo from "./UserInfo";
 import UserVotes from "./UserVotes";
 import UserSessions from "./UserSessions";
 import UserOfficeHours from "./UserOfficeHours";
 import ClaimNFTs from "./ClaimNFTs";
 import { FaPencil } from "react-icons/fa6";
+import { SiFarcaster } from "react-icons/si";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useRouter } from "next-nprogress-bar";
 import toast, { Toaster } from "react-hot-toast";
@@ -43,6 +44,7 @@ import { useSession } from "next-auth/react";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
 import MainProfileSkeletonLoader from "../SkeletonLoader/MainProfileSkeletonLoader";
+import { BASE_URL } from "@/config/constants";
 
 function MainProfile() {
   const { isConnected, address } = useAccount();
@@ -76,6 +78,7 @@ function MainProfile() {
   const [isPageLoading, setIsPageLoading] = useState(true);
   const [selfDelegate, setSelfDelegate] = useState(false);
   const [daoName, setDaoName] = useState("optimism");
+  const [isCopied, setIsCopied] = useState(false);
 
   interface ProgressData {
     total: any;
@@ -692,7 +695,8 @@ function MainProfile() {
                 style={{
                   backgroundColor: "#fcfcfc",
                   border: "2px solid #E9E9E9 ",
-                }}>
+                }}
+              >
                 <div className="w-40 h-40 flex items-center justify-content ">
                   <div className="flex justify-center items-center w-40 h-40">
                     <Image
@@ -752,7 +756,8 @@ function MainProfile() {
                         twitter == "" ? "hidden" : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                      target="_blank">
+                      target="_blank"
+                    >
                       <FaXTwitter color="#7C7C7C" size={12} />
                     </Link>
                     <Link
@@ -767,7 +772,8 @@ function MainProfile() {
                         discourse == "" ? "hidden" : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                      target="_blank">
+                      target="_blank"
+                    >
                       <BiSolidMessageRoundedDetail color="#7C7C7C" size={12} />
                     </Link>
                     <Link
@@ -776,7 +782,8 @@ function MainProfile() {
                         discord == "" ? "hidden" : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                      target="_blank">
+                      target="_blank"
+                    >
                       <FaDiscord color="#7C7C7C" size={12} />
                     </Link>
                     <Link
@@ -785,24 +792,28 @@ function MainProfile() {
                         github == "" ? "hidden" : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                      target="_blank">
+                      target="_blank"
+                    >
                       <FaGithub color="#7C7C7C" size={12} />
                     </Link>
                     <Tooltip
                       content="Update your Profile"
-                      placement="right"
-                      showArrow>
+                      placement="top"
+                      showArrow
+                    >
                       <span
                         className="border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 cursor-pointer"
                         style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                        onClick={onOpen}>
+                        onClick={onOpen}
+                      >
                         <FaPencil color="#3e3d3d" size={12} />
                       </span>
                     </Tooltip>
                     <Modal
                       isOpen={isOpen}
                       onOpenChange={onOpenChange}
-                      className="font-poppins">
+                      className="font-poppins"
+                    >
                       <ModalContent>
                         {(onClose: any) => (
                           <>
@@ -896,7 +907,8 @@ function MainProfile() {
                               </Button>
                               <Button
                                 color="primary"
-                                onClick={() => handleSubmit()}>
+                                onClick={() => handleSubmit()}
+                              >
                                 {isLoading ? "Saving" : "Save"}
                               </Button>
                             </ModalFooter>
@@ -915,13 +927,50 @@ function MainProfile() {
 
                   <Tooltip
                     content="Copy"
-                    placement="right"
+                    placement="bottom"
                     closeDelay={1}
-                    showArrow>
+                    showArrow
+                  >
                     <span className="px-2 cursor-pointer" color="#3E3D3D">
                       <IoCopy onClick={() => handleCopy(`${address}`)} />
                     </span>
                   </Tooltip>
+                  <div className="flex space-x-2">
+                    {/* <span className="p-2 bg-gray-200 rounded-lg text-black">
+                      {typeof window !== "undefined" &&
+                        `${BASE_URL}/${
+                          chain?.name === "Optimism" ? "optimism" : "arbitrum"
+                        }/${address}?active=info`}
+                      Copy to Share Profile URL on Warpcast
+                    </span> */}
+                    <Tooltip
+                      content="Copy to share your profile URL on Warpcast or Twitter."
+                      placement="bottom"
+                      closeDelay={1}
+                      showArrow
+                    >
+                      <Button
+                        className="bg-gray-200 hover:bg-gray-300"
+                        onClick={() => {
+                          if (typeof window === "undefined") return;
+                          navigator.clipboard.writeText(
+                            `${BASE_URL}/${
+                              chain?.name === "Optimism"
+                                ? "optimism"
+                                : "arbitrum"
+                            }/${address}?active=info`
+                          );
+                          setIsCopied(true);
+                          setTimeout(() => {
+                            setIsCopied(false);
+                          }, 3000);
+                        }}
+                      >
+                        <IoShareSocialSharp />
+                        {isCopied ? "Copied" : "Share profile"}
+                      </Button>
+                    </Tooltip>
+                  </div>
                   <Toaster
                     toastOptions={{
                       style: {
@@ -935,7 +984,7 @@ function MainProfile() {
                     }}
                   />
                 </div>
-                {selfDelegate === true
+                {/* {selfDelegate === true
                   ? votes && (
                       <div className="flex gap-4 py-1">
                         <div className="text-[#4F4F4F] border-[0.5px] border-[#D9D9D9] rounded-md px-3 py-1">
@@ -965,14 +1014,15 @@ function MainProfile() {
                         </div>
                       </div>
                     )
-                  : null}
+                  : null} */}
 
                 {selfDelegate === false ? (
                   <div className="pt-2 flex gap-5">
                     {/* pass address of whom you want to delegate the voting power to */}
                     <button
                       className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
-                      onClick={() => handleDelegateVotes(`${address}`)}>
+                      onClick={() => handleDelegateVotes(`${address}`)}
+                    >
                       Become Delegate
                     </button>
 
@@ -1006,7 +1056,8 @@ function MainProfile() {
                   ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
                   : "border-transparent"
               }`}
-              onClick={() => router.push(path + "?active=info")}>
+              onClick={() => router.push(path + "?active=info")}
+            >
               Info
             </button>
             {selfDelegate === true && (
@@ -1016,7 +1067,8 @@ function MainProfile() {
                     ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
                     : "border-transparent"
                 }`}
-                onClick={() => router.push(path + "?active=votes")}>
+                onClick={() => router.push(path + "?active=votes")}
+              >
                 Past Votes
               </button>
             )}
@@ -1028,7 +1080,8 @@ function MainProfile() {
               }`}
               onClick={() =>
                 router.push(path + "?active=sessions&session=schedule")
-              }>
+              }
+            >
               Sessions
             </button>
             <button
@@ -1039,7 +1092,8 @@ function MainProfile() {
               }`}
               onClick={() =>
                 router.push(path + "?active=officeHours&hours=schedule")
-              }>
+              }
+            >
               Office Hours
             </button>
 
@@ -1050,7 +1104,8 @@ function MainProfile() {
                     ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
                     : "border-transparent"
                 }`}
-                onClick={() => router.push(path + "?active=instant-meet")}>
+                onClick={() => router.push(path + "?active=instant-meet")}
+              >
                 Instant Meet
               </button>
             )}
