@@ -47,13 +47,13 @@ export async function getMetaAddressOrEnsName(
   daoName: string,
   address: string
 ) {
-  const res = await fetch(
-    `https://api.karmahq.xyz/api/dao/find-delegate?dao=${daoName}&user=${address}`
-  );
-  const details = await res.json();
+  // const res = await fetch(
+  //   `https://api.karmahq.xyz/api/dao/find-delegate?dao=${daoName}&user=${address}`
+  // );
+  // const details = await res.json();
   const fetchedEnsName = await getEnsName(address);
-  const karmaEnsName = details.data.delegate?.ensName;
-  const ensName = karmaEnsName || fetchedEnsName;
+  // const karmaEnsName = details.data.delegate?.ensName;
+  const ensName = fetchedEnsName;
   return ensName ? ensName : truncateAddress(address);
 }
 
@@ -93,7 +93,7 @@ export async function fetchEnsAvatar(address: string) {
     const reddit = await resolver.getText("com.reddit");
     const twitter = await resolver.getText("com.twitter");
     const supportsWildcard = await resolver.supportsWildcard();
-
+    console.log("ensName", ensName);
     return avatar;
   } catch (error) {
     console.error(`Error fetching ENS details for address ${address}:`, error);
