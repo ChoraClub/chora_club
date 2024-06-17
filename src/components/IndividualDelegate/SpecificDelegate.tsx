@@ -28,6 +28,7 @@ import ccLogo from "@/assets/images/daos/CC.png";
 import { Oval } from "react-loader-spinner";
 import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
 import { getEnsNameOfUser } from "../ConnectWallet/ENSResolver";
+import MainProfileSkeletonLoader from "../SkeletonLoader/MainProfileSkeletonLoader";
 
 interface Type {
   daoDelegates: string;
@@ -311,16 +312,7 @@ function SpecificDelegate({ props }: { props: Type }) {
   return (
     <>
       {isPageLoading && (
-        <div className="flex items-center justify-center pt-10">
-          <Oval
-            visible={true}
-            height="40"
-            width="40"
-            color="#0500FF"
-            secondaryColor="#cdccff"
-            ariaLabel="oval-loading"
-          />
-        </div>
+        <MainProfileSkeletonLoader/>
       )}
       {!(isPageLoading || (!isDelegate && !selfDelegate)) ? (
         <div className="font-poppins">

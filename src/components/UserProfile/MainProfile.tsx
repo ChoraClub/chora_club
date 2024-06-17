@@ -42,6 +42,7 @@ import InstantMeet from "./InstantMeet";
 import { useSession } from "next-auth/react";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
+import MainProfileSkeletonLoader from "../SkeletonLoader/MainProfileSkeletonLoader";
 
 function MainProfile() {
   const { isConnected, address } = useAccount();
@@ -1121,16 +1122,8 @@ function MainProfile() {
         </div>
       ) : (
         <>
-          <div className="flex items-center justify-center pt-10">
-            <Oval
-              visible={true}
-              height="40"
-              width="40"
-              color="#0500FF"
-              secondaryColor="#cdccff"
-              ariaLabel="oval-loading"
-            />
-          </div>
+          
+          <MainProfileSkeletonLoader/>
         </>
       )}
     </>

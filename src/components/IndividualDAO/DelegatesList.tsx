@@ -19,6 +19,7 @@ import { useConnectModal, useChainModal } from "@rainbow-me/rainbowkit";
 import dao_abi from "../../artifacts/Dao.sol/GovernanceToken.json";
 import { useAccount } from "wagmi";
 import WalletAndPublicClient from "@/helpers/signer";
+import DelegateListSkeletonLoader from "../SkeletonLoader/DelegateListSkeletonLoader";
 
 
 function DelegatesList({ props }: { props: string }) {
@@ -310,16 +311,8 @@ function DelegatesList({ props }: { props: string }) {
 
       <div className="py-8 pe-10 font-poppins">
         {isPageLoading ? (
-          <div className="flex items-center justify-center">
-            <Oval
-              visible={true}
-              height="40"
-              width="40"
-              color="#0500FF"
-              secondaryColor="#cdccff"
-              ariaLabel="oval-loading"
-            />
-          </div>
+
+          <DelegateListSkeletonLoader/>
         ) : delegateData.delegates.length > 0 ? (
           <div> 
             <div className="grid min-[475px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-10">

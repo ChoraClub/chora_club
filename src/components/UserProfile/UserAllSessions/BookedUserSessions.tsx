@@ -10,6 +10,7 @@ import EventTile from "../../utils/EventTile";
 import { useAccount, useNetwork } from "wagmi";
 import toast, { Toaster } from "react-hot-toast";
 import { Oval } from "react-loader-spinner";
+import SessionTileSkeletonLoader from "@/components/SkeletonLoader/SessionTileSkeletonLoader";
 
 interface Session {
   booking_status: string;
@@ -72,16 +73,7 @@ function BookedUserSessions({ daoName }: { daoName: string }) {
     <>
       <div className="space-y-6">
         {pageLoading ? (
-          <div className="flex items-center justify-center">
-            <Oval
-              visible={true}
-              height="40"
-              width="40"
-              color="#0500FF"
-              secondaryColor="#cdccff"
-              ariaLabel="oval-loading"
-            />
-          </div>
+          <SessionTileSkeletonLoader/>
         ) : sessionDetails.length > 0 ? (
           sessionDetails.map((data, index) => (
             <EventTile
