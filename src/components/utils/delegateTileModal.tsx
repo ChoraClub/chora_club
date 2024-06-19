@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import Image from "next/image";
 import user from "@/assets/images/daos/user1.png"
-import { FaArrowDown } from "react-icons/fa6";
+import { IoArrowDown } from "react-icons/io5";
+import Arrow1 from '@/assets/images/daos/arrow1.png';
+import Arrow2 from '@/assets/images/daos/arrow2.png';
 
 interface delegate{
   isOpen:boolean,
@@ -10,12 +12,21 @@ interface delegate{
   fromDelegate:any,
   delegateName:String,
   displayImage:any,
-  addressCheck:boolean
+  addressCheck:boolean,
 }
 
 function DelegateTile ({isOpen,closeModal, handleDelegateVotes, fromDelegate ,delegateName,displayImage,addressCheck}:delegate) {
 
   const [isLoading, setIsLoading] = useState(true);
+  const [isHovering, setIsHovering] = useState(false);
+  const handleMouseEnter = () => {
+    setIsHovering(true);
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovering(false);
+  };
+
 
   useEffect(() => {
     // Simulate data fetching
@@ -44,31 +55,41 @@ function DelegateTile ({isOpen,closeModal, handleDelegateVotes, fromDelegate ,de
             className="absolute inset-0 backdrop-blur-md"
             onClick={closeModal}
           ></div>
-          <div className='bg-white px-6 py-8 rounded-2xl flex flex-col  z-50 border-[2px] border-black-shade-900'>
-            <h1 className='font-semibold text-2xl mb-2 '>Set {delegateName} as your delegate</h1>
-            <p className='font-normal text-sm max-w-[29rem]'>{delegateName} will be able to vote with any token owned by your address</p>
+          <div className='bg-white p-9 rounded-[34px] flex flex-col  z-50 border-[2px] items-center justify-center '>
+            <h1 className='font-semibold text-[26px] mb-2 text-blue-shade-100 text-center'>Set {delegateName} as your delegate</h1>
+            <p className='font-normal text-[13px] text-center text-black-shade-1000 max-w-[400px]'>{delegateName} will be able to vote with any token owned by your address</p>
 
-            <div className='border-[2px] rounded-xl border-black-shade-900 my-6'>
-                <div className='flex gap-2 items-center'>
-                    <Image src={user} alt="" className='size-10 mx-2'/>
+            <div className='my-6 w-full'>
+                <div className='flex items-center rounded-3xl border-[2.5px] border-white bg-[#F4F4F4] pb-5 pt-4'>
+                    <Image src={user} alt="" className='size-[46px] mx-5'/>
                     <div className=''>
-                        <p className='mt-2 text-sm font-medium'>Currently delegated to</p>
-                        <p className='mb-2 font-semibold'>{fromDelegate}</p>
+                        <p className=' text-sm font-medium'>Currently delegated to</p>
+                        <p className=' font-normal text-[12px]'>{fromDelegate}</p>
                     </div>
                 </div>
-                <div className='w-full border-[0.5px] border-black-shade-900 flex items-center justify-center h-0'>
-                  <div className='rounded-full size-10 border-[2px] border-black-shade-900 flex items-center justify-center z-50 bg-white'><FaArrowDown className='text-black-shade-900'/></div>
+                <div className='w-full border-[0.5px] border-white flex items-center justify-center h-0'>
+                  {/* <div className='rounded-full size-14 border-[5px] border-white flex items-center justify-center z-50 bg-[#F4F4F4]'><IoArrowDown className='text-black size-7 hover:text-blue-shade-100'/></div> */}
+                  <div className='border-[5px] border-white rounded-full size-14'>
+
+                  <Image
+        src={isHovering ? Arrow2 : Arrow1}
+        alt=""
+        className="w-full h-full z-50" // Adjust the size as needed
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        />
+        </div>
                 </div>
-                <div className='flex gap-2 items-center'>
-                    <Image src={displayImage} alt="" width={40} height={40} className='size-10 mx-2 rounded-full'/>
+                <div className='flex items-center rounded-3xl border-[2.5px] border-white bg-[#F4F4F4] pb-4 pt-5'>
+                    <Image src={displayImage} alt="" width={46} height={46} className='size-10 mx-5 rounded-full'/>
                     <div className=''>
-                        <p className='mt-2 text-sm font-medium'> Delegating to</p>
-                        <p className='mb-2 font-semibold'>{delegateName}</p>
+                        <p className=' text-sm font-medium'> Delegating to</p>
+                        <p className=' font-normal text-[12px]'>{delegateName}</p>
                     </div>
                 </div>
             </div>
         <button
-          className={`rounded-md py-1.5 font-medium font-poppins ${addressCheck ? 'bg-grey-shade-50 text-grey' : 'bg-blue-shade-100 text-white'}`}
+          className={`rounded-full py-5 font-semibold font-poppins w-full text-base hover:bg-blue-shade-100 ${addressCheck ? 'bg-grey-shade-50 text-grey' : 'bg-black text-white'}`}
           onClick={handleDelegateVotes}
           disabled={addressCheck}
         >
