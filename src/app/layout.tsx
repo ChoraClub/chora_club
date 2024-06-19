@@ -10,6 +10,7 @@ import { useEffect } from "react";
 import FeedbackTile from "@/components/utils/FeedbackTile";
 import Script from "next/script";
 import ProgressBarProvider from "@/components/ProgressBarProvider/ProgressBarProvider";
+import MobileResponsiveMessage from "@/components/MobileResponsiveMessage/MobileResponsiveMessage";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -109,6 +110,20 @@ export default function RootLayout({
                   <div>{children}</div>
                 </div>
               </div>
+              {/* <div className="lg:block hidden">
+                <div className="flex">
+                  <div className="fixed w-[6%] bg-blue-shade-100 h-screen ">
+                    <SidebarMain />
+                  </div>
+                  <div className="w-full md:w-[94%] ml-auto">
+                    <FeedbackTile />
+                    <div>{children}</div>
+                  </div>
+                </div>
+              </div>
+              <div className="lg:hidden w-full h-screen flex items-center justify-center">
+                <MobileResponsiveMessage />
+              </div> */}
             </HuddleContextProvider>
           </RootProviders>
         </ProgressBarProvider>

@@ -357,25 +357,27 @@ function WatchSession({
               >
                 {data.attendees.map((attendee, index) => (
                   <div key={index}>
-                    <div className="flex items-center text-sm gap-3 px-6  py-[10px]">
-                      <div>
-                        <Image
-                          src={
-                            attendee.profileInfo?.image
-                              ? `https://gateway.lighthouse.storage/ipfs/${attendee.profileInfo.image}`
-                              : user
-                          }
-                          alt="image"
-                          width={18}
-                          height={18}
-                          className="rounded-full"
-                          priority
-                        />
-                      </div>
-                      <div>
-                        {attendee.attendee_address.slice(0, 8) +
-                          "..." +
-                          attendee.attendee_address.slice(-6)}{" "}
+                    <div className="flex items-center text-sm gap-3 px-6  py-[10px] justify-between">
+                      <div className="flex gap-3">
+                        <div>
+                          <Image
+                            src={
+                              attendee.profileInfo?.image
+                                ? `https://gateway.lighthouse.storage/ipfs/${attendee.profileInfo.image}`
+                                : user
+                            }
+                            alt="image"
+                            width={18}
+                            height={18}
+                            className="rounded-full"
+                            priority
+                          />
+                        </div>
+                        <div>
+                          {attendee.attendee_address.slice(0, 6) +
+                            "..." +
+                            attendee.attendee_address.slice(-4)}{" "}
+                        </div>
                       </div>
                       {attendee.attendee_uid ? (
                         <Tooltip

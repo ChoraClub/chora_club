@@ -29,16 +29,31 @@ import { Oval } from "react-loader-spinner";
 import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
 import { getEnsNameOfUser } from "../ConnectWallet/ENSResolver";
 import DelegateTileModal from "../utils/delegateTileModal";
+// import { cacheExchange, createClient, fetchExchange, gql } from "urql/core";
+import { set } from "video.js/dist/types/tech/middleware";
 
 interface Type {
   daoDelegates: string;
   individualDelegate: string;
 }
-
 const client = createClient({
-  url: "https://api.studio.thegraph.com/query/68573/op/version/latest",
+  url: "https://api.studio.thegraph.com/query/68573/op/v0.0.1",
   exchanges: [cacheExchange, fetchExchange],
 });
+const GET_LATEST_DELEGATE_VOTES_CHANGED = gql`
+query MyQuery($delegate: String!) {
+  delegateVotesChangeds(
+    first: 1
+    orderBy: blockTimestamp
+    orderDirection: desc
+    where: { delegate: $delegate }
+  ) {
+    newBalance
+  }
+}
+`;
+
+
 const DELEGATE_CHANGED_QUERY = gql`
   query MyQuery($delegator: String!) {
     delegateChangeds(
@@ -116,6 +131,7 @@ function SpecificDelegate({ props }: { props: Type }) {
       document.body.style.overflow = "auto";
     };
   }, [delegateOpen]);
+  const [votingPower,setVotingPower] = useState<number>();
 
   const [karmaSocials, setKarmaSocials] = useState({
     twitter: "",
@@ -130,6 +146,78 @@ function SpecificDelegate({ props }: { props: Type }) {
     discourse: "",
     github: "",
   });
+  const [delegatorsCount, setDelegatorsCount] = useState<number>();
+  const[votesCount,setVotesCount] = useState<number>();
+
+  const totalCount =
+   `query Delegate($input: DelegateInput!) {
+  delegate(input: $input) {
+    id
+    votesCount
+    delegatorsCount
+  }
+}
+ `;
+ const variables = {
+  input: {
+    address: `${props.individualDelegate}`,
+    governorId:"",
+    organizationId :null as number | null
+  }
+};
+if (props.daoDelegates === "arbitrum") {
+  variables.input.governorId = "eip155:42161:0x789fC99093B09aD01C34DC7251D0C89ce743e5a4";
+  variables.input.organizationId = 2206072050315953936;
+}else{
+  variables.input.governorId = "eip155:10:0xcDF27F107725988f2261Ce2256bDfCdE8B382B10";
+  variables.input.organizationId = 2206072049871356990;
+}
+ 
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const apiKey = process.env.NEXT_PUBLIC_TALLY_API_KEY;
+      console.log("API key", apiKey);
+          if (!apiKey) {
+            throw new Error('API key is missing');
+          }
+        fetch('https://api.tally.xyz/query', {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Api-Key": apiKey,
+          },
+          body: JSON.stringify({
+            query: totalCount,
+            variables: variables
+          }),
+        })
+        .then(result => result.json())
+        .then(finalCounting => {
+          console.log(finalCounting);
+          console.log("dataa", finalCounting.data);
+          setVotesCount(finalCounting.data.delegate.votesCount);
+          setDelegatorsCount(finalCounting.data.delegate.delegatorsCount);
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+
+        console.log("Props", props.individualDelegate);
+        const data = await client.query(GET_LATEST_DELEGATE_VOTES_CHANGED, { delegate: props.individualDelegate.toString()}).toPromise();
+        console.log("voting data", data.data.delegateVotesChangeds[0]);
+        setVotingPower(data.data.delegateVotesChangeds[0].newBalance);
+      } catch (error) {
+        console.error("Error fetching data", error);
+      }
+    };
+
+    if (props.individualDelegate) {
+      fetchData();
+    }
+  }, [client, props.individualDelegate]);
+
 
   useEffect(() => {
     console.log("Network", chain?.network);
@@ -559,9 +647,8 @@ function SpecificDelegate({ props }: { props: Type }) {
                 <div className="flex gap-4 py-1">
                   <div className="text-[#4F4F4F] border-[0.5px] border-[#D9D9D9] rounded-md px-3 py-1">
                     <span className="text-blue-shade-200 font-semibold">
-                      {delegateInfo?.delegatedVotes
-                        ? formatNumber(Number(delegateInfo?.delegatedVotes))
-                        : 0}
+                      {props.daoDelegates === "arbitrum" ? (votesCount?formatNumber(votesCount/10**18):0) 
+                          :(votingPower?formatNumber(votingPower/10**18):0)}
                       &nbsp;
                     </span>
                     delegated tokens
@@ -570,13 +657,13 @@ function SpecificDelegate({ props }: { props: Type }) {
                     Delegated from
                     <span className="text-blue-shade-200 font-semibold">
                       &nbsp;
-                      {delegateInfo?.delegatorCount
-                        ? formatNumber(delegateInfo?.delegatorCount)
+                      {delegatorsCount
+                        ? formatNumber(delegatorsCount)
                         : 0}
                       &nbsp;
                     </span>
                     Addresses
-                  </div>
+                  </div> 
                 </div>
 
                 <div className="pt-2">

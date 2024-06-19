@@ -22,9 +22,11 @@ import lighthouse from "@lighthouse-web3/sdk";
 import toast from "react-hot-toast";
 import { FaPencil } from "react-icons/fa6";
 import { Tooltip } from "@nextui-org/react";
+import { IoCopy } from "react-icons/io5";
 import { FaGift } from "react-icons/fa6";
 import style from "./SessionTiles.module.css";
 // const { ethers } = require("ethers");
+import copy from "copy-to-clipboard";
 
 type Attendee = {
   attendee_address: string;
@@ -392,6 +394,11 @@ SessionTileProps) {
     }
   };
 
+  const handleCopy = (addr: string) => {
+    copy(addr);
+    toast("Address Copied");
+  };
+
   return (
     <>
       <div className="">
@@ -444,21 +451,59 @@ SessionTileProps) {
 
                     <div className="flex gap-x-16 text-sm py-3">
                       {data.session_type === "session" ? (
-                        <div className="text-[#3E3D3D]">
+                        <div className="text-[#3E3D3D] flex">
                           <span className="font-semibold">Session - </span>{" "}
                           <span className="font-semibold">Guest:</span>{" "}
                           {formatWalletAddress(
                             data.attendees[0].attendee_address
                           )}
+                          <Tooltip
+                            content="Copy"
+                            placement="right"
+                            closeDelay={1}
+                            showArrow
+                          >
+                            <div
+                              className="pl-2 pt-[2px] cursor-pointer"
+                              color="#3E3D3D"
+                            >
+                              <IoCopy
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleCopy(
+                                    `${data.attendees[0].attendee_address}`
+                                  );
+                                }}
+                              />
+                            </div>
+                          </Tooltip>
                         </div>
                       ) : (
                         <div className="text-[#3E3D3D]">
                           <span className="font-semibold">Instant Meet</span>{" "}
                         </div>
                       )}
-                      <div className="text-[#3E3D3D]">
+                      <div className="text-[#3E3D3D] flex">
                         <span className="font-semibold">Host:</span>{" "}
                         {formatWalletAddress(data.host_address)}
+                        <Tooltip
+                          content="Copy"
+                          placement="right"
+                          closeDelay={1}
+                          showArrow
+                        >
+                          <div
+                            className="pl-2 pt-[2px] cursor-pointer"
+                            color="#3E3D3D"
+                          >
+                            <IoCopy
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleCopy(`${data.host_address}`);
+                              }}
+                            />
+                          </div>
+                        </Tooltip>
                       </div>
                       <div className="text-[#3E3D3D]">
                         {isEvent === "Upcoming" ? (
@@ -488,57 +533,59 @@ SessionTileProps) {
                   data.attendees[0]?.attendee_uid && (
                     <div className="flex items-end gap-2">
                       <Tooltip
-                      content={
-                        isClaiming[index]
-                          ? "Claiming Onchain Attestation"
-                          : data.onchain_host_uid || isClaimed[index]
-                          ? "Received Onchain Attestation"
-                          : "Claim Onchain Attestation"
-                      }
-                      placement="top"
-                      showArrow
-                    >
-                      <button
-                        className={`${style.button}`}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleAttestationOnchain({
-                            meetingId: data.meetingId,
-                            meetingType: 2,
-                            meetingStartTime: data.attestations[0].startTime,
-                            meetingEndTime: data.attestations[0].endTime,
-                            index,
-                            dao: data.dao_name,
-                          });
-                        }}
-                        disabled={
-                          !!data.attendees[0].onchain_attendee_uid ||
-                          isClaiming[index] ||
-                          isClaimed[index]
+                        content={
+                          isClaiming[index]
+                            ? "Claiming Onchain Attestation"
+                            : data.attendees[0].onchain_attendee_uid ||
+                              isClaimed[index]
+                            ? "Received Onchain Attestation"
+                            : "Claim Onchain Attestation"
                         }
+                        placement="top"
+                        showArrow
                       >
-                        {isClaiming[index] ? (
-                          <div className="flex items-center justify-center px-3">
-                            <Oval
-                              visible={true}
-                              height="20"
-                              width="20"
-                              color="#fff"
-                              secondaryColor="#cdccff"
-                              ariaLabel="oval-loading"
-                            />
-                          </div>
-                        ) : data.attendees[0].onchain_attendee_uid ||
-                          isClaimed[index] ? (
-                          "Claimed"
-                        ) : (<>
-                          <div className="flex items-center justify-center translate-y-[1px]">
-                              Claim
+                        <button
+                          className={`${style.button}`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleAttestationOnchain({
+                              meetingId: data.meetingId,
+                              meetingType: 2,
+                              meetingStartTime: data.attestations[0].startTime,
+                              meetingEndTime: data.attestations[0].endTime,
+                              index,
+                              dao: data.dao_name,
+                            });
+                          }}
+                          disabled={
+                            !!data.attendees[0].onchain_attendee_uid ||
+                            isClaiming[index] ||
+                            isClaimed[index]
+                          }
+                        >
+                          {isClaiming[index] ? (
+                            <div className="flex items-center justify-center px-3">
+                              <Oval
+                                visible={true}
+                                height="20"
+                                width="20"
+                                color="#fff"
+                                secondaryColor="#cdccff"
+                                ariaLabel="oval-loading"
+                              />
                             </div>
-                            <FaGift className={`${style.icon}`} />
-                        </>
-                      )}
-                      </button>
+                          ) : data.attendees[0].onchain_attendee_uid ||
+                            isClaimed[index] ? (
+                            "Claimed"
+                          ) : (
+                            <>
+                              <div className="flex items-center justify-center translate-y-[1px]">
+                                Claim
+                              </div>
+                              <FaGift className={`${style.icon}`} />
+                            </>
+                          )}
+                        </button>
                       </Tooltip>
                     </div>
                   )}
