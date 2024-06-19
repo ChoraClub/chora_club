@@ -45,6 +45,8 @@ function DelegatesList({ props }: { props: string }) {
   const searchParams = useSearchParams();
   const [isShowing, setIsShowing] = useState(true);
   const [isSearching, setIsSearching] = useState<boolean>(false);
+  const [lastCursor, setLastCursor] = useState<string | null>(null);
+
   // const [circlePosition, setCirclePosition] = useState({ x: 0, y: 0 });
   // const [clickedTileIndex,setClickedTileIndex]=useState(null);
 
@@ -60,65 +62,64 @@ function DelegatesList({ props }: { props: string }) {
     setIsShowing(!KarmaCreditClosed);
   }, []);
 
+  // let uniqueDelegates = new Set(); 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchData = async (lastCursor: string | null) => {
       try {
         setDataLoading(true);
-        // console.log("Current page: ", currentPage);
-        const res = await fetch( props === "arbitrum" ?
-          `https://api.karmahq.xyz/api/dao/delegates?name=${props}&offset=${currentPage}&order=desc&field=delegatedVotes&period=lifetime&pageSize=20&statuses=active,inactive,withdrawn,recognized` : `/api/get-delegatelist`
+        console.log("its props", props);
+        console.log("currentPage", currentPage);
+        const res = await fetch(
+          props === "arbitrum"
+            ? `/api/get-arbitrum-delegatelist?lastCursor=${lastCursor || ""}`
+            : `/api/get-delegatelist?currentPage=${currentPage}`
         );
-
+  console.log("res",res);
         if (!res.ok) {
           throw new Error(`HTTP error! status: ${res.status}`);
         }
-
-        const daoInfo: any = await res.json();
-        console.log(daoInfo)
+  
+        const daoInfo = await res.json();
+  
+        // Use a Set to store unique addresses
+        const uniqueDelegates = new Set();
         let formattedDelegates;
-        if(props==="arbitrum"){
-           formattedDelegates = await Promise.all(
-            daoInfo.data.delegates.map(async (delegate: any) => {
-              // const ensName = await getEnsNameOfUser(delegate.publicAddress);
+  
+        if (props === "arbitrum") {
+          formattedDelegates = daoInfo.delegates.nodes.map((delegate:any) => {
+            if (!uniqueDelegates.has(delegate.account.address)) {
+              uniqueDelegates.add(delegate.account.address);
               return {
-                delegate: delegate.publicAddress,
-                adjustedBalance: delegate.voteWeight,
-                newBalance: delegate.voteWeight,
-                ensName: delegate.ensName,
+                delegate: delegate.account.address,
+                adjustedBalance: delegate.votesCount / 10 ** 18,
+                ensName: delegate.account.ens,
               };
-            })
-          );
-        }else{
-
-           formattedDelegates = await Promise.all(
-            daoInfo.map(async (delegate: any) => {
+            }
+            return null; // Filter out duplicates
+          })
+        } else {
+          formattedDelegates = await Promise.all(
+            daoInfo.map(async (delegate:any) => {
               const ensName = await getEnsNameOfUser(delegate._id);
-              // const profilePicture= await fetchEnsAvatar(delegate._id);
               return {
                 delegate: delegate._id,
                 adjustedBalance: delegate.adjustedBalance,
                 newBalance: delegate.newBalance,
                 ensName: ensName,
-                // profilePicture:profilePicture,
               };
             })
           );
         }
-  console.log(formattedDelegates)
-        setDelegateData((prevData: any) => ({
+  
+        setDelegateData((prevData:any) => ({
           delegates: [...prevData.delegates, ...formattedDelegates],
         }));
   
-        setTempData((prevData: any) => ({
+        setTempData((prevData:any) => ({
           delegates: [...prevData.delegates, ...formattedDelegates],
         }));
-        // setDelegateData((prevData: any) => ({
-        //   delegates: [...prevData._id, ...daoInfo._id],
-        // }));
-        // setTempData((prevData: any) => ({
-        //   delegates: [...prevData.delegates, ...daoInfo.delegates],
-        // }));
-        // setTempData({delegate:daoInfo._id});
+  
+        setLastCursor(daoInfo.delegates?.pageInfo?.lastCursor);
         setDataLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -126,75 +127,102 @@ function DelegatesList({ props }: { props: string }) {
         setPageLoading(false);
       }
     };
-
-    fetchData();
+  
+    fetchData(lastCursor || "");
   }, [currentPage]);
-
-  const handleSearchChange = async (query: string) => {
-    // console.log("query: ", query.length);
-
-    setSearchQuery(query);
-    setPageLoading(true);
-
-    if (query.length > 0) {
-      // console.log("Delegate data: ", query, delegateData);
-      // console.log(delegateData);
-      setIsSearching(true);
-      window.removeEventListener("scroll", handleScroll);
-
-      const res = await fetch(
-        `/api/get-delegatelist?user=${query}`
-        // `https://api.karmahq.xyz/api/dao/search-delegate?user=${query}&pageSize=10&offset=0&period=lifetime&order=desc&dao=${props}`
-      );
-      console.log("res: ", res);
-      const filtered: any = await res.json();
-      const formattedDelegates = await Promise.all(
-        filtered.map(async (delegate: any) => {
-          const ensName = await getEnsNameOfUser(delegate._id);
-          return {
-            delegate: delegate._id,
-            adjustedBalance: delegate.adjustedBalance,
-            newBalance: delegate.newBalance,
-            ensName: ensName,
-          };
-        })
-      );
-      console.log(formattedDelegates);
-      // const formattedDelegates = await Promise.all(
-      //   filtered.map(async (delegate: any) => {
-      //     // const ensName = await getEnsNameOfUser(delegate._id);
-      //     return {
-      //       delegate: delegate._id,
-      //       adjustedBalance: delegate.adjustedBalance,
-      //       newBalance: delegate.newBalance,
-      //       // ensName: ensName,
-      //     };
-      //   }))
-      // const filtered = await res.json().then((delegates) => delegates._id);
-// console.log("Filtered Data: ", query, filtered);
-      // console.log("Filtered Data: ", query, filtered);
-      setDelegateData({ delegates: [...formattedDelegates] });
-
-      setPageLoading(false);
-    } else {
-      console.log("in else");
-      setIsSearching(false);
-      setDelegateData({ ...delegateData, delegates: tempData.delegates });
-      setPageLoading(false);
-      window.addEventListener("scroll", handleScroll);
-    }
+  const debounce = (func: (...args: any[]) => void, wait: number) => {
+    let timeout: NodeJS.Timeout;
+    return (...args: any[]) => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func(...args), wait);
+    };
   };
+    const handleSearchChange = async (query: string) => {
+      console.log("query: ", query.length);
 
-  const handleScroll = () => {
-    const { scrollTop, clientHeight, scrollHeight } = document.documentElement;
-    const threshold = 100;
-    if (
-      !isDataLoading &&
-      scrollTop + clientHeight >= scrollHeight - threshold
-    ) {
-      setCurrentPage((prev) => prev + 1);
-    }
-  };
+      setSearchQuery(query);
+      setPageLoading(true);
+
+      if (query.length > 0) {
+        // console.log("Delegate data: ", query, delegateData);
+        // console.log(delegateData);
+        setIsSearching(true);
+        window.removeEventListener("scroll", handleScroll);
+        console.log(props)
+console.log("lowercasee",query.toLowerCase( ))
+        const res = await fetch(
+           props==="optimism" ? `/api/get-delegatelist?user=${query.toLowerCase()}`: `/api/get-arbitrum-delegatelist?user=${query}`
+          // `https://api.karmahq.xyz/api/dao/search-delegate?user=${query}&pageSize=10&offset=0&period=lifetime&order=desc&dao=${props}`
+        );
+        console.log("res: ", res);
+        let filtered: any = await res.json();
+        filtered.delegate===null?filtered=[]:null;
+        console.log(filtered);
+
+        if(props==="optimism"){
+          const formattedDelegates = await Promise.all(
+          filtered.map(async (delegate: any) => {
+            const ensName = await getEnsNameOfUser(delegate._id);
+            return {
+              delegate: delegate._id,
+              adjustedBalance: delegate.adjustedBalance,
+              newBalance: delegate.newBalance,
+              ensName: ensName,
+            };
+          })
+        );
+        console.log("formate",formattedDelegates);
+      
+        setDelegateData({ delegates: [...formattedDelegates] });
+
+        setPageLoading(false);
+      }else{  
+        let formattedDelegates:any;
+        filtered.delegate ?  formattedDelegates = {
+          delegate : filtered.delegate?.account.address ,
+          adjustedBalance: filtered.delegate?.votesCount / 10 ** 18,
+          ensName: filtered.delegate?.account.ens,
+        }:formattedDelegates = [];
+       console.log("formattedDelegates",formattedDelegates)
+        // setDelegateData({ delegates: [formattedDelegates] });
+        setDelegateData({ delegates: Array.isArray(formattedDelegates) ? formattedDelegates : [formattedDelegates] });
+
+
+        setPageLoading(false);
+      
+      }
+        
+      } else {
+        
+        setIsSearching(false);
+        setDelegateData({ ...delegateData, delegates: tempData.delegates });
+        setPageLoading(false);
+        window.addEventListener("scroll", handleScroll);
+      }
+    };
+// Debounced version of handleSearchChange
+const debouncedHandleSearchChange = debounce(handleSearchChange, 300); // Delay of 300ms
+
+// Use the debounced function instead of handleSearchChange
+const handleSearchChangeWithDebounce = async (query: string) => {
+  debouncedHandleSearchChange(query);
+};
+    
+    const handleScroll = debounce(() => {
+      const { scrollTop, clientHeight, scrollHeight } = document.documentElement;
+      const threshold = 100;
+      if (!isDataLoading && scrollTop + clientHeight >= scrollHeight - threshold) {
+        console.log("fetching more data");
+        setCurrentPage((prev) => prev + 1);
+      }
+    }, 200); // Adjust the debounce wait time as necessary
+  
+    useEffect(() => {
+      window.addEventListener('scroll', handleScroll);
+      return () => {
+        window.removeEventListener('scroll', handleScroll);
+      };
+    }, [isDataLoading, currentPage]);
 
   useEffect(() => {
     if (isSearching === false) {
@@ -365,7 +393,7 @@ function DelegatesList({ props }: { props: string }) {
             className="pl-5 pr-3 rounded-full outline-none w-full"
             value={searchQuery}
             onChange={(e) => handleSearchChange(e.target.value)}
-          ></input>
+            ></input>
           <span className="flex items-center bg-black rounded-full px-5 py-2">
             <Image src={search} alt="search" width={20} />
           </span>
@@ -399,6 +427,7 @@ function DelegatesList({ props }: { props: string }) {
           </div>
         ) : delegateData.delegates?.length > 0 ? (
           <div> 
+            
             <div className="grid min-[475px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-10">
             {console.log("data............",delegateData)}
               {delegateData.delegates.map((delegate: any, index: number) => (
@@ -432,7 +461,7 @@ function DelegatesList({ props }: { props: string }) {
                       
                       <Image
                         src={
-                          delegate.profilePicture == null
+                          delegate?.profilePicture == null
                             ? props == "optimism"
                               ? OPLogo
                               : props == "arbitrum"
@@ -463,7 +492,7 @@ function DelegatesList({ props }: { props: string }) {
                         <div
                           className={`font-semibold overflow-hidden ${styles.desc}`}
                         >
-                          {!delegate.ensName ? (
+                          {!delegate?.ensName ? (
                             <span>
                               {
                               delegate.delegate?.slice(0, 6) +
