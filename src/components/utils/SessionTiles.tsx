@@ -533,57 +533,59 @@ SessionTileProps) {
                   data.attendees[0]?.attendee_uid && (
                     <div className="flex items-end gap-2">
                       <Tooltip
-                      content={
-                        isClaiming[index]
-                          ? "Claiming Onchain Attestation"
-                          : data.onchain_host_uid || isClaimed[index]
-                          ? "Received Onchain Attestation"
-                          : "Claim Onchain Attestation"
-                      }
-                      placement="top"
-                      showArrow
-                    >
-                      <button
-                        className={`${style.button}`}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleAttestationOnchain({
-                            meetingId: data.meetingId,
-                            meetingType: 2,
-                            meetingStartTime: data.attestations[0].startTime,
-                            meetingEndTime: data.attestations[0].endTime,
-                            index,
-                            dao: data.dao_name,
-                          });
-                        }}
-                        disabled={
-                          !!data.attendees[0].onchain_attendee_uid ||
-                          isClaiming[index] ||
-                          isClaimed[index]
+                        content={
+                          isClaiming[index]
+                            ? "Claiming Onchain Attestation"
+                            : data.attendees[0].onchain_attendee_uid ||
+                              isClaimed[index]
+                            ? "Received Onchain Attestation"
+                            : "Claim Onchain Attestation"
                         }
+                        placement="top"
+                        showArrow
                       >
-                        {isClaiming[index] ? (
-                          <div className="flex items-center justify-center px-3">
-                            <Oval
-                              visible={true}
-                              height="20"
-                              width="20"
-                              color="#fff"
-                              secondaryColor="#cdccff"
-                              ariaLabel="oval-loading"
-                            />
-                          </div>
-                        ) : data.attendees[0].onchain_attendee_uid ||
-                          isClaimed[index] ? (
-                          "Claimed"
-                        ) : (<>
-                          <div className="flex items-center justify-center translate-y-[1px]">
-                              Claim
+                        <button
+                          className={`${style.button}`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleAttestationOnchain({
+                              meetingId: data.meetingId,
+                              meetingType: 2,
+                              meetingStartTime: data.attestations[0].startTime,
+                              meetingEndTime: data.attestations[0].endTime,
+                              index,
+                              dao: data.dao_name,
+                            });
+                          }}
+                          disabled={
+                            !!data.attendees[0].onchain_attendee_uid ||
+                            isClaiming[index] ||
+                            isClaimed[index]
+                          }
+                        >
+                          {isClaiming[index] ? (
+                            <div className="flex items-center justify-center px-3">
+                              <Oval
+                                visible={true}
+                                height="20"
+                                width="20"
+                                color="#fff"
+                                secondaryColor="#cdccff"
+                                ariaLabel="oval-loading"
+                              />
                             </div>
-                            <FaGift className={`${style.icon}`} />
-                        </>
-                      )}
-                      </button>
+                          ) : data.attendees[0].onchain_attendee_uid ||
+                            isClaimed[index] ? (
+                            "Claimed"
+                          ) : (
+                            <>
+                              <div className="flex items-center justify-center translate-y-[1px]">
+                                Claim
+                              </div>
+                              <FaGift className={`${style.icon}`} />
+                            </>
+                          )}
+                        </button>
                       </Tooltip>
                     </div>
                   )}

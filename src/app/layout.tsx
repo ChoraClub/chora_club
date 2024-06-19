@@ -101,7 +101,7 @@ export default function RootLayout({
         <ProgressBarProvider>
           <RootProviders>
             <HuddleContextProvider>
-              {/* <div className="flex">
+              <div className="flex">
                 <div className="fixed w-[6%] bg-blue-shade-100 h-screen">
                   <SidebarMain />
                 </div>
@@ -109,8 +109,8 @@ export default function RootLayout({
                   <FeedbackTile />
                   <div>{children}</div>
                 </div>
-              </div> */}
-              <div className="lg:block hidden">
+              </div>
+              {/* <div className="lg:block hidden">
                 <div className="flex">
                   <div className="fixed w-[6%] bg-blue-shade-100 h-screen ">
                     <SidebarMain />
@@ -123,7 +123,7 @@ export default function RootLayout({
               </div>
               <div className="lg:hidden w-full h-screen flex items-center justify-center">
                 <MobileResponsiveMessage />
-              </div>
+              </div> */}
             </HuddleContextProvider>
           </RootProviders>
         </ProgressBarProvider>

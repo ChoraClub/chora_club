@@ -52,6 +52,8 @@ function UserSessions({
   const [sessionDetails, setSessionDetails] = useState([]);
   const [dataLoading, setDataLoading] = useState(true);
   // const [daoName, setDaoName] = useState("");
+  const [attendedDetails, setAttendedDetails] = useState([]);
+  const [hostedDetails, setHostedDetails] = useState([]);
 
   let dao_name = "";
   const getUserMeetingData = async () => {
@@ -79,10 +81,12 @@ function UserSessions({
         console.log("attendedData", attendedData);
         setDataLoading(true);
         if (searchParams.get("session") === "hosted") {
-          setSessionDetails(hostedData);
+          // setSessionDetails(hostedData);
+          setHostedDetails(hostedData);
           console.log("in session hosted");
         } else if (searchParams.get("session") === "attended") {
-          setSessionDetails(attendedData);
+          // setSessionDetails(attendedData);
+          setAttendedDetails(attendedData);
         }
         setDataLoading(false);
       }
@@ -101,6 +105,8 @@ function UserSessions({
     chain,
     chain?.name,
     daoName,
+    hostedDetails,
+    attendedDetails,
   ]);
 
   // useEffect(() => {
@@ -212,7 +218,7 @@ function UserSessions({
               </div>
             ) : (
               <SessionTile
-                sessionDetails={sessionDetails}
+                sessionDetails={hostedDetails}
                 dataLoading={dataLoading}
                 isEvent="Recorded"
                 isOfficeHour={false}
@@ -233,7 +239,7 @@ function UserSessions({
               </div>
             ) : (
               <SessionTile
-                sessionDetails={sessionDetails}
+                sessionDetails={attendedDetails}
                 dataLoading={dataLoading}
                 isEvent="Recorded"
                 isOfficeHour={false}

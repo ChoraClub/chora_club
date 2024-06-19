@@ -225,19 +225,9 @@ function UserInfo({
 
   const blocks = [
     {
-      number: sessionHostCount,
-      desc: "Sessions hosted",
-      ref: `/profile/${address}}?active=sessions&session=hosted`,
-    },
-    {
       number: sessionAttendCount,
       desc: "Sessions attended",
       ref: `/profile/${address}}?active=sessions&session=attended`,
-    },
-    {
-      number: officehoursHostCount,
-      desc: "Office Hours hosted",
-      ref: `/profile/${address}}?active=officeHours&hours=attended`,
     },
     {
       number: officehoursAttendCount,
@@ -245,6 +235,21 @@ function UserInfo({
       ref: `/profile/${address}}?active=officeHours&hours=attended`,
     },
   ];
+
+  if (isDelegate === true || isSelfDelegate === true) {
+    blocks.unshift(
+      {
+        number: sessionHostCount,
+        desc: "Sessions hosted",
+        ref: `/profile/${address}}?active=sessions&session=hosted`,
+      },
+      {
+        number: officehoursHostCount,
+        desc: "Office Hours hosted",
+        ref: `/profile/${address}}?active=officeHours&hours=attended`,
+      }
+    );
+  }
 
   const handleDescChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
     setTempDesc(event.target.value);
@@ -288,16 +293,8 @@ function UserInfo({
           blocks.map((key, index) => (
             <div
               key={index}
-              className={`bg-[#3E3D3D] text-white rounded-2xl px-3 py-7 ${
-                isDelegate === true || isSelfDelegate === true
-                  ? "cursor-pointer"
-                  : ""
-              }`}
-              onClick={
-                isSelfDelegate === true || isDelegate === true
-                  ? () => router.push(`${key.ref}`)
-                  : undefined
-              }
+              className={`bg-[#3E3D3D] text-white rounded-2xl px-3 py-7 cursor-pointer`}
+              onClick={() => router.push(`${key.ref}`)}
             >
               <div className="font-semibold text-3xl text-center pb-2">
                 {isSessionHostedLoading &&
