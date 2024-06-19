@@ -35,7 +35,7 @@ function BookedUserSessions({ daoName }: { daoName: string }) {
   const getMeetingData = async () => {
     try {
       const response = await fetch(`/api/get-meeting/${address}`, {
-        method: "GET",
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
@@ -50,9 +50,10 @@ function BookedUserSessions({ daoName }: { daoName: string }) {
         filteredData = result.data.filter(
           (session: Session) =>
             session.dao_name === daoName &&
-            session.meeting_status !== "Recorded" &&
-            new Date(session.slot_time).toLocaleString() >=
-              currentSlot.toLocaleString()
+            session.meeting_status !== "Recorded" 
+            // &&
+            // new Date(session.slot_time).toLocaleString() >=
+            //   currentSlot.toLocaleString()
         );
 
         setSessionDetails(filteredData);
