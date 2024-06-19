@@ -943,7 +943,7 @@ function MainProfile() {
                       Copy to Share Profile URL on Warpcast
                     </span> */}
                     <Tooltip
-                      content="Copy to share your profile URL on Warpcast or Twitter."
+                      content="Copy your profile URL to share on Warpcast or Twitter."
                       placement="bottom"
                       closeDelay={1}
                       showArrow
