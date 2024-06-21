@@ -7,7 +7,7 @@ import {
 } from "@/components/ConnectWallet/ENSResolver";
 import { ethers } from "ethers";
 
-const provider = new ethers.JsonRpcProvider(process.env.ENS_RPC_PROVIDER);
+const provider = new ethers.JsonRpcProvider(process.env.NEXT_PUBLIC_ENS_RPC_PROVIDER);
 
 export async function resolveENSProfileImage(
   address: string
@@ -63,7 +63,6 @@ export async function fetchEnsAvatar(address: string) {
   try {
     // Reverse lookup the ENS name from the address
     const ensName = await provider.lookupAddress(address);
-
     if (!ensName) {
       console.log(`No ENS name found for address ${address}`);
       return;
@@ -73,7 +72,6 @@ export async function fetchEnsAvatar(address: string) {
 
     // Get the resolver for the ENS name
     const resolver = await provider.getResolver(ensName);
-
     if (!resolver) {
       console.log(`No resolver found for ${ensName}`);
       return;
@@ -94,7 +92,7 @@ export async function fetchEnsAvatar(address: string) {
     const twitter = await resolver.getText("com.twitter");
     const supportsWildcard = await resolver.supportsWildcard();
     console.log("ensName", ensName);
-    return avatar;
+    return {avatar,ensName};
   } catch (error) {
     console.error(`Error fetching ENS details for address ${address}:`, error);
     return null;

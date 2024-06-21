@@ -225,8 +225,40 @@ function DelegateInfo({ props, desc }: { props: Type; desc: string }) {
       ref: `/${props.daoDelegates}/${props.individualDelegate}?active=officeHours&hours=attended`,
     },
   ];
+
+  const renderParagraphs = (text: string) => {
+    return text
+      .split("\n")
+      .filter((paragraph) => paragraph.trim() !== "")
+      .map((paragraph, index) => (
+        <p key={index} className="mb-3">
+          {paragraph}
+        </p>
+      ));
+  };
+
   useEffect(() => {
     const fetchData = async () => {
+      if(props.daoDelegates === 'arbitrum') {
+      try {
+        setLoadingKarma(true);
+        setLoading(true);
+        const res = await fetch(
+          `/api/get-arbitrum-delegatelist?user=${props.individualDelegate}`
+        );
+        const details = await res.json();
+        console.log("Details: ", details);
+        console.log("Desc: ", details.delegate.statement.statement);
+        setKarmaDescription(details.delegate.statement.statement);
+        setLoadingKarma(false);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setLoadingKarma(false);
+        setLoading(false);
+      }
+      setLoading(false);
+    }else{
       try {
         setLoading(true);
         setLoadingOpAgora(true);
@@ -257,44 +289,11 @@ function DelegateInfo({ props, desc }: { props: Type; desc: string }) {
         setLoadingOpAgora(false);
         setLoading(false);
       }
-    };
+      setLoading(false);
+    }
+  }
     fetchData();
   }, [props.individualDelegate]);
-
-  const renderParagraphs = (text: string) => {
-    return text
-      .split("\n")
-      .filter((paragraph) => paragraph.trim() !== "")
-      .map((paragraph, index) => (
-        <p key={index} className="mb-3">
-          {paragraph}
-        </p>
-      ));
-  };
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoadingKarma(true);
-        setLoading(true);
-        const res = await fetch(
-          `https://api.karmahq.xyz/api/forum-user/${props.daoDelegates}/delegate-pitch/${props.individualDelegate}`
-        );
-        const details = await res.json();
-        console.log("Desc: ", details.data.delegatePitch.customFields[1].value);
-        setKarmaDescription(details.data.delegatePitch.customFields[1].value);
-        setLoadingKarma(false);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        setLoadingKarma(false);
-        setLoading(false);
-      }
-      setLoading(false);
-    };
-
-    fetchData();
-  }, []);
 
   console.log("desc from karma: ", karmaDescription);
   console.log("desc from db: ", desc);
@@ -359,10 +358,10 @@ function DelegateInfo({ props, desc }: { props: Type; desc: string }) {
       <div
         style={{ boxShadow: "0px 4px 30.9px 0px rgba(0, 0, 0, 0.12)" }}
         className={`rounded-xl my-7 me-32 py-6 px-7 text-sm ${
-          desc && opAgoraDescription && karmaDescription ? "" : "min-h-52"
+          desc && loadingKarma && loadingOpAgora? "" : "min-h-52"
         }`}
       >
-        {loadingOpAgora || loadingKarma || loading ? (
+        {  loading ? (
           <div className="flex pt-6 justify-center">
             <ThreeDots
               visible={true}
@@ -377,7 +376,7 @@ function DelegateInfo({ props, desc }: { props: Type; desc: string }) {
         ) :props.daoDelegates === 'optimism' && opAgoraDescription ? ( // Check for opAgoraDescription
           renderParagraphs(opAgoraDescription)
         ) : karmaDescription ? (
-          karmaDescription
+          renderParagraphs(karmaDescription)
         ) : (
           <div className="font-semibold text-base flex justify-center">
             Delegate has not provided a description
