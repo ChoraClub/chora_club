@@ -1,0 +1,22 @@
+/* Remove the border */
+.ql-container {
+    border: none !important;
+    margin-top: 10px !important;
+  }
+  
+  /* Increase the height of the editor */
+  .ql-editor {
+    min-height: 200px !important; /* Adjust the value as needed */
+    font-family: 'poppins' !important;
+  }
+
+  .ql-toolbar{
+    border-radius: 12px !important;
+    border: 2px solid #ccc !important;
+    /* bottom: 0 !important;
+    position: absolute !important; */
+  }
+  
+  /* .quill{
+    position: relative !important;
+  } */
