@@ -73,7 +73,7 @@ export async function POST(req: NextRequest) {
 
     token = await createToken(
       roomId,
-      previewPeers.length > 0 ? Role.LISTENER : Role.HOST,
+      previewPeers.length > 0 ? Role.GUEST : Role.HOST,
       displayName,
       address
     );

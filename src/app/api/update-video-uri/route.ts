@@ -14,14 +14,14 @@ export async function POST(req: NextRequest, res: NextApiResponse) {
     const officeHoursCollection = db.collection("office_hours");
     const officeHoursMeeting = await officeHoursCollection.findOneAndUpdate(
       { meetingId },
-      { $set: { video_uri } }
+      { $set: { video_uri, meeting_status: "inactive" } }
     );
 
     // Update video_uri in the other collection
     const otherCollection = db.collection("meetings");
     const otherMeeting = await otherCollection.findOneAndUpdate(
       { meetingId },
-      { $set: { video_uri } }
+      { $set: { video_uri, meeting_status: "Recorded" } }
     );
 
     // Close MongoDB client

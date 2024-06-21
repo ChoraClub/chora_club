@@ -5,7 +5,7 @@ import "./globals.css";
 import { NextUIProvider } from "@nextui-org/react";
 import SidebarMain from "@/components/MainSidebar/SidebarMain";
 import RootProviders from "./providers/root-providers";
-import HuddleContextProvider from "@/components/ClientComponents/HuddleContextProvider";
+import HuddleContextProvider from "@/context/HuddleContextProvider";
 import { useEffect } from "react";
 import FeedbackTile from "@/components/utils/FeedbackTile";
 import Script from "next/script";

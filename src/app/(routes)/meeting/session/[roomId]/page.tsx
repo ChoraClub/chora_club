@@ -1,77 +1,179 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-
-// Components
-import BottomBar from "@/components/BottomBar/BottomBar";
-import Sidebar from "@/components/Sidebar/Sidebar";
-import GridLayout from "@/components/GridLayout/GridLayout";
-import Prompts from "@/components/common/Prompts";
+import RemotePeer from "@/components/remotePeer";
+import { useStudioState } from "@/store/studioState";
+import { BasicIcons } from "@/utils/BasicIcons";
 import {
-  useRoom,
-  useLocalPeer,
-  usePeerIds,
-  useHuddle01,
   useDataMessage,
+  useDevices,
+  useLocalAudio,
+  useLocalMedia,
+  useLocalPeer,
+  useLocalScreenShare,
+  useLocalVideo,
+  usePeerIds,
+  useRoom,
 } from "@huddle01/react/hooks";
-import { usePathname } from "next/navigation";
-import { useRouter } from "next-nprogress-bar";
-import AcceptRequest from "@/components/Modals/AcceptRequest";
-import useStore from "@/components/store/slices";
-import { toast } from "react-hot-toast";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import BottomBar from "@/components/bottomBar";
+import { Button } from "@/components/ui/button";
+import { PeerMetadata } from "@/utils/types";
+import ChatBar from "@/components/sidebars/ChatBar/chatbar";
+import ParticipantsBar from "@/components/sidebars/participantsSidebar/participantsBar";
+import Video from "@/components/Media/Video";
 import { Role } from "@huddle01/server-sdk/auth";
-import Chat from "@/components/Chat/Chat";
-import { useAccount } from "wagmi";
+import clsx from "clsx";
+import GridContainer from "@/components/GridContainer";
+// import ShowCaptions from "@/components/Caption/showCaptions";
+import RemoteScreenShare from "@/components/remoteScreenShare";
+import Camera from "@/components/Media/Camera";
 import AttestationModal from "@/components/utils/AttestationModal";
+import { useAccount } from "wagmi";
 import { TailSpin } from "react-loader-spinner";
 import Link from "next/link";
-import { PiRecordFill } from "react-icons/pi";
 import { Tooltip } from "@nextui-org/react";
-import copy from "copy-to-clipboard";
+import { PiRecordFill } from "react-icons/pi";
 
-// import Chat from '@/components/Chat/Chat';
-
-const Home = ({ params }: { params: { roomId: string } }) => {
+export default function Component({ params }: { params: { roomId: string } }) {
+  const { isVideoOn, enableVideo, disableVideo, stream } = useLocalVideo();
+  const {
+    isAudioOn,
+    enableAudio,
+    disableAudio,
+    stream: audioStream,
+  } = useLocalAudio();
+  const { fetchStream } = useLocalMedia();
+  const { setPreferredDevice: setCamPrefferedDevice } = useDevices({
+    type: "cam",
+  });
+  const { setPreferredDevice: setAudioPrefferedDevice } = useDevices({
+    type: "mic",
+  });
+  const {
+    name,
+    isChatOpen,
+    isParticipantsOpen,
+    addChatMessage,
+    activeBg,
+    videoDevice,
+    audioInputDevice,
+    layout,
+    isScreenShared,
+    avatarUrl,
+  } = useStudioState();
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const { peerIds } = usePeerIds({
+    roles: [Role.HOST, Role.GUEST],
+  });
+  const [isCopied, setIsCopied] = useState(false);
+  const router = useRouter();
+  const { peerId } = useLocalPeer();
+  const { metadata, role } = useLocalPeer<PeerMetadata>();
+  const { videoTrack, shareStream } = useLocalScreenShare();
+  const [modalOpen, setModalOpen] = useState(false);
+  const [hostAddress, setHostAddress] = useState();
+  const { address } = useAccount();
   const { push } = useRouter();
-  // const { changePeerRole } = useAcl();
-  const [requestedPeerId, setRequestedPeerId] = useState("");
-  const { showAcceptRequest, setShowAcceptRequest } = useStore();
-  const addChatMessage = useStore((state) => state.addChatMessage);
-  const addRequestedPeers = useStore((state) => state.addRequestedPeers);
-  const removeRequestedPeers = useStore((state) => state.removeRequestedPeers);
-  const requestedPeers = useStore((state) => state.requestedPeers);
-  const avatarUrl = useStore((state) => state.avatarUrl);
-  const userDisplayName = useStore((state) => state.userDisplayName);
-  const isChatOpen = useStore((state) => state.isChatOpen);
-  const { updateMetadata, metadata, peerId, role } = useLocalPeer<{
+  const [isAllowToEnter, setIsAllowToEnter] = useState<boolean>();
+  const [notAllowedMessage, setNotAllowedMessage] = useState<string>();
+  const [videoStreamTrack, setVideoStreamTrack] = useState<any>("");
+  const { state } = useRoom({
+    onLeave: async () => {
+      setModalOpen(true);
+    },
+  });
+
+  const { updateMetadata } = useLocalPeer<{
     displayName: string;
     avatarUrl: string;
     isHandRaised: boolean;
   }>();
-  const { peerIds } = usePeerIds();
 
-  const { huddleClient } = useHuddle01();
+  // useDataMessage({
+  //   async onMessage(payload, from, label) {
+  //     if (label === "chat") {
+  //       const { message, name } = JSON.parse(payload);
+  //       addChatMessage({
+  //         name: name,
+  //         text: message,
+  //         isUser: from === peerId,
+  //       });
+  //     }
+  //     if (label === "file") {
+  //       const { message, fileName, name } = JSON.parse(payload);
+  //       // fetch file from message and display it
+  //       addChatMessage({
+  //         name: name,
+  //         text: message,
+  //         isUser: from === peerId,
+  //         fileName,
+  //       });
+  //     }
+  //     if (label === "server-message") {
+  //       const { s3URL } = JSON.parse(payload);
+  //       alert(`Your recording: ${s3URL}`);
+  //     }
+  //   },
+  // });
 
-  const { address } = useAccount();
+  useEffect(() => {
+    if (videoRef.current && stream) {
+      videoRef.current.srcObject = stream;
+    }
+  }, [stream]);
 
-  const [isAllowToEnter, setIsAllowToEnter] = useState<boolean>();
-  const [notAllowedMessage, setNotAllowedMessage] = useState<string>();
-  const [meetingDetailsVisible, setMeetingDetailsVisible] = useState(true);
+  useEffect(() => {
+    if (state === "idle") {
+      router.push(`${params.roomId}/lobby`);
+    }
+  }, [state]);
 
-  const path = usePathname();
+  useEffect(() => {
+    setCamPrefferedDevice(videoDevice.deviceId);
+    if (isVideoOn) {
+      disableVideo();
+      const changeVideo = async () => {
+        const { stream } = await fetchStream({
+          mediaDeviceKind: "cam",
+        });
+        if (stream) {
+          await enableVideo(stream);
+        }
+      };
+      changeVideo();
+    }
+  }, [videoDevice]);
 
-  const [modalOpen, setModalOpen] = useState(false);
+  useEffect(() => {
+    setAudioPrefferedDevice(audioInputDevice.deviceId);
+    if (isAudioOn) {
+      disableAudio();
+      const changeAudio = async () => {
+        const { stream } = await fetchStream({
+          mediaDeviceKind: "mic",
+        });
+        if (stream) {
+          enableAudio(stream);
+        }
+      };
+      changeAudio();
+    }
+  }, [audioInputDevice]);
 
   const handleModalClose = () => {
     setModalOpen(false);
-    push(`/meeting/session/${params.roomId}/lobby`);
+    if (address === hostAddress) {
+      push(`/profile/${address}?active=sessions&session=hosted`);
+    } else {
+      push(`/profile/${address}?active=sessions&session=attended`);
+    }
   };
-
-  const { state } = useRoom({
-    onLeave: () => {
-      setModalOpen(true);
-    },
-  });
 
   useEffect(() => {
     const myHeaders = new Headers();
@@ -93,6 +195,10 @@ const Home = ({ params }: { params: { roomId: string } }) => {
       try {
         const response = await fetch("/api/verify-meeting-id", requestOptions);
         const result = await response.json();
+
+        if (result.success) {
+          setHostAddress(result.data.host_address);
+        }
 
         if (result.success) {
           if (result.message === "Meeting has ended") {
@@ -135,14 +241,14 @@ const Home = ({ params }: { params: { roomId: string } }) => {
       return;
     } else {
       updateMetadata({
-        displayName: userDisplayName,
+        displayName: name,
         avatarUrl: avatarUrl,
         isHandRaised: metadata?.isHandRaised || false,
       });
 
-      if (role === "listener" || role === "speaker") {
+      if (role === "guest") {
         // Get the attendee address based on the role
-        const attendeeAddress = role === "listener" ? address : peerId;
+        const attendeeAddress = role === "guest" ? address : peerId;
         let uniqueAddresses = new Set();
         let attendees = [];
 
@@ -179,115 +285,160 @@ const Home = ({ params }: { params: { roomId: string } }) => {
     }
   }, [isAllowToEnter]);
 
-  useDataMessage({
-    onMessage(payload, from, label) {
-      if (label === "requestToSpeak") {
-        setShowAcceptRequest(true);
-        setRequestedPeerId(from);
-        addRequestedPeers(from);
-        setTimeout(() => {
-          setShowAcceptRequest(false);
-        }, 5000);
-      }
-
-      if (label === "chat" && from !== peerId) {
-        const messagePayload = JSON.parse(payload);
-        const newChatMessage = {
-          name: messagePayload.name,
-          text: messagePayload.message,
-          is_user: false,
-        };
-        addChatMessage(newChatMessage);
-      }
-    },
-  });
-
   useEffect(() => {
-    if (!requestedPeers.includes(requestedPeerId)) {
-      setShowAcceptRequest(false);
-    }
-  }, [requestedPeers]);
-
-  const handleCopy = (link: string) => {
-    copy(link);
-    toast("Meeting link Copied");
-  };
+    setVideoStreamTrack(videoTrack && new MediaStream([videoTrack]));
+    console.log("videoTrack", videoTrack);
+  }, [videoTrack]);
 
   return (
     <>
       {isAllowToEnter ? (
-        <section className="bg-white flex h-screen text-slate-100 flex-col justify-between overflow-hidden">
-          <>
-            <div className="flex w-full h-[90%] pb-4 relative">
-              <div className="absolute top-5 left-5">
-                <Tooltip
-                  showArrow
-                  content={
-                    <div className="font-poppins">
-                      This meeting is being recorded
-                    </div>
-                  }
-                  placement="right"
-                  className="rounded-md bg-opacity-90 max-w-96"
-                  closeDelay={1}
-                >
-                  <span>
-                    <PiRecordFill color="#c42727" size={22} />
-                  </span>
-                </Tooltip>
-              </div>
-              <GridLayout />
-              <Sidebar />
-              <div className="absolute right-4 bottom-20">
-                {Role.HOST
-                  ? showAcceptRequest && (
-                      <AcceptRequest peerId={requestedPeerId} />
-                    )
-                  : null}
-              </div>
-              {isChatOpen && <Chat />}
-              {/* {meetingDetailsVisible && (
-              <div className="absolute bottom-20 bg-white shadow-md p-4 rounded-lg text-black">
-                <div className="flex justify-between items-center mb-2">
-                  <h3 className="text-lg font-semibold">
-                    Your meeting&apos;s ready
-                  </h3>
-                  <button
-                    onClick={() => setMeetingDetailsVisible(false)}
-                    className="p-2 hover:bg-slate-100 hover:rounded-full"
-                  >
-                    <RxCross2 size={20} />
-                  </button>
-                </div>
-
-                <div className="pb-3 text-sm">
-                  Or share this meeting link with others that you want in the
-                  meeting
-                </div>
-
-                <div className="flex mb-2 bg-slate-100 rounded-sm px-2 py-1 justify-between items-center">
-                  <div>{"https://app.chora.club" + path}</div>
-                  <div className="pl-5 cursor-pointer">
-                    <IoCopy
-                      onClick={() =>
-                        handleCopy("https://app.chora.club" + `${path}`)
-                      }
-                    />
+        <div className={clsx("flex flex-col h-screen bg-white")}>
+          <header className="flex items-center justify-between pt-4 px-4">
+            <h1 className="text-black text-xl font-semibold">ChoraClub</h1>
+            <div className="flex items-center justify-center gap-4">
+              <Tooltip
+                showArrow
+                content={
+                  <div className="font-poppins">
+                    This meeting is being recorded
                   </div>
-                </div>
+                }
+                placement="left"
+                className="rounded-md bg-opacity-90 max-w-96"
+                closeDelay={1}
+              >
+                <span>
+                  <PiRecordFill color="#c42727" size={22} />
+                </span>
+              </Tooltip>
 
-                <div className="text-sm py-2">Joined in as {address}</div>
+              <div className="flex space-x-3">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button className="flex gap-2 bg-gray-600/50 text-gray-200 hover:bg-gray-500/50">
+                      {BasicIcons.invite}
+                      Invite
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <div className="flex space-x-2">
+                      <span className="p-2 bg-gray-200 rounded-lg text-black">
+                        {typeof window !== "undefined" &&
+                          `http://${window.location.host}/${params.roomId}`}
+                      </span>
+                      <Button
+                        className="bg-gray-200 hover:bg-gray-300 text-gray-900"
+                        onClick={() => {
+                          if (typeof window === "undefined") return;
+                          navigator.clipboard.writeText(
+                            `http://${window.location.host}/${params.roomId}`
+                          );
+                          setIsCopied(true);
+                          setTimeout(() => {
+                            setIsCopied(false);
+                          }, 3000);
+                        }}
+                      >
+                        {isCopied ? "Copied" : "Copy"}
+                      </Button>
+                    </div>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
-            )} */}
             </div>
-
-            <BottomBar />
-            <Prompts />
-          </>
-          {/* {modalOpen && (
-            <AttestationModal isOpen={modalOpen} onClose={handleModalClose} />
-          )} */}
-        </section>
+          </header>
+          <main
+            className={`transition-all ease-in-out flex items-center justify-center flex-1 duration-300 w-full h-[80%] p-2`}
+            style={{
+              backgroundColor: activeBg === "bg-white" ? "white" : undefined,
+              backgroundImage:
+                activeBg === "bg-white" ? undefined : `url(${activeBg})`,
+              backgroundPosition: "center",
+              backgroundSize: "cover",
+              backgroundRepeat: "no-repeat",
+            }}
+          >
+            <div className="flex w-full h-full">
+              {shareStream && (
+                <div className="w-3/4">
+                  <GridContainer className="w-full h-full">
+                    <>
+                      <Video
+                        stream={videoStreamTrack}
+                        name={metadata?.displayName ?? "guest"}
+                      />
+                    </>
+                  </GridContainer>
+                </div>
+              )}
+              {peerIds.map((peerId) => (
+                <RemoteScreenShare key={peerId} peerId={peerId} />
+              ))}
+              <section
+                className={clsx(
+                  "justify-center px-4",
+                  isScreenShared
+                    ? "flex flex-col w-1/4 gap-2"
+                    : "flex flex-wrap gap-3 w-full"
+                )}
+              >
+                {role !== Role.BOT && (
+                  <GridContainer
+                    className={clsx(
+                      isScreenShared ? "w-full h-full gap-y-2 mx-1" : "w-[49%]"
+                    )}
+                  >
+                    {metadata?.isHandRaised && (
+                      <span className="absolute top-4 right-4 text-4xl text-gray-200 font-medium">
+                        ✋
+                      </span>
+                    )}
+                    {stream ? (
+                      <>
+                        <Camera
+                          stream={stream}
+                          name={metadata?.displayName ?? "guest"}
+                        />
+                      </>
+                    ) : (
+                      // <div className="flex w-24 h-24 rounded-full">
+                      //   {metadata?.avatarUrl ? (
+                      //     <Image src={metadata?.avatarUrl} width={6} />
+                      //   ) : (
+                      <div className="flex w-24 h-24 rounded-full text-3xl font-semibold items-center justify-center bg-[#004DFF] text-gray-200">
+                        {name[0]?.toUpperCase()}
+                      </div>
+                      //   )}
+                      // </div>
+                    )}
+                    <span className="absolute bottom-4 left-4 text-gray-800 font-medium">
+                      {`${metadata?.displayName} (You)`}
+                    </span>
+                  </GridContainer>
+                )}
+                {isScreenShared
+                  ? peerIds
+                      .slice(0, 2)
+                      .map((peerId) => (
+                        <RemotePeer key={peerId} peerId={peerId} />
+                      ))
+                  : peerIds.map((peerId) => (
+                      <RemotePeer key={peerId} peerId={peerId} />
+                    ))}
+              </section>
+              {/* <MainGridLayout params={params} /> */}
+            </div>
+            {isChatOpen && <ChatBar />}
+            {isParticipantsOpen && <ParticipantsBar />}
+          </main>
+          {/* <ShowCaptions
+        mediaStream={audioStream}
+        name={metadata?.displayName}
+        localPeerId={peerId}
+      /> */}
+          <BottomBar />
+        </div>
       ) : (
         <>
           {notAllowedMessage ? (
@@ -339,5 +490,4 @@ const Home = ({ params }: { params: { roomId: string } }) => {
       )}
     </>
   );
-};
-export default Home;
+}

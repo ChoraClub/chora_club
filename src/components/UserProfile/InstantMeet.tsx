@@ -64,15 +64,12 @@ function InstantMeet({ isDelegate, selfDelegate, daoName }: instantMeetProps) {
 
   const startInstantMeet = async () => {
     setConfirmSave(true);
-    const res = await fetch(
-      "https://api-choraclub.vercel.app/api/create-room",
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const res = await fetch(`${process.env.NEXT_PUBLIC_CREATE_ROOM_ENDPOINT}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
     const result = await res.json();
     const roomId = await result.data;
     console.log("Instant meet: ", roomId);
@@ -114,6 +111,7 @@ function InstantMeet({ isDelegate, selfDelegate, daoName }: instantMeetProps) {
         // setIsScheduled(true);
         setConfirmSave(false);
         router.push(`/meeting/session/${roomId}/lobby`);
+        onClose();
       }
     } catch (error) {
       setConfirmSave(false);

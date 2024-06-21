@@ -2,7 +2,7 @@ import { BasicIcons } from "@/assets/BasicIcons";
 import { cn } from "@/components/utils/helpers";
 import React from "react";
 import { useDataMessage, useLocalPeer } from "@huddle01/react/hooks";
-import useStore from "@/components/store/slices";
+import useStore from "@/store/slices";
 
 type peerMetaData = {
   displayName: string;

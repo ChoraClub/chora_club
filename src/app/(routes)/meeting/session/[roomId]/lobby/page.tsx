@@ -14,7 +14,7 @@ import FeatCommon from "@/components/common/FeatCommon";
 import AvatarWrapper from "@/components/common/AvatarWrapper";
 
 // Store
-import useStore from "@/components/store/slices";
+import { useStudioState } from "@/store/studioState";
 
 // Hooks
 import {
@@ -40,10 +40,10 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
   // Local States
   console.log("params", params);
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const avatarUrl = useStore((state) => state.avatarUrl);
-  const setAvatarUrl = useStore((state) => state.setAvatarUrl);
-  const setUserDisplayName = useStore((state) => state.setUserDisplayName);
-  const userDisplayName = useStore((state) => state.userDisplayName);
+  // const avatarUrl = useStore((state) => state.avatarUrl);
+  // const setAvatarUrl = useStore((state) => state.setAvatarUrl);
+  // const setUserDisplayName = useStore((state) => state.setUserDisplayName);
+  // const userDisplayName = useStore((state) => state.userDisplayName);
   const [token, setToken] = useState<string>("");
   const [isJoining, setIsJoining] = useState<boolean>(false);
   const { updateMetadata, metadata, peerId, role } = useLocalPeer<{
@@ -51,6 +51,8 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
     avatarUrl: string;
     isHandRaised: boolean;
   }>();
+
+  const { name, setName, avatarUrl, setAvatarUrl } = useStudioState();
 
   const { address, isDisconnected } = useAccount();
   const [isLoading, setIsLoading] = useState(true);
@@ -110,7 +112,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
           const requestBody = {
             roomId: params.roomId,
             role: "host",
-            displayName: address,
+            displayName: name,
             address: address, // assuming you have userAddress defined somewhere
           };
           try {
@@ -281,7 +283,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
 
         if (Array.isArray(resultData)) {
           const filtered: any = resultData.filter((data) => {
-            return data.daoName === dao && data.displayName !== "";
+            return data.displayName !== "";
           });
           console.log("filtered profile: ", filtered);
           setProfileDetails(filtered[0]);
@@ -290,7 +292,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
           if (imageCid) {
             setAvatarUrl(`https://gateway.lighthouse.storage/ipfs/${imageCid}`);
           }
-          setUserDisplayName(filtered[0].displayName);
+          setName(filtered[0].displayName);
         }
 
         if (resultData.length === 0) {
@@ -304,9 +306,9 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
           setIsLoading(false);
 
           if (resultData.ensName !== null) {
-            setUserDisplayName(resultData.ensName);
+            setName(resultData.ensName);
           } else {
-            setUserDisplayName(formattedAddress);
+            setName(formattedAddress);
           }
         }
       } catch (error) {
@@ -316,6 +318,20 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
     fetchData();
   }, []);
 
+  // useEffect(() => {
+  //   const handleBeforeUnload = (event: any) => {
+  //     const message = "Are you sure you want to leave?";
+  //     event.returnValue = message; // Standard way to display an alert in modern browsers
+  //     return message; // For some older browsers
+  //   };
+
+  //   window.addEventListener("beforeunload", handleBeforeUnload);
+
+  //   return () => {
+  //     window.removeEventListener("beforeunload", handleBeforeUnload);
+  //   };
+  // }, []);
+
   const formattedAddress = address?.slice(0, 6) + "..." + address?.slice(-4);
 
   return (
@@ -324,17 +340,17 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
         <div className="h-screen">
           {popupVisibility && (
             <div className="flex items-center justify-center">
-              <div className="absolute bg-white text-[#3E3D3D] flex justify-center items-center py-2 font-poppins font-semibold w-1/4 rounded-md top-6 drop-shadow-xl">
-                <div className="flex absolute left-2">
+              <div className="absolute bg-white text-[#3E3D3D] flex items-center py-2 pl-5 font-poppins font-semibold w-1/4 rounded-md top-6 drop-shadow-xl">
+                <div className="flex gap-3">
                   <Image
                     alt="record-left"
                     width={25}
                     height={25}
                     src={record}
-                    className="w-5 h-5 ml-2"
+                    className="w-5 h-5"
                   />
+                  <div className="">This meeting is being recorded.</div>
                 </div>
-                <div className="">This meeting is being recorded.</div>
                 <div className="flex absolute right-2">
                   <button
                     onClick={() => setPopupVisibility(false)}
@@ -359,13 +375,13 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
                     quality={100}
                     priority
                   />
-                  <video
+                  {/* <video
                     src={avatarUrl}
                     muted
                     className="maskAvatar absolute left-1/2 top-1/2 z-10 h-full w-full -translate-x-1/2 -translate-y-1/2"
                     // autoPlay
                     loop
-                  />
+                  /> */}
                   <button
                     onClick={() => setIsOpen((prev) => !prev)}
                     type="button"
@@ -391,11 +407,11 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
                             height={45}
                             loading="lazy"
                             className="object-contain cursor-pointer"
-                            onClick={() => {
-                              setAvatarUrl(
-                                `https://gateway.lighthouse.storage/ipfs/${profileDetails.image}`
-                              );
-                            }}
+                            // onClick={() => {
+                            //   setAvatarUrl(
+                            //     `https://gateway.lighthouse.storage/ipfs/${profileDetails.image}`
+                            //   );
+                            // }}
                           />
                         )}
                         {Array.from({ length: 20 }).map((_, i) => {

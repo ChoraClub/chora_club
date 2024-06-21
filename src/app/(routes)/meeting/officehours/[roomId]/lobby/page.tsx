@@ -16,7 +16,7 @@ import FeatCommon from "@/components/common/FeatCommon";
 import AvatarWrapper from "@/components/common/AvatarWrapper";
 
 // Store
-import useStore from "@/components/store/slices";
+// import useStore from "@/components/store/slices";
 
 // Hooks
 import {
@@ -31,16 +31,17 @@ import { Role } from "@huddle01/server-sdk/auth";
 import { Oval, TailSpin } from "react-loader-spinner";
 import Link from "next/link";
 import ConnectWalletWithENS from "@/components/ConnectWallet/ConnectWalletWithENS";
+import { useStudioState } from "@/store/studioState";
 
 type lobbyProps = {};
 
 const Lobby = ({ params }: { params: { roomId: string } }) => {
   // Local States
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const avatarUrl = useStore((state) => state.avatarUrl);
-  const setAvatarUrl = useStore((state) => state.setAvatarUrl);
-  const setUserDisplayName = useStore((state) => state.setUserDisplayName);
-  const userDisplayName = useStore((state) => state.userDisplayName);
+  // const avatarUrl = useStore((state) => state.avatarUrl);
+  // const setAvatarUrl = useStore((state) => state.setAvatarUrl);
+  // const setUserDisplayName = useStore((state) => state.setUserDisplayName);
+  // const userDisplayName = useStore((state) => state.userDisplayName);
   const [token, setToken] = useState<string>("");
   const [isJoining, setIsJoining] = useState<boolean>(false);
   const { updateMetadata, metadata, peerId, role } = useLocalPeer<{
@@ -48,6 +49,8 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
     avatarUrl: string;
     isHandRaised: boolean;
   }>();
+
+  const { name, setName, avatarUrl, setAvatarUrl } = useStudioState();
 
   const { address, isDisconnected } = useAccount();
 
@@ -66,7 +69,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
     } else {
       // const userDisplayName = "demoNamefromDemo";
 
-      if (userDisplayName.length === 0) {
+      if (name.length === 0) {
         toast.error("Display name is required!");
         setIsJoining(false);
         return;
@@ -78,7 +81,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
           const requestBody = {
             roomId: params.roomId,
             role: "host",
-            displayName: address,
+            displayName: name,
             address: address, // assuming you have userAddress defined somewhere
           };
           try {
@@ -291,9 +294,9 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
                     />
                   </div>
                   <input
-                    value={userDisplayName}
+                    value={name}
                     onChange={(e) => {
-                      setUserDisplayName(e.target.value);
+                      setName(e.target.value);
                     }}
                     type="text"
                     placeholder="Enter your name"
