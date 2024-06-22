@@ -65,6 +65,9 @@ function Sidebar() {
           CONNECT WALLET
         </h1>
       ),
+      locale: {
+        skip: <p className="font-poppins font-semibold text-[13px]">Skip</p>,
+      },
     },
     {
       target: ".dao",
@@ -80,6 +83,9 @@ function Sidebar() {
           EXPLORE DAOs
         </h1>
       ),
+      locale: {
+        skip: <p className="font-poppins font-semibold text-[13px]">Skip</p>,
+      },
     },
     {
       target: ".office",
@@ -95,6 +101,9 @@ function Sidebar() {
           OFFICE HOURS
         </h1>
       ),
+      locale: {
+        skip: <p className="font-poppins font-semibold text-[13px]">Skip</p>,
+      },
     },
     {
       target: ".session",
@@ -110,6 +119,9 @@ function Sidebar() {
           SESSIONS
         </h1>
       ),
+      locale: {
+        skip: <p className="font-poppins font-semibold text-[13px]">Skip</p>,
+      },
     },
     {
       target: ".gitbook",
@@ -125,6 +137,9 @@ function Sidebar() {
           GITBOOK DOC
         </h1>
       ),
+      locale: {
+        skip: <p className="font-poppins font-semibold text-[13px]">Skip</p>,
+      },
     },
     {
       target: "body",
@@ -136,7 +151,9 @@ function Sidebar() {
       disableBeacon: true,
       placement: "center" as Placement,
       bodyClass: "tour-step-background",
-      locale: { skip: "Skip" },
+      locale: {
+        skip: <p className="font-poppins font-semibold text-[13px]">Skip</p>,
+      },
       // title: (
       //   <h1 className="text-blue-shade-100 text-left font-semibold text-xl font-poppins ml-[10px]">
       //     PROFILE
