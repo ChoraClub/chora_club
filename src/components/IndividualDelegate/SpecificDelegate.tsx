@@ -37,6 +37,7 @@ import { getEnsNameOfUser } from "../ConnectWallet/ENSResolver";
 import DelegateTileModal from "../utils/delegateTileModal";
 // import { cacheExchange, createClient, fetchExchange, gql } from "urql/core";
 import { set } from "video.js/dist/types/tech/middleware";
+import { fetchEnsAvatar } from "@/utils/ENSUtils";
 
 interface Type {
   daoDelegates: string;
@@ -473,8 +474,8 @@ if (props.daoDelegates === "arbitrum") {
 
   useEffect(() => {
     const fetchEnsName = async () => {
-      const ensName = await getEnsNameOfUser(props.individualDelegate);
-      setDisplayEnsName(ensName);
+      const ensName = await fetchEnsAvatar(props.individualDelegate);
+      setDisplayEnsName(ensName?.ensName);
     };
     fetchEnsName();
   }, [chain, props.individualDelegate]);
