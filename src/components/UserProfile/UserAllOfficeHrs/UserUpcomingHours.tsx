@@ -18,6 +18,7 @@ import { RiDeleteBin5Line } from "react-icons/ri";
 import { FaSpinner } from "react-icons/fa"; // Importing the spinner icon
 import { Oval } from "react-loader-spinner";
 import toast, { Toaster } from "react-hot-toast";
+import SessionTileSkeletonLoader from "@/components/SkeletonLoader/SessionTileSkeletonLoader";
 
 interface SessionDetail {
   img: any;
@@ -202,16 +203,7 @@ function UserUpcomingHours() {
     <div>
       <div className="space-y-6">
         {pageLoading ? (
-          <div className="flex items-center justify-center">
-            <Oval
-              visible={true}
-              height="40"
-              width="40"
-              color="#0500FF"
-              secondaryColor="#cdccff"
-              ariaLabel="oval-loading"
-            />
-          </div>
+          <SessionTileSkeletonLoader            />
         ) : sessionDetails.length > 0 ? (
           sessionDetails.map((data, index) => (
             <div

@@ -42,6 +42,7 @@ interface SessionData {
 import Head from "next/head";
 import { getEnsName, getEnsNameOfUser } from "../ConnectWallet/ENSResolver";
 import RecordedSessionsTile from "../utils/RecordedSessionsTile";
+import RecordedSessionsSkeletonLoader from "../SkeletonLoader/RecordedSessionsSkeletonLoader";
 
 function RecordedSessions() {
   // const parseISO = dateFns;
@@ -266,16 +267,7 @@ function RecordedSessions() {
         </div>
 
         {isLoading ? (
-          <div className="flex items-center justify-center m-6">
-            <Oval
-              visible={true}
-              height="40"
-              width="40"
-              color="#0500FF"
-              secondaryColor="#cdccff"
-              ariaLabel="oval-loading"
-            />
-          </div>
+          <RecordedSessionsSkeletonLoader/>
         ) :
          meetingData && meetingData.length > 0 ? (
          
@@ -305,5 +297,4 @@ function RecordedSessions() {
   );
 }
 
-export default RecordedSessions;   
-
+export default RecordedSessions;  

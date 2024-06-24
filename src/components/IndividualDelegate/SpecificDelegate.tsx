@@ -30,6 +30,7 @@ import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
 import { getEnsNameOfUser } from "../ConnectWallet/ENSResolver";
 import { cacheExchange, createClient, fetchExchange, gql } from "urql/core";
 import { set } from "video.js/dist/types/tech/middleware";
+import MainProfileSkeletonLoader from "../SkeletonLoader/MainProfileSkeletonLoader";
 
 interface Type {
   daoDelegates: string;
@@ -402,16 +403,7 @@ if (props.daoDelegates === "arbitrum") {
   return (
     <>
       {isPageLoading && (
-        <div className="flex items-center justify-center pt-10">
-          <Oval
-            visible={true}
-            height="40"
-            width="40"
-            color="#0500FF"
-            secondaryColor="#cdccff"
-            ariaLabel="oval-loading"
-          />
-        </div>
+        <MainProfileSkeletonLoader/>
       )}
       {!(isPageLoading || (!isDelegate && !selfDelegate)) ? (
         <div className="font-poppins">
