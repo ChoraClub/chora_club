@@ -371,7 +371,7 @@ function DelegateInfo({ props, desc }: { props: Type; desc: string }) {
               ariaLabel="oval-loading"
             />
           </div>
-        ) : desc !== "" ? (
+        ) : desc !== "" && desc !== null ? (
           desc
         ) :props.daoDelegates === 'optimism' && opAgoraDescription ? ( // Check for opAgoraDescription
           renderParagraphs(opAgoraDescription)
