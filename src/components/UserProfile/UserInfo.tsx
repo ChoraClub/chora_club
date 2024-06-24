@@ -273,8 +273,7 @@ function UserInfo({
               ? "text-[#3E3D3D] font-bold"
               : "text-[#7C7C7C]"
           } `}
-          onClick={() => fetchAttestation("onchain")}
-        >
+          onClick={() => fetchAttestation("onchain")}>
           Onchain
         </button>
         <button
@@ -283,8 +282,7 @@ function UserInfo({
               ? "text-[#3E3D3D] font-bold"
               : "text-[#7C7C7C]"
           }`}
-          onClick={() => fetchAttestation("offchain")}
-        >
+          onClick={() => fetchAttestation("offchain")}>
           Offchain
         </button>
       </div>
@@ -294,8 +292,7 @@ function UserInfo({
             <div
               key={index}
               className={`bg-[#3E3D3D] text-white rounded-2xl px-3 py-7 cursor-pointer`}
-              onClick={() => router.push(`${key.ref}`)}
-            >
+              onClick={() => router.push(`${key.ref}`)}>
               <div className="font-semibold text-3xl text-center pb-2">
                 {isSessionHostedLoading &&
                 isSessionAttendedLoading &&
@@ -324,8 +321,7 @@ function UserInfo({
       <div
         style={{ boxShadow: "0px 4px 30.9px 0px rgba(0, 0, 0, 0.12)" }}
         className={`flex flex-col justify-between min-h-48 rounded-xl my-7 me-32 p-3 
-        ${isEditing ? "outline" : ""}`}
-      >
+        ${isEditing ? "outline" : ""}`}>
         <textarea
           readOnly={!isEditing}
           className="outline-none min-h-48"
@@ -339,8 +335,7 @@ function UserInfo({
           {isEditing && (
             <button
               className="bg-blue-shade-100 text-white text-sm py-1 px-3 rounded-full font-semibold"
-              onClick={handleSaveClick}
-            >
+              onClick={handleSaveClick}>
               {loading ? "Saving" : "Save"}
             </button>
           )}
@@ -348,8 +343,7 @@ function UserInfo({
           {!isEditing && (
             <button
               className="bg-blue-shade-100 text-white text-sm py-1 px-4 mt-3 rounded-full font-semibold"
-              onClick={() => setEditing(true)}
-            >
+              onClick={() => setEditing(true)}>
               Edit
             </button>
           )}

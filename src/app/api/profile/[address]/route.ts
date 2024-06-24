@@ -19,12 +19,12 @@ type network_details = {
   dao_name: string;
   network: string;
   discourse: string;
+  description: string;
 };
 
 interface DelegateRequestBody {
   address: string;
   image: string;
-  description: string;
   isDelegate: boolean;
   displayName: string;
   emailId: string;
@@ -62,7 +62,6 @@ interface DelegateResponseBody {
     id: string;
     address: string;
     image: string;
-    description: string;
     isDelegate: boolean;
     displayName: string;
     emailId: string;
