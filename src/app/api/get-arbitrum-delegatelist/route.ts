@@ -17,7 +17,11 @@ export const GET = async (req: NextRequest) => {
             account {
               address
               ens
+              picture
             }
+            statement{
+              statement
+           }
             delegatorsCount
             votesCount
           }
@@ -39,6 +43,7 @@ export const GET = async (req: NextRequest) => {
                 account {
                   address,
                   ens
+                  picture
                 }
                 votesCount
               }

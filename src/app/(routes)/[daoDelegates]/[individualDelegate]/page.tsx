@@ -37,16 +37,32 @@ export async function generateMetadata({
   );
 
   // const avatar = (await fetchEnsAvatar(params.individualDelegate)) || IMAGE_URL;
+  // const [avatar] = await Promise.all([
+  //   fetchEnsAvatar(params.individualDelegate),
+  // ]);
+  // console.log("avatar...", avatar);
+  // const dao_name = params.daoDelegates;
+  // const tokenName = "Optimism";
+  
+  // const imgParams = [
+  //   avatar ? `avatar=${encodeURIComponent(avatar.avatar)}` : null,
+  //   dao_name ? `dao_name=${encodeURIComponent(dao_name)}` : null,
+  // ].filter((param): param is string => param !== null);
+  
+  const defaultAvatar = IMAGE_URL; // Provide a default value for avatar
   const [avatar] = await Promise.all([
-    await fetchEnsAvatar(params.individualDelegate),
+    fetchEnsAvatar(params.individualDelegate),
   ]);
+  console.log("avatar...", avatar);
   const dao_name = params.daoDelegates;
   const tokenName = "Optimism";
-
+  
   const imgParams = [
-    avatar && `avatar=${encodeURIComponent(avatar)}`,
-    dao_name && `dao_name=${encodeURIComponent(dao_name)}`,
-  ];
+    avatar ? `avatar=${encodeURIComponent(avatar?.avatar ?? defaultAvatar)}` : null, // Use nullish coalescing operator to provide a default value for avatar
+    dao_name ? `dao_name=${encodeURIComponent(dao_name)}` : null,
+  ].filter((param): param is string => param !== null);
+  
+  console.log("imgParams...", imgParams);
   // .filter(Boolean);
 
   const preview = `${BASE_URL}/api/images/og/ccTest?${imgParams.join(

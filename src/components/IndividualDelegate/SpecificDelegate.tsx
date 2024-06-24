@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import user from "@/assets/images/daos/profile.png";
 import { FaXTwitter, FaDiscord, FaGithub } from "react-icons/fa6";
 import { BiSolidMessageRoundedDetail } from "react-icons/bi";
@@ -16,21 +16,29 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { useRouter } from "next-nprogress-bar";
 import Link from "next/link";
 import toast, { Toaster } from "react-hot-toast";
-// import { Provider, cacheExchange, createClient, fetchExchange } from "urql";
+import {
+  Provider,
+  cacheExchange,
+  createClient,
+  fetchExchange,
+  gql,
+} from "urql";
 import WalletAndPublicClient from "@/helpers/signer";
 import dao_abi from "../../artifacts/Dao.sol/GovernanceToken.json";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
+// import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useConnectModal, useChainModal } from "@rainbow-me/rainbowkit";
-import { useNetwork } from "wagmi";
+import { useAccount, useNetwork } from "wagmi";
 import OPLogo from "@/assets/images/daos/op.png";
 import ArbLogo from "@/assets/images/daos/arbCir.png";
 import ccLogo from "@/assets/images/daos/CC.png";
 import { Oval } from "react-loader-spinner";
 import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
 import { getEnsNameOfUser } from "../ConnectWallet/ENSResolver";
-import { cacheExchange, createClient, fetchExchange, gql } from "urql/core";
+import DelegateTileModal from "../utils/delegateTileModal";
+// import { cacheExchange, createClient, fetchExchange, gql } from "urql/core";
 import { set } from "video.js/dist/types/tech/middleware";
 import MainProfileSkeletonLoader from "../SkeletonLoader/MainProfileSkeletonLoader";
+import { fetchEnsAvatar } from "@/utils/ENSUtils";
 
 interface Type {
   daoDelegates: string;
@@ -53,6 +61,20 @@ query MyQuery($delegate: String!) {
 }
 `;
 
+
+const DELEGATE_CHANGED_QUERY = gql`
+  query MyQuery($delegator: String!) {
+    delegateChangeds(
+      orderBy: blockTimestamp
+      orderDirection: desc
+      where: { delegator: $delegator }
+      first: 1
+    ) {
+      toDelegate
+    }
+  }
+`;
+
 function SpecificDelegate({ props }: { props: Type }) {
   const { publicClient, walletClient } = WalletAndPublicClient();
   const { chain, chains } = useNetwork();
@@ -61,6 +83,7 @@ function SpecificDelegate({ props }: { props: Type }) {
   const [delegateInfo, setDelegateInfo] = useState<any>();
   const router = useRouter();
   const path = usePathname();
+  const { openConnectModal } = useConnectModal();
   console.log(path);
   const searchParams = useSearchParams();
   const [selfDelegate, setSelfDelegate] = useState<boolean>();
@@ -73,6 +96,65 @@ function SpecificDelegate({ props }: { props: Type }) {
   const [description, setDescription] = useState("");
   // const provider = new ethers.BrowserProvider(window?.ethereum);
   const [displayEnsName, setDisplayEnsName] = useState<string>();
+  const [delegate, setDelegate] = useState("");
+  const [same, setSame] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const [delegateOpen, setDelegateOpen] = useState(false);
+  const address = useAccount();
+  const { isConnected } = useAccount();
+
+  const handleDelegateModal = async () => {
+  
+      if (!isConnected) {
+        if (openConnectModal) {
+          openConnectModal();
+        }
+      } else {
+        console.log(address);
+        setDelegateOpen(true);
+        setLoading(true);
+        try {
+          const { data } = await client.query(DELEGATE_CHANGED_QUERY, {
+            delegator: address,
+          });
+          // const ens = await getEnsNameOfUser(
+          //   data.delegateChangeds[0]?.toDelegate
+          // );
+          const delegate = data.delegateChangeds[0]?.toDelegate;
+          console.log("individualDelegate", props.individualDelegate);
+          setSame(delegate === props.individualDelegate);
+          // ens
+            // ? setDelegate(ens)
+            // : 
+            setDelegate(delegate.slice(0, 6) + "..." + delegate.slice(-4));
+          setError(null);
+        } catch (err: any) {
+          setError(err.message);
+        } finally {
+          setLoading(false);
+        }
+
+        setDelegateOpen(true);
+      }
+    
+  };
+  const handleCloseDelegateModal = () => {
+    setDelegateOpen(false);
+  };
+  useEffect(() => {
+    // Lock scrolling when the modal is open
+    if (delegateOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [delegateOpen]);
   const [votingPower,setVotingPower] = useState<number>();
 
   const [karmaSocials, setKarmaSocials] = useState({
@@ -394,8 +476,8 @@ if (props.daoDelegates === "arbitrum") {
 
   useEffect(() => {
     const fetchEnsName = async () => {
-      const ensName = await getEnsNameOfUser(props.individualDelegate);
-      setDisplayEnsName(ensName);
+      const ensName = await fetchEnsAvatar(props.individualDelegate);
+      setDisplayEnsName(ensName?.ensName);
     };
     fetchEnsName();
   }, [chain, props.individualDelegate]);
@@ -602,9 +684,11 @@ if (props.daoDelegates === "arbitrum") {
                 <div className="pt-2">
                   <button
                     className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
-                    onClick={() =>
-                      handleDelegateVotes(`${props.individualDelegate}`)
-                    }
+                    // onClick={() =>
+                    //   handleDelegateVotes(`${props.individualDelegate}`)
+                    // }
+
+                    onClick={handleDelegateModal}
                   >
                     Delegate
                   </button>
@@ -689,6 +773,38 @@ if (props.daoDelegates === "arbitrum") {
             </div>
           </div>
         )
+      )}
+      {console.log("Delegate", delegate)}
+      {delegateOpen && (
+        <DelegateTileModal
+          isOpen={delegateOpen}
+          closeModal={handleCloseDelegateModal}
+          handleDelegateVotes={() =>
+            handleDelegateVotes(`${props.individualDelegate}`)
+          }
+          fromDelegate={delegate ? delegate : "N/A"}
+          delegateName={
+            delegateInfo?.ensName ||
+            displayEnsName || (
+              // displayName ||
+              <>
+                {props.individualDelegate.slice(0, 6)}...
+                {props.individualDelegate.slice(-4)}
+              </>
+            )
+          }
+          displayImage={
+            displayImage
+              ? `https://gateway.lighthouse.storage/ipfs/${displayImage}`
+              : delegateInfo?.profilePicture ||
+                (props.daoDelegates === "optimism"
+                  ? OPLogo
+                  : props.daoDelegates === "arbitrum"
+                  ? ArbLogo
+                  : ccLogo)
+          }
+          addressCheck={same}
+        />
       )}
     </>
   );
