@@ -48,7 +48,6 @@
     "react-icons": "^5.2.1",
     "react-loader-spinner": "^6.1.6",
     "react-quill": "^2.0.0",
-    "react-quilljs": "^2.0.0",
     "siwe": "^2.3.2",
     "tailwindcss-scrollbar": "^0.1.0",
     "urql": "^4.0.6",
