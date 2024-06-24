@@ -4,6 +4,7 @@ import { useRouter } from "next-nprogress-bar";
 import text1 from "@/assets/images/daos/texture1.png";
 import Tile from "../utils/Tile";
 import { Oval } from "react-loader-spinner";
+import SessionTileSkeletonLoader from "../SkeletonLoader/SessionTileSkeletonLoader";
 
 interface Type {
   daoDelegates: string;
@@ -171,16 +172,7 @@ function DelegateOfficeHrs({ props }: { props: Type }) {
         <div className="py-10">
           {searchParams.get("hours") === "ongoing" &&
             (dataLoading ? (
-              <div className="flex items-center justify-center">
-                <Oval
-                  visible={true}
-                  height="40"
-                  width="40"
-                  color="#0500FF"
-                  secondaryColor="#cdccff"
-                  ariaLabel="oval-loading"
-                />
-              </div>
+              <SessionTileSkeletonLoader/>
             ) : (
               <Tile
                 sessionDetails={sessionDetails}
@@ -191,16 +183,7 @@ function DelegateOfficeHrs({ props }: { props: Type }) {
             ))}
           {searchParams.get("hours") === "upcoming" &&
             (dataLoading ? (
-              <div className="flex items-center justify-center">
-                <Oval
-                  visible={true}
-                  height="40"
-                  width="40"
-                  color="#0500FF"
-                  secondaryColor="#cdccff"
-                  ariaLabel="oval-loading"
-                />
-              </div>
+              <SessionTileSkeletonLoader/>
             ) : (
               <Tile
                 sessionDetails={sessionDetails}
@@ -211,16 +194,7 @@ function DelegateOfficeHrs({ props }: { props: Type }) {
             ))}
           {searchParams.get("hours") === "hosted" &&
             (dataLoading ? (
-              <div className="flex items-center justify-center">
-                <Oval
-                  visible={true}
-                  height="40"
-                  width="40"
-                  color="#0500FF"
-                  secondaryColor="#cdccff"
-                  ariaLabel="oval-loading"
-                />
-              </div>
+              <SessionTileSkeletonLoader/>
             ) : (
               <Tile
                 sessionDetails={sessionDetails}
@@ -231,16 +205,7 @@ function DelegateOfficeHrs({ props }: { props: Type }) {
             ))}
           {searchParams.get("hours") === "attended" &&
             (dataLoading ? (
-              <div className="flex items-center justify-center">
-                <Oval
-                  visible={true}
-                  height="40"
-                  width="40"
-                  color="#0500FF"
-                  secondaryColor="#cdccff"
-                  ariaLabel="oval-loading"
-                />
-              </div>
+              <SessionTileSkeletonLoader/>
             ) : (
               <Tile
                 sessionDetails={sessionDetails}

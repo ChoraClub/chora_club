@@ -16,6 +16,7 @@ import WatchLeaderBoard from "./WatchLeaderBoard";
 import WatchFreeCollect from "./WatchFreeCollect";
 import WatchVideoRecommendation from "./WatchVideoRecommendation";
 import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
+import WatchComponentSkeletonLoader from "../SkeletonLoader/WatchComponentSkeletonLoader";
 
 interface AttestationObject {
   attendee_address: string;
@@ -111,16 +112,7 @@ function WatchComponentMain({ props }: { props: { id: string } }) {
           </div>
         </div>
       ) : (
-        <div className="flex items-center justify-center mt-5">
-          <Oval
-            visible={true}
-            height="40"
-            width="40"
-            color="#0500FF"
-            secondaryColor="#cdccff"
-            ariaLabel="oval-loading"
-          />
-        </div>
+    <WatchComponentSkeletonLoader/>
       )}
     </>
   );

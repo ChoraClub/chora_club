@@ -50,6 +50,7 @@ function ConnectWalletWithENS() {
                 userSelect: "none",
               },
             })}
+            className="wallet"
           >
             {(() => {
               if (!connected) {

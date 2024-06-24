@@ -1,9 +1,17 @@
-// import { useRouter } from "next/navigation";
 import { useRouter } from "next-nprogress-bar";
 import React, { ChangeEvent, useState, useEffect } from "react";
 import { Oval, RotatingLines } from "react-loader-spinner";
 import { useAccount } from "wagmi";
 import { useNetwork } from "wagmi";
+import 'react-quill/dist/quill.snow.css';
+import './quillCustomStyles.css'; 
+
+import dynamic from 'next/dynamic';
+
+const ReactQuill = dynamic(
+  () => import('react-quill').then((mod) => mod.default),
+  { ssr: false }
+);
 
 interface userInfoProps {
   description: string;
@@ -53,6 +61,39 @@ function UserInfo({
   let officehoursAttendingCount = 0;
   let dao_name = daoName;
   const [activeButton, setActiveButton] = useState("onchain");
+
+
+  const [originalDesc, setOriginalDesc] = useState(description || karmaDesc);
+  
+  useEffect(() => {
+    // Check if the window object exists (client-side)
+    if (typeof window !== 'undefined') {
+      // Access document object here
+      console.log('document name ', document.title);
+    }
+  }, []);
+
+  const toolbarOptions = [
+    ['bold', 'italic', 'underline', 'strike'], 
+    ['blockquote', 'code-block'],
+
+    [{ header: 1 }, { header: 2 }], 
+    [{ list: 'ordered' }, { list: 'bullet' }],
+    [{ script: 'sub' }, { script: 'super' }], 
+    [{ indent: '-1' }, { indent: '+1' }], 
+    [{ direction: 'rtl' }], 
+
+    [{ size: ['small', false, 'large', 'huge'] }], 
+    [{ header: [1, 2, 3, 4, 5, 6, false] }],
+
+    [{ color: [] }, { background: [] }], 
+    [{ font: [] }],
+    [{ align: [] }],
+
+    ['clean'], 
+
+    ['link', 'image', 'video'], 
+  ];
 
   const fetchAttestation = async (buttonType: string) => {
     let sessionHostingCount = 0;
@@ -225,19 +266,9 @@ function UserInfo({
 
   const blocks = [
     {
-      number: sessionHostCount,
-      desc: "Sessions hosted",
-      ref: `/profile/${address}}?active=sessions&session=hosted`,
-    },
-    {
       number: sessionAttendCount,
       desc: "Sessions attended",
       ref: `/profile/${address}}?active=sessions&session=attended`,
-    },
-    {
-      number: officehoursHostCount,
-      desc: "Office Hours hosted",
-      ref: `/profile/${address}}?active=officeHours&hours=attended`,
     },
     {
       number: officehoursAttendCount,
@@ -246,9 +277,31 @@ function UserInfo({
     },
   ];
 
-  const handleDescChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
-    setTempDesc(event.target.value);
-    console.log("Temp Desc", event.target.value);
+  if (isDelegate === true || isSelfDelegate === true) {
+    blocks.unshift(
+      {
+        number: sessionHostCount,
+        desc: "Sessions hosted",
+        ref: `/profile/${address}}?active=sessions&session=hosted`,
+      },
+      {
+        number: officehoursHostCount,
+        desc: "Office Hours hosted",
+        ref: `/profile/${address}}?active=officeHours&hours=attended`,
+      }
+    );
+  }
+
+  // const handleDescChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+  //   setTempDesc(event.target.value);
+  //   console.log("Temp Desc", event.target.value);
+  // };
+
+  const handleDescChange = (value: string, delta: any, source: any, editor: any) => {
+    // Update the tempDesc state with the new value
+    setTempDesc(value);
+    console.log("Temp Desc", value);
+    // setEditing(true);
   };
 
   const handleSaveClick = async () => {
@@ -258,6 +311,16 @@ function UserInfo({
     setEditing(false);
     setLoading(false);
   };
+
+  const handleCancelClick = () => {
+    setTempDesc(originalDesc); // Restore the original description
+    setEditing(false); // Set isEditing to false
+  };
+
+  useEffect(() => {
+    setOriginalDesc(description || karmaDesc); // Update originalDesc whenever description or karmaDesc changes
+    setTempDesc(description || karmaDesc);
+  }, [description, karmaDesc]);
 
   return (
     <div className="pt-4">
@@ -288,16 +351,8 @@ function UserInfo({
           blocks.map((key, index) => (
             <div
               key={index}
-              className={`bg-[#3E3D3D] text-white rounded-2xl px-3 py-7 ${
-                isDelegate === true || isSelfDelegate === true
-                  ? "cursor-pointer"
-                  : ""
-              }`}
-              onClick={
-                isSelfDelegate === true || isDelegate === true
-                  ? () => router.push(`${key.ref}`)
-                  : undefined
-              }
+              className={`bg-[#3E3D3D] text-white rounded-2xl px-3 py-7 cursor-pointer`}
+              onClick={() => router.push(`${key.ref}`)}
             >
               <div className="font-semibold text-3xl text-center pb-2">
                 {isSessionHostedLoading &&
@@ -329,26 +384,46 @@ function UserInfo({
         className={`flex flex-col justify-between min-h-48 rounded-xl my-7 me-32 p-3 
         ${isEditing ? "outline" : ""}`}
       >
-        <textarea
+        
+          <ReactQuill
+            readOnly={!isEditing}
+            value={isEditing ? tempDesc :( description || karmaDesc)}
+            onChange={handleDescChange}
+            modules={{
+              toolbar: toolbarOptions,
+            }}
+            placeholder={"Type your description here ..."}
+          />
+       
+
+        {/* <textarea
           readOnly={!isEditing}
           className="outline-none min-h-48"
           onChange={handleDescChange}
           value={isEditing ? tempDesc : description || karmaDesc}
           placeholder={"Type your description here..."}
           // style={{height:"200px",width:"250px"}}
-        />
+        /> */}
 
         <div className="flex justify-end">
-          {isEditing && (
+          {isEditing ? (
+            <>
+            <button
+                className="bg-blue-shade-100 text-white text-sm py-1 px-3 rounded-full font-semibold mr-2"
+                onClick={handleCancelClick}
+              >
+                Cancel
+              </button>
             <button
               className="bg-blue-shade-100 text-white text-sm py-1 px-3 rounded-full font-semibold"
               onClick={handleSaveClick}
             >
               {loading ? "Saving" : "Save"}
             </button>
-          )}
+            </>
+          ):
 
-          {!isEditing && (
+          (
             <button
               className="bg-blue-shade-100 text-white text-sm py-1 px-4 mt-3 rounded-full font-semibold"
               onClick={() => setEditing(true)}

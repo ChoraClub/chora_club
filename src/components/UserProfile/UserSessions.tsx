@@ -13,6 +13,7 @@ import { useNetwork, useAccount } from "wagmi";
 import Tile from "../utils/Tile";
 import SessionTile from "../utils/SessionTiles";
 import { Oval } from "react-loader-spinner";
+import SessionTileSkeletonLoader from "../SkeletonLoader/SessionTileSkeletonLoader";
 
 interface UserSessionsProps {
   isDelegate: boolean | undefined;
@@ -52,6 +53,8 @@ function UserSessions({
   const [sessionDetails, setSessionDetails] = useState([]);
   const [dataLoading, setDataLoading] = useState(true);
   // const [daoName, setDaoName] = useState("");
+  const [attendedDetails, setAttendedDetails] = useState([]);
+  const [hostedDetails, setHostedDetails] = useState([]);
 
   let dao_name = "";
   const getUserMeetingData = async () => {
@@ -79,10 +82,12 @@ function UserSessions({
         console.log("attendedData", attendedData);
         setDataLoading(true);
         if (searchParams.get("session") === "hosted") {
-          setSessionDetails(hostedData);
+          // setSessionDetails(hostedData);
+          setHostedDetails(hostedData);
           console.log("in session hosted");
         } else if (searchParams.get("session") === "attended") {
-          setSessionDetails(attendedData);
+          // setSessionDetails(attendedData);
+          setAttendedDetails(attendedData);
         }
         setDataLoading(false);
       }
@@ -101,6 +106,8 @@ function UserSessions({
     chain,
     chain?.name,
     daoName,
+    hostedDetails,
+    attendedDetails,
   ]);
 
   // useEffect(() => {
@@ -200,19 +207,10 @@ function UserSessions({
           {selfDelegate === true &&
             searchParams.get("session") === "hosted" &&
             (dataLoading ? (
-              <div className="flex items-center justify-center">
-                <Oval
-                  visible={true}
-                  height="40"
-                  width="40"
-                  color="#0500FF"
-                  secondaryColor="#cdccff"
-                  ariaLabel="oval-loading"
-                />
-              </div>
+              <SessionTileSkeletonLoader/>
             ) : (
               <SessionTile
-                sessionDetails={sessionDetails}
+                sessionDetails={hostedDetails}
                 dataLoading={dataLoading}
                 isEvent="Recorded"
                 isOfficeHour={false}
@@ -221,19 +219,10 @@ function UserSessions({
             ))}
           {searchParams.get("session") === "attended" &&
             (dataLoading ? (
-              <div className="flex items-center justify-center">
-                <Oval
-                  visible={true}
-                  height="40"
-                  width="40"
-                  color="#0500FF"
-                  secondaryColor="#cdccff"
-                  ariaLabel="oval-loading"
-                />
-              </div>
+              <SessionTileSkeletonLoader/>
             ) : (
               <SessionTile
-                sessionDetails={sessionDetails}
+                sessionDetails={attendedDetails}
                 dataLoading={dataLoading}
                 isEvent="Recorded"
                 isOfficeHour={false}

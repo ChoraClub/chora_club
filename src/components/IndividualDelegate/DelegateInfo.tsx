@@ -8,6 +8,7 @@ import {
   RotatingLines,
   ThreeDots,
 } from "react-loader-spinner";
+import styles from './DelegateInfo.module.css'
 
 interface Type {
   daoDelegates: string;
@@ -225,8 +226,40 @@ function DelegateInfo({ props, desc }: { props: Type; desc: string }) {
       ref: `/${props.daoDelegates}/${props.individualDelegate}?active=officeHours&hours=attended`,
     },
   ];
+
+  const renderParagraphs = (text: string) => {
+    return text
+      .split("\n")
+      .filter((paragraph) => paragraph.trim() !== "")
+      .map((paragraph, index) => (
+        <p key={index} className="mb-3">
+          {paragraph}
+        </p>
+      ));
+  };
+
   useEffect(() => {
     const fetchData = async () => {
+      if(props.daoDelegates === 'arbitrum') {
+      try {
+        setLoadingKarma(true);
+        setLoading(true);
+        const res = await fetch(
+          `/api/get-arbitrum-delegatelist?user=${props.individualDelegate}`
+        );
+        const details = await res.json();
+        console.log("Details: ", details);
+        console.log("Desc: ", details.delegate.statement.statement);
+        setKarmaDescription(details.delegate.statement.statement);
+        setLoadingKarma(false);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setLoadingKarma(false);
+        setLoading(false);
+      }
+      setLoading(false);
+    }else{
       try {
         setLoading(true);
         setLoadingOpAgora(true);
@@ -257,44 +290,11 @@ function DelegateInfo({ props, desc }: { props: Type; desc: string }) {
         setLoadingOpAgora(false);
         setLoading(false);
       }
-    };
+      setLoading(false);
+    }
+  }
     fetchData();
   }, [props.individualDelegate]);
-
-  const renderParagraphs = (text: string) => {
-    return text
-      .split("\n")
-      .filter((paragraph) => paragraph.trim() !== "")
-      .map((paragraph, index) => (
-        <p key={index} className="mb-3">
-          {paragraph}
-        </p>
-      ));
-  };
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoadingKarma(true);
-        setLoading(true);
-        const res = await fetch(
-          `https://api.karmahq.xyz/api/forum-user/${props.daoDelegates}/delegate-pitch/${props.individualDelegate}`
-        );
-        const details = await res.json();
-        console.log("Desc: ", details.data.delegatePitch.customFields[1].value);
-        setKarmaDescription(details.data.delegatePitch.customFields[1].value);
-        setLoadingKarma(false);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        setLoadingKarma(false);
-        setLoading(false);
-      }
-      setLoading(false);
-    };
-
-    fetchData();
-  }, []);
 
   console.log("desc from karma: ", karmaDescription);
   console.log("desc from db: ", desc);
@@ -359,9 +359,13 @@ function DelegateInfo({ props, desc }: { props: Type; desc: string }) {
       <div
         style={{ boxShadow: "0px 4px 30.9px 0px rgba(0, 0, 0, 0.12)" }}
         className={`rounded-xl my-7 me-32 py-6 px-7 text-sm ${
-          desc && opAgoraDescription && karmaDescription ? "" : "min-h-52"
+          desc && loadingKarma && loadingOpAgora? "" : "min-h-52"
         }`}
       >
+        <div className="flex">
+
+        <h1 className={`text-3xl font-semibold mb-6 ${styles.heading}`}>Delegate Statement</h1>
+        </div>
         {loadingOpAgora || loadingKarma || loading ? (
           <div className="flex pt-6 justify-center">
             <ThreeDots
@@ -372,14 +376,53 @@ function DelegateInfo({ props, desc }: { props: Type; desc: string }) {
               ariaLabel="oval-loading"
             />
           </div>
-        ) : desc !== "" ? (
+        ) : desc !== "" && desc !== null ? (
           desc
         ) :props.daoDelegates === 'optimism' && opAgoraDescription ? ( // Check for opAgoraDescription
-          renderParagraphs(opAgoraDescription)
+          // renderParagraphs(opAgoraDescription)
+          <div
+      dangerouslySetInnerHTML={{
+        __html: opAgoraDescription
+          // // .replace(/### (.*)/g, '<h3>$1</h3><br/>')
+          // // .replace(/## (.*)/g, '<h2>$1</h2>')
+          // .replace(/\*\*\*\*(.*)\*\*\*\*/g, '<br/><strong>$1</strong><br/>')
+          // .replace(/\*\*(.*)\*\*/g, '<br/><strong>$1</strong><br/>')
+          // .replace(/- (.*)/g, '<li>$1</li>')
+          // // .replace(/\n/g, '<br />'),
+          // // .replace(/###\*\*(.*)\*\*/g, '<br/><h3><strong>$1<strong></h3><br/>')
+          // // .replace(/###\*\*\*\*(.*)\*\*\*\*/g, '<br/><h3><strong><strong>$1</strong></strong></h3><br/>')
+          // // .replace(/##\*\*\*\*(.*)\*\*\*\*/g, '<br/><h2><strong><strong>$1</strong></strong></h2><br/>')
+          // // .replace(/##\*\*(.*)\*\*/g, '<br/><h2><strong>$1<strong></h2><br/>')
+          // .replace(/### (.*)/g, '<br/><h3>$1</h3><br/>')
+          // .replace(/## (.*)/g, '<br/><h2>$1</h2><br/>')
+          // .replace(/\*(.*)/g, '<li>$1</li>')
+          // .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" style="text-decoration: underline;">$1</a>')
+
+
+          // .replace(/### (.*)/g, '<h3 style="font-size:22px">$1</h3>')
+          // .replace(/## (.*)/g, '<h2 style="font-size:22px">$1</h2>')
+          .replace(/### (.*?)\n/g, '<h3 style="font-size:18px;line-height:1;display:block;margin:0;font-weight:500">$1</h3>')
+.replace(/## (.*?)\n/g, '<h2 style="font-size:18px;line-height:1;display:block;margin:0;font-weight:600">$1</h2>')
+          .replace(/\*\*\*(.*)\*\*\*/g, '<strong>$1</strong>')
+          .replace(/\*\*(.*)\*\*/g, '<strong style="font-size:18px">$1</strong>')
+          .replace(/- (.*)/g, '<li>$1</li>')
+          .replace(/\* (.*)/g, '<li style="margin-top: 1rem;margin-bottom:-1rem">$1</li>')
+          .replace(
+            /\[(.*?)\]\((.*?)\)/g,
+            '<a href="$2" target="_blank" style="text-decoration: underline;">$1</a>'
+          )
+          .replace(/\n/g, '<br/>')
+          // .replace(/\*\*(.*)\*\*/g, '<strong>$1</strong>')
+          .replace(/\*([^*]*)\*/g, '<h2>$1</h2>')
+          .replace(/(\*{3})(.*)\1/g, '<strong>$2</strong>')
+          .replace(/(?<!<h3.*?>)\n(?!<\/h3>)/g, '<br/>')
+          .replace(/(?<!<h2.*?>)\n(?!<\/h2>)/g, '<br/>')
+      }}
+    />
         ) : karmaDescription ? (
-          karmaDescription
+          renderParagraphs(karmaDescription)
         ) : (
-          <div className="font-semibold text-base flex justify-center">
+          <div className="font-semibold text-base flex justify-center items-center">
             Delegate has not provided a description
           </div>
         )}

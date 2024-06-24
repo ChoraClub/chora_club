@@ -14,6 +14,7 @@ import { Oval } from "react-loader-spinner";
 import { Tooltip } from "@nextui-org/react";
 import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
 import { RxCross2 } from "react-icons/rx";
+import SessionTileSkeletonLoader from "../SkeletonLoader/SessionTileSkeletonLoader";
 
 interface Type {
   img: StaticImageData;
@@ -227,16 +228,7 @@ function DaoOfficeHours() {
         <div className="py-5">
           {searchParams.get("hours") === "ongoing" &&
             (dataLoading ? (
-              <div className="flex items-center justify-center">
-                <Oval
-                  visible={true}
-                  height="40"
-                  width="40"
-                  color="#0500FF"
-                  secondaryColor="#cdccff"
-                  ariaLabel="oval-loading"
-                />
-              </div>
+              <SessionTileSkeletonLoader/>            
             ) : (
               <Tile
                 sessionDetails={sessionDetails}
@@ -247,16 +239,7 @@ function DaoOfficeHours() {
             ))}
           {searchParams.get("hours") === "upcoming" &&
             (dataLoading ? (
-              <div className="flex items-center justify-center">
-                <Oval
-                  visible={true}
-                  height="40"
-                  width="40"
-                  color="#0500FF"
-                  secondaryColor="#cdccff"
-                  ariaLabel="oval-loading"
-                />
-              </div>
+              <SessionTileSkeletonLoader/>  
             ) : (
               <Tile
                 sessionDetails={sessionDetails}
@@ -267,16 +250,8 @@ function DaoOfficeHours() {
             ))}
           {searchParams.get("hours") === "recorded" &&
             (dataLoading ? (
-              <div className="flex items-center justify-center">
-                <Oval
-                  visible={true}
-                  height="40"
-                  width="40"
-                  color="#0500FF"
-                  secondaryColor="#cdccff"
-                  ariaLabel="oval-loading"
-                />
-              </div>
+              <SessionTileSkeletonLoader/>  
+
             ) : (
               <Tile
                 sessionDetails={sessionDetails}
