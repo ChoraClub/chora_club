@@ -33,7 +33,7 @@ import ArbLogo from "@/assets/images/daos/arbCir.png";
 import ccLogo from "@/assets/images/daos/CC.png";
 import { Oval } from "react-loader-spinner";
 import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
-import { getEnsNameOfUser } from "../ConnectWallet/ENSResolver";
+// import { getEnsNameOfUser } from "../ConnectWallet/ENSResolver";
 import DelegateTileModal from "../utils/delegateTileModal";
 // import { cacheExchange, createClient, fetchExchange, gql } from "urql/core";
 import { set } from "video.js/dist/types/tech/middleware";
