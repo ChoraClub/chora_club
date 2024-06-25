@@ -19,7 +19,7 @@ import { useConnectModal, useChainModal } from "@rainbow-me/rainbowkit";
 import dao_abi from "../../artifacts/Dao.sol/GovernanceToken.json";
 import { useAccount } from "wagmi";
 import WalletAndPublicClient from "@/helpers/signer";
-import { getEnsNameOfUser } from "../ConnectWallet/ENSResolver";
+// import { getEnsNameOfUser } from "../ConnectWallet/ENSResolver";
 import {
   processAddressOrEnsName,
   resolveENSProfileImage,

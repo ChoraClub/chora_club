@@ -40,7 +40,7 @@ interface SessionData {
   };
 }
 import Head from "next/head";
-import { getEnsName, getEnsNameOfUser } from "../ConnectWallet/ENSResolver";
+// import { getEnsName, getEnsNameOfUser } from "../ConnectWallet/ENSResolver";
 import RecordedSessionsTile from "../utils/RecordedSessionsTile";
 import RecordedSessionsSkeletonLoader from "../SkeletonLoader/RecordedSessionsSkeletonLoader";
 

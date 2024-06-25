@@ -31,13 +31,12 @@ function Sidebar() {
   // const [isClient, setIsClient] = useState(false);
   const [hasSeenTour, setHasSeenTour] = useState(true);
 
-
   const tourSteps = [
     {
       target: "body",
       content: (
         <p className="text-black-shade-1000 text-left font-normal text-base font-poppins">
-          Let's take a quick tour of Chora Club.
+          Let&apos;s take a quick tour of Chora Club.
         </p>
       ),
       disableBeacon: true,
@@ -145,7 +144,7 @@ function Sidebar() {
       target: "body",
       content: (
         <p className="text-black-shade-1000 text-left font-normal text-base font-poppins">
-          You're all set! Begin your web3 journey now.
+          You&apos;re all set! Begin your web3 journey now.
         </p>
       ),
       disableBeacon: true,
@@ -161,8 +160,6 @@ function Sidebar() {
       // ),
     },
   ];
-
- 
 
   const tourStyles = {
     options: {
@@ -274,7 +271,7 @@ function Sidebar() {
     updatedVisibility[index] = false;
     setBadgeVisibility(updatedVisibility);
   };
-  
+
   const closeTour = () => {
     setIsTourOpen(false);
     setHasSeenTour(true);
@@ -289,16 +286,15 @@ function Sidebar() {
     }
   }, []);
 
- 
   return (
     <>
-{!hasSeenTour && (
+      {!hasSeenTour && (
         <Joyride
           steps={tourSteps}
           run={isTourOpen}
-          callback={data => {
+          callback={(data) => {
             const { status } = data;
-            const finishedStatuses = ['finished', 'skipped'];
+            const finishedStatuses = ["finished", "skipped"];
             if (finishedStatuses.includes(status)) {
               closeTour();
             }
