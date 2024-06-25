@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
      const db = client.db("optimism-agora-delegate");
      const collection = db.collection("delegate_info");
      const response = await collection.findOne({ address: individualDelegate });
-       client.close();
+     client.close();  
         return new Response(JSON.stringify(response), { status: 200 });
   } catch (error) {
     console.error('Error fetching data:', error);

@@ -20,6 +20,7 @@ import OPLogo from "@/assets/images/daos/op.png";
 import ArbLogo from "@/assets/images/daos/arbCir.png";
 import "@/components/DelegateSessions/DelegateSessionsMain.module.css";
 import { getEnsNameOfUser } from "../ConnectWallet/ENSResolver";
+import AvailableSessionsSkeletonLoader from "../SkeletonLoader/AvailableSessionsSkeletonLoader";
 
 interface Type {
   ensName: string;
@@ -399,16 +400,10 @@ function AvailableSessions() {
 
       <div className="pt-8 font-poppins">
         {isPageLoading ? (
-          <div className="flex items-center justify-center m-6">
-            <Oval
-              visible={true}
-              height="40"
-              width="40"
-              color="#0500FF"
-              secondaryColor="#cdccff"
-              ariaLabel="oval-loading"
-            />
-          </div>
+
+    <AvailableSessionsSkeletonLoader/>
+  
+
         ) : daoInfo && daoInfo?.length > 0 ? (
           <div className="overflow-auto font-poppins grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 2xl:grid-cols-2 gap-12 py-5 px-10">
             {daoInfo.map((daos: any, index: number) => (

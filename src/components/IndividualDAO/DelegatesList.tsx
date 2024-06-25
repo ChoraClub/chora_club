@@ -25,8 +25,8 @@ import {
   resolveENSProfileImage,
   getMetaAddressOrEnsName,
   fetchEnsAvatar,
-} from "../../utils/ENSUtils";
-import { profile } from "console";
+} from "@/utils/ENSUtils";
+import DelegateListSkeletonLoader from "../SkeletonLoader/DelegateListSkeletonLoader";
 
 
 function DelegatesList({ props }: { props: string }) {
@@ -441,7 +441,7 @@ function DelegatesList({ props }: { props: string }) {
         >
           <input
             type="text"
-            placeholder="Search by Address"
+            placeholder="Search by Address or ENS Name"
             style={{ background: "rgba(238, 237, 237, 0.36)" }}
             className="pl-5 pr-3 rounded-full outline-none w-full"
             value={searchQuery}
@@ -468,19 +468,11 @@ function DelegatesList({ props }: { props: string }) {
 
       <div className="py-8 pe-10 font-poppins">
         {isPageLoading ? (
-          <div className="flex items-center justify-center">
-            <Oval
-              visible={true}
-              height="40"
-              width="40"
-              color="#0500FF"
-              secondaryColor="#cdccff"
-              ariaLabel="oval-loading"
-            />
-          </div>
-        ) : delegateData.delegates?.length > 0 ? (
-          <div>
 
+          <DelegateListSkeletonLoader/>
+        ) : delegateData.delegates.length > 0 ? (
+          <div> 
+            
             <div className="grid min-[475px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-10">
               {console.log("data............", delegateData)}
               {delegateData.delegates.map((delegate: any, index: number) => (

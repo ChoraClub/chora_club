@@ -1,9 +1,17 @@
-// import { useRouter } from "next/navigation";
 import { useRouter } from "next-nprogress-bar";
 import React, { ChangeEvent, useState, useEffect } from "react";
 import { Oval, RotatingLines } from "react-loader-spinner";
 import { useAccount } from "wagmi";
 import { useNetwork } from "wagmi";
+import 'react-quill/dist/quill.snow.css';
+import './quillCustomStyles.css'; 
+
+import dynamic from 'next/dynamic';
+
+const ReactQuill = dynamic(
+  () => import('react-quill').then((mod) => mod.default),
+  { ssr: false }
+);
 
 interface userInfoProps {
   description: string;
@@ -53,6 +61,39 @@ function UserInfo({
   let officehoursAttendingCount = 0;
   let dao_name = daoName;
   const [activeButton, setActiveButton] = useState("onchain");
+
+
+  const [originalDesc, setOriginalDesc] = useState(description || karmaDesc);
+  
+  useEffect(() => {
+    // Check if the window object exists (client-side)
+    if (typeof window !== 'undefined') {
+      // Access document object here
+      console.log('document name ', document.title);
+    }
+  }, []);
+
+  const toolbarOptions = [
+    ['bold', 'italic', 'underline', 'strike'], 
+    ['blockquote', 'code-block'],
+
+    [{ header: 1 }, { header: 2 }], 
+    [{ list: 'ordered' }, { list: 'bullet' }],
+    [{ script: 'sub' }, { script: 'super' }], 
+    [{ indent: '-1' }, { indent: '+1' }], 
+    [{ direction: 'rtl' }], 
+
+    [{ size: ['small', false, 'large', 'huge'] }], 
+    [{ header: [1, 2, 3, 4, 5, 6, false] }],
+
+    [{ color: [] }, { background: [] }], 
+    [{ font: [] }],
+    [{ align: [] }],
+
+    ['clean'], 
+
+    ['link', 'image', 'video'], 
+  ];
 
   const fetchAttestation = async (buttonType: string) => {
     let sessionHostingCount = 0;
@@ -251,9 +292,16 @@ function UserInfo({
     );
   }
 
-  const handleDescChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
-    setTempDesc(event.target.value);
-    console.log("Temp Desc", event.target.value);
+  // const handleDescChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+  //   setTempDesc(event.target.value);
+  //   console.log("Temp Desc", event.target.value);
+  // };
+
+  const handleDescChange = (value: string, delta: any, source: any, editor: any) => {
+    // Update the tempDesc state with the new value
+    setTempDesc(value);
+    console.log("Temp Desc", value);
+    // setEditing(true);
   };
 
   const handleSaveClick = async () => {
@@ -263,6 +311,16 @@ function UserInfo({
     setEditing(false);
     setLoading(false);
   };
+
+  const handleCancelClick = () => {
+    setTempDesc(originalDesc); // Restore the original description
+    setEditing(false); // Set isEditing to false
+  };
+
+  useEffect(() => {
+    setOriginalDesc(description || karmaDesc); // Update originalDesc whenever description or karmaDesc changes
+    setTempDesc(description || karmaDesc);
+  }, [description, karmaDesc]);
 
   return (
     <div className="pt-4">
@@ -321,26 +379,47 @@ function UserInfo({
       <div
         style={{ boxShadow: "0px 4px 30.9px 0px rgba(0, 0, 0, 0.12)" }}
         className={`flex flex-col justify-between min-h-48 rounded-xl my-7 me-32 p-3 
-        ${isEditing ? "outline" : ""}`}>
-        <textarea
+        ${isEditing ? "outline" : ""}`}
+      >
+        
+          <ReactQuill
+            readOnly={!isEditing}
+            value={isEditing ? tempDesc :( description || karmaDesc)}
+            onChange={handleDescChange}
+            modules={{
+              toolbar: toolbarOptions,
+            }}
+            placeholder={"Type your description here ..."}
+          />
+       
+
+        {/* <textarea
           readOnly={!isEditing}
           className="outline-none min-h-48"
           onChange={handleDescChange}
           value={isEditing ? tempDesc : description || karmaDesc}
           placeholder={"Type your description here..."}
           // style={{height:"200px",width:"250px"}}
-        />
+        /> */}
 
         <div className="flex justify-end">
-          {isEditing && (
+          {isEditing ? (
+            <>
+            <button
+                className="bg-blue-shade-100 text-white text-sm py-1 px-3 rounded-full font-semibold mr-2"
+                onClick={handleCancelClick}
+              >
+                Cancel
+              </button>
             <button
               className="bg-blue-shade-100 text-white text-sm py-1 px-3 rounded-full font-semibold"
               onClick={handleSaveClick}>
               {loading ? "Saving" : "Save"}
             </button>
-          )}
+            </>
+          ):
 
-          {!isEditing && (
+          (
             <button
               className="bg-blue-shade-100 text-white text-sm py-1 px-4 mt-3 rounded-full font-semibold"
               onClick={() => setEditing(true)}>

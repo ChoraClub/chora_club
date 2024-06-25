@@ -37,6 +37,7 @@ import { getEnsNameOfUser } from "../ConnectWallet/ENSResolver";
 import DelegateTileModal from "../utils/delegateTileModal";
 // import { cacheExchange, createClient, fetchExchange, gql } from "urql/core";
 import { set } from "video.js/dist/types/tech/middleware";
+import MainProfileSkeletonLoader from "../SkeletonLoader/MainProfileSkeletonLoader";
 import { fetchEnsAvatar } from "@/utils/ENSUtils";
 
 interface Type {
@@ -48,18 +49,17 @@ const client = createClient({
   exchanges: [cacheExchange, fetchExchange],
 });
 const GET_LATEST_DELEGATE_VOTES_CHANGED = gql`
-query MyQuery($delegate: String!) {
-  delegateVotesChangeds(
-    first: 1
-    orderBy: blockTimestamp
-    orderDirection: desc
-    where: { delegate: $delegate }
-  ) {
-    newBalance
+  query MyQuery($delegate: String!) {
+    delegateVotesChangeds(
+      first: 1
+      orderBy: blockTimestamp
+      orderDirection: desc
+      where: { delegate: $delegate }
+    ) {
+      newBalance
+    }
   }
-}
 `;
-
 
 const DELEGATE_CHANGED_QUERY = gql`
   query MyQuery($delegator: String!) {
@@ -105,38 +105,37 @@ function SpecificDelegate({ props }: { props: Type }) {
   const { isConnected } = useAccount();
 
   const handleDelegateModal = async () => {
-  
-      if (!isConnected) {
-        if (openConnectModal) {
-          openConnectModal();
-        }
-      } else {
-        console.log(address);
-        setDelegateOpen(true);
-        setLoading(true);
-        try {
-          const { data } = await client.query(DELEGATE_CHANGED_QUERY, {
-            delegator: address,
-          });
-          const ens = await getEnsNameOfUser(
-            data.delegateChangeds[0]?.toDelegate
-          );
-          const delegate = data.delegateChangeds[0]?.toDelegate;
-          console.log("individualDelegate", props.individualDelegate);
-          setSame(delegate === props.individualDelegate);
-          ens
-            ? setDelegate(ens)
-            : setDelegate(delegate.slice(0, 6) + "..." + delegate.slice(-4));
-          setError(null);
-        } catch (err: any) {
-          setError(err.message);
-        } finally {
-          setLoading(false);
-        }
-
-        setDelegateOpen(true);
+    if (!isConnected) {
+      if (openConnectModal) {
+        openConnectModal();
       }
-    
+    } else {
+      console.log(address);
+      setDelegateOpen(true);
+      setLoading(true);
+      try {
+        const { data } = await client.query(DELEGATE_CHANGED_QUERY, {
+          delegator: address,
+        });
+        // const ens = await getEnsNameOfUser(
+        //   data.delegateChangeds[0]?.toDelegate
+        // );
+        const delegate = data.delegateChangeds[0]?.toDelegate;
+        console.log("individualDelegate", props.individualDelegate);
+        setSame(delegate === props.individualDelegate);
+        // ens
+        // ? setDelegate(ens)
+        // :
+        setDelegate(delegate.slice(0, 6) + "..." + delegate.slice(-4));
+        setError(null);
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+
+      setDelegateOpen(true);
+    }
   };
   const handleCloseDelegateModal = () => {
     setDelegateOpen(false);
@@ -153,7 +152,7 @@ function SpecificDelegate({ props }: { props: Type }) {
       document.body.style.overflow = "auto";
     };
   }, [delegateOpen]);
-  const [votingPower,setVotingPower] = useState<number>();
+  const [votingPower, setVotingPower] = useState<number>();
 
   const [karmaSocials, setKarmaSocials] = useState({
     twitter: "",
@@ -169,10 +168,9 @@ function SpecificDelegate({ props }: { props: Type }) {
     github: "",
   });
   const [delegatorsCount, setDelegatorsCount] = useState<number>();
-  const[votesCount,setVotesCount] = useState<number>();
+  const [votesCount, setVotesCount] = useState<number>();
 
-  const totalCount =
-   `query Delegate($input: DelegateInput!) {
+  const totalCount = `query Delegate($input: DelegateInput!) {
   delegate(input: $input) {
     id
     votesCount
@@ -180,31 +178,32 @@ function SpecificDelegate({ props }: { props: Type }) {
   }
 }
  `;
- const variables = {
-  input: {
-    address: `${props.individualDelegate}`,
-    governorId:"",
-    organizationId :null as number | null
+  const variables = {
+    input: {
+      address: `${props.individualDelegate}`,
+      governorId: "",
+      organizationId: null as number | null,
+    },
+  };
+  if (props.daoDelegates === "arbitrum") {
+    variables.input.governorId =
+      "eip155:42161:0x789fC99093B09aD01C34DC7251D0C89ce743e5a4";
+    variables.input.organizationId = 2206072050315953936;
+  } else {
+    variables.input.governorId =
+      "eip155:10:0xcDF27F107725988f2261Ce2256bDfCdE8B382B10";
+    variables.input.organizationId = 2206072049871356990;
   }
-};
-if (props.daoDelegates === "arbitrum") {
-  variables.input.governorId = "eip155:42161:0x789fC99093B09aD01C34DC7251D0C89ce743e5a4";
-  variables.input.organizationId = 2206072050315953936;
-}else{
-  variables.input.governorId = "eip155:10:0xcDF27F107725988f2261Ce2256bDfCdE8B382B10";
-  variables.input.organizationId = 2206072049871356990;
-}
- 
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const apiKey = process.env.NEXT_PUBLIC_TALLY_API_KEY;
-      console.log("API key", apiKey);
-          if (!apiKey) {
-            throw new Error('API key is missing');
-          }
-        fetch('https://api.tally.xyz/query', {
+        console.log("API key", apiKey);
+        if (!apiKey) {
+          throw new Error("API key is missing");
+        }
+        fetch("https://api.tally.xyz/query", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -212,22 +211,26 @@ if (props.daoDelegates === "arbitrum") {
           },
           body: JSON.stringify({
             query: totalCount,
-            variables: variables
+            variables: variables,
           }),
         })
-        .then(result => result.json())
-        .then(finalCounting => {
-          console.log(finalCounting);
-          console.log("dataa", finalCounting.data);
-          setVotesCount(finalCounting.data.delegate.votesCount);
-          setDelegatorsCount(finalCounting.data.delegate.delegatorsCount);
-        })
-        .catch(error => {
-          console.error('Error:', error);
-        });
+          .then((result) => result.json())
+          .then((finalCounting) => {
+            console.log(finalCounting);
+            console.log("dataa", finalCounting.data);
+            setVotesCount(finalCounting.data.delegate.votesCount);
+            setDelegatorsCount(finalCounting.data.delegate.delegatorsCount);
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
 
         console.log("Props", props.individualDelegate);
-        const data = await client.query(GET_LATEST_DELEGATE_VOTES_CHANGED, { delegate: props.individualDelegate.toString()}).toPromise();
+        const data = await client
+          .query(GET_LATEST_DELEGATE_VOTES_CHANGED, {
+            delegate: props.individualDelegate.toString(),
+          })
+          .toPromise();
         console.log("voting data", data.data.delegateVotesChangeds[0]);
         setVotingPower(data.data.delegateVotesChangeds[0].newBalance);
       } catch (error) {
@@ -239,7 +242,6 @@ if (props.daoDelegates === "arbitrum") {
       fetchData();
     }
   }, [client, props.individualDelegate]);
-
 
   useEffect(() => {
     console.log("Network", chain?.network);
@@ -445,6 +447,19 @@ if (props.daoDelegates === "arbitrum") {
             // setResponseFromDB(true);
             setDisplayImage(item.image);
             setDescription(item.description);
+            const matchingNetwork = item.networks.find(
+              (network: any) => network.dao_name === chain?.name
+            );
+
+            // If a matching network is found, set the discourse ID
+            if (matchingNetwork) {
+              setDescription(matchingNetwork.description);
+            } else {
+              // Handle the case where no matching network is found
+              console.log(
+                "No matching network found for the specified dao_name"
+              );
+            }
             setDisplayName(item.displayName);
             // setEmailId(item.emailId);
 
@@ -482,18 +497,7 @@ if (props.daoDelegates === "arbitrum") {
 
   return (
     <>
-      {isPageLoading && (
-        <div className="flex items-center justify-center pt-10">
-          <Oval
-            visible={true}
-            height="40"
-            width="40"
-            color="#0500FF"
-            secondaryColor="#cdccff"
-            ariaLabel="oval-loading"
-          />
-        </div>
-      )}
+      {isPageLoading && <MainProfileSkeletonLoader />}
       {!(isPageLoading || (!isDelegate && !selfDelegate)) ? (
         <div className="font-poppins">
           <div className="flex ps-14 py-5 justify-between">
@@ -510,8 +514,7 @@ if (props.daoDelegates === "arbitrum") {
                 style={{
                   backgroundColor: "#fcfcfc",
                   border: "2px solid #E9E9E9 ",
-                }}
-              >
+                }}>
                 <div className="w-40 h-40 flex items-center justify-content ">
                   <div className="flex justify-center items-center w-40 h-40">
                     <Image
@@ -573,8 +576,7 @@ if (props.daoDelegates === "arbitrum") {
                           : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                      target="_blank"
-                    >
+                      target="_blank">
                       <FaXTwitter color="#7C7C7C" size={12} />
                     </Link>
                     <Link
@@ -593,8 +595,7 @@ if (props.daoDelegates === "arbitrum") {
                           : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                      target="_blank"
-                    >
+                      target="_blank">
                       <BiSolidMessageRoundedDetail color="#7C7C7C" size={12} />
                     </Link>
                     <Link
@@ -609,8 +610,7 @@ if (props.daoDelegates === "arbitrum") {
                           : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                      target="_blank"
-                    >
+                      target="_blank">
                       <FaDiscord color="#7C7C7C" size={12} />
                     </Link>
                     <Link
@@ -625,8 +625,7 @@ if (props.daoDelegates === "arbitrum") {
                           : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                      target="_blank"
-                    >
+                      target="_blank">
                       <FaGithub color="#7C7C7C" size={12} />
                     </Link>
                   </div>
@@ -642,8 +641,7 @@ if (props.daoDelegates === "arbitrum") {
                     content="Copy"
                     placement="right"
                     closeDelay={1}
-                    showArrow
-                  >
+                    showArrow>
                     <span className="px-2 cursor-pointer" color="#3E3D3D">
                       <IoCopy
                         onClick={() => handleCopy(props.individualDelegate)}
@@ -669,8 +667,13 @@ if (props.daoDelegates === "arbitrum") {
                 <div className="flex gap-4 py-1">
                   <div className="text-[#4F4F4F] border-[0.5px] border-[#D9D9D9] rounded-md px-3 py-1">
                     <span className="text-blue-shade-200 font-semibold">
-                      {props.daoDelegates === "arbitrum" ? (votesCount?formatNumber(votesCount/10**18):0) 
-                          :(votingPower?formatNumber(votingPower/10**18):0)}
+                      {props.daoDelegates === "arbitrum"
+                        ? votesCount
+                          ? formatNumber(votesCount / 10 ** 18)
+                          : 0
+                        : votingPower
+                        ? formatNumber(votingPower / 10 ** 18)
+                        : 0}
                       &nbsp;
                     </span>
                     delegated tokens
@@ -679,13 +682,11 @@ if (props.daoDelegates === "arbitrum") {
                     Delegated from
                     <span className="text-blue-shade-200 font-semibold">
                       &nbsp;
-                      {delegatorsCount
-                        ? formatNumber(delegatorsCount)
-                        : 0}
+                      {delegatorsCount ? formatNumber(delegatorsCount) : 0}
                       &nbsp;
                     </span>
                     Addresses
-                  </div> 
+                  </div>
                 </div>
 
                 <div className="pt-2">
@@ -695,8 +696,7 @@ if (props.daoDelegates === "arbitrum") {
                     //   handleDelegateVotes(`${props.individualDelegate}`)
                     // }
 
-                    onClick={handleDelegateModal}
-                  >
+                    onClick={handleDelegateModal}>
                     Delegate
                   </button>
                 </div>
@@ -714,8 +714,7 @@ if (props.daoDelegates === "arbitrum") {
                   ? " border-blue-shade-200 text-blue-shade-200 font-semibold"
                   : "border-transparent"
               }`}
-              onClick={() => router.push(path + "?active=info")}
-            >
+              onClick={() => router.push(path + "?active=info")}>
               Info
             </button>
             <button
@@ -724,8 +723,7 @@ if (props.daoDelegates === "arbitrum") {
                   ? "text-blue-shade-200 font-semibold border-blue-shade-200"
                   : "border-transparent"
               }`}
-              onClick={() => router.push(path + "?active=pastVotes")}
-            >
+              onClick={() => router.push(path + "?active=pastVotes")}>
               Past Votes
             </button>
             <button
@@ -736,8 +734,7 @@ if (props.daoDelegates === "arbitrum") {
               }`}
               onClick={() =>
                 router.push(path + "?active=delegatesSession&session=book")
-              }
-            >
+              }>
               Sessions
             </button>
             <button
@@ -748,8 +745,7 @@ if (props.daoDelegates === "arbitrum") {
               }`}
               onClick={() =>
                 router.push(path + "?active=officeHours&hours=ongoing")
-              }
-            >
+              }>
               Office Hours
             </button>
           </div>

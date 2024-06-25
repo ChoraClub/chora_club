@@ -8,6 +8,7 @@ import {
   RotatingLines,
   ThreeDots,
 } from "react-loader-spinner";
+import styles from './DelegateInfo.module.css'
 
 interface Type {
   daoDelegates: string;
@@ -361,7 +362,11 @@ function DelegateInfo({ props, desc }: { props: Type; desc: string }) {
           desc && loadingKarma && loadingOpAgora? "" : "min-h-52"
         }`}
       >
-        {  loading ? (
+        <div className="flex">
+
+        <h1 className={`text-3xl font-semibold mb-6 ${styles.heading}`}>Delegate Statement</h1>
+        </div>
+        {loadingOpAgora || loadingKarma || loading ? (
           <div className="flex pt-6 justify-center">
             <ThreeDots
               visible={true}
@@ -374,11 +379,50 @@ function DelegateInfo({ props, desc }: { props: Type; desc: string }) {
         ) : desc !== "" && desc !== null ? (
           desc
         ) :props.daoDelegates === 'optimism' && opAgoraDescription ? ( // Check for opAgoraDescription
-          renderParagraphs(opAgoraDescription)
+          // renderParagraphs(opAgoraDescription)
+          <div
+      dangerouslySetInnerHTML={{
+        __html: opAgoraDescription
+          // // .replace(/### (.*)/g, '<h3>$1</h3><br/>')
+          // // .replace(/## (.*)/g, '<h2>$1</h2>')
+          // .replace(/\*\*\*\*(.*)\*\*\*\*/g, '<br/><strong>$1</strong><br/>')
+          // .replace(/\*\*(.*)\*\*/g, '<br/><strong>$1</strong><br/>')
+          // .replace(/- (.*)/g, '<li>$1</li>')
+          // // .replace(/\n/g, '<br />'),
+          // // .replace(/###\*\*(.*)\*\*/g, '<br/><h3><strong>$1<strong></h3><br/>')
+          // // .replace(/###\*\*\*\*(.*)\*\*\*\*/g, '<br/><h3><strong><strong>$1</strong></strong></h3><br/>')
+          // // .replace(/##\*\*\*\*(.*)\*\*\*\*/g, '<br/><h2><strong><strong>$1</strong></strong></h2><br/>')
+          // // .replace(/##\*\*(.*)\*\*/g, '<br/><h2><strong>$1<strong></h2><br/>')
+          // .replace(/### (.*)/g, '<br/><h3>$1</h3><br/>')
+          // .replace(/## (.*)/g, '<br/><h2>$1</h2><br/>')
+          // .replace(/\*(.*)/g, '<li>$1</li>')
+          // .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" style="text-decoration: underline;">$1</a>')
+
+
+          // .replace(/### (.*)/g, '<h3 style="font-size:22px">$1</h3>')
+          // .replace(/## (.*)/g, '<h2 style="font-size:22px">$1</h2>')
+          .replace(/### (.*?)\n/g, '<h3 style="font-size:18px;line-height:1;display:block;margin:0;font-weight:500">$1</h3>')
+.replace(/## (.*?)\n/g, '<h2 style="font-size:18px;line-height:1;display:block;margin:0;font-weight:600">$1</h2>')
+          .replace(/\*\*\*(.*)\*\*\*/g, '<strong>$1</strong>')
+          .replace(/\*\*(.*)\*\*/g, '<strong style="font-size:18px">$1</strong>')
+          .replace(/- (.*)/g, '<li>$1</li>')
+          .replace(/\* (.*)/g, '<li style="margin-top: 1rem;margin-bottom:-1rem">$1</li>')
+          .replace(
+            /\[(.*?)\]\((.*?)\)/g,
+            '<a href="$2" target="_blank" style="text-decoration: underline;">$1</a>'
+          )
+          .replace(/\n/g, '<br/>')
+          // .replace(/\*\*(.*)\*\*/g, '<strong>$1</strong>')
+          .replace(/\*([^*]*)\*/g, '<h2>$1</h2>')
+          .replace(/(\*{3})(.*)\1/g, '<strong>$2</strong>')
+          .replace(/(?<!<h3.*?>)\n(?!<\/h3>)/g, '<br/>')
+          .replace(/(?<!<h2.*?>)\n(?!<\/h2>)/g, '<br/>')
+      }}
+    />
         ) : karmaDescription ? (
           renderParagraphs(karmaDescription)
         ) : (
-          <div className="font-semibold text-base flex justify-center">
+          <div className="font-semibold text-base flex justify-center items-center">
             Delegate has not provided a description
           </div>
         )}
