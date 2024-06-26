@@ -14,7 +14,7 @@ export const GET = async (req: NextRequest) => {
   const id = searchParams.get('user');
   const currentPage = parseInt(searchParams.get('currentPage') || '1', 10);
   console.log("currentPage",currentPage)
-  const limit = 40;
+  const limit = 20;
   const skip = (currentPage) * limit;
   console.log("skip",skip)
   const client = new MongoClient(process.env.MONGODB_URI!);

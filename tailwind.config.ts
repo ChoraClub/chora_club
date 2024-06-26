@@ -38,6 +38,7 @@ const config: Config = {
         "black-shade-700": "#D9D9D9",
         "black-shade-800": "#EDEDED",
         "black-shade-900": "#B9B9B9",
+        "black-shade-1000": "#3E3D3D",
         "green-shade-100": "#00CE78",
         "green-shade-200": "#25d366",
 

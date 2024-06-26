@@ -11,7 +11,7 @@ import { useRouter } from "next-nprogress-bar";
 import Link from "next/link";
 import text1 from "@/assets/images/daos/texture1.png";
 import text2 from "@/assets/images/daos/texture2.png";
-import { getEnsName } from "../ConnectWallet/ENSResolver";
+// import { getEnsName } from "../ConnectWallet/ENSResolver";
 import {
   Modal,
   ModalContent,

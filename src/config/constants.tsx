@@ -4,10 +4,9 @@ export const DB_NAME =
     : process.env.PROD_DB;
 
 export const BASE_URL =
-  "https://e799-115-117-174-60.ngrok-free.app" || "http://localhost:3000";
-// process.env.NODE_ENV === "development"
-//   ? process.env.NEXT_PUBLIC_LOCAL_BASE_URL
-//   : process.env.NEXT_PUBLIC_HOSTED_BASE_URL;
+process.env.NODE_ENV === "development"
+  ? process.env.NEXT_PUBLIC_LOCAL_BASE_URL
+  : process.env.NEXT_PUBLIC_HOSTED_BASE_URL;
 
 export const SCHEMA_ID =
   process.env.NODE_ENV == "development"

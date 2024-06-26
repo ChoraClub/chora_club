@@ -1,0 +1,52 @@
+.joyride-beacon__outer {
+  display: none !important;
+}
+.react-joyride__tooltip{
+  border-radius: 20px !important;
+  padding: 20px 20px 10px 20px !important;
+}
+.__floater__body{
+  margin-top: -10px;
+  margin-left: 20px;
+}
+
+button[data-test-id="button-primary"] {
+  background-color: #004DFF !important; 
+  color: #ffffff !important; 
+  border-radius: 20px !important; 
+  padding: 13px 15px !important;
+  border: none !important;
+  font-weight: 500 !important;
+  font-family: 'poppins' !important;
+  margin-left: 3px !important;
+  margin-right: 10px !important;
+  transform: translateY(-10px);
+  font-size: 14px !important;
+}
+
+button[data-test-id="button-back"]{
+  background-color: white !important;
+  border-radius: 20px !important; 
+  padding: 12px 15px !important;
+  color: #004DFF !important;
+  border: 1px solid #004DFF !important;
+  font-weight: 500 !important;
+  font-family: 'poppins' !important;
+  transform: translateY(-10px);
+  font-size: 13px !important;
+  
+  /* margin-left: 40px !important; */
+}
+
+button[data-test-id="button-skip"]{
+  color: black !important;
+  font-weight: 500 !important;
+  font-family: 'poppins' !important;
+  transform: translateY(-10px);
+  font-size: 13px !important;
+}
+
+.tour-step-background .shepherd-element {
+  /* Add your background styles here */
+  background-color: rgba(0, 0, 0, 0.5) !important; /* Example: semi-transparent black background */
+}

@@ -9,6 +9,7 @@ import { useNetwork, useAccount } from "wagmi";
 import text1 from "@/assets/images/daos/texture1.png";
 import { Oval } from "react-loader-spinner";
 import { RxCross2 } from "react-icons/rx";
+import SessionTileSkeletonLoader from "../SkeletonLoader/SessionTileSkeletonLoader";
 
 interface UserOfficeHoursProps {
   isDelegate: boolean | undefined;
@@ -225,16 +226,7 @@ function UserOfficeHours({
 
           {searchParams.get("hours") === "hosted" &&
             (dataLoading ? (
-              <div className="flex items-center justify-center">
-                <Oval
-                  visible={true}
-                  height="40"
-                  width="40"
-                  color="#0500FF"
-                  secondaryColor="#cdccff"
-                  ariaLabel="oval-loading"
-                />
-              </div>
+              <SessionTileSkeletonLoader/>
             ) : (
               <Tile
                 sessionDetails={sessionDetails}
@@ -245,16 +237,7 @@ function UserOfficeHours({
             ))}
           {searchParams.get("hours") === "attended" &&
             (dataLoading ? (
-              <div className="flex items-center justify-center">
-                <Oval
-                  visible={true}
-                  height="40"
-                  width="40"
-                  color="#0500FF"
-                  secondaryColor="#cdccff"
-                  ariaLabel="oval-loading"
-                />
-              </div>
+              <SessionTileSkeletonLoader/>
             ) : (
               <Tile
                 sessionDetails={sessionDetails}

@@ -8,6 +8,8 @@ import { Oval } from "react-loader-spinner";
 import Image from "next/image";
 import VotedOnOptions from "@/assets/images/votedOnOption.png";
 import { Tooltip as NextUITooltip } from "@nextui-org/react";
+import ProposalVotedLeftSkeletonLoader from "../SkeletonLoader/ProposalVotedLeftSkeletonLoader";
+import ProposalVotedRightSkeletonLoader from "../SkeletonLoader/ProposalVotedRightSkeletonLoader";
 
 Chart.register(ArcElement, Tooltip, Legend);
 
@@ -285,16 +287,7 @@ function ProposalVoted({ daoName , address }: any) {
           className="col-span-2 space-y-4 p-10 rounded-xl"
         >
           {isPageLoading ? (
-            <div className="flex pt-6 justify-center">
-              <Oval
-                visible={true}
-                height="40"
-                width="40"
-                color="#0500FF"
-                secondaryColor="#cdccff"
-                ariaLabel="oval-loading"
-              />
-            </div>
+            <ProposalVotedLeftSkeletonLoader/>
           ) : first && !isPageLoading && pageData.length > 0 ? (
             <Doughnut
               data={chartData}
@@ -320,16 +313,9 @@ function ProposalVoted({ daoName , address }: any) {
   
           <div className={`h-[23rem] overflow-y-auto ${styles.scrollbar}`}>
             {isPageLoading ? (
-              <div className="flex pt-6 justify-center">
-                <Oval
-                  visible={true}
-                  height="40"
-                  width="40"
-                  color="#0500FF"
-                  secondaryColor="#cdccff"
-                  ariaLabel="oval-loading"
-                />
-              </div>
+
+              <ProposalVotedRightSkeletonLoader/>
+
             ) : first && !isPageLoading && pageData.length > 0 ? (
               dataToShow.map((proposal: any, index: number) => (
                 <div

@@ -18,6 +18,7 @@ import {
   useDisclosure,
 } from "@nextui-org/react";
 import AttestationModal from "../utils/AttestationModal";
+import SessionTileSkeletonLoader from "../SkeletonLoader/SessionTileSkeletonLoader";
 
 interface Session {
   booking_status: string;
@@ -203,18 +204,11 @@ function DelegatesSession({ props }: { props: string }) {
               />
             ))} */}
           {searchParams.get("session") === "recorded" &&
-            (dataLoading ? (
-              <div className="flex items-center justify-center">
-                <Oval
-                  visible={true}
-                  height="40"
-                  width="40"
-                  color="#0500FF"
-                  secondaryColor="#cdccff"
-                  ariaLabel="oval-loading"
-                />
-              </div>
-            ) : (
+            (dataLoading ? 
+            (
+            <SessionTileSkeletonLoader/>
+            )
+            : (
               <SessionTile
                 sessionDetails={sessionDetails}
                 dataLoading={dataLoading}

@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 // import "@rainbow-me/rainbow-button/styles.css";
-import { getEnsName } from "./ENSResolver";
+import { fetchEnsAvatar, getEnsName } from "@/utils/ENSUtils";
 
 function ConnectWalletWithENS() {
   const [displayAddress, setDisplayAddress] = useState<any>();
@@ -35,8 +35,10 @@ function ConnectWalletWithENS() {
 
         if (account) {
           (async () => {
-            const displayName = await getEnsName(account.address);
-            setDisplayAddress(displayName);
+            console.log("account in if: ", account?.address);
+            const displayName = await getEnsName(account?.address);
+            console.log("display name: ", displayName?.ensNameOrAddress);
+            setDisplayAddress(displayName?.ensNameOrAddress);
           })();
         }
 
@@ -50,6 +52,7 @@ function ConnectWalletWithENS() {
                 userSelect: "none",
               },
             })}
+            className="wallet"
           >
             {(() => {
               if (!connected) {
