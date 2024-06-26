@@ -1,20 +1,54 @@
-.scrollbar::-webkit-scrollbar {
+/* .scrollbar::-webkit-scrollbar {
     width: 8px;
-    /* padding: 5px; */
   }
   
-  /* Track */
+  
   .scrollbar::-webkit-scrollbar-track {
     background: #F6F6F6;
     border-radius: 8px;
     height: 410px;
-    /* padding: 5px; */
-    /* margin: 24px; */
   }
   
-  /* Handle */
+ 
   .scrollbar::-webkit-scrollbar-thumb {
     background:#888;
     border-radius: 5px;
   }
-  
+   */
+
+   .scrollContainer {
+    width: 100%; 
+    height: 460px;
+    overflow-y: auto;
+    overflow-x: hidden; 
+    scrollbar-width: none; /* For Firefox /
+    -ms-overflow-style: none; / For Internet Explorer and Edge /
+    / width: 45vw;  */
+  }
+
+  .scrollContainer::-webkit-scrollbar {
+    width: 0px; /* For Chrome, Safari, and Opera */
+  }
+
+  .scrollContainer:hover {
+    scrollbar-width: thin; /* For Firefox /
+    -ms-overflow-style: auto; / For Internet Explorer and Edge /
+    / padding-right: 0;  */
+  }
+
+  .scrollContainer:hover::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .scrollContainer:hover::-webkit-scrollbar-track {
+    background: #F6F6F6;
+    border-radius: 10px !important;
+  }
+
+  .scrollContainer:hover::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px !important;
+  }
+  .voterItem {
+    width: 100%; /* Subtract scrollbar width from item width */
+  }
