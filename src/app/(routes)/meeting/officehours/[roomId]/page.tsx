@@ -1,6 +1,6 @@
 "use client";
 
-import RemotePeer from "@/components/remotePeer";
+import RemotePeer from "@/components/Huddle/remotePeer";
 import { useStudioState } from "@/store/studioState";
 import { BasicIcons } from "@/utils/BasicIcons";
 import {
@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import BottomBar from "@/components/bottomBar";
+import BottomBar from "@/components/Huddle/bottomBar";
 import { Button } from "@/components/ui/button";
 import { PeerMetadata } from "@/utils/types";
 import ChatBar from "@/components/sidebars/ChatBar/chatbar";
@@ -29,9 +29,9 @@ import ParticipantsBar from "@/components/sidebars/participantsSidebar/participa
 import Video from "@/components/Media/Video";
 import { Role } from "@huddle01/server-sdk/auth";
 import clsx from "clsx";
-import GridContainer from "@/components/GridContainer";
+import GridContainer from "@/components/Huddle/GridContainer";
 // import ShowCaptions from "@/components/Caption/showCaptions";
-import RemoteScreenShare from "@/components/remoteScreenShare";
+import RemoteScreenShare from "@/components/Huddle/remoteScreenShare";
 import Camera from "@/components/Media/Camera";
 
 export default function Component({ params }: { params: { roomId: string } }) {
@@ -59,7 +59,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
     audioInputDevice,
     layout,
     isScreenShared,
-    avatarUrl
+    avatarUrl,
   } = useStudioState();
   const videoRef = useRef<HTMLVideoElement>(null);
   const { peerIds } = usePeerIds({
@@ -76,32 +76,18 @@ export default function Component({ params }: { params: { roomId: string } }) {
     },
   });
 
-  // useDataMessage({
-  //   async onMessage(payload, from, label) {
-  //     if (label === "chat") {
-  //       const { message, name } = JSON.parse(payload);
-  //       addChatMessage({
-  //         name: name,
-  //         text: message,
-  //         isUser: from === peerId,
-  //       });
-  //     }
-  //     if (label === "file") {
-  //       const { message, fileName, name } = JSON.parse(payload);
-  //       // fetch file from message and display it
-  //       addChatMessage({
-  //         name: name,
-  //         text: message,
-  //         isUser: from === peerId,
-  //         fileName,
-  //       });
-  //     }
-  //     if (label === "server-message") {
-  //       const { s3URL } = JSON.parse(payload);
-  //       alert(`Your recording: ${s3URL}`);
-  //     }
-  //   },
-  // });
+  useDataMessage({
+    async onMessage(payload, from, label) {
+      if (label === "chat") {
+        const { message, name } = JSON.parse(payload);
+        addChatMessage({
+          name: name,
+          text: message,
+          isUser: from === peerId,
+        });
+      }
+    },
+  });
 
   useEffect(() => {
     if (videoRef.current && stream) {

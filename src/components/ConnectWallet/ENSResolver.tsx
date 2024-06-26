@@ -22,7 +22,7 @@ export const getEnsName = async (address: string | undefined) => {
     const query_data: any = await client.query(query, {
       address: address,
     });
-    const data = query_data.data.domains[0]?.name
+    const data = query_data.data?.domains[0]?.name
       ? query_data.data.domains[0]?.name
       : displayName;
     return data;
@@ -36,7 +36,7 @@ export const getEnsNameOfUser = async (address: string | undefined) => {
     const query_data: any = await client.query(query, {
       address: address,
     });
-    const data = query_data.data.domains[0]?.name
+    const data = query_data.data?.domains[0]?.name
       ? query_data.data.domains[0]?.name
       : "";
     return data;

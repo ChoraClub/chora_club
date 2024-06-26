@@ -254,7 +254,7 @@ function AvailableSessions() {
   useEffect(() => {
     const fetchEnsNames = async () => {
       console.log("dao info: ", daoInfo);
-      const addresses = daoInfo.map((dao: any) => dao.userInfo[0].address);
+      const addresses = daoInfo.map((dao: any) => dao.userInfo[0]?.address);
       console.log("addresses: ", addresses);
       const names = await Promise.all(
         addresses.map(async (address) => {
@@ -290,7 +290,7 @@ function AvailableSessions() {
             value={searchQuery}
             onChange={(e) => handleSearchChange(e.target.value)}
           ></input>
-          <span className="flex items-center bg-black rounded-full px-5 py-2">
+          <span className="flex items-center bg-black rounded-full px-5 py-2 cursor-pointer">
             <Image
               className="min-w-[25px]"
               src={search}
@@ -316,9 +316,9 @@ function AvailableSessions() {
               value={selectedDao}
               // onChange={(e) => setSelectedDao(e.target.value)}
               onChange={handleDaoChange}
-              className="px-3 py-2 rounded-md shadow"
+              className="px-3 py-2 rounded-md shadow cursor-pointer"
             >
-              <option value="All-DAOS">All DAOS</option>
+              <option value="All-DAOS">All DAOs</option>
               <option value="optimism">Optimism</option>
               <option value="arbitrum">Arbitrum</option>
             </select>
@@ -343,7 +343,7 @@ function AvailableSessions() {
               onChange={handleDateChange}
               min={formattedDate}
               // onChange={(e) => setSelectedDate(e.target.value)}
-              className="px-3 py-2 shadow mr-1 rounded-md"
+              className="px-3 py-2 shadow mr-1 rounded-md cursor-pointer"
             />
           </Tooltip>
         </div>
@@ -363,7 +363,7 @@ function AvailableSessions() {
             <select
               value={startTime || "Start Time"}
               onChange={handleStartTimeChange}
-              className="px-3 py-2 rounded-md shadow mr-1"
+              className="px-3 py-2 rounded-md shadow mr-1 cursor-pointer"
             >
               <option disabled>Start Time</option>
               {timeOptions.map((time) => (
@@ -376,7 +376,7 @@ function AvailableSessions() {
             <select
               value={endTime || "End Time"}
               onChange={handleEndTimeChange}
-              className="px-3 py-2 rounded-md shadow ml-2"
+              className="px-3 py-2 rounded-md shadow ml-2 cursor-pointer"
             >
               <option disabled>End Time</option>
               {timeOptions.map((time) => (
@@ -409,7 +409,7 @@ function AvailableSessions() {
               ariaLabel="oval-loading"
             />
           </div>
-        ) : daoInfo && daoInfo.length > 0 ? (
+        ) : daoInfo && daoInfo?.length > 0 ? (
           <div className="overflow-auto font-poppins grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 2xl:grid-cols-2 gap-12 py-5 px-10">
             {daoInfo.map((daos: any, index: number) => (
               <div
@@ -431,8 +431,8 @@ function AvailableSessions() {
                       <div className="flex justify-center items-center w-32 h-32">
                         <Image
                           src={
-                            daos.userInfo[0].image
-                              ? `https://gateway.lighthouse.storage/ipfs/${daos.userInfo[0].image}`
+                            daos?.userInfo[0]?.image
+                              ? `https://gateway.lighthouse.storage/ipfs/${daos?.userInfo[0]?.image}`
                               : daos.session.dao_name === "optimism"
                               ? OPLogo
                               : daos.session.dao_name === "arbitrum"
@@ -466,8 +466,8 @@ function AvailableSessions() {
 
                   <div className="w-3/4 ml-4">
                     <div className="text-[#3E3D3D] text-lg font-semibold mb-1">
-                      {ensNames[daos.userInfo[0].address] ||
-                        daos.userInfo[0].displayName ||
+                      {ensNames[daos?.userInfo[0]?.address] ||
+                        daos.userInfo[0]?.displayName ||
                         daos.session.userAddress.slice(0, 6) +
                           "..." +
                           daos.session.userAddress.slice(-4)}

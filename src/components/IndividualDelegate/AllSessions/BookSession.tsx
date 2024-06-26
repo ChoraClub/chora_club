@@ -24,6 +24,7 @@ import BookingSuccessModal from "./BookingSuccessModal";
 import AddEmailModal from "@/components/utils/AddEmailModal";
 import { RxCross2 } from "react-icons/rx";
 import { MdCancel } from "react-icons/md";
+import { useRouter } from "next-nprogress-bar";
 interface Type {
   daoDelegates: string;
   individualDelegate: string;
@@ -35,6 +36,7 @@ const StyledTimePickerContainer = styled.div`
 `;
 
 function BookSession({ props }: { props: Type }) {
+  const router = useRouter();
   const { openConnectModal } = useConnectModal();
   // const host_address = "0x3013bb4E03a7B81106D69C10710EaE148C8410E1";
   const daoName = props.daoDelegates;
@@ -327,7 +329,7 @@ function BookSession({ props }: { props: Type }) {
       description: modalData.description,
       host_address: host_address,
       attendees: [{ attendee_address: address }],
-      meeting_status: "",
+      meeting_status: "Upcoming",
       booking_status: "Approved",
       session_type: "session",
       meetingId: roomId,
@@ -368,7 +370,7 @@ function BookSession({ props }: { props: Type }) {
     onClose();
   };
 
-  const timeSlotSizeMinutes = 15;
+  const timeSlotSizeMinutes = 30;
   let dateAndRanges: any = [];
   let allowedDates: any = [];
 
@@ -423,11 +425,25 @@ function BookSession({ props }: { props: Type }) {
     ];
   }
 
+  function subtractOneMinute(date: any) {
+    // Create a new Date object from the provided date
+    let newDate = new Date(date);
+    // Subtract one minute (60000 milliseconds)
+    newDate.setTime(newDate.getTime() - 60000);
+    return newDate;
+  }
+
   function timeSlotValidator(
     slotTime: any,
     dateAndRanges: any,
     bookedSlots: any
   ) {
+    dateAndRanges = dateAndRanges.map((range: any) => ({
+      formattedUTCTime_startTime: range.formattedUTCTime_startTime,
+      formattedUTCTime_endTime: subtractOneMinute(
+        range.formattedUTCTime_endTime
+      ),
+    }));
     for (const {
       formattedUTCTime_startTime: startTime,
       formattedUTCTime_endTime: endTime,
@@ -440,7 +456,7 @@ function BookSession({ props }: { props: Type }) {
         // Check if the slot is booked
         const isBooked = bookedSlots.some((bookedSlot: any) => {
           return (
-            dateFns?.isSameDay(startTime, bookedSlot) &&
+            dateFns.isSameDay(startTime, bookedSlot) &&
             slotTime.getHours() === bookedSlot.getHours() &&
             slotTime.getMinutes() === bookedSlot.getMinutes()
           );
@@ -459,6 +475,7 @@ function BookSession({ props }: { props: Type }) {
   const handleModalClose = () => {
     console.log("Popup Closed");
     setModalOpen(false);
+    router.push(`/profile/${address}?active=sessions&session=attending`);
   };
 
   const handleEmailChange = (email: string) => {

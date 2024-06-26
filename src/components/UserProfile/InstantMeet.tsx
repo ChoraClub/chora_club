@@ -64,7 +64,7 @@ function InstantMeet({ isDelegate, selfDelegate, daoName }: instantMeetProps) {
 
   const startInstantMeet = async () => {
     setConfirmSave(true);
-    const res = await fetch(`${process.env.NEXT_PUBLIC_CREATE_ROOM_ENDPOINT}`, {
+    const res = await fetch(`/api/create-room`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

@@ -14,6 +14,7 @@ import AddEmailModal from "@/components/utils/AddEmailModal";
 import Image from "next/image";
 
 import AvailableUserSessions from "./AvailableUserSessions";
+import styles from "./ScheduleUserSessions.module.css";
 
 interface dataToStore {
   userAddress: `0x${string}` | undefined | null;
@@ -26,7 +27,7 @@ interface dataToStore {
 function ScheduledUserSessions({ daoName }: { daoName: string }) {
   const { address } = useAccount();
   // const address = "0x5e349eca2dc61abcd9dd99ce94d04136151a09ee";
-  const [timeSlotSizeMinutes, setTimeSlotSizeMinutes] = useState(15);
+  const [timeSlotSizeMinutes, setTimeSlotSizeMinutes] = useState(30);
   const [selectedDate, setSelectedDate] = useState<any>("");
   const [dateAndRanges, setDateAndRanges] = useState<any>([]);
   const [startHour, setStartHour] = useState("");
@@ -160,7 +161,9 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
         console.log("error:", error);
       }
     } else {
-      toast.error("Please select at least one date before applying.");
+      toast.error(
+        "Please select a time. After selecting, click 'Add Session' and then 'Create Session'"
+      );
     }
   };
 
@@ -487,15 +490,17 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
 
   return (
     <>
-      <div className="flex flex-col md:flex-row justify-center gap-8 md:gap-20 p-4">
+      <div className="flex flex-col md:flex-row justify-center gap-8 md:gap-10 1.5lg:gap-20 p-4">
         {/* First box- left side */}
-        <div className="w-full md:w-auto min-w-[34rem] h-fit mt-2 p-8 bg-white rounded-2xl shadow-lg">
+        <div
+          className={`w-full md:w-auto p-8 bg-white rounded-2xl ${styles.boxshadow} basis-1/2`}
+        >
           <div className="mb-4">
             <label className="text-gray-700 font-semibold flex items-center">
               Select DAO Name:
               <Tooltip
                 content={
-                  <div className="font-poppins p-2 bg-gray-800 text-white rounded-md">
+                  <div className="font-poppins p-2 max-w-80 text-black rounded-md">
                     DAO for which the session is to be created. The attestations
                     will be issued for the selected DAO. The attendees of this
                     session will seek questions related to the selected DAO.
@@ -520,7 +525,7 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
               Select Time Slot Size:
               <Tooltip
                 content={
-                  <div className="font-poppins p-2 bg-gray-800 text-white rounded-md">
+                  <div className="font-poppins p-2 max-w-80 text-black rounded-md">
                     The duration for which you would be able to take the
                     session. The preferred duration is 30 minutes. And note that
                     the selected time slot size will apply to all the selected
@@ -538,12 +543,14 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
             </label>
             <select
               value={timeSlotSizeMinutes}
-              onChange={(e) => setTimeSlotSizeMinutes(Number(e.target.value))}
-              className="border border-gray-300 rounded px-3 py-2 mt-1 w-full"
+              onChange={(e: any) => setTimeSlotSizeMinutes(e.target.value)}
+              className="border border-gray-300 rounded px-3 py-2 mt-1 w-full cursor-pointer"
             >
-              <option value={15}>15 minutes</option>
+              {/* <option value={15}>15 minutes</option> */}
               <option value={30}>30 minutes</option>
-              <option value={45}>45 minutes</option>
+              <option value={45} disabled>
+                45 minutes (Under development - It will be live soon)
+              </option>
             </select>
           </div>
 
@@ -552,7 +559,7 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
               Select Date:
               <Tooltip
                 content={
-                  <div className="font-poppins p-2 bg-gray-800 text-white rounded-md">
+                  <div className="font-poppins p-2 text-black rounded-md">
                     It is based on your timezone.
                   </div>
                 }
@@ -569,7 +576,7 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
               type="date"
               value={selectedDate}
               onChange={(e) => setSelectedDate(e.target.value)}
-              className="border border-gray-300 rounded px-3 py-2 mt-1 w-full"
+              className="border border-gray-300 rounded px-3 py-2 mt-1 w-full cursor-pointer"
               min={formattedDate}
             />
           </div>
@@ -579,7 +586,7 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
               Select Available Time:
               <Tooltip
                 content={
-                  <div className="font-poppins p-2 bg-gray-800 text-white rounded-md">
+                  <div className="font-poppins p-2 max-w-80 text-black rounded-md">
                     Session start time and end time based on your timezone.
                   </div>
                 }
@@ -597,7 +604,7 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
                 <label className="text-gray-500 mt-1">Start Time</label>
                 <div className="relative">
                   <select
-                    className="appearance-none border border-gray-300 rounded px-3 py-2 mt-1 w-full bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-300 focus:outline-none focus:border-blue-400 dark:focus:border-blue-400 transition duration-300 ease-in-out"
+                    className="appearance-none border border-gray-300 rounded px-3 py-2 mt-1 w-full bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-300 focus:outline-none focus:border-blue-400 dark:focus:border-blue-400 transition duration-300 ease-in-out cursor-pointer"
                     value={selectedStartTime}
                     onChange={handleStartTimeChange}
                   >
@@ -605,7 +612,7 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
                       <option
                         key={time}
                         value={time}
-                        className="py-2 px-4 cursor-pointer hover:bg-blue-100 dark:hover:bg-gray-700"
+                        className={`py-2 px-4 hover:bg-blue-100 dark:hover:bg-gray-700 custom-time-picker-option`}
                       >
                         {time}
                       </option>
@@ -618,7 +625,7 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
                 <label className="text-gray-500 mt-1">End Time</label>
                 <div className="relative">
                   <select
-                    className="appearance-none border border-gray-300 rounded px-3 py-2 mt-1 w-full bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-300 focus:outline-none focus:border-blue-400 dark:focus:border-blue-400 transition duration-300 ease-in-out"
+                    className="appearance-none border border-gray-300 rounded px-3 py-2 mt-1 w-full bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-300 focus:outline-none focus:border-blue-400 dark:focus:border-blue-400 transition duration-300 ease-in-out cursor-pointer"
                     value={selectedEndTime}
                     onChange={handleEndTimeChange}
                   >
@@ -626,7 +633,8 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
                       <option
                         key={time}
                         value={time}
-                        className="py-2 px-4 cursor-pointer hover:bg-blue-100 dark:hover:bg-gray-700"
+                        className={`py-2 px-4 hover:bg-blue-100 dark:hover:bg-gray-700 custom-time-picker-option`}
+                        style={{ cursor: "pointer" }}
                       >
                         {time}
                       </option>
@@ -725,7 +733,9 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
         </div>
 
         {/* Second box- right side */}
-        <div className="w-full md:w-auto">
+        <div
+          className={`w-full md:w-auto p-8 bg-white rounded-2xl ${styles.boxshadow} basis-1/2`}
+        >
           <AvailableUserSessions
             daoName={daoName}
             scheduledSuccess={scheduledSuccess}

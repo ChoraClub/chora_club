@@ -13,7 +13,7 @@ import { IoMdArrowDropdown } from "react-icons/io";
 import Link from "next/link";
 import VideoJS from "@/components/utils/VideoJs";
 import videojs from "video.js";
-import { parseISO } from "date-fns";
+// import { parseISO } from "date-fns";
 import ReportOptionModal from "./ReportOptionModal";
 import { getEnsName } from "../ConnectWallet/ENSResolver";
 import { useRouter } from "next-nprogress-bar";
@@ -116,10 +116,10 @@ function WatchSession({
   }, [data.description, isExpanded]);
 
   const formatTimeAgo = (utcTime: string): string => {
-    const parsedTime = parseISO(utcTime);
+    const parsedTime = new Date(utcTime);
     const currentTime = new Date();
     const differenceInSeconds = Math.abs(
-      (parsedTime.getTime() - currentTime.getTime()) / 1000
+      (currentTime.getTime() - parsedTime.getTime()) / 1000
     );
 
     if (differenceInSeconds < 60) {
@@ -194,7 +194,14 @@ function WatchSession({
           <div className="flex justify-between text-sm pe-4 pb-4">
             <div className="flex gap-6">
               <div className="flex items-center gap-2 ">
-                <div>
+                <div
+                  className="flex gap-2 cursor-pointer"
+                  onClick={() =>
+                    router.push(
+                      `/${data.dao_name}/${data.host_address}?active=info`
+                    )
+                  }
+                >
                   <Image
                     src={
                       data.hostProfileInfo?.image
@@ -204,15 +211,12 @@ function WatchSession({
                     alt="image"
                     width={20}
                     height={20}
-                    className="rounded-full"
+                    className="w-5 h-5 rounded-full"
                     priority
                   />
-                </div>
-                <div
-                  className="text-[#292929] font-semibold"
-                  // onClick={() => router.push(`${BASE_URL}/${data.dao_name}/${data.host_address}?active=info`)}
-                >
-                  {ensHostName}
+                  <div className="text-[#292929] font-semibold ">
+                    {ensHostName}
+                  </div>
                 </div>
                 <>
                   <Tooltip
@@ -353,25 +357,27 @@ function WatchSession({
               >
                 {data.attendees.map((attendee, index) => (
                   <div key={index}>
-                    <div className="flex items-center text-sm gap-3 px-6  py-[10px]">
-                      <div>
-                        <Image
-                          src={
-                            attendee.profileInfo?.image
-                              ? `https://gateway.lighthouse.storage/ipfs/${attendee.profileInfo.image}`
-                              : user
-                          }
-                          alt="image"
-                          width={18}
-                          height={18}
-                          className="rounded-full"
-                          priority
-                        />
-                      </div>
-                      <div>
-                        {attendee.attendee_address.slice(0, 8) +
-                          "........." +
-                          attendee.attendee_address.slice(-6)}{" "}
+                    <div className="flex items-center text-sm gap-3 px-6  py-[10px] justify-between">
+                      <div className="flex gap-3">
+                        <div>
+                          <Image
+                            src={
+                              attendee.profileInfo?.image
+                                ? `https://gateway.lighthouse.storage/ipfs/${attendee.profileInfo.image}`
+                                : user
+                            }
+                            alt="image"
+                            width={18}
+                            height={18}
+                            className="rounded-full"
+                            priority
+                          />
+                        </div>
+                        <div>
+                          {attendee.attendee_address.slice(0, 6) +
+                            "..." +
+                            attendee.attendee_address.slice(-4)}{" "}
+                        </div>
                       </div>
                       {attendee.attendee_uid ? (
                         <Tooltip

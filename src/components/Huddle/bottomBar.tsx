@@ -11,19 +11,20 @@ import {
 import { Button } from "@/components/ui/button";
 import { BasicIcons } from "@/utils/BasicIcons";
 import { useStudioState } from "@/store/studioState";
-import ButtonWithIcon from "./ui/buttonWithIcon";
+import ButtonWithIcon from "../ui/buttonWithIcon";
 import ChangeDevice from "./changeDevice";
 import { Role } from "@huddle01/server-sdk/auth";
 import { PeerMetadata } from "@/utils/types";
 import clsx from "clsx";
 import toast from "react-hot-toast";
-import Dropdown from "./common/Dropdown";
-import Strip from "./sidebars/participantsSidebar/Peers/PeerRole/Strip";
+import Dropdown from "../common/Dropdown";
+import Strip from "../sidebars/participantsSidebar/Peers/PeerRole/Strip";
 import { useEffect, useState } from "react";
 import { useParams, usePathname } from "next/navigation";
 import { useAccount, useNetwork } from "wagmi";
 import { PiLinkSimpleBold } from "react-icons/pi";
 import { opBlock, arbBlock } from "@/config/constants";
+import MeetingRecordingModal from "../utils/MeetingRecordingModal";
 
 const BottomBar = () => {
   const { isAudioOn, enableAudio, disableAudio } = useLocalAudio();
@@ -45,6 +46,7 @@ const BottomBar = () => {
     peerId: localPeerId,
   } = useLocalPeer<PeerMetadata>();
   const { peerIds } = usePeerIds({ roles: ["host", "guest"] });
+
   const {
     isChatOpen,
     setIsChatOpen,
@@ -56,7 +58,8 @@ const BottomBar = () => {
     isScreenShared,
     setIsScreenShared,
   } = useStudioState();
-
+  const [showModal, setShowModal] = useState(true);
+  const [recordingStatus, setRecordingStatus] = useState<string | null>();
   const { startScreenShare, stopScreenShare, shareStream } =
     useLocalScreenShare({
       onProduceStart(data) {
@@ -161,6 +164,20 @@ const BottomBar = () => {
     }
   }, []);
 
+  useEffect(() => {
+    const storedStatus = sessionStorage.getItem("isMeetingRecorded");
+    console.log("storedStatus: ", storedStatus);
+    setRecordingStatus(storedStatus);
+  }, []);
+
+  const handleModalClose = (result: boolean) => {
+    sessionStorage.setItem("isMeetingRecorded", result.toString());
+    setShowModal(false);
+    console.log(
+      result ? "Meeting will be recorded." : "Meeting will not be recorded."
+    );
+  };
+
   const startRecordingAutomatically = async () => {
     try {
       const status = await fetch(`/api/startRecording/${params.roomId}`);
@@ -179,46 +196,18 @@ const BottomBar = () => {
 
   useEffect(() => {
     const handleBeforeUnload = (event: any) => {
-      // Prevent the default action
-      event.preventDefault();
-      event.returnValue = "";
-
-      // Show confirmation dialog
-      return "";
-    };
-
-    const handleUnload = async () => {
-      if (window.confirm("Do you really want to leave?")) {
-        const response = await fetch(`/api/get-host`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            meetingId: roomId,
-          }),
-        });
-        const response_data = await response.json();
-        const host_address = await response_data.address;
-
-        console.log("host address", host_address);
-
-        if (address?.toLowerCase() === host_address.toLowerCase()) {
-          await handleEndCall("close");
-        } else {
-          await handleEndCall("leave");
-        }
+      if (role === "host") {
+        event.preventDefault();
+        event.returnValue = "Changes you made may not be saved.";
       }
     };
 
     window.addEventListener("beforeunload", handleBeforeUnload);
-    window.addEventListener("unload", handleUnload);
 
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
-      window.removeEventListener("unload", handleUnload);
     };
-  }, [roomId]);
+  }, [role]);
 
   const handleEndCall = async (endMeet: string) => {
     setIsLoading(true);
@@ -238,7 +227,7 @@ const BottomBar = () => {
 
     console.log("host address", host_address);
 
-    if (address?.toLowerCase() === host_address.toLowerCase()) {
+    if (role === "host") {
       console.log("addresses: ", address, host_address);
 
       await handleStopRecording(); // Do not proceed with API calls if not the host
@@ -338,8 +327,9 @@ const BottomBar = () => {
   };
 
   return (
-    <footer className="flex items-center justify-between px-4 py-2">
-      {/* <div className="flex items-center">
+    <>
+      <footer className="flex items-center justify-between px-4 py-2">
+        {/* <div className="flex items-center">
         {role === Role.HOST ? (
           <Button
             className="flex gap-2 bg-red-500 hover:bg-red-400 text-white text-md font-semibold"
@@ -357,165 +347,169 @@ const BottomBar = () => {
         )}
       </div> */}
 
-      <div>
-        <div className="relative">
-          <div
-            className="mr-auto flex items-center gap-4 w-44 cursor-pointer"
-            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-          >
-            <div className="bg-blue-shade-200 p-2 rounded-lg">
-              <PiLinkSimpleBold
-                className="text-white"
-                size={24}
-              ></PiLinkSimpleBold>
+        <div>
+          <div className="relative">
+            <div
+              className="mr-auto flex items-center gap-4 w-44 cursor-pointer"
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+            >
+              <div className="bg-blue-shade-200 p-2 rounded-lg">
+                <PiLinkSimpleBold
+                  className="text-white"
+                  size={24}
+                ></PiLinkSimpleBold>
+              </div>
+              <span className="text-gray-800">Quick Links</span>
             </div>
-            <span className="text-gray-800">Quick Links</span>
+            {isDropdownOpen && chain?.name === "Arbitrum One" && (
+              <div className="absolute z-10 top-auto bottom-full left-0 mb-2 w-52 bg-white rounded-lg shadow-lg">
+                <div className="arrow-up"></div>
+                {arbBlock.map((block, index) => (
+                  <a
+                    href={block.link}
+                    target="_blank"
+                    className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
+                    key={index}
+                  >
+                    {block.title}
+                  </a>
+                ))}
+              </div>
+            )}
+            {isDropdownOpen && chain?.name === "Optimism" && (
+              <div className="absolute z-10 top-auto bottom-full left-0 mb-2 w-52 bg-white rounded-lg shadow-lg">
+                <div className="arrow-up"></div>
+                {opBlock.map((block, index) => (
+                  <a
+                    href={block.link}
+                    target="_blank"
+                    className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
+                    key={index}
+                  >
+                    {block.title}
+                  </a>
+                ))}
+              </div>
+            )}
           </div>
-          {isDropdownOpen && chain?.name === "Arbitrum One" && (
-            <div className="absolute z-10 top-auto bottom-full left-0 mb-2 w-52 bg-white rounded-lg shadow-lg">
-              <div className="arrow-up"></div>
-              {arbBlock.map((block, index) => (
-                <a
-                  href={block.link}
-                  target="_blank"
-                  className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
-                  key={index}
-                >
-                  {block.title}
-                </a>
-              ))}
-            </div>
-          )}
-          {isDropdownOpen && chain?.name === "Optimism" && (
-            <div className="absolute z-10 top-auto bottom-full left-0 mb-2 w-52 bg-white rounded-lg shadow-lg">
-              <div className="arrow-up"></div>
-              {opBlock.map((block, index) => (
-                <a
-                  href={block.link}
-                  target="_blank"
-                  className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
-                  key={index}
-                >
-                  {block.title}
-                </a>
-              ))}
-            </div>
-          )}
         </div>
-      </div>
 
-      <div
-        className={clsx("flex space-x-3", role === Role.HOST ? "mr-12" : "")}
-      >
-        <ChangeDevice deviceType="cam">
-          <button
+        <div
+          className={clsx("flex space-x-3", role === Role.HOST ? "mr-12" : "")}
+        >
+          <ChangeDevice deviceType="cam">
+            <button
+              onClick={() => {
+                if (isVideoOn) {
+                  disableVideo();
+                } else {
+                  enableVideo();
+                }
+              }}
+              className="bg-gray-600/50 p-2.5 rounded-lg"
+            >
+              {isVideoOn ? BasicIcons.on.cam : BasicIcons.off.cam}
+            </button>
+          </ChangeDevice>
+          <ChangeDevice deviceType="mic">
+            <button
+              onClick={() => {
+                if (isAudioOn) {
+                  disableAudio();
+                } else {
+                  enableAudio();
+                }
+              }}
+              className="bg-gray-600/50 p-2.5 rounded-lg"
+            >
+              {isAudioOn ? BasicIcons.on.mic : BasicIcons.off.mic}
+            </button>
+          </ChangeDevice>
+          <ChangeDevice deviceType="speaker">
+            <button
+              onClick={() => {}}
+              className="bg-gray-600/50 p-2.5 rounded-lg"
+            >
+              {BasicIcons.speaker}
+            </button>
+          </ChangeDevice>
+          <ButtonWithIcon
             onClick={() => {
-              if (isVideoOn) {
-                disableVideo();
+              if (isScreenShared) {
+                toast.error("Only one screen share is allowed at a time");
+                return;
+              }
+              if (shareStream !== null) {
+                stopScreenShare();
               } else {
-                enableVideo();
+                startScreenShare();
               }
             }}
-            className="bg-gray-600/50 p-2.5 rounded-lg"
+            className={clsx(
+              (shareStream !== null || isScreenShared) && "bg-gray-500"
+            )}
           >
-            {isVideoOn ? BasicIcons.on.cam : BasicIcons.off.cam}
-          </button>
-        </ChangeDevice>
-        <ChangeDevice deviceType="mic">
-          <button
+            {BasicIcons.screenShare}
+          </ButtonWithIcon>
+          <ButtonWithIcon
             onClick={() => {
-              if (isAudioOn) {
-                disableAudio();
-              } else {
-                enableAudio();
-              }
+              updateMetadata({
+                displayName: metadata?.displayName || "",
+                avatarUrl: metadata?.avatarUrl || "",
+                isHandRaised: !metadata?.isHandRaised,
+              });
             }}
-            className="bg-gray-600/50 p-2.5 rounded-lg"
+            className={clsx(metadata?.isHandRaised && "bg-gray-500")}
           >
-            {isAudioOn ? BasicIcons.on.mic : BasicIcons.off.mic}
-          </button>
-        </ChangeDevice>
-        <ChangeDevice deviceType="speaker">
-          <button
-            onClick={() => {}}
-            className="bg-gray-600/50 p-2.5 rounded-lg"
-          >
-            {BasicIcons.speaker}
-          </button>
-        </ChangeDevice>
-        <ButtonWithIcon
-          onClick={() => {
-            if (isScreenShared) {
-              toast.error("Only one screen share is allowed at a time");
-              return;
-            }
-            if (shareStream !== null) {
-              stopScreenShare();
-            } else {
-              startScreenShare();
-            }
-          }}
-          className={clsx(
-            (shareStream !== null || isScreenShared) && "bg-gray-500"
-          )}
-        >
-          {BasicIcons.screenShare}
-        </ButtonWithIcon>
-        <ButtonWithIcon
-          onClick={() => {
-            updateMetadata({
-              displayName: metadata?.displayName || "",
-              avatarUrl: metadata?.avatarUrl || "",
-              isHandRaised: !metadata?.isHandRaised,
-            });
-          }}
-          className={clsx(metadata?.isHandRaised && "bg-gray-500")}
-        >
-          {BasicIcons.handRaise}
-        </ButtonWithIcon>
-        {/* <ButtonWithIcon onClick={leaveRoom}>{BasicIcons.end}</ButtonWithIcon> */}
-        <div className="flex cursor-pointer items-center">
-          <Dropdown
-            triggerChild={BasicIcons.leave}
-            open={showLeaveDropDown}
-            onOpenChange={() => setShowLeaveDropDown((prev) => !prev)}
-          >
-            {role === "host" && (
-              <Strip
-                type="close"
-                title={isLoading ? "Leaving..." : "End spaces for all"}
-                variant="danger"
-                onClick={() => handleEndCall("close")}
-              />
-            )}
-            {role !== "host" && (
-              <Strip
-                type="leave"
-                title={isLoading ? "Leaving..." : "Leave the spaces"}
-                variant="danger"
-                onClick={() => handleEndCall("leave")}
-              />
-            )}
-          </Dropdown>
-        </div>
-      </div>
-
-      <div className="flex space-x-3">
-        <ButtonWithIcon
-          onClick={() => setIsParticipantsOpen(!isParticipantsOpen)}
-        >
-          <div className="flex items-center justify-center">
-            {BasicIcons.people}
-            <span className="text-white ps-2">
-              {Object.keys(peerIds).length + 1}
-            </span>
+            {BasicIcons.handRaise}
+          </ButtonWithIcon>
+          {/* <ButtonWithIcon onClick={leaveRoom}>{BasicIcons.end}</ButtonWithIcon> */}
+          <div className="flex cursor-pointer items-center">
+            <Dropdown
+              triggerChild={BasicIcons.leave}
+              open={showLeaveDropDown}
+              onOpenChange={() => setShowLeaveDropDown((prev) => !prev)}
+            >
+              {role === "host" && (
+                <Strip
+                  type="close"
+                  title={isLoading ? "Leaving..." : "End spaces for all"}
+                  variant="danger"
+                  onClick={() => handleEndCall("close")}
+                />
+              )}
+              {role !== "host" && (
+                <Strip
+                  type="leave"
+                  title={isLoading ? "Leaving..." : "Leave the spaces"}
+                  variant="danger"
+                  onClick={() => handleEndCall("leave")}
+                />
+              )}
+            </Dropdown>
           </div>
-        </ButtonWithIcon>
-        <ButtonWithIcon onClick={() => setIsChatOpen(!isChatOpen)}>
-          {BasicIcons.chat}
-        </ButtonWithIcon>
-      </div>
-    </footer>
+        </div>
+
+        <div className="flex space-x-3">
+          <ButtonWithIcon
+            onClick={() => setIsParticipantsOpen(!isParticipantsOpen)}
+          >
+            <div className="flex items-center justify-center">
+              {BasicIcons.people}
+              <span className="text-white ps-2">
+                {Object.keys(peerIds).length + 1}
+              </span>
+            </div>
+          </ButtonWithIcon>
+          <ButtonWithIcon onClick={() => setIsChatOpen(!isChatOpen)}>
+            {BasicIcons.chat}
+          </ButtonWithIcon>
+        </div>
+      </footer>
+      {/* {role === "host" && recordingStatus === null && (
+        <MeetingRecordingModal show={showModal} onClose={handleModalClose} />
+      )} */}
+    </>
   );
 };
 

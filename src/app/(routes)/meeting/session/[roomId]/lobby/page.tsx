@@ -107,12 +107,19 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
       if (address === hostAddress || result.message === "Meeting is ongoing") {
         setIsJoining(true);
 
+        let role;
+        if (address === hostAddress) {
+          role = "host";
+        } else {
+          role = "guest";
+        }
         let token = "";
+        console.log("name", name);
         if (state !== "connected") {
           const requestBody = {
             roomId: params.roomId,
-            role: "host",
-            displayName: name,
+            role: role,
+            displayName: formattedAddress,
             address: address, // assuming you have userAddress defined somewhere
           };
           try {
@@ -280,6 +287,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
         const response = await fetch(`/api/profile/${address}`, requestOptions);
         const result = await response.json();
         const resultData = await result.data;
+        console.log("result data: ", resultData);
 
         if (Array.isArray(resultData)) {
           const filtered: any = resultData.filter((data) => {
@@ -288,29 +296,35 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
           console.log("filtered profile: ", filtered);
           setProfileDetails(filtered[0]);
           setIsLoading(false);
-          const imageCid = filtered[0].image;
+          const imageCid = filtered[0]?.image;
           if (imageCid) {
             setAvatarUrl(`https://gateway.lighthouse.storage/ipfs/${imageCid}`);
           }
-          setName(filtered[0].displayName);
-        }
-
-        if (resultData.length === 0) {
-          const res = await fetch(
-            `https://api.karmahq.xyz/api/dao/find-delegate?dao=${dao}&user=${address}`
-          );
-          const result = await response.json();
-          const resultData = await result.data.delegate;
-
-          setProfileDetails(resultData);
-          setIsLoading(false);
-
-          if (resultData.ensName !== null) {
-            setName(resultData.ensName);
+          if (filtered[0]?.displayName) {
+            setName(filtered[0].displayName);
           } else {
+            console.log("formattedAddress ", formattedAddress);
             setName(formattedAddress);
           }
         }
+
+        // if (resultData.length === 0) {
+        // const res = await fetch(
+        //   `https://api.karmahq.xyz/api/dao/find-delegate?dao=${dao}&user=${address}`
+        // );
+        // const result = await response.json();
+        // const resultData = await result.data.delegate;
+
+        // setProfileDetails(resultData);
+        // setIsLoading(false);
+
+        // if (resultData.ensName !== null) {
+        //   setName(resultData.ensName);
+        // } else {
+
+        // setName(formattedAddress);
+        // }
+        // }
       } catch (error) {
         console.log("Error in catch: ", error);
       }
@@ -371,7 +385,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
                     alt="audio-spaces-img"
                     width={125}
                     height={125}
-                    className="maskAvatar object-contain"
+                    className="maskAvatar"
                     quality={100}
                     priority
                   />
@@ -406,7 +420,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
                             width={45}
                             height={45}
                             loading="lazy"
-                            className="object-contain cursor-pointer"
+                            className="cursor-pointer"
                             // onClick={() => {
                             //   setAvatarUrl(
                             //     `https://gateway.lighthouse.storage/ipfs/${profileDetails.image}`
@@ -431,7 +445,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
                                 width={45}
                                 height={45}
                                 loading="lazy"
-                                className="object-contain"
+                                className=""
                               />
                             </AvatarWrapper>
                           );

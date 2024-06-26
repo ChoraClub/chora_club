@@ -35,7 +35,7 @@ function AttendingUserSessions({ daoName }: { daoName: string }) {
   const path = usePathname();
   const searchParams = useSearchParams();
   const { address } = useAccount();
-  const [sessionDetails, setSessionDetails] = useState([]);
+  const [sessionDetails, setSessionDetails] = useState<any[]>([]);
   const [pageLoading, setPageLoading] = useState(true);
 
   const getUserMeetingData = async () => {
@@ -51,32 +51,13 @@ function AttendingUserSessions({ daoName }: { daoName: string }) {
       });
 
       const result = await response.json();
-      // console.log("result in get session data", result);
 
       if (result.success) {
-        // setSessionDetails(result.data);
-        const resultData = await result.data;
-        console.log("resultData", resultData);
         setPageLoading(true);
-        const currentTime = new Date();
-        const currentSlot = new Date(currentTime.getTime() - 60 * 60 * 1000);
-        if (Array.isArray(resultData)) {
-          let filteredData: any = resultData;
-          if (searchParams.get("session") === "attending") {
-            filteredData = resultData.filter((session: Session) => {
-              return (
-                session.meeting_status !== "Recorded" &&
-                new Date(session.slot_time).toLocaleString() >=
-                  currentSlot.toLocaleString()
-                // && session.dao_name === daoName
-              );
-            });
-            console.log("filtered data in attending: ", filteredData);
-          }
-          // console.log("filtered in attending", filteredData);
-          setSessionDetails(filteredData);
-          setPageLoading(false);
-        }
+        const resultData = await result.attending;
+        console.log("resultData in attending", resultData);
+        setSessionDetails(resultData);
+        setPageLoading(false);
       }
     } catch (error) {
       console.log("error in catch", error);

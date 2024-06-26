@@ -7,7 +7,7 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "./ui/tooltip";
+} from "../ui/tooltip";
 import { BasicIcons } from "@/utils/BasicIcons";
 import { useStudioState } from "@/store/studioState";
 
@@ -51,7 +51,7 @@ const ChangeDevice: FC<ChangeDeviceProps> = ({ children, deviceType }) => {
                       break;
                   }
                 }}
-                className="flex gap-2 p-2 gray-800 w-full rounded-lg hover:bg-gray-700"
+                className="flex gap-2 p-2 gray-800 w-full rounded-lg hover:bg-gray-200"
               >
                 <span>
                   {deviceType === "mic" &&

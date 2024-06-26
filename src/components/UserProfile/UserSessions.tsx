@@ -45,7 +45,6 @@ function UserSessions({
   daoName,
 }: UserSessionsProps) {
   const { address } = useAccount();
-  // const address = "0x5e349eca2dc61abcd9dd99ce94d04136151a09ee";
   const router = useRouter();
   const path = usePathname();
   const searchParams = useSearchParams();
@@ -53,6 +52,8 @@ function UserSessions({
   const [sessionDetails, setSessionDetails] = useState([]);
   const [dataLoading, setDataLoading] = useState(true);
   // const [daoName, setDaoName] = useState("");
+  const [attendedDetails, setAttendedDetails] = useState([]);
+  const [hostedDetails, setHostedDetails] = useState([]);
 
   let dao_name = "";
   const getUserMeetingData = async () => {
@@ -80,10 +81,12 @@ function UserSessions({
         console.log("attendedData", attendedData);
         setDataLoading(true);
         if (searchParams.get("session") === "hosted") {
-          setSessionDetails(hostedData);
+          // setSessionDetails(hostedData);
+          setHostedDetails(hostedData);
           console.log("in session hosted");
         } else if (searchParams.get("session") === "attended") {
-          setSessionDetails(attendedData);
+          // setSessionDetails(attendedData);
+          setAttendedDetails(attendedData);
         }
         setDataLoading(false);
       }
@@ -102,6 +105,8 @@ function UserSessions({
     chain,
     chain?.name,
     daoName,
+    hostedDetails,
+    attendedDetails,
   ]);
 
   // useEffect(() => {
@@ -110,10 +115,10 @@ function UserSessions({
   // }, [searchParams.get("session")]);
 
   useEffect(() => {
-    if (!selfDelegate && searchParams.get("session") === "schedule") {
+    if (selfDelegate === false && searchParams.get("session") === "schedule") {
       router.replace(path + "?active=sessions&session=attending");
     }
-  }, [isDelegate, selfDelegate]);
+  }, [selfDelegate]);
   return (
     <div>
       <div className="pr-32 pt-3">
@@ -213,7 +218,7 @@ function UserSessions({
               </div>
             ) : (
               <SessionTile
-                sessionDetails={sessionDetails}
+                sessionDetails={hostedDetails}
                 dataLoading={dataLoading}
                 isEvent="Recorded"
                 isOfficeHour={false}
@@ -234,7 +239,7 @@ function UserSessions({
               </div>
             ) : (
               <SessionTile
-                sessionDetails={sessionDetails}
+                sessionDetails={attendedDetails}
                 dataLoading={dataLoading}
                 isEvent="Recorded"
                 isOfficeHour={false}
