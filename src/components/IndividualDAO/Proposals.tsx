@@ -81,6 +81,18 @@ function Proposals({ props }: { props: string }) {
   const proposalsPerPage = 5;
   const [canceledProposals, setCanceledProposals] = useState<any[]>([]);
 
+  const VoteLoader = () => (
+    <div className="bg-[#dbf8d4] border border-[#639b55] py-1 text-[#639b55] rounded-md text-sm font-medium flex justify-center items-center w-32">
+            <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-black-shade-900"></div>
+          </div>
+  );
+  const StatusLoader = () => (
+    <div className="rounded-full flex items-end justify-center text-xs  py-1 border font-medium w-24 bg-red-200 border-red-500">
+            <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-black-shade-900"></div>
+          </div>
+  );
+  
+
   const handleClick = (index: any) => {
     router.push(`/${props}/Proposals/${index.proposalId}`);
   };
@@ -282,7 +294,29 @@ function Proposals({ props }: { props: string }) {
   
   // const formattedDate = formatDate(proposal.blockTimestamp);
 
-  if (loading && displayedProposals.length === 0) return <p>Loading...</p>;
+  if (loading && displayedProposals.length === 0) return (
+    <>
+    <div className="mr-16 rounded-[2rem] mt-4">
+        {[...Array(5)].map((_, index) => (
+          <div key={index} className="flex p-4 mb-2 gap-5 bg-gray-100 rounded-3xl animate-pulse">
+            <div className="flex basis-1/2 items-center">
+              <div className="h-10 w-10 rounded-full mx-5" />
+              <div className="flex-1">
+                <div className="h-5 w-3/4 rounded mb-2" />
+                <div className="h-3 w-1/2 rounded" />
+              </div>
+            </div>
+            <div className="flex justify-around items-center basis-1/2">
+              <div className="h-8 w-8 rounded-full" />
+              <div className="h-6 w-20 rounded-full" />
+              <div className="h-6 w-44 rounded" />
+              <div className="h-6 w-16 rounded-full" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </>
+  );
   if (error) return <p>Error: {error}</p>;
 
   return (
@@ -325,8 +359,9 @@ function Proposals({ props }: { props: string }) {
                 </div>
               </Tooltip>
 
+              {proposal.votesLoaded ? (
               <div
-                className={`rounded-full flex items-end justify-center text-xs h-fit py-0.5 font-medium px-2 ${canceledProposals.some((item) => item.proposalId === proposal.proposalId)
+                className={`rounded-full flex items-end justify-center text-xs h-fit py-0.5 border font-medium w-24 ${canceledProposals.some((item) => item.proposalId === proposal.proposalId)
                     ? 'bg-red-200 border-red-500 text-red-500'
                     : proposal.support1Weight > proposal.support0Weight
                       ? 'bg-green-200 border-green-600 text-green-600'
@@ -339,14 +374,20 @@ function Proposals({ props }: { props: string }) {
                   proposal.support1Weight > proposal.support0Weight ? 'SUCCEEDED' : 'DEFEATED'
                 )}
               </div>
+              ) : (
+                <StatusLoader />
+              )}
            
-
-              <div className="bg-[#dbf8d4] border border-[#639b55] py-0.5 px-2 text-[#639b55] rounded-md text-sm font-medium flex justify-center items-center">
+              {proposal.votesLoaded ? (
+              <div className={`bg-[#dbf8d4] border border-[#639b55] py-0.5  rounded-md text-sm font-medium flex justify-center items-center w-32 ${proposal.support1Weight > proposal.support0Weight ? 'text-[#639b55] border-[#639b55] bg-[#dbf8d4]' : 'bg-[#fa989a] text-[#e13b15] border-[#e13b15]'}`}>
                 {proposal.support1Weight > proposal.support0Weight ? `${formatWeight(proposal.support1Weight)} FOR` : `${formatWeight(proposal.support0Weight)} AGAINST`}
               </div>
+               ) : (
+                <VoteLoader />
+              )}
           
               <div className="rounded-full bg-[#f4d3f9] border border-[#77367a] flex items-center justify-center text-[#77367a] text-xs h-fit  py-0.5 font-medium px-2">
-                {new Date() > new Date(proposal.blockTimestamp * 1000 + 7 * 24 * 60 * 60 * 1000) ? 'closed' : 'active'}
+                {new Date() > new Date(proposal.blockTimestamp * 1000 + 7 * 24 * 60 * 60 * 1000) ? 'Closed' : 'Active'}
               </div>
             </div>
           </div>
@@ -354,7 +395,10 @@ function Proposals({ props }: { props: string }) {
         ))}
 
         {displayedProposals.length < allProposals.length && (
-          <button onClick={loadMoreProposals}>Load More</button>
+          <div className="flex items-center justify-center">
+
+          <button onClick={loadMoreProposals} className="bg-blue-shade-100 text-white py-2 px-4 w-fit rounded-lg font-medium">View More</button>
+          </div>
         )}
       </div>
     </>

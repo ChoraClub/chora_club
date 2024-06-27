@@ -50,6 +50,7 @@
     "react-loader-spinner": "^6.1.6",
     "react-quill": "^2.0.0",
     "reactour": "^1.19.4",
+    "recharts": "^2.12.7",
     "siwe": "^2.3.2",
     "tailwindcss-scrollbar": "^0.1.0",
     "urql": "^4.0.6",

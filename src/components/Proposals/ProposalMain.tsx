@@ -10,8 +10,7 @@ import IndividualDaoHeader from "../utils/IndividualDaoHeader";
 import { LuDot } from "react-icons/lu";
 import user from "@/assets/images/daos/user1.png";
 import chain from "@/assets/images/daos/chain.png";
-import { Tooltip } from "@nextui-org/react";
-import style from './proposalMain.module.css';
+// import style from './proposalMain.module.css';
 import {
   Provider,
   cacheExchange,
@@ -38,6 +37,10 @@ interface Proposal {
   support2Weight?: number;
   votersCount?: number;
 }
+import { Tooltip as Tooltips } from "@nextui-org/react";
+import style from "./proposalMain.module.css";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid,Tooltip, Legend, ResponsiveContainer } from 'recharts';
+
 function ProposalMain({ props }: { props: Props }) {
   const router = useRouter();
   const [link, setLink] = useState("");
@@ -165,6 +168,31 @@ function ProposalMain({ props }: { props: Props }) {
     return `${day} ${month}, ${year} ${hours}:${minutes}:${seconds} ${ampm}`;
   };
 
+
+function ProposalMain({ props }: { props: string }) {
+  const router = useRouter();
+  const [link, setLink] = useState("");
+  const [voterCount, setVoterCount] = useState(10);
+
+  const Chartdata = [
+    { name: 'Day 1', For: 4000, Against: 2400 },
+    { name: 'Day 2', For: 3000, Against: 1398 },
+    { name: 'Day 3', For: 2000, Against: 9800 },
+    { name: 'Day 4', For: 2780, Against: 3908 },
+    { name: 'Day 5', For: 1890, Against: 4800 },
+    { name: 'Day 6', For: 2390, Against: 3800 },
+    { name: 'Day 7', For: 3490, Against: 4300 },
+  ];
+
+  const [isChartLoading, setIsChartLoading] = useState(true);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsChartLoading(false);
+    }, 2000); // Simulate 2 seconds loading time
+  
+    return () => clearTimeout(timer);
+  }, []);
+
   const handleBack = () => {
     router.back();
   };
@@ -214,16 +242,29 @@ function ProposalMain({ props }: { props: Props }) {
   };
   return (
     <>
+      {/* <div className="mx-10 my-8 flex justify-between  ">
+        <h1 className="capitalize text-4xl text-blue-shade-100 flex items-center justify-between">
+          Optimism/ Arbritrum
+        </h1>
+        <ConnectWalletWithENS />
+      </div> */}
       <div className="pr-8 pb-5 pl-16 pt-6">
         <IndividualDaoHeader />
       </div>
 
+      {/* buttons */}
       <div className="flex gap-4 mx-24 mb-8 mt-2 font-poppins">
-        <div className="text-white bg-blue-shade-100 rounded-full py-1.5 px-4 flex justify-center items-center gap-1 cursor-pointer" onClick={handleBack}>
+        <div
+          className="text-white bg-blue-shade-100 rounded-full py-1.5 px-4 flex justify-center items-center gap-1 cursor-pointer"
+          onClick={handleBack}
+        >
           <IoArrowBack />
           Back
         </div>
-        <div className="text-white bg-blue-shade-100 rounded-full py-1.5 px-4 flex justify-center items-center gap-1 cursor-pointer" onClick={shareOnTwitter}>
+        <div
+          className="text-white bg-blue-shade-100 rounded-full py-1.5 px-4 flex justify-center items-center gap-1 cursor-pointer"
+          onClick={shareOnTwitter}
+        >
           Share
           <IoShareSocialSharp />
         </div>
@@ -233,7 +274,7 @@ function ProposalMain({ props }: { props: Props }) {
         <div className="flex items-center">
           <div className="flex gap-2 items-center">
             {loading ? (<p></p>) : (<p className="text-3xl font-semibold">{truncateText(data?.description, 7)}</p>)}
-            <Tooltip
+            <Tooltips
               showArrow
               content={<div className="font-poppins">OnChain</div>}
               placement="right"
@@ -241,9 +282,11 @@ function ProposalMain({ props }: { props: Props }) {
               closeDelay={1}
             >
               <Image src={chain} alt="" className="size-6 cursor-pointer" />
-            </Tooltip>
+            </Tooltips>
           </div>
-          <div className="rounded-full bg-[#f4d3f9] border border-[#77367a] flex items-center justify-center text-[#77367a] text-xs h-fit py-0.5 font-medium px-2 w-fit ml-auto">Closed</div>
+          <div className="rounded-full bg-[#f4d3f9] border border-[#77367a] flex items-center justify-center text-[#77367a] text-xs h-fit  py-0.5 font-medium px-2 w-fit ml-auto ">
+            Closed
+          </div>
         </div>
         <div className="flex gap-1 my-1 items-center">
           <Image src={user} alt="" className="size-4" />
@@ -301,8 +344,91 @@ function ProposalMain({ props }: { props: Props }) {
           )}
         </div>
       </div>
+
+
+      <div className="flex ">
+
+     
+      {/* For Voters  */}
+      <div>
+
+      
+      <h1 className="my-8 ml-24 text-4xl font-semibold text-blue-shade-100 font-poppins">
+        Voters
+      </h1>
+      <div className="h-[460px] ml-24 hover:mr-7 mr-10 w-fit font-poppins  transition-shadow duration-300 ease-in-out shadow-xl">
+              <div
+          className={`${
+            voterCount > 5 ? `h-[460px] overflow-y-auto gap-2 flex flex-col ${style.scrollContainer}` : ""
+          }`}
+        >
+          {Array.from({ length: voterCount }).map((_, index) => (
+            <div
+              className="flex py-4 pl-8 pr-6 text-base  bg-gray-50 hover:bg-gray-200 transition-shadow duration-300 ease-in-out shadow-lg w-[45vw]"
+              key={index}
+            >
+              <div className="w-[75%] flex justify-start items-center ">
+                <Image src={user1} alt="" className="size-8 mx-2" />
+                <p
+                  onClick={() =>
+                    handleAddressClick(
+                      "0xf11b6a8c3cb8bb7dbc1518a613b10ceb0bbfc06b"
+                    )
+                  }
+                  className="cursor-pointer hover:text-blue-shade-100"
+                >
+                  0xf11b6a8c3cb8bb7dbc1518a613b10ceb0bbfc06b
+                </p>
+              </div>
+              <div className="w-[25%] flex justify-center items-center ml-auto ">
+                
+                <div className="bg-[#dbf8d4] border  py-0.5 px-2 text-[#639b55] border-[#639b55] rounded-md text-sm font-medium flex w-32 justify-center items-center">
+                  3.5M For
+                </div>
+                <div>arrow</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      </div>
+
+      {/*  Chart for status   */}
+      <div className="w-[40vw] mr-16 my-[105px]  transition-shadow duration-300 ease-in-out shadow-xl h-[460px] flex text-sm items-center justify-center bg-gray-50 font-poppins">
+      {isChartLoading ? (
+   <>
+     <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-black-shade-900"></div>
+   </>
+  ) :(
+    
+  <ResponsiveContainer width="100%" height={400} className=''>
+    <LineChart
+      data={data}
+      margin={{
+        top: 40,
+        right: 30,
+        left: 20,
+        bottom: 5,
+      }}
+    >
+      {/* <CartesianGrid strokeDasharray="3 3" /> */}
+      <XAxis dataKey="name" />
+      <YAxis />
+      <Tooltip />
+      <Legend />
+      <Line type="monotone" dataKey="For" stroke="#82ca9d" strokeWidth={2} activeDot={{ r: 8 }} />
+      <Line type="monotone" dataKey="Against" stroke="#ff4560" strokeWidth={2}/>
+    </LineChart>
+  </ResponsiveContainer>
+  )}
+ 
+</div>
+
+</div>
+
     </>
   );
+}
 }
 
 export default ProposalMain;
