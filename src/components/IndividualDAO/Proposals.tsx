@@ -16,6 +16,7 @@ import {
   fetchExchange,
   gql,
 } from "urql";
+import ProposalsSkeletonLoader from "../SkeletonLoader/ProposalsSkeletonLoader";
 const client = createClient({
   url: "https://api.studio.thegraph.com/query/68573/v6_proxy/version/latest",
   exchanges: [cacheExchange, fetchExchange],
@@ -295,27 +296,7 @@ function Proposals({ props }: { props: string }) {
   // const formattedDate = formatDate(proposal.blockTimestamp);
 
   if (loading && displayedProposals.length === 0) return (
-    <>
-    <div className="mr-16 rounded-[2rem] mt-4">
-        {[...Array(5)].map((_, index) => (
-          <div key={index} className="flex p-4 mb-2 gap-5 bg-gray-100 rounded-3xl animate-pulse">
-            <div className="flex basis-1/2 items-center">
-              <div className="h-10 w-10 rounded-full mx-5" />
-              <div className="flex-1">
-                <div className="h-5 w-3/4 rounded mb-2" />
-                <div className="h-3 w-1/2 rounded" />
-              </div>
-            </div>
-            <div className="flex justify-around items-center basis-1/2">
-              <div className="h-8 w-8 rounded-full" />
-              <div className="h-6 w-20 rounded-full" />
-              <div className="h-6 w-44 rounded" />
-              <div className="h-6 w-16 rounded-full" />
-            </div>
-          </div>
-        ))}
-      </div>
-    </>
+    <ProposalsSkeletonLoader/>
   );
   if (error) return <p>Error: {error}</p>;
 

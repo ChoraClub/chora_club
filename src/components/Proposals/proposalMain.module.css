@@ -1,4 +1,4 @@
-/* .scrollbar::-webkit-scrollbar {
+.scrollbar::-webkit-scrollbar {
     width: 8px;
   }
   
@@ -10,30 +10,26 @@
   }
   
  
-  .scrollbar::-webkit-scrollbar-thumb {
+  .scrollbar:hover::-webkit-scrollbar-thumb {
     background:#888;
     border-radius: 5px;
   }
-   */
+  
 
-   .scrollContainer {
+   /* .scrollContainer {
     width: 100%; 
     height: 460px;
     overflow-y: auto;
     overflow-x: hidden; 
-    scrollbar-width: none; /* For Firefox /
-    -ms-overflow-style: none; / For Internet Explorer and Edge /
-    / width: 45vw;  */
+    scrollbar-width: none;
   }
 
   .scrollContainer::-webkit-scrollbar {
-    width: 0px; /* For Chrome, Safari, and Opera */
+    width: 0px; 
   }
 
   .scrollContainer:hover {
-    scrollbar-width: thin; /* For Firefox /
-    -ms-overflow-style: auto; / For Internet Explorer and Edge /
-    / padding-right: 0;  */
+    scrollbar-width: thin; 
   }
 
   .scrollContainer:hover::-webkit-scrollbar {
@@ -50,5 +46,5 @@
     border-radius: 10px !important;
   }
   .voterItem {
-    width: 100%; /* Subtract scrollbar width from item width */
-  }
+    width: 100%; 
+  } */

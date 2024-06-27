@@ -39,6 +39,7 @@ interface Proposal {
 import { Tooltip as Tooltips } from "@nextui-org/react";
 import style from "./proposalMain.module.css";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid,Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { RiArrowRightUpLine } from "react-icons/ri";
 
 function ProposalMain({ props }: { props: Props }) {
   const router = useRouter();
@@ -208,6 +209,10 @@ function ProposalMain({ props }: { props: Props }) {
     }
   };
 
+  const handleTransactionClick = (transactionHash:any) => {
+    window.open(`https://optimistic.etherscan.io/tx/${transactionHash}`, '_blank');
+  };
+
   const shareOnTwitter = () => {
     const url = encodeURIComponent(link);
     const text = encodeURIComponent(
@@ -246,7 +251,7 @@ function ProposalMain({ props }: { props: Props }) {
       </div>
 
       {/* buttons */}
-      <div className="flex gap-4 mx-24 mb-8 mt-2 font-poppins">
+      <div className="flex gap-4 mx-24 mb-8 mt-5 font-poppins">
         <div
           className="text-white bg-blue-shade-100 rounded-full py-1.5 px-4 flex justify-center items-center gap-1 cursor-pointer"
           onClick={handleBack}
@@ -349,10 +354,10 @@ function ProposalMain({ props }: { props: Props }) {
       <h1 className="my-8 ml-24 text-4xl font-semibold text-blue-shade-100 font-poppins">
         Voters
       </h1>
-      <div className="h-[460px] ml-24 hover:mr-7 mr-10 w-fit font-poppins  transition-shadow duration-300 ease-in-out shadow-xl">
+      <div className="h-[460px] ml-24 mr-10 w-fit font-poppins  transition-shadow duration-300 ease-in-out shadow-xl">
               <div
           className={`${
-            voterCount > 5 ? `h-[460px] overflow-y-auto gap-2 flex flex-col ${style.scrollContainer}` : ""
+            voterCount > 5 ? `h-[460px] overflow-y-auto gap-2 flex flex-col ${style.scrollbar}` : ""
           }`}
         >
           {Array.from({ length: voterCount }).map((_, index) => (
@@ -373,12 +378,12 @@ function ProposalMain({ props }: { props: Props }) {
                   0xf11b6a8c3cb8bb7dbc1518a613b10ceb0bbfc06b
                 </p>
               </div>
-              <div className="w-[25%] flex justify-center items-center ml-auto ">
+              <div className="w-[25%] flex justify-center items-center ml-auto gap-3">
                 
                 <div className="bg-[#dbf8d4] border  py-0.5 px-2 text-[#639b55] border-[#639b55] rounded-md text-sm font-medium flex w-32 justify-center items-center">
                   3.5M For
                 </div>
-                <div>arrow</div>
+                <div className="rounded-full border-blue-shade-500 p-0.5 border-2 hover:bg-[#f6f9f9] flex items-center justify-center"><RiArrowRightUpLine className="size-4 text-blue-shade-500 cursor-pointer" onClick={() => handleTransactionClick(transactionHash)}/></div>
               </div>
             </div>
           ))}
