@@ -30,35 +30,6 @@ const GET_CANCELED_PROPOSALS = gql`
     }
   }
 `
-const GET_PROPOSALS = gql`
-  query MyQuery {
-    proposalCreated1S(orderDirection: desc, orderBy: blockTimestamp) {
-      proposalId
-      blockTimestamp
-      description
-      proposer      
-    }
-    proposalCreated2S(orderDirection: desc, orderBy: blockTimestamp) {
-      proposalId
-      blockTimestamp
-      description
-      proposer
-    }
-    proposalCreated3S(orderDirection: desc, orderBy: blockTimestamp) {
-      proposalId
-      blockTimestamp
-      description
-      proposer
-    }
-    proposalCreateds(orderDirection: desc, orderBy: blockTimestamp) {
-      proposalId
-      blockTimestamp
-      description
-      proposer
-    }
-  }
-`;
-
 const COMBINED_VOTE_QUERY = gql`
   query CombinedVoteQuery($proposalId: String!, $skip1: Int!, $skip2: Int!, $first: Int!) {
     voteCastWithParams: voteCastWithParams_collection(
@@ -124,13 +95,14 @@ function Proposals({ props }: { props: string }) {
   
 
   const handleClick = (index: any) => {
-    router.push(`/${props}/Proposals/${index}`);
+    router.push(`/${props}/Proposals/${index.proposalId}`);
   };
   const weiToEther = (wei: string): number => {
     return Number(wei) / 1e18;
   };
 
   const formatWeight = (weight: number): string => {
+    
     if (weight >= 1e9) {
       return (weight / 1e9).toFixed(2) + 'B';
     } else if (weight >= 1e6) {
@@ -153,8 +125,8 @@ function Proposals({ props }: { props: string }) {
 
     try {
       while (true) {
-        const { data } = await client.query(COMBINED_VOTE_QUERY, { proposalId: proposal.proposalId, skip1, skip2, first });
-
+        const response = await fetch(`/api/get-voters?proposalId=${proposal.proposalId}&skip1=${skip1}&skip2=${skip2}&first=${first}`);
+        const data = await response.json();
         const newVoteCastWithParams = data?.voteCastWithParams || [];
         const newVoteCasts = data?.voteCasts || [];
 
@@ -233,13 +205,16 @@ function Proposals({ props }: { props: string }) {
   useEffect(() => {
     const fetchProposals = async () => {
       try {
-        const result = await client.query(GET_PROPOSALS, {});
+        const response = await fetch('/api/get-proposals');
+        console.log("response from api",response);
+        const responseData = await response.json();
+        console.log("responseData",responseData);
         const {
           proposalCreated1S,
           proposalCreated2S,
-          proposalCreated3S,
+          proposalCreated3S,  
           proposalCreateds,
-        } = result.data;
+        } = responseData.data;
 
         const proposals: Proposal[] = [
           ...proposalCreated1S,
@@ -334,7 +309,7 @@ function Proposals({ props }: { props: string }) {
           <div
             key={index}
             className="flex p-4 text-lg mb-2 gap-5 bg-gray-100 hover:bg-gray-50 rounded-3xl transition-shadow duration-300 ease-in-out shadow-lg cursor-pointer items-center"
-            onClick={() => handleClick(index)}
+            onClick={() => handleClick(proposal)}
           >
             <div className="flex basis-1/2">
               <Image src={opLogo} alt="" className="size-10 mx-5 " />
