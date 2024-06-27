@@ -10,7 +10,6 @@ import IndividualDaoHeader from "../utils/IndividualDaoHeader";
 import { LuDot } from "react-icons/lu";
 import user from "@/assets/images/daos/user1.png";
 import chain from "@/assets/images/daos/chain.png";
-// import style from './proposalMain.module.css';
 import {
   Provider,
   cacheExchange,
@@ -168,12 +167,6 @@ function ProposalMain({ props }: { props: Props }) {
     return `${day} ${month}, ${year} ${hours}:${minutes}:${seconds} ${ampm}`;
   };
 
-
-function ProposalMain({ props }: { props: string }) {
-  const router = useRouter();
-  const [link, setLink] = useState("");
-  const [voterCount, setVoterCount] = useState(10);
-
   const Chartdata = [
     { name: 'Day 1', For: 4000, Against: 2400 },
     { name: 'Day 2', For: 3000, Against: 1398 },
@@ -308,8 +301,8 @@ function ProposalMain({ props }: { props: string }) {
           )}
         </div>
       </div>
-
       <h1 className="my-8 mx-24 text-4xl font-semibold text-blue-shade-100 font-poppins">Voters</h1>
+      <div className="flex ">
       <div className="h-[80vh] mx-24 w-fit font-poppins">
         <div className="flex py-3 mb-3 bg-gray-100 w-[46vw] transition-shadow duration-300 ease-in-out shadow-lg text-xl font-semibold pr-6">
           <h3 className="w-[75%] flex pl-8 items-center justify-center">ENS Address</h3>
@@ -346,11 +339,11 @@ function ProposalMain({ props }: { props: string }) {
       </div>
 
 
-      <div className="flex ">
+      
 
      
       {/* For Voters  */}
-      <div>
+      {/* <div>
 
       
       <h1 className="my-8 ml-24 text-4xl font-semibold text-blue-shade-100 font-poppins">
@@ -391,7 +384,7 @@ function ProposalMain({ props }: { props: string }) {
           ))}
         </div>
       </div>
-      </div>
+      </div> */}
 
       {/*  Chart for status   */}
       <div className="w-[40vw] mr-16 my-[105px]  transition-shadow duration-300 ease-in-out shadow-xl h-[460px] flex text-sm items-center justify-center bg-gray-50 font-poppins">
@@ -403,7 +396,7 @@ function ProposalMain({ props }: { props: string }) {
     
   <ResponsiveContainer width="100%" height={400} className=''>
     <LineChart
-      data={data}
+      data={Chartdata}
       margin={{
         top: 40,
         right: 30,
@@ -428,7 +421,6 @@ function ProposalMain({ props }: { props: string }) {
 
     </>
   );
-}
 }
 
 export default ProposalMain;
