@@ -7,6 +7,8 @@ import opLogo from "@/assets/images/daos/op.png";
 import user from "@/assets/images/daos/user1.png";
 import chain from "@/assets/images/daos/chain.png";
 import ProposalsSkeletonLoader from "../SkeletonLoader/ProposalsSkeletonLoader";
+import ArbLogo from "@/assets/images/daos/arbCir.png";
+
 
 interface Proposal {
   proposalId: string;
@@ -32,16 +34,22 @@ function Proposals({ props }: { props: string }) {
   const proposalsPerPage = 5;
 
   const VoteLoader = () => (
-    <div className="bg-[#dbf8d4] border border-[#639b55] py-1 text-[#639b55] rounded-md text-sm font-medium flex justify-center items-center w-32">
-      <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-black-shade-900"></div>
-    </div>
+    <div className=" flex justify-center items-center ">
+            <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-black-shade-900"></div>
+          </div>
   );
-
   const StatusLoader = () => (
-    <div className="rounded-full flex items-end justify-center text-xs py-1 border font-medium w-24 bg-red-200 border-red-500">
-      <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-black-shade-900"></div>
-    </div>
+    <div className="flex items-end justify-center ">
+            <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-black-shade-900"></div>
+          </div>
   );
+  
+
+  // const StatusLoader = () => (
+  //   <div className="rounded-full flex items-end justify-center text-xs py-1 border font-medium w-24 bg-red-200 border-red-500">
+  //     <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-black-shade-900"></div>
+  //   </div>
+  // );
 
   const handleClick = (proposal: Proposal) => {
     router.push(`/${props}/Proposals/${proposal.proposalId}`);
@@ -239,15 +247,15 @@ console.log("responseData of arb", responseData.porposalV2)
             onClick={() => handleClick(proposal)}
           >
             <div className="flex basis-1/2">
-              <Image src={opLogo} alt="" className="size-10 mx-5" />
+              <Image src={props === "optimism" ? opLogo:ArbLogo} alt="" className="size-10 mx-5" />
               <div>
                 <p className="text-base font-medium">
                   {truncateText(proposal.description || '', 7)}
                 </p>
                 <div className="flex gap-1">
-                  <Image src={user} alt="" className="size-4" />
+                  {/* <Image src={user} alt="" className="size-4" /> */}
                   <p className="flex text-xs font-normal items-center">
-                    {proposal.proposer} <LuDot />{formatDate(proposal.blockTimestamp)}
+                    Started at {formatDate(proposal.blockTimestamp)}
                   </p>
                 </div>
               </div>
