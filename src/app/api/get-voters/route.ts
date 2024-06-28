@@ -19,6 +19,7 @@ const COMBINED_VOTE_QUERY = gql`
       voter
       weight
       support
+      blockTimestamp
     }
     voteCasts(
       where: { proposalId: $proposalId }
@@ -30,6 +31,7 @@ const COMBINED_VOTE_QUERY = gql`
       voter
       weight
       support
+      blockTimestamp
     }
   }
 `;
@@ -60,7 +62,7 @@ export async function GET(req: NextRequest) {
   
 
     // Log the raw data returned from the query
-  console.log('result:', result);
+
     if (result.error) {
       console.error('GraphQL query error:', result.error);
       return NextResponse.json({ error: 'An error occurred while fetching data' }, { status: 500 });
