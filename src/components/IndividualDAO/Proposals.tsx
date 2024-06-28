@@ -83,12 +83,12 @@ function Proposals({ props }: { props: string }) {
   const [canceledProposals, setCanceledProposals] = useState<any[]>([]);
 
   const VoteLoader = () => (
-    <div className="bg-[#dbf8d4] border border-[#639b55] py-1 text-[#639b55] rounded-md text-sm font-medium flex justify-center items-center w-32">
+    <div className=" flex justify-center items-center ">
             <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-black-shade-900"></div>
           </div>
   );
   const StatusLoader = () => (
-    <div className="rounded-full flex items-end justify-center text-xs  py-1 border font-medium w-24 bg-red-200 border-red-500">
+    <div className="flex items-end justify-center ">
             <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-black-shade-900"></div>
           </div>
   );

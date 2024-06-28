@@ -1,12 +1,18 @@
 .scrollbar::-webkit-scrollbar {
     width: 8px;
   }
+
+.scrollbar{
+  overflow-x: hidden; 
+}
   
-  
+/* .scrollbar::-webkit-scrollbar-track{
+  background-color: transparent;
+} */
   .scrollbar::-webkit-scrollbar-track {
-    background: #F6F6F6;
+    background:  rgb(229 231 235);
     border-radius: 8px;
-    height: 410px;
+    height: 400px;
   }
   
  
@@ -15,6 +21,12 @@
     border-radius: 5px;
   }
   
+  .description-content {
+    display: -webkit-box;
+    -webkit-line-clamp: 6;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
 
    /* .scrollContainer {
     width: 100%; 
