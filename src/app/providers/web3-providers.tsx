@@ -46,7 +46,7 @@ const optimsimSepolia = {
 };
 
 const { chains, publicClient, webSocketPublicClient } = configureChains(
-  [optimism, arbitrum, optimsimSepolia],
+  [optimism, arbitrum],
   [publicProvider()]
 );
 

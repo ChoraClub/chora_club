@@ -50,17 +50,20 @@ const PeerMetaData: React.FC<PeerMetaDatProps> = ({
   return (
     <div className={cn(className, "flex items-center justify-between w-full")}>
       <div className="flex items-center gap-2">
-      {metadata?.avatarUrl &&
+        {metadata?.avatarUrl &&
         metadata.avatarUrl !== "/avatars/avatars/0.png" ? (
           <div className="bg-pink-50 border border-pink-100 rounded-full w-6 h-6">
-            <img
+            <Image
               src={metadata?.avatarUrl}
+              alt="image"
               className="maskAvatar object-cover"
+              width={100}
+              height={100}
             />
           </div>
         ) : (
           <div className="flex text-sm font-semibold items-center justify-center w-6 h-6 bg-[#004DFF] text-gray-200 rounded-full">
-           {metadata?.displayName} (You)
+            {metadata?.displayName[0]?.toUpperCase()}
             {/* <img src={metadata?.avatarUrl} /> */}
           </div>
         )}

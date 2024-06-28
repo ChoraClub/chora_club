@@ -1,5 +1,6 @@
 import { PeerMetadata } from "@/utils/types";
 import {
+  useDataMessage,
   useLocalScreenShare,
   usePeerIds,
   useRemoteAudio,
@@ -14,6 +15,9 @@ import clsx from "clsx";
 import { useStudioState } from "@/store/studioState";
 import Camera from "../Media/Camera";
 import { Role } from "@huddle01/server-sdk/auth";
+import { NestedPeerListIcons } from "@/utils/PeerListIcons";
+import { useState } from "react";
+import Image from "next/image";
 
 interface RemotePeerProps {
   peerId: string;
@@ -21,11 +25,25 @@ interface RemotePeerProps {
 
 const RemotePeer = ({ peerId }: RemotePeerProps) => {
   const { stream: videoStream } = useRemoteVideo({ peerId });
-  const { stream: audioStream } = useRemoteAudio({ peerId });
+  const { stream: audioStream, isAudioOn } = useRemoteAudio({ peerId });
   const { metadata } = useRemotePeer<PeerMetadata>({ peerId });
   const { isScreenShared } = useStudioState();
   const { peerIds } = usePeerIds({
     roles: [Role.HOST, Role.GUEST],
+  });
+  const [reaction, setReaction] = useState("");
+
+  useDataMessage({
+    onMessage(payload, from, label) {
+      if (from === peerId) {
+        if (label === "reaction") {
+          setReaction(payload);
+          setTimeout(() => {
+            setReaction("");
+          }, 5000);
+        }
+      }
+    },
   });
 
   return (
@@ -38,6 +56,9 @@ const RemotePeer = ({ peerId }: RemotePeerProps) => {
             }`
       )}
     >
+      <div className="absolute left-1/2 -translate-x-1/2 mb-2 text-4xl">
+        {reaction}
+      </div>
       {metadata?.isHandRaised && (
         <span className="absolute top-4 right-4 text-4xl text-gray-200 font-medium">
           ✋
@@ -50,9 +71,12 @@ const RemotePeer = ({ peerId }: RemotePeerProps) => {
           {metadata?.avatarUrl &&
           metadata.avatarUrl !== "/avatars/avatars/0.png" ? (
             <div className="bg-pink-50 border border-pink-100 rounded-full w-24 h-24">
-              <img
+              <Image
                 src={metadata?.avatarUrl}
+                alt="image"
                 className="maskAvatar object-cover"
+                width={100}
+                height={100}
               />
             </div>
           ) : (
@@ -65,6 +89,11 @@ const RemotePeer = ({ peerId }: RemotePeerProps) => {
       )}
       <span className="absolute bottom-4 left-4 text-gray-800 font-medium">
         {metadata?.displayName}
+      </span>
+      <span className="absolute bottom-4 right-4">
+        {isAudioOn
+          ? NestedPeerListIcons.active.mic
+          : NestedPeerListIcons.inactive.mic}
       </span>
       {audioStream && (
         <Audio stream={audioStream} name={metadata?.displayName ?? "guest"} />

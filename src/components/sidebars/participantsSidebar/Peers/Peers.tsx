@@ -36,7 +36,7 @@ const Peers: React.FC<PeersProps> = () => {
 
   return (
     <div>
-      {me.role === Role.HOST && <MuteMicDiv onClick={muteEveryone} />}
+      {me.role === Role.HOST && <MuteMicDiv onClick={() => muteEveryone()} />}
 
       {/* {requestedPeers.length > 0 && me.role === Role.HOST && (
         <PeerList className="mt-5" title="Requested to Speak">

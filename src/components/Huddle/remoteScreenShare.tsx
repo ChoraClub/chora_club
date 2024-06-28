@@ -4,7 +4,7 @@ import Video from "../Media/Video";
 import Audio from "../Media/Audio";
 import GridContainer from "./GridContainer";
 import clsx from "clsx";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useStudioState } from "@/store/studioState";
 
 interface RemotePeerProps {
@@ -25,6 +25,12 @@ const RemoteScreenShare = ({ peerId }: RemotePeerProps) => {
     },
   });
   const { metadata } = useRemotePeer<PeerMetadata>({ peerId });
+  const [videoStreamTrack, setVideoStreamTrack] = useState<any>("");
+
+  useEffect(() => {
+    setVideoStreamTrack(videoTrack && new MediaStream([videoTrack]));
+    console.log("videoTrack", videoTrack);
+  }, [videoTrack]);
 
   return (
     <>
@@ -33,7 +39,7 @@ const RemoteScreenShare = ({ peerId }: RemotePeerProps) => {
           <GridContainer className="w-full h-full">
             <>
               <Video
-                stream={videoTrack && new MediaStream([videoTrack])}
+                stream={videoStreamTrack}
                 name={metadata?.displayName ?? "guest"}
               />
               {audioTrack && (

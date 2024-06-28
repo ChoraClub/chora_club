@@ -74,9 +74,12 @@ const PeerMetaData: React.FC<PeerMetaDatProps> = ({
         {metadata?.avatarUrl &&
         metadata.avatarUrl !== "/avatars/avatars/0.png" ? (
           <div className="bg-pink-50 border border-pink-100 rounded-full w-6 h-6">
-            <img
+            <Image
               src={metadata?.avatarUrl}
+              alt="image"
               className="maskAvatar object-cover"
+              width={100}
+              height={100}
             />
           </div>
         ) : (

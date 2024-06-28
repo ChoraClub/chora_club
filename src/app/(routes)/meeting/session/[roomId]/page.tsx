@@ -19,7 +19,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import BottomBar from "@/components/Huddle/bottomBar";
 import { Button } from "@/components/ui/button";
@@ -40,6 +40,9 @@ import Link from "next/link";
 import { Tooltip } from "@nextui-org/react";
 import { PiRecordFill } from "react-icons/pi";
 import ParticipantTile from "@/components/Huddle/ParticipantTile";
+import { NestedPeerListIcons } from "@/assets/PeerListIcons";
+import logo from "@/assets/images/daos/CCLogo1.png";
+import Image from "next/image";
 
 export default function Component({ params }: { params: { roomId: string } }) {
   const { isVideoOn, enableVideo, disableVideo, stream } = useLocalVideo();
@@ -81,6 +84,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
   const [hostAddress, setHostAddress] = useState();
   const { address } = useAccount();
   const { push } = useRouter();
+  const path = usePathname();
   const [isAllowToEnter, setIsAllowToEnter] = useState<boolean>();
   const [notAllowedMessage, setNotAllowedMessage] = useState<string>();
   const [videoStreamTrack, setVideoStreamTrack] = useState<any>("");
@@ -96,6 +100,8 @@ export default function Component({ params }: { params: { roomId: string } }) {
     isHandRaised: boolean;
   }>();
 
+  const [reaction, setReaction] = useState("");
+
   useDataMessage({
     async onMessage(payload, from, label) {
       if (label === "chat") {
@@ -105,6 +111,14 @@ export default function Component({ params }: { params: { roomId: string } }) {
           text: message,
           isUser: from === peerId,
         });
+      }
+      if (from === peerId) {
+        if (label === "reaction") {
+          setReaction(payload);
+          setTimeout(() => {
+            setReaction("");
+          }, 5000);
+        }
       }
     },
   });
@@ -286,7 +300,13 @@ export default function Component({ params }: { params: { roomId: string } }) {
       {isAllowToEnter ? (
         <div className={clsx("flex flex-col h-screen bg-white font-poppins")}>
           <header className="flex items-center justify-between pt-4 px-4">
-            <h1 className="text-black text-xl font-semibold">ChoraClub</h1>
+            <div className="flex items-center bg-black px-3 rounded-full py-2 space-x-2">
+              <Image src={logo} alt="image" height={25} width={25} />
+              <div className="text-xl font-medium tracking-widest">
+                <span className="text-white">Chora</span>
+                <span className="text-blue-shade-100">Club</span>
+              </div>
+            </div>
             <div className="flex items-center justify-center gap-4">
               <Tooltip
                 showArrow
@@ -316,14 +336,14 @@ export default function Component({ params }: { params: { roomId: string } }) {
                     <div className="flex space-x-2">
                       <span className="p-2 bg-gray-200 rounded-lg text-black">
                         {typeof window !== "undefined" &&
-                          `http://${window.location.host}/${params.roomId}`}
+                          `https://${window.location.host}/${path}`}
                       </span>
                       <Button
                         className="bg-gray-200 hover:bg-gray-300 text-gray-900"
                         onClick={() => {
                           if (typeof window === "undefined") return;
                           navigator.clipboard.writeText(
-                            `http://${window.location.host}/${params.roomId}`
+                            `https://${window.location.host}/${path}/lobby`
                           );
                           setIsCopied(true);
                           setTimeout(() => {
@@ -386,11 +406,15 @@ export default function Component({ params }: { params: { roomId: string } }) {
                           }`
                     )}
                   >
+                    <div className="absolute left-1/2 -translate-x-1/2 mb-2 text-4xl z-10">
+                      {reaction}
+                    </div>
                     {metadata?.isHandRaised && (
                       <span className="absolute top-4 right-4 text-4xl text-gray-200 font-medium">
                         ✋
                       </span>
                     )}
+
                     {stream ? (
                       <>
                         <Camera
@@ -403,9 +427,12 @@ export default function Component({ params }: { params: { roomId: string } }) {
                         {metadata?.avatarUrl &&
                         metadata.avatarUrl !== "/avatars/avatars/0.png" ? (
                           <div className="bg-pink-50 border border-pink-100 rounded-full w-24 h-24">
-                            <img
+                            <Image
+                              alt="image"
                               src={metadata?.avatarUrl}
                               className="maskAvatar object-contain object-center"
+                              width={100}
+                              height={100}
                             />
                           </div>
                         ) : (
@@ -418,6 +445,11 @@ export default function Component({ params }: { params: { roomId: string } }) {
                     )}
                     <span className="absolute bottom-4 left-4 text-gray-800 font-medium">
                       {`${metadata?.displayName} (You)`}
+                    </span>
+                    <span className="absolute bottom-4 right-4">
+                      {isAudioOn
+                        ? NestedPeerListIcons.active.mic
+                        : NestedPeerListIcons.inactive.mic}
                     </span>
                   </GridContainer>
                 )}

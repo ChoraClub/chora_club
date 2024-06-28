@@ -19,6 +19,8 @@ interface StudioState {
   setName: (name: string) => void;
   avatarUrl: string;
   setAvatarUrl: (val: string) => void;
+  myReaction: string;
+  setMyReaction: (val: string) => void;
   isChatOpen: boolean;
   setIsChatOpen: (isChatOpen: boolean) => void;
   isQnAOpen: boolean;
@@ -69,6 +71,12 @@ export const useStudioState = create<StudioState>((set) => ({
   setAvatarUrl: (val: string) => {
     set(() => ({
       avatarUrl: val,
+    }));
+  },
+  myReaction: "",
+  setMyReaction: (val: string) => {
+    set(() => ({
+      myReaction: val,
     }));
   },
   isChatOpen: false,

@@ -25,6 +25,7 @@ import { useAccount, useNetwork } from "wagmi";
 import { PiLinkSimpleBold } from "react-icons/pi";
 import { opBlock, arbBlock } from "@/config/constants";
 import MeetingRecordingModal from "../utils/MeetingRecordingModal";
+import ReactionBar from "./ReactionBar";
 
 const BottomBar = () => {
   const { isAudioOn, enableAudio, disableAudio } = useLocalAudio();
@@ -164,19 +165,48 @@ const BottomBar = () => {
     }
   }, []);
 
-  useEffect(() => {
-    const storedStatus = sessionStorage.getItem("isMeetingRecorded");
-    console.log("storedStatus: ", storedStatus);
-    setRecordingStatus(storedStatus);
-  }, []);
+  // useEffect(() => {
+  //   const storedStatus = sessionStorage.getItem("isMeetingRecorded");
+  //   console.log("storedStatus: ", storedStatus);
+  //   setRecordingStatus(storedStatus);
+  // }, []);
 
-  const handleModalClose = (result: boolean) => {
-    sessionStorage.setItem("isMeetingRecorded", result.toString());
-    setShowModal(false);
-    console.log(
-      result ? "Meeting will be recorded." : "Meeting will not be recorded."
-    );
-  };
+  // const handleModalClose = async (result: boolean) => {
+  //   if (role === "host") {
+  //     sessionStorage.setItem("isMeetingRecorded", result.toString());
+  //     setShowModal(false);
+  //     setRecordingStatus(result.toString());
+  //     console.log(
+  //       result ? "Meeting will be recorded." : "Meeting will not be recorded."
+  //     );
+
+  //     if (result) {
+  //       startRecordingAutomatically();
+  //     }
+
+  //     try {
+  //       const requestOptions = {
+  //         method: "PUT",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //         body: JSON.stringify({
+  //           meetingId: roomId,
+  //           meetingType: meetingCategory,
+  //           recordedStatus: result.toString(),
+  //         }),
+  //       };
+
+  //       const response = await fetch(
+  //         "/api/update-recording-status",
+  //         requestOptions
+  //       );
+  //       console.log("Response: ", response);
+  //     } catch (e) {
+  //       console.log("Error: ", e);
+  //     }
+  //   }
+  // };
 
   const startRecordingAutomatically = async () => {
     try {
@@ -284,26 +314,28 @@ const BottomBar = () => {
       console.error("Error handling end call:", error);
     }
 
-    try {
-      toast.success("Giving Attestations");
-      const response = await fetch(`/api/get-attest-data`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          roomId: roomId,
-        }),
-      });
-      const response_data = await response.json();
-      console.log("Updated", response_data);
-      if (response_data.success) {
-        toast.success("Attestation successful");
+    // if (recordingStatus === "true") {
+      try {
+        toast.success("Giving Attestations");
+        const response = await fetch(`/api/get-attest-data`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            roomId: roomId,
+          }),
+        });
+        const response_data = await response.json();
+        console.log("Updated", response_data);
+        if (response_data.success) {
+          toast.success("Attestation successful");
+        }
+      } catch (e) {
+        console.log("Error in attestation: ", e);
+        toast.error("Attestation denied");
       }
-    } catch (e) {
-      console.log("Error in attestation: ", e);
-      toast.error("Attestation denied");
-    }
+    // }
 
     if (meetingCategory === "officehours") {
       try {
@@ -324,6 +356,8 @@ const BottomBar = () => {
         console.log("error: ", e);
       }
     }
+
+    // sessionStorage.removeItem("isMeetingRecorded");
   };
 
   return (
@@ -425,14 +459,14 @@ const BottomBar = () => {
               {isAudioOn ? BasicIcons.on.mic : BasicIcons.off.mic}
             </button>
           </ChangeDevice>
-          <ChangeDevice deviceType="speaker">
+          {/* <ChangeDevice deviceType="speaker">
             <button
               onClick={() => {}}
               className="bg-gray-600/50 p-2.5 rounded-lg"
             >
               {BasicIcons.speaker}
             </button>
-          </ChangeDevice>
+          </ChangeDevice> */}
           <ButtonWithIcon
             onClick={() => {
               if (isScreenShared) {
@@ -464,6 +498,10 @@ const BottomBar = () => {
             {BasicIcons.handRaise}
           </ButtonWithIcon>
           {/* <ButtonWithIcon onClick={leaveRoom}>{BasicIcons.end}</ButtonWithIcon> */}
+
+          <div>
+            <ReactionBar />
+          </div>
           <div className="flex cursor-pointer items-center">
             <Dropdown
               triggerChild={BasicIcons.leave}
