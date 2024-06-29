@@ -128,6 +128,10 @@ function ProposalMain({ props }: { props: Props }) {
 
     // Convert headers (lines starting with #)
     description = description.replace(/^# (.+)$/gm, "<h2>$1</h2>");
+    description = description.replace(/(\*\*)(.+?)(\*\*)/g, '<strong>$2</strong>');
+    description = description.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+    description = description.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+    description = description.replace(/^# (.+)$/gm, '<h1>$1</h1>');
 
     // Convert links [text](url)
     description = description.replace(
@@ -630,7 +634,7 @@ function ProposalMain({ props }: { props: Props }) {
         </div>
         <div className="flex gap-1 my-1 items-center">
           <div className="flex text-xs font-normal items-center">
-            {date ? formatDate(date) : 'Loading...'}
+            {date ? formatDate(date) : <div className="animate-pulse bg-gray-200  h-4 w-32 rounded-full"></div>}
             {/* {console.log(formatDate(data.blockTimestamp))} */}
           </div>
           {/* <div className="rounded-full bg-[#dbf8d4] border border-[#639b55] flex w-fit items-end justify-center text-[#639b55] text-xs h-fit py-0.5 font-medium px-2">
