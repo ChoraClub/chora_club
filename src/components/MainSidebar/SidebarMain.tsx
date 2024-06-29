@@ -275,11 +275,11 @@ function Sidebar() {
   const closeTour = () => {
     setIsTourOpen(false);
     setHasSeenTour(true);
-    sessionStorage.setItem("tourSeen", JSON.stringify(true));
+    localStorage.setItem("tourSeen", JSON.stringify(true));
   };
-
+  
   useEffect(() => {
-    const tourSeen = JSON.parse(sessionStorage.getItem("tourSeen") || "false");
+    const tourSeen = JSON.parse(localStorage.getItem("tourSeen") || "false");
     setHasSeenTour(tourSeen);
     if (!tourSeen) {
       setIsTourOpen(true);

@@ -2,9 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export const GET = async (req: NextRequest) => {
     const url = new URL(req.url);
-    const user = url.searchParams.get('user');
     const lastCursor = url.searchParams.get('lastCursor');
-    console.log("user", user);
+ 
     console.log("lastCursor", lastCursor);
 
     let query = '';
@@ -57,6 +56,7 @@ export const GET = async (req: NextRequest) => {
               "organizationId": "2206072050315953936"
             },
             "page": {
+               afterCursor: lastCursor || null,
               "limit": 20,
             },
             "sort": {

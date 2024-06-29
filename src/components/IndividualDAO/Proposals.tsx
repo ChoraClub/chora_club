@@ -32,6 +32,7 @@ function Proposals({ props }: { props: string }) {
   const [currentPage, setCurrentPage] = useState(1);
   const [canceledProposals, setCanceledProposals] = useState<any[]>([]);
   const proposalsPerPage = 5;
+  const [VoterlastCursor, setVoterLastCursor] = useState<string | null>(null);
 
   const VoteLoader = () => (
     <div className=" flex justify-center items-center ">
@@ -43,13 +44,6 @@ function Proposals({ props }: { props: string }) {
             <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-black-shade-900"></div>
           </div>
   );
-  
-
-  // const StatusLoader = () => (
-  //   <div className="rounded-full flex items-end justify-center text-xs py-1 border font-medium w-24 bg-red-200 border-red-500">
-  //     <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-black-shade-900"></div>
-  //   </div>
-  // );
 
   const handleClick = (proposal: Proposal) => {
     router.push(`/${props}/Proposals/${proposal.proposalId}`);
@@ -120,60 +114,80 @@ function Proposals({ props }: { props: string }) {
     }
   }, [props]);
 
-  useEffect(() => {
-    const fetchProposals = async () => {
-      try {
-        let response;
-        if (props === "optimism") {
-          response = await fetch('/api/get-proposals');
-        } else {
-          response = await fetch('/api/get-arbitrumproposals');
-        }
-        const responseData = await response.json();
-console.log("responseData of arb", responseData.porposalV2)
-        let proposals: Proposal[];
-        if (props === "optimism") {
-          const {
-            proposalCreated1S,
-            proposalCreated2S,
-            proposalCreated3S,
-            proposalCreateds,
-          } = responseData.data;
-
-          proposals = [
-            ...proposalCreated1S,
-            ...proposalCreated2S,
-            ...proposalCreated3S,
-            ...proposalCreateds,
-          ].map((p: any) => ({
-            ...p,
-            votesLoaded: false,
-          }));
-        } else {
-          proposals = responseData.proposalsV2.nodes.map((node: any) => ({
-            blockTimestamp: new Date(node.block.timestamp).getTime() / 1000,
-            description: node.metadata.description,
-            proposalId: node.id,
-            proposer: node.governor.id.split(':').pop() || '',
-            support0Weight: (node.voteStats.find((v: any) => v.type === "against")?.votesCount)/10**18 || 0,
-            support1Weight: (node.voteStats.find((v: any) => v.type === "for")?.votesCount)/10**18 || 0,
-            support2Weight: (node.voteStats.find((v: any) => v.type === "abstain")?.votesCount)/10**18 || 0,
-            votersCount: node.voteStats.reduce((acc: number, v: any) => acc + v.votersCount, 0),
-            votesLoaded: true,
-            status: node.status,
-          }));
-        }
-
-        proposals.sort((a, b) => b.blockTimestamp - a.blockTimestamp);
-        setAllProposals(proposals);
-        setDisplayedProposals(proposals.slice(0, proposalsPerPage));
-      } catch (error: any) {
-        console.error("Error fetching data:", error);
-        setError(error.message);
-      } finally {
-        setLoading(false);
+  const fetchProposals = async () => {
+    setLoading(true);
+    try {
+      let response;
+      if (props === "optimism") {
+        response = await fetch('/api/get-proposals');
+      } else {
+        response = await fetch(`/api/get-arbitrumproposals${VoterlastCursor ? `?lastCursor=${VoterlastCursor}` : ''}`);
       }
-    };
+      const responseData = await response.json();
+      
+      let newProposals;
+      if (props === "optimism") {
+        const {
+          proposalCreated1S,
+          proposalCreated2S,
+          proposalCreated3S,
+          proposalCreateds,
+        } = responseData.data;
+
+        newProposals = [
+          ...proposalCreated1S,
+          ...proposalCreated2S,
+          ...proposalCreated3S,
+          ...proposalCreateds,
+        ].map((p) => ({
+          ...p,
+          votesLoaded: false,
+        }));
+      } else {
+        setVoterLastCursor(responseData.proposalsV2?.pageInfo.lastCursor);
+        newProposals = responseData.proposalsV2.nodes.map((node:any) => ({
+          blockTimestamp: new Date(node.block.timestamp).getTime() / 1000,
+          description: node.metadata.description,
+          proposalId: node.id,
+          proposer: node.governor.id.split(':').pop() || '',
+          support0Weight: (node.voteStats.find((v:any) => v.type === "against")?.votesCount) / 10**18 || 0,
+          support1Weight: (node.voteStats.find((v:any) => v.type === "for")?.votesCount) / 10**18 || 0,
+          support2Weight: (node.voteStats.find((v:any) => v.type === "abstain")?.votesCount) / 10**18 || 0,
+          votersCount: node.voteStats.reduce((acc:any, v:any) => acc + v.votersCount, 0),
+          votesLoaded: true,
+          status: node.status,
+        }));
+      }
+
+      newProposals.sort((a:any, b:any) => b.blockTimestamp - a.blockTimestamp);
+      
+      setAllProposals(prevProposals => {
+        const updatedProposals = [...prevProposals, ...newProposals];
+        return updatedProposals.sort((a, b) => b.blockTimestamp - a.blockTimestamp);
+      });
+      
+      setDisplayedProposals(prevDisplayed => {
+        const newDisplayed = [...prevDisplayed, ...newProposals];
+        return newDisplayed.slice(0, Math.min(newDisplayed.length, prevDisplayed.length + proposalsPerPage));
+      });
+    } catch (error:any) {
+      console.error("Error fetching data:", error);
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadMoreProposal = () => {
+    const currentLength = displayedProposals.length;
+    const moreProposals = allProposals.slice(currentLength, currentLength + proposalsPerPage);
+    setDisplayedProposals(prevProposals => [...prevProposals, ...moreProposals]);
+
+    if (currentLength + proposalsPerPage >= allProposals.length && props !== "optimism") {
+      fetchProposals();
+    }
+  };
+  useEffect(() => {
 
     fetchProposals();
   }, [props]);
@@ -207,18 +221,28 @@ console.log("responseData of arb", responseData.porposalV2)
   }, [displayedProposals, fetchVotes, props]);
 
   const loadMoreProposals = useCallback(() => {
-    const nextPage = currentPage + 1;
-    const startIndex = (nextPage - 1) * proposalsPerPage;
-    const endIndex = startIndex + proposalsPerPage;
-    const newProposals = allProposals.slice(startIndex, endIndex);
-    setDisplayedProposals(prevProposals => [...prevProposals, ...newProposals]);
-    setCurrentPage(nextPage);
-  }, [allProposals, currentPage, proposalsPerPage]);
+    if (props === "optimism") {
+      const nextPage = currentPage + 1;
+      const startIndex = (nextPage - 1) * proposalsPerPage;
+      const endIndex = startIndex + proposalsPerPage;
+      const newProposals = allProposals.slice(startIndex, endIndex);
+      setDisplayedProposals(prevProposals => [...prevProposals, ...newProposals]);
+      setCurrentPage(nextPage);
+    } else {
+      // For Arbitrum
+      const currentLength = displayedProposals.length;
+      const moreProposals = allProposals.slice(currentLength, currentLength + proposalsPerPage);
+      setDisplayedProposals(prevProposals => [...prevProposals, ...moreProposals]);
 
-  const truncateText = (text: string, wordLimit: number) => {
-    const words = text.split(' ');
-    return words.length <= wordLimit ? text : words.slice(0, wordLimit).join(' ') + '...';
-  };
+      if (currentLength + proposalsPerPage >= allProposals.length) {
+        fetchProposals();
+      }
+    }
+  }, [props, allProposals, currentPage, displayedProposals.length]);
+
+  const truncateText = (text: string, charLimit: number) => {
+    return text.length <= charLimit ? text : text.slice(0, charLimit) + '...';
+};
 
   const formatDate = (timestamp: number) => {
     const date = new Date(timestamp * 1000);
@@ -250,7 +274,7 @@ console.log("responseData of arb", responseData.porposalV2)
               <Image src={props === "optimism" ? opLogo:ArbLogo} alt="" className="size-10 mx-5" />
               <div>
                 <p className="text-base font-medium">
-                  {truncateText(proposal.description || '', 7)}
+                  {truncateText(proposal.description || '', 50    )}
                 </p>
                 <div className="flex gap-1">
                   {/* <Image src={user} alt="" className="size-4" /> */}
@@ -328,7 +352,7 @@ console.log("responseData of arb", responseData.porposalV2)
 
         {displayedProposals.length < allProposals.length && (
           <div className="flex items-center justify-center">
-            <button onClick={loadMoreProposals} className="bg-blue-shade-100 text-white py-2 px-4 w-fit rounded-lg font-medium">View More</button>
+            <button onClick={loadMoreProposals } className="bg-blue-shade-100 text-white py-2 px-4 w-fit rounded-lg font-medium">View More</button>
           </div>
         )}
       </div>
