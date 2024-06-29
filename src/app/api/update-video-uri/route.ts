@@ -32,7 +32,7 @@ export async function POST(req: NextRequest, res: NextApiResponse) {
       );
     }
     // Call the FastAPI endpoint to process the video URL
-    const response = await axios.post("http://127.0.0.1:8000/analyze", {
+    const response = await axios.post(`${process.env.DESC_GENERATION_BASE_URL}/analyze`, {
       url: video_uri,
     });
 
