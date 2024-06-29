@@ -315,26 +315,26 @@ const BottomBar = () => {
     }
 
     // if (recordingStatus === "true") {
-      try {
-        toast.success("Giving Attestations");
-        const response = await fetch(`/api/get-attest-data`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            roomId: roomId,
-          }),
-        });
-        const response_data = await response.json();
-        console.log("Updated", response_data);
-        if (response_data.success) {
-          toast.success("Attestation successful");
-        }
-      } catch (e) {
-        console.log("Error in attestation: ", e);
-        toast.error("Attestation denied");
+    try {
+      toast.success("Giving Attestations");
+      const response = await fetch(`/api/get-attest-data`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          roomId: roomId,
+        }),
+      });
+      const response_data = await response.json();
+      console.log("Updated", response_data);
+      if (response_data.success) {
+        toast.success("Attestation successful");
       }
+    } catch (e) {
+      console.log("Error in attestation: ", e);
+      toast.error("Attestation denied");
+    }
     // }
 
     if (meetingCategory === "officehours") {
@@ -431,34 +431,34 @@ const BottomBar = () => {
         <div
           className={clsx("flex space-x-3", role === Role.HOST ? "mr-12" : "")}
         >
-          <ChangeDevice deviceType="cam">
-            <button
-              onClick={() => {
-                if (isVideoOn) {
-                  disableVideo();
-                } else {
-                  enableVideo();
-                }
-              }}
-              className="bg-gray-600/50 p-2.5 rounded-lg"
-            >
-              {isVideoOn ? BasicIcons.on.cam : BasicIcons.off.cam}
-            </button>
-          </ChangeDevice>
-          <ChangeDevice deviceType="mic">
-            <button
-              onClick={() => {
-                if (isAudioOn) {
-                  disableAudio();
-                } else {
-                  enableAudio();
-                }
-              }}
-              className="bg-gray-600/50 p-2.5 rounded-lg"
-            >
-              {isAudioOn ? BasicIcons.on.mic : BasicIcons.off.mic}
-            </button>
-          </ChangeDevice>
+          {/* <ChangeDevice deviceType="cam"> */}
+          <button
+            onClick={() => {
+              if (isVideoOn) {
+                disableVideo();
+              } else {
+                enableVideo();
+              }
+            }}
+            className="bg-gray-600/50 p-2.5 rounded-lg hover:bg-gray-600"
+          >
+            {isVideoOn ? BasicIcons.on.cam : BasicIcons.off.cam}
+          </button>
+          {/* </ChangeDevice> */}
+          {/* <ChangeDevice deviceType="mic"> */}
+          <button
+            onClick={() => {
+              if (isAudioOn) {
+                disableAudio();
+              } else {
+                enableAudio();
+              }
+            }}
+            className="bg-gray-600/50 p-2.5 rounded-lg hover:bg-gray-600"
+          >
+            {isAudioOn ? BasicIcons.on.mic : BasicIcons.off.mic}
+          </button>
+          {/* </ChangeDevice> */}
           {/* <ChangeDevice deviceType="speaker">
             <button
               onClick={() => {}}
