@@ -336,14 +336,14 @@ export default function Component({ params }: { params: { roomId: string } }) {
                     <div className="flex space-x-2">
                       <span className="p-2 bg-gray-200 rounded-lg text-black">
                         {typeof window !== "undefined" &&
-                          `https://${window.location.host}/${path}`}
+                          `https://${window.location.host}${path}`}
                       </span>
                       <Button
                         className="bg-gray-200 hover:bg-gray-300 text-gray-900"
                         onClick={() => {
                           if (typeof window === "undefined") return;
                           navigator.clipboard.writeText(
-                            `https://${window.location.host}/${path}/lobby`
+                            `https://${window.location.host}${path}/lobby`
                           );
                           setIsCopied(true);
                           setTimeout(() => {
