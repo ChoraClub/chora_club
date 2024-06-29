@@ -20,6 +20,7 @@ const COMBINED_VOTE_QUERY = gql`
       weight
       support
       blockTimestamp
+      transactionHash
     }
     voteCasts(
       where: { proposalId: $proposalId }
@@ -32,6 +33,7 @@ const COMBINED_VOTE_QUERY = gql`
       weight
       support
       blockTimestamp
+      transactionHash
     }
   }
 `;
