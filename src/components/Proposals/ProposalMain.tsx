@@ -608,22 +608,58 @@ function ProposalMain({ props }: { props: Props }) {
               <Image src={chain} alt="" className="size-6 cursor-pointer" />
             </Tooltips>
           </div>
-          <div className="rounded-full bg-[#f4d3f9] border border-[#77367a] flex items-center justify-center text-[#77367a] text-xs h-fit  py-0.5 font-medium px-2 w-fit ml-auto ">
+          {/* <div className={`rounded-full bg-[#f4d3f9] border border-[#77367a] flex items-center justify-center text-[#77367a] text-xs h-fit  py-0.5 font-medium px-2 w-fit ml-auto `}>
             {data && data.blockTimestamp
               ? (new Date() > new Date(data.blockTimestamp * 1000 + 7 * 24 * 60 * 60 * 1000) ? 'Closed' : 'Active')
-              : 'Loading...'}          </div>
+              : <>
+              <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-black-shade-900"></div>
+             </>}          </div> */}
+             <div className={`rounded-full flex items-center justify-center text-xs h-fit py-0.5 font-medium px-2 w-fit ml-auto ${
+  data && data.blockTimestamp
+    ? (new Date() > new Date(data.blockTimestamp * 1000 + 7 * 24 * 60 * 60 * 1000)
+      ? 'bg-red-100 border border-red-500 text-red-500'  // Closed state
+      : 'bg-[#f4d3f9] border border-[#77367a] text-[#77367a]')  // Active state
+    : 'bg-gray-200 animate-pulse  rounded-full'  // Loading state
+}`}>
+  {data && data.blockTimestamp
+    ? (new Date() > new Date(data.blockTimestamp * 1000 + 7 * 24 * 60 * 60 * 1000)
+      ? 'Closed'
+      : 'Active')
+    : <div className="h-5 w-20"></div>}
+</div>
         </div>
         <div className="flex gap-1 my-1 items-center">
           <div className="flex text-xs font-normal items-center">
-            {date ? formatDate(date):'Loading...'}
+            {date ? formatDate(date):<div className="h-4 animate-pulse w-40 rounded-full bg-gray-200"></div>}
             {/* {console.log(formatDate(data.blockTimestamp))} */}
           </div>
-          <div className="rounded-full bg-[#dbf8d4] border border-[#639b55] flex w-fit items-end justify-center text-[#639b55] text-xs h-fit py-0.5 font-medium px-2">
+          {/* <div className="rounded-full bg-[#dbf8d4] border border-[#639b55] flex w-fit items-end justify-center text-[#639b55] text-xs h-fit py-0.5 font-medium px-2">
             {props.daoDelegates==="arbitrum"? data?.status :(canceledProposals && canceledProposals.some((item: any) => item.proposalId == props.id) ? (
               'CANCELLED'
             ) : (
               support1Weight > support0Weight ? 'SUCCEEDED' : 'DEFEATED'
-            ))}</div>
+            ))}</div> */}
+            <div className={`rounded-full flex w-fit items-end justify-center text-xs h-fit py-0.5 font-medium px-2 ${
+  props.daoDelegates === "arbitrum" ? (
+    data?.status ? 'bg-[#dbf8d4] border border-[#639b55] text-[#639b55]' : 'bg-gray-200'
+  ) : (
+    canceledProposals && canceledProposals.some((item: any) => item.proposalId == props.id) ? 
+      'bg-blue-100 border border-blue-500 text-blue-500' :
+    support1Weight > support0Weight ?
+      'bg-green-100 border border-green-500 text-green-500' :
+      'bg-red-100 border border-red-500 text-red-500'
+  )
+}`}>
+  {props.daoDelegates === "arbitrum" ? (
+    data?.status || <div className="animate-pulse h-4 w-24  rounded"></div>
+  ) : (
+    canceledProposals && canceledProposals.some((item: any) => item.proposalId == props.id) ? 
+      'CANCELLED' :
+    support1Weight > support0Weight ?
+      'SUCCEEDED' :
+      'DEFEATED'
+  )}
+</div>
         </div>
 
         <div className="text-sm mt-3">
