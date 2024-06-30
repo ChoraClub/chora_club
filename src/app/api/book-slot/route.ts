@@ -20,7 +20,7 @@ interface MeetingRequestBody {
   dao_name: string;
   title: string;
   description: string;
-  thumbnail:string;
+  thumbnail: string;
   session_type: string;
 }
 
@@ -106,21 +106,23 @@ export async function POST(
         .find({ address: host_address })
         .toArray();
 
-      for (const document of documentsForHostEmail) {
-        const emailId = document.emailId;
-        if (emailId && emailId !== "" && emailId !== undefined) {
-          try {
-            await sendMail({
-              to: emailId,
-              name: "Chora Club",
-              subject: "Session Booked",
-              body: compileBookedSessionTemplate(
-                "Your session has been Booked.",
-                "You can Approve or Reject."
-              ),
-            });
-          } catch (error) {
-            console.error("Error sending mail:", error);
+      if (session_type === "session") {
+        for (const document of documentsForHostEmail) {
+          const emailId = document.emailId;
+          if (emailId && emailId !== "" && emailId !== undefined) {
+            try {
+              await sendMail({
+                to: emailId,
+                name: "Chora Club",
+                subject: "Session Booked",
+                body: compileBookedSessionTemplate(
+                  "Your session has been Booked.",
+                  "You can Approve or Reject."
+                ),
+              });
+            } catch (error) {
+              console.error("Error sending mail:", error);
+            }
           }
         }
       }

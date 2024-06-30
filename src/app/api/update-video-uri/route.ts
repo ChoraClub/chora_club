@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { connectDB } from "@/config/connectDB";
 import { NextRequest, NextResponse } from "next/server";
+import axios from "axios";
 
 export async function POST(req: NextRequest, res: NextApiResponse) {
   const { meetingId, video_uri } = await req.json();
@@ -24,16 +25,26 @@ export async function POST(req: NextRequest, res: NextApiResponse) {
       { $set: { video_uri, meeting_status: "Recorded" } }
     );
 
-    // Close MongoDB client
-    await client.close();
-
     if (!officeHoursMeeting && !otherMeeting) {
       return NextResponse.json(
         { message: "Meeting not found with the given meetingId" },
         { status: 404 }
       );
     }
+    // Call the FastAPI endpoint to process the video URL
+    const response = await axios.post(`${process.env.DESC_GENERATION_BASE_URL}/analyze`, {
+      url: video_uri,
+    });
 
+    const { title, description } = response.data;
+
+    await otherCollection.findOneAndUpdate(
+      { meetingId },
+      { $set: { title, description } }
+    );
+
+    // Close MongoDB client
+    await client.close();
     return NextResponse.json(
       { message: "Video URI updated successfully" },
       { status: 200 }
