@@ -2,14 +2,12 @@
 import Image from "next/image";
 import React, { use, useEffect, useState } from "react";
 import user from "@/assets/images/daos/profile.png";
+import { FaXTwitter, FaDiscord, FaGithub } from "react-icons/fa6";
 import {
-  FaXTwitter,
-  FaDiscord,
-  FaGithub,
-  FaBell,
-  FaBellSlash,
-} from "react-icons/fa6";
-import { BiSolidMessageRoundedDetail } from "react-icons/bi";
+  BiSolidBellOff,
+  BiSolidBellRing,
+  BiSolidMessageRoundedDetail,
+} from "react-icons/bi";
 import { IoCopy } from "react-icons/io5";
 import DelegateInfo from "./DelegateInfo";
 import DelegateVotes from "./DelegateVotes";
@@ -694,7 +692,7 @@ function SpecificDelegate({ props }: { props: Type }) {
       {isPageLoading && <MainProfileSkeletonLoader />}
       {!(isPageLoading || (!isDelegate && !selfDelegate)) ? (
         <div className="font-poppins">
-          {followed && <Confetti recycle={false} numberOfPieces={550} />}
+          {/* {followed && <Confetti recycle={false} numberOfPieces={550} />} */}
           <div className="flex ps-14 py-5 justify-between">
             <div className="flex">
               {/* <Image
@@ -710,7 +708,8 @@ function SpecificDelegate({ props }: { props: Type }) {
                 style={{
                   backgroundColor: "#fcfcfc",
                   border: "2px solid #E9E9E9 ",
-                }}>
+                }}
+              >
                 <div className="w-40 h-40 flex items-center justify-content ">
                   <div className="flex justify-center items-center w-40 h-40">
                     <Image
@@ -772,7 +771,8 @@ function SpecificDelegate({ props }: { props: Type }) {
                           : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                      target="_blank">
+                      target="_blank"
+                    >
                       <FaXTwitter color="#7C7C7C" size={12} />
                     </Link>
                     <Link
@@ -791,7 +791,8 @@ function SpecificDelegate({ props }: { props: Type }) {
                           : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                      target="_blank">
+                      target="_blank"
+                    >
                       <BiSolidMessageRoundedDetail color="#7C7C7C" size={12} />
                     </Link>
                     <Link
@@ -806,7 +807,8 @@ function SpecificDelegate({ props }: { props: Type }) {
                           : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                      target="_blank">
+                      target="_blank"
+                    >
                       <FaDiscord color="#7C7C7C" size={12} />
                     </Link>
                     <Link
@@ -821,7 +823,8 @@ function SpecificDelegate({ props }: { props: Type }) {
                           : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                      target="_blank">
+                      target="_blank"
+                    >
                       <FaGithub color="#7C7C7C" size={12} />
                     </Link>
                   </div>
@@ -837,7 +840,8 @@ function SpecificDelegate({ props }: { props: Type }) {
                     content="Copy"
                     placement="right"
                     closeDelay={1}
-                    showArrow>
+                    showArrow
+                  >
                     <span className="px-2 cursor-pointer" color="#3E3D3D">
                       <IoCopy
                         onClick={() => handleCopy(props.individualDelegate)}
@@ -899,7 +903,8 @@ function SpecificDelegate({ props }: { props: Type }) {
                     //   handleDelegateVotes(`${props.individualDelegate}`)
                     // }
 
-                    onClick={handleDelegateModal}>
+                    onClick={handleDelegateModal}
+                  >
                     Delegate
                   </button>
 
@@ -907,7 +912,8 @@ function SpecificDelegate({ props }: { props: Type }) {
                     className={`font-bold text-white rounded-full px-8 py-[10px] flex items-center ${
                       isFollowing ? "bg-green-500" : "bg-blue-shade-200"
                     }`}
-                    onClick={handleFollow}>
+                    onClick={handleFollow}
+                  >
                     {loading ? (
                       <Oval
                         visible={true}
@@ -944,12 +950,14 @@ function SpecificDelegate({ props }: { props: Type }) {
                           <div className="flex justify-center px-8 py-4">
                             <button
                               className="bg-gray-300 text-gray-700 px-8 py-3 font-semibold rounded-full mr-4"
-                              onClick={() => setUnfollowmodel(false)}>
+                              onClick={() => setUnfollowmodel(false)}
+                            >
                               Cancel
                             </button>
                             <button
                               className="bg-red-500 text-white px-8 py-3 font-semibold rounded-full"
-                              onClick={() => handleConfirm(1)}>
+                              onClick={() => handleConfirm(1)}
+                            >
                               {loading ? (
                                 <Oval
                                   visible={true}
@@ -990,12 +998,14 @@ function SpecificDelegate({ props }: { props: Type }) {
                           <div className="flex justify-center px-8 py-4">
                             <button
                               className="bg-gray-300 text-gray-700 px-8 py-3 font-semibold rounded-full mr-4"
-                              onClick={() => setNotificationmodel(false)}>
+                              onClick={() => setNotificationmodel(false)}
+                            >
                               Keep Notifications
                             </button>
                             <button
                               className="bg-red-500 text-white px-8 py-3 font-semibold rounded-full"
-                              onClick={() => handleConfirm(2)}>
+                              onClick={() => handleConfirm(2)}
+                            >
                               {loading ? (
                                 <Oval
                                   visible={true}
@@ -1023,8 +1033,9 @@ function SpecificDelegate({ props }: { props: Type }) {
                     }
                     placement="top"
                     closeDelay={1}
-                    showArrow>
-                    <button
+                    showArrow
+                  >
+                    {/* <button
                       className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[5px] flex items-center mr-2"
                       onClick={() => {
                         if (notification) {
@@ -1032,13 +1043,33 @@ function SpecificDelegate({ props }: { props: Type }) {
                         } else {
                           handleConfirm(2);
                         }
-                      }}>
+                      }}
+                    > */}
+                    <div
+                      className="flex items-center cursor-pointer"
+                      onClick={() => {
+                        if (notification) {
+                          setNotificationmodel(true);
+                        } else {
+                          handleConfirm(2);
+                        }
+                      }}
+                    >
                       {notification ? (
-                        <FaBell className="mr-2" />
+                        <BiSolidBellRing
+                          className=""
+                          color="bg-blue-shade-200"
+                          size={24}
+                        />
                       ) : (
-                        <FaBellSlash className="mr-2" />
+                        <BiSolidBellOff
+                          className="mr-1"
+                          color="bg-blue-shade-200"
+                          size={24}
+                        />
                       )}
-                    </button>
+                      {/* </button> */}
+                    </div>
                   </Tooltip>
                 </div>
               </div>
@@ -1055,7 +1086,8 @@ function SpecificDelegate({ props }: { props: Type }) {
                   ? " border-blue-shade-200 text-blue-shade-200 font-semibold"
                   : "border-transparent"
               }`}
-              onClick={() => router.push(path + "?active=info")}>
+              onClick={() => router.push(path + "?active=info")}
+            >
               Info
             </button>
             <button
@@ -1064,7 +1096,8 @@ function SpecificDelegate({ props }: { props: Type }) {
                   ? "text-blue-shade-200 font-semibold border-blue-shade-200"
                   : "border-transparent"
               }`}
-              onClick={() => router.push(path + "?active=pastVotes")}>
+              onClick={() => router.push(path + "?active=pastVotes")}
+            >
               Past Votes
             </button>
             <button
@@ -1075,7 +1108,8 @@ function SpecificDelegate({ props }: { props: Type }) {
               }`}
               onClick={() =>
                 router.push(path + "?active=delegatesSession&session=book")
-              }>
+              }
+            >
               Sessions
             </button>
             <button
@@ -1086,7 +1120,8 @@ function SpecificDelegate({ props }: { props: Type }) {
               }`}
               onClick={() =>
                 router.push(path + "?active=officeHours&hours=ongoing")
-              }>
+              }
+            >
               Office Hours
             </button>
           </div>
