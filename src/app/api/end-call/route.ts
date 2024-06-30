@@ -10,6 +10,7 @@ interface Meeting {
 
 interface Participant {
   displayName: string;
+  walletAddress: string;
   joinedAt: string;
   exitedAt: string;
   attestation: string; // Added attestation field
@@ -151,7 +152,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
       // Calculate meeting time per participant
       participantList.participants.forEach((participant) => {
-        const eoaAddress: string = participant.displayName;
+        const eoaAddress: string = participant.walletAddress;
         const joinedAt: Date = new Date(participant.joinedAt);
         const exitedAt: Date = new Date(participant.exitedAt);
         const durationInMinutes: number = Math.floor(
@@ -187,7 +188,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
     let participantsWithSufficientAttendance: Participant[] = [];
     for (const participant of validParticipants) {
       const participantMeetingTime =
-        meetingTimePerEOA[participant.displayName] || 0;
+        meetingTimePerEOA[participant.walletAddress] || 0;
       if (participantMeetingTime >= minimumAttendanceTime) {
         participantsWithSufficientAttendance.push({
           ...participant,
@@ -198,7 +199,10 @@ export async function POST(req: NextRequest, res: NextResponse) {
     // Remove host from participants with sufficient attendance
     participantsWithSufficientAttendance =
       participantsWithSufficientAttendance.filter(
-        (participant) => participant.displayName !== hostData?.address
+        (participant) =>
+          participant.walletAddress &&
+          participant.walletAddress.toLowerCase() !==
+            hostData?.address.toLowerCase()
       );
 
     // Add the "attestation" field with value "pending" to each host
@@ -207,10 +211,19 @@ export async function POST(req: NextRequest, res: NextResponse) {
       hostData &&
       combinedParticipantLists
         .flat()
-        .some((participant) => participant.displayName === hostData.address)
+        .some(
+          (participant) =>
+            participant.walletAddress &&
+            participant.walletAddress.toLowerCase() ===
+              hostData.address.toLowerCase()
+        )
     ) {
       combinedParticipantLists.flat().forEach((participant) => {
-        if (participant.displayName === hostData.address) {
+        if (
+          participant.walletAddress &&
+          participant.walletAddress.toLowerCase() ===
+            hostData.address.toLowerCase()
+        ) {
           hosts.push({ ...participant, attestation: "pending" });
         }
       });

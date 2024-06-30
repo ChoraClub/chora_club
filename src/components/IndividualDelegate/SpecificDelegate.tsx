@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import user from "@/assets/images/daos/profile.png";
 import { FaXTwitter, FaDiscord, FaGithub } from "react-icons/fa6";
 import { BiSolidMessageRoundedDetail } from "react-icons/bi";
@@ -16,24 +16,69 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { useRouter } from "next-nprogress-bar";
 import Link from "next/link";
 import toast, { Toaster } from "react-hot-toast";
-// import { Provider, cacheExchange, createClient, fetchExchange } from "urql";
+import {
+  Provider,
+  cacheExchange,
+  createClient,
+  fetchExchange,
+  gql,
+} from "urql";
 import WalletAndPublicClient from "@/helpers/signer";
 import dao_abi from "../../artifacts/Dao.sol/GovernanceToken.json";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
+// import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useConnectModal, useChainModal } from "@rainbow-me/rainbowkit";
-import { useNetwork } from "wagmi";
+import { useAccount, useNetwork } from "wagmi";
 import OPLogo from "@/assets/images/daos/op.png";
 import ArbLogo from "@/assets/images/daos/arbCir.png";
 import ccLogo from "@/assets/images/daos/CC.png";
 import { Oval } from "react-loader-spinner";
 import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
+<<<<<<< HEAD
 import { getEnsNameOfUser } from "../ConnectWallet/ENSResolver";
 import { BASE_URL } from "@/config/constants";
+=======
+// import { getEnsNameOfUser } from "../ConnectWallet/ENSResolver";
+import DelegateTileModal from "../utils/delegateTileModal";
+// import { cacheExchange, createClient, fetchExchange, gql } from "urql/core";
+import { set } from "video.js/dist/types/tech/middleware";
+import MainProfileSkeletonLoader from "../SkeletonLoader/MainProfileSkeletonLoader";
+import { fetchEnsAvatar } from "@/utils/ENSUtils";
+>>>>>>> dev2
 
 interface Type {
   daoDelegates: string;
   individualDelegate: string;
 }
+const client = createClient({
+  url: "https://api.studio.thegraph.com/query/68573/op/v0.0.1",
+  exchanges: [cacheExchange, fetchExchange],
+});
+const GET_LATEST_DELEGATE_VOTES_CHANGED = gql`
+query MyQuery($delegate: String!) {
+  delegateVotesChangeds(
+    first: 1
+    orderBy: blockTimestamp
+    orderDirection: desc
+    where: { delegate: $delegate }
+  ) {
+    newBalance
+  }
+}
+`;
+
+
+const DELEGATE_CHANGED_QUERY = gql`
+  query MyQuery($delegator: String!) {
+    delegateChangeds(
+      orderBy: blockTimestamp
+      orderDirection: desc
+      where: { delegator: $delegator }
+      first: 1
+    ) {
+      toDelegate
+    }
+  }
+`;
 
 function SpecificDelegate({ props }: { props: Type }) {
   const { publicClient, walletClient } = WalletAndPublicClient();
@@ -43,6 +88,7 @@ function SpecificDelegate({ props }: { props: Type }) {
   const [delegateInfo, setDelegateInfo] = useState<any>();
   const router = useRouter();
   const path = usePathname();
+  const { openConnectModal } = useConnectModal();
   console.log(path);
   const searchParams = useSearchParams();
   const [selfDelegate, setSelfDelegate] = useState<boolean>();
@@ -55,7 +101,71 @@ function SpecificDelegate({ props }: { props: Type }) {
   const [description, setDescription] = useState("");
   // const provider = new ethers.BrowserProvider(window?.ethereum);
   const [displayEnsName, setDisplayEnsName] = useState<string>();
+<<<<<<< HEAD
   const [isCopied, setIsCopied] = useState(false);
+=======
+  const [delegate, setDelegate] = useState("");
+  const [same, setSame] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const [delegateOpen, setDelegateOpen] = useState(false);
+  const address = useAccount();
+  const { isConnected } = useAccount();
+
+  const handleDelegateModal = async () => {
+  
+      if (!isConnected) {
+        if (openConnectModal) {
+          openConnectModal();
+        }
+      } else {
+        console.log(address);
+        setDelegateOpen(true);
+        setLoading(true);
+        try {
+          const { data } = await client.query(DELEGATE_CHANGED_QUERY, {
+            delegator: address,
+          });
+          // const ens = await getEnsNameOfUser(
+          //   data.delegateChangeds[0]?.toDelegate
+          // );
+          const delegate = data.delegateChangeds[0]?.toDelegate;
+          console.log("individualDelegate", props.individualDelegate);
+          setSame(delegate === props.individualDelegate);
+          // ens
+            // ? setDelegate(ens)
+            // : 
+            setDelegate(delegate.slice(0, 6) + "..." + delegate.slice(-4));
+          setError(null);
+        } catch (err: any) {
+          setError(err.message);
+        } finally {
+          setLoading(false);
+        }
+
+        setDelegateOpen(true);
+      }
+    
+  };
+  const handleCloseDelegateModal = () => {
+    setDelegateOpen(false);
+  };
+  useEffect(() => {
+    // Lock scrolling when the modal is open
+    if (delegateOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [delegateOpen]);
+  const [votingPower,setVotingPower] = useState<number>();
+
+>>>>>>> dev2
   const [karmaSocials, setKarmaSocials] = useState({
     twitter: "",
     discord: "",
@@ -69,6 +179,78 @@ function SpecificDelegate({ props }: { props: Type }) {
     discourse: "",
     github: "",
   });
+  const [delegatorsCount, setDelegatorsCount] = useState<number>();
+  const[votesCount,setVotesCount] = useState<number>();
+
+  const totalCount =
+   `query Delegate($input: DelegateInput!) {
+  delegate(input: $input) {
+    id
+    votesCount
+    delegatorsCount
+  }
+}
+ `;
+ const variables = {
+  input: {
+    address: `${props.individualDelegate}`,
+    governorId:"",
+    organizationId :null as number | null
+  }
+};
+if (props.daoDelegates === "arbitrum") {
+  variables.input.governorId = "eip155:42161:0x789fC99093B09aD01C34DC7251D0C89ce743e5a4";
+  variables.input.organizationId = 2206072050315953936;
+}else{
+  variables.input.governorId = "eip155:10:0xcDF27F107725988f2261Ce2256bDfCdE8B382B10";
+  variables.input.organizationId = 2206072049871356990;
+}
+ 
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const apiKey = process.env.NEXT_PUBLIC_TALLY_API_KEY;
+      console.log("API key", apiKey);
+          if (!apiKey) {
+            throw new Error('API key is missing');
+          }
+        fetch('https://api.tally.xyz/query', {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Api-Key": apiKey,
+          },
+          body: JSON.stringify({
+            query: totalCount,
+            variables: variables
+          }),
+        })
+        .then(result => result.json())
+        .then(finalCounting => {
+          console.log(finalCounting);
+          console.log("dataa", finalCounting.data);
+          setVotesCount(finalCounting.data.delegate.votesCount);
+          setDelegatorsCount(finalCounting.data.delegate.delegatorsCount);
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+
+        console.log("Props", props.individualDelegate);
+        const data = await client.query(GET_LATEST_DELEGATE_VOTES_CHANGED, { delegate: props.individualDelegate.toString()}).toPromise();
+        console.log("voting data", data.data.delegateVotesChangeds[0]);
+        setVotingPower(data.data.delegateVotesChangeds[0].newBalance);
+      } catch (error) {
+        console.error("Error fetching data", error);
+      }
+    };
+
+    if (props.individualDelegate) {
+      fetchData();
+    }
+  }, [client, props.individualDelegate]);
+
 
   useEffect(() => {
     console.log("Network", chain?.network);
@@ -303,8 +485,8 @@ function SpecificDelegate({ props }: { props: Type }) {
 
   useEffect(() => {
     const fetchEnsName = async () => {
-      const ensName = await getEnsNameOfUser(props.individualDelegate);
-      setDisplayEnsName(ensName);
+      const ensName = await fetchEnsAvatar(props.individualDelegate);
+      setDisplayEnsName(ensName?.ensName);
     };
     fetchEnsName();
   }, [chain, props.individualDelegate]);
@@ -312,16 +494,7 @@ function SpecificDelegate({ props }: { props: Type }) {
   return (
     <>
       {isPageLoading && (
-        <div className="flex items-center justify-center pt-10">
-          <Oval
-            visible={true}
-            height="40"
-            width="40"
-            color="#0500FF"
-            secondaryColor="#cdccff"
-            ariaLabel="oval-loading"
-          />
-        </div>
+        <MainProfileSkeletonLoader/>
       )}
       {!(isPageLoading || (!isDelegate && !selfDelegate)) ? (
         <div className="font-poppins">
@@ -530,9 +703,8 @@ function SpecificDelegate({ props }: { props: Type }) {
                 <div className="flex gap-4 py-1">
                   <div className="text-[#4F4F4F] border-[0.5px] border-[#D9D9D9] rounded-md px-3 py-1">
                     <span className="text-blue-shade-200 font-semibold">
-                      {delegateInfo?.delegatedVotes
-                        ? formatNumber(Number(delegateInfo?.delegatedVotes))
-                        : 0}
+                      {props.daoDelegates === "arbitrum" ? (votesCount?formatNumber(votesCount/10**18):0) 
+                          :(votingPower?formatNumber(votingPower/10**18):0)}
                       &nbsp;
                     </span>
                     delegated tokens
@@ -541,21 +713,23 @@ function SpecificDelegate({ props }: { props: Type }) {
                     Delegated from
                     <span className="text-blue-shade-200 font-semibold">
                       &nbsp;
-                      {delegateInfo?.delegatorCount
-                        ? formatNumber(delegateInfo?.delegatorCount)
+                      {delegatorsCount
+                        ? formatNumber(delegatorsCount)
                         : 0}
                       &nbsp;
                     </span>
                     Addresses
-                  </div>
+                  </div> 
                 </div>
 
                 <div className="pt-2">
                   <button
                     className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
-                    onClick={() =>
-                      handleDelegateVotes(`${props.individualDelegate}`)
-                    }
+                    // onClick={() =>
+                    //   handleDelegateVotes(`${props.individualDelegate}`)
+                    // }
+
+                    onClick={handleDelegateModal}
                   >
                     Delegate
                   </button>
@@ -640,6 +814,38 @@ function SpecificDelegate({ props }: { props: Type }) {
             </div>
           </div>
         )
+      )}
+      {console.log("Delegate", delegate)}
+      {delegateOpen && (
+        <DelegateTileModal
+          isOpen={delegateOpen}
+          closeModal={handleCloseDelegateModal}
+          handleDelegateVotes={() =>
+            handleDelegateVotes(`${props.individualDelegate}`)
+          }
+          fromDelegate={delegate ? delegate : "N/A"}
+          delegateName={
+            delegateInfo?.ensName ||
+            displayEnsName || (
+              // displayName ||
+              <>
+                {props.individualDelegate.slice(0, 6)}...
+                {props.individualDelegate.slice(-4)}
+              </>
+            )
+          }
+          displayImage={
+            displayImage
+              ? `https://gateway.lighthouse.storage/ipfs/${displayImage}`
+              : delegateInfo?.profilePicture ||
+                (props.daoDelegates === "optimism"
+                  ? OPLogo
+                  : props.daoDelegates === "arbitrum"
+                  ? ArbLogo
+                  : ccLogo)
+          }
+          addressCheck={same}
+        />
       )}
     </>
   );

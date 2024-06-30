@@ -6,6 +6,7 @@ import { useRouter } from "next-nprogress-bar";
 import text1 from "@/assets/images/daos/texture1.png";
 import SessionTile from "../utils/SessionTiles";
 import { Oval } from "react-loader-spinner";
+import SessionTileSkeletonLoader from "../SkeletonLoader/SessionTileSkeletonLoader";
 
 type Attendee = {
   attendee_address: string;
@@ -221,16 +222,7 @@ function DelegateSessions({ props }: { props: Type }) {
             ))} */}
           {searchParams.get("session") === "hosted" &&
             (dataLoading ? (
-              <div className="flex items-center justify-center">
-                <Oval
-                  visible={true}
-                  height="40"
-                  width="40"
-                  color="#0500FF"
-                  secondaryColor="#cdccff"
-                  ariaLabel="oval-loading"
-                />
-              </div>
+              <SessionTileSkeletonLoader/>
             ) : (
               <SessionTile
                 sessionDetails={sessionDetails}
@@ -242,16 +234,7 @@ function DelegateSessions({ props }: { props: Type }) {
             ))}
           {searchParams.get("session") === "attended" &&
             (dataLoading ? (
-              <div className="flex items-center justify-center">
-                <Oval
-                  visible={true}
-                  height="40"
-                  width="40"
-                  color="#0500FF"
-                  secondaryColor="#cdccff"
-                  ariaLabel="oval-loading"
-                />
-              </div>
+              <SessionTileSkeletonLoader/>
             ) : (
               <SessionTile
                 sessionDetails={sessionDetails}

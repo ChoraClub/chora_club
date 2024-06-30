@@ -69,7 +69,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
       console.log("Meeting type: officehours");
       // For office hours, delegate attestation to hosts (meetingType 3) and participants (meetingType 4)
       await delegateAndSetAttestation(
-        data.hosts[0].displayName,
+        data.hosts[0].walletAddress,
         `${roomId}/${token}`,
         3,
         data.startTime,
@@ -78,7 +78,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
       );
       for (const participant of data.participants) {
         await delegateAndSetAttestation(
-          participant.displayName,
+          participant.walletAddress,
           `${roomId}/${token}`,
           4,
           data.startTime,
@@ -87,10 +87,10 @@ export async function POST(req: NextRequest, res: NextResponse) {
         );
       }
     } else if (data.meetingType === "session") {
-      console.log("Meeting type: session");
+      console.log("Meeting type: session: ", data);
       // For sessions, delegate attestation to hosts (meetingType 1) and participants (meetingType 2)
       await delegateAndSetAttestation(
-        data.hosts[0].displayName,
+        data.hosts[0].walletAddress,
         `${roomId}/${token}`,
         1,
         data.startTime,
@@ -99,7 +99,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
       );
       for (const participant of data.participants) {
         await delegateAndSetAttestation(
-          participant.displayName,
+          participant.walletAddress,
           `${roomId}/${token}`,
           2,
           data.startTime,

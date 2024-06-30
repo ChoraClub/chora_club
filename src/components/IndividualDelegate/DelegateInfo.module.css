@@ -1,0 +1,28 @@
+.heading {
+    background: radial-gradient(
+      64.18% 64.18% at 71.16% 35.69%,
+      #004DFF 0.89%,
+      #0249f0 17.23%,
+      #0246e3 42.04%,
+      #023cc3 55.12%,
+      #0241d3 71.54%,
+      #0238b5 100%
+  
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-fill-color: transparent;
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+@keyframes pulse {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+    100% {
+        opacity: 1;
+    }
+}

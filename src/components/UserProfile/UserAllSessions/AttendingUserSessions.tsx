@@ -10,6 +10,7 @@ import { useAccount, useNetwork } from "wagmi";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useRouter } from "next-nprogress-bar";
 import { Oval } from "react-loader-spinner";
+import SessionTileSkeletonLoader from "@/components/SkeletonLoader/SessionTileSkeletonLoader";
 
 type Attendee = {
   attendee_address: string;
@@ -71,16 +72,7 @@ function AttendingUserSessions({ daoName }: { daoName: string }) {
   return (
     <div className="space-y-6">
       {pageLoading ? (
-        <div className="flex items-center justify-center">
-          <Oval
-            visible={true}
-            height="40"
-            width="40"
-            color="#0500FF"
-            secondaryColor="#cdccff"
-            ariaLabel="oval-loading"
-          />
-        </div>
+        <SessionTileSkeletonLoader/>
       ) : sessionDetails.length > 0 ? (
         sessionDetails.map((data, index) => (
           <EventTile

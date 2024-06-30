@@ -5,6 +5,7 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { useRouter } from "next-nprogress-bar";
 import Tile from "../utils/Tile";
 import { Oval } from "react-loader-spinner";
+import SessionTileSkeletonLoader from "../SkeletonLoader/SessionTileSkeletonLoader";
 
 interface Session {
   _id: string;
@@ -183,16 +184,7 @@ function OfficeHours({ props }: { props: string }) {
         <div className="py-10">
           {searchParams.get("hours") === "ongoing" &&
             (dataLoading ? (
-              <div className="flex items-center justify-center">
-                <Oval
-                  visible={true}
-                  height="40"
-                  width="40"
-                  color="#0500FF"
-                  secondaryColor="#cdccff"
-                  ariaLabel="oval-loading"
-                />
-              </div>
+              <SessionTileSkeletonLoader/>
             ) : (
               <Tile
                 sessionDetails={sessionDetails}
@@ -203,16 +195,7 @@ function OfficeHours({ props }: { props: string }) {
             ))}
           {searchParams.get("hours") === "upcoming" &&
             (dataLoading ? (
-              <div className="flex items-center justify-center">
-                <Oval
-                  visible={true}
-                  height="40"
-                  width="40"
-                  color="#0500FF"
-                  secondaryColor="#cdccff"
-                  ariaLabel="oval-loading"
-                />
-              </div>
+              <SessionTileSkeletonLoader/>
             ) : (
               <Tile
                 sessionDetails={sessionDetails}
@@ -223,16 +206,7 @@ function OfficeHours({ props }: { props: string }) {
             ))}
           {searchParams.get("hours") === "recorded" &&
             (dataLoading ? (
-              <div className="flex items-center justify-center">
-                <Oval
-                  visible={true}
-                  height="40"
-                  width="40"
-                  color="#0500FF"
-                  secondaryColor="#cdccff"
-                  ariaLabel="oval-loading"
-                />
-              </div>
+              <SessionTileSkeletonLoader/>
             ) : (
               <div>
                 <Tile

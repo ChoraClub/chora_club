@@ -11,7 +11,7 @@ import { useRouter } from "next-nprogress-bar";
 import Link from "next/link";
 import text1 from "@/assets/images/daos/texture1.png";
 import text2 from "@/assets/images/daos/texture2.png";
-import { getEnsName } from "../ConnectWallet/ENSResolver";
+// import { getEnsName } from "../ConnectWallet/ENSResolver";
 import {
   Modal,
   ModalContent,
@@ -54,7 +54,7 @@ interface TileProps {
 }
 
 const createRandomRoom = async () => {
-  const res = await fetch("https://api-choraclub.vercel.app/api/create-room", {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_CREATE_ROOM_ENDPOINT}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
