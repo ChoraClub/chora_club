@@ -15,6 +15,25 @@ import { connectDB } from "@/config/connectDB";
 //     github: string;
 //   };
 // }
+
+type follow_activity = {
+  action: string;
+  timestamp: Date;
+};
+type followings={
+  follower_address:string
+}
+type dao_follower = {
+  address: string;
+  isNotification: boolean;
+  isFollowing: boolean;
+  activity: follow_activity[];
+};
+type follower_details = {
+  dao_name: string;
+  follower: dao_follower[];
+};
+
 type network_details = {
   dao_name: string;
   network: string;
@@ -34,6 +53,8 @@ interface DelegateRequestBody {
     github: string;
   };
   networks: network_details[];
+  followers: follower_details[];
+  followings:[];
 }
 
 // Define the response body type
@@ -72,6 +93,7 @@ interface DelegateResponseBody {
       github: string;
     };
     networks: network_details[];
+    followers: follower_details[];
   } | null;
   error?: string;
 }

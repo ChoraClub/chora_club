@@ -166,7 +166,7 @@ export const bookedSessionTemplate = `
 															<td class="pad">
 																<div style="font-family: Tahoma, Verdana, sans-serif">
 																	<div class style="font-size: 12px; font-family: Tahoma, Verdana, Segoe, sans-serif; mso-line-height-alt: 14.399999999999999px; color: #555555; line-height: 1.2;">
-																		<p style="margin: 0; font-size: 16px; text-align: center; mso-line-height-alt: 19.2px;"><strong>Congratulations, {{title}}</strong></p>
+																		<p style="margin: 0; font-size: 16px; text-align: center; mso-line-height-alt: 19.2px;"><strong>Exciting update!, {{title}}</strong></p>
 																	</div>
 																</div>
 															</td>
