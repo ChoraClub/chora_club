@@ -594,8 +594,8 @@ function ProposalMain({ props }: { props: Props }) {
 
   const handleAddressClick = (address: any) => {
     console.log("Navigating to:", `/optimism/${address}?active=info`);
-    // router.push(`/optimism/${address}?active=info`);
-    window.location.href = `/optimism/${address}?active=info`;
+    router.push(`/optimism/${address}?active=info`);
+    // window.location.href = `/optimism/${address}?active=info`;
   };
   const date = data?.blockTimestamp;
   console.log("data", data);

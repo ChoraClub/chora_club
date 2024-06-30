@@ -46,7 +46,7 @@ function Proposals({ props }: { props: string }) {
   );
 
   const handleClick = (proposal: Proposal) => {
-    router.push(`/${props}/Proposals/${proposal.proposalId}`);
+    router.push(`/${props}/proposals/${proposal.proposalId}`);
   };
 
   const weiToEther = (wei: string): number => {
