@@ -19,7 +19,8 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
+import { useRouter } from "next-nprogress-bar";
 import { useEffect, useRef, useState } from "react";
 import BottomBar from "@/components/Huddle/bottomBar";
 import { Button } from "@/components/ui/button";
