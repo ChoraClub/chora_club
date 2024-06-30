@@ -23,18 +23,6 @@ const query = gql`
 // export const getEnsName = async (address: string | undefined) => {
 //   const displayName = address?.slice(0, 4) + "..." + address?.slice(-4);
 
-<<<<<<< HEAD
-  if (address) {
-    const query_data: any = await client.query(query, {
-      address: address,
-    });
-    const data = query_data.data?.domains[0]?.name
-      ? query_data.data?.domains[0]?.name
-      : displayName;
-    return data;
-  }
-};
-=======
 //   if (address) {
 //     const query_data: any = await client.query(query, {
 //       address: address,
@@ -45,23 +33,10 @@ const query = gql`
 //     return ensNameOrAddress;
 //   }
 // };
->>>>>>> dev2
 
 // export const getEnsNameOfUser = async (address: string | undefined) => {
 //   const displayName = address?.slice(0, 4) + "..." + address?.slice(-4);
 
-<<<<<<< HEAD
-  if (address) {
-    const query_data: any = await client.query(query, {
-      address: address,
-    });
-    const data = query_data.data?.domains[0]?.name
-      ? query_data.data?.domains[0]?.name
-      : "";
-    return data;
-  }
-};
-=======
 //   if (address) {
 //     const query_data: any = await client.query(query, {
 //       address: address,
@@ -72,4 +47,3 @@ const query = gql`
 //     return data;
 //   }
 // };
->>>>>>> dev2
