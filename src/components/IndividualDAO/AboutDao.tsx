@@ -55,60 +55,76 @@ function AboutDao({ props }:any) {
   return (
     <>
     <div className="container mx-auto px-4 py-8">
-      <div className="bg-gray-50 shadow-md rounded-lg p-8 mb-10">
-      <h1 className="text-2xl font-semibold mb-6">Introduction
-      </h1>
-      <p className="text-sm  ">{text.introduction}</p>
-      
-
-      <h1 className="text-2xl font-semibold my-6">Mission and Vision</h1>
-      <div className="mb-4">
+      {/* <div className="bg-gray-50 shadow-md rounded-lg p-8 mb-10"> */}
+      {/* <h1 className="text-2xl font-semibold mb-6">Introduction
+      </h1> */}
+      <h2 className="text-2xl font-semibold mb-4 text-blue-shade-100">Mission and Vision</h2>
+     <div className="bg-gray-50 shadow-md rounded-lg p-8 mb-10 ">
+      <div className="mb-4 ms-8">
           <h2 className="text-lg font-semibold mb-2">Mission:</h2>
-          <ul className="list-disc pl-8">
-            <li className="text-sm  ">{text.mission_and_vision.mission}</li>
+          <ul className="list-disc pl-8 ">
+            <li className=" ">{text.mission_and_vision.mission}</li>
           </ul>
         </div>
-        <div>
+        <div className="ms-8">
           <h2 className="text-lg font-semibold mb-2">Vision:</h2>
-          <ul className="list-disc pl-8 text-sm">
+          <ul className="list-disc pl-8">
             {text.mission_and_vision.vision.map((item, index) => (
               <li key={index} className="mb-1">{item}</li>
             ))}
           </ul>
         </div>
-
+      </div>
         <div>
-        <h1 className="text-2xl font-semibold my-6">Technology</h1>
-        <p className="text-sm  mb-2">{text.technology.description}</p>
-        <ul className="list-disc pl-8 text-sm">
-            {text.technology.features.map((item, index) => (
-              <li key={index} className="mb-1">{item}</li>
-            ))}
-          </ul>
-          </div>
-        <div>
-
-        <h1 className="text-2xl font-semibold my-6">Governance and DAO Structure</h1>
-        <p className="text-sm  mb-2">{text.governance_and_dao_structure.description}</p>
-        <ol className="list-decimal pl-8 text-sm">
-  {props === 'arbitrum'?
-    (text.governance_and_dao_structure as { elements: { name: string; details: string; }[] }).elements.map((element, index) => (
-      <li key={index}>
-        <h3>{element.name} : {element.details}</h3>
-        {/* <p>{element.details}</p> */}
-      </li>
-    )) :
-    (text.governance_and_dao_structure as { houses: { name: string; details: string; }[] }).houses.map((house, index) => (
-      <li key={index}>
-        <h3>{house.name} : {house.details}</h3>
-        
+        <h2 className="text-2xl font-semibold mt-5 mb-5 text-blue-shade-100">Technology</h2>
+        <div className="bg-gray-50 shadow-md rounded-lg p-8 mb-10 ps-8">
+        <div className="ms-8">
+        <p className="mb-2">{text.technology.description}</p>
+        <ul className="list-disc pl-8">
+  {props === "arbitrum" ? (
+    (text.technology.features as { name: string; description: string; }[]).map((item, index) => (
+      <li key={index} className="mb-2">
+        <p className="font-semibold">{item.name}:</p>
+        <p>{item.description}</p>
       </li>
     ))
-  }
-</ol>
-      </div>      
-    </div>
-    <h2 className="text-2xl font-semibold mb-8 text-blue-shade-100">Important Links</h2>
+  ) : (
+    (text.technology.features as string[]).map((item, index) => (
+      <li key={index} className="mb-1">{item}</li>
+    ))
+  )}
+</ul>
+
+
+          </div>
+          </div>
+          </div>
+          <div>
+          <h2 className="text-2xl font-semibold mt-5 mb-5 text-blue-shade-100">Governance and DAO Structure</h2>
+          <div className="bg-gray-50 shadow-md rounded-lg p-8 mb-10 ">
+            <div className="ms-8">
+              <p className="mb-2">{text.governance_and_dao_structure.description}</p>
+              <ul className="list-disc pl-8">
+                {props === 'arbitrum' ?
+                  (text.governance_and_dao_structure as { elements: { name: string; details: string; }[] }).elements.map((element, index) => (
+                    <li key={index} className="mb-2">
+                      <p className="font-semibold">{element.name}:</p>
+                      <p>{element.details}</p>
+                    </li>
+                  )) :
+                  (text.governance_and_dao_structure as { houses: { name: string; details: string; }[] }).houses.map((house, index) => (
+                    <li key={index} className="mb-2">
+                      <p className="font-semibold">{house.name}:</p> 
+                      <p>  {house.details}</p>
+                    </li>
+                  ))
+                }
+              </ul>
+            </div>
+          </div>
+        </div>     
+    
+    <h2 className="text-2xl font-semibold mb-8 text-blue-shade-100">Community and Resources</h2>
    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
   {links.map((link) => (
     <Link key={link.name} href={link.href}>

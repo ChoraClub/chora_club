@@ -20,7 +20,7 @@
         ]
       },
       "governance_and_dao_structure": {
-        "description": "Optimism operates as a decentralized autonomous organization (DAO) known as the Optimism Collective. The governance structure consists of two houses:",
+        "description": "Optimism operates as a Decentralized Autonomous Organization (DAO) known as the Optimism Collective. The governance structure consists of two houses:",
         "houses": [
           {
             "name": "Token House",
@@ -60,12 +60,24 @@
       },
       "technology": {
         "description": "Arbitrum utilizes Optimistic Rollups, a Layer 2 scaling technique that processes transactions off-chain and then posts transaction data to Ethereum.",
-        "features": [
-          "ArbOS: A custom-designed operating system for Arbitrum's L2 environment",
-          "Nitro upgrade: Launched in August 2022, significantly improving performance and reducing costs",
-          "Fraud proofs: Ensuring the validity of transactions without requiring constant on-chain verification",
-          "EVM compatibility: Allowing easy migration of existing Ethereum smart contracts"
-        ]
+          "features": [
+            {
+              "name": "ArbOS",
+              "description": "A custom-designed operating system for Arbitrum's L2 environment"
+            },
+            {
+              "name": "Nitro upgrade",
+              "description": "Launched in August 2022, significantly improving performance and reducing costs"
+            },
+            {
+              "name": "Fraud proofs",
+              "description": "Ensuring the validity of transactions without requiring constant on-chain verification"
+            },
+            {
+              "name": "EVM compatibility",
+              "description": "Allowing easy migration of existing Ethereum smart contracts"
+            }
+          ]        
       },
       "governance_and_dao_structure": {
         "description": "Arbitrum transitioned to a decentralized governance model with the launch of the Arbitrum DAO in March 2023. The governance structure includes:",

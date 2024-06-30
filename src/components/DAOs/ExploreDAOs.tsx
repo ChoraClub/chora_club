@@ -67,7 +67,7 @@ function ExploreDAOs() {
       "visitedDao",
       JSON.stringify({ ...localData, [formatted]: [formatted, img] })
     );
-    router.push(`/${formatted}?active=delegatesList`);
+    router.push(`/${formatted}?active=about`);
   };
 
   const handleClose = () => {

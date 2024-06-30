@@ -48,7 +48,7 @@ function IndividualDaoHeader(){
       JSON.stringify({ ...localData, [formatted]: [formatted, option.image] })
     );
 
-    router.push(`/${name}?active=delegatesList`);
+    router.push(`/${name}?active=about`);
   };
     return (
         <div className="flex items-center justify-between pe-10">

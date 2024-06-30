@@ -410,7 +410,7 @@ function Sidebar() {
                         className="rounded-md bg-opacity-90"
                         closeDelay={1}
                       >
-                        <Link href={`/${data[0]}?active=delegatesList`}>
+                        <Link href={`/${data[0]}?active=about`}>
                           <Image
                             key={index}
                             src={data[1]}

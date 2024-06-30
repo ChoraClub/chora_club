@@ -207,7 +207,7 @@ function SpecificDAO({ props }: { props: { daoDelegates: string } }) {
         
       </div>
 
-      <div className="py-6 ps-16">
+      <div className="py-6 px-16">
         {searchParams.get("active") === "delegatesList" ? (
           <DelegatesList props={props.daoDelegates} />
         ) : (
