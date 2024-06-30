@@ -32,8 +32,8 @@ function DelegateInfo({ props, desc }: { props: Type; desc: string }) {
   const [isOfficeHoursAttendedLoading, setOfficeHoursAttendedLoading] =
     useState(true);
   const [activeButton, setActiveButton] = useState("onchain");
-  const [loadingOpAgora, setLoadingOpAgora] = useState(true);
-  const [loadingKarma, setLoadingKarma] = useState(true);
+  const [loadingOpAgora, setLoadingOpAgora] = useState(false);
+  const [loadingKarma, setLoadingKarma] = useState(false);
 
   useEffect(() => {
     if (activeButton === "onchain") {

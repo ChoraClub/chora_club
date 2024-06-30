@@ -275,11 +275,11 @@ function Sidebar() {
   const closeTour = () => {
     setIsTourOpen(false);
     setHasSeenTour(true);
-    sessionStorage.setItem("tourSeen", JSON.stringify(true));
+    localStorage.setItem("tourSeen", JSON.stringify(true));
   };
-
+  
   useEffect(() => {
-    const tourSeen = JSON.parse(sessionStorage.getItem("tourSeen") || "false");
+    const tourSeen = JSON.parse(localStorage.getItem("tourSeen") || "false");
     setHasSeenTour(tourSeen);
     if (!tourSeen) {
       setIsTourOpen(true);
@@ -410,7 +410,7 @@ function Sidebar() {
                         className="rounded-md bg-opacity-90"
                         closeDelay={1}
                       >
-                        <Link href={`/${data[0]}?active=delegatesList`}>
+                        <Link href={`/${data[0]}?active=about`}>
                           <Image
                             key={index}
                             src={data[1]}
