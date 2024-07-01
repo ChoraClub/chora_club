@@ -84,21 +84,6 @@ export async function PUT(req: NextRequest) {
             updatenotification,
         },
       };
-      const followerUpdateResult = await collection.updateOne(
-        {
-          address: { $regex: `^${follower_address}$`, $options: "i" },
-          "followings.follower_address": { $ne: delegate_address },
-        },
-        {
-          $addToSet: {
-            followings: {
-              follower_address: delegate_address,
-              isFollowing: false,
-            },
-          },
-        },
-        { upsert: true }
-      );
     } else {
       throw new Error("Invalid action");
     }

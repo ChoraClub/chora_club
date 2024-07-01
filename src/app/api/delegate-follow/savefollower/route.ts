@@ -126,52 +126,48 @@ export async function PUT(req: NextRequest) {
           { upsert: true }
         );
       }
-      const documents = await collection
-        .find({ address: { $regex: `^${follower_address}$`, $options: "i" } })
-        .toArray();
+    } else {
+      console.log(
+        `Existing follower updated for ${delegate_address}:`,
+        updateResult
+      );
+    }
 
-      if (documents.length > 0) {
-        const document = documents[0];
+    const documents = await collection
+      .find({ address: { $regex: `^${follower_address}$`, $options: "i" } })
+      .toArray();
 
-        // Check if followings array exists
-        if (Array.isArray(document.followings)) {
-          const existingFollowingIndex = document.followings.findIndex(
-            (item) => item.follower_address === delegate_address
-          );
+    if (documents.length > 0) {
+      const document = documents[0];
+      console.log(document);
 
-          if (existingFollowingIndex !== -1) {
-            console.log("Updating existing following");
-            const updateQuery = {
-              $set: {
-                [`followings.${existingFollowingIndex}.isFollowing`]: true,
-              },
-            };
-            await collection.updateOne(
-              { address: document.address },
-              updateQuery
-            );
-          } else {
-            console.log("Adding new following");
-            const updateQuery = {
-              $push: {
-                followings: {
-                  follower_address: delegate_address,
-                  isFollowing: true,
-                } as any,
-              },
-            };
-            await collection.updateOne(
-              { address: document.address },
-              updateQuery
-            );
-          }
-        } else {
-          console.log("Creating followings array");
+      // Check if followings array exists
+      if (Array.isArray(document.followings)) {
+        const existingFollowingIndex = document.followings.findIndex(
+          (item) => item.follower_address === delegate_address
+        );
+
+        console.log(existingFollowingIndex);
+
+        if (existingFollowingIndex !== -1) {
+          console.log("Updating existing following");
           const updateQuery = {
             $set: {
-              followings: [
-                { follower_address: delegate_address, isFollowing: true },
-              ],
+              [`followings.${existingFollowingIndex}.isFollowing`]: true,
+            },
+          };
+          await collection.updateOne(
+            { address: document.address },
+            updateQuery
+          );
+        } else {
+          console.log("Adding new following");
+          const updateQuery = {
+            $push: {
+              followings: {
+                follower_address: delegate_address,
+                isFollowing: true,
+              } as any,
             },
           };
           await collection.updateOne(
@@ -179,12 +175,17 @@ export async function PUT(req: NextRequest) {
             updateQuery
           );
         }
+      } else {
+        console.log("Creating followings array");
+        const updateQuery = {
+          $set: {
+            followings: [
+              { follower_address: delegate_address, isFollowing: true },
+            ],
+          },
+        };
+        await collection.updateOne({ address: document.address }, updateQuery);
       }
-    } else {
-      console.log(
-        `Existing follower updated for ${delegate_address}:`,
-        updateResult
-      );
     }
 
     await client.close();
