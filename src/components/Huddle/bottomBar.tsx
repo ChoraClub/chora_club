@@ -17,7 +17,7 @@ import { Role } from "@huddle01/server-sdk/auth";
 import { PeerMetadata } from "@/utils/types";
 import clsx from "clsx";
 import toast from "react-hot-toast";
-import Dropdown from "../common/Dropdown";
+import Dropdown from "../ui/Dropdown";
 import Strip from "../sidebars/participantsSidebar/Peers/PeerRole/Strip";
 import { useEffect, useState } from "react";
 import { useParams, usePathname } from "next/navigation";

@@ -10,8 +10,8 @@ import { Toaster, toast } from "react-hot-toast";
 import { BasicIcons } from "@/assets/BasicIcons";
 
 // Components
-import FeatCommon from "@/components/common/FeatCommon";
-import AvatarWrapper from "@/components/common/AvatarWrapper";
+import FeatCommon from "@/components/ui/FeatCommon";
+import AvatarWrapper from "@/components/ui/AvatarWrapper";
 
 // Store
 import { useStudioState } from "@/store/studioState";

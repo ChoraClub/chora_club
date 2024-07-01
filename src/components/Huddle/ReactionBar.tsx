@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Dropdown from "../common/Dropdown";
+import Dropdown from "../ui/Dropdown";
 import EmojiTray from "../EmojiTray/EmojiTray";
 import { BasicIcons } from "@/utils/BasicIcons";
 import { useDataMessage } from "@huddle01/react/hooks";
