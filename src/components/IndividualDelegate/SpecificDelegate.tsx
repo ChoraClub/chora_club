@@ -4,13 +4,13 @@ import React, { use, useEffect, useState } from "react";
 import user from "@/assets/images/daos/profile.png";
 import { FaXTwitter, FaDiscord, FaGithub } from "react-icons/fa6";
 import { BiSolidMessageRoundedDetail } from "react-icons/bi";
-import { IoCopy } from "react-icons/io5";
+import { IoCopy, IoShareSocialSharp } from "react-icons/io5";
 import DelegateInfo from "./DelegateInfo";
 import DelegateVotes from "./DelegateVotes";
 import DelegateSessions from "./DelegateSessions";
 import DelegateOfficeHrs from "./DelegateOfficeHrs";
 import copy from "copy-to-clipboard";
-import { Tooltip } from "@nextui-org/react";
+import { Button, Tooltip } from "@nextui-org/react";
 import { StaticImport } from "next/dist/shared/lib/get-img-props";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useRouter } from "next-nprogress-bar";
@@ -33,6 +33,7 @@ import ArbLogo from "@/assets/images/daos/arbCir.png";
 import ccLogo from "@/assets/images/daos/CC.png";
 import { Oval } from "react-loader-spinner";
 import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
+import { BASE_URL } from "@/config/constants";
 // import { getEnsNameOfUser } from "../ConnectWallet/ENSResolver";
 import DelegateTileModal from "../utils/delegateTileModal";
 // import { cacheExchange, createClient, fetchExchange, gql } from "urql/core";
@@ -49,18 +50,17 @@ const client = createClient({
   exchanges: [cacheExchange, fetchExchange],
 });
 const GET_LATEST_DELEGATE_VOTES_CHANGED = gql`
-query MyQuery($delegate: String!) {
-  delegateVotesChangeds(
-    first: 1
-    orderBy: blockTimestamp
-    orderDirection: desc
-    where: { delegate: $delegate }
-  ) {
-    newBalance
+  query MyQuery($delegate: String!) {
+    delegateVotesChangeds(
+      first: 1
+      orderBy: blockTimestamp
+      orderDirection: desc
+      where: { delegate: $delegate }
+    ) {
+      newBalance
+    }
   }
-}
 `;
-
 
 const DELEGATE_CHANGED_QUERY = gql`
   query MyQuery($delegator: String!) {
@@ -96,6 +96,7 @@ function SpecificDelegate({ props }: { props: Type }) {
   const [description, setDescription] = useState("");
   // const provider = new ethers.BrowserProvider(window?.ethereum);
   const [displayEnsName, setDisplayEnsName] = useState<string>();
+  const [isCopied, setIsCopied] = useState(false);
   const [delegate, setDelegate] = useState("");
   const [same, setSame] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -106,39 +107,37 @@ function SpecificDelegate({ props }: { props: Type }) {
   const { isConnected } = useAccount();
 
   const handleDelegateModal = async () => {
-  
-      if (!isConnected) {
-        if (openConnectModal) {
-          openConnectModal();
-        }
-      } else {
-        console.log(address);
-        setDelegateOpen(true);
-        setLoading(true);
-        try {
-          const { data } = await client.query(DELEGATE_CHANGED_QUERY, {
-            delegator: address,
-          });
-          // const ens = await getEnsNameOfUser(
-          //   data.delegateChangeds[0]?.toDelegate
-          // );
-          const delegate = data.delegateChangeds[0]?.toDelegate;
-          console.log("individualDelegate", props.individualDelegate);
-          setSame(delegate === props.individualDelegate);
-          // ens
-            // ? setDelegate(ens)
-            // : 
-            setDelegate(delegate.slice(0, 6) + "..." + delegate.slice(-4));
-          setError(null);
-        } catch (err: any) {
-          setError(err.message);
-        } finally {
-          setLoading(false);
-        }
-
-        setDelegateOpen(true);
+    if (!isConnected) {
+      if (openConnectModal) {
+        openConnectModal();
       }
-    
+    } else {
+      console.log(address);
+      setDelegateOpen(true);
+      setLoading(true);
+      try {
+        const { data } = await client.query(DELEGATE_CHANGED_QUERY, {
+          delegator: address,
+        });
+        // const ens = await getEnsNameOfUser(
+        //   data.delegateChangeds[0]?.toDelegate
+        // );
+        const delegate = data.delegateChangeds[0]?.toDelegate;
+        console.log("individualDelegate", props.individualDelegate);
+        setSame(delegate === props.individualDelegate);
+        // ens
+        // ? setDelegate(ens)
+        // :
+        setDelegate(delegate.slice(0, 6) + "..." + delegate.slice(-4));
+        setError(null);
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+
+      setDelegateOpen(true);
+    }
   };
   const handleCloseDelegateModal = () => {
     setDelegateOpen(false);
@@ -155,7 +154,7 @@ function SpecificDelegate({ props }: { props: Type }) {
       document.body.style.overflow = "auto";
     };
   }, [delegateOpen]);
-  const [votingPower,setVotingPower] = useState<number>();
+  const [votingPower, setVotingPower] = useState<number>();
 
   const [karmaSocials, setKarmaSocials] = useState({
     twitter: "",
@@ -171,10 +170,9 @@ function SpecificDelegate({ props }: { props: Type }) {
     github: "",
   });
   const [delegatorsCount, setDelegatorsCount] = useState<number>();
-  const[votesCount,setVotesCount] = useState<number>();
+  const [votesCount, setVotesCount] = useState<number>();
 
-  const totalCount =
-   `query Delegate($input: DelegateInput!) {
+  const totalCount = `query Delegate($input: DelegateInput!) {
   delegate(input: $input) {
     id
     votesCount
@@ -182,31 +180,32 @@ function SpecificDelegate({ props }: { props: Type }) {
   }
 }
  `;
- const variables = {
-  input: {
-    address: `${props.individualDelegate}`,
-    governorId:"",
-    organizationId :null as number | null
+  const variables = {
+    input: {
+      address: `${props.individualDelegate}`,
+      governorId: "",
+      organizationId: null as number | null,
+    },
+  };
+  if (props.daoDelegates === "arbitrum") {
+    variables.input.governorId =
+      "eip155:42161:0x789fC99093B09aD01C34DC7251D0C89ce743e5a4";
+    variables.input.organizationId = 2206072050315953936;
+  } else {
+    variables.input.governorId =
+      "eip155:10:0xcDF27F107725988f2261Ce2256bDfCdE8B382B10";
+    variables.input.organizationId = 2206072049871356990;
   }
-};
-if (props.daoDelegates === "arbitrum") {
-  variables.input.governorId = "eip155:42161:0x789fC99093B09aD01C34DC7251D0C89ce743e5a4";
-  variables.input.organizationId = 2206072050315953936;
-}else{
-  variables.input.governorId = "eip155:10:0xcDF27F107725988f2261Ce2256bDfCdE8B382B10";
-  variables.input.organizationId = 2206072049871356990;
-}
- 
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const apiKey = process.env.NEXT_PUBLIC_TALLY_API_KEY;
-      console.log("API key", apiKey);
-          if (!apiKey) {
-            throw new Error('API key is missing');
-          }
-        fetch('https://api.tally.xyz/query', {
+        console.log("API key", apiKey);
+        if (!apiKey) {
+          throw new Error("API key is missing");
+        }
+        fetch("https://api.tally.xyz/query", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -214,22 +213,26 @@ if (props.daoDelegates === "arbitrum") {
           },
           body: JSON.stringify({
             query: totalCount,
-            variables: variables
+            variables: variables,
           }),
         })
-        .then(result => result.json())
-        .then(finalCounting => {
-          console.log(finalCounting);
-          console.log("dataa", finalCounting.data);
-          setVotesCount(finalCounting.data.delegate.votesCount);
-          setDelegatorsCount(finalCounting.data.delegate.delegatorsCount);
-        })
-        .catch(error => {
-          console.error('Error:', error);
-        });
+          .then((result) => result.json())
+          .then((finalCounting) => {
+            console.log(finalCounting);
+            console.log("dataa", finalCounting.data);
+            setVotesCount(finalCounting.data.delegate.votesCount);
+            setDelegatorsCount(finalCounting.data.delegate.delegatorsCount);
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
 
         console.log("Props", props.individualDelegate);
-        const data = await client.query(GET_LATEST_DELEGATE_VOTES_CHANGED, { delegate: props.individualDelegate.toString()}).toPromise();
+        const data = await client
+          .query(GET_LATEST_DELEGATE_VOTES_CHANGED, {
+            delegate: props.individualDelegate.toString(),
+          })
+          .toPromise();
         console.log("voting data", data.data.delegateVotesChangeds[0]);
         setVotingPower(data.data.delegateVotesChangeds[0].newBalance);
       } catch (error) {
@@ -241,7 +244,6 @@ if (props.daoDelegates === "arbitrum") {
       fetchData();
     }
   }, [client, props.individualDelegate]);
-
 
   useEffect(() => {
     console.log("Network", chain?.network);
@@ -484,9 +486,7 @@ if (props.daoDelegates === "arbitrum") {
 
   return (
     <>
-      {isPageLoading && (
-        <MainProfileSkeletonLoader/>
-      )}
+      {isPageLoading && <MainProfileSkeletonLoader />}
       {!(isPageLoading || (!isDelegate && !selfDelegate)) ? (
         <div className="font-poppins">
           <div className="flex ps-14 py-5 justify-between">
@@ -633,7 +633,7 @@ if (props.daoDelegates === "arbitrum") {
 
                   <Tooltip
                     content="Copy"
-                    placement="right"
+                    placement="bottom"
                     closeDelay={1}
                     showArrow
                   >
@@ -643,6 +643,38 @@ if (props.daoDelegates === "arbitrum") {
                       />
                     </span>
                   </Tooltip>
+                  <div className="flex space-x-2">
+                    {/* <span className="p-2 bg-gray-200 rounded-lg text-black">
+                      {typeof window !== "undefined" &&
+                        `${BASE_URL}/${
+                          chain?.name === "Optimism" ? "optimism" : "arbitrum"
+                        }/${address}?active=info`}
+                      Copy to Share Profile URL on Warpcast
+                    </span> */}
+                    <Tooltip
+                      content="Copy profile URL to share on Warpcast or Twitter."
+                      placement="bottom"
+                      closeDelay={1}
+                      showArrow
+                    >
+                      <Button
+                        className="bg-gray-200 hover:bg-gray-300"
+                        onClick={() => {
+                          if (typeof window === "undefined") return;
+                          navigator.clipboard.writeText(
+                            `${BASE_URL}/${props.daoDelegates}/${props.individualDelegate}?active=info`
+                          );
+                          setIsCopied(true);
+                          setTimeout(() => {
+                            setIsCopied(false);
+                          }, 3000);
+                        }}
+                      >
+                        <IoShareSocialSharp />
+                        {isCopied ? "Copied" : "Share profile"}
+                      </Button>
+                    </Tooltip>
+                  </div>
                   <div style={{ zIndex: "21474836462" }}>
                     <Toaster
                       toastOptions={{
@@ -662,8 +694,13 @@ if (props.daoDelegates === "arbitrum") {
                 <div className="flex gap-4 py-1">
                   <div className="text-[#4F4F4F] border-[0.5px] border-[#D9D9D9] rounded-md px-3 py-1">
                     <span className="text-blue-shade-200 font-semibold">
-                      {props.daoDelegates === "arbitrum" ? (votesCount?formatNumber(votesCount/10**18):0) 
-                          :(votingPower?formatNumber(votingPower/10**18):0)}
+                      {props.daoDelegates === "arbitrum"
+                        ? votesCount
+                          ? formatNumber(votesCount / 10 ** 18)
+                          : 0
+                        : votingPower
+                        ? formatNumber(votingPower / 10 ** 18)
+                        : 0}
                       &nbsp;
                     </span>
                     delegated tokens
@@ -672,13 +709,11 @@ if (props.daoDelegates === "arbitrum") {
                     Delegated from
                     <span className="text-blue-shade-200 font-semibold">
                       &nbsp;
-                      {delegatorsCount
-                        ? formatNumber(delegatorsCount)
-                        : 0}
+                      {delegatorsCount ? formatNumber(delegatorsCount) : 0}
                       &nbsp;
                     </span>
                     Addresses
-                  </div> 
+                  </div>
                 </div>
 
                 <div className="pt-2">

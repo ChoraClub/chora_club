@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
-import logo from "@/assets/images/sidebar/favicon.png";
+import logo from "@/assets/images/daos/CCLogo.png";
+// import logo from "@/assets/images/sidebar/favicon.png";
 import rocket from "@/assets/images/sidebar/rocket.png";
 import sessionIcn from "@/assets/images/sidebar/office.png";
 import office from "@/assets/images/sidebar/Office hour (1).png";
@@ -277,7 +278,7 @@ function Sidebar() {
     setHasSeenTour(true);
     localStorage.setItem("tourSeen", JSON.stringify(true));
   };
-  
+
   useEffect(() => {
     const tourSeen = JSON.parse(localStorage.getItem("tourSeen") || "false");
     setHasSeenTour(tourSeen);
@@ -320,7 +321,7 @@ function Sidebar() {
               src={logo}
               alt={"image"}
               width={40}
-              className="xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 logo"
+              className="xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 logo bg-black rounded-full p-1"
             ></Image>
             <Tooltip
               content="DAOs"

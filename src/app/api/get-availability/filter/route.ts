@@ -34,6 +34,7 @@ export async function POST(req: NextRequest, res: NextResponse<Type[]>) {
     const db = client.db();
     const collection = db.collection("scheduling");
     const delegatesCollection = db.collection("delegates");
+    const meetingsCollection = db.collection("meetings");
 
     // const newDate = new Date().toISOString().split("T")[0];
 
@@ -163,8 +164,38 @@ export async function POST(req: NextRequest, res: NextResponse<Type[]>) {
           })
           .toArray();
 
+        const meetingsData = await meetingsCollection
+          .find({ host_address: userAddress })
+          .toArray();
+
+        // Aggregate counts for uid_host and onchain_host_uid
+        const counts = await meetingsCollection
+          .aggregate([
+            { $match: { host_address: userAddress } },
+            {
+              $group: {
+                _id: null,
+                offChainCount: {
+                  $sum: { $cond: [{ $ifNull: ["$uid_host", false] }, 1, 0] },
+                },
+                onChainCount: {
+                  $sum: {
+                    $cond: [{ $ifNull: ["$onchain_host_uid", false] }, 1, 0],
+                  },
+                },
+              },
+            },
+          ])
+          .toArray();
+
+        // Combine meetingsData and counts
+        const meetingsInfo = {
+          meetingsData,
+          counts: counts[0] || { offChainCount: 0, onChainCount: 0 },
+        };
+
         // Return merged data
-        return { session, userInfo };
+        return { session, userInfo, meetingsInfo };
       })
     );
 

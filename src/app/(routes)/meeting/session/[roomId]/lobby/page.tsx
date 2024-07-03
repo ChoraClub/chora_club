@@ -10,11 +10,11 @@ import { Toaster, toast } from "react-hot-toast";
 import { BasicIcons } from "@/assets/BasicIcons";
 
 // Components
-import FeatCommon from "@/components/common/FeatCommon";
-import AvatarWrapper from "@/components/common/AvatarWrapper";
+import FeatCommon from "@/components/ui/FeatCommon";
+import AvatarWrapper from "@/components/ui/AvatarWrapper";
 
 // Store
-import useStore from "@/components/store/slices";
+import { useStudioState } from "@/store/studioState";
 
 // Hooks
 import {
@@ -40,10 +40,10 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
   // Local States
   console.log("params", params);
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const avatarUrl = useStore((state) => state.avatarUrl);
-  const setAvatarUrl = useStore((state) => state.setAvatarUrl);
-  const setUserDisplayName = useStore((state) => state.setUserDisplayName);
-  const userDisplayName = useStore((state) => state.userDisplayName);
+  // const avatarUrl = useStore((state) => state.avatarUrl);
+  // const setAvatarUrl = useStore((state) => state.setAvatarUrl);
+  // const setUserDisplayName = useStore((state) => state.setUserDisplayName);
+  // const userDisplayName = useStore((state) => state.userDisplayName);
   const [token, setToken] = useState<string>("");
   const [isJoining, setIsJoining] = useState<boolean>(false);
   const { updateMetadata, metadata, peerId, role } = useLocalPeer<{
@@ -51,6 +51,8 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
     avatarUrl: string;
     isHandRaised: boolean;
   }>();
+
+  const { name, setName, avatarUrl, setAvatarUrl } = useStudioState();
 
   const { address, isDisconnected } = useAccount();
   const [isLoading, setIsLoading] = useState(true);
@@ -105,12 +107,19 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
       if (address === hostAddress || result.message === "Meeting is ongoing") {
         setIsJoining(true);
 
+        let role;
+        if (address === hostAddress) {
+          role = "host";
+        } else {
+          role = "guest";
+        }
         let token = "";
+        console.log("name", name);
         if (state !== "connected") {
           const requestBody = {
             roomId: params.roomId,
-            role: "host",
-            displayName: address,
+            role: role,
+            displayName: formattedAddress,
             address: address, // assuming you have userAddress defined somewhere
           };
           try {
@@ -278,6 +287,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
         const response = await fetch(`/api/profile/${address}`, requestOptions);
         const result = await response.json();
         const resultData = await result.data;
+        console.log("result data: ", resultData);
 
         if (Array.isArray(resultData)) {
           const filtered: any = resultData.filter((data) => {
@@ -286,35 +296,55 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
           console.log("filtered profile: ", filtered);
           setProfileDetails(filtered[0]);
           setIsLoading(false);
-          const imageCid = filtered[0].image;
+          const imageCid = filtered[0]?.image;
           if (imageCid) {
             setAvatarUrl(`https://gateway.lighthouse.storage/ipfs/${imageCid}`);
           }
-          setUserDisplayName(filtered[0].displayName);
-        }
-
-        if (resultData.length === 0) {
-          const res = await fetch(
-            `https://api.karmahq.xyz/api/dao/find-delegate?dao=${dao}&user=${address}`
-          );
-          const result = await response.json();
-          const resultData = await result.data.delegate;
-
-          setProfileDetails(resultData);
-          setIsLoading(false);
-
-          if (resultData.ensName !== null) {
-            setUserDisplayName(resultData.ensName);
+          if (filtered[0]?.displayName) {
+            setName(filtered[0].displayName);
           } else {
-            setUserDisplayName(formattedAddress);
+            console.log("formattedAddress ", formattedAddress);
+            setName(formattedAddress);
           }
         }
+
+        // if (resultData.length === 0) {
+        // const res = await fetch(
+        //   `https://api.karmahq.xyz/api/dao/find-delegate?dao=${dao}&user=${address}`
+        // );
+        // const result = await response.json();
+        // const resultData = await result.data.delegate;
+
+        // setProfileDetails(resultData);
+        // setIsLoading(false);
+
+        // if (resultData.ensName !== null) {
+        //   setName(resultData.ensName);
+        // } else {
+
+        // setName(formattedAddress);
+        // }
+        // }
       } catch (error) {
         console.log("Error in catch: ", error);
       }
     };
     fetchData();
   }, []);
+
+  // useEffect(() => {
+  //   const handleBeforeUnload = (event: any) => {
+  //     const message = "Are you sure you want to leave?";
+  //     event.returnValue = message; // Standard way to display an alert in modern browsers
+  //     return message; // For some older browsers
+  //   };
+
+  //   window.addEventListener("beforeunload", handleBeforeUnload);
+
+  //   return () => {
+  //     window.removeEventListener("beforeunload", handleBeforeUnload);
+  //   };
+  // }, []);
 
   const formattedAddress = address?.slice(0, 6) + "..." + address?.slice(-4);
 
@@ -324,17 +354,17 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
         <div className="h-screen">
           {popupVisibility && (
             <div className="flex items-center justify-center">
-              <div className="absolute bg-white text-[#3E3D3D] flex justify-center items-center py-2 font-poppins font-semibold w-1/4 rounded-md top-6 drop-shadow-xl">
-                <div className="flex absolute left-2">
+              <div className="absolute bg-white text-[#3E3D3D] flex items-center py-2 pl-5 font-poppins font-semibold w-1/4 rounded-md top-6 drop-shadow-xl">
+                <div className="flex gap-3">
                   <Image
                     alt="record-left"
                     width={25}
                     height={25}
                     src={record}
-                    className="w-5 h-5 ml-2"
+                    className="w-5 h-5"
                   />
+                  <div className="">This meeting is being recorded.</div>
                 </div>
-                <div className="">This meeting is being recorded.</div>
                 <div className="flex absolute right-2">
                   <button
                     onClick={() => setPopupVisibility(false)}
@@ -355,17 +385,17 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
                     alt="audio-spaces-img"
                     width={125}
                     height={125}
-                    className="maskAvatar object-contain"
+                    className="maskAvatar"
                     quality={100}
                     priority
                   />
-                  <video
+                  {/* <video
                     src={avatarUrl}
                     muted
                     className="maskAvatar absolute left-1/2 top-1/2 z-10 h-full w-full -translate-x-1/2 -translate-y-1/2"
                     // autoPlay
                     loop
-                  />
+                  /> */}
                   <button
                     onClick={() => setIsOpen((prev) => !prev)}
                     type="button"
@@ -390,12 +420,12 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
                             width={45}
                             height={45}
                             loading="lazy"
-                            className="object-contain cursor-pointer"
-                            onClick={() => {
-                              setAvatarUrl(
-                                `https://gateway.lighthouse.storage/ipfs/${profileDetails.image}`
-                              );
-                            }}
+                            className="cursor-pointer"
+                            // onClick={() => {
+                            //   setAvatarUrl(
+                            //     `https://gateway.lighthouse.storage/ipfs/${profileDetails.image}`
+                            //   );
+                            // }}
                           />
                         )}
                         {Array.from({ length: 20 }).map((_, i) => {
@@ -415,7 +445,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
                                 width={45}
                                 height={45}
                                 loading="lazy"
-                                className="object-contain"
+                                className=""
                               />
                             </AvatarWrapper>
                           );

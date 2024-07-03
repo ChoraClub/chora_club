@@ -9,6 +9,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
         method: "POST",
         body: JSON.stringify({
           title: "Test Room",
+          // hostWallets: ["0xB351a70dD6E5282A8c84edCbCd5A955469b9b032"],
         }),
         headers: {
           "Content-Type": "application/json",

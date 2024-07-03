@@ -307,15 +307,12 @@ function BookSession({ props }: { props: Type }) {
   };
 
   const createRandomRoom = async () => {
-    const res = await fetch(
-      "https://api-choraclub.vercel.app/api/create-room",
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const res = await fetch(`${process.env.NEXT_PUBLIC_CREATE_ROOM_ENDPOINT}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
     const result = await res.json();
     // console.log("result", result);
     const roomId = await result.data;
