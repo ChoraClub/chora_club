@@ -1,7 +1,7 @@
 import { PeerMetadata } from "@/utils/types";
 import { useRemotePeer, useRemoteScreenShare } from "@huddle01/react/hooks";
-import Video from "../Media/Video";
-import Audio from "../Media/Audio";
+import Video from "./Media/Video";
+import Audio from "./Media/Audio";
 import GridContainer from "./GridContainer";
 import clsx from "clsx";
 import { useEffect, useState } from "react";
