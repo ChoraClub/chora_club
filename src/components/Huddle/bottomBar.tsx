@@ -440,7 +440,7 @@ const BottomBar = () => {
                 enableVideo();
               }
             }}
-            className="bg-gray-600/50 p-2.5 rounded-lg hover:bg-gray-600"
+            className="bg-blue-shade-100 p-2.5 rounded-lg hover:bg-blue-shade-200"
           >
             {isVideoOn ? BasicIcons.on.cam : BasicIcons.off.cam}
           </button>
@@ -454,7 +454,7 @@ const BottomBar = () => {
                 enableAudio();
               }
             }}
-            className="bg-gray-600/50 p-2.5 rounded-lg hover:bg-gray-600"
+            className="bg-blue-shade-100 p-2.5 rounded-lg hover:bg-blue-shade-200"
           >
             {isAudioOn ? BasicIcons.on.mic : BasicIcons.off.mic}
           </button>
@@ -480,7 +480,7 @@ const BottomBar = () => {
               }
             }}
             className={clsx(
-              (shareStream !== null || isScreenShared) && "bg-gray-500"
+              (shareStream !== null || isScreenShared) && "bg-blue-shade-100"
             )}
           >
             {BasicIcons.screenShare}

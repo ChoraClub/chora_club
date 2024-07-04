@@ -103,92 +103,91 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
         setMeetingStatus("Ongoing");
       }
 
-      // if (address === hostAddress || meetingStatus === "Ongoing") {
-      if (address === hostAddress || result.message === "Meeting is ongoing") {
-        setIsJoining(true);
+      // if (address === hostAddress || result.message === "Meeting is ongoing") {
+      setIsJoining(true);
 
-        let role;
-        if (address === hostAddress) {
-          role = "host";
-        } else {
-          role = "guest";
-        }
-        let token = "";
-        console.log("name", name);
-        if (state !== "connected") {
-          const requestBody = {
-            roomId: params.roomId,
-            role: role,
-            displayName: formattedAddress,
-            address: address, // assuming you have userAddress defined somewhere
-          };
-          try {
-            const response = await fetch("/api/new-token", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(requestBody),
-            });
-
-            // if (!response.ok) {
-            //   throw new Error("Failed to fetch token");
-            // }
-
-            token = await response.text(); // Change this line
-            // console.log("Token fetched successfully:", token);
-          } catch (error) {
-            console.error("Error fetching token:", error);
-            // Handle error appropriately, e.g., show error message to user
-            toast.error("Failed to fetch token");
-            setIsJoining(false);
-            return;
-          }
-        }
-
-        try {
-          console.log({ token });
-          console.log(params.roomId);
-          await joinRoom({
-            roomId: params.roomId,
-            token,
-          });
-        } catch (error) {
-          console.error("Error joining room:", error);
-          // Handle error appropriately, e.g., show error message to user
-          toast.error("Failed to join room");
-        }
-
-        console.log("Role.HOST", Role.HOST);
-        if (Role.HOST) {
-          console.log("inside put api");
-          const myHeaders = new Headers();
-          myHeaders.append("Content-Type", "application/json");
-
-          const raw = JSON.stringify({
-            meetingId: params.roomId,
-            meetingType: "session",
-          });
-          const requestOptions: any = {
-            method: "PUT",
-            headers: myHeaders,
-            body: raw,
-            redirect: "follow",
-          };
-          const response = await fetch(
-            `/api/update-meeting-status/${params.roomId}`,
-            requestOptions
-          );
-          const responseData = await response.json();
-          console.log("responseData: ", responseData);
-          // setMeetingStatus("Ongoing");
-        }
-
-        setIsJoining(false);
+      let role;
+      if (address === hostAddress) {
+        role = "host";
       } else {
-        toast("Please wait, Host has not started the session yet.");
-        console.log("Wait..");
+        role = "guest";
       }
+      let token = "";
+      console.log("name", name);
+      if (state !== "connected") {
+        const requestBody = {
+          roomId: params.roomId,
+          role: role,
+          displayName: formattedAddress,
+          address: address, // assuming you have userAddress defined somewhere
+        };
+        try {
+          const response = await fetch("/api/new-token", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(requestBody),
+          });
+
+          // if (!response.ok) {
+          //   throw new Error("Failed to fetch token");
+          // }
+
+          token = await response.text(); // Change this line
+          // console.log("Token fetched successfully:", token);
+        } catch (error) {
+          console.error("Error fetching token:", error);
+          // Handle error appropriately, e.g., show error message to user
+          toast.error("Failed to fetch token");
+          setIsJoining(false);
+          return;
+        }
+      }
+
+      try {
+        console.log({ token });
+        console.log(params.roomId);
+        await joinRoom({
+          roomId: params.roomId,
+          token,
+        });
+      } catch (error) {
+        console.error("Error joining room:", error);
+        // Handle error appropriately, e.g., show error message to user
+        toast.error("Failed to join room");
+      }
+
+      console.log("Role.HOST", Role.HOST);
+      if (Role.HOST) {
+        console.log("inside put api");
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+
+        const raw = JSON.stringify({
+          meetingId: params.roomId,
+          meetingType: "session",
+        });
+        const requestOptions: any = {
+          method: "PUT",
+          headers: myHeaders,
+          body: raw,
+          redirect: "follow",
+        };
+        const response = await fetch(
+          `/api/update-meeting-status/${params.roomId}`,
+          requestOptions
+        );
+        const responseData = await response.json();
+        console.log("responseData: ", responseData);
+        // setMeetingStatus("Ongoing");
+      }
+
+      setIsJoining(false);
+      // } else {
+      //   toast("Please wait, Host has not started the session yet.");
+      //   console.log("Wait..");
+      // }
     }
   };
 

@@ -86,7 +86,7 @@ export const arbBlock = [
 export const IMAGE_URL =
   "https://gateway.lighthouse.storage/ipfs/QmZRLHd4CwA8btpa2WhbDHju46rnKbYGUFyzojAFXkhbt1";
 
-// For development testing
+// // For development testing
 //   export const DB_NAME =
 //   process.env.NODE_ENV == "development"
 //     ? process.env.DEV_DB
@@ -121,5 +121,5 @@ export const IMAGE_URL =
 
 // export const ATTESTATION_ARB_URL =
 //   process.env.NODE_ENV == "development"
-//     ? process.env.NEXT_PUBLIC_SEPOLIA_ATTESTATION_URL
+//     ? process.env.NEXT_PUBLIC_ARB_ATTESTATION_URL
 //     : process.env.NEXT_PUBLIC_ARB_ATTESTATION_URL;
