@@ -1,0 +1,62 @@
+.scrollbar::-webkit-scrollbar {
+    width: 8px;
+  }
+
+.scrollbar{
+  overflow-x: hidden; 
+}
+  
+/* .scrollbar::-webkit-scrollbar-track{
+  background-color: transparent;
+} */
+  .scrollbar::-webkit-scrollbar-track {
+    background:  rgb(229 231 235);
+    border-radius: 8px;
+    height: 400px;
+  }
+  
+ 
+  .scrollbar:hover::-webkit-scrollbar-thumb {
+    background:#888;
+    border-radius: 5px;
+  }
+  
+  .description-content {
+    display: -webkit-box;
+    -webkit-line-clamp: 6;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+   /* .scrollContainer {
+    width: 100%; 
+    height: 460px;
+    overflow-y: auto;
+    overflow-x: hidden; 
+    scrollbar-width: none;
+  }
+
+  .scrollContainer::-webkit-scrollbar {
+    width: 0px; 
+  }
+
+  .scrollContainer:hover {
+    scrollbar-width: thin; 
+  }
+
+  .scrollContainer:hover::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .scrollContainer:hover::-webkit-scrollbar-track {
+    background: #F6F6F6;
+    border-radius: 10px !important;
+  }
+
+  .scrollContainer:hover::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px !important;
+  }
+  .voterItem {
+    width: 100%; 
+  } */

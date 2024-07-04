@@ -30,12 +30,9 @@ export async function PUT(
   const address = req.url.split("update-office-hours/")[1];
 
   try {
-    const res = await fetch(
-      `https://api-choraclub.vercel.app/api/create-room`,
-      {
-        method: "GET",
-      }
-    );
+    const res = await fetch(`${process.env.NEXT_PUBLIC_CREATE_ROOM_ENDPOINT}`, {
+      method: "GET",
+    });
     const data = await res.json();
     const roomId = data.data; // Extract roomId directly from the response
     console.log("Generated roomId:", roomId);

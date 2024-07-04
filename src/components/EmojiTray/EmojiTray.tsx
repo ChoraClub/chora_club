@@ -2,7 +2,7 @@ import { BasicIcons } from "@/assets/BasicIcons";
 import { cn } from "@/components/utils/helpers";
 import React from "react";
 import { useDataMessage, useLocalPeer } from "@huddle01/react/hooks";
-import useStore from "@/components/store/slices";
+import { useStudioState } from "@/store/studioState";
 
 type peerMetaData = {
   displayName: string;
@@ -54,7 +54,7 @@ const EmojiTray: React.FC<Props> = ({ onClick, onClose }) => {
   ];
 
   const { sendData } = useDataMessage();
-  const setMyReaction = useStore((state) => state.setMyReaction);
+  const setMyReaction = useStudioState((state) => state.setMyReaction);
 
   const { metadata, updateMetadata } = useLocalPeer<peerMetaData>();
 

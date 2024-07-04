@@ -30,10 +30,15 @@ type follower_details = {
   isFollowing: boolean;
   activity: follow_activity[];
 };
-type followings={
-  isFollowing:boolean;
-  follower_address:string
-}
+type dao_following = {
+  isFollowing: boolean;
+  isNotification:boolean;
+  follower_address: string;
+};
+type followings = {
+  dao: string;
+  following: dao_following[];
+};
 
 type network_details = {
   dao_name: string;
@@ -54,8 +59,8 @@ interface DelegateRequestBody {
     github: string;
   };
   networks: network_details[];
-  followers:follower_details[];
-  followings:followings[];
+  followers: follower_details[];
+  followings: followings[];
 }
 
 // Define the response body type
@@ -96,8 +101,8 @@ interface DelegateResponseBody {
       github: string;
     };
     networks: network_details[];
-    followers:follower_details[];
-    followings:followings[];
+    followers: follower_details[];
+    followings: followings[];
   } | null;
   error?: string;
 }

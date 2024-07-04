@@ -20,18 +20,18 @@ const optimismSepolia = defineChain({
   rpcUrls: {
     default: {
       http: [
-        "https://opt-sepolia.g.alchemy.com/v2/BZr3W1fqQEy2wnrcDQf1z4hiGCOhcHfp",
+        "https://opt-sepolia.g.alchemy.com/v2/WRQwCsk2ip0sMcZ7zJYQKgyQfWj1qm61",
       ],
       webSocket: [
-        "wss://opt-sepolia.g.alchemy.com/v2/BZr3W1fqQEy2wnrcDQf1z4hiGCOhcHfp",
+        "wss://opt-sepolia.g.alchemy.com/v2/WRQwCsk2ip0sMcZ7zJYQKgyQfWj1qm61",
       ],
     },
     public: {
       http: [
-        "https://opt-sepolia.g.alchemy.com/v2/BZr3W1fqQEy2wnrcDQf1z4hiGCOhcHfp",
+        "https://opt-sepolia.g.alchemy.com/v2/WRQwCsk2ip0sMcZ7zJYQKgyQfWj1qm61",
       ],
       webSocket: [
-        "wss://opt-sepolia.g.alchemy.com/v2/BZr3W1fqQEy2wnrcDQf1z4hiGCOhcHfp",
+        "wss://opt-sepolia.g.alchemy.com/v2/WRQwCsk2ip0sMcZ7zJYQKgyQfWj1qm61",
       ],
     }
   },

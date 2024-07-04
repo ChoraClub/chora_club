@@ -141,34 +141,67 @@ export async function PUT(req: NextRequest) {
       const document = documents[0];
       console.log(document);
 
+      const dao_name = dao; // Replace with actual DAO name
+
       // Check if followings array exists
       if (Array.isArray(document.followings)) {
-        const existingFollowingIndex = document.followings.findIndex(
-          (item) => item.follower_address === delegate_address
+        const existingDaoIndex = document.followings.findIndex(
+          (item) => item.dao === dao_name
         );
 
-        console.log(existingFollowingIndex);
-
-        if (existingFollowingIndex !== -1) {
-          console.log("Updating existing following");
-          const updateQuery = {
-            $set: {
-              [`followings.${existingFollowingIndex}.isFollowing`]: true,
-            },
-          };
-          await collection.updateOne(
-            { address: document.address },
-            updateQuery
+        if (existingDaoIndex !== -1) {
+          // DAO exists in followings array
+          const existingFollowingIndex = document.followings[
+            existingDaoIndex
+          ].following.findIndex(
+            (item: any) => item.follower_address === delegate_address
           );
+
+          if (existingFollowingIndex !== -1) {
+            console.log("Updating existing following for DAO");
+            const updateQuery = {
+              $set: {
+                [`followings.${existingDaoIndex}.following.${existingFollowingIndex}.isFollowing`]:
+                  true,
+                [`followings.${existingDaoIndex}.following.${existingFollowingIndex}.isNotification`]:
+                  true, // Add isNotification
+              },
+            };
+            await collection.updateOne(
+              { address: document.address },
+              updateQuery
+            );
+          } else {
+            console.log("Adding new following for existing DAO");
+            const updateQuery = {
+              $push: {
+                [`followings.${existingDaoIndex}.following`]: {
+                  follower_address: delegate_address,
+                  isFollowing: true,
+                  isNotification: true, // Add isNotification
+                } as any,
+              },
+            };
+            await collection.updateOne(
+              { address: document.address },
+              updateQuery
+            );
+          }
         } else {
-          console.log("Adding new following");
+          console.log("Adding new DAO and following");
           const updateQuery = {
             $push: {
               followings: {
-                follower_address: delegate_address,
-                isFollowing: true,
-              } as any,
-            },
+                dao: dao_name,
+                following: [
+                  {
+                    follower_address: delegate_address,
+                    isFollowing: true,
+                    isNotification: true, // Add isNotification
+                  },
+                ],
+              },
+            } as any,
           };
           await collection.updateOne(
             { address: document.address },
@@ -176,11 +209,20 @@ export async function PUT(req: NextRequest) {
           );
         }
       } else {
-        console.log("Creating followings array");
+        console.log("Creating followings array with DAO");
         const updateQuery = {
           $set: {
             followings: [
-              { follower_address: delegate_address, isFollowing: true },
+              {
+                dao: dao,
+                following: [
+                  {
+                    follower_address: delegate_address,
+                    isFollowing: true,
+                    isNotification: true, // Add isNotification
+                  },
+                ],
+              },
             ],
           },
         };

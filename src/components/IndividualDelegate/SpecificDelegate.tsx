@@ -406,8 +406,6 @@ function SpecificDelegate({ props }: { props: Type }) {
           "You has to follow delegate first in order to get notification!"
         );
       } else {
-        if (notification == true) setLoading(true);
-        else setLoading(false);
         let updatenotification: boolean;
         updatenotification = !notification;
         try {
@@ -430,11 +428,9 @@ function SpecificDelegate({ props }: { props: Type }) {
             throw new Error("Failed to notification");
           }
 
-          const data = await response.json();
-          setLoading(false);
-          setNotificationmodel(false);
-          isNotification(!notification);
           toast.success("Succefully update notification status!");
+          const data = await response.json();
+          isNotification(!notification);
           console.log("notification successful:", data);
         } catch (error) {
           console.error("Error following:", error);
@@ -708,8 +704,7 @@ function SpecificDelegate({ props }: { props: Type }) {
                 style={{
                   backgroundColor: "#fcfcfc",
                   border: "2px solid #E9E9E9 ",
-                }}
-              >
+                }}>
                 <div className="w-40 h-40 flex items-center justify-content ">
                   <div className="flex justify-center items-center w-40 h-40">
                     <Image
@@ -771,8 +766,7 @@ function SpecificDelegate({ props }: { props: Type }) {
                           : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                      target="_blank"
-                    >
+                      target="_blank">
                       <FaXTwitter color="#7C7C7C" size={12} />
                     </Link>
                     <Link
@@ -791,8 +785,7 @@ function SpecificDelegate({ props }: { props: Type }) {
                           : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                      target="_blank"
-                    >
+                      target="_blank">
                       <BiSolidMessageRoundedDetail color="#7C7C7C" size={12} />
                     </Link>
                     <Link
@@ -807,8 +800,7 @@ function SpecificDelegate({ props }: { props: Type }) {
                           : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                      target="_blank"
-                    >
+                      target="_blank">
                       <FaDiscord color="#7C7C7C" size={12} />
                     </Link>
                     <Link
@@ -823,8 +815,7 @@ function SpecificDelegate({ props }: { props: Type }) {
                           : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                      target="_blank"
-                    >
+                      target="_blank">
                       <FaGithub color="#7C7C7C" size={12} />
                     </Link>
                   </div>
@@ -840,8 +831,7 @@ function SpecificDelegate({ props }: { props: Type }) {
                     content="Copy"
                     placement="right"
                     closeDelay={1}
-                    showArrow
-                  >
+                    showArrow>
                     <span className="px-2 cursor-pointer" color="#3E3D3D">
                       <IoCopy
                         onClick={() => handleCopy(props.individualDelegate)}
@@ -903,8 +893,7 @@ function SpecificDelegate({ props }: { props: Type }) {
                     //   handleDelegateVotes(`${props.individualDelegate}`)
                     // }
 
-                    onClick={handleDelegateModal}
-                  >
+                    onClick={handleDelegateModal}>
                     Delegate
                   </button>
 
@@ -912,8 +901,7 @@ function SpecificDelegate({ props }: { props: Type }) {
                     className={`font-bold text-white rounded-full px-8 py-[10px] flex items-center ${
                       isFollowing ? "bg-green-500" : "bg-blue-shade-200"
                     }`}
-                    onClick={handleFollow}
-                  >
+                    onClick={handleFollow}>
                     {loading ? (
                       <Oval
                         visible={true}
@@ -950,14 +938,12 @@ function SpecificDelegate({ props }: { props: Type }) {
                           <div className="flex justify-center px-8 py-4">
                             <button
                               className="bg-gray-300 text-gray-700 px-8 py-3 font-semibold rounded-full mr-4"
-                              onClick={() => setUnfollowmodel(false)}
-                            >
+                              onClick={() => setUnfollowmodel(false)}>
                               Cancel
                             </button>
                             <button
                               className="bg-red-500 text-white px-8 py-3 font-semibold rounded-full"
-                              onClick={() => handleConfirm(1)}
-                            >
+                              onClick={() => handleConfirm(1)}>
                               {loading ? (
                                 <Oval
                                   visible={true}
@@ -976,54 +962,6 @@ function SpecificDelegate({ props }: { props: Type }) {
                       </div>
                     </div>
                   )}
-                  {isOpenNotification && (
-                    <div className="font-poppins z-[70] fixed inset-0 flex items-center justify-center backdrop-blur-md">
-                      <div className="bg-white rounded-[41px] overflow-hidden shadow-lg w-1/2">
-                        <div className="relative">
-                          <div className="flex flex-col gap-1 text-white bg-[#292929] p-4 py-7">
-                            <h2 className="text-lg font-semibold mx-4">
-                              Are you sure you want to turn off notifications
-                              for this delegate?
-                            </h2>
-                          </div>
-                          <div className="px-8 py-4">
-                            <p className="mt-4 text-center">
-                              Don't miss out on the action! By turning off
-                              notifications, you might miss crucial updates,
-                              game-changing decisions, and exciting developments
-                              from this delegate. Stay in the loop and be part
-                              of the community shaping the future!
-                            </p>
-                          </div>
-                          <div className="flex justify-center px-8 py-4">
-                            <button
-                              className="bg-gray-300 text-gray-700 px-8 py-3 font-semibold rounded-full mr-4"
-                              onClick={() => setNotificationmodel(false)}
-                            >
-                              Keep Notifications
-                            </button>
-                            <button
-                              className="bg-red-500 text-white px-8 py-3 font-semibold rounded-full"
-                              onClick={() => handleConfirm(2)}
-                            >
-                              {loading ? (
-                                <Oval
-                                  visible={true}
-                                  height="20"
-                                  width="20"
-                                  color="white"
-                                  secondaryColor="#cdccff"
-                                  ariaLabel="oval-loading"
-                                />
-                              ) : (
-                                "Turn Off"
-                              )}
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
 
                   <Tooltip
                     content={
@@ -1033,8 +971,7 @@ function SpecificDelegate({ props }: { props: Type }) {
                     }
                     placement="top"
                     closeDelay={1}
-                    showArrow
-                  >
+                    showArrow>
                     {/* <button
                       className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[5px] flex items-center mr-2"
                       onClick={() => {
@@ -1049,26 +986,25 @@ function SpecificDelegate({ props }: { props: Type }) {
                       className="flex items-center cursor-pointer"
                       onClick={() => {
                         if (notification) {
-                          setNotificationmodel(true);
+                          handleConfirm(2);
                         } else {
                           handleConfirm(2);
                         }
-                      }}
-                    >
-                      {notification ? (
-                        <BiSolidBellRing
-                          className=""
-                          color="bg-blue-shade-200"
-                          size={24}
-                        />
-                      ) : (
-                        <BiSolidBellOff
-                          className="mr-1"
-                          color="bg-blue-shade-200"
-                          size={24}
-                        />
-                      )}
-                      {/* </button> */}
+                      }}>
+                      {isFollowing &&
+                        (notification ? (
+                          <BiSolidBellRing
+                            className=""
+                            color="bg-blue-shade-200"
+                            size={24}
+                          />
+                        ) : (
+                          <BiSolidBellOff
+                            className="mr-1"
+                            color="bg-blue-shade-200"
+                            size={24}
+                          />
+                        ))}
                     </div>
                   </Tooltip>
                 </div>
@@ -1086,8 +1022,7 @@ function SpecificDelegate({ props }: { props: Type }) {
                   ? " border-blue-shade-200 text-blue-shade-200 font-semibold"
                   : "border-transparent"
               }`}
-              onClick={() => router.push(path + "?active=info")}
-            >
+              onClick={() => router.push(path + "?active=info")}>
               Info
             </button>
             <button
@@ -1096,8 +1031,7 @@ function SpecificDelegate({ props }: { props: Type }) {
                   ? "text-blue-shade-200 font-semibold border-blue-shade-200"
                   : "border-transparent"
               }`}
-              onClick={() => router.push(path + "?active=pastVotes")}
-            >
+              onClick={() => router.push(path + "?active=pastVotes")}>
               Past Votes
             </button>
             <button
@@ -1108,8 +1042,7 @@ function SpecificDelegate({ props }: { props: Type }) {
               }`}
               onClick={() =>
                 router.push(path + "?active=delegatesSession&session=book")
-              }
-            >
+              }>
               Sessions
             </button>
             <button
@@ -1120,8 +1053,7 @@ function SpecificDelegate({ props }: { props: Type }) {
               }`}
               onClick={() =>
                 router.push(path + "?active=officeHours&hours=ongoing")
-              }
-            >
+              }>
               Office Hours
             </button>
           </div>

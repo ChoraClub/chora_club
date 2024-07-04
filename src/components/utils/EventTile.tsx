@@ -54,7 +54,7 @@ interface TileProps {
 }
 
 const createRandomRoom = async () => {
-  const res = await fetch("https://api-choraclub.vercel.app/api/create-room", {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_CREATE_ROOM_ENDPOINT}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",

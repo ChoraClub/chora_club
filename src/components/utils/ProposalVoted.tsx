@@ -3,7 +3,7 @@ import React, { use, useEffect, useState } from "react";
 import { Doughnut } from "react-chartjs-2";
 import { Chart, ArcElement, Tooltip, Legend } from "chart.js";
 import { Pagination } from "@nextui-org/react";
-import styles from "../IndividualDelegate/DelegateVotes.module.css"
+import styles from "../IndividualDelegate/DelegateVotes.module.css";
 import { Oval } from "react-loader-spinner";
 import Image from "next/image";
 import VotedOnOptions from "@/assets/images/votedOnOption.png";
@@ -19,16 +19,16 @@ interface Type {
 }
 
 const op_client = createClient({
-    url: "https://api.studio.thegraph.com/query/68573/v6_proxy/version/latest",
-    exchanges: [cacheExchange, fetchExchange],
-  });
-  
-  const arb_client = createClient({
-    url: "https://api.thegraph.com/subgraphs/name/show-karma/onchain-voting-arbitrum",
-    exchanges: [cacheExchange, fetchExchange],
-  });
+  url: "https://api.studio.thegraph.com/query/68573/v6_proxy/version/latest",
+  exchanges: [cacheExchange, fetchExchange],
+});
 
-  const opQuery = (first: any, skip: any) => gql`
+const arb_client = createClient({
+  url: "https://api.thegraph.com/subgraphs/name/show-karma/onchain-voting-arbitrum",
+  exchanges: [cacheExchange, fetchExchange],
+});
+
+const opQuery = (first: any, skip: any) => gql`
   query MyQuery($address: String!) {
     voteCasts(
       where: { voter: $address}
@@ -60,7 +60,7 @@ const op_client = createClient({
     }
   }
   `;
-  const opDescription = gql`
+const opDescription = gql`
   query MyDescriptionQuery($proposalId: String!) {
     proposalCreated1S(where: { proposalId: $proposalId }) {
       description
@@ -77,217 +77,252 @@ const op_client = createClient({
   }
 `;
 
-
 const arbQuery = gql`
-query Votes($address: String!) {
-  votes(
-    orderBy: timestamp
-    orderDirection: desc
-where: { user: $address, organization: "arbitrum.eth" }
-  ) {
-    id
-    proposal {
+  query Votes($address: String!) {
+    votes(
+      orderBy: timestamp
+      orderDirection: desc
+      where: { user: $address, organization: "arbitrum.eth" }
+    ) {
       id
-      description
+      proposal {
+        id
+        description
+        timestamp
+      }
+      organization {
+        id
+      }
+      solution
       timestamp
+      support
     }
-    organization {
-      id
-    }
-    solution
-    timestamp
-    support
   }
-}
 `;
 
-export const fetchProposalDescriptions = async (first:any, skip:any, daoName:any,address:any) => {
-    if (daoName === "optimism") {
+export const fetchProposalDescriptions = async (
+  first: any,
+  skip: any,
+  daoName: any,
+  address: any
+) => {
+  if (daoName === "optimism") {
+    const proposalIdsResult: any = await op_client.query(opQuery(first, skip), {
+      address: address,
+    });
+    console.log("result", proposalIdsResult);
 
-      const proposalIdsResult: any = await op_client.query(opQuery(first, skip), { address: address });
-      console.log("result", proposalIdsResult);
+    const voteCasts = proposalIdsResult.data.voteCasts || [];
+    const voteCastWithParamsCollection =
+      proposalIdsResult.data.voteCastWithParams_collection || [];
 
-      const voteCasts = proposalIdsResult.data.voteCasts || [];
-      const voteCastWithParamsCollection = proposalIdsResult.data.voteCastWithParams_collection || [];
+    // Combine the data
+    const combinedData = [...voteCasts, ...voteCastWithParamsCollection];
 
-      // Combine the data
-      const combinedData = [...voteCasts, ...voteCastWithParamsCollection];
+    // Sort combined data by blockTimestamp in descending order
+    combinedData.sort((a: any, b: any) => b.blockTimestamp - a.blockTimestamp);
+    // console.log(combinedData)
+    const proposalIds = combinedData.map((voteCast: any) => voteCast);
 
-      // Sort combined data by blockTimestamp in descending order
-      combinedData.sort((a: any, b: any) => b.blockTimestamp - a.blockTimestamp);
-      // console.log(combinedData)
-      const proposalIds = combinedData.map((voteCast: any) => voteCast);
+    // console.log("Id", proposalIds);
 
+    const descriptionsPromises = proposalIds.map((proposalId: any) => {
+      // console.log("proposalId...", proposalId);
+      return op_client
+        .query(opDescription, { proposalId: proposalId.proposalId.toString() })
+        .toPromise();
+    });
 
-      // console.log("Id", proposalIds);
+    // console.log("descriptionsPromises", descriptionsPromises);
 
-      const descriptionsPromises = proposalIds.map((proposalId: any) => {
-        // console.log("proposalId...", proposalId);
-        return op_client.query(opDescription, { proposalId: proposalId.proposalId.toString() }).toPromise();
-      });
+    const descriptionsResults = await Promise.all(descriptionsPromises);
+    // console.log("descriptionsResults", descriptionsResults);
+    const FinalResult = descriptionsResults
+      .flatMap((result, index) =>
+        Object.values(result.data)
+          .flat()
+          .filter((d: any) => d.description)
+          .map((d: any) => ({
+            proposalId: proposalIds[index],
+            proposal: { description: d.description },
+            support: proposalIds[index].support,
+          }))
+      )
+      .filter((item) => item.proposal.description.length > 0);
 
-      // console.log("descriptionsPromises", descriptionsPromises);
+    return FinalResult;
+  } else if (daoName === "arbitrum") {
+    // console.log("helloo arb")
+    const arb_gqdata: any = await arb_client.query(arbQuery, {
+      address: address,
+    });
 
-      const descriptionsResults = await Promise.all(descriptionsPromises);
-      // console.log("descriptionsResults", descriptionsResults);
-      const FinalResult = descriptionsResults
-        .flatMap((result, index) =>
-          Object.values(result.data)
-            .flat()
-            .filter((d: any) => d.description)
-            .map((d: any) => ({
-              proposalId: proposalIds[index],
-              proposal: { description: d.description, },
-              support: proposalIds[index].support
-            }))
-        )
-        .filter((item) => item.proposal.description.length > 0);
+    return arb_gqdata.data.votes;
+  }
+};
 
-   
-      return FinalResult;
-    } else if (daoName === "arbitrum") {
-      // console.log("helloo arb")
-      const arb_gqdata: any = await arb_client.query(arbQuery, {
-        address: address,
-      });
-    
-      return arb_gqdata.data.votes;
-    }
-  };
+export const fetchGraphData = async (daoName: any, pageData: any) => {
+  if (daoName == "optimism") {
+    const op_counts = pageData.reduce(
+      (acc: any, curr: any) => {
+        // console.log("curr", curr.proposalId.params.length)
+        const support =
+          curr.proposalId.params && curr.proposalId.params.length > 2
+            ? 1
+            : curr.support;
+        // console.log(support)
+        acc[support] = (acc[support] || 0) + 1;
+        return acc;
+      },
+      { 0: 0, 1: 0, 2: 0 }
+    );
 
+    return op_counts;
+    // setFirst(true);
+  } else if (daoName == "arbitrum") {
+    const arb_counts = pageData.reduce(
+      (acc: any, curr: any) => {
+        const support = curr.support;
+        acc[support] = (acc[support] || 0) + 1;
+        return acc;
+      },
+      { 0: 0, 1: 0, 2: 0 }
+    );
 
-
-export const fetchGraphData = async (daoName:any,pageData:any) => {
-      if (daoName == "optimism") {
-        const op_counts = pageData.reduce(
-          (acc: any, curr: any) => {
-            // console.log("curr", curr.proposalId.params.length)
-            const support = (curr.proposalId.params && curr.proposalId.params.length > 2) ? 1 : curr.support;
-            // console.log(support)
-            acc[support] = (acc[support] || 0) + 1;
-            return acc;
-          },
-          { 0: 0, 1: 0, 2: 0 }
-        );
-        
-        return op_counts;
-        // setFirst(true);
-      } else if (daoName == "arbitrum") {
-        const arb_counts = pageData.reduce(
-          (acc: any, curr: any) => {
-            const support = curr.support;
-            acc[support] = (acc[support] || 0) + 1;
-            return acc;
-          },
-          { 0: 0, 1: 0, 2: 0 }
-        );
-       
-        return arb_counts;
-      } else {
-       
-        return { 0: 0, 1: 0, 2: 0 };
-      }
-    };
+    return arb_counts;
+  } else {
+    return { 0: 0, 1: 0, 2: 0 };
+  }
+};
 export function formatNumber(num: any) {
-
   if (num >= 1e9) {
-    return (num / 1e9).toFixed(2) + 'B'; // Billion
+    return (num / 1e9).toFixed(2) + "B"; // Billion
   } else if (num >= 1e6) {
-    return (num / 1e6).toFixed(2) + 'M'; // Million
+    return (num / 1e6).toFixed(2) + "M"; // Million
   } else if (num >= 1e3) {
-    return (num / 1e3).toFixed(2) + 'k'; // Thousand
+    return (num / 1e3).toFixed(2) + "k"; // Thousand
   } else {
     return num.toFixed(1); // Less than a thousand
   }
 }
 
-function ProposalVoted({ daoName , address }: any) {
-    const [currentPage, setCurrentPage] = useState<number>(1);
-    const [dataToShow, setDataToShow] = useState<any>([]);
-    const [first, setFirst] = useState<boolean>(false);
-    const [graphData, setGraphData] = useState<any>([]);
-    const [pageData, setPageData] = useState<any>([]);
-    const [isPageLoading, setIsPageLoading] = useState(true);
-    const [openDesc, setOpenDesc] = useState<boolean[]>([]);
-    const [supportCounts, setSupportCounts] = useState({ 0: 0, 1: 0, 2: 0});
-  
-    useEffect(() => {
-      const fetchData = async () => {
-        try {
-            // Your async logic here
-            // console.log("props",props)
-            const finalResult =await fetchProposalDescriptions(1000,0,daoName,address);
-            console.log("finalResult",finalResult)
-            setPageData(finalResult);
-            setGraphData(finalResult);
-            setIsPageLoading(false);
-            setFirst(true)
-        } catch (error) {
-            // Handle errors here
-            console.error('Error fetching proposal descriptions:', error);
-        }
-    };
-  
-    // Call the async function
-    fetchData();
-     
-    }, [daoName]);
-    ;
+function ProposalVoted({ daoName, address }: any) {
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [dataToShow, setDataToShow] = useState<any>([]);
+  const [first, setFirst] = useState<boolean>(false);
+  const [graphData, setGraphData] = useState<any>([]);
+  const [pageData, setPageData] = useState<any>([]);
+  const [isPageLoading, setIsPageLoading] = useState(true);
+  const [openDesc, setOpenDesc] = useState<boolean[]>([]);
+  const [supportCounts, setSupportCounts] = useState({ 0: 0, 1: 0, 2: 0 });
+  const [isShowing, setIsShowing] = useState(true);
+
   useEffect(() => {
-  
     const fetchData = async () => {
       try {
-          // Your async logic here
-        const counts = await fetchGraphData(daoName,pageData);
+        // Your async logic here
+        // console.log("props",props)
+        const finalResult = await fetchProposalDescriptions(
+          1000,
+          0,
+          daoName,
+          address
+        );
+        console.log("finalResult", finalResult);
+        setPageData(finalResult);
+        setGraphData(finalResult);
+        setIsPageLoading(false);
+        setFirst(true);
+      } catch (error) {
+        // Handle errors here
+        console.error("Error fetching proposal descriptions:", error);
+      }
+    };
+
+    // Call the async function
+    fetchData();
+  }, [daoName]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Your async logic here
+        const counts = await fetchGraphData(daoName, pageData);
         setSupportCounts(counts);
       } catch (error) {
-          // Handle errors here
-          console.error('Error fetching proposal descriptions:', error);
+        // Handle errors here
+        console.error("Error fetching proposal descriptions:", error);
       }
-  };
-  
-  // Call the async function
-  fetchData();
-  },[pageData]);
-  
-    const totalData: number = graphData.length;
-    const dataPerPage: number = 5;
-    const totalPages: number = Math.ceil(totalData / dataPerPage);
-  
-    useEffect(() => {
-      const fetchPageData = async () => {
-        const offset = (currentPage - 1) * dataPerPage;
-        const end = offset + dataPerPage;
-        const initialData = await graphData.slice(offset, end);
-        setDataToShow(initialData);
-        setIsPageLoading(false);
-      };
-      if (first) {
-        fetchPageData();
-      }
-      setOpenDesc(new Array(pageData.length).fill(false));
-    }, [currentPage, graphData]);
-  
-    const chartData = {
-      labels: [`For: ${supportCounts[1]} votes`, `Against: ${supportCounts[0]} votes`, `Abstain: ${supportCounts[2]} votes`],
-      datasets: [
-        {
-          label: "# of Votes",
-          data: [supportCounts[1], supportCounts[0], supportCounts[2]],
-          backgroundColor: ["#0033A8", "#6B98FF", "#004DFF"],
-          borderWidth: 1,
-        },
-      ],
     };
-  
-    return (
+
+    // Call the async function
+    fetchData();
+  }, [pageData]);
+
+  const totalData: number = graphData.length;
+  const dataPerPage: number = 5;
+  const totalPages: number = Math.ceil(totalData / dataPerPage);
+
+  useEffect(() => {
+    const fetchPageData = async () => {
+      const offset = (currentPage - 1) * dataPerPage;
+      const end = offset + dataPerPage;
+      const initialData = await graphData.slice(offset, end);
+      setDataToShow(initialData);
+      setIsPageLoading(false);
+    };
+    if (first) {
+      fetchPageData();
+    }
+    setOpenDesc(new Array(pageData.length).fill(false));
+  }, [currentPage, graphData]);
+
+  const chartData = {
+    labels: [
+      `For: ${supportCounts[1]} votes`,
+      `Against: ${supportCounts[0]} votes`,
+      `Abstain: ${supportCounts[2]} votes`,
+    ],
+    datasets: [
+      {
+        label: "# of Votes",
+        data: [supportCounts[1], supportCounts[0], supportCounts[2]],
+        backgroundColor: ["#0033A8", "#6B98FF", "#004DFF"],
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  const handleClose = () => {
+    setIsShowing(false);
+  };
+
+  return (
+    <>
+      {isShowing && daoName === "arbitrum" && (
+        <div
+          className="bg-yellow-200 border border-gray-300 rounded-md shadow-md text-gray-700 flex items-center p-3 w-70 mb-4"
+          style={{ width: "80%" }}
+        >
+          <span>
+            📊 We are currently gathering the data and will update with the
+            latest information soon!
+          </span>{" "}
+          &nbsp;
+          <button
+            className="flex ml-auto items-center justify-center p-1 text-gray-500 hover:text-red-500 bg-white border border-gray-300 rounded-md"
+            onClick={handleClose}
+          >
+            Close
+          </button>
+        </div>
+      )}
       <div className="grid grid-cols-5 pe-5 gap-4 pb-6">
         <div
           style={{ boxShadow: "0px 4px 15.1px 0px rgba(0, 0, 0, 0.17)" }}
           className="col-span-2 space-y-4 p-10 rounded-xl"
         >
           {isPageLoading ? (
-            <ProposalVotedLeftSkeletonLoader/>
+            <ProposalVotedLeftSkeletonLoader />
           ) : first && !isPageLoading && pageData.length > 0 ? (
             <Doughnut
               data={chartData}
@@ -310,12 +345,10 @@ function ProposalVoted({ daoName , address }: any) {
           <div className="font-semibold text-blue-shade-200 text-2xl py-2 ">
             Voted Proposals
           </div>
-  
+
           <div className={`h-[23rem] overflow-y-auto ${styles.scrollbar}`}>
             {isPageLoading ? (
-
-              <ProposalVotedRightSkeletonLoader/>
-
+              <ProposalVotedRightSkeletonLoader />
             ) : first && !isPageLoading && pageData.length > 0 ? (
               dataToShow.map((proposal: any, index: number) => (
                 <div
@@ -325,7 +358,6 @@ function ProposalVoted({ daoName , address }: any) {
                   <div className="w-3/4 break-words">
                     <div className={`${openDesc[index] ? "" : styles.desc}`}>
                       {proposal.proposal.description}
-                   
                     </div>
                     <span
                       className="text-xs text-blue-shade-100 underline cursor-pointer"
@@ -339,43 +371,53 @@ function ProposalVoted({ daoName , address }: any) {
                     </span>
                   </div>
                   <div
-                    className={`text-white rounded-full px-3 py-[2px] w-[70px] me-1 text-center flex justify-center align-center ${proposal.proposalId && proposal.proposalId.params && proposal.proposalId.params.length > 2
+                    className={`text-white rounded-full px-3 py-[2px] w-[70px] me-1 text-center flex justify-center align-center ${
+                      proposal.proposalId &&
+                      proposal.proposalId.params &&
+                      proposal.proposalId.params.length > 2
                         ? "" // Your custom color for this condition
                         : proposal.support === 1
-                          ? "bg-[#0033A8]"
-                          : proposal.support === 0
-                            ? "bg-[#6B98FF]"
-                            : "bg-[#004DFF]"
-                      }`}
+                        ? "bg-[#0033A8]"
+                        : proposal.support === 0
+                        ? "bg-[#6B98FF]"
+                        : "bg-[#004DFF]"
+                    }`}
                   >
-                 
-                     <NextUITooltip
-                        content="Voted on options"
-                        isDisabled={!(proposal.proposalId && proposal.proposalId.params && proposal.proposalId.params.length > 2)}
-                      >
-                        {
-                         proposal.proposalId&& proposal.proposalId.params && proposal.proposalId.params.length > 2
-                            ? <Image className="flex justify-center items-center" src={VotedOnOptions} alt="Voted on options" />
-                            : proposal.support === 1
-                              ? "For"
-                              : proposal.support === 0
-                                ? "Against"
-                                : "Abstain"
-                        }
-                      </NextUITooltip>
+                    <NextUITooltip
+                      content="Voted on options"
+                      isDisabled={
+                        !(
+                          proposal.proposalId &&
+                          proposal.proposalId.params &&
+                          proposal.proposalId.params.length > 2
+                        )
+                      }
+                    >
+                      {proposal.proposalId &&
+                      proposal.proposalId.params &&
+                      proposal.proposalId.params.length > 2 ? (
+                        <Image
+                          className="flex justify-center items-center"
+                          src={VotedOnOptions}
+                          alt="Voted on options"
+                        />
+                      ) : proposal.support === 1 ? (
+                        "For"
+                      ) : proposal.support === 0 ? (
+                        "Against"
+                      ) : (
+                        "Abstain"
+                      )}
+                    </NextUITooltip>
                   </div>
-                  <NextUITooltip
-                  content="Votes">
-                 {
-                  
-                 daoName === "optimism" && proposal.proposalId&& (
-                    <div className="text-white rounded-full px-3 py-[2px] bg-[#FF0000]">
-                      {formatNumber(proposal.proposalId.weight / 1e18)}
-                    </div>
-                  )
-                 }
-   </NextUITooltip>
-                  {daoName === "optimism"&& proposal.proposalId && (
+                  <NextUITooltip content="Votes">
+                    {daoName === "optimism" && proposal.proposalId && (
+                      <div className="text-white rounded-full px-3 py-[2px] bg-[#FF0000]">
+                        {formatNumber(proposal.proposalId.weight / 1e18)}
+                      </div>
+                    )}
+                  </NextUITooltip>
+                  {daoName === "optimism" && proposal.proposalId && (
                     <div className="px-3 py-[2px] text-xl">
                       <a
                         href={`https://optimistic.etherscan.io/tx/${proposal.proposalId.transactionHash}`}
@@ -386,7 +428,6 @@ function ProposalVoted({ daoName , address }: any) {
                       </a>
                     </div>
                   )}
-  
                 </div>
               ))
             ) : (
@@ -396,13 +437,14 @@ function ProposalVoted({ daoName , address }: any) {
               </div>
             )}
           </div>
-  
+
           {isPageLoading ? (
             ""
           ) : (
             <div
-              className={`pt-4 flex items-end bottom-0 justify-center ${graphData.length == 0 ? "hidden" : ""
-                }`}
+              className={`pt-4 flex items-end bottom-0 justify-center ${
+                graphData.length == 0 ? "hidden" : ""
+              }`}
             >
               <Pagination
                 color="primary"
@@ -416,8 +458,8 @@ function ProposalVoted({ daoName , address }: any) {
           )}
         </div>
       </div>
-    );
-  
+    </>
+  );
 }
 
 export default ProposalVoted;

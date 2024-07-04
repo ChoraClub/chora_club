@@ -20,9 +20,15 @@ type follow_activity = {
   action: string;
   timestamp: Date;
 };
-type followings={
-  follower_address:string
-}
+type dao_following = {
+  isFollowing: boolean;
+  follower_address: string;
+};
+type followings = {
+  dao: string;
+  following: dao_following[];
+};
+
 type dao_follower = {
   address: string;
   isNotification: boolean;
@@ -54,7 +60,7 @@ interface DelegateRequestBody {
   };
   networks: network_details[];
   followers: follower_details[];
-  followings:[];
+  followings: followings[];
 }
 
 // Define the response body type

@@ -1,0 +1,12 @@
+.partialborder {
+    position: relative;
+}
+
+.partialborder::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 10%;
+    width: 80%;
+    border-bottom: 1px solid #e5e7eb; /* Tailwind's gray-200 color */
+}

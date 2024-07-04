@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/config/connectDB";
+import { promises } from "dns";
 
 export async function PUT(req: NextRequest) {
   try {
@@ -30,6 +31,14 @@ export async function PUT(req: NextRequest) {
     let updateOperation;
     if (action === 1) {
       // Unfollow action
+      await updateFollowing(
+        collection,
+        follower_address,
+        delegate_address,
+        dao,
+        action,
+        updatenotification
+      );
       updateOperation = {
         $set: {
           "followers.$[outer].follower.$[inner].isFollowing": false,
@@ -41,43 +50,19 @@ export async function PUT(req: NextRequest) {
             timestamp: new Date(),
           } as any,
         },
+
+        // For unfollow action
       };
-
-      const documents = await collection
-        .find({ address: { $regex: `^${follower_address}$`, $options: "i" } })
-        .toArray();
-
-      const document = documents[0];
-
-      if (Array.isArray(document.followings)) {
-        console.log("Followings array:", JSON.stringify(document.followings));
-        console.log("Delegate address:", delegate_address);
-
-        const existingFollowingIndex = document.followings.findIndex(
-          (item) =>
-            item.follower_address.toLowerCase() ===
-            delegate_address.toLowerCase()
-        );
-
-        if (existingFollowingIndex !== -1) {
-          console.log("Updating following status");
-          const updateQuery = {
-            $set: {
-              [`followings.${existingFollowingIndex}.isFollowing`]: false,
-            },
-          };
-          await collection.updateOne(
-            { address: follower_address },
-            updateQuery
-          );
-        } else {
-          console.log("Following not found");
-        }
-      } else {
-        console.log("Followings array doesn't exist");
-      }
     } else if (action === 2) {
       // Update notification setting only
+      await updateFollowing(
+        collection,
+        follower_address,
+        delegate_address,
+        dao,
+        action,
+        updatenotification
+      );
       updateOperation = {
         $set: {
           "followers.$[outer].follower.$[inner].isNotification":
@@ -106,22 +91,6 @@ export async function PUT(req: NextRequest) {
 
     console.log(`Delegate document updated for ${delegate_address}:`, result);
 
-    // const followerUpdateResult = await collection.updateOne(
-    //   {
-    //     address: { $regex: `^${follower_address}$`, $options: "i" },
-    //     "followings.follower_address": { $ne: delegate_address },
-    //   },
-    //   {
-    //     $addToSet: {
-    //       followings: {
-    //         follower_address: delegate_address,
-    //         isFollowing: false,
-    //       },
-    //     },
-    //   },
-    //   { upsert: true }
-    // );
-
     await client.close();
     console.log("MongoDB connection closed");
 
@@ -145,5 +114,81 @@ export async function PUT(req: NextRequest) {
       { error: "Internal Server Error" },
       { status: 500 }
     );
+  }
+}
+
+async function updateFollowing(
+  collection: any,
+  follower_address: string,
+  delegate_address: string,
+  dao: string,
+  action: number,
+  updatenotification?: boolean
+): Promise<void> {
+  const documents = await collection
+    .find({ address: { $regex: `^${follower_address}$`, $options: "i" } })
+    .toArray();
+
+  if (documents.length > 0) {
+    const document = documents[0];
+    const dao_name = dao;
+
+    if (Array.isArray(document.followings)) {
+      console.log("Followings array:", JSON.stringify(document.followings));
+      console.log("Delegate address:", delegate_address);
+
+      const existingDaoIndex = document.followings.findIndex(
+        (item: any) => item.dao === dao_name
+      );
+
+      if (existingDaoIndex !== -1) {
+        const daoFollowings = document.followings[existingDaoIndex].following;
+        const existingFollowingIndex = daoFollowings.findIndex(
+          (item: any) =>
+            item.follower_address.toLowerCase() ===
+            delegate_address.toLowerCase()
+        );
+
+        if (existingFollowingIndex !== -1) {
+          let updateQuery;
+
+          if (action === 1) {
+            // Unfollow action
+            updateQuery = {
+              $set: {
+                [`followings.${existingDaoIndex}.following.${existingFollowingIndex}.isFollowing`]:
+                  false,
+                [`followings.${existingDaoIndex}.following.${existingFollowingIndex}.isNotification`]:
+                  false,
+              },
+            };
+          } else if (action === 2) {
+            // Update notification setting only
+            updateQuery = {
+              $set: {
+                [`followings.${existingDaoIndex}.following.${existingFollowingIndex}.isNotification`]:
+                  updatenotification,
+              },
+            };
+          } else {
+            throw new Error("Invalid action");
+          }
+
+          console.log("Updating following status");
+          await collection.updateOne(
+            { address: follower_address },
+            updateQuery
+          );
+        } else {
+          console.log("Following not found for this DAO");
+        }
+      } else {
+        console.log("DAO not found in followings");
+      }
+    } else {
+      console.log("Followings array doesn't exist");
+    }
+  } else {
+    console.log("Document not found");
   }
 }
