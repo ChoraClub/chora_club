@@ -3,15 +3,59 @@ import React, { ChangeEvent, useState, useEffect } from "react";
 import { Oval, RotatingLines } from "react-loader-spinner";
 import { useAccount } from "wagmi";
 import { useNetwork } from "wagmi";
-import 'react-quill/dist/quill.snow.css';
-import './quillCustomStyles.css'; 
+// import 'react-quill/dist/quill.snow.css';
+// import './quillCustomStyles.css'; 
 
 import dynamic from 'next/dynamic';
+import styled from 'styled-components';
+import rehypeSanitize from "rehype-sanitize";
 
-const ReactQuill = dynamic(
-  () => import('react-quill').then((mod) => mod.default),
+
+const StyledMDEditorWrapper = styled.div`
+  .w-md-editor-toolbar {
+    height: 40px !important;
+    border-radius: 20px 20px 0 0 !important;
+  }
+
+  .w-md-editor-toolbar svg {
+    width: 18px !important;
+    height: 18px !important;
+    margin: 0 6px 2px 6px !important;
+  }
+
+  .w-md-editor {
+  border-radius:15px !important;
+ 
+  }
+  .w-md-editor-content {
+  margin:12px 0 12px 0 !important;
+   font-family:'Poppins', sans-serif !important;
+  }
+  .wmde-markdown {
+    font-family: 'Poppins', sans-serif !important;
+  }
+    .wmde-markdown ul {
+    list-style-type: disc !important;
+    padding-left: 20px !important;
+  }
+
+  .wmde-markdown ol {
+    list-style-type: decimal !important;
+    padding-left: 20px !important;
+  }
+  
+`;
+
+// const ReactQuill = dynamic(
+//   () => import('react-quill').then((mod) => mod.default),
+//   { ssr: false }
+// );
+
+const MDEditor = dynamic(
+  () => import("@uiw/react-md-editor").then((mod) => mod.default),
   { ssr: false }
 );
+
 
 interface userInfoProps {
   description: string;
@@ -297,9 +341,9 @@ function UserInfo({
   //   console.log("Temp Desc", event.target.value);
   // };
 
-  const handleDescChange = (value: string, delta: any, source: any, editor: any) => {
+  const handleDescChange = (value?: string) => {
     // Update the tempDesc state with the new value
-    setTempDesc(value);
+    setTempDesc(value || "");
     console.log("Temp Desc", value);
     // setEditing(true);
   };
@@ -379,13 +423,15 @@ function UserInfo({
         )}
       </div>
 
+      {isSelfDelegate ? (
+
       <div
         style={{ boxShadow: "0px 4px 30.9px 0px rgba(0, 0, 0, 0.12)" }}
-        className={`flex flex-col justify-between min-h-48 rounded-xl my-7 me-32 p-3 
+        className={`flex flex-col justify-between min-h-48 rounded-xl my-7 me-32 p-6
         ${isEditing ? "outline" : ""}`}
       >
         
-          <ReactQuill
+          {/* <ReactQuill
             readOnly={!isEditing}
             value={isEditing ? tempDesc :( description || karmaDesc)}
             onChange={handleDescChange}
@@ -393,7 +439,34 @@ function UserInfo({
               toolbar: toolbarOptions,
             }}
             placeholder={"Type your description here ..."}
-          />
+          /> */}
+
+          
+
+<StyledMDEditorWrapper>
+
+<MDEditor
+          value={isEditing ? tempDesc : (description || karmaDesc)}
+          onChange={handleDescChange}
+          preview={isEditing ? "live" : "preview"}
+          height={300}
+          hideToolbar={!isEditing}
+    visibleDragbar={false}
+    previewOptions={{
+      rehypePlugins: [[rehypeSanitize]],
+    }}
+          // style={{
+            //   backgroundColor: '#f5f5f5',
+            //   fontSize: '16px',
+            // }}
+            textareaProps={{
+              placeholder: "Type your description here..."
+            }}
+            />
+            </StyledMDEditorWrapper>
+          
+
+       
        
 
         {/* <textarea
@@ -405,7 +478,7 @@ function UserInfo({
           // style={{height:"200px",width:"250px"}}
         /> */}
 
-        <div className="flex justify-end">
+        <div className="flex justify-end mt-3">
           {isEditing ? (
             <>
             <button
@@ -425,7 +498,7 @@ function UserInfo({
 
           (
             <button
-              className="bg-blue-shade-100 text-white text-sm py-1 px-4 mt-3 rounded-full font-semibold"
+              className="bg-blue-shade-100 text-white text-sm py-1 px-4  rounded-full font-semibold"
               onClick={() => setEditing(true)}
             >
               Edit
@@ -433,6 +506,8 @@ function UserInfo({
           )}
         </div>
       </div>
+      ): (<></>)
+    }
     </div>
   );
 }
