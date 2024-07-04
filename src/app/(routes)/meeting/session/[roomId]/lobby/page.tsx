@@ -40,10 +40,6 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
   // Local States
   console.log("params", params);
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  // const avatarUrl = useStore((state) => state.avatarUrl);
-  // const setAvatarUrl = useStore((state) => state.setAvatarUrl);
-  // const setUserDisplayName = useStore((state) => state.setUserDisplayName);
-  // const userDisplayName = useStore((state) => state.userDisplayName);
   const [token, setToken] = useState<string>("");
   const [isJoining, setIsJoining] = useState<boolean>(false);
   const { updateMetadata, metadata, peerId, role } = useLocalPeer<{
@@ -68,6 +64,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
   const [isAllowToEnter, setIsAllowToEnter] = useState<boolean>();
   const [notAllowedMessage, setNotAllowedMessage] = useState<string>();
   const [hostAddress, setHostAddress] = useState();
+  const [daoName, setDaoName] = useState();
   const [meetingStatus, setMeetingStatus] = useState<any>();
 
   useEffect(() => {
@@ -98,11 +95,13 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
 
       if (result.success) {
         setHostAddress(result.data.host_address);
+        setDaoName(result.data.dao_name);
       }
       if (result.message === "Meeting is ongoing") {
         setMeetingStatus("Ongoing");
       }
 
+      // if (address === hostAddress || meetingStatus === "Ongoing") {
       // if (address === hostAddress || result.message === "Meeting is ongoing") {
       setIsJoining(true);
 
@@ -118,7 +117,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
         const requestBody = {
           roomId: params.roomId,
           role: role,
-          displayName: formattedAddress,
+          displayName: name,
           address: address, // assuming you have userAddress defined somewhere
         };
         try {
@@ -257,16 +256,9 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
     verifyMeetingId();
   }, [params.roomId, isAllowToEnter, notAllowedMessage, meetingStatus]);
 
-  useEffect(() => {
-    let dao = "";
-    if (chain && chain?.name === "Optimism") {
-      dao = "optimism";
-    } else if (chain && chain?.name === "Arbitrum One") {
-      dao = "arbitrum";
-    } else {
-      return;
-    }
+  useEffect(() => {}, [daoName]);
 
+  useEffect(() => {
     const fetchData = async () => {
       try {
         const myHeaders = new Headers();
@@ -330,20 +322,6 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
     };
     fetchData();
   }, []);
-
-  // useEffect(() => {
-  //   const handleBeforeUnload = (event: any) => {
-  //     const message = "Are you sure you want to leave?";
-  //     event.returnValue = message; // Standard way to display an alert in modern browsers
-  //     return message; // For some older browsers
-  //   };
-
-  //   window.addEventListener("beforeunload", handleBeforeUnload);
-
-  //   return () => {
-  //     window.removeEventListener("beforeunload", handleBeforeUnload);
-  //   };
-  // }, []);
 
   const formattedAddress = address?.slice(0, 6) + "..." + address?.slice(-4);
 

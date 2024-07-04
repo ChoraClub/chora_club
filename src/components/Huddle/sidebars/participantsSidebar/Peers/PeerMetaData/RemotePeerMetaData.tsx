@@ -85,31 +85,12 @@ const PeerMetaData: React.FC<PeerMetaDatProps> = ({
         ) : (
           <div className="flex text-sm font-semibold items-center justify-center w-6 h-6 bg-[#004DFF] text-gray-200 rounded-full">
             {metadata?.displayName[0]?.toUpperCase()}
-            {/* <img src={metadata?.avatarUrl} /> */}
           </div>
         )}
-        {/* <div className="flex text-sm font-semibold items-center justify-center w-6 h-6 bg-[#004DFF] text-gray-200 rounded-full">
-          {metadata?.displayName[0]?.toUpperCase()}
-        </div> */}
-        <div className="text-slate-400 tex-sm font-normal">
+        <div className="text-slate-400 text-sm font-normal">
           {metadata?.displayName}
         </div>
       </div>
-      {/* {isRequested ? (
-        <AcceptDenyGroup
-          onDeny={() => {
-            if (peerId) {
-              // removeRequestedPeers(peerId);
-            }
-          }}
-          onAccept={() => {
-            if (peerId && role && ["host", "coHost"].includes(role)) {
-              updateRole(Role.SPEAKER);
-              // removeRequestedPeers(peerId);
-            }
-          }}
-        />
-      ) : ( */}
       <div className="flex items-center gap-3">
         <div onClick={() => {}}>
           {metadata?.isHandRaised
@@ -121,16 +102,15 @@ const PeerMetaData: React.FC<PeerMetaDatProps> = ({
             ? NestedPeerListIcons.active.mic
             : NestedPeerListIcons.inactive.mic}
         </div>
-        {/* {role === "host" && ( */}
-        <div className="cursor-pointer flex items-center">
-          <Dropdown
-            triggerChild={<div>{NestedPeerListIcons.inactive.more}</div>}
-            align="end"
-          >
-            {role && RoleData[role as keyof typeof RoleData]}
-            {/* {renderRoleData()} */}
-          </Dropdown>
-        </div>
+        {/* {role !== "host" || role === "guest" && ( */}
+          <div className="cursor-pointer flex items-center">
+            <Dropdown
+              triggerChild={<div>{NestedPeerListIcons.inactive.more}</div>}
+              align="end"
+            >
+              {role && RoleData[role as keyof typeof RoleData]}
+            </Dropdown>
+          </div>
         {/* )} */}
       </div>
       {/* )}  */}
