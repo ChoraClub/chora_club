@@ -25,15 +25,15 @@ import { useEffect, useRef, useState } from "react";
 import BottomBar from "@/components/Huddle/bottomBar";
 import { Button } from "@/components/ui/button";
 import { PeerMetadata } from "@/utils/types";
-import ChatBar from "@/components/sidebars/ChatBar/chatbar";
-import ParticipantsBar from "@/components/sidebars/participantsSidebar/participantsBar";
-import Video from "@/components/Media/Video";
+import ChatBar from "@/components/Huddle/sidebars/ChatBar/chatbar";
+import ParticipantsBar from "@/components/Huddle/sidebars/participantsSidebar/participantsBar";
+import Video from "@/components/Huddle/Media/Video";
 import { Role } from "@huddle01/server-sdk/auth";
 import clsx from "clsx";
 import GridContainer from "@/components/Huddle/GridContainer";
 // import ShowCaptions from "@/components/Caption/showCaptions";
 import RemoteScreenShare from "@/components/Huddle/remoteScreenShare";
-import Camera from "@/components/Media/Camera";
+import Camera from "@/components/Huddle/Media/Camera";
 
 export default function Component({ params }: { params: { roomId: string } }) {
   const { isVideoOn, enableVideo, disableVideo, stream } = useLocalVideo();
@@ -76,6 +76,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
       router.push(`/${params.roomId}/lobby`);
     },
   });
+  const [daoName, setDaoName] = useState<any>();
 
   useDataMessage({
     async onMessage(payload, from, label) {
@@ -253,7 +254,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
         name={metadata?.displayName}
         localPeerId={peerId}
       /> */}
-      <BottomBar />
+      <BottomBar daoName={daoName} />
     </div>
   );
 }
