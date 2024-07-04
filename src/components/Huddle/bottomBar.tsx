@@ -159,14 +159,14 @@ const BottomBar = ({ daoName }: { daoName: string }) => {
   // }, []);
 
   useEffect(() => {
-    const storedStatus = sessionStorage.getItem("isMeetingRecorded");
+    const storedStatus = localStorage.getItem("isMeetingRecorded");
     console.log("storedStatus: ", storedStatus);
     setRecordingStatus(storedStatus);
   }, []);
 
   const handleModalClose = async (result: boolean) => {
     if (role === "host") {
-      sessionStorage.setItem("isMeetingRecorded", result.toString());
+      localStorage.setItem("isMeetingRecorded", result.toString());
       setShowModal(false);
       setRecordingStatus(result.toString());
       console.log(
@@ -344,7 +344,7 @@ const BottomBar = ({ daoName }: { daoName: string }) => {
       }
     }
 
-    sessionStorage.removeItem("isMeetingRecorded");
+    localStorage.removeItem("isMeetingRecorded");
   };
 
   return (
