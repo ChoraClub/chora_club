@@ -8,12 +8,12 @@ import {
   useRemoteScreenShare,
   useRemoteVideo,
 } from "@huddle01/react/hooks";
-import Video from "../Media/Video";
-import Audio from "../Media/Audio";
+import Video from "./Media/Video";
+import Audio from "./Media/Audio";
 import GridContainer from "./GridContainer";
 import clsx from "clsx";
 import { useStudioState } from "@/store/studioState";
-import Camera from "../Media/Camera";
+import Camera from "./Media/Camera";
 import { Role } from "@huddle01/server-sdk/auth";
 import { NestedPeerListIcons } from "@/utils/PeerListIcons";
 import { useState } from "react";

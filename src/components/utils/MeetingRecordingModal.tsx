@@ -1,5 +1,7 @@
+import Image from "next/image";
 import React from "react";
 import { MdCancel } from "react-icons/md";
+import record from "@/assets/images/instant-meet/record.svg";
 
 function MeetingRecordingModal({
   show,
@@ -17,26 +19,41 @@ function MeetingRecordingModal({
             // onClick={onClose}
           ></div>
           <div className="bg-white rounded-3xl shadow-lg p-8 relative w-full max-w-lg mx-4">
-            <button
-              className="absolute top-5 right-6"
-              onClick={() => onClose(false)}
-            >
-              <MdCancel size={25} />
-            </button>
-
-            <h2 className="text-2xl font-bold mb-2">
-              Do you want to record the meeting?
-            </h2>
-            <div className="flex justify-center space-x-4 mt-6">
+            <div className="flex justify-between items-center mb-4">
+              <div className="flex gap-3 items-center">
+                <Image
+                  alt="record-left"
+                  width={25}
+                  height={25}
+                  src={record}
+                  className="w-5 h-5"
+                />
+                <h2 className="text-lg font-bold">
+                  Do you want to record the meeting?
+                </h2>
+              </div>
+              <button
+                onClick={() => onClose(false)}
+                className="text-gray-700 hover:text-gray-800 "
+              >
+                <MdCancel size={20} />
+              </button>
+            </div>
+            <div className="flex text-sm text-justify">
+              In order for meeting participants to claim both offchain and
+              onchain attestations, the meeting must be recorded. Without a
+              recording, they will not be able to claim these attestations.
+            </div>
+            <div className="flex justify-center space-x-4 pt-4">
               <button
                 onClick={() => onClose(true)}
-                className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                className="bg-blue-shade-200 text-xs text-white px-6 py-2 rounded-full font-bold"
               >
                 Yes
               </button>
               <button
                 onClick={() => onClose(false)}
-                className="bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-900"
+                className="bg-[#FF0000] text-xs text-white px-6 py-2 rounded-full font-bold"
               >
                 No
               </button>
