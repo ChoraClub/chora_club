@@ -127,7 +127,7 @@ function AboutDao({ props }:any) {
     <h2 className="text-2xl font-semibold mb-8 text-blue-shade-100">Community and Resources</h2>
    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
   {links.map((link) => (
-    <Link key={link.name} href={link.href}>
+    <Link key={link.name} href={link.href} target="_blank" rel="noopener noreferrer">
       <div className="bg-gray-50 shadow-md rounded-lg p-4 flex items-center space-x-3 cursor-pointer hover:bg-gray-100 transition duration-300">
         <link.icon className={`${link.color} text-xl`} />
         <span className="text-gray-700">{link.name}</span>
