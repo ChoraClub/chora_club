@@ -113,7 +113,7 @@ function SpecificDelegate({ props }: { props: Type }) {
         // ens
         // ? setDelegate(ens)
         // :
-        setDelegate(delegate.slice(0, 6) + "..." + delegate.slice(-4));
+        setDelegate(delegate);
         setError(null);
       } catch (err: any) {
         setError(err.message);
@@ -827,6 +827,7 @@ function SpecificDelegate({ props }: { props: Type }) {
                   ? ArbLogo
                   : ccLogo)
           }
+          daoName={props.daoDelegates}
           addressCheck={same}
         />
       )}

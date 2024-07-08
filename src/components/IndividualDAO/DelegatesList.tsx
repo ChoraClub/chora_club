@@ -441,11 +441,13 @@ function DelegatesList({ props }: { props: string }) {
         let data: any;
         if (props === "optimism") {
           data = await op_client.query(DELEGATE_CHANGED_QUERY, {
-            delegator: delegateObject.delegate,
+            // delegator: delegateObject.delegate,
+            delegator: "0xa2d590fee197c0b614fe7c3e10303327f38c0dc3",
           });
         } else {
           data = await arb_client.query(DELEGATE_CHANGED_QUERY, {
-            delegator: delegateObject.delegate,
+            // delegator: delegateObject.delegate,
+            delegator: "0xa2d590fee197c0b614fe7c3e10303327f38c0dc3",
           });
         }
         // const ens = await getEnsNameOfUser(
@@ -461,7 +463,7 @@ function DelegatesList({ props }: { props: string }) {
         // ? setDelegate(ens)
         // :
         console.log("delegate N/A: ", delegate);
-        setDelegateDetails(delegate.slice(0, 6) + "..." + delegate.slice(-4));
+        setDelegateDetails(delegate);
         setError(null);
       } catch (err: any) {
         setError(err.message);
@@ -763,6 +765,7 @@ function DelegatesList({ props }: { props: string }) {
                             : ""
                           : selectedDelegate.profilePicture
                       }
+                      daoName={props}
                       addressCheck={same}
                     />
                   )}

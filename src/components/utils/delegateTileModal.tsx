@@ -4,6 +4,9 @@ import user from "@/assets/images/user/user1.svg";
 import { IoArrowDown } from "react-icons/io5";
 import Arrow1 from "@/assets/images/daos/arrow1.png";
 import Arrow2 from "@/assets/images/daos/arrow2.png";
+import Link from "next/link";
+import { BASE_URL } from "@/config/constants";
+import { HiOutlineExternalLink } from "react-icons/hi";
 
 interface delegate {
   isOpen: boolean;
@@ -12,6 +15,7 @@ interface delegate {
   fromDelegate: any;
   delegateName: String;
   displayImage: any;
+  daoName: String;
   addressCheck: boolean;
 }
 
@@ -22,6 +26,7 @@ function DelegateTile({
   fromDelegate,
   delegateName,
   displayImage,
+  daoName,
   addressCheck,
 }: delegate) {
   const [isLoading, setIsLoading] = useState(true);
@@ -75,7 +80,18 @@ function DelegateTile({
               <Image src={user} alt="" className="size-[46px] mx-5" />
               <div className="">
                 <p className=" text-sm font-medium">Currently delegated to</p>
-                <p className=" font-normal text-[12px]">{fromDelegate}</p>
+                {fromDelegate === "N/A" ? (
+                  <p className="font-normal text-[12px]">{fromDelegate}</p>
+                ) : (
+                  <Link
+                    href={`${BASE_URL}/${daoName}/${fromDelegate}?active=info`}
+                    target="_blank"
+                    className="font-normal text-[12px] flex gap-1 items-center"
+                  >
+                    {fromDelegate.slice(0, 6) + "..." + fromDelegate.slice(-4)}
+                    <HiOutlineExternalLink size={14}/>
+                  </Link>
+                )}
               </div>
             </div>
             <div className="w-full border-[0.5px] border-white flex items-center justify-center h-0">
