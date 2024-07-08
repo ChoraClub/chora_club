@@ -57,8 +57,6 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
   const { chain, chains } = useNetwork();
   const [profileDetails, setProfileDetails] = useState<any>();
 
-  const [popupVisibility, setPopupVisibility] = useState(true);
-
   // Huddle Hooks
   const { joinRoom, state, room } = useRoom();
   const [isAllowToEnter, setIsAllowToEnter] = useState<boolean>();
@@ -329,30 +327,6 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
     <>
       {isAllowToEnter ? (
         <div className="h-screen">
-          {popupVisibility && (
-            <div className="flex items-center justify-center">
-              <div className="absolute bg-white text-[#3E3D3D] flex items-center py-2 pl-5 font-poppins font-semibold w-1/4 rounded-md top-6 drop-shadow-xl">
-                <div className="flex gap-3">
-                  <Image
-                    alt="record-left"
-                    width={25}
-                    height={25}
-                    src={record}
-                    className="w-5 h-5"
-                  />
-                  <div className="">This meeting is being recorded.</div>
-                </div>
-                <div className="flex absolute right-2">
-                  <button
-                    onClick={() => setPopupVisibility(false)}
-                    className="p-1 bg-[#3E3D3D] rounded-full text-white text-bold"
-                  >
-                    <RxCross2 size={10} />
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
           <main className="flex h-screen flex-col items-center justify-center bg-lobby text-slate-100 font-poppins">
             <div className="flex flex-col items-center justify-center gap-4 w-1/3 mt-14">
               <div className="text-center flex items-center justify-center bg-slate-100 w-full rounded-2xl py-28">
