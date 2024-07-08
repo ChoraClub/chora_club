@@ -325,7 +325,6 @@ function MainProfile() {
     // Close the modal
     setLoading(false);
     setfollowingmodel(false);
-    toast.success("Succesfully changes are made!");
   };
   const toggleFollowing = async (index: number, userupdate: any) => {
     setUserFollowings((prevUsers) =>

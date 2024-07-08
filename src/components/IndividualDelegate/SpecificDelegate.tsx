@@ -929,18 +929,23 @@ function SpecificDelegate({ props }: { props: Type }) {
                     placement="top"
                     closeDelay={1}
                     showArrow>
-                  <div className={`border  rounded-full flex items-center justify-center size-10  ${
-      isFollowing ? 'cursor-pointer border-black' : 'cursor-not-allowed border-gray-200'}`} onClick={() => isFollowing && handleConfirm(2)}>                    
+                    <div
+                      className={`border  rounded-full flex items-center justify-center size-10  ${
+                        isFollowing
+                          ? "cursor-pointer border-black"
+                          : "cursor-not-allowed border-gray-200"
+                      }`}
+                      onClick={() => isFollowing && handleConfirm(2)}>
                       {isFollowing ? (
-      notification ? (
-        <IoMdNotifications className="text-black size-6" />
-      ) : (
-        <IoMdNotificationsOff className="text-black size-6" />
-      )
-    ) : (
-      <IoMdNotifications className="text-gray-200 size-6" />
-    )}             
-                  </div>
+                        notification ? (
+                          <IoMdNotifications className="text-black size-6" />
+                        ) : (
+                          <IoMdNotificationsOff className="text-black size-6" />
+                        )
+                      ) : (
+                        <IoMdNotifications className="text-gray-200 size-6" />
+                      )}
+                    </div>
                   </Tooltip>
 
                   {isOpenunfollow && (
@@ -954,7 +959,7 @@ function SpecificDelegate({ props }: { props: Type }) {
                           </div>
                           <div className="px-8 py-4">
                             <p className="mt-4 text-center">
-                              By unfollowing, you'll miss out on important
+                              By unfollowing, you will miss out on important
                               updates, exclusive alerts of delegate. Stay
                               connected to keep up with all the latest
                               activities!
@@ -997,7 +1002,7 @@ function SpecificDelegate({ props }: { props: Type }) {
                     placement="top"
                     closeDelay={1}
                     showArrow> */}
-                    {/* <button
+                  {/* <button
                       className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[5px] flex items-center mr-2"
                       onClick={() => {
                         if (notification) {
@@ -1007,7 +1012,7 @@ function SpecificDelegate({ props }: { props: Type }) {
                         }
                       }}
                     > */}
-                    {/* <div
+                  {/* <div
                       className="flex items-center cursor-pointer"
                       onClick={() => {
                         if (notification) {
