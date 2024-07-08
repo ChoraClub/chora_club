@@ -26,11 +26,13 @@ import "./tour.css";
 import Joyride from "react-joyride";
 import { title } from "process";
 import { Placement } from "react-joyride";
+import { IoMdNotifications } from "react-icons/io";
 
 function Sidebar() {
   const [isTourOpen, setIsTourOpen] = useState(false);
   // const [isClient, setIsClient] = useState(false);
   const [hasSeenTour, setHasSeenTour] = useState(true);
+  const [notificationCount, setNotificationCount] = useState(1);
 
   const tourSteps = [
     {
@@ -436,6 +438,28 @@ function Sidebar() {
             </div>
           </div>
           <div className="flex flex-col items-center gap-y-4 pt-5">
+            <Tooltip
+              content={<div className="capitalize">Notifications</div>}
+              placement="right"
+              className="rounded-md bg-opacity-90"
+              closeDelay={1}
+            >
+              <Badge
+                content={notificationCount}
+                color="danger"
+                placement="top-right"
+                size="md"
+                isInvisible={notificationCount === 0}
+                className="border-none bg-blue-shade-200 translate-x-1.5 -translate-y-1.5"
+              >
+                <div
+                  className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 bg-white rounded-full flex justify-center items-center `}
+                  onClick={() => router.push(`/notifications`)}
+                >
+                  <IoMdNotifications className="size-6 text-blue-shade-200" />
+                </div>
+              </Badge>
+            </Tooltip>
             <Tooltip
               content={<div className="capitalize">Git Book</div>}
               placement="right"

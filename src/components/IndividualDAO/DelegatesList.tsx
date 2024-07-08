@@ -28,7 +28,6 @@ import {
 } from "@/utils/ENSUtils";
 import DelegateListSkeletonLoader from "../SkeletonLoader/DelegateListSkeletonLoader";
 
-
 function DelegatesList({ props }: { props: string }) {
   const [delegateData, setDelegateData] = useState<any>({ delegates: [] });
   const { openChainModal } = useChainModal();
@@ -80,7 +79,7 @@ function DelegatesList({ props }: { props: string }) {
     setIsShowing(!KarmaCreditClosed);
   }, []);
 
-  // let uniqueDelegates = new Set(); 
+  // let uniqueDelegates = new Set();
   useEffect(() => {
     const fetchData = async (lastCursor: string | null) => {
       try {
@@ -99,17 +98,16 @@ function DelegatesList({ props }: { props: string }) {
 
         const daoInfo = await res.json();
 
-
         let formattedDelegates;
         if (props === "arbitrum") {
           formattedDelegates = daoInfo.delegates.nodes.map((delegate: any) => {
-              return {
-                delegate: delegate.account.address,
-                adjustedBalance: delegate.votesCount / 10 ** 18,
-                ensName: delegate.account.ens,
-                profilePicture: delegate.account.picture,
-              };
-          })
+            return {
+              delegate: delegate.account.address,
+              adjustedBalance: delegate.votesCount / 10 ** 18,
+              ensName: delegate.account.ens,
+              profilePicture: delegate.account.picture,
+            };
+          });
         } else {
           formattedDelegates = await Promise.all(
             daoInfo.map(async (delegate: any) => {
@@ -203,7 +201,6 @@ function DelegatesList({ props }: { props: string }) {
   //       // setDelegateData({ delegates: [formattedDelegates] });
   //       setDelegateData({ delegates: Array.isArray(formattedDelegates) ? formattedDelegates : [formattedDelegates] });
 
-
   //       setPageLoading(false);
 
   //     }
@@ -240,9 +237,13 @@ function DelegatesList({ props }: { props: string }) {
       );
       const filtered = await res.json().then((delegates) => delegates.data);
 
-      console.log("Filtered Data: ", query, filtered.delegates[0].publicAddress  );
-      const formattedDelegates = filtered.delegates.map((delegate:any) => ({
-// console.log("delegate",delegate)
+      console.log(
+        "Filtered Data: ",
+        query,
+        filtered.delegates[0].publicAddress
+      );
+      const formattedDelegates = filtered.delegates.map((delegate: any) => ({
+        // console.log("delegate",delegate)
         delegate: delegate.publicAddress,
         adjustedBalance: delegate.delegatedVotes,
         // newBalance: delegate.newBalance,
@@ -264,16 +265,19 @@ function DelegatesList({ props }: { props: string }) {
   const handleScroll = debounce(() => {
     const { scrollTop, clientHeight, scrollHeight } = document.documentElement;
     const threshold = 100;
-    if (!isDataLoading && scrollTop + clientHeight >= scrollHeight - threshold) {
+    if (
+      !isDataLoading &&
+      scrollTop + clientHeight >= scrollHeight - threshold
+    ) {
       console.log("fetching more data");
       setCurrentPage((prev) => prev + 1);
     }
   }, 200); // Adjust the debounce wait time as necessary
 
   useEffect(() => {
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
     return () => {
-      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener("scroll", handleScroll);
     };
   }, [isDataLoading, currentPage]);
 
@@ -304,9 +308,7 @@ function DelegatesList({ props }: { props: string }) {
   //     setClickedTileIndex(null);
   //   }, 1500); // Adjust the time as needed
 
-
   // };
-
 
   const WalletOpen = async (to: string) => {
     const adr = await walletClient.getAddresses();
@@ -415,7 +417,8 @@ function DelegatesList({ props }: { props: string }) {
           style={{ width: "80%" }}
         >
           <span>
-            We apologize for the inconvenience; we&apos;re currently working on sourcing accurate data and it will be available soon.
+            We apologize for the inconvenience; we&apos;re currently working on
+            sourcing accurate data and it will be available soon.
           </span>{" "}
           &nbsp;
           {/* <a
@@ -446,7 +449,7 @@ function DelegatesList({ props }: { props: string }) {
             className="pl-5 pr-3 rounded-full outline-none w-full"
             value={searchQuery}
             onChange={(e) => handleSearchChange(e.target.value)}
-            ></input>
+          ></input>
           <span className="flex items-center bg-black rounded-full px-5 py-2">
             <Image src={search} alt="search" width={20} />
           </span>
@@ -468,25 +471,21 @@ function DelegatesList({ props }: { props: string }) {
 
       <div className="py-8 pe-10 font-poppins">
         {isPageLoading ? (
-
-          <DelegateListSkeletonLoader/>
+          <DelegateListSkeletonLoader />
         ) : delegateData.delegates.length > 0 ? (
-          <div> 
-            
+          <div>
             <div className="grid min-[475px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-10">
               {console.log("data............", delegateData)}
               {delegateData.delegates.map((delegate: any, index: number) => (
                 <div
                   onClick={(event) => {
                     // handleMouseMove(event,index);
-                    router.push(`/${props}/${delegate.delegate}?active=info  `)
+                    router.push(`/${props}/${delegate.delegate}?active=info  `);
                   }}
-
                   key={index}
                   style={{
                     boxShadow: "0px 4px 50.8px 0px rgba(0, 0, 0, 0.11)",
                   }}
-
                   className="px-5 py-7 rounded-2xl flex flex-col justify-between cursor-pointer relative"
                 >
                   {/* {clickedTileIndex === index && (
@@ -503,15 +502,14 @@ function DelegatesList({ props }: { props: string }) {
                   )} */}
                   <div>
                     <div className="flex justify-center relative">
-
                       <Image
                         src={
                           delegate?.profilePicture == null
                             ? props == "optimism"
                               ? OPLogo
                               : props == "arbitrum"
-                                ? ARBLogo
-                                : ""
+                              ? ARBLogo
+                              : ""
                             : delegate.profilePicture
                         }
                         alt="Image not found"
@@ -539,15 +537,16 @@ function DelegatesList({ props }: { props: string }) {
                         >
                           {!delegate?.ensName ? (
                             <span>
-                              {
-                                delegate.delegate?.slice(0, 6) +
+                              {delegate.delegate?.slice(0, 6) +
                                 "..." +
-                                delegate.delegate?.slice(-4)
-                              }
+                                delegate.delegate?.slice(-4)}
                             </span>
                           ) : (
                             <span>
-                              {delegate.ensName === "[693c70956042e4295f0c73589e9ac0850b5b7d276a02639b83331ec323549b88].sismo.eth" ? "lindajxie.eth" : delegate.ensName.length > 15
+                              {delegate.ensName ===
+                              "[693c70956042e4295f0c73589e9ac0850b5b7d276a02639b83331ec323549b88].sismo.eth"
+                                ? "lindajxie.eth"
+                                : delegate.ensName.length > 15
                                 ? delegate.ensName.slice(0, 15) + "..."
                                 : delegate.ensName}
                               {/* {delegate.ensName.length > 15
