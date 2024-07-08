@@ -45,6 +45,8 @@ import MainProfileSkeletonLoader from "../SkeletonLoader/MainProfileSkeletonLoad
 import { fetchEnsAvatar } from "@/utils/ENSUtils";
 import Confetti from "react-confetti";
 import { connected } from "process";
+import { IoMdNotifications } from "react-icons/io";
+import { IoMdNotificationsOff } from "react-icons/io";
 
 interface Type {
   daoDelegates: string;
@@ -886,7 +888,7 @@ function SpecificDelegate({ props }: { props: Type }) {
                   </div>
                 </div>
 
-                <div className="pt-2 flex space-x-4">
+                <div className="pt-2 flex space-x-4 items-center">
                   <button
                     className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
                     // onClick={() =>
@@ -898,8 +900,8 @@ function SpecificDelegate({ props }: { props: Type }) {
                   </button>
 
                   <button
-                    className={`font-bold text-white rounded-full px-8 py-[10px] flex items-center ${
-                      isFollowing ? "bg-green-500" : "bg-blue-shade-200"
+                    className={`font-bold text-white rounded-full w-[138.5px] h-[44px] py-[10px] flex justify-center items-center ${
+                      isFollowing ? "bg-green-500" : "bg-black"
                     }`}
                     onClick={handleFollow}>
                     {loading ? (
@@ -917,6 +919,29 @@ function SpecificDelegate({ props }: { props: Type }) {
                       "Follow"
                     )}
                   </button>
+
+                  <Tooltip
+                    content={
+                      notification
+                        ? "Click to mute delegate activity alerts."
+                        : "Don't miss out! Click to get alerts on delegate activity."
+                    }
+                    placement="top"
+                    closeDelay={1}
+                    showArrow>
+                  <div className={`border  rounded-full flex items-center justify-center size-10  ${
+      isFollowing ? 'cursor-pointer border-black' : 'cursor-not-allowed border-gray-200'}`} onClick={() => isFollowing && handleConfirm(2)}>                    
+                      {isFollowing ? (
+      notification ? (
+        <IoMdNotifications className="text-black size-6" />
+      ) : (
+        <IoMdNotificationsOff className="text-black size-6" />
+      )
+    ) : (
+      <IoMdNotifications className="text-gray-200 size-6" />
+    )}             
+                  </div>
+                  </Tooltip>
 
                   {isOpenunfollow && (
                     <div className="font-poppins z-[70] fixed inset-0 flex items-center justify-center backdrop-blur-md">
@@ -963,7 +988,7 @@ function SpecificDelegate({ props }: { props: Type }) {
                     </div>
                   )}
 
-                  <Tooltip
+                  {/* <Tooltip
                     content={
                       notification
                         ? "Click to mute delegate activity alerts."
@@ -971,7 +996,7 @@ function SpecificDelegate({ props }: { props: Type }) {
                     }
                     placement="top"
                     closeDelay={1}
-                    showArrow>
+                    showArrow> */}
                     {/* <button
                       className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[5px] flex items-center mr-2"
                       onClick={() => {
@@ -982,7 +1007,7 @@ function SpecificDelegate({ props }: { props: Type }) {
                         }
                       }}
                     > */}
-                    <div
+                    {/* <div
                       className="flex items-center cursor-pointer"
                       onClick={() => {
                         if (notification) {
@@ -1006,7 +1031,7 @@ function SpecificDelegate({ props }: { props: Type }) {
                           />
                         ))}
                     </div>
-                  </Tooltip>
+                  </Tooltip> */}
                 </div>
               </div>
             </div>

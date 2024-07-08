@@ -1,6 +1,6 @@
 import { BasicIcons } from "@/utils/BasicIcons";
-import { Button } from "../../ui/button";
-import { Input } from "../../ui/input";
+import { Button } from "../../../ui/button";
+import { Input } from "../../../ui/input";
 import ChatsPreview from "./chatsPreview";
 import { useDataMessage, useLocalPeer } from "@huddle01/react/hooks";
 import { useState } from "react";
