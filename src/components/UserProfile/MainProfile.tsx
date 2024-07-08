@@ -90,6 +90,7 @@ function MainProfile() {
   const [loading, setLoading] = useState(false);
   const [notification, setnotification] = useState(true);
   const [isOpenFollowings, setfollowingmodel] = useState(false);
+  const [isOpentoaster, settoaster] = useState(false);
   const [userFollowings, setUserFollowings] = useState<Following[]>([]);
   const [dbResponse, setDbResponse] = useState<any>(null);
 
@@ -324,6 +325,7 @@ function MainProfile() {
     // Close the modal
     setLoading(false);
     setfollowingmodel(false);
+    toast.success("Succesfully changes are made!");
   };
   const toggleFollowing = async (index: number, userupdate: any) => {
     setUserFollowings((prevUsers) =>
@@ -331,6 +333,7 @@ function MainProfile() {
         i === index ? { ...user, isFollowing: !user.isFollowing } : user
       )
     );
+    settoaster(true);
 
     if (!userupdate.isFollowing) {
       setfollowings(followings + 1);
@@ -354,13 +357,14 @@ function MainProfile() {
         }
 
         const data = await response.json();
-        toast.success("You are following delegate!");
+        settoaster(false);
         console.log("Follow successful:", data);
       } catch (error) {
         console.error("Error following:", error);
       }
     } else {
       setfollowings(followings - 1);
+      settoaster(true);
       try {
         const response = await fetch("/api/delegate-follow/updatefollower", {
           method: "PUT",
@@ -381,19 +385,21 @@ function MainProfile() {
         }
 
         const data = await response.json();
-        toast.success("You are unfollow delegate!");
+        settoaster(false);
         console.log("unFollow successful:", data);
       } catch (error) {
         console.error("Error following:", error);
       }
     }
   };
+
   const toggleNotification = async (index: number, userupdate: any) => {
     setUserFollowings((prevUsers) =>
       prevUsers.map((user, i) =>
         i === index ? { ...user, isNotification: !user.isNotification } : user
       )
     );
+    settoaster(true);
 
     try {
       const response = await fetch("/api/delegate-follow/updatefollower", {
@@ -416,7 +422,7 @@ function MainProfile() {
       }
 
       const data = await response.json();
-      toast.success("Successfully changed notification status!");
+      settoaster(false);
       console.log("notification successful:", data);
     } catch (error) {
       console.error("Error following:", error);
@@ -1193,6 +1199,8 @@ function MainProfile() {
                     )
                   : null} */}
 
+                {isOpentoaster && toast.loading("Saving...")}
+
                 {isOpenFollowings && (
                   <div className="font-poppins z-[70] fixed inset-0 flex items-center justify-center backdrop-blur-md">
                     <div className="bg-white rounded-[41px] overflow-hidden shadow-lg w-3/4">
@@ -1300,7 +1308,13 @@ function MainProfile() {
 
                     <button
                       className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
-                      onClick={() => setfollowingmodel(true)}>
+                      onClick={() =>
+                        followings
+                          ? setfollowingmodel(true)
+                          : toast.error(
+                              "You have 0 following explore delegate profile now!"
+                            )
+                      }>
                       {followings} Following
                     </button>
 

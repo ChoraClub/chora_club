@@ -10,6 +10,7 @@ import { Tooltip } from "@nextui-org/react";
 import SchedulingSuccessModal from "./SchedulingSuccessModal";
 import { RxCross2 } from "react-icons/rx";
 import AddEmailModal from "@/components/utils/AddEmailModal";
+import { fetchEnsAvatar } from "@/utils/ENSUtils";
 
 import Image from "next/image";
 
@@ -58,6 +59,7 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
   const [userRejected, setUserRejected] = useState<Boolean>();
   const [addingEmail, setAddingEmail] = useState<boolean>();
   const [scheduledSuccess, setScheduledSuccess] = useState<boolean>();
+  const [EnsName, setDisplayEnsName] = useState<string>();
 
   const checkUser = async () => {
     try {
@@ -118,6 +120,19 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
       handleApplyButtonClick();
     }
   }, [continueAPICalling]);
+
+  useEffect(() => {
+    const fetchEnsName = async () => {
+      const ensName = await fetchEnsAvatar(address?address:"");
+      if(ensName){
+        setDisplayEnsName(ensName?.ensName);
+      }
+      else{
+        setDisplayEnsName("");
+      }
+    };
+    fetchEnsName();
+  }, [chain, address]);
 
   useEffect(() => {
     console.log("userRejected in useEffect", userRejected);
@@ -209,7 +224,9 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
             body: JSON.stringify({
               // Add any necessary data
               address: address,
-              daoName:daoName,
+              daoName: daoName,
+              EnsName:EnsName
+              
             }),
           });
 

@@ -4,7 +4,15 @@ import { sendMail, compileBookedSessionTemplate } from "@/libs/mail";
 
 export async function PUT(req: NextRequest) {
   try {
-    const { address, daoName } = await req.json();
+    const { address, daoName, ensName } = await req.json();
+
+    let delegate_address = address;
+
+    const capitalizedDAO = daoName.charAt(0).toUpperCase() + daoName.slice(1);
+
+    const delegateInfo = ensName
+      ? `${ensName}`
+      : `${delegate_address.slice(0, 6)}...${delegate_address.slice(-4)}`;
 
     console.log("Delegate address:", address);
     console.log("DAO name:", daoName);
@@ -15,7 +23,7 @@ export async function PUT(req: NextRequest) {
 
     const db = client.db();
     const collection = db.collection("delegates");
-    
+
     // Find the document by address
     const document = await collection.findOne({ address });
 
@@ -30,7 +38,9 @@ export async function PUT(req: NextRequest) {
     }
 
     // Find the specific DAO in the followers array
-    const daoFollowers = document.followers.find((dao:any) => dao.dao_name === daoName);
+    const daoFollowers = document.followers.find(
+      (dao: any) => dao.dao_name === daoName
+    );
 
     if (!daoFollowers) {
       client.close();
@@ -44,8 +54,8 @@ export async function PUT(req: NextRequest) {
 
     // Extract follower addresses who have notifications enabled
     const followerAddresses = daoFollowers.follower
-      .filter((follower:any) => follower.isNotification === true)
-      .map((follower:any) => follower.address);
+      .filter((follower: any) => follower.isNotification === true)
+      .map((follower: any) => follower.address);
 
     // Find emails associated with follower addresses
     const followerEmails = await collection
@@ -57,19 +67,23 @@ export async function PUT(req: NextRequest) {
 
     console.log("Follower emails:", followerEmails);
 
-    // Extract only the valid emailId values
-    const emailIds = followerEmails
-      .map(follower => follower.emailId)
-      .filter(email => email && email.trim() !== ""); // Remove empty or null emails
+    const emailsWithAddresses = followerEmails
+      .filter((follower) => follower.emailId && follower.emailId.trim() !== "")
+      .map((follower) => ({
+        emailId: follower.emailId,
+        address: follower.address,
+      }));
 
-    for (const emailId of emailIds) {
+    for (const { emailId, address } of emailsWithAddresses) {
       try {
         await sendMail({
           to: emailId,
           name: "Chora Club",
           subject: "Your Delegate Has Scheduled a New Session",
           body: compileBookedSessionTemplate(
-            "Dear Chora Club Member,We're thrilled to inform you that a delegate from a DAO you're following has just scheduled a new session!",
+            `Dear ${address.slice(0, 6)}...${address.slice(
+              -4
+            )},\nWe're thrilled to inform you that ${delegateInfo} a delegate from a ${capitalizedDAO} DAO you're following has just scheduled a new session!`,
             "Don't miss out—book your spot now to dive deeper into the Web3 Ecosystem."
           ),
         });
@@ -83,7 +97,7 @@ export async function PUT(req: NextRequest) {
 
     // Return the email addresses
     return NextResponse.json({
-      message: `Emails sent to ${emailIds.length} followers`,
+      message: `Emails sent to ${emailsWithAddresses.length} followers`,
     });
   } catch (error) {
     console.error("Error updating delegate:", error);
