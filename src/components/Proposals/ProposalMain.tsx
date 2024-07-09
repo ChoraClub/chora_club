@@ -603,12 +603,12 @@ function ProposalMain({ props }: { props: Props }) {
     return formatWeight(value);
   };
 
-  const truncateText = (text: any, wordLimit: any) => {
-    const words = text?.split(" ");
-    if (words?.length <= wordLimit) {
-      return text;
-    }
-    return words?.slice(0, wordLimit).join(" ") + "...";
+  const truncateText = (text: string, charLimit: number) => {
+    // Remove all '#' characters from the text
+    const cleanedText = text.replace(/#/g, '');
+    
+    // Truncate the cleaned text if necessary
+    return cleanedText.length <= charLimit ? cleanedText : cleanedText.slice(0, charLimit) + "...";
   };
 
   return (
@@ -646,7 +646,7 @@ function ProposalMain({ props }: { props: Props }) {
               <div className="h-5 bg-gray-200 animate-pulse w-[50vw] rounded-full"></div>
             ) : (
               <p className="text-3xl font-semibold">
-                {truncateText(data?.description, 7)}
+                {truncateText(data?.description, 50)}
               </p>
             )}
             <Tooltips

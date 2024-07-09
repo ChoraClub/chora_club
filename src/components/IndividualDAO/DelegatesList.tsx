@@ -65,6 +65,9 @@ function DelegatesList({ props }: { props: string }) {
   // const address = "0xc622420AD9dE8E595694413F24731Dd877eb84E1";
   const address = useAccount();
 
+  // const address = "0xa2d590fee197c0b614fe7c3e10303327f38c0dc3";
+  // const address = "0xc622420AD9dE8E595694413F24731Dd877eb84E1";
+
   const handleClose = () => {
     setIsShowing(false);
     sessionStorage.setItem("KarmaCreditClosed", JSON.stringify(true));

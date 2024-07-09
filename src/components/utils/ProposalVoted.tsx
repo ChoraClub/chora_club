@@ -292,30 +292,12 @@ function ProposalVoted({ daoName, address }: any) {
     ],
   };
 
-  const handleClose = () => {
-    setIsShowing(false);
+  const filterDescription = (description:any) => {
+    return description.replace(/#/g, '').trim();
   };
 
   return (
     <>
-      {isShowing && daoName === "arbitrum" && (
-        <div
-          className="bg-yellow-200 border border-gray-300 rounded-md shadow-md text-gray-700 flex items-center p-3 w-70 mb-4"
-          style={{ width: "80%" }}
-        >
-          <span>
-            📊 We are currently gathering the data and will update with the
-            latest information soon!
-          </span>{" "}
-          &nbsp;
-          <button
-            className="flex ml-auto items-center justify-center p-1 text-gray-500 hover:text-red-500 bg-white border border-gray-300 rounded-md"
-            onClick={handleClose}
-          >
-            Close
-          </button>
-        </div>
-      )}
       <div className="grid grid-cols-5 pe-5 gap-4 pb-6">
         <div
           style={{ boxShadow: "0px 4px 15.1px 0px rgba(0, 0, 0, 0.17)" }}
@@ -357,7 +339,7 @@ function ProposalVoted({ daoName, address }: any) {
                 >
                   <div className="w-3/4 break-words">
                     <div className={`${openDesc[index] ? "" : styles.desc}`}>
-                      {proposal.proposal.description}
+                      {filterDescription(proposal.proposal.description)}
                     </div>
                     <span
                       className="text-xs text-blue-shade-100 underline cursor-pointer"
