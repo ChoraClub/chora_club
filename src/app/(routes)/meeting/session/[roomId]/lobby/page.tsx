@@ -40,10 +40,6 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
   // Local States
   console.log("params", params);
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  // const avatarUrl = useStore((state) => state.avatarUrl);
-  // const setAvatarUrl = useStore((state) => state.setAvatarUrl);
-  // const setUserDisplayName = useStore((state) => state.setUserDisplayName);
-  // const userDisplayName = useStore((state) => state.userDisplayName);
   const [token, setToken] = useState<string>("");
   const [isJoining, setIsJoining] = useState<boolean>(false);
   const { updateMetadata, metadata, peerId, role } = useLocalPeer<{
@@ -61,13 +57,12 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
   const { chain, chains } = useNetwork();
   const [profileDetails, setProfileDetails] = useState<any>();
 
-  const [popupVisibility, setPopupVisibility] = useState(true);
-
   // Huddle Hooks
   const { joinRoom, state, room } = useRoom();
   const [isAllowToEnter, setIsAllowToEnter] = useState<boolean>();
   const [notAllowedMessage, setNotAllowedMessage] = useState<string>();
   const [hostAddress, setHostAddress] = useState();
+  const [daoName, setDaoName] = useState();
   const [meetingStatus, setMeetingStatus] = useState<any>();
 
   useEffect(() => {
@@ -98,97 +93,98 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
 
       if (result.success) {
         setHostAddress(result.data.host_address);
+        setDaoName(result.data.dao_name);
       }
       if (result.message === "Meeting is ongoing") {
         setMeetingStatus("Ongoing");
       }
 
       // if (address === hostAddress || meetingStatus === "Ongoing") {
-      if (address === hostAddress || result.message === "Meeting is ongoing") {
-        setIsJoining(true);
+      // if (address === hostAddress || result.message === "Meeting is ongoing") {
+      setIsJoining(true);
 
-        let role;
-        if (address === hostAddress) {
-          role = "host";
-        } else {
-          role = "guest";
-        }
-        let token = "";
-        console.log("name", name);
-        if (state !== "connected") {
-          const requestBody = {
-            roomId: params.roomId,
-            role: role,
-            displayName: formattedAddress,
-            address: address, // assuming you have userAddress defined somewhere
-          };
-          try {
-            const response = await fetch("/api/new-token", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(requestBody),
-            });
-
-            // if (!response.ok) {
-            //   throw new Error("Failed to fetch token");
-            // }
-
-            token = await response.text(); // Change this line
-            // console.log("Token fetched successfully:", token);
-          } catch (error) {
-            console.error("Error fetching token:", error);
-            // Handle error appropriately, e.g., show error message to user
-            toast.error("Failed to fetch token");
-            setIsJoining(false);
-            return;
-          }
-        }
-
-        try {
-          console.log({ token });
-          console.log(params.roomId);
-          await joinRoom({
-            roomId: params.roomId,
-            token,
-          });
-        } catch (error) {
-          console.error("Error joining room:", error);
-          // Handle error appropriately, e.g., show error message to user
-          toast.error("Failed to join room");
-        }
-
-        console.log("Role.HOST", Role.HOST);
-        if (Role.HOST) {
-          console.log("inside put api");
-          const myHeaders = new Headers();
-          myHeaders.append("Content-Type", "application/json");
-
-          const raw = JSON.stringify({
-            meetingId: params.roomId,
-            meetingType: "session",
-          });
-          const requestOptions: any = {
-            method: "PUT",
-            headers: myHeaders,
-            body: raw,
-            redirect: "follow",
-          };
-          const response = await fetch(
-            `/api/update-meeting-status/${params.roomId}`,
-            requestOptions
-          );
-          const responseData = await response.json();
-          console.log("responseData: ", responseData);
-          // setMeetingStatus("Ongoing");
-        }
-
-        setIsJoining(false);
+      let role;
+      if (address === hostAddress) {
+        role = "host";
       } else {
-        toast("Please wait, Host has not started the session yet.");
-        console.log("Wait..");
+        role = "guest";
       }
+      let token = "";
+      console.log("name", name);
+      if (state !== "connected") {
+        const requestBody = {
+          roomId: params.roomId,
+          role: role,
+          displayName: name,
+          address: address, // assuming you have userAddress defined somewhere
+        };
+        try {
+          const response = await fetch("/api/new-token", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(requestBody),
+          });
+
+          // if (!response.ok) {
+          //   throw new Error("Failed to fetch token");
+          // }
+
+          token = await response.text(); // Change this line
+          // console.log("Token fetched successfully:", token);
+        } catch (error) {
+          console.error("Error fetching token:", error);
+          // Handle error appropriately, e.g., show error message to user
+          toast.error("Failed to fetch token");
+          setIsJoining(false);
+          return;
+        }
+      }
+
+      try {
+        console.log({ token });
+        console.log(params.roomId);
+        await joinRoom({
+          roomId: params.roomId,
+          token,
+        });
+      } catch (error) {
+        console.error("Error joining room:", error);
+        // Handle error appropriately, e.g., show error message to user
+        toast.error("Failed to join room");
+      }
+
+      console.log("Role.HOST", Role.HOST);
+      if (Role.HOST) {
+        console.log("inside put api");
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+
+        const raw = JSON.stringify({
+          meetingId: params.roomId,
+          meetingType: "session",
+        });
+        const requestOptions: any = {
+          method: "PUT",
+          headers: myHeaders,
+          body: raw,
+          redirect: "follow",
+        };
+        const response = await fetch(
+          `/api/update-meeting-status/${params.roomId}`,
+          requestOptions
+        );
+        const responseData = await response.json();
+        console.log("responseData: ", responseData);
+        // setMeetingStatus("Ongoing");
+      }
+
+      setIsJoining(false);
+      // } else {
+      //   toast("Please wait, Host has not started the session yet.");
+      //   console.log("Wait..");
+      // }
     }
   };
 
@@ -258,16 +254,9 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
     verifyMeetingId();
   }, [params.roomId, isAllowToEnter, notAllowedMessage, meetingStatus]);
 
-  useEffect(() => {
-    let dao = "";
-    if (chain && chain?.name === "Optimism") {
-      dao = "optimism";
-    } else if (chain && chain?.name === "Arbitrum One") {
-      dao = "arbitrum";
-    } else {
-      return;
-    }
+  useEffect(() => {}, [daoName]);
 
+  useEffect(() => {
     const fetchData = async () => {
       try {
         const myHeaders = new Headers();
@@ -332,50 +321,12 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
     fetchData();
   }, []);
 
-  // useEffect(() => {
-  //   const handleBeforeUnload = (event: any) => {
-  //     const message = "Are you sure you want to leave?";
-  //     event.returnValue = message; // Standard way to display an alert in modern browsers
-  //     return message; // For some older browsers
-  //   };
-
-  //   window.addEventListener("beforeunload", handleBeforeUnload);
-
-  //   return () => {
-  //     window.removeEventListener("beforeunload", handleBeforeUnload);
-  //   };
-  // }, []);
-
   const formattedAddress = address?.slice(0, 6) + "..." + address?.slice(-4);
 
   return (
     <>
       {isAllowToEnter ? (
         <div className="h-screen">
-          {popupVisibility && (
-            <div className="flex items-center justify-center">
-              <div className="absolute bg-white text-[#3E3D3D] flex items-center py-2 pl-5 font-poppins font-semibold w-1/4 rounded-md top-6 drop-shadow-xl">
-                <div className="flex gap-3">
-                  <Image
-                    alt="record-left"
-                    width={25}
-                    height={25}
-                    src={record}
-                    className="w-5 h-5"
-                  />
-                  <div className="">This meeting is being recorded.</div>
-                </div>
-                <div className="flex absolute right-2">
-                  <button
-                    onClick={() => setPopupVisibility(false)}
-                    className="p-1 bg-[#3E3D3D] rounded-full text-white text-bold"
-                  >
-                    <RxCross2 size={10} />
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
           <main className="flex h-screen flex-col items-center justify-center bg-lobby text-slate-100 font-poppins">
             <div className="flex flex-col items-center justify-center gap-4 w-1/3 mt-14">
               <div className="text-center flex items-center justify-center bg-slate-100 w-full rounded-2xl py-28">

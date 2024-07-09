@@ -25,15 +25,14 @@ import { useEffect, useRef, useState } from "react";
 import BottomBar from "@/components/Huddle/bottomBar";
 import { Button } from "@/components/ui/button";
 import { PeerMetadata } from "@/utils/types";
-import ChatBar from "@/components/sidebars/ChatBar/chatbar";
-import ParticipantsBar from "@/components/sidebars/participantsSidebar/participantsBar";
-import Video from "@/components/Media/Video";
+import ChatBar from "@/components/Huddle/sidebars/ChatBar/chatbar";
+import ParticipantsBar from "@/components/Huddle/sidebars/participantsSidebar/participantsBar";
+import Video from "@/components/Huddle/Media/Video";
 import { Role } from "@huddle01/server-sdk/auth";
 import clsx from "clsx";
 import GridContainer from "@/components/Huddle/GridContainer";
-// import ShowCaptions from "@/components/Caption/showCaptions";
 import RemoteScreenShare from "@/components/Huddle/remoteScreenShare";
-import Camera from "@/components/Media/Camera";
+import Camera from "@/components/Huddle/Media/Camera";
 import AttestationModal from "@/components/utils/AttestationModal";
 import { useAccount } from "wagmi";
 import { TailSpin } from "react-loader-spinner";
@@ -83,6 +82,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
   const { videoTrack, shareStream } = useLocalScreenShare();
   const [modalOpen, setModalOpen] = useState(false);
   const [hostAddress, setHostAddress] = useState();
+  const [daoName, setDaoName] = useState<any>();
   const { address } = useAccount();
   const { push } = useRouter();
   const path = usePathname();
@@ -130,11 +130,11 @@ export default function Component({ params }: { params: { roomId: string } }) {
     }
   }, [stream]);
 
-  useEffect(() => {
-    if (state === "idle") {
-      router.push(`${params.roomId}/lobby`);
-    }
-  }, [state]);
+  // useEffect(() => {
+  //   if (state === "idle") {
+  //     router.push(`${params.roomId}/lobby`);
+  //   }
+  // }, [state]);
 
   useEffect(() => {
     setCamPrefferedDevice(videoDevice.deviceId);
@@ -200,10 +200,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
 
         if (result.success) {
           setHostAddress(result.data.host_address);
-        }
-
-        if (result.success) {
-          setHostAddress(result.data.host_address);
+          setDaoName(result.data.dao_name);
         }
 
         if (result.success) {
@@ -289,7 +286,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
           .catch((error) => console.error(error));
       }
     }
-  }, [isAllowToEnter]);
+  }, [isAllowToEnter, state]);
 
   useEffect(() => {
     setVideoStreamTrack(videoTrack && new MediaStream([videoTrack]));
@@ -301,10 +298,12 @@ export default function Component({ params }: { params: { roomId: string } }) {
       {isAllowToEnter ? (
         <div className={clsx("flex flex-col h-screen bg-white font-poppins")}>
           <header className="flex items-center justify-between pt-4 px-4">
-            <div className="flex items-center bg-black px-3 rounded-full py-2 space-x-2">
-              <Image src={logo} alt="image" height={25} width={25} />
-              <div className="text-xl font-medium tracking-widest">
-                <span className="text-white">Chora</span>
+            <div className="flex items-center py-2 space-x-2">
+              <div className="bg-black p-2 rounded-full">
+                <Image src={logo} alt="image" height={18} width={18} />
+              </div>
+              <div className="text-2xl font-medium tracking-wider">
+                <span className="text-black">Chora</span>
                 <span className="text-blue-shade-100">Club</span>
               </div>
             </div>
@@ -483,7 +482,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
         name={metadata?.displayName}
         localPeerId={peerId}
       /> */}
-          <BottomBar />
+          <BottomBar daoName={daoName} />
         </div>
       ) : (
         <>

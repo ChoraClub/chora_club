@@ -7,10 +7,6 @@ const client = new Client({
   exchanges: [cacheExchange, fetchExchange],
 });
 
-const arb_client = new Client({
-  url: 'https://api.studio.thegraph.com/query/68573/arbitrum_proposals/v0.0.4',
-  exchanges: [cacheExchange, fetchExchange],
-});
 const COMBINED_VOTE_QUERY = gql`
   query CombinedVoteQuery($proposalId: String!, $skip1: Int!, $skip2: Int!, $first: Int!) {
     voteCastWithParams: voteCastWithParams_collection(
@@ -44,12 +40,16 @@ const COMBINED_VOTE_QUERY = gql`
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
-
+//   console.log('searchParams:', searchParams.get('proposalId'));
   const proposalId = searchParams.get('proposalId');
   const skip1 = parseInt(searchParams.get('skip1') || '0', 10);
   const skip2 = parseInt(searchParams.get('skip2') || '0', 10);
   const first = parseInt(searchParams.get('first') || '10', 10);
-  const dao = searchParams.get('dao');
+
+  console.log('proposalId:', proposalId);
+  console.log('skip1:', skip1);
+  console.log('skip2:', skip2);
+  console.log('first:', first);
 
   if (!proposalId) {
     return NextResponse.json({ error: 'Missing proposalId parameter' }, { status: 400 });
@@ -60,13 +60,10 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    let result;
-    if(dao==='optimism'){
-     result = await client.query(COMBINED_VOTE_QUERY, { proposalId, skip1, skip2, first }).toPromise();
-    }else{
-      result =await arb_client.query(COMBINED_VOTE_QUERY, { proposalId, skip1, skip2, first }).toPromise();
-    }
+    const result = await client.query(COMBINED_VOTE_QUERY, { proposalId, skip1, skip2, first }).toPromise();
+  
 
+    // Log the raw data returned from the query
 
     if (result.error) {
       console.error('GraphQL query error:', result.error);

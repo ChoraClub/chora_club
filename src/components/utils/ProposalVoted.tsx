@@ -10,7 +10,7 @@ import VotedOnOptions from "@/assets/images/votedOnOption.png";
 import { Tooltip as NextUITooltip } from "@nextui-org/react";
 import ProposalVotedLeftSkeletonLoader from "../SkeletonLoader/ProposalVotedLeftSkeletonLoader";
 import ProposalVotedRightSkeletonLoader from "../SkeletonLoader/ProposalVotedRightSkeletonLoader";
-import { useRouter } from "next/navigation";
+
 Chart.register(ArcElement, Tooltip, Legend);
 
 interface Type {
@@ -24,20 +24,11 @@ const op_client = createClient({
 });
 
 const arb_client = createClient({
-  url: "https://api.studio.thegraph.com/query/68573/arbitrum_proposals/v0.0.4",
+  url: "https://api.thegraph.com/subgraphs/name/show-karma/onchain-voting-arbitrum",
   exchanges: [cacheExchange, fetchExchange],
 });
 
-const arbDescription = gql`
-query MyQuery($proposalId: String!) {
-proposalCreateds(where: {proposalId:$proposalId} 
-    orderBy: blockTimestamp
-    orderDirection: desc) {
-  description
-}
-}`
-
-const VoterQuery = (first: any, skip: any) => gql`
+const opQuery = (first: any, skip: any) => gql`
   query MyQuery($address: String!) {
     voteCasts(
       where: { voter: $address}
@@ -115,18 +106,11 @@ export const fetchProposalDescriptions = async (
   daoName: any,
   address: any
 ) => {
-  let proposalIdsResult: any;
   if (daoName === "optimism") {
-     proposalIdsResult= await op_client.query(VoterQuery(first, skip), {
+    const proposalIdsResult: any = await op_client.query(opQuery(first, skip), {
       address: address,
     });
-}
-    else if (daoName === "arbitrum") {
-      proposalIdsResult= await arb_client.query(VoterQuery(first, skip), {
-        address: address,
-      });
-
-    }
+    console.log("result", proposalIdsResult);
 
     const voteCasts = proposalIdsResult.data.voteCasts || [];
     const voteCastWithParamsCollection =
@@ -137,32 +121,24 @@ export const fetchProposalDescriptions = async (
 
     // Sort combined data by blockTimestamp in descending order
     combinedData.sort((a: any, b: any) => b.blockTimestamp - a.blockTimestamp);
-   
+    // console.log(combinedData)
     const proposalIds = combinedData.map((voteCast: any) => voteCast);
 
-let descriptionsPromises;
-let descriptionsResults:any;
-if(daoName === "optimism"){
-     descriptionsPromises = proposalIds.map((proposalId: any) => {
-      
+    // console.log("Id", proposalIds);
+
+    const descriptionsPromises = proposalIds.map((proposalId: any) => {
+      // console.log("proposalId...", proposalId);
       return op_client
         .query(opDescription, { proposalId: proposalId.proposalId.toString() })
         .toPromise();
     });
-    descriptionsResults = await Promise.all(descriptionsPromises) || [];
 
-  }else if(daoName === "arbitrum"){
-    descriptionsPromises = proposalIds.map((proposalId: any) => {
-    
-      return arb_client
-        .query(arbDescription, { proposalId: proposalId.proposalId.toString() })
-        .toPromise();
-    });
-    descriptionsResults = await Promise.all(descriptionsPromises) || [];
-  }
-  
+    // console.log("descriptionsPromises", descriptionsPromises);
+
+    const descriptionsResults = await Promise.all(descriptionsPromises);
+    // console.log("descriptionsResults", descriptionsResults);
     const FinalResult = descriptionsResults
-      .flatMap((result:any, index:any) =>
+      .flatMap((result, index) =>
         Object.values(result.data)
           .flat()
           .filter((d: any) => d.description)
@@ -172,20 +148,29 @@ if(daoName === "optimism"){
             support: proposalIds[index].support,
           }))
       )
-      .filter((item:any) => item.proposal.description.length > 0);
+      .filter((item) => item.proposal.description.length > 0);
 
     return FinalResult;
+  } else if (daoName === "arbitrum") {
+    // console.log("helloo arb")
+    const arb_gqdata: any = await arb_client.query(arbQuery, {
+      address: address,
+    });
 
+    return arb_gqdata.data.votes;
+  }
 };
 
 export const fetchGraphData = async (daoName: any, pageData: any) => {
   if (daoName == "optimism") {
     const op_counts = pageData.reduce(
       (acc: any, curr: any) => {
+        // console.log("curr", curr.proposalId.params.length)
         const support =
           curr.proposalId.params && curr.proposalId.params.length > 2
             ? 1
             : curr.support;
+        // console.log(support)
         acc[support] = (acc[support] || 0) + 1;
         return acc;
       },
@@ -231,18 +216,19 @@ function ProposalVoted({ daoName, address }: any) {
   const [openDesc, setOpenDesc] = useState<boolean[]>([]);
   const [supportCounts, setSupportCounts] = useState({ 0: 0, 1: 0, 2: 0 });
   const [isShowing, setIsShowing] = useState(true);
-const router = useRouter();
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         // Your async logic here
+        // console.log("props",props)
         const finalResult = await fetchProposalDescriptions(
           1000,
           0,
           daoName,
           address
         );
-
+        console.log("finalResult", finalResult);
         setPageData(finalResult);
         setGraphData(finalResult);
         setIsPageLoading(false);
@@ -376,10 +362,12 @@ const router = useRouter();
                     <span
                       className="text-xs text-blue-shade-100 underline cursor-pointer"
                       onClick={() => {
-                        router.push(`/${daoName}/proposals/${proposal.proposalId.proposalId}`);
+                        const newOpenDesc = [...openDesc];
+                        newOpenDesc[index] = !newOpenDesc[index];
+                        setOpenDesc(newOpenDesc);
                       }}
                     >
-                      view
+                      {openDesc[index] ? "Close" : "View"}
                     </span>
                   </div>
                   <div
@@ -423,16 +411,16 @@ const router = useRouter();
                     </NextUITooltip>
                   </div>
                   <NextUITooltip content="Votes">
-                    { proposal.proposalId && (
+                    {daoName === "optimism" && proposal.proposalId && (
                       <div className="text-white rounded-full px-3 py-[2px] bg-[#FF0000]">
                         {formatNumber(proposal.proposalId.weight / 1e18)}
                       </div>
                     )}
                   </NextUITooltip>
-                  { proposal.proposalId && (
+                  {daoName === "optimism" && proposal.proposalId && (
                     <div className="px-3 py-[2px] text-xl">
                       <a
-                        href={daoName==="optimism"?`https://optimistic.etherscan.io/tx/${proposal.proposalId.transactionHash}`:`https://arbiscan.io/tx/${proposal.proposalId.transactionHash}`}
+                        href={`https://optimistic.etherscan.io/tx/${proposal.proposalId.transactionHash}`}
                         target="_blank"
                         className="cursor-pointer"
                       >
