@@ -1,100 +1,53 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { Client, cacheExchange, fetchExchange, gql } from 'urql';
 
-export const GET = async (req: NextRequest) => {
-    const url = new URL(req.url);
-    const lastCursor = url.searchParams.get('lastCursor');
- 
-    console.log("lastCursor", lastCursor);
+const client = new Client({
+  url: 'https://api.studio.thegraph.com/query/68573/arbitrum_proposals/v0.0.4',
+  exchanges: [cacheExchange, fetchExchange],
+});
 
-    let query = '';
-    let variables = {};
+const GET_PROPOSALS = gql`
+query MyQuery {
+  proposalCreateds(orderBy: blockTimestamp, orderDirection: desc, first: 1000) {
+    blockTimestamp
+    description
+    proposalId
+    proposer
+  }
+}`;
+const GET_PROPOSAL = gql`
+query MyQuery($proposalId: String!) {
+  proposalCreateds(where: { proposalId: $proposalId }) {
+    blockTimestamp
+    description
+    proposalId
+    proposer
+  }
+}`;
 
-   
-        // Specific delegate query
-        query = `query GovernanceProposals($input: ProposalsInput!) {
-  proposalsV2(input: $input) {
-    nodes {
-      ... on ProposalV2 {
-        id
-        onchainId
-        status
-        originalId
-        createdAt
-        voteStats {
-          votesCount
-          percent
-          type
-          votersCount
-        }
-        metadata {
-          description
-        }
-        block {
-          timestamp
-        }
-        governor {
-          id
-          quorum
-          name
-          timelockId
-          token {
-            decimals
-          }
-        }
+export async function GET(req: NextRequest) {
+  try {
+      const { searchParams } = new URL(req.url);
+      const proposalId = searchParams.get('proposalId');
+
+      let result;
+
+      if (proposalId) {
+          // Fetch specific proposal
+          result = await client.query(GET_PROPOSAL, { proposalId }).toPromise();
+      } else {
+          // Fetch all proposals
+          result = await client.query(GET_PROPOSALS, {}).toPromise();
       }
-    }
-    pageInfo {
-      firstCursor
-      lastCursor
-    }
+
+      if (result.error) {
+          console.error('GraphQL query error:', result.error);
+          return NextResponse.json({ error: 'An error occurred while fetching data' }, { status: 500 });
+      }
+
+      return NextResponse.json(result);
+  } catch (error) {
+      console.error('Unexpected error:', error);
+      return NextResponse.json({ error: 'An unexpected error occurred' }, { status: 500 });
   }
 }
-`;
-
-        variables = {"input":{
-            "filters": {
-              "organizationId": "2206072050315953936"
-            },
-            "page": {
-               afterCursor: lastCursor || null,
-              "limit": 20,
-            },
-            "sort": {
-              "sortBy": "id",
-              "isDescending": true
-            }
-          }
-          };
-   
-
-    try {
-        const apiKey = process.env.NEXT_PUBLIC_TALLY_API_KEY; // Ensure you have this in your .env file
-        if (!apiKey) {
-            throw new Error('API key is missing');
-        }
-        const response = await fetch('https://api.tally.xyz/query', {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Api-Key": apiKey,
-            },
-            body: JSON.stringify({
-                query: query,
-                variables: variables
-            }),
-        });
-
-        const data = await response.json();
-       
-        console.log("data", data);
-
-        if (response.ok) {
-            return NextResponse.json(data.data, { status: 200 });
-        } 
-        return NextResponse.json({ error: 'user not found' }, { status: 200 });
-        
-    } catch (error) {
-        console.error('Error:', error);
-        return NextResponse.json({ error: 'An error occurred.' }, { status: 500 });
-    }
-};
