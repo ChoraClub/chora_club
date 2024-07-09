@@ -19,7 +19,7 @@ import { useConnectModal, useChainModal } from "@rainbow-me/rainbowkit";
 import dao_abi from "../../artifacts/Dao.sol/GovernanceToken.json";
 import { useAccount } from "wagmi";
 import WalletAndPublicClient from "@/helpers/signer";
-import { getEnsNameOfUser } from "../ConnectWallet/ENSResolver";
+// import { getEnsNameOfUser } from "../ConnectWallet/ENSResolver";
 import {
   processAddressOrEnsName,
   resolveENSProfileImage,
@@ -441,12 +441,12 @@ function DelegatesList({ props }: { props: string }) {
         >
           <input
             type="text"
-            placeholder="Search by Address or ENS Name"
+            placeholder="Search by Address"
             style={{ background: "rgba(238, 237, 237, 0.36)" }}
             className="pl-5 pr-3 rounded-full outline-none w-full"
             value={searchQuery}
             onChange={(e) => handleSearchChange(e.target.value)}
-          ></input>
+            ></input>
           <span className="flex items-center bg-black rounded-full px-5 py-2">
             <Image src={search} alt="search" width={20} />
           </span>

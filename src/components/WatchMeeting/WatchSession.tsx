@@ -15,13 +15,13 @@ import VideoJS from "@/components/utils/VideoJs";
 import videojs from "video.js";
 // import { parseISO } from "date-fns";
 import ReportOptionModal from "./ReportOptionModal";
-import { getEnsName } from "../ConnectWallet/ENSResolver";
 import { useRouter } from "next-nprogress-bar";
 import "./WatchSession.module.css";
 import ShareMediaModal from "./ShareMediaModal";
 import { BASE_URL } from "@/config/constants";
 import { Toaster } from "react-hot-toast";
 import { Tooltip } from "@nextui-org/react";
+import { getEnsName } from "@/utils/ENSUtils";
 
 interface ProfileInfo {
   _id: string;
@@ -101,7 +101,7 @@ function WatchSession({
   const [isExpanded, setIsExpanded] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
   const [contentHeight, setContentHeight] = useState(0);
-  const [ensHostName, setEnsHostName] = useState<string | null>(null);
+  const [ensHostName, setEnsHostName] = useState<any>(null);
   const [shareModal, setShareModal] = useState(false);
   const router = useRouter();
 
@@ -176,7 +176,7 @@ function WatchSession({
   useEffect(() => {
     const fetchEnsName = async () => {
       const name = await getEnsName(data.host_address.toLowerCase());
-      setEnsHostName(name);
+      setEnsHostName(name?.ensNameOrAddress);
     };
 
     fetchEnsName();

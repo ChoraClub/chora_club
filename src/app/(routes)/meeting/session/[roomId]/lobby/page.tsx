@@ -10,11 +10,11 @@ import { Toaster, toast } from "react-hot-toast";
 import { BasicIcons } from "@/assets/BasicIcons";
 
 // Components
-import FeatCommon from "@/components/common/FeatCommon";
-import AvatarWrapper from "@/components/common/AvatarWrapper";
+import FeatCommon from "@/components/ui/FeatCommon";
+import AvatarWrapper from "@/components/ui/AvatarWrapper";
 
 // Store
-import useStore from "@/components/store/slices";
+import { useStudioState } from "@/store/studioState";
 
 // Hooks
 import {
@@ -40,10 +40,6 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
   // Local States
   console.log("params", params);
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const avatarUrl = useStore((state) => state.avatarUrl);
-  const setAvatarUrl = useStore((state) => state.setAvatarUrl);
-  const setUserDisplayName = useStore((state) => state.setUserDisplayName);
-  const userDisplayName = useStore((state) => state.userDisplayName);
   const [token, setToken] = useState<string>("");
   const [isJoining, setIsJoining] = useState<boolean>(false);
   const { updateMetadata, metadata, peerId, role } = useLocalPeer<{
@@ -52,6 +48,8 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
     isHandRaised: boolean;
   }>();
 
+  const { name, setName, avatarUrl, setAvatarUrl } = useStudioState();
+
   const { address, isDisconnected } = useAccount();
   const [isLoading, setIsLoading] = useState(true);
 
@@ -59,13 +57,12 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
   const { chain, chains } = useNetwork();
   const [profileDetails, setProfileDetails] = useState<any>();
 
-  const [popupVisibility, setPopupVisibility] = useState(true);
-
   // Huddle Hooks
   const { joinRoom, state, room } = useRoom();
   const [isAllowToEnter, setIsAllowToEnter] = useState<boolean>();
   const [notAllowedMessage, setNotAllowedMessage] = useState<string>();
   const [hostAddress, setHostAddress] = useState();
+  const [daoName, setDaoName] = useState();
   const [meetingStatus, setMeetingStatus] = useState<any>();
 
   useEffect(() => {
@@ -96,90 +93,98 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
 
       if (result.success) {
         setHostAddress(result.data.host_address);
+        setDaoName(result.data.dao_name);
       }
       if (result.message === "Meeting is ongoing") {
         setMeetingStatus("Ongoing");
       }
 
       // if (address === hostAddress || meetingStatus === "Ongoing") {
-      if (address === hostAddress || result.message === "Meeting is ongoing") {
-        setIsJoining(true);
+      // if (address === hostAddress || result.message === "Meeting is ongoing") {
+      setIsJoining(true);
 
-        let token = "";
-        if (state !== "connected") {
-          const requestBody = {
-            roomId: params.roomId,
-            role: "host",
-            displayName: address,
-            address: address, // assuming you have userAddress defined somewhere
-          };
-          try {
-            const response = await fetch("/api/new-token", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(requestBody),
-            });
-
-            // if (!response.ok) {
-            //   throw new Error("Failed to fetch token");
-            // }
-
-            token = await response.text(); // Change this line
-            // console.log("Token fetched successfully:", token);
-          } catch (error) {
-            console.error("Error fetching token:", error);
-            // Handle error appropriately, e.g., show error message to user
-            toast.error("Failed to fetch token");
-            setIsJoining(false);
-            return;
-          }
-        }
-
-        try {
-          console.log({ token });
-          console.log(params.roomId);
-          await joinRoom({
-            roomId: params.roomId,
-            token,
-          });
-        } catch (error) {
-          console.error("Error joining room:", error);
-          // Handle error appropriately, e.g., show error message to user
-          toast.error("Failed to join room");
-        }
-
-        console.log("Role.HOST", Role.HOST);
-        if (Role.HOST) {
-          console.log("inside put api");
-          const myHeaders = new Headers();
-          myHeaders.append("Content-Type", "application/json");
-
-          const raw = JSON.stringify({
-            meetingId: params.roomId,
-            meetingType: "session",
-          });
-          const requestOptions: any = {
-            method: "PUT",
-            headers: myHeaders,
-            body: raw,
-            redirect: "follow",
-          };
-          const response = await fetch(
-            `/api/update-meeting-status/${params.roomId}`,
-            requestOptions
-          );
-          const responseData = await response.json();
-          console.log("responseData: ", responseData);
-          // setMeetingStatus("Ongoing");
-        }
-
-        setIsJoining(false);
+      let role;
+      if (address === hostAddress) {
+        role = "host";
       } else {
-        toast("Please wait, Host has not started the session yet.");
-        console.log("Wait..");
+        role = "guest";
       }
+      let token = "";
+      console.log("name", name);
+      if (state !== "connected") {
+        const requestBody = {
+          roomId: params.roomId,
+          role: role,
+          displayName: name,
+          address: address, // assuming you have userAddress defined somewhere
+        };
+        try {
+          const response = await fetch("/api/new-token", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(requestBody),
+          });
+
+          // if (!response.ok) {
+          //   throw new Error("Failed to fetch token");
+          // }
+
+          token = await response.text(); // Change this line
+          // console.log("Token fetched successfully:", token);
+        } catch (error) {
+          console.error("Error fetching token:", error);
+          // Handle error appropriately, e.g., show error message to user
+          toast.error("Failed to fetch token");
+          setIsJoining(false);
+          return;
+        }
+      }
+
+      try {
+        console.log({ token });
+        console.log(params.roomId);
+        await joinRoom({
+          roomId: params.roomId,
+          token,
+        });
+      } catch (error) {
+        console.error("Error joining room:", error);
+        // Handle error appropriately, e.g., show error message to user
+        toast.error("Failed to join room");
+      }
+
+      console.log("Role.HOST", Role.HOST);
+      if (Role.HOST) {
+        console.log("inside put api");
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+
+        const raw = JSON.stringify({
+          meetingId: params.roomId,
+          meetingType: "session",
+        });
+        const requestOptions: any = {
+          method: "PUT",
+          headers: myHeaders,
+          body: raw,
+          redirect: "follow",
+        };
+        const response = await fetch(
+          `/api/update-meeting-status/${params.roomId}`,
+          requestOptions
+        );
+        const responseData = await response.json();
+        console.log("responseData: ", responseData);
+        // setMeetingStatus("Ongoing");
+      }
+
+      setIsJoining(false);
+      // } else {
+      //   toast("Please wait, Host has not started the session yet.");
+      //   console.log("Wait..");
+      // }
     }
   };
 
@@ -249,16 +254,9 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
     verifyMeetingId();
   }, [params.roomId, isAllowToEnter, notAllowedMessage, meetingStatus]);
 
-  useEffect(() => {
-    let dao = "";
-    if (chain && chain?.name === "Optimism") {
-      dao = "optimism";
-    } else if (chain && chain?.name === "Arbitrum One") {
-      dao = "arbitrum";
-    } else {
-      return;
-    }
+  useEffect(() => {}, [daoName]);
 
+  useEffect(() => {
     const fetchData = async () => {
       try {
         const myHeaders = new Headers();
@@ -278,6 +276,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
         const response = await fetch(`/api/profile/${address}`, requestOptions);
         const result = await response.json();
         const resultData = await result.data;
+        console.log("result data: ", resultData);
 
         if (Array.isArray(resultData)) {
           const filtered: any = resultData.filter((data) => {
@@ -286,29 +285,35 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
           console.log("filtered profile: ", filtered);
           setProfileDetails(filtered[0]);
           setIsLoading(false);
-          const imageCid = filtered[0].image;
+          const imageCid = filtered[0]?.image;
           if (imageCid) {
             setAvatarUrl(`https://gateway.lighthouse.storage/ipfs/${imageCid}`);
           }
-          setUserDisplayName(filtered[0].displayName);
-        }
-
-        if (resultData.length === 0) {
-          const res = await fetch(
-            `https://api.karmahq.xyz/api/dao/find-delegate?dao=${dao}&user=${address}`
-          );
-          const result = await response.json();
-          const resultData = await result.data.delegate;
-
-          setProfileDetails(resultData);
-          setIsLoading(false);
-
-          if (resultData.ensName !== null) {
-            setUserDisplayName(resultData.ensName);
+          if (filtered[0]?.displayName) {
+            setName(filtered[0].displayName);
           } else {
-            setUserDisplayName(formattedAddress);
+            console.log("formattedAddress ", formattedAddress);
+            setName(formattedAddress);
           }
         }
+
+        // if (resultData.length === 0) {
+        // const res = await fetch(
+        //   `https://api.karmahq.xyz/api/dao/find-delegate?dao=${dao}&user=${address}`
+        // );
+        // const result = await response.json();
+        // const resultData = await result.data.delegate;
+
+        // setProfileDetails(resultData);
+        // setIsLoading(false);
+
+        // if (resultData.ensName !== null) {
+        //   setName(resultData.ensName);
+        // } else {
+
+        // setName(formattedAddress);
+        // }
+        // }
       } catch (error) {
         console.log("Error in catch: ", error);
       }
@@ -322,30 +327,6 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
     <>
       {isAllowToEnter ? (
         <div className="h-screen">
-          {popupVisibility && (
-            <div className="flex items-center justify-center">
-              <div className="absolute bg-white text-[#3E3D3D] flex justify-center items-center py-2 font-poppins font-semibold w-1/4 rounded-md top-6 drop-shadow-xl">
-                <div className="flex absolute left-2">
-                  <Image
-                    alt="record-left"
-                    width={25}
-                    height={25}
-                    src={record}
-                    className="w-5 h-5 ml-2"
-                  />
-                </div>
-                <div className="">This meeting is being recorded.</div>
-                <div className="flex absolute right-2">
-                  <button
-                    onClick={() => setPopupVisibility(false)}
-                    className="p-1 bg-[#3E3D3D] rounded-full text-white text-bold"
-                  >
-                    <RxCross2 size={10} />
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
           <main className="flex h-screen flex-col items-center justify-center bg-lobby text-slate-100 font-poppins">
             <div className="flex flex-col items-center justify-center gap-4 w-1/3 mt-14">
               <div className="text-center flex items-center justify-center bg-slate-100 w-full rounded-2xl py-28">
@@ -355,17 +336,17 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
                     alt="audio-spaces-img"
                     width={125}
                     height={125}
-                    className="maskAvatar object-contain"
+                    className="maskAvatar"
                     quality={100}
                     priority
                   />
-                  <video
+                  {/* <video
                     src={avatarUrl}
                     muted
                     className="maskAvatar absolute left-1/2 top-1/2 z-10 h-full w-full -translate-x-1/2 -translate-y-1/2"
                     // autoPlay
                     loop
-                  />
+                  /> */}
                   <button
                     onClick={() => setIsOpen((prev) => !prev)}
                     type="button"
@@ -390,12 +371,12 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
                             width={45}
                             height={45}
                             loading="lazy"
-                            className="object-contain cursor-pointer"
-                            onClick={() => {
-                              setAvatarUrl(
-                                `https://gateway.lighthouse.storage/ipfs/${profileDetails.image}`
-                              );
-                            }}
+                            className="cursor-pointer"
+                            // onClick={() => {
+                            //   setAvatarUrl(
+                            //     `https://gateway.lighthouse.storage/ipfs/${profileDetails.image}`
+                            //   );
+                            // }}
                           />
                         )}
                         {Array.from({ length: 20 }).map((_, i) => {
@@ -415,7 +396,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
                                 width={45}
                                 height={45}
                                 loading="lazy"
-                                className="object-contain"
+                                className=""
                               />
                             </AvatarWrapper>
                           );

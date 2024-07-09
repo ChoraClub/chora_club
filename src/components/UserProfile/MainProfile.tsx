@@ -45,6 +45,14 @@ import { useConnectModal } from "@rainbow-me/rainbowkit";
 import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
 import MainProfileSkeletonLoader from "../SkeletonLoader/MainProfileSkeletonLoader";
 import { BASE_URL } from "@/config/constants";
+import { IoClose } from "react-icons/io5";
+import "./MainProfile.module.css";
+import { FaUserEdit } from "react-icons/fa";
+import { TbMailFilled } from "react-icons/tb";
+import { SiDiscourse } from "react-icons/si";
+import { BsDiscord } from "react-icons/bs";
+import { TbBrandGithubFilled } from "react-icons/tb";
+import { CgAttachment } from "react-icons/cg";
 
 function MainProfile() {
   const { isConnected, address } = useAccount();
@@ -695,7 +703,8 @@ function MainProfile() {
                 style={{
                   backgroundColor: "#fcfcfc",
                   border: "2px solid #E9E9E9 ",
-                }}>
+                }}
+              >
                 <div className="w-40 h-40 flex items-center justify-content ">
                   <div className="flex justify-center items-center w-40 h-40">
                     <Image
@@ -755,7 +764,8 @@ function MainProfile() {
                         twitter == "" ? "hidden" : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                      target="_blank">
+                      target="_blank"
+                    >
                       <FaXTwitter color="#7C7C7C" size={12} />
                     </Link>
                     <Link
@@ -770,7 +780,8 @@ function MainProfile() {
                         discourse == "" ? "hidden" : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                      target="_blank">
+                      target="_blank"
+                    >
                       <BiSolidMessageRoundedDetail color="#7C7C7C" size={12} />
                     </Link>
                     <Link
@@ -779,7 +790,8 @@ function MainProfile() {
                         discord == "" ? "hidden" : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                      target="_blank">
+                      target="_blank"
+                    >
                       <FaDiscord color="#7C7C7C" size={12} />
                     </Link>
                     <Link
@@ -788,118 +800,235 @@ function MainProfile() {
                         github == "" ? "hidden" : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                      target="_blank">
+                      target="_blank"
+                    >
                       <FaGithub color="#7C7C7C" size={12} />
                     </Link>
                     <Tooltip
                       content="Update your Profile"
                       placement="top"
-                      showArrow>
+                      showArrow
+                    >
                       <span
                         className="border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 cursor-pointer"
                         style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                        onClick={onOpen}>
+                        onClick={onOpen}
+                      >
                         <FaPencil color="#3e3d3d" size={12} />
                       </span>
                     </Tooltip>
                     <Modal
                       isOpen={isOpen}
                       onOpenChange={onOpenChange}
-                      className="font-poppins">
+                      className="font-poppins rounded-3xl "
+                      size="xl"
+                      // style={{ '--modal-size': '672px' }}
+                      hideCloseButton
+                    >
                       <ModalContent>
                         {(onClose: any) => (
                           <>
-                            <ModalHeader className="flex flex-col gap-1">
+                            <ModalHeader className="flex justify-between text-2xl font-semibold items-center bg-blue-shade-100 text-white px-8 py-6 ">
                               Update your Profile
+                              <button
+                                onClick={onClose}
+                                className="text-blue-shade-100 bg-white w-5 h-5  rounded-full flex items-center justify-center font-semibold text-xl"
+                              >
+                                <IoClose className="font-bold size-4"/>
+                              </button>
                             </ModalHeader>
-                            <ModalBody>
-                              <div className="px-1 font-medium">
+                            <ModalBody className="px-10 pb-4 pt-6">
+                              {/* <div className="text-sm font-semibold mb-2">
                                 Upload Profile Image:
-                              </div>
-                              <input
+                                
+                              </div> */}
+                              {/* <input
                                 type="file"
                                 ref={fileInputRef}
                                 placeholder="Upload Image"
                                 onChange={(e) => uploadImage(e.target.files)}
-                              />
-                              <div className="px-1 font-medium">
-                                Display name:
+                              /> */}
+
+                              <div className="mb-4">
+                                <div className="text-sm font-semibold mb-2">
+                                  Upload Profile Image:
+                                </div>
+                                <div className="flex items-center">
+                                  <div className="w-24 h-24 bg-gray-100 rounded-md flex items-center justify-center mr-4">
+                                    {displayImage ? (
+                                      <img
+                                        src={`https://gateway.lighthouse.storage/ipfs/${displayImage}`}
+                                        alt="Profile"
+                                        className="w-full h-full object-cover rounded-md"
+                                      />
+                                    ) : (
+                                      <div className="text-gray-400">
+                                        <svg
+                                          xmlns="http://www.w3.org/2000/svg"
+                                          className="h-12 w-12"
+                                          viewBox="0 0 20 20"
+                                          fill="currentColor"
+                                        >
+                                          <path
+                                            fillRule="evenodd"
+                                            d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
+                                            clipRule="evenodd"
+                                          />
+                                        </svg>
+                                      </div>
+                                    )}
+                                  </div>
+                                  <div>
+                                    <p className="text-sm text-gray-600 mb-2">
+                                      Please upload square image, size less than
+                                      100KB
+                                    </p>
+                                    <div className="flex items-center">
+                                      <label className="bg-white  text-blue-shade-100 font-medium text-sm py-3 px-4 rounded-full border cursor-pointer border-blue-shade-100 cursor-point flex gap-2 items-center">
+                                        <CgAttachment />
+                                        <span>Choose File</span>
+                                        <input
+                                          type="file"
+                                          ref={fileInputRef}
+                                          onChange={(e) =>
+                                            uploadImage(e.target.files)
+                                          }
+                                          className="hidden"
+                                        />
+                                      </label>
+                                      <span className="ml-3 text-sm text-gray-600">
+                                        {fileInputRef.current?.files?.[0]
+                                          ?.name || "No File Chosen"}
+                                      </span>
+                                    </div>
+                                  </div>
+                                </div>
                               </div>
-                              <input
-                                type="text"
-                                value={displayName}
-                                placeholder="Enter your name here"
-                                className="outline-none bg-[#D9D9D945] rounded-md px-2 py-1 text-sm"
-                                onChange={(e) =>
-                                  handleInputChange(
-                                    "displayName",
-                                    e.target.value
-                                  )
-                                }
-                              />
-                              <div className="px-1 font-medium">Email:</div>
-                              <input
-                                type="email"
-                                value={emailId}
-                                placeholder="Enter your email here"
-                                className="outline-none bg-[#D9D9D945] rounded-md px-2 py-1 text-sm"
-                                onChange={(e) =>
-                                  handleInputChange("emailId", e.target.value)
-                                }
-                              />
 
-                              <div className="px-1 font-medium">
-                                X (Formerly Twitter):
+                              <div className="flex gap-6 ">
+                                <div className="flex flex-col basis-1/2 mt-1.5">
+                                  <div className="font-semibold text-sm flex px-3 items-center gap-1.5">
+                                    <FaUserEdit /> Display name:
+                                  </div>
+                                  <input
+                                    type="text"
+                                    value={displayName}
+                                    placeholder="Enter Name"
+                                    className="border border-[#f2eeee] mt-1 bg-white rounded-lg px-3 py-[10px] text-sm text-[#b5b5b5] font-normal"
+                                    onChange={(e) =>
+                                      handleInputChange(
+                                        "displayName",
+                                        e.target.value
+                                      )
+                                    }
+                                  />
+                                </div>
+                                <div className="flex flex-col basis-1/2 mt-1.5 ">
+                                  <div className="text-sm font-semibold flex px-3 items-center gap-1.5">
+                                    <TbMailFilled />
+                                    Email:
+                                  </div>
+                                  <input
+                                    type="email"
+                                    value={emailId}
+                                    placeholder="xxx@gmail.com"
+                                    className="border border-[#f2eeee] mt-1 bg-white rounded-lg px-3 py-[10px] text-sm text-[#b5b5b5] font-normal"
+                                    onChange={(e) =>
+                                      handleInputChange(
+                                        "emailId",
+                                        e.target.value
+                                      )
+                                    }
+                                  />
+                                </div>
                               </div>
-                              <input
-                                type="url"
-                                value={twitter}
-                                placeholder="Enter twitter username"
-                                className="outline-none bg-[#D9D9D945] rounded-md px-2 py-1 text-sm"
-                                onChange={(e) =>
-                                  handleInputChange("twitter", e.target.value)
-                                }
-                              />
 
-                              <div className="px-1 font-medium">Discourse:</div>
-                              <input
-                                type="url"
-                                value={discourse}
-                                placeholder="Enter discourse username"
-                                className="outline-none bg-[#D9D9D945] rounded-md px-2 py-1 text-sm"
-                                onChange={(e) =>
-                                  handleInputChange("discourse", e.target.value)
-                                }
-                              />
+                              <div className="flex gap-6 ">
+                                <div className="flex flex-col basis-1/2 mt-1.5">
+                                  <div className="text-sm font-semibold flex px-3 items-center gap-1.5">
+                                    <FaXTwitter />
+                                    (Formerly Twitter):
+                                  </div>
+                                  <input
+                                    type="url"
+                                    value={twitter}
+                                    placeholder="Enter Twitter Name"
+                                    className="border border-[#f2eeee] mt-1 bg-white rounded-lg px-3 py-[10px] text-sm text-[#b5b5b5] font-normal "
+                                    onChange={(e) =>
+                                      handleInputChange(
+                                        "twitter",
+                                        e.target.value
+                                      )
+                                    }
+                                  />
+                                </div>
+                                <div className="flex flex-col basis-1/2 mt-1.5">
+                                  <div className="text-sm font-semibold flex px-3 items-center gap-1.5">
+                                    <SiDiscourse />
+                                    Discourse:
+                                  </div>
+                                  <input
+                                    type="url"
+                                    value={discourse}
+                                    placeholder="Enter Discourse Name"
+                                    className="border border-[#f2eeee] mt-1 bg-white rounded-lg px-3 py-[10px] text-sm text-[#b5b5b5] font-normal "
+                                    onChange={(e) =>
+                                      handleInputChange(
+                                        "discourse",
+                                        e.target.value
+                                      )
+                                    }
+                                  />
+                                </div>
+                              </div>
 
-                              <div className="px-1 font-medium">Discord:</div>
-                              <input
-                                type="url"
-                                value={discord}
-                                placeholder="Enter discord username"
-                                className="outline-none bg-[#D9D9D945] rounded-md px-2 py-1 text-sm"
-                                onChange={(e) =>
-                                  handleInputChange("discord", e.target.value)
-                                }
-                              />
-                              <div className="px-1 font-medium">Github:</div>
-                              <input
-                                type="url"
-                                value={github}
-                                placeholder="Enter github username"
-                                className="outline-none bg-[#D9D9D945] rounded-md px-2 py-1 text-sm"
-                                onChange={(e) =>
-                                  handleInputChange("github", e.target.value)
-                                }
-                              />
+                              <div className="flex gap-6 ">
+                                <div className="flex flex-col basis-1/2 mt-1.5">
+                                  <div className="text-sm font-semibold flex px-3 items-center gap-1.5">
+                                    <BsDiscord />
+                                    Discord:
+                                  </div>
+                                  <input
+                                    type="url"
+                                    value={discord}
+                                    placeholder="Enter Discord Name"
+                                    className="border border-[#f2eeee] mt-1 bg-white rounded-lg px-3 py-[10px] text-sm text-[#b5b5b5] font-normal "
+                                    onChange={(e) =>
+                                      handleInputChange(
+                                        "discord",
+                                        e.target.value
+                                      )
+                                    }
+                                  />
+                                </div>
+                                <div className="flex flex-col basis-1/2 mt-1.5">
+                                  <div className="text-sm font-semibold flex px-3 items-center gap-1.5">
+                                    <TbBrandGithubFilled />
+                                    Github:
+                                  </div>
+                                  <input
+                                    type="url"
+                                    value={github}
+                                    placeholder="Enter Github Name"
+                                    className="border border-[#f2eeee] mt-1 bg-white rounded-lg px-3 py-[10px] text-sm text-[#b5b5b5] font-normal "
+                                    onChange={(e) =>
+                                      handleInputChange(
+                                        "github",
+                                        e.target.value
+                                      )
+                                    }
+                                  />
+                                </div>
+                              </div>
                             </ModalBody>
-                            <ModalFooter>
-                              <Button color="default" onPress={onClose}>
+                            <ModalFooter className="flex justify-center items-center">
+                              {/* <Button color="default" onPress={onClose}>
                                 Close
-                              </Button>
+                              </Button> */}
                               <Button
-                                color="primary"
-                                onClick={() => handleSubmit()}>
+                                className="bg-blue-shade-100 rounded-full text-sm font-semibold text-white px-10 mt-3 mb-7 "
+                                onClick={() => handleSubmit()}
+                              >
                                 {isLoading ? "Saving" : "Save"}
                               </Button>
                             </ModalFooter>
@@ -920,7 +1049,8 @@ function MainProfile() {
                     content="Copy"
                     placement="bottom"
                     closeDelay={1}
-                    showArrow>
+                    showArrow
+                  >
                     <span className="px-2 cursor-pointer" color="#3E3D3D">
                       <IoCopy onClick={() => handleCopy(`${address}`)} />
                     </span>
@@ -937,7 +1067,8 @@ function MainProfile() {
                       content="Copy your profile URL to share on Warpcast or Twitter."
                       placement="bottom"
                       closeDelay={1}
-                      showArrow>
+                      showArrow
+                    >
                       <Button
                         className="bg-gray-200 hover:bg-gray-300"
                         onClick={() => {
@@ -953,7 +1084,8 @@ function MainProfile() {
                           setTimeout(() => {
                             setIsCopied(false);
                           }, 3000);
-                        }}>
+                        }}
+                      >
                         <IoShareSocialSharp />
                         {isCopied ? "Copied" : "Share profile"}
                       </Button>
@@ -1009,7 +1141,8 @@ function MainProfile() {
                     {/* pass address of whom you want to delegate the voting power to */}
                     <button
                       className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
-                      onClick={() => handleDelegateVotes(`${address}`)}>
+                      onClick={() => handleDelegateVotes(`${address}`)}
+                    >
                       Become Delegate
                     </button>
 
@@ -1043,7 +1176,8 @@ function MainProfile() {
                   ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
                   : "border-transparent"
               }`}
-              onClick={() => router.push(path + "?active=info")}>
+              onClick={() => router.push(path + "?active=info")}
+            >
               Info
             </button>
             {selfDelegate === true && (
@@ -1053,7 +1187,8 @@ function MainProfile() {
                     ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
                     : "border-transparent"
                 }`}
-                onClick={() => router.push(path + "?active=votes")}>
+                onClick={() => router.push(path + "?active=votes")}
+              >
                 Past Votes
               </button>
             )}
@@ -1065,7 +1200,8 @@ function MainProfile() {
               }`}
               onClick={() =>
                 router.push(path + "?active=sessions&session=schedule")
-              }>
+              }
+            >
               Sessions
             </button>
             <button
@@ -1076,7 +1212,8 @@ function MainProfile() {
               }`}
               onClick={() =>
                 router.push(path + "?active=officeHours&hours=schedule")
-              }>
+              }
+            >
               Office Hours
             </button>
 
@@ -1087,7 +1224,8 @@ function MainProfile() {
                     ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
                     : "border-transparent"
                 }`}
-                onClick={() => router.push(path + "?active=instant-meet")}>
+                onClick={() => router.push(path + "?active=instant-meet")}
+              >
                 Instant Meet
               </button>
             )}
@@ -1159,8 +1297,7 @@ function MainProfile() {
         </div>
       ) : (
         <>
-          
-          <MainProfileSkeletonLoader/>
+          <MainProfileSkeletonLoader />
         </>
       )}
     </>

@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 // import "@rainbow-me/rainbow-button/styles.css";
-import { getEnsName } from "./ENSResolver";
+import { fetchEnsAvatar, getEnsName } from "@/utils/ENSUtils";
 
 function ConnectWalletWithENS() {
   const [displayAddress, setDisplayAddress] = useState<any>();
@@ -35,8 +35,10 @@ function ConnectWalletWithENS() {
 
         if (account) {
           (async () => {
-            const displayName = await getEnsName(account.address);
-            setDisplayAddress(displayName);
+            console.log("account in if: ", account?.address);
+            const displayName = await getEnsName(account?.address);
+            console.log("display name: ", displayName?.ensNameOrAddress);
+            setDisplayAddress(displayName?.ensNameOrAddress);
           })();
         }
 
@@ -61,18 +63,19 @@ function ConnectWalletWithENS() {
                     style={{
                       display: "flex",
                       alignItems: "center",
+                      justifyContent:"center",
                       color: "white",
-                      borderRadius: "12px",
+                      borderRadius: "9999px",
                       borderColor: "white",
                       borderStyle: "solid",
-                      paddingLeft: "10px",
-                      paddingRight: "12px",
-                      paddingTop: "8px",
-                      paddingBottom: "8px",
+                      paddingLeft: "20px",
+                      paddingRight: "20px",
+                      paddingTop: "16px",
+                      paddingBottom: "16px",
                       backgroundColor: "#0500FF",
                       fontWeight: "bold",
                     }}
-                    className="hover:scale-105 hover:transition-all hover:ease-in-out"
+                    className="hover:scale-105 hover:transition-all hover:ease-in-out text-sm"
                   >
                     Connect Wallet
                   </button>

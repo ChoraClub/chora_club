@@ -4,13 +4,13 @@ import React, { use, useEffect, useState } from "react";
 import user from "@/assets/images/daos/profile.png";
 import { FaXTwitter, FaDiscord, FaGithub } from "react-icons/fa6";
 import { BiSolidMessageRoundedDetail } from "react-icons/bi";
-import { IoCopy } from "react-icons/io5";
+import { IoCopy, IoShareSocialSharp } from "react-icons/io5";
 import DelegateInfo from "./DelegateInfo";
 import DelegateVotes from "./DelegateVotes";
 import DelegateSessions from "./DelegateSessions";
 import DelegateOfficeHrs from "./DelegateOfficeHrs";
 import copy from "copy-to-clipboard";
-import { Tooltip } from "@nextui-org/react";
+import { Button, Tooltip } from "@nextui-org/react";
 import { StaticImport } from "next/dist/shared/lib/get-img-props";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useRouter } from "next-nprogress-bar";
@@ -33,7 +33,8 @@ import ArbLogo from "@/assets/images/daos/arbCir.png";
 import ccLogo from "@/assets/images/daos/CC.png";
 import { Oval } from "react-loader-spinner";
 import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
-import { getEnsNameOfUser } from "../ConnectWallet/ENSResolver";
+import { BASE_URL } from "@/config/constants";
+// import { getEnsNameOfUser } from "../ConnectWallet/ENSResolver";
 import DelegateTileModal from "../utils/delegateTileModal";
 // import { cacheExchange, createClient, fetchExchange, gql } from "urql/core";
 import { set } from "video.js/dist/types/tech/middleware";
@@ -95,6 +96,7 @@ function SpecificDelegate({ props }: { props: Type }) {
   const [description, setDescription] = useState("");
   // const provider = new ethers.BrowserProvider(window?.ethereum);
   const [displayEnsName, setDisplayEnsName] = useState<string>();
+  const [isCopied, setIsCopied] = useState(false);
   const [delegate, setDelegate] = useState("");
   const [same, setSame] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -639,7 +641,7 @@ function SpecificDelegate({ props }: { props: Type }) {
 
                   <Tooltip
                     content="Copy"
-                    placement="right"
+                    placement="bottom"
                     closeDelay={1}
                     showArrow>
                     <span className="px-2 cursor-pointer" color="#3E3D3D">
@@ -648,6 +650,38 @@ function SpecificDelegate({ props }: { props: Type }) {
                       />
                     </span>
                   </Tooltip>
+                  <div className="flex space-x-2">
+                    {/* <span className="p-2 bg-gray-200 rounded-lg text-black">
+                      {typeof window !== "undefined" &&
+                        `${BASE_URL}/${
+                          chain?.name === "Optimism" ? "optimism" : "arbitrum"
+                        }/${address}?active=info`}
+                      Copy to Share Profile URL on Warpcast
+                    </span> */}
+                    <Tooltip
+                      content="Copy profile URL to share on Warpcast or Twitter."
+                      placement="bottom"
+                      closeDelay={1}
+                      showArrow
+                    >
+                      <Button
+                        className="bg-gray-200 hover:bg-gray-300"
+                        onClick={() => {
+                          if (typeof window === "undefined") return;
+                          navigator.clipboard.writeText(
+                            `${BASE_URL}/${props.daoDelegates}/${props.individualDelegate}?active=info`
+                          );
+                          setIsCopied(true);
+                          setTimeout(() => {
+                            setIsCopied(false);
+                          }, 3000);
+                        }}
+                      >
+                        <IoShareSocialSharp />
+                        {isCopied ? "Copied" : "Share profile"}
+                      </Button>
+                    </Tooltip>
+                  </div>
                   <div style={{ zIndex: "21474836462" }}>
                     <Toaster
                       toastOptions={{

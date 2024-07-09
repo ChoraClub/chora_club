@@ -9,7 +9,14 @@ import { ethers } from "ethers";
 import { stringToBytes, bytesToHex } from "viem";
 import axios from "axios";
 import { connectDB } from "@/config/connectDB";
-import { BASE_URL } from "@/config/constants";
+import {
+  ATTESTATION_ARB_URL,
+  ATTESTATION_OP_URL,
+  BASE_URL,
+  OFFCHAIN_ARB_ATTESTATION_BASE_URL,
+  OFFCHAIN_OP_ATTESTATION_BASE_URL,
+  SCHEMA_ID,
+} from "@/config/constants";
 interface MeetingRequestBody {
   host_address: string;
   user_address: string;
@@ -72,9 +79,9 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
     const atstUrl =
       requestData.daoName === "optimism"
-        ? process.env.NEXT_PUBLIC_OP_ATTESTATION_URL
+        ? ATTESTATION_OP_URL
         : requestData.daoName === "arbitrum"
-        ? process.env.NEXT_PUBLIC_ARB_ATTESTATION_URL
+        ? ATTESTATION_ARB_URL
         : "";
     console.log("atstUrl", atstUrl);
     // Set up your ethers provider and signer
@@ -128,8 +135,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
     const offchainAttestation = await offchain.signOffchainAttestation(
       {
-        schema:
-          "0xf9e214a80b66125cad64453abe4cef5263be3a7f01760d0cc72789236fca2b5d",
+        schema: SCHEMA_ID,
         recipient: requestData.recipient,
         time: currentTime,
         expirationTime: expirationTime,
@@ -149,9 +155,9 @@ export async function POST(req: NextRequest, res: NextResponse) {
     let baseUrl = "";
 
     if (requestData.daoName === "optimism") {
-      baseUrl = "https://optimism.easscan.org";
+      baseUrl = OFFCHAIN_OP_ATTESTATION_BASE_URL;
     } else if (requestData.daoName) {
-      baseUrl = "https://arbitrum.easscan.org";
+      baseUrl = OFFCHAIN_ARB_ATTESTATION_BASE_URL;
     }
     const url = baseUrl + createOffchainURL(pkg);
 
@@ -160,7 +166,10 @@ export async function POST(req: NextRequest, res: NextResponse) {
       textJson: JSON.stringify(pkg),
     };
 
+    console.log("base url: ", baseUrl);
+
     let uploadstatus = false;
+    console.log("data: ", data);
     try {
       const response = await axios.post(`${baseUrl}/offchain/store`, data);
       if (response.data) {
@@ -183,7 +192,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
           {
             $set: {
               uid_host: response.data.offchainAttestationId,
-              meeting_status: "Recorded",
             },
           }
         );
@@ -198,7 +206,9 @@ export async function POST(req: NextRequest, res: NextResponse) {
         await collection.findOneAndUpdate(
           {
             meetingId: requestData.meetingId.split("/")[0],
-            "attendees.attendee_address": requestData.recipient,
+            "attendees.attendee_address": {
+              $regex: new RegExp(`^${requestData.recipient}$`, "i"),
+            },
           },
           {
             $set: {
@@ -219,7 +229,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
           {
             $set: {
               uid_host: response.data.offchainAttestationId,
-              meeting_status: "inactive",
             },
           }
         );

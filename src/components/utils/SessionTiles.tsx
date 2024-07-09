@@ -17,7 +17,7 @@ import {
 import { useNetwork, useAccount } from "wagmi";
 import styles from "./Tile.module.css";
 import { ethers } from "ethers";
-import { getEnsName } from "../ConnectWallet/ENSResolver";
+// import { getEnsName } from "../ConnectWallet/ENSResolver";
 import lighthouse from "@lighthouse-web3/sdk";
 import toast from "react-hot-toast";
 import { FaPencil } from "react-icons/fa6";

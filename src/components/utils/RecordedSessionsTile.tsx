@@ -19,8 +19,8 @@ import user7 from "@/assets/images/user/user7.svg";
 import user8 from "@/assets/images/user/user8.svg";
 import user9 from "@/assets/images/user/user9.svg";
 // import { parseISO } from "date-fns";
-import { getEnsName } from "../ConnectWallet/ENSResolver";
 import posterImage from "@/assets/images/daos/thumbnail1.png";
+import { getEnsName } from "@/utils/ENSUtils";
 
 interface meeting {
   meetingData: any;
@@ -207,7 +207,8 @@ function RecordedSessionsTile({ meetingData }: meeting) {
     const fetchEnsNames = async () => {
       const ensNamesMap: any = {};
       for (const data of meetingData) {
-        const ensName = await getEnsName(data.host_address.toLowerCase());
+        const ensNames = await getEnsName(data.host_address.toLowerCase());
+        const ensName = ensNames?.ensNameOrAddress;
         if (ensName) {
           ensNamesMap[data.host_address] = ensName;
         }
@@ -225,9 +226,10 @@ function RecordedSessionsTile({ meetingData }: meeting) {
     const fetchEnsNames = async () => {
       const ensNamesMap: any = {};
       for (const data of meetingData) {
-        const ensName = await getEnsName(
+        const ensNames = await getEnsName(
           data.attendees[0]?.attendee_address.toLowerCase()
         );
+        const ensName = ensNames?.ensNameOrAddress;
         if (ensName) {
           ensNamesMap[data.attendees[0]?.attendee_address] = ensName;
         }

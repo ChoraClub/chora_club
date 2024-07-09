@@ -67,7 +67,7 @@ function ExploreDAOs() {
       "visitedDao",
       JSON.stringify({ ...localData, [formatted]: [formatted, img] })
     );
-    router.push(`/${formatted}?active=delegatesList`);
+    router.push(`/${formatted}?active=about`);
   };
 
   const handleClose = () => {
@@ -124,7 +124,7 @@ function ExploreDAOs() {
           <ExploreDaosSkeletonLoader/>
         ) : (
           <>
-            <div className="grid min-[475px]:grid-cols-2 md:grid-cols-3 lg:grid2cols-4 2xl:grid-cols-5 gap-10 py-8 font-poppins">
+            <div className="grid min-[475px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-10 py-8 font-poppins">
               {daoInfo.length > 0 ? (
                 daoInfo.map((daos: any, index: any) => (
                   <div

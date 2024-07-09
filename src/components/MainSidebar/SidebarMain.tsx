@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
-import logo from "@/assets/images/sidebar/favicon.png";
+import logo from "@/assets/images/daos/CCLogo.png";
+// import logo from "@/assets/images/sidebar/favicon.png";
 import rocket from "@/assets/images/sidebar/rocket.png";
 import sessionIcn from "@/assets/images/sidebar/office.png";
 import office from "@/assets/images/sidebar/Office hour (1).png";
@@ -31,13 +32,12 @@ function Sidebar() {
   // const [isClient, setIsClient] = useState(false);
   const [hasSeenTour, setHasSeenTour] = useState(true);
 
-
   const tourSteps = [
     {
       target: "body",
       content: (
         <p className="text-black-shade-1000 text-left font-normal text-base font-poppins">
-          Let's take a quick tour of Chora Club.
+          Let&apos;s take a quick tour of Chora Club.
         </p>
       ),
       disableBeacon: true,
@@ -145,7 +145,7 @@ function Sidebar() {
       target: "body",
       content: (
         <p className="text-black-shade-1000 text-left font-normal text-base font-poppins">
-          You're all set! Begin your web3 journey now.
+          You&apos;re all set! Begin your web3 journey now.
         </p>
       ),
       disableBeacon: true,
@@ -161,8 +161,6 @@ function Sidebar() {
       // ),
     },
   ];
-
- 
 
   const tourStyles = {
     options: {
@@ -274,31 +272,30 @@ function Sidebar() {
     updatedVisibility[index] = false;
     setBadgeVisibility(updatedVisibility);
   };
-  
+
   const closeTour = () => {
     setIsTourOpen(false);
     setHasSeenTour(true);
-    sessionStorage.setItem("tourSeen", JSON.stringify(true));
+    localStorage.setItem("tourSeen", JSON.stringify(true));
   };
 
   useEffect(() => {
-    const tourSeen = JSON.parse(sessionStorage.getItem("tourSeen") || "false");
+    const tourSeen = JSON.parse(localStorage.getItem("tourSeen") || "false");
     setHasSeenTour(tourSeen);
     if (!tourSeen) {
       setIsTourOpen(true);
     }
   }, []);
 
- 
   return (
     <>
-{!hasSeenTour && (
+      {!hasSeenTour && (
         <Joyride
           steps={tourSteps}
           run={isTourOpen}
-          callback={data => {
+          callback={(data) => {
             const { status } = data;
-            const finishedStatuses = ['finished', 'skipped'];
+            const finishedStatuses = ["finished", "skipped"];
             if (finishedStatuses.includes(status)) {
               closeTour();
             }
@@ -324,7 +321,7 @@ function Sidebar() {
               src={logo}
               alt={"image"}
               width={40}
-              className="xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 logo"
+              className="xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 logo bg-black rounded-full p-1"
             ></Image>
             <Tooltip
               content="DAOs"
@@ -414,7 +411,7 @@ function Sidebar() {
                         className="rounded-md bg-opacity-90"
                         closeDelay={1}
                       >
-                        <Link href={`/${data[0]}?active=delegatesList`}>
+                        <Link href={`/${data[0]}?active=about`}>
                           <Image
                             key={index}
                             src={data[1]}
