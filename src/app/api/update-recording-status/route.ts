@@ -2,14 +2,16 @@ import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/config/connectDB";
 
 export async function PUT(req: NextRequest, res: NextResponse) {
-  const { meetingId, meetingType, recordedStatus } = await req.json();
+  const { meetingId, meetingType, recordedStatus, meetingStatus } =
+    await req.json();
   // const meetingId = req.url.split("update-meeting-status/")[1];
 
   console.log(
     "meetingId, meetingType, recordedStatus: ",
     meetingId,
     meetingType,
-    recordedStatus
+    recordedStatus,
+    meetingStatus
   );
   try {
     // Connect to MongoDB database
@@ -23,7 +25,11 @@ export async function PUT(req: NextRequest, res: NextResponse) {
     if (collectionName === "office_hours") {
       const officeHours = await collection.findOneAndUpdate(
         { meetingId },
-        { $set: { isMeetingRecorded: recordedStatus } }
+        {
+          $set: {
+            isMeetingRecorded: recordedStatus,
+          },
+        }
       );
 
       client.close();
@@ -32,7 +38,12 @@ export async function PUT(req: NextRequest, res: NextResponse) {
     } else if (collectionName === "meetings") {
       const sessions = await collection.findOneAndUpdate(
         { meetingId },
-        { $set: { isMeetingRecorded: recordedStatus } }
+        {
+          $set: {
+            isMeetingRecorded: recordedStatus,
+            meeting_status: meetingStatus,
+          },
+        }
       );
 
       client.close();

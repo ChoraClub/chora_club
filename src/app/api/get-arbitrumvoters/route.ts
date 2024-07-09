@@ -4,7 +4,8 @@ export const GET = async (req: NextRequest) => {
     const url = new URL(req.url);
     const proposalId = url.searchParams.get('proposalId');
     const lastCursor = url.searchParams.get('lastCursor');
-  
+    console.log("proposalId", proposalId);
+    console.log("lastCursor", lastCursor);
 
     if (!proposalId) {
         return NextResponse.json({ error: 'Proposal ID is required' }, { status: 400 });
@@ -14,7 +15,7 @@ export const GET = async (req: NextRequest) => {
         query ProposalVotesCastList($input: VotesInput!) {
             votes(input: $input) {
                 nodes {
-                    ... on Vote {
+                    ... on VoteV2 {
                         voter {
                             name
                             picture
@@ -64,6 +65,7 @@ export const GET = async (req: NextRequest) => {
         });
 
         const data = await response.json();
+        console.log("data", data);
 
         if (response.ok) {
             return NextResponse.json({
