@@ -438,19 +438,19 @@ function Sidebar() {
             </div>
           </div>
           <div className="flex flex-col items-center gap-y-4 pt-5">
-            <Tooltip
-              content={<div className="capitalize">Notifications</div>}
-              placement="right"
-              className="rounded-md bg-opacity-90"
-              closeDelay={1}
+            <Badge
+              content={notificationCount}
+              color="danger"
+              placement="top-right"
+              size="md"
+              isInvisible={notificationCount === 0}
+              className="border-none bg-blue-shade-200 translate-x-1.5 -translate-y-1.5"
             >
-              <Badge
-                content={notificationCount}
-                color="danger"
-                placement="top-right"
-                size="md"
-                isInvisible={notificationCount === 0}
-                className="border-none bg-blue-shade-200 translate-x-1.5 -translate-y-1.5"
+              <Tooltip
+                content={<div className="capitalize">Notifications</div>}
+                placement="right"
+                className="rounded-md bg-opacity-90"
+                closeDelay={1}
               >
                 <div
                   className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 bg-white rounded-full flex justify-center items-center `}
@@ -458,8 +458,8 @@ function Sidebar() {
                 >
                   <IoMdNotifications className="size-6 text-blue-shade-200" />
                 </div>
-              </Badge>
-            </Tooltip>
+              </Tooltip>
+            </Badge>
             <Tooltip
               content={<div className="capitalize">Git Book</div>}
               placement="right"
