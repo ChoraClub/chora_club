@@ -12,15 +12,33 @@ import rehypeSanitize from "rehype-sanitize";
 
 
 const StyledMDEditorWrapper = styled.div`
+.w-md-editor {
+    background-color: white !important;
+    color: black !important;
+  }
+
+  .w-md-editor-text-pre,
+  .w-md-editor-text-input,
+  .w-md-editor-text {
+    color: black !important;
+  }
+
+  .wmde-markdown {
+    background-color: white !important;
+    color: black !important;
+  }
+
   .w-md-editor-toolbar {
     height: 40px !important;
     border-radius: 20px 20px 0 0 !important;
+    background-color: white !important;
   }
 
   .w-md-editor-toolbar svg {
     width: 18px !important;
     height: 18px !important;
     margin: 0 6px 2px 6px !important;
+    color: black !important;
   }
 
   .w-md-editor {
@@ -375,8 +393,7 @@ function UserInfo({
               ? "text-[#3E3D3D] font-bold"
               : "text-[#7C7C7C]"
           } `}
-          onClick={() => fetchAttestation("onchain")}
-        >
+          onClick={() => fetchAttestation("onchain")}>
           Onchain
         </button>
         <button
@@ -385,8 +402,7 @@ function UserInfo({
               ? "text-[#3E3D3D] font-bold"
               : "text-[#7C7C7C]"
           }`}
-          onClick={() => fetchAttestation("offchain")}
-        >
+          onClick={() => fetchAttestation("offchain")}>
           Offchain
         </button>
       </div>
@@ -396,8 +412,7 @@ function UserInfo({
             <div
               key={index}
               className={`bg-[#3E3D3D] text-white rounded-2xl px-3 py-7 cursor-pointer`}
-              onClick={() => router.push(`${key.ref}`)}
-            >
+              onClick={() => router.push(`${key.ref}`)}>
               <div className="font-semibold text-3xl text-center pb-2">
                 {isSessionHostedLoading &&
                 isSessionAttendedLoading &&
@@ -489,8 +504,7 @@ function UserInfo({
               </button>
             <button
               className="bg-blue-shade-100 text-white text-sm py-1 px-3 rounded-full font-semibold"
-              onClick={handleSaveClick}
-            >
+              onClick={handleSaveClick}>
               {loading ? "Saving" : "Save"}
             </button>
             </>
