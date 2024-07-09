@@ -17,7 +17,7 @@ import styles from "@/components/IndividualDelegate/DelegateVotes.module.css";
 import { FaArrowUp } from "react-icons/fa6";
 import { useConnectModal, useChainModal } from "@rainbow-me/rainbowkit";
 import dao_abi from "../../artifacts/Dao.sol/GovernanceToken.json";
-import { useAccount } from "wagmi";
+import { useAccount, useNetwork } from "wagmi";
 import WalletAndPublicClient from "@/helpers/signer";
 // import { getEnsNameOfUser } from "../ConnectWallet/ENSResolver";
 import {
@@ -27,13 +27,19 @@ import {
   fetchEnsAvatar,
 } from "@/utils/ENSUtils";
 import DelegateListSkeletonLoader from "../SkeletonLoader/DelegateListSkeletonLoader";
+import DelegateTileModal from "../utils/delegateTileModal";
+import {
+  arb_client,
+  DELEGATE_CHANGED_QUERY,
+  op_client,
+} from "@/config/constants";
 
 function DelegatesList({ props }: { props: string }) {
   const [delegateData, setDelegateData] = useState<any>({ delegates: [] });
   const { openChainModal } = useChainModal();
   const { publicClient, walletClient } = WalletAndPublicClient();
   const { openConnectModal } = useConnectModal();
-  const { isConnected, address } = useAccount();
+  const { isConnected } = useAccount();
   const [tempData, setTempData] = useState<any>({ delegates: [] });
   const [searchResults, setSearchResults] = useState<any>({ delegates: [] });
   const [searchQuery, setSearchQuery] = useState("");
@@ -46,9 +52,18 @@ function DelegatesList({ props }: { props: string }) {
   const [isShowing, setIsShowing] = useState(true);
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [lastCursor, setLastCursor] = useState<string | null>(null);
+  const [delegateOpen, setDelegateOpen] = useState(false);
+  const [delegateDetails, setDelegateDetails] = useState<any>();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [same, setSame] = useState(false);
+  const { chain, chains } = useNetwork();
+  const [delegateInfo, setDelegateInfo] = useState<any>();
+  const [selectedDelegate, setSelectedDelegate] = useState<any>(null);
 
-  // const [circlePosition, setCirclePosition] = useState({ x: 0, y: 0 });
-  // const [clickedTileIndex,setClickedTileIndex]=useState(null);
+  // const address = "0xa2d590fee197c0b614fe7c3e10303327f38c0dc3";
+  // const address = "0xc622420AD9dE8E595694413F24731Dd877eb84E1";
+  const address = useAccount();
 
   const handleClose = () => {
     setIsShowing(false);
@@ -113,7 +128,7 @@ function DelegatesList({ props }: { props: string }) {
             daoInfo.map(async (delegate: any) => {
               // const ensName = await getEnsNameOfUser(delegate._id);
               const avatar = await fetchEnsAvatar(delegate._id);
-              console.log("avatar", avatar);
+              // console.log("avatar", avatar);
               return {
                 delegate: delegate._id,
                 adjustedBalance: delegate.adjustedBalance,
@@ -409,6 +424,120 @@ function DelegatesList({ props }: { props: string }) {
     }
   };
 
+  const handleDelegateModal = async (delegateObject: any) => {
+    setSelectedDelegate(delegateObject);
+    console.log("delegateObject----------", delegateObject);
+    if (!isConnected) {
+      if (openConnectModal) {
+        openConnectModal();
+      }
+    } else {
+      console.log(delegateObject.delegate);
+      setDelegateOpen(true);
+      // setLoading(true);
+      try {
+        let data: any;
+        if (props === "optimism") {
+          data = await op_client.query(DELEGATE_CHANGED_QUERY, {
+            delegator: address,
+          });
+        } else {
+          data = await arb_client.query(DELEGATE_CHANGED_QUERY, {
+            delegator: address,
+          });
+        }
+        // const ens = await getEnsNameOfUser(
+        //   data.delegateChangeds[0]?.toDelegate
+        // );
+        console.log("data of individual delegate: ", data.data);
+        const delegate = data.data.delegateChangeds[0]?.toDelegate;
+        console.log("individualDelegate", delegate);
+        setSame(
+          delegate.toLowerCase() === delegateObject.delegate.toLowerCase()
+        );
+        // ens
+        // ? setDelegate(ens)
+        // :
+        console.log("delegate N/A: ", delegate);
+        setDelegateDetails(delegate);
+        setError(null);
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        // setLoading(false);
+      }
+
+      setDelegateOpen(true);
+    }
+  };
+
+  const handleCloseDelegateModal = () => {
+    setSelectedDelegate(null);
+    setDelegateOpen(false);
+  };
+
+  const handleDelegateVotes = async (to: string) => {
+    let address;
+    let address1;
+
+    try {
+      address = await walletClient.getAddresses();
+      address1 = address[0];
+    } catch (error) {
+      console.error("Error getting addresses:", error);
+      toast.error("Please connect your MetaMask wallet!");
+      return;
+    }
+
+    if (!address1) {
+      toast.error("Please connect your MetaMask wallet!");
+      return;
+    }
+
+    console.log("address", address);
+    console.log("address1", address1);
+    console.log("to: ", to);
+
+    let chainAddress;
+    if (chain?.name === "Optimism") {
+      chainAddress = "0x4200000000000000000000000000000000000042";
+    } else if (chain?.name === "Arbitrum One") {
+      chainAddress = "0x912CE59144191C1204E64559FE8253a0e49E6548";
+    } else {
+      return;
+    }
+
+    console.log("walletClient?.chain?.network", walletClient?.chain?.network);
+
+    if (walletClient?.chain === "") {
+      toast.error("Please connect your wallet!");
+    } else {
+      if (walletClient?.chain?.network === props) {
+        try {
+          const delegateTx = await walletClient.writeContract({
+            address: chainAddress,
+            abi: dao_abi.abi,
+            functionName: "delegate",
+            args: [to],
+            account: address1,
+          });
+
+          console.log(delegateTx);
+          handleCloseDelegateModal();
+        } catch (error) {
+          toast.error("Transaction failed");
+          handleCloseDelegateModal();
+        }
+      } else {
+        toast.error("Please switch to appropriate network to delegate!");
+
+        if (openChainModal) {
+          openChainModal();
+        }
+      }
+    }
+  };
+
   return (
     <div>
       {isShowing && (
@@ -477,141 +606,166 @@ function DelegatesList({ props }: { props: string }) {
             <div className="grid min-[475px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-10">
               {console.log("data............", delegateData)}
               {delegateData.delegates.map((delegate: any, index: number) => (
-                <div
-                  onClick={(event) => {
-                    // handleMouseMove(event,index);
-                    router.push(`/${props}/${delegate.delegate}?active=info  `);
-                  }}
-                  key={index}
-                  style={{
-                    boxShadow: "0px 4px 50.8px 0px rgba(0, 0, 0, 0.11)",
-                  }}
-                  className="px-5 py-7 rounded-2xl flex flex-col justify-between cursor-pointer relative"
-                >
-                  {/* {clickedTileIndex === index && (
-                    <div
-                    className="absolute bg-blue-200 rounded-full animate-ping"
+                <>
+                  <div
+                    onClick={(event) => {
+                      // handleMouseMove(event,index);
+                      router.push(
+                        `/${props}/${delegate.delegate}?active=info  `
+                      );
+                    }}
+                    key={index}
                     style={{
-                    width: "30px",
-                    height: "30px",
-                    left: `${circlePosition.x -10}px`,
-                    top: `${circlePosition.y - 10}px`,
-                    zIndex: "9999",
-                   }}
-                   ></div>
-                  )} */}
-                  <div>
-                    <div className="flex justify-center relative">
-                      <Image
-                        src={
-                          delegate?.profilePicture == null
-                            ? props == "optimism"
-                              ? OPLogo
-                              : props == "arbitrum"
-                              ? ARBLogo
-                              : ""
-                            : delegate.profilePicture
-                        }
-                        alt="Image not found"
-                        width={80}
-                        height={80}
-                        className="rounded-full"
-                      ></Image>
+                      boxShadow: "0px 4px 50.8px 0px rgba(0, 0, 0, 0.11)",
+                    }}
+                    className="px-5 py-7 rounded-2xl flex flex-col justify-between cursor-pointer relative"
+                  >
+                    <div>
+                      <div className="flex justify-center relative">
+                        <Image
+                          src={
+                            delegate?.profilePicture == null
+                              ? props == "optimism"
+                                ? OPLogo
+                                : props == "arbitrum"
+                                ? ARBLogo
+                                : ""
+                              : delegate.profilePicture
+                          }
+                          alt="Image not found"
+                          width={80}
+                          height={80}
+                          className="rounded-full"
+                        ></Image>
 
-                      <Image
-                        src={ccLogo}
-                        alt="ChoraClub Logo"
-                        className="absolute top-0 right-0"
-                        style={{
-                          width: "35px",
-                          height: "35px",
-                          marginTop: "-20px",
-                          marginRight: "-5px",
-                        }}
-                      />
-                    </div>
-                    <div className="text-center">
-                      <div className="py-3">
-                        <div
-                          className={`font-semibold overflow-hidden ${styles.desc}`}
-                        >
-                          {!delegate?.ensName ? (
-                            <span>
-                              {delegate.delegate?.slice(0, 6) +
-                                "..." +
-                                delegate.delegate?.slice(-4)}
-                            </span>
-                          ) : (
-                            <span>
-                              {delegate.ensName ===
-                              "[693c70956042e4295f0c73589e9ac0850b5b7d276a02639b83331ec323549b88].sismo.eth"
-                                ? "lindajxie.eth"
-                                : delegate.ensName.length > 15
-                                ? delegate.ensName.slice(0, 15) + "..."
-                                : delegate.ensName}
-                              {/* {delegate.ensName.length > 15
+                        <Image
+                          src={ccLogo}
+                          alt="ChoraClub Logo"
+                          className="absolute top-0 right-0"
+                          style={{
+                            width: "35px",
+                            height: "35px",
+                            marginTop: "-20px",
+                            marginRight: "-5px",
+                          }}
+                        />
+                      </div>
+                      <div className="text-center">
+                        <div className="py-3">
+                          <div
+                            className={`font-semibold overflow-hidden ${styles.desc}`}
+                          >
+                            {!delegate?.ensName ? (
+                              <span>
+                                {delegate.delegate?.slice(0, 6) +
+                                  "..." +
+                                  delegate.delegate?.slice(-4)}
+                              </span>
+                            ) : (
+                              <span>
+                                {delegate.ensName ===
+                                "[693c70956042e4295f0c73589e9ac0850b5b7d276a02639b83331ec323549b88].sismo.eth"
+                                  ? "lindajxie.eth"
+                                  : delegate.ensName.length > 15
+                                  ? delegate.ensName.slice(0, 15) + "..."
+                                  : delegate.ensName}
+                                {/* {delegate.ensName.length > 15
                                 ? delegate.ensName.slice(0, 15) + "..."
                                 : delegate.ensName} */}
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex justify-center items-center gap-2 pb-2 pt-1">
+                            {delegate.delegate?.slice(0, 6) +
+                              "..." +
+                              delegate.delegate?.slice(-4)}
+                            <Tooltip
+                              content="Copy"
+                              placement="right"
+                              closeDelay={1}
+                              showArrow
+                            >
+                              <span className="cursor-pointer text-sm">
+                                <IoCopy
+                                  onClick={(event) => {
+                                    event.stopPropagation();
+                                    handleCopy(delegate.delegate);
+                                  }}
+                                />
+                              </span>
+                            </Tooltip>
+                          </div>
+                          <div className="text-sm border border-[#D9D9D9] py-2 px-1 rounded-lg w-full">
+                            <span className="text-blue-shade-200 font-semibold">
+                              {formatNumber(delegate.adjustedBalance)}&nbsp;
                             </span>
-                          )}
-                        </div>
-                        <div className="flex justify-center items-center gap-2 pb-2 pt-1">
-                          {delegate.delegate?.slice(0, 6) +
-                            "..." +
-                            delegate.delegate?.slice(-4)}
-                          <Tooltip
-                            content="Copy"
-                            placement="right"
-                            closeDelay={1}
-                            showArrow
-                          >
-                            <span className="cursor-pointer text-sm">
-                              <IoCopy
-                                onClick={(event) => {
-                                  event.stopPropagation();
-                                  handleCopy(delegate.delegate);
-                                }}
-                              />
-                            </span>
-                          </Tooltip>
-                        </div>
-                        <div className="text-sm border border-[#D9D9D9] py-2 px-1 rounded-lg w-full">
-                          <span className="text-blue-shade-200 font-semibold">
-                            {formatNumber(delegate.adjustedBalance)}&nbsp;
-                          </span>
-                          delegated tokens
+                            delegated tokens
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                  <div>
                     <div>
-                      <button
-                        className="bg-blue-shade-100 text-white font-poppins w-full rounded-[4px] text-sm py-1 font-medium"
-                        onClick={(event) => {
-                          event.stopPropagation(); // Prevent event propagation to parent container
-                          WalletOpen(delegate.delegate);
+                      <div>
+                        <button
+                          className="bg-blue-shade-100 text-white font-poppins w-full rounded-[4px] text-sm py-1 font-medium"
+                          onClick={(event) => {
+                            event.stopPropagation(); // Prevent event propagation to parent container
+                            handleDelegateModal(delegate);
+                          }}
+                        >
+                          Delegate
+                        </button>
+                      </div>
+                    </div>
+                    <div style={{ zIndex: "21474836462" }}>
+                      <Toaster
+                        toastOptions={{
+                          style: {
+                            fontSize: "14px",
+                            backgroundColor: "#3E3D3D",
+                            color: "#fff",
+                            boxShadow: "none",
+                            borderRadius: "50px",
+                            padding: "3px 5px",
+                          },
                         }}
-                      >
-                        Delegate
-                      </button>
+                      />
                     </div>
                   </div>
-                  <div style={{ zIndex: "21474836462" }}>
-                    <Toaster
-                      toastOptions={{
-                        style: {
-                          fontSize: "14px",
-                          backgroundColor: "#3E3D3D",
-                          color: "#fff",
-                          boxShadow: "none",
-                          borderRadius: "50px",
-                          padding: "3px 5px",
-                        },
-                      }}
+                  {delegateOpen && (
+                    <DelegateTileModal
+                      isOpen={delegateOpen}
+                      closeModal={handleCloseDelegateModal}
+                      handleDelegateVotes={() =>
+                        handleDelegateVotes(`${selectedDelegate.delegate}`)
+                      }
+                      fromDelegate={delegateDetails ? delegateDetails : "N/A"}
+                      delegateName={
+                        !selectedDelegate?.ensName
+                          ? selectedDelegate.delegate?.slice(0, 6) +
+                            "..." +
+                            selectedDelegate.delegate?.slice(-4)
+                          : selectedDelegate.ensName ===
+                            "[693c70956042e4295f0c73589e9ac0850b5b7d276a02639b83331ec323549b88].sismo.eth"
+                          ? "lindajxie.eth"
+                          : selectedDelegate.ensName?.length > 15
+                          ? selectedDelegate.ensName?.slice(0, 15) + "..."
+                          : selectedDelegate.ensName
+                      }
+                      displayImage={
+                        selectedDelegate?.profilePicture == null
+                          ? props == "optimism"
+                            ? OPLogo
+                            : props == "arbitrum"
+                            ? ARBLogo
+                            : ""
+                          : selectedDelegate.profilePicture
+                      }
+                      daoName={props}
+                      addressCheck={same}
                     />
-                  </div>
-                </div>
+                  )}
+                </>
               ))}
             </div>
 
