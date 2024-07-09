@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
+// import { useRouter } from "next/navigation";
 import { useRouter } from "next-nprogress-bar";
 import { Tooltip } from "@nextui-org/react";
 import { LuDot } from "react-icons/lu";
@@ -30,15 +31,16 @@ function Proposals({ props }: { props: string }) {
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [canceledProposals, setCanceledProposals] = useState<any[]>([]);
-  const proposalsPerPage = 7;
-  
+  const proposalsPerPage = 5;
+  const [VoterlastCursor, setVoterLastCursor] = useState<string | null>(null);
+
   const VoteLoader = () => (
-    <div className=" flex justify-center items-center w-24">
+    <div className=" flex justify-center items-center ">
       <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-black-shade-900"></div>
     </div>
   );
   const StatusLoader = () => (
-    <div className="flex items-center justify-center w-32">
+    <div className="flex items-end justify-center ">
       <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-black-shade-900"></div>
     </div>
   );
@@ -66,6 +68,8 @@ function Proposals({ props }: { props: string }) {
     const fetchCanacelledProposals = async () => {
       const response = await fetch(`/api/get-canceledproposal`);
       const result = await response.json();
+      console.log("result", result);
+      console.log("result?.data", result[0].proposalId);
       setCanceledProposals(result);
     };
     fetchCanacelledProposals();
@@ -73,32 +77,19 @@ function Proposals({ props }: { props: string }) {
 
   const fetchVotes = useCallback(
     async (proposal: Proposal): Promise<Proposal> => {
-      let allVotes: any[] = [];
-      let skip1 = 0;
-      let skip2 = 0;
-      const limit = 1000;
-      let hasMore = true;
+      if (proposal.votesLoaded || props === "arbitrum") {
+        return proposal;
+      }
 
       try {
-        while (hasMore) {
-          const response = await fetch(
-            `/api/get-voters?proposalId=${proposal.proposalId}&skip1=${skip1}&skip2=${skip2}&first=${limit}&dao=${props}`
-          );
-          const data = await response.json();
-
-          const newVotes = [
-            ...(data?.voteCastWithParams || []),
-            ...(data?.voteCasts || []),
-          ];
-
-          if (newVotes.length === 0) {
-            hasMore = false;
-          } else {
-            allVotes = [...allVotes, ...newVotes];
-            skip1 += data?.voteCastWithParams?.length || 0;
-            skip2 += data?.voteCasts?.length || 0;
-          }
-        }
+        const response = await fetch(
+          `/api/get-voters?proposalId=${proposal.proposalId}&skip1=0&skip2=0&first=1000`
+        );
+        const data = await response.json();
+        const allVotes = [
+          ...(data?.voteCastWithParams || []),
+          ...(data?.voteCasts || []),
+        ];
 
         let s0Weight = 0;
         let s1Weight = 0;
@@ -114,6 +105,7 @@ function Proposals({ props }: { props: string }) {
             s2Weight += weightInEther;
           }
         });
+
         return {
           ...proposal,
           support0Weight: s0Weight,
@@ -128,7 +120,9 @@ function Proposals({ props }: { props: string }) {
       }
     },
     [props]
-  ); const fetchProposals = async () => {
+  );
+
+  const fetchProposals = async () => {
     setLoading(true);
     try {
       let response;
@@ -136,10 +130,13 @@ function Proposals({ props }: { props: string }) {
         response = await fetch("/api/get-proposals");
       } else {
         response = await fetch(
-          `/api/get-arbitrumproposals`
+          `/api/get-arbitrumproposals${
+            VoterlastCursor ? `?lastCursor=${VoterlastCursor}` : ""
+          }`
         );
       }
       const responseData = await response.json();
+
       let newProposals;
       if (props === "optimism") {
         const {
@@ -159,8 +156,30 @@ function Proposals({ props }: { props: string }) {
           votesLoaded: false,
         }));
       } else {
-        newProposals = responseData.data.proposalCreateds;
+        setVoterLastCursor(responseData.proposalsV2?.pageInfo.lastCursor);
+        newProposals = responseData.proposalsV2.nodes.map((node: any) => ({
+          blockTimestamp: new Date(node.block.timestamp).getTime() / 1000,
+          description: node.metadata.description,
+          proposalId: node.id,
+          proposer: node.governor.id.split(":").pop() || "",
+          support0Weight:
+            node.voteStats.find((v: any) => v.type === "against")?.votesCount /
+              10 ** 18 || 0,
+          support1Weight:
+            node.voteStats.find((v: any) => v.type === "for")?.votesCount /
+              10 ** 18 || 0,
+          support2Weight:
+            node.voteStats.find((v: any) => v.type === "abstain")?.votesCount /
+              10 ** 18 || 0,
+          votersCount: node.voteStats.reduce(
+            (acc: any, v: any) => acc + v.votersCount,
+            0
+          ),
+          votesLoaded: true,
+          status: node.status,
+        }));
       }
+
       newProposals.sort(
         (a: any, b: any) => b.blockTimestamp - a.blockTimestamp
       );
@@ -187,12 +206,32 @@ function Proposals({ props }: { props: string }) {
     }
   };
 
+  const loadMoreProposal = () => {
+    const currentLength = displayedProposals.length;
+    const moreProposals = allProposals.slice(
+      currentLength,
+      currentLength + proposalsPerPage
+    );
+    setDisplayedProposals((prevProposals) => [
+      ...prevProposals,
+      ...moreProposals,
+    ]);
+
+    if (
+      currentLength + proposalsPerPage >= allProposals.length &&
+      props !== "optimism"
+    ) {
+      fetchProposals();
+    }
+  };
   useEffect(() => {
     fetchProposals();
   }, [props]);
 
   useEffect(() => {
     const fetchVotesForDisplayedProposals = async () => {
+      if (props === "arbitrum") return; // Skip for Arbitrum as votes are already loaded
+
       setLoading(true);
       try {
         const updatedProposals = await Promise.all(
@@ -246,32 +285,23 @@ function Proposals({ props }: { props: string }) {
     }
   }, [props, allProposals, currentPage, displayedProposals.length]);
 
-const truncateText = (text: string, charLimit: number) => {
-  // Remove all '#' characters from the text
-  const cleanedText = text.replace(/#/g, '');
-  
-  // Truncate the cleaned text if necessary
-  return cleanedText.length <= charLimit ? cleanedText : cleanedText.slice(0, charLimit) + "...";
-};
-
+  const truncateText = (text: string, charLimit: number) => {
+    return text.length <= charLimit ? text : text.slice(0, charLimit) + "...";
+  };
 
   const formatDate = (timestamp: number) => {
-    // Convert IST timestamp to UTC
-    const utcTimestamp = timestamp - (5.5 * 60 * 60); // Subtract 5 hours and 30 minutes
-    
-    const date = new Date(utcTimestamp * 1000);
-    const day = date.getUTCDate();
-    const month = date.toLocaleString("en-US", { month: "long", timeZone: "UTC" });
-    const year = date.getUTCFullYear();
-    let hours: number | string = date.getUTCHours();
-    const minutes = String(date.getUTCMinutes()).padStart(2, "0");
-    const seconds = String(date.getUTCSeconds()).padStart(2, "0");
+    const date = new Date(timestamp * 1000);
+    const day = date.getDate();
+    const month = date.toLocaleString("default", { month: "long" });
+    const year = date.getFullYear();
+    let hours: number | string = date.getHours();
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    const seconds = String(date.getSeconds()).padStart(2, "0");
     const ampm = hours >= 12 ? "PM" : "AM";
     hours = hours % 12 || 12;
     hours = String(hours).padStart(2, "0");
-    
-    return `${day} ${month}, ${year} ${hours}:${minutes}:${seconds} ${ampm} UTC`;
-};
+    return `${day} ${month}, ${year} ${hours}:${minutes}:${seconds} ${ampm}`;
+  };
 
   if (loading && displayedProposals.length === 0)
     return <ProposalsSkeletonLoader />;
@@ -319,25 +349,32 @@ const truncateText = (text: string, charLimit: number) => {
               </Tooltip>
               {proposal.votesLoaded ? (
                 <div
-                  className={`rounded-full flex items-center justify-center text-xs h-fit py-0.5 border font-medium w-24 ${props === "optimism" &&
-                      canceledProposals.some(
-                        (item) => item.proposalId === proposal.proposalId
-                      )
+                  className={`rounded-full flex items-end justify-center text-xs h-fit py-0.5 border font-medium w-24 ${
+                    props === "optimism" &&
+                    canceledProposals.some(
+                      (item) => item.proposalId === proposal.proposalId
+                    )
                       ? "bg-red-200 border-red-500 text-red-500"
-                      : proposal.support1Weight! > proposal.support0Weight!
+                      : props === "arbitrum"
+                      ? proposal.status === "executed" ||
+                        proposal.status === "succeeded"
                         ? "bg-green-200 border-green-600 text-green-600"
                         : "bg-red-200 border-red-500 text-red-500"
-                    }`}
+                      : proposal.support1Weight! > proposal.support0Weight!
+                      ? "bg-green-200 border-green-600 text-green-600"
+                      : "bg-red-200 border-red-500 text-red-500"
+                  }`}
                 >
-                  {
-                    new Date() > new Date(proposal.blockTimestamp * 1000 + 7 * 24 * 60 * 60 * 1000)
-                      ? canceledProposals.some((item) => item.proposalId === proposal.proposalId)
-                        ? "CANCELLED"
-                        : proposal.support1Weight! > proposal.support0Weight!
-                          ? "SUCCEEDED"
-                          : "DEFEATED"
-                      : "PENDING"
-                  }
+                  {props === "optimism" &&
+                  canceledProposals.some(
+                    (item) => item.proposalId === proposal.proposalId
+                  )
+                    ? "CANCELLED"
+                    : props === "arbitrum"
+                    ? proposal.status?.toUpperCase()
+                    : proposal.support1Weight! > proposal.support0Weight!
+                    ? "SUCCEEDED"
+                    : "DEFEATED"}
                 </div>
               ) : (
                 <StatusLoader />
@@ -345,12 +382,20 @@ const truncateText = (text: string, charLimit: number) => {
 
               {proposal.votesLoaded ? (
                 <div
-                  className={`bg-[#dbf8d4] border border-[#639b55] py-0.5 rounded-md text-sm font-medium flex justify-center items-center w-32 ${proposal.support1Weight! > proposal.support0Weight!
+                  className={`bg-[#dbf8d4] border border-[#639b55] py-0.5 rounded-md text-sm font-medium flex justify-center items-center w-32 ${
+                    props === "arbitrum"
+                      ? proposal.status === "executed" ||
+                        proposal.status === "succeeded"
+                        ? "text-[#639b55] border-[#639b55] bg-[#dbf8d4]"
+                        : "bg-[#fa989a] text-[#e13b15] border-[#e13b15]"
+                      : proposal.support1Weight! > proposal.support0Weight!
                       ? "text-[#639b55] border-[#639b55] bg-[#dbf8d4]"
                       : "bg-[#fa989a] text-[#e13b15] border-[#e13b15]"
-                    }`}
+                  }`}
                 >
-                  {proposal.support1Weight! > proposal.support0Weight!
+                  {props === "arbitrum"
+                    ? `${formatWeight(Number(proposal.support1Weight))} FOR`
+                    : proposal.support1Weight! > proposal.support0Weight!
                     ? `${formatWeight(proposal.support1Weight!)} FOR`
                     : `${formatWeight(proposal.support0Weight!)} AGAINST`}
                 </div>
@@ -360,9 +405,9 @@ const truncateText = (text: string, charLimit: number) => {
 
               <div className="rounded-full bg-[#f4d3f9] border border-[#77367a] flex items-center justify-center text-[#77367a] text-xs h-fit py-0.5 font-medium px-2">
                 {new Date() >
-                  new Date(
-                    proposal.blockTimestamp * 1000 + 7 * 24 * 60 * 60 * 1000
-                  )
+                new Date(
+                  proposal.blockTimestamp * 1000 + 7 * 24 * 60 * 60 * 1000
+                )
                   ? "Closed"
                   : "Active"}
               </div>
