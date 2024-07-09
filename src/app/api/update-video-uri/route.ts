@@ -31,17 +31,17 @@ export async function POST(req: NextRequest, res: NextApiResponse) {
         { status: 404 }
       );
     }
-    // Call the FastAPI endpoint to process the video URL
-    const response = await axios.post(`${process.env.DESC_GENERATION_BASE_URL}/analyze`, {
-      url: video_uri,
-    });
+    // // Call the FastAPI endpoint to process the video URL
+    // const response = await axios.post(`${process.env.DESC_GENERATION_BASE_URL}/analyze`, {
+    //   url: video_uri,
+    // });
 
-    const { title, description } = response.data;
+    // const { title, description } = response.data;
 
-    await otherCollection.findOneAndUpdate(
-      { meetingId },
-      { $set: { title, description } }
-    );
+    // await otherCollection.findOneAndUpdate(
+    //   { meetingId },
+    //   { $set: { title, description } }
+    // );
 
     // Close MongoDB client
     await client.close();

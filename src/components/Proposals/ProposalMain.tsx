@@ -183,12 +183,11 @@ function ProposalMain({ props }: { props: Props }) {
         setLoading(true);
         setError(null);
         try {
-
           const response = await fetch(
             `/api/get-proposals?proposalId=${props.id}`
           );
           const result = await response.json();
- 
+
           const {
             proposalCreated1S,
             proposalCreated2S,
@@ -220,17 +219,13 @@ function ProposalMain({ props }: { props: Props }) {
             `/api/get-arbitrumproposals?proposalId=${props.id}`
           );
           const result = await response.json();
-          setData(result.data.proposalCreateds[0])
-
+          setData(result.data.proposalCreateds[0]);
         } catch (err: any) {
           setError(err.message);
-
         }
       }
 
-
       setLoading(false);
-
     };
     fetchDescription();
   }, [props]);
@@ -296,9 +291,7 @@ function ProposalMain({ props }: { props: Props }) {
   }, []);
 
   useEffect(() => {
-
     fetchVotes();
-
   }, []);
 
   const formatDate = (timestamp: any) => {
@@ -314,7 +307,6 @@ function ProposalMain({ props }: { props: Props }) {
     hours = String(hours).padStart(2, "0"); // Pad hours with leading zero if necessary
     return `${day} ${month}, ${year} ${hours}:${minutes}:${seconds} ${ampm}`;
   };
-
 
   // New useEffect to handle chart data processing
   const formatWeight = (weight: number | string): string => {
@@ -420,13 +412,12 @@ function ProposalMain({ props }: { props: Props }) {
   };
 
   const handleTransactionClick = (transactionHash: any) => {
-    isArbitrum ? window.open(
-      `https://arbiscan.io/tx/${transactionHash}`,
-      "_blank") :
-      window.open(
-        `https://optimistic.etherscan.io/tx/${transactionHash}`,
-        "_blank"
-      );
+    isArbitrum
+      ? window.open(`https://arbiscan.io/tx/${transactionHash}`, "_blank")
+      : window.open(
+          `https://optimistic.etherscan.io/tx/${transactionHash}`,
+          "_blank"
+        );
   };
 
   const shareOnTwitter = () => {
@@ -442,10 +433,9 @@ function ProposalMain({ props }: { props: Props }) {
   };
 
   const handleAddressClick = (address: any) => {
-    if(props.daoDelegates === "optimism"){
-
+    if (props.daoDelegates === "optimism") {
       router.push(`/optimism/${address}?active=info`);
-    }else{
+    } else {
       router.push(`/arbitrum/${address}?active=info`);
     }
     // window.location.href = `/optimism/${address}?active=info`;
@@ -457,10 +447,12 @@ function ProposalMain({ props }: { props: Props }) {
 
   const truncateText = (text: string, charLimit: number) => {
     // Remove all '#' characters from the text
-    const cleanedText = text.replace(/#/g, '');
-    
+    const cleanedText = text.replace(/#/g, "");
+
     // Truncate the cleaned text if necessary
-    return cleanedText.length <= charLimit ? cleanedText : cleanedText.slice(0, charLimit) + "...";
+    return cleanedText.length <= charLimit
+      ? cleanedText
+      : cleanedText.slice(0, charLimit) + "...";
   };
 
   return (
@@ -488,8 +480,9 @@ function ProposalMain({ props }: { props: Props }) {
       </div>
 
       <div
-        className={` rounded-[1rem] mx-24 px-12 py-6 transition-shadow duration-300 ease-in-out shadow-xl bg-gray-50 font-poppins relative ${isExpanded ? "h-fit" : "h-fit"
-          }`}
+        className={` rounded-[1rem] mx-24 px-12 py-6 transition-shadow duration-300 ease-in-out shadow-xl bg-gray-50 font-poppins relative ${
+          isExpanded ? "h-fit" : "h-fit"
+        }`}
       >
         <div className="flex items-center ">
           <div className="flex gap-2 items-center">
@@ -512,17 +505,18 @@ function ProposalMain({ props }: { props: Props }) {
           </div>
 
           <div
-            className={`rounded-full flex items-center justify-center text-xs h-fit py-0.5 font-medium px-2 w-fit ml-auto ${data && data.blockTimestamp
+            className={`rounded-full flex items-center justify-center text-xs h-fit py-0.5 font-medium px-2 w-fit ml-auto ${
+              data && data.blockTimestamp
                 ? new Date() >
                   new Date(data.blockTimestamp * 1000 + 7 * 24 * 60 * 60 * 1000)
                   ? "bg-red-100 border border-red-500 text-red-500" // Closed state
                   : "bg-[#f4d3f9] border border-[#77367a] text-[#77367a]" // Active state
                 : "bg-gray-200 animate-pulse  rounded-full" // Loading state
-              }`}
+            }`}
           >
             {data && data.blockTimestamp ? (
               new Date() >
-                new Date(data.blockTimestamp * 1000 + 7 * 24 * 60 * 60 * 1000) ? (
+              new Date(data.blockTimestamp * 1000 + 7 * 24 * 60 * 60 * 1000) ? (
                 "Closed"
               ) : (
                 "Active"
@@ -539,36 +533,38 @@ function ProposalMain({ props }: { props: Props }) {
             ) : (
               <div className="animate-pulse bg-gray-200  h-4 w-32 rounded-full"></div>
             )}
-
           </div>
 
           <div
-            className={`rounded-full flex items-end justify-center text-xs h-fit py-0.5 border font-medium w-24 ${data && support1Weight ?
-                (props.daoDelegates === "optimism" &&
-                  canceledProposals.some(
-                    (item) => item.proposalId === props.id
-                  )
+            className={`rounded-full flex items-end justify-center text-xs h-fit py-0.5 border font-medium w-24 ${
+              data && support1Weight
+                ? props.daoDelegates === "optimism" &&
+                  canceledProposals.some((item) => item.proposalId === props.id)
                   ? "bg-red-200 border-red-500 text-red-500"
                   : support1Weight! > support0Weight!
-                    ? "bg-green-200 border-green-600 text-green-600"
-                    : "bg-red-200 border-red-500 text-red-500") :
-                "bg-gray-200 animate-pulse  rounded-full"
-              }`}
+                  ? "bg-green-200 border-green-600 text-green-600"
+                  : "bg-red-200 border-red-500 text-red-500"
+                : "bg-gray-200 animate-pulse  rounded-full"
+            }`}
           >
-            {data && support1Weight  ?
-              (new Date() > new Date(data.blockTimestamp * 1000 + 7 * 24 * 60 * 60 * 1000)
-                ?
-                (canceledProposals.some(
-                  (item) =>  item.proposalId === props.id
+            {data && support1Weight ? (
+              new Date() >
+              new Date(data.blockTimestamp * 1000 + 7 * 24 * 60 * 60 * 1000) ? (
+                canceledProposals.some(
+                  (item) => item.proposalId === props.id
+                ) ? (
+                  "CANCELLED"
+                ) : support1Weight! > support0Weight! ? (
+                  "SUCCEEDED"
+                ) : (
+                  "DEFEATED"
                 )
-                  ? "CANCELLED"
-                  : support1Weight! > support0Weight!
-                    ? "SUCCEEDED"
-                    : "DEFEATED")
-                : ("PENDING"))
-              : (<div className="h-5 w-20"></div>)
-
-            }
+              ) : (
+                "PENDING"
+              )
+            ) : (
+              <div className="h-5 w-20"></div>
+            )}
           </div>
         </div>
 
@@ -582,8 +578,9 @@ function ProposalMain({ props }: { props: Props }) {
               {/* // data.description */}
               <div
                 ref={contentRef}
-                className={`max-h-full transition-max-height duration-500 ease-in-out overflow-hidden ${isExpanded ? "max-h-full" : "max-h-36"
-                  }`}
+                className={`max-h-full transition-max-height duration-500 ease-in-out overflow-hidden ${
+                  isExpanded ? "max-h-full" : "max-h-36"
+                }`}
               >
                 <div
                   className="description-content"
@@ -611,183 +608,191 @@ function ProposalMain({ props }: { props: Props }) {
       <div className="flex mb-6 ml-24 ">
         <div className="flex gap-8 items-center">
           <div className="h-[500px] w-[45%] font-poppins px-4 flex items-center justify-center rounded-2xl bg-gray-50 transition-shadow duration-300 ease-in-out shadow-xl">
-          {
-  isLoading ? (
-    <ProposalMainVotersSkeletonLoader />
-  ) : (
-    <div
-      className={`flex flex-col gap-2 py-3 pl-3 pr-2 my-3 border-gray-200 ${
-        voterList.length > 5 ? `h-[440px] overflow-y-auto ${style.scrollbar}` : "h-fit"
-      }`}
-    >
-      {voterList.length === 0 ? (
-        <div className="flex items-center justify-center h-full text-gray-500">
-          ⏳ No Participation: This proposal hasn't received any votes yet.
-        </div>
-      ) : (
-        voterList.slice(0, displayCount).map((voter: any, index: any) => (
-          <div
-            className="flex items-center py-6 px-6 bg-white transition-all duration-300 rounded-2xl border-2 border-transparent hover:border-blue-200 transform hover:-translate-y-1 space-x-6"
-            key={index}
-          >
-            <div className="flex-grow flex items-center space-x-4">
-              {isArbitrum ? (
-                <Image
-                  src={user2}
-                  alt="Profile"
-                  className="w-10 h-10 rounded-full"
-                />
-              ) : (
-                <Image
-                  src={user5}
-                  alt="Profile"
-                  className="w-10 h-10 rounded-full"
-                />
-              )}
-
-              <div>
-                <p
-                  onClick={() => handleAddressClick(voter.voter)}
-                  className="text-gray-800 font-medium hover:text-blue-600 transition-colors duration-200 cursor-pointer"
-                >
-                  {voter.voter.slice(0, 6)}...
-                  {voter.voter.slice(-4)}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center space-x-4">
+            {isLoading ? (
+              <ProposalMainVotersSkeletonLoader />
+            ) : (
               <div
-                className={`px-4 py-2 rounded-full text-sm w-36 flex items-center justify-center font-medium ${
-                  voter.support === 1 || voter.type === "for"
-                    ? "bg-green-100 text-green-800"
-                    : "bg-red-100 text-red-800"
+                className={`flex flex-col gap-2 py-3 pl-3 pr-2 my-3 border-gray-200 ${
+                  voterList.length > 5
+                    ? `h-[440px] overflow-y-auto ${style.scrollbar}`
+                    : "h-fit"
                 }`}
               >
-                {formatWeight(voter.weight / 10 ** 18)}
-                &nbsp;
-                {voter.support === 1 ? "For" : "Against"}
+                {voterList.length === 0 ? (
+                  <div className="flex items-center justify-center h-full text-gray-500">
+                    ⏳ No Participation: This proposal hasn&apos;t received any
+                    votes yet.
+                  </div>
+                ) : (
+                  voterList
+                    .slice(0, displayCount)
+                    .map((voter: any, index: any) => (
+                      <div
+                        className="flex items-center py-6 px-6 bg-white transition-all duration-300 rounded-2xl border-2 border-transparent hover:border-blue-200 transform hover:-translate-y-1 space-x-6"
+                        key={index}
+                      >
+                        <div className="flex-grow flex items-center space-x-4">
+                          {isArbitrum ? (
+                            <Image
+                              src={user2}
+                              alt="Profile"
+                              className="w-10 h-10 rounded-full"
+                            />
+                          ) : (
+                            <Image
+                              src={user5}
+                              alt="Profile"
+                              className="w-10 h-10 rounded-full"
+                            />
+                          )}
+
+                          <div>
+                            <p
+                              onClick={() => handleAddressClick(voter.voter)}
+                              className="text-gray-800 font-medium hover:text-blue-600 transition-colors duration-200 cursor-pointer"
+                            >
+                              {voter.voter.slice(0, 6)}...
+                              {voter.voter.slice(-4)}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-4">
+                          <div
+                            className={`px-4 py-2 rounded-full text-sm w-36 flex items-center justify-center font-medium ${
+                              voter.support === 1 || voter.type === "for"
+                                ? "bg-green-100 text-green-800"
+                                : "bg-red-100 text-red-800"
+                            }`}
+                          >
+                            {formatWeight(voter.weight / 10 ** 18)}
+                            &nbsp;
+                            {voter.support === 1 ? "For" : "Against"}
+                          </div>
+                          <Tooltips
+                            showArrow
+                            content={
+                              <div className="font-poppins">
+                                Transaction Hash
+                              </div>
+                            }
+                            placement="right"
+                            className="rounded-md bg-opacity-90"
+                            closeDelay={1}
+                          >
+                            <button
+                              onClick={() =>
+                                handleTransactionClick(voter.transactionHash)
+                              }
+                              className="text-blue-600 hover:text-blue-800 transition-colors duration-200"
+                            >
+                              <RiExternalLinkLine className="w-5 h-5" />
+                            </button>
+                          </Tooltips>
+                        </div>
+                      </div>
+                    ))
+                )}
+                {displayCount <= voterList.length && (
+                  <div className="flex justify-center items-center mt-6">
+                    <button
+                      onClick={loadMore}
+                      className="bg-blue-shade-100 text-white py-2 px-4 w-fit rounded-lg font-medium"
+                    >
+                      Load More
+                    </button>
+                  </div>
+                )}
               </div>
-              <Tooltips
-                showArrow
-                content={<div className="font-poppins">Transaction Hash</div>}
-                placement="right"
-                className="rounded-md bg-opacity-90"
-                closeDelay={1}
-              >
-                <button
-                  onClick={() => handleTransactionClick(voter.transactionHash)}
-                  className="text-blue-600 hover:text-blue-800 transition-colors duration-200"
-                >
-                  <RiExternalLinkLine className="w-5 h-5" />
-                </button>
-              </Tooltips>
+            )}
+          </div>
+
+          {isChartLoading ? (
+            <div
+              className="w-[45vw] h-[500px] flex items-center justify-center bg-gray-50 rounded-2xl"
+              style={{ boxShadow: "0px 4px 26.7px 0px rgba(0, 0, 0, 0.10)" }}
+            >
+              <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-black-shade-900"></div>
             </div>
-          </div>
-        ))
-      )}
-      {displayCount <= voterList.length && (
-        <div className="flex justify-center items-center mt-6">
-          <button
-            onClick={loadMore}
-            className="bg-blue-shade-100 text-white py-2 px-4 w-fit rounded-lg font-medium"
-          >
-            Load More
-          </button>
-        </div>
-      )}
-    </div>
-  )
-}
-
-          </div>
-
-{
-  isChartLoading ? (
-    <div
-      className="w-[45vw] h-[500px] flex items-center justify-center bg-gray-50 rounded-2xl"
-      style={{ boxShadow: "0px 4px 26.7px 0px rgba(0, 0, 0, 0.10)" }}
-    >
-      <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-black-shade-900"></div>
-    </div>
-  ) :voterList && chartData.length === 0 ? (
-    <div
-      className="w-[45vw] h-[500px] flex items-center justify-center bg-gray-50 rounded-2xl"
-      style={{ boxShadow: "0px 4px 26.7px 0px rgba(0, 0, 0, 0.10)" }}
-    >
-      <p className="text-lg font-poppins text-gray-500">📊 Chart Empty: No votes have been recorded on this chart. </p>
-    </div>
-  ) : (
-    <div className="w-[45vw] transition-shadow duration-300 ease-in-out shadow-xl h-[500px] rounded-2xl flex text-sm items-center justify-center bg-gray-50 font-poppins">
-      <ResponsiveContainer width="100%" height={400}>
-        <LineChart
-          data={chartData}
-          margin={{
-            top: 30,
-            right: 30,
-            left: 20,
-            bottom: 30,
-          }}
-        >
-          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-          <XAxis
-            dataKey="name"
-            tick={{ fill: "#718096", fontSize: 12 }}
-            axisLine={{ stroke: "#e2e8f0" }}
-          />
-          <YAxis
-            tickFormatter={formatYAxis}
-            tick={{ fill: "#718096", fontSize: 12 }}
-            axisLine={{ stroke: "#e2e8f0" }}
-          />
-          <Tooltip
-            formatter={(value) => formatWeight(value as number)}
-            contentStyle={{
-              backgroundColor: "rgba(255, 255, 255, 0.8)",
-              border: "none",
-              borderRadius: "0.5rem",
-              boxShadow:
-                "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
-              padding: "10px",
-            }}
-            labelStyle={{ color: "#2d3748", fontWeight: "bold" }}
-          />
-          <Legend
-            wrapperStyle={{
-              paddingTop: "20px",
-            }}
-            iconType="circle"
-          />
-          <Line
-            type="monotone"
-            dataKey="For"
-            stroke="#4CAF50"
-            strokeWidth={3}
-            activeDot={{
-              r: 8,
-              fill: "#4CAF50",
-              stroke: "#fff",
-              strokeWidth: 2,
-            }}
-            dot={{ r: 4, strokeWidth: 2, fill: "#fff" }}
-          />
-          <Line
-            type="monotone"
-            dataKey="Against"
-            stroke="#F44336"
-            strokeWidth={3}
-            activeDot={{
-              r: 8,
-              fill: "#F44336",
-              stroke: "#fff",
-              strokeWidth: 2,
-            }}
-            dot={{ r: 4, strokeWidth: 2, fill: "#fff" }}
-          />
-        </LineChart>
-      </ResponsiveContainer>
-    </div>
-  )
-}
+          ) : voterList && chartData.length === 0 ? (
+            <div
+              className="w-[45vw] h-[500px] flex items-center justify-center bg-gray-50 rounded-2xl"
+              style={{ boxShadow: "0px 4px 26.7px 0px rgba(0, 0, 0, 0.10)" }}
+            >
+              <p className="text-lg font-poppins text-gray-500">
+                📊 Chart Empty: No votes have been recorded on this chart.{" "}
+              </p>
+            </div>
+          ) : (
+            <div className="w-[45vw] transition-shadow duration-300 ease-in-out shadow-xl h-[500px] rounded-2xl flex text-sm items-center justify-center bg-gray-50 font-poppins">
+              <ResponsiveContainer width="100%" height={400}>
+                <LineChart
+                  data={chartData}
+                  margin={{
+                    top: 30,
+                    right: 30,
+                    left: 20,
+                    bottom: 30,
+                  }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                  <XAxis
+                    dataKey="name"
+                    tick={{ fill: "#718096", fontSize: 12 }}
+                    axisLine={{ stroke: "#e2e8f0" }}
+                  />
+                  <YAxis
+                    tickFormatter={formatYAxis}
+                    tick={{ fill: "#718096", fontSize: 12 }}
+                    axisLine={{ stroke: "#e2e8f0" }}
+                  />
+                  <Tooltip
+                    formatter={(value) => formatWeight(value as number)}
+                    contentStyle={{
+                      backgroundColor: "rgba(255, 255, 255, 0.8)",
+                      border: "none",
+                      borderRadius: "0.5rem",
+                      boxShadow:
+                        "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+                      padding: "10px",
+                    }}
+                    labelStyle={{ color: "#2d3748", fontWeight: "bold" }}
+                  />
+                  <Legend
+                    wrapperStyle={{
+                      paddingTop: "20px",
+                    }}
+                    iconType="circle"
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="For"
+                    stroke="#4CAF50"
+                    strokeWidth={3}
+                    activeDot={{
+                      r: 8,
+                      fill: "#4CAF50",
+                      stroke: "#fff",
+                      strokeWidth: 2,
+                    }}
+                    dot={{ r: 4, strokeWidth: 2, fill: "#fff" }}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="Against"
+                    stroke="#F44336"
+                    strokeWidth={3}
+                    activeDot={{
+                      r: 8,
+                      fill: "#F44336",
+                      stroke: "#fff",
+                      strokeWidth: 2,
+                    }}
+                    dot={{ r: 4, strokeWidth: 2, fill: "#fff" }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          )}
         </div>
       </div>
     </>
