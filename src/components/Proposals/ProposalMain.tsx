@@ -80,7 +80,7 @@ function ProposalMain({ props }: { props: Props }) {
   };
 
   useEffect(() => {
-    setIsArbitrum(props?.daoDelegates === "arbitrum"); // Arbitrum One chain ID
+    setIsArbitrum(props?.daoDelegates === "arbitrum"); 
   }, []);
 
   const contentRef = useRef<HTMLDivElement>(null);
