@@ -1,5 +1,3 @@
-import { cacheExchange, createClient, fetchExchange, gql } from "urql";
-
 export const DB_NAME =
   process.env.NODE_ENV == "development"
     ? process.env.DEV_DB
@@ -34,42 +32,6 @@ export const ATTESTATION_ARB_URL =
   process.env.NODE_ENV == "development"
     ? process.env.NEXT_PUBLIC_SEPOLIA_ATTESTATION_URL
     : process.env.NEXT_PUBLIC_ARB_ATTESTATION_URL;
-
-export const arb_client = createClient({
-  url: "https://api.studio.thegraph.com/query/477/arbitrum/v0.0.2 ",
-  exchanges: [cacheExchange, fetchExchange],
-});
-
-export const op_client = createClient({
-  url: "https://api.studio.thegraph.com/query/68573/op/v0.0.1",
-  exchanges: [cacheExchange, fetchExchange],
-});
-
-export const DELEGATE_CHANGED_QUERY = gql`
-  query MyQuery($delegator: String!) {
-    delegateChangeds(
-      orderBy: blockTimestamp
-      orderDirection: desc
-      where: { delegator: $delegator }
-      first: 1
-    ) {
-      toDelegate
-    }
-  }
-`;
-
-export const GET_LATEST_DELEGATE_VOTES_CHANGED = gql`
-  query MyQuery($delegate: String!) {
-    delegateVotesChangeds(
-      first: 1
-      orderBy: blockTimestamp
-      orderDirection: desc
-      where: { delegate: $delegate }
-    ) {
-      newBalance
-    }
-  }
-`;
 
 export const opBlock = [
   {
@@ -159,5 +121,5 @@ export const IMAGE_URL =
 
 // export const ATTESTATION_ARB_URL =
 //   process.env.NODE_ENV == "development"
-//     ? process.env.NEXT_PUBLIC_ARB_ATTESTATION_URL
+//     ? process.env.NEXT_PUBLIC_SEPOLIA_ATTESTATION_URL
 //     : process.env.NEXT_PUBLIC_ARB_ATTESTATION_URL;

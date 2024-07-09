@@ -206,9 +206,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
         await collection.findOneAndUpdate(
           {
             meetingId: requestData.meetingId.split("/")[0],
-            "attendees.attendee_address": {
-              $regex: new RegExp(`^${requestData.recipient}$`, "i"),
-            },
+            "attendees.attendee_address": requestData.recipient,
           },
           {
             $set: {

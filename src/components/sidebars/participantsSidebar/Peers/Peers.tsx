@@ -16,7 +16,7 @@ import CoHostsList from "./SidebarViewPorts/CoHostsList";
 import { Role } from "@huddle01/server-sdk/auth";
 import SpeakersList from "./SidebarViewPorts/SpeakersList";
 import ListenersList from "./SidebarViewPorts/ListenersList";
-import { NestedPeerListIcons } from "@/utils/PeerListIcons";
+import AcceptDenyPeer from "./PeerMetaData/AcceptDenyPeer";
 
 type PeersProps = {};
 
@@ -93,7 +93,7 @@ const MuteMicDiv: React.FC<Props> = ({ onClick }) => (
     onClick={onClick}
     className="flex items-center justify-center border border-custom-4 rounded-lg p-2 gap-2 w-full"
   >
-    <span>{NestedPeerListIcons.inactive.mic}</span>
+    <span>{BasicIcons.off.mic}</span>
     <span className="text-gray-600 text-sm font-semibold">Mute Everyone</span>
   </button>
 );

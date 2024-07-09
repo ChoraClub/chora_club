@@ -12,12 +12,13 @@ import { Button } from "@/components/ui/button";
 import { BasicIcons } from "@/utils/BasicIcons";
 import { useStudioState } from "@/store/studioState";
 import ButtonWithIcon from "../ui/buttonWithIcon";
+import ChangeDevice from "./changeDevice";
 import { Role } from "@huddle01/server-sdk/auth";
 import { PeerMetadata } from "@/utils/types";
 import clsx from "clsx";
 import toast from "react-hot-toast";
 import Dropdown from "../ui/Dropdown";
-import Strip from "./sidebars/participantsSidebar/Peers/PeerRole/Strip";
+import Strip from "../sidebars/participantsSidebar/Peers/PeerRole/Strip";
 import { useEffect, useState } from "react";
 import { useParams, usePathname } from "next/navigation";
 import { useAccount, useNetwork } from "wagmi";
@@ -26,7 +27,7 @@ import { opBlock, arbBlock } from "@/config/constants";
 import MeetingRecordingModal from "../utils/MeetingRecordingModal";
 import ReactionBar from "./ReactionBar";
 
-const BottomBar = ({ daoName }: { daoName: string }) => {
+const BottomBar = () => {
   const { isAudioOn, enableAudio, disableAudio } = useLocalAudio();
   const { isVideoOn, enableVideo, disableVideo } = useLocalVideo();
   const [showLeaveDropDown, setShowLeaveDropDown] = useState<boolean>(false);
@@ -146,38 +147,66 @@ const BottomBar = ({ daoName }: { daoName: string }) => {
 
       setIsRecording(false);
       toast.success("Recording stopped");
+
+      // // Fetch the recordings
+      // const recordingsResponse = await fetch(`/api/recordings/${roomId}`);
+      // const recordingsData = await recordingsResponse.json();
+      // console.log("Recordings:", recordingsData);
+      // // Now you can use the recordingsData in your frontend as needed
     } catch (error) {
       console.error("Error during stop recording:", error);
       toast.error("Error during stop recording");
     }
   };
 
-  // useEffect(() => {
-  //   if (role === "host") {
-  //     startRecordingAutomatically();
-  //   }
-  // }, []);
-
   useEffect(() => {
-    const storedStatus = localStorage.getItem("isMeetingRecorded");
-    console.log("storedStatus: ", storedStatus);
-    setRecordingStatus(storedStatus);
+    if (role === "host") {
+      startRecordingAutomatically();
+    }
   }, []);
 
-  const handleModalClose = async (result: boolean) => {
-    if (role === "host") {
-      localStorage.setItem("isMeetingRecorded", result.toString());
-      setShowModal(false);
-      setRecordingStatus(result.toString());
-      console.log(
-        result ? "Meeting will be recorded." : "Meeting will not be recorded."
-      );
+  // useEffect(() => {
+  //   const storedStatus = sessionStorage.getItem("isMeetingRecorded");
+  //   console.log("storedStatus: ", storedStatus);
+  //   setRecordingStatus(storedStatus);
+  // }, []);
 
-      if (result) {
-        startRecordingAutomatically();
-      }
-    }
-  };
+  // const handleModalClose = async (result: boolean) => {
+  //   if (role === "host") {
+  //     sessionStorage.setItem("isMeetingRecorded", result.toString());
+  //     setShowModal(false);
+  //     setRecordingStatus(result.toString());
+  //     console.log(
+  //       result ? "Meeting will be recorded." : "Meeting will not be recorded."
+  //     );
+
+  //     if (result) {
+  //       startRecordingAutomatically();
+  //     }
+
+  //     try {
+  //       const requestOptions = {
+  //         method: "PUT",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //         body: JSON.stringify({
+  //           meetingId: roomId,
+  //           meetingType: meetingCategory,
+  //           recordedStatus: result.toString(),
+  //         }),
+  //       };
+
+  //       const response = await fetch(
+  //         "/api/update-recording-status",
+  //         requestOptions
+  //       );
+  //       console.log("Response: ", response);
+  //     } catch (e) {
+  //       console.log("Error: ", e);
+  //     }
+  //   }
+  // };
 
   const startRecordingAutomatically = async () => {
     try {
@@ -228,7 +257,7 @@ const BottomBar = ({ daoName }: { daoName: string }) => {
 
     console.log("host address", host_address);
 
-    if (role === "host" && recordingStatus === "true") {
+    if (role === "host") {
       console.log("addresses: ", address, host_address);
 
       await handleStopRecording(); // Do not proceed with API calls if not the host
@@ -257,6 +286,13 @@ const BottomBar = ({ daoName }: { daoName: string }) => {
       meetingType = 0;
     }
 
+    let dao_name = "";
+    if (chain?.name === "Optimism") {
+      dao_name = "optimism";
+    } else if (chain?.name === "Arbitrum One") {
+      dao_name = "arbitrum";
+    }
+
     try {
       const requestOptions = {
         method: "POST",
@@ -266,7 +302,7 @@ const BottomBar = ({ daoName }: { daoName: string }) => {
         body: JSON.stringify({
           roomId: roomId,
           meetingType: meetingType,
-          dao_name: daoName,
+          dao_name: dao_name,
         }),
       };
       // console.log("req optionnnn", requestOptions);
@@ -301,29 +337,6 @@ const BottomBar = ({ daoName }: { daoName: string }) => {
     }
     // }
 
-    try {
-      const requestOptions = {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          meetingId: roomId,
-          meetingType: meetingCategory,
-          recordedStatus: recordingStatus,
-          meetingStatus: recordingStatus === "true" ? "Recorded" : "Finished",
-        }),
-      };
-
-      const response = await fetch(
-        "/api/update-recording-status",
-        requestOptions
-      );
-      console.log("Response: ", response);
-    } catch (e) {
-      console.log("Error: ", e);
-    }
-
     if (meetingCategory === "officehours") {
       try {
         const res = await fetch(`/api/update-office-hours/${host_address}`, {
@@ -344,12 +357,30 @@ const BottomBar = ({ daoName }: { daoName: string }) => {
       }
     }
 
-    localStorage.removeItem("isMeetingRecorded");
+    // sessionStorage.removeItem("isMeetingRecorded");
   };
 
   return (
     <>
       <footer className="flex items-center justify-between px-4 py-2">
+        {/* <div className="flex items-center">
+        {role === Role.HOST ? (
+          <Button
+            className="flex gap-2 bg-red-500 hover:bg-red-400 text-white text-md font-semibold"
+            onClick={handleRecording}
+          >
+            {isUploading ? BasicIcons.spin : BasicIcons.record}{" "}
+            {isRecording
+              ? isUploading
+                ? "Recording..."
+                : "Stop Recording"
+              : "Record"}
+          </Button>
+        ) : (
+          <div className="w-24" />
+        )}
+      </div> */}
+
         <div>
           <div className="relative">
             <div
@@ -364,15 +395,25 @@ const BottomBar = ({ daoName }: { daoName: string }) => {
               </div>
               <span className="text-gray-800">Quick Links</span>
             </div>
-            {isDropdownOpen && (
+            {isDropdownOpen && chain?.name === "Arbitrum One" && (
               <div className="absolute z-10 top-auto bottom-full left-0 mb-2 w-52 bg-white rounded-lg shadow-lg">
                 <div className="arrow-up"></div>
-                {(daoName === "arbitrum"
-                  ? arbBlock
-                  : daoName === "optimism"
-                  ? opBlock
-                  : []
-                ).map((block, index) => (
+                {arbBlock.map((block, index) => (
+                  <a
+                    href={block.link}
+                    target="_blank"
+                    className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
+                    key={index}
+                  >
+                    {block.title}
+                  </a>
+                ))}
+              </div>
+            )}
+            {isDropdownOpen && chain?.name === "Optimism" && (
+              <div className="absolute z-10 top-auto bottom-full left-0 mb-2 w-52 bg-white rounded-lg shadow-lg">
+                <div className="arrow-up"></div>
+                {opBlock.map((block, index) => (
                   <a
                     href={block.link}
                     target="_blank"
@@ -390,8 +431,8 @@ const BottomBar = ({ daoName }: { daoName: string }) => {
         <div
           className={clsx("flex space-x-3", role === Role.HOST ? "mr-12" : "")}
         >
-          <ButtonWithIcon
-            content={isVideoOn ? "Turn off camera" : "Turn on camera"}
+          {/* <ChangeDevice deviceType="cam"> */}
+          <button
             onClick={() => {
               if (isVideoOn) {
                 disableVideo();
@@ -399,14 +440,13 @@ const BottomBar = ({ daoName }: { daoName: string }) => {
                 enableVideo();
               }
             }}
-            className={clsx(
-              isVideoOn ? "bg-gray-500" : "bg-red-400 hover:bg-red-500"
-            )}
+            className="bg-gray-600/50 p-2.5 rounded-lg hover:bg-gray-600"
           >
             {isVideoOn ? BasicIcons.on.cam : BasicIcons.off.cam}
-          </ButtonWithIcon>
-          <ButtonWithIcon
-            content={isAudioOn ? "Turn off microphone" : "Turn on microphone"}
+          </button>
+          {/* </ChangeDevice> */}
+          {/* <ChangeDevice deviceType="mic"> */}
+          <button
             onClick={() => {
               if (isAudioOn) {
                 disableAudio();
@@ -414,26 +454,22 @@ const BottomBar = ({ daoName }: { daoName: string }) => {
                 enableAudio();
               }
             }}
-            className={clsx(
-              isAudioOn ? "bg-gray-500" : "bg-red-400 hover:bg-red-500"
-            )}
+            className="bg-gray-600/50 p-2.5 rounded-lg hover:bg-gray-600"
           >
             {isAudioOn ? BasicIcons.on.mic : BasicIcons.off.mic}
-          </ButtonWithIcon>
+          </button>
+          {/* </ChangeDevice> */}
+          {/* <ChangeDevice deviceType="speaker">
+            <button
+              onClick={() => {}}
+              className="bg-gray-600/50 p-2.5 rounded-lg"
+            >
+              {BasicIcons.speaker}
+            </button>
+          </ChangeDevice> */}
           <ButtonWithIcon
-            content={
-              isScreenShared && shareStream !== null
-                ? "Stop Sharing"
-                : shareStream !== null
-                ? "Stop Sharing"
-                : isScreenShared
-                ? "Only one screen share is allowed at a time"
-                : "Share Screen"
-            }
             onClick={() => {
-              if (isScreenShared && shareStream !== null) {
-                stopScreenShare();
-              } else if (isScreenShared) {
+              if (isScreenShared) {
                 toast.error("Only one screen share is allowed at a time");
                 return;
               }
@@ -444,15 +480,12 @@ const BottomBar = ({ daoName }: { daoName: string }) => {
               }
             }}
             className={clsx(
-              `bg-blue-shade-100 hover:bg-blue-shade-200 ${
-                (shareStream !== null || isScreenShared) && "bg-blue-shade-100"
-              }`
+              (shareStream !== null || isScreenShared) && "bg-gray-500"
             )}
           >
             {BasicIcons.screenShare}
           </ButtonWithIcon>
           <ButtonWithIcon
-            content={metadata?.isHandRaised ? "Lower Hand" : "Raise Hand"}
             onClick={() => {
               updateMetadata({
                 displayName: metadata?.displayName || "",
@@ -460,11 +493,7 @@ const BottomBar = ({ daoName }: { daoName: string }) => {
                 isHandRaised: !metadata?.isHandRaised,
               });
             }}
-            className={clsx(
-              `bg-blue-shade-100 hover:bg-blue-shade-200 ${
-                metadata?.isHandRaised && "bg-blue-shade-100"
-              }`
-            )}
+            className={clsx(metadata?.isHandRaised && "bg-gray-500")}
           >
             {BasicIcons.handRaise}
           </ButtonWithIcon>
@@ -501,9 +530,7 @@ const BottomBar = ({ daoName }: { daoName: string }) => {
 
         <div className="flex space-x-3">
           <ButtonWithIcon
-            content="Participants"
             onClick={() => setIsParticipantsOpen(!isParticipantsOpen)}
-            className={clsx("bg-gray-600/50 hover:bg-gray-600")}
           >
             <div className="flex items-center justify-center">
               {BasicIcons.people}
@@ -512,18 +539,14 @@ const BottomBar = ({ daoName }: { daoName: string }) => {
               </span>
             </div>
           </ButtonWithIcon>
-          <ButtonWithIcon
-            content="Chat"
-            onClick={() => setIsChatOpen(!isChatOpen)}
-            className={clsx("bg-gray-600/50 hover:bg-gray-600")}
-          >
+          <ButtonWithIcon onClick={() => setIsChatOpen(!isChatOpen)}>
             {BasicIcons.chat}
           </ButtonWithIcon>
         </div>
       </footer>
-      {role === "host" && recordingStatus === null && (
+      {/* {role === "host" && recordingStatus === null && (
         <MeetingRecordingModal show={showModal} onClose={handleModalClose} />
-      )}
+      )} */}
     </>
   );
 };

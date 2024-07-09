@@ -33,13 +33,7 @@ import ArbLogo from "@/assets/images/daos/arbCir.png";
 import ccLogo from "@/assets/images/daos/CC.png";
 import { Oval } from "react-loader-spinner";
 import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
-import {
-  arb_client,
-  BASE_URL,
-  DELEGATE_CHANGED_QUERY,
-  GET_LATEST_DELEGATE_VOTES_CHANGED,
-  op_client,
-} from "@/config/constants";
+import { BASE_URL } from "@/config/constants";
 // import { getEnsNameOfUser } from "../ConnectWallet/ENSResolver";
 import DelegateTileModal from "../utils/delegateTileModal";
 // import { cacheExchange, createClient, fetchExchange, gql } from "urql/core";
@@ -51,6 +45,35 @@ interface Type {
   daoDelegates: string;
   individualDelegate: string;
 }
+const client = createClient({
+  url: "https://api.studio.thegraph.com/query/68573/op/v0.0.1",
+  exchanges: [cacheExchange, fetchExchange],
+});
+const GET_LATEST_DELEGATE_VOTES_CHANGED = gql`
+  query MyQuery($delegate: String!) {
+    delegateVotesChangeds(
+      first: 1
+      orderBy: blockTimestamp
+      orderDirection: desc
+      where: { delegate: $delegate }
+    ) {
+      newBalance
+    }
+  }
+`;
+
+const DELEGATE_CHANGED_QUERY = gql`
+  query MyQuery($delegator: String!) {
+    delegateChangeds(
+      orderBy: blockTimestamp
+      orderDirection: desc
+      where: { delegator: $delegator }
+      first: 1
+    ) {
+      toDelegate
+    }
+  }
+`;
 
 function SpecificDelegate({ props }: { props: Type }) {
   const { publicClient, walletClient } = WalletAndPublicClient();
@@ -80,9 +103,7 @@ function SpecificDelegate({ props }: { props: Type }) {
   const [error, setError] = useState(null);
 
   const [delegateOpen, setDelegateOpen] = useState(false);
-  const address = useAccount();
-
-  const { isConnected } = useAccount();
+  const { isConnected,address } = useAccount();
 
   const handleDelegateModal = async () => {
     if (!isConnected) {
@@ -94,26 +115,19 @@ function SpecificDelegate({ props }: { props: Type }) {
       setDelegateOpen(true);
       setLoading(true);
       try {
-        let data: any;
-        if (props.daoDelegates === "optimism") {
-          data = await op_client.query(DELEGATE_CHANGED_QUERY, {
-            delegator: address,
-          });
-        } else {
-          data = await arb_client.query(DELEGATE_CHANGED_QUERY, {
-            delegator: address,
-          });
-        }
-        console.log("data of individual delegate: ", data);
-        const delegate = data.data.delegateChangeds[0]?.toDelegate;
+        const { data } = await client.query(DELEGATE_CHANGED_QUERY, {
+          delegator: address,
+        });
+        // const ens = await getEnsNameOfUser(
+        //   data.delegateChangeds[0]?.toDelegate
+        // );
+        const delegate = data.delegateChangeds[0]?.toDelegate;
         console.log("individualDelegate", props.individualDelegate);
-        setSame(
-          delegate.toLowerCase() === props.individualDelegate.toLowerCase()
-        );
+        setSame(delegate === props.individualDelegate);
         // ens
         // ? setDelegate(ens)
         // :
-        setDelegate(delegate);
+        setDelegate(delegate.slice(0, 6) + "..." + delegate.slice(-4));
         setError(null);
       } catch (err: any) {
         setError(err.message);
@@ -186,7 +200,6 @@ function SpecificDelegate({ props }: { props: Type }) {
     const fetchData = async () => {
       try {
         const apiKey = process.env.NEXT_PUBLIC_TALLY_API_KEY;
-        console.log("API key", apiKey);
         if (!apiKey) {
           throw new Error("API key is missing");
         }
@@ -213,7 +226,7 @@ function SpecificDelegate({ props }: { props: Type }) {
           });
 
         console.log("Props", props.individualDelegate);
-        const data = await op_client
+        const data = await client
           .query(GET_LATEST_DELEGATE_VOTES_CHANGED, {
             delegate: props.individualDelegate.toString(),
           })
@@ -228,7 +241,7 @@ function SpecificDelegate({ props }: { props: Type }) {
     if (props.individualDelegate) {
       fetchData();
     }
-  }, [op_client, props.individualDelegate]);
+  }, [client, props.individualDelegate]);
 
   useEffect(() => {
     console.log("Network", chain?.network);
@@ -367,19 +380,15 @@ function SpecificDelegate({ props }: { props: Type }) {
       toast.error("Please connect your wallet!");
     } else {
       if (walletClient?.chain?.network === props.daoDelegates) {
-        try {
-          const delegateTx = await walletClient.writeContract({
-            address: chainAddress,
-            abi: dao_abi.abi,
-            functionName: "delegate",
-            args: [to],
-            account: address1,
-          });
+        const delegateTx = await walletClient.writeContract({
+          address: chainAddress,
+          abi: dao_abi.abi,
+          functionName: "delegate",
+          args: [to],
+          account: address1,
+        });
 
-          console.log(delegateTx);
-        } catch (e) {
-          toast.error("Transaction failed");
-        }
+        console.log(delegateTx);
       } else {
         toast.error("Please switch to appropriate network to delegate!");
 
@@ -827,7 +836,6 @@ function SpecificDelegate({ props }: { props: Type }) {
                   ? ArbLogo
                   : ccLogo)
           }
-          daoName={props.daoDelegates}
           addressCheck={same}
         />
       )}

@@ -60,20 +60,20 @@ export async function getMetaProfileImage() {}
 export async function fetchEnsAvatar(address: string) {
   try {
     // Reverse lookup the ENS name from the address
-    // console.log("provider: ", provider);
+    console.log("provider: ", provider);
     const ensName = await provider.lookupAddress(address);
-    // console.log("ensName: ", ensName);
+    console.log("ensName: ", ensName);
     const displayName = address?.slice(0, 4) + "..." + address?.slice(-4);
 
     const ensNameOrAddress = ensName ? ensName : displayName;
-    // console.log("ensNameOrAddress: ", ensNameOrAddress);
+    console.log("ensNameOrAddress: ", ensNameOrAddress);
 
     if (!ensName) {
-      // console.log(`No ENS name found for address ${address}`);
+      console.log(`No ENS name found for address ${address}`);
       return;
     }
 
-    // console.log(`ENS name for address ${address}: ${ensName}`);
+    console.log(`ENS name for address ${address}: ${ensName}`);
 
     // Get the resolver for the ENS name
     const resolver = await provider.getResolver(ensName);
@@ -96,7 +96,7 @@ export async function fetchEnsAvatar(address: string) {
     const reddit = await resolver.getText("com.reddit");
     const twitter = await resolver.getText("com.twitter");
     const supportsWildcard = await resolver.supportsWildcard();
-    // console.log("ensName", ensName);
+    console.log("ensName", ensName);
     return { avatar, ensName, ensNameOrAddress };
   } catch (error) {
     console.error(`Error fetching ENS details for address ${address}:`, error);
@@ -107,7 +107,7 @@ export async function fetchEnsAvatar(address: string) {
 export async function getEnsName(address: string) {
   try {
     const ensName = await provider.lookupAddress(address);
-    // console.log("ensName: ", ensName);
+    console.log("ensName: ", ensName);
     const displayName = address?.slice(0, 4) + "..." + address?.slice(-4);
 
     const ensNameOrAddress = ensName ? ensName : displayName;

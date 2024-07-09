@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Dropdown from "../ui/Dropdown";
-import EmojiTray from "./EmojiTray/EmojiTray";
+import EmojiTray from "../EmojiTray/EmojiTray";
 import { BasicIcons } from "@/utils/BasicIcons";
 import { useDataMessage } from "@huddle01/react/hooks";
 import { useStudioState } from "@/store/studioState";
@@ -23,8 +23,21 @@ function ReactionBar() {
 
   return (
     <div>
-      <div className="flex rounded-lg bg-blue-shade-100 hover:bg-blue-shade-200 items-center">
-        <div className="grid grid-cols-3 place-items-center gap-2 ps-2">
+      <div className="flex rounded-lg bg-gray-600/50 items-center">
+        <div className="cursor-pointer">
+          <Dropdown
+            triggerChild={BasicIcons.avatar}
+            open={isOpen}
+            onOpenChange={() => setIsOpen((prev) => !prev)}
+          >
+            <EmojiTray
+              onClick={() => alert("todo")}
+              onClose={() => setIsOpen(false)}
+            />
+          </Dropdown>
+        </div>
+
+        <div className="grid grid-cols-3 place-items-center gap-2 pe-2">
           {emojiList.map((emoji) => (
             <span
               key={emoji}
@@ -42,19 +55,6 @@ function ReactionBar() {
               {emoji}
             </span>
           ))}
-        </div>
-
-        <div className="cursor-pointer">
-          <Dropdown
-            triggerChild={BasicIcons.avatar}
-            open={isOpen}
-            onOpenChange={() => setIsOpen((prev) => !prev)}
-          >
-            <EmojiTray
-              onClick={() => alert("todo")}
-              onClose={() => setIsOpen(false)}
-            />
-          </Dropdown>
         </div>
       </div>
     </div>
