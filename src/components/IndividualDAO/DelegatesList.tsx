@@ -61,12 +61,11 @@ function DelegatesList({ props }: { props: string }) {
   const [delegateInfo, setDelegateInfo] = useState<any>();
   const [selectedDelegate, setSelectedDelegate] = useState<any>(null);
 
-  // const address = "0xa2d590fee197c0b614fe7c3e10303327f38c0dc3";
-  // const address = "0xc622420AD9dE8E595694413F24731Dd877eb84E1";
-  const address = useAccount();
+  // const [circlePosition, setCirclePosition] = useState({ x: 0, y: 0 });
+  // const [clickedTileIndex,setClickedTileIndex]=useState(null);
 
   // const address = "0xa2d590fee197c0b614fe7c3e10303327f38c0dc3";
-  // const address = "0xc622420AD9dE8E595694413F24731Dd877eb84E1";
+  const address = "0xc622420AD9dE8E595694413F24731Dd877eb84E1";
 
   const handleClose = () => {
     setIsShowing(false);
@@ -442,11 +441,13 @@ function DelegatesList({ props }: { props: string }) {
         let data: any;
         if (props === "optimism") {
           data = await op_client.query(DELEGATE_CHANGED_QUERY, {
-            delegator: address,
+            // delegator: delegateObject.delegate,
+            delegator: "0xa2d590fee197c0b614fe7c3e10303327f38c0dc3",
           });
         } else {
           data = await arb_client.query(DELEGATE_CHANGED_QUERY, {
-            delegator: address,
+            // delegator: delegateObject.delegate,
+            delegator: "0xa2d590fee197c0b614fe7c3e10303327f38c0dc3",
           });
         }
         // const ens = await getEnsNameOfUser(
