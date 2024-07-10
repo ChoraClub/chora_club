@@ -2,6 +2,12 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { connectDB } from "@/config/connectDB";
 import { NextRequest, NextResponse } from "next/server";
 import axios from "axios";
+import { imageCIDs } from "@/config/staticDataUtils";
+
+function getRandomElementFromArray(arr: any[]) {
+  const randomIndex = Math.floor(Math.random() * arr.length);
+  return arr[randomIndex];
+}
 
 export async function POST(req: NextRequest, res: NextApiResponse) {
   const { meetingId, video_uri } = await req.json();
@@ -19,10 +25,11 @@ export async function POST(req: NextRequest, res: NextApiResponse) {
     );
 
     // Update video_uri in the other collection
+    const randomCID = getRandomElementFromArray(imageCIDs);
     const otherCollection = db.collection("meetings");
     const otherMeeting = await otherCollection.findOneAndUpdate(
       { meetingId },
-      { $set: { video_uri, meeting_status: "Recorded" } }
+      { $set: { video_uri, thumbnail_image: randomCID } }
     );
 
     if (!officeHoursMeeting && !otherMeeting) {
@@ -31,17 +38,17 @@ export async function POST(req: NextRequest, res: NextApiResponse) {
         { status: 404 }
       );
     }
-    // Call the FastAPI endpoint to process the video URL
-    const response = await axios.post(`${process.env.DESC_GENERATION_BASE_URL}/analyze`, {
-      url: video_uri,
-    });
+    // // Call the FastAPI endpoint to process the video URL
+    // const response = await axios.post(`${process.env.DESC_GENERATION_BASE_URL}/analyze`, {
+    //   url: video_uri,
+    // });
 
-    const { title, description } = response.data;
+    // const { title, description } = response.data;
 
-    await otherCollection.findOneAndUpdate(
-      { meetingId },
-      { $set: { title, description } }
-    );
+    // await otherCollection.findOneAndUpdate(
+    //   { meetingId },
+    //   { $set: { title, description } }
+    // );
 
     // Close MongoDB client
     await client.close();

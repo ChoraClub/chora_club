@@ -3,7 +3,7 @@ import search from "@/assets/images/daos/search.png";
 import Image from "next/image";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useRouter } from "next-nprogress-bar";
-import Tile from "../utils/Tile";
+import Tile from "../ComponentUtils/Tile";
 import { Oval } from "react-loader-spinner";
 import SessionTileSkeletonLoader from "../SkeletonLoader/SessionTileSkeletonLoader";
 
@@ -184,7 +184,7 @@ function OfficeHours({ props }: { props: string }) {
         <div className="py-10">
           {searchParams.get("hours") === "ongoing" &&
             (dataLoading ? (
-              <SessionTileSkeletonLoader/>
+              <SessionTileSkeletonLoader />
             ) : (
               <Tile
                 sessionDetails={sessionDetails}
@@ -195,7 +195,7 @@ function OfficeHours({ props }: { props: string }) {
             ))}
           {searchParams.get("hours") === "upcoming" &&
             (dataLoading ? (
-              <SessionTileSkeletonLoader/>
+              <SessionTileSkeletonLoader />
             ) : (
               <Tile
                 sessionDetails={sessionDetails}
@@ -206,7 +206,7 @@ function OfficeHours({ props }: { props: string }) {
             ))}
           {searchParams.get("hours") === "recorded" &&
             (dataLoading ? (
-              <SessionTileSkeletonLoader/>
+              <SessionTileSkeletonLoader />
             ) : (
               <div>
                 <Tile

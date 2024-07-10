@@ -9,7 +9,7 @@ import { FaChevronDown, FaCircleInfo, FaPlus } from "react-icons/fa6";
 import { Tooltip } from "@nextui-org/react";
 import SchedulingSuccessModal from "./SchedulingSuccessModal";
 import { RxCross2 } from "react-icons/rx";
-import AddEmailModal from "@/components/utils/AddEmailModal";
+import AddEmailModal from "@/components/ComponentUtils/AddEmailModal";
 
 import Image from "next/image";
 

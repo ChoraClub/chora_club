@@ -8,7 +8,7 @@ import { useRouter } from "next-nprogress-bar";
 import text1 from "@/assets/images/daos/texture1.png";
 import text2 from "@/assets/images/daos/texture2.png";
 import { StaticImageData } from "next/image";
-import Tile from "../utils/Tile";
+import Tile from "../ComponentUtils/Tile";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { Oval } from "react-loader-spinner";
 import { Tooltip } from "@nextui-org/react";
@@ -228,7 +228,7 @@ function DaoOfficeHours() {
         <div className="py-5">
           {searchParams.get("hours") === "ongoing" &&
             (dataLoading ? (
-              <SessionTileSkeletonLoader/>            
+              <SessionTileSkeletonLoader />
             ) : (
               <Tile
                 sessionDetails={sessionDetails}
@@ -239,7 +239,7 @@ function DaoOfficeHours() {
             ))}
           {searchParams.get("hours") === "upcoming" &&
             (dataLoading ? (
-              <SessionTileSkeletonLoader/>  
+              <SessionTileSkeletonLoader />
             ) : (
               <Tile
                 sessionDetails={sessionDetails}
@@ -250,8 +250,7 @@ function DaoOfficeHours() {
             ))}
           {searchParams.get("hours") === "recorded" &&
             (dataLoading ? (
-              <SessionTileSkeletonLoader/>  
-
+              <SessionTileSkeletonLoader />
             ) : (
               <Tile
                 sessionDetails={sessionDetails}

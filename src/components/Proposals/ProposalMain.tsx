@@ -7,7 +7,7 @@ import { IoArrowBack } from "react-icons/io5";
 import { IoShareSocialSharp } from "react-icons/io5";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next-nprogress-bar";
-import IndividualDaoHeader from "../utils/IndividualDaoHeader";
+import IndividualDaoHeader from "../ComponentUtils/IndividualDaoHeader";
 import { LuDot } from "react-icons/lu";
 import chain from "@/assets/images/daos/chain.png";
 import user2 from "@/assets/images/user/user2.svg";

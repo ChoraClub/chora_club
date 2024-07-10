@@ -22,8 +22,8 @@ import { useEffect, useState } from "react";
 import { useParams, usePathname } from "next/navigation";
 import { useAccount, useNetwork } from "wagmi";
 import { PiLinkSimpleBold } from "react-icons/pi";
-import { opBlock, arbBlock } from "@/config/constants";
-import MeetingRecordingModal from "../utils/MeetingRecordingModal";
+import { opBlock, arbBlock } from "@/config/staticDataUtils";
+import MeetingRecordingModal from "../ComponentUtils/MeetingRecordingModal";
 import ReactionBar from "./ReactionBar";
 
 const BottomBar = ({ daoName }: { daoName: string }) => {

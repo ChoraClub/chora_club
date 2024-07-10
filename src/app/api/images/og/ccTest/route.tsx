@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { ImageResponse } from "next/og";
-import { IMAGE_URL } from "@/config/constants";
+import { IMAGE_URL } from "@/config/staticDataUtils";
 export const revalidate = 0;
 
 export const runtime = "edge";

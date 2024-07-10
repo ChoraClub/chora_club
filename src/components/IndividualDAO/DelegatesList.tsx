@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 import search from "@/assets/images/daos/search.png";
 import OPLogo from "@/assets/images/daos/op.png";
 import ARBLogo from "@/assets/images/daos/arbitrum.jpg";
-import ccLogo from "@/assets/images/daos/CC.png";
+import ccLogo from "@/assets/images/daos/CCLogo2.png";
 import { IoCopy } from "react-icons/io5";
 import copy from "copy-to-clipboard";
 import { Button, Dropdown, Pagination, Tooltip } from "@nextui-org/react";
@@ -27,12 +27,12 @@ import {
   fetchEnsAvatar,
 } from "@/utils/ENSUtils";
 import DelegateListSkeletonLoader from "../SkeletonLoader/DelegateListSkeletonLoader";
-import DelegateTileModal from "../utils/delegateTileModal";
+import DelegateTileModal from "../ComponentUtils/delegateTileModal";
 import {
   arb_client,
   DELEGATE_CHANGED_QUERY,
   op_client,
-} from "@/config/constants";
+} from "@/config/staticDataUtils";
 
 function DelegatesList({ props }: { props: string }) {
   const [delegateData, setDelegateData] = useState<any>({ delegates: [] });
