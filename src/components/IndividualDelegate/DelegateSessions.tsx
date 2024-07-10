@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
-import Tile from "../utils/Tile";
+import Tile from "../ComponentUtils/Tile";
 import BookSession from "./AllSessions/BookSession";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useRouter } from "next-nprogress-bar";
 import text1 from "@/assets/images/daos/texture1.png";
-import SessionTile from "../utils/SessionTiles";
+import SessionTile from "../ComponentUtils/SessionTiles";
 import { Oval } from "react-loader-spinner";
 import SessionTileSkeletonLoader from "../SkeletonLoader/SessionTileSkeletonLoader";
 
@@ -222,7 +222,7 @@ function DelegateSessions({ props }: { props: Type }) {
             ))} */}
           {searchParams.get("session") === "hosted" &&
             (dataLoading ? (
-              <SessionTileSkeletonLoader/>
+              <SessionTileSkeletonLoader />
             ) : (
               <SessionTile
                 sessionDetails={sessionDetails}
@@ -234,7 +234,7 @@ function DelegateSessions({ props }: { props: Type }) {
             ))}
           {searchParams.get("session") === "attended" &&
             (dataLoading ? (
-              <SessionTileSkeletonLoader/>
+              <SessionTileSkeletonLoader />
             ) : (
               <SessionTile
                 sessionDetails={sessionDetails}

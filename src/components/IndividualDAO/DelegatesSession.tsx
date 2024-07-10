@@ -4,10 +4,10 @@ import React, { useState, useEffect } from "react";
 import search from "@/assets/images/daos/search.png";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useRouter } from "next-nprogress-bar";
-import Tile from "../utils/Tile";
-import SessionTile from "../utils/SessionTiles";
+import Tile from "../ComponentUtils/Tile";
+import SessionTile from "../ComponentUtils/SessionTiles";
 import { Oval } from "react-loader-spinner";
-import RecordedSessionsTile from "../utils/RecordedSessionsTile";
+import RecordedSessionsTile from "../ComponentUtils/RecordedSessionsTile";
 import {
   Modal,
   ModalContent,
@@ -17,7 +17,7 @@ import {
   Button,
   useDisclosure,
 } from "@nextui-org/react";
-import AttestationModal from "../utils/AttestationModal";
+import AttestationModal from "../ComponentUtils/AttestationModal";
 import SessionTileSkeletonLoader from "../SkeletonLoader/SessionTileSkeletonLoader";
 
 interface Session {
@@ -204,11 +204,9 @@ function DelegatesSession({ props }: { props: string }) {
               />
             ))} */}
           {searchParams.get("session") === "recorded" &&
-            (dataLoading ? 
-            (
-            <SessionTileSkeletonLoader/>
-            )
-            : (
+            (dataLoading ? (
+              <SessionTileSkeletonLoader />
+            ) : (
               <SessionTile
                 sessionDetails={sessionDetails}
                 dataLoading={dataLoading}

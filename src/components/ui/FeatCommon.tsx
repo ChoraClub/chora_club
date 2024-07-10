@@ -1,5 +1,5 @@
-import { BasicIcons } from "@/assets/BasicIcons";
-import { cn } from "@/components/utils/helpers";
+import { BasicIcons } from "@/utils/BasicIcons";
+import { cn } from "@/components/ComponentUtils/helpers";
 import React, { useRef } from "react";
 
 interface Props {

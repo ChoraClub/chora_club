@@ -1,5 +1,3 @@
-import { cacheExchange, createClient, fetchExchange, gql } from "urql";
-
 export const DB_NAME =
   process.env.NODE_ENV == "development"
     ? process.env.DEV_DB
@@ -35,94 +33,7 @@ export const ATTESTATION_ARB_URL =
     ? process.env.NEXT_PUBLIC_SEPOLIA_ATTESTATION_URL
     : process.env.NEXT_PUBLIC_ARB_ATTESTATION_URL;
 
-export const arb_client = createClient({
-  url: "https://api.studio.thegraph.com/query/477/arbitrum/v0.0.2 ",
-  exchanges: [cacheExchange, fetchExchange],
-});
 
-export const op_client = createClient({
-  url: "https://api.studio.thegraph.com/query/68573/op/v0.0.1",
-  exchanges: [cacheExchange, fetchExchange],
-});
-
-export const DELEGATE_CHANGED_QUERY = gql`
-  query MyQuery($delegator: String!) {
-    delegateChangeds(
-      orderBy: blockTimestamp
-      orderDirection: desc
-      where: { delegator: $delegator }
-      first: 1
-    ) {
-      toDelegate
-    }
-  }
-`;
-
-export const GET_LATEST_DELEGATE_VOTES_CHANGED = gql`
-  query MyQuery($delegate: String!) {
-    delegateVotesChangeds(
-      first: 1
-      orderBy: blockTimestamp
-      orderDirection: desc
-      where: { delegate: $delegate }
-    ) {
-      newBalance
-    }
-  }
-`;
-
-export const opBlock = [
-  {
-    title: "Forum",
-    link: "https://gov.optimism.io/",
-  },
-  {
-    title: "Website",
-    link: "https://optimism.io/",
-  },
-  {
-    title: "Block Explorer",
-    link: "https://optimistic.etherscan.io/",
-  },
-  {
-    title: "Optimism Twitter Profile",
-    link: "https://twitter.com/Optimism",
-  },
-  {
-    title: "Optimism DAO Twitter Profile",
-    link: "https://twitter.com/OptimismGov",
-  },
-];
-
-export const arbBlock = [
-  {
-    title: "Forum",
-    link: "https://forum.arbitrum.foundation",
-  },
-  {
-    title: "Website",
-    link: "https://arbitrum.io",
-  },
-  {
-    title: "Arbitrum Foundation Website",
-    link: "https://arbitrum.foundation",
-  },
-  {
-    title: "Block Explorer",
-    link: "https://arbiscan.io",
-  },
-  {
-    title: "Arbitrum Twitter Profile",
-    link: "https://twitter.com/arbitrum",
-  },
-  {
-    title: "Arbitrum DAO Twitter Profile",
-    link: "https://twitter.com/DAO_Arbitrum",
-  },
-];
-
-export const IMAGE_URL =
-  "https://gateway.lighthouse.storage/ipfs/QmZRLHd4CwA8btpa2WhbDHju46rnKbYGUFyzojAFXkhbt1";
 
 // For development testing
 //   export const DB_NAME =

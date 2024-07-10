@@ -5,7 +5,7 @@ import text1 from "@/assets/images/daos/texture1.png";
 import text2 from "@/assets/images/daos/texture2.png";
 import Image from "next/image";
 import { Tooltip } from "@nextui-org/react";
-import EventTile from "../../utils/EventTile";
+import EventTile from "../../ComponentUtils/EventTile";
 import { useAccount, useNetwork } from "wagmi";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useRouter } from "next-nprogress-bar";
@@ -72,7 +72,7 @@ function AttendingUserSessions({ daoName }: { daoName: string }) {
   return (
     <div className="space-y-6">
       {pageLoading ? (
-        <SessionTileSkeletonLoader/>
+        <SessionTileSkeletonLoader />
       ) : sessionDetails.length > 0 ? (
         sessionDetails.map((data, index) => (
           <EventTile

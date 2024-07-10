@@ -11,7 +11,7 @@ import { PiFlagFill } from "react-icons/pi";
 import { BiSolidShare } from "react-icons/bi";
 import { IoMdArrowDropdown } from "react-icons/io";
 import Link from "next/link";
-import VideoJS from "@/components/utils/VideoJs";
+import VideoJS from "@/components/ComponentUtils/VideoJs";
 import videojs from "video.js";
 // import { parseISO } from "date-fns";
 import ReportOptionModal from "./ReportOptionModal";

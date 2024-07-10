@@ -6,12 +6,12 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { useRouter } from "next-nprogress-bar";
 import text1 from "@/assets/images/daos/texture1.png";
 import text2 from "@/assets/images/daos/texture2.png";
-import EventTile from "../utils/EventTile";
+import EventTile from "../ComponentUtils/EventTile";
 // import HostedUserSessions from "./UserAllSessions/HostedUserSessions";
 // import AttendedUserSessions from "./UserAllSessions/AttendedUserSessions";
 import { useNetwork, useAccount } from "wagmi";
-import Tile from "../utils/Tile";
-import SessionTile from "../utils/SessionTiles";
+import Tile from "../ComponentUtils/Tile";
+import SessionTile from "../ComponentUtils/SessionTiles";
 import { Oval } from "react-loader-spinner";
 import SessionTileSkeletonLoader from "../SkeletonLoader/SessionTileSkeletonLoader";
 
@@ -207,7 +207,7 @@ function UserSessions({
           {selfDelegate === true &&
             searchParams.get("session") === "hosted" &&
             (dataLoading ? (
-              <SessionTileSkeletonLoader/>
+              <SessionTileSkeletonLoader />
             ) : (
               <SessionTile
                 sessionDetails={hostedDetails}
@@ -219,7 +219,7 @@ function UserSessions({
             ))}
           {searchParams.get("session") === "attended" &&
             (dataLoading ? (
-              <SessionTileSkeletonLoader/>
+              <SessionTileSkeletonLoader />
             ) : (
               <SessionTile
                 sessionDetails={attendedDetails}

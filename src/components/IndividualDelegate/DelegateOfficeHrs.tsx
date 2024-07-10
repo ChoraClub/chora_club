@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useRouter } from "next-nprogress-bar";
 import text1 from "@/assets/images/daos/texture1.png";
-import Tile from "../utils/Tile";
+import Tile from "../ComponentUtils/Tile";
 import { Oval } from "react-loader-spinner";
 import SessionTileSkeletonLoader from "../SkeletonLoader/SessionTileSkeletonLoader";
 
@@ -172,7 +172,7 @@ function DelegateOfficeHrs({ props }: { props: Type }) {
         <div className="py-10">
           {searchParams.get("hours") === "ongoing" &&
             (dataLoading ? (
-              <SessionTileSkeletonLoader/>
+              <SessionTileSkeletonLoader />
             ) : (
               <Tile
                 sessionDetails={sessionDetails}
@@ -183,7 +183,7 @@ function DelegateOfficeHrs({ props }: { props: Type }) {
             ))}
           {searchParams.get("hours") === "upcoming" &&
             (dataLoading ? (
-              <SessionTileSkeletonLoader/>
+              <SessionTileSkeletonLoader />
             ) : (
               <Tile
                 sessionDetails={sessionDetails}
@@ -194,7 +194,7 @@ function DelegateOfficeHrs({ props }: { props: Type }) {
             ))}
           {searchParams.get("hours") === "hosted" &&
             (dataLoading ? (
-              <SessionTileSkeletonLoader/>
+              <SessionTileSkeletonLoader />
             ) : (
               <Tile
                 sessionDetails={sessionDetails}
@@ -205,7 +205,7 @@ function DelegateOfficeHrs({ props }: { props: Type }) {
             ))}
           {searchParams.get("hours") === "attended" &&
             (dataLoading ? (
-              <SessionTileSkeletonLoader/>
+              <SessionTileSkeletonLoader />
             ) : (
               <Tile
                 sessionDetails={sessionDetails}

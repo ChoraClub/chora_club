@@ -33,14 +33,14 @@ import clsx from "clsx";
 import GridContainer from "@/components/Huddle/GridContainer";
 import RemoteScreenShare from "@/components/Huddle/remoteScreenShare";
 import Camera from "@/components/Huddle/Media/Camera";
-import AttestationModal from "@/components/utils/AttestationModal";
+import AttestationModal from "@/components/ComponentUtils/AttestationModal";
 import { useAccount } from "wagmi";
 import { TailSpin } from "react-loader-spinner";
 import Link from "next/link";
 import { Tooltip } from "@nextui-org/react";
 import { PiRecordFill } from "react-icons/pi";
 import ParticipantTile from "@/components/Huddle/ParticipantTile";
-import { NestedPeerListIcons } from "@/assets/PeerListIcons";
+import { NestedPeerListIcons } from "@/utils/PeerListIcons";
 import logo from "@/assets/images/daos/CCLogo1.png";
 import Image from "next/image";
 

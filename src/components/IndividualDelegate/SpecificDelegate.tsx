@@ -35,17 +35,17 @@ import { Oval } from "react-loader-spinner";
 import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
 import {
   arb_client,
-  BASE_URL,
   DELEGATE_CHANGED_QUERY,
   GET_LATEST_DELEGATE_VOTES_CHANGED,
   op_client,
-} from "@/config/constants";
+} from "@/config/staticDataUtils";
 // import { getEnsNameOfUser } from "../ConnectWallet/ENSResolver";
-import DelegateTileModal from "../utils/delegateTileModal";
+import DelegateTileModal from "../ComponentUtils/delegateTileModal";
 // import { cacheExchange, createClient, fetchExchange, gql } from "urql/core";
 import { set } from "video.js/dist/types/tech/middleware";
 import MainProfileSkeletonLoader from "../SkeletonLoader/MainProfileSkeletonLoader";
 import { fetchEnsAvatar } from "@/utils/ENSUtils";
+import { BASE_URL } from "@/config/constants";
 
 interface Type {
   daoDelegates: string;

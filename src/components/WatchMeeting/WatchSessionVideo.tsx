@@ -1,5 +1,5 @@
 import React from "react";
-import VideoJs from "../utils/VideoJs";
+import VideoJs from "../ComponentUtils/VideoJs";
 import videojs from "video.js";
 
 interface ProfileInfo {

@@ -28,6 +28,8 @@ import { title } from "process";
 import { Placement } from "react-joyride";
 import { IoMdNotifications } from "react-icons/io";
 
+import { Poppins } from "next/font/google";
+import { MdImportantDevices } from "react-icons/md";
 function Sidebar() {
   const [isTourOpen, setIsTourOpen] = useState(false);
   // const [isClient, setIsClient] = useState(false);
@@ -75,7 +77,7 @@ function Sidebar() {
       target: ".dao",
       content: (
         <p className="text-black-shade-1000 text-left font-normal text-base font-poppins">
-          Discover all the DAOs listed on your platform.
+          Discover all the DAOs listed on our platform.
         </p>
       ),
       disableBeacon: true,
@@ -147,7 +149,7 @@ function Sidebar() {
       target: "body",
       content: (
         <p className="text-black-shade-1000 text-left font-normal text-base font-poppins">
-          You&apos;re all set! Begin your web3 journey now.
+          You&apos;re all set! Begin your web3 journey now.
         </p>
       ),
       disableBeacon: true,
@@ -175,6 +177,7 @@ function Sidebar() {
       zIndex: 1000,
       showArrow: false,
     },
+
     floaterStyles: {
       arrow: {
         display: "none",

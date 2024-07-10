@@ -21,7 +21,7 @@ import toast, { Toaster } from "react-hot-toast";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import SchedulingSuccessModal from "@/components/UserProfile/UserAllSessions/SchedulingSuccessModal";
 import BookingSuccessModal from "./BookingSuccessModal";
-import AddEmailModal from "@/components/utils/AddEmailModal";
+import AddEmailModal from "@/components/ComponentUtils/AddEmailModal";
 import { RxCross2 } from "react-icons/rx";
 import { MdCancel } from "react-icons/md";
 import { useRouter } from "next-nprogress-bar";

@@ -41,7 +41,7 @@ interface SessionData {
 }
 import Head from "next/head";
 // import { getEnsName, getEnsNameOfUser } from "../ConnectWallet/ENSResolver";
-import RecordedSessionsTile from "../utils/RecordedSessionsTile";
+import RecordedSessionsTile from "../ComponentUtils/RecordedSessionsTile";
 import RecordedSessionsSkeletonLoader from "../SkeletonLoader/RecordedSessionsSkeletonLoader";
 
 function RecordedSessions() {
@@ -57,7 +57,6 @@ function RecordedSessions() {
   const [videoDurations, setVideoDurations] = useState<any>({});
   const [searchMeetingData, setSearchMeetingData] = useState<any>([]);
   const [activeButton, setActiveButton] = useState("all");
-
 
   const handleCopy = (addr: string) => {
     copy(addr);
@@ -209,7 +208,6 @@ function RecordedSessions() {
     }
   };
 
-  
   return (
     <>
       <div className="pe-10">
@@ -267,11 +265,9 @@ function RecordedSessions() {
         </div>
 
         {isLoading ? (
-          <RecordedSessionsSkeletonLoader/>
-        ) :
-         meetingData && meetingData.length > 0 ? (
-         
-          <RecordedSessionsTile meetingData={meetingData}/>
+          <RecordedSessionsSkeletonLoader />
+        ) : meetingData && meetingData.length > 0 ? (
+          <RecordedSessionsTile meetingData={meetingData} />
         ) : (
           <div className="flex flex-col justify-center items-center pt-10">
             <div className="text-5xl">☹️</div>{" "}
@@ -297,5 +293,4 @@ function RecordedSessions() {
   );
 }
 
-
-export default RecordedSessions;  
+export default RecordedSessions;
