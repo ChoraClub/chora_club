@@ -1,80 +1,84 @@
-import user from "@/assets/images/daos/user1.png";
-import dummy from "@/assets/images/daos/user2.png";
+"use client"
+
+import { usePathname, useSearchParams } from "next/navigation";
+import { useRouter } from "next-nprogress-bar";
 import Image from "next/image";
+import NotificationAll from "./NotificationAll";
+import SessionBookings from "./SessionBookings";
+import RecordedSessions from "./RecorderSessions";
+import Followers from "./Followers";
+import Attestations from "./Attestation";
 function NotificationMain() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const path = usePathname();
   return (
     <>
-      <div className="px-14 pt-6 font-poppins mb-12">
-        <div className="font-semibold text-4xl text-blue-shade-100 pb-6">
+      <div className="font-poppins mb-12">
+        <div className="font-semibold text-4xl text-blue-shade-100 pb-8 pt-9 px-16">
           Notifications
         </div>
-        <div className="flex gap-4 items-center">
-          <Image src={user} alt="" className="size-12" />
-          <p className="font-bold text-xl ">
-            {" "}
-            Welcome, 0xBb4c2baB6B2de45F9CC7Ab41087b730Eaa4adE31
-          </p>
+        <div className="flex gap-12 bg-[#D9D9D945] pl-16">
+        <button className={`py-4 px-2 outline-none ${
+                searchParams.get("active") === "all"
+                  ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
+                  : "border-transparent"
+              }`}
+              onClick={() => router.push(path + "?active=all")} >
+              All
+            </button>
+        <button className={`py-4 px-2 outline-none ${
+                searchParams.get("active") === "sessionBookings"
+                  ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
+                  : "border-transparent"
+              }`}
+              onClick={() => router.push(path + "?active=sessionBookings")}>
+              Session Bookings
+            </button>
+        <button className={`py-4 px-2 outline-none ${
+                searchParams.get("active") === "recordedSessions"
+                  ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
+                  : "border-transparent"
+              }`}
+              onClick={() => router.push(path + "?active=recordedSessions")}>
+              Recorded Sessions
+            </button>
+        <button className={`py-4 px-2 outline-none ${
+                searchParams.get("active") === "followers"
+                  ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
+                  : "border-transparent"
+              }`}
+              onClick={() => router.push(path + "?active=followers")}>
+              Followers
+            </button>
+        <button className={`py-4 px-2 outline-none ${
+                searchParams.get("active") === "attestations"
+                  ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
+                  : "border-transparent"
+              }`}
+              onClick={() => router.push(path + "?active=attestations")}>
+              Attestations
+            </button>
         </div>
 
-        {/* Today */}
-        <div className="mt-6 mb-4 font-medium text-lg text-black-shade-500 ml-2">
-          Today
-        </div>
-        <div className="rounded-2xl bg-gray-50 shadow-md w-full ">
-          {Array.from({ length: 3 }).map((_, index, array) => (
-            <>
-              <div className="flex justify-between items-center p-4">
-                <div className="flex gap-3 ">
-                  <Image src={dummy} alt=" " className="size-12 " />
-                  <div className="flex flex-col gap-1 justify-center">
-                    <h1 className="font-semibold text-sm ">
-                      Chain-l.eth booked your session{" "}
-                    </h1>
-                    <p className="font-normal text-xs text-black-shade-500">
-                      On November 2, 2024 at 5:00 PM
-                    </p>
-                  </div>
-                </div>
-                <div className="text-black-shade-500 text-xs font-normal">
-                  2 hours ago
-                </div>
+              <div className="px-16">
+              {searchParams.get("active") === "all" ? (
+                <NotificationAll/>
+              ):("")}
+              {searchParams.get("active") === "sessionBookings" ? (
+                <SessionBookings/>
+              ):("")}
+              {searchParams.get("active") === "recordedSessions" ? (
+                <RecordedSessions/>
+              ):("")}
+              {searchParams.get("active") === "followers" ? (
+                <Followers/>
+              ):("")}
+              {searchParams.get("active") === "attestations" ? (
+                <Attestations/>
+              ):("")}
               </div>
-              {index < array.length - 1 && (
-                <hr className="border-gray-200 border-1.5" />
-              )}
-            </>
-          ))}
-        </div>
-
-        {/* Yesterday */}
-        <div className="mt-6 mb-4 font-medium text-lg text-black-shade-500 ml-2">
-          Yesterday
-        </div>
-        <div className="rounded-2xl bg-gray-50 shadow-md w-full ">
-          {Array.from({ length: 3 }).map((_, index, array) => (
-            <>
-              <div className="flex justify-between items-center p-4">
-                <div className="flex gap-3 ">
-                  <Image src={dummy} alt=" " className="size-12 " />
-                  <div className="flex flex-col gap-1 justify-center">
-                    <h1 className="font-semibold text-sm ">
-                      Chain-l.eth booked your session{" "}
-                    </h1>
-                    <p className="font-normal text-xs text-black-shade-500">
-                      On November 2, 2024 at 5:00 PM
-                    </p>
-                  </div>
-                </div>
-                <div className="text-black-shade-500 text-xs font-normal">
-                  2 hours ago
-                </div>
-              </div>
-              {index < array.length - 1 && (
-                <hr className="border-gray-200 border-1.5" />
-              )}
-            </>
-          ))}
-        </div>
+        
       </div>
     </>
   );
