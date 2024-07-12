@@ -50,6 +50,10 @@ import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
 import MainProfileSkeletonLoader from "../SkeletonLoader/MainProfileSkeletonLoader";
 import { BASE_URL } from "@/config/constants";
 import { fetchData } from "next-auth/client/_utils";
+import { IoClose } from "react-icons/io5";
+import user1 from '@/assets/images/daos/user1.png';
+import { FaCalendarDays } from "react-icons/fa6";
+import FollowingModal from "../utils/FollowingModal";
 
 function MainProfile() {
   const { isConnected, address } = useAccount();
@@ -1198,102 +1202,14 @@ function MainProfile() {
                     )
                   : null} */}
 
-                {isOpentoaster && toast.loading("Saving...")}
+                {/* {isOpentoaster && toast.loading("Saving...")} */}
 
                 {isOpenFollowings && (
-                  <div className="font-poppins z-[70] fixed inset-0 flex items-center justify-center backdrop-blur-md">
-                    <div className="bg-white rounded-[41px] overflow-hidden shadow-lg w-3/4">
-                      <div className="relative">
-                        <div className="flex flex-col gap-1 text-white bg-[#292929] p-4 py-7">
-                          <h2 className="text-lg font-semibold mx-4">
-                            Followings
-                          </h2>
-                        </div>
-                        <div className="px-8 py-4 max-h-[60vh] overflow-y-auto">
-                          {userFollowings.map((user, index) => (
-                            <div
-                              key={index}
-                              className="flex justify-between items-center border-b py-4">
-                              <div className="flex items-center">
-                                <img
-                                  src={
-                                    "https://img.freepik.com/free-vector/user-blue-gradient_78370-4692.jpg?size=338&ext=jpg&ga=GA1.1.1546980028.1719619200&semt=sph " ||
-                                    "default-image-url"
-                                  } // Add a default image URL
-                                  alt={user.follower_address}
-                                  className="w-10 h-10 rounded-full mr-4"
-                                />
-                                <div>
-                                  <p className="font-semibold">
-                                    {user.follower_address.slice(0, 6)}...
-                                    {user.follower_address.slice(-4)}
-                                  </p>
-                                  <p className="text-sm text-gray-500">
-                                    {user.follower_address}
-                                  </p>
-                                </div>
-                              </div>
-                              <div className="flex items-center">
-                                <button
-                                  className={`font-bold text-white rounded-full px-8 py-[10px] flex items-center ${
-                                    user.isFollowing
-                                      ? "bg-red-600"
-                                      : "bg-blue-shade-200"
-                                  }`}
-                                  onClick={() => toggleFollowing(index, user)}>
-                                  {user.isFollowing ? "Unfollow" : "Follow"}
-                                </button>
-                                <span className="text-sm text-blue-700 mx-1">
-                                  {user.isNotification ? (
-                                    <BiSolidBellRing
-                                      className=""
-                                      color="bg-blue-shade-200"
-                                      size={24}
-                                      onClick={() =>
-                                        toggleNotification(index, user)
-                                      }
-                                    />
-                                  ) : (
-                                    <BiSolidBellOff
-                                      className="mr-1"
-                                      color="bg-blue-shade-200"
-                                      size={24}
-                                      onClick={() =>
-                                        toggleNotification(index, user)
-                                      }
-                                    />
-                                  )}
-                                </span>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                        <div className="flex justify-center px-8 py-4">
-                          <button
-                            className="bg-gray-300 text-gray-700 px-8 py-3 font-semibold rounded-full"
-                            onClick={handleCloseAndUpdateFollowings}>
-                            {loading ? (
-                              <Oval
-                                visible={true}
-                                height="20"
-                                width="20"
-                                color="black"
-                                secondaryColor="#cdccff"
-                                ariaLabel="oval-loading"
-                              />
-                            ) : (
-                              "Save Changes"
-                            )}
-                          </button>
-                          <button
-                            className="bg-red-300 text-gray-700 px-8 py-3 ml-4 font-semibold rounded-full"
-                            onClick={() => setfollowingmodel(false)}>
-                            Close
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                  <FollowingModal userFollowings={userFollowings}
+                  toggleFollowing={toggleFollowing}
+                  toggleNotification={toggleNotification}
+                  setfollowingmodel={setfollowingmodel}
+                  chainName={chain?.name} />
                 )}
 
                 {selfDelegate === false ? (

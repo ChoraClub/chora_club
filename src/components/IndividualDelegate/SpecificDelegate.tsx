@@ -901,7 +901,7 @@ function SpecificDelegate({ props }: { props: Type }) {
 
                   <button
                     className={`font-bold text-white rounded-full w-[138.5px] h-[44px] py-[10px] flex justify-center items-center ${
-                      isFollowing ? "bg-green-500" : "bg-black"
+                      isFollowing ? "bg-blue-shade-200" : "bg-black"
                     }`}
                     onClick={handleFollow}>
                     {loading ? (
@@ -932,15 +932,15 @@ function SpecificDelegate({ props }: { props: Type }) {
                     <div
                       className={`border  rounded-full flex items-center justify-center size-10  ${
                         isFollowing
-                          ? "cursor-pointer border-black"
+                          ? "cursor-pointer border-blue-shade-200"
                           : "cursor-not-allowed border-gray-200"
                       }`}
                       onClick={() => isFollowing && handleConfirm(2)}>
                       {isFollowing ? (
                         notification ? (
-                          <IoMdNotifications className="text-black size-6" />
+                          <IoMdNotifications className="text-blue-shade-200 size-6" />
                         ) : (
-                          <IoMdNotificationsOff className="text-black size-6" />
+                          <IoMdNotificationsOff className="text-blue-shade-200 size-6" />
                         )
                       ) : (
                         <IoMdNotifications className="text-gray-200 size-6" />
