@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import logo from "@/assets/images/daos/CCLogo.png";
 // import logo from "@/assets/images/sidebar/favicon.png";
 import rocket from "@/assets/images/sidebar/rocket.png";
@@ -27,6 +27,7 @@ import Joyride from "react-joyride";
 import { title } from "process";
 import { Placement } from "react-joyride";
 import { IoMdNotifications } from "react-icons/io";
+import dummy from "@/assets/images/daos/user2.png";
 
 import { Poppins } from "next/font/google";
 import { MdImportantDevices } from "react-icons/md";
@@ -35,6 +36,7 @@ function Sidebar() {
   // const [isClient, setIsClient] = useState(false);
   const [hasSeenTour, setHasSeenTour] = useState(true);
   const [notificationCount, setNotificationCount] = useState(1);
+  const [isHovering, setIsHovering] = useState(false);
 
   const tourSteps = [
     {
@@ -234,6 +236,25 @@ function Sidebar() {
   const { address, isConnected } = useAccount();
   const { data: session, status } = useSession();
   const sessionLoading = status === "loading";
+  const hoverRef = useRef<HTMLDivElement>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, []);
+
+  const handleMouseEnter = () => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    setIsHovering(true);
+  };
+
+  const handleMouseLeave = () => {
+    timeoutRef.current = setTimeout(() => {
+      setIsHovering(false);
+    }, 300); // 300ms delay before hiding
+  };
 
   useEffect(() => {
     // console.log(session, sessionLoading, isConnected);
@@ -441,28 +462,58 @@ function Sidebar() {
             </div>
           </div>
           <div className="flex flex-col items-center gap-y-4 pt-5">
-            <Badge
-              content={notificationCount}
-              color="danger"
-              placement="top-right"
-              size="md"
-              isInvisible={notificationCount === 0}
-              className="border-none bg-blue-shade-200 translate-x-1.5 -translate-y-1.5"
+            <div
+              className="relative"
+              ref={hoverRef}
+              onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
             >
-              <Tooltip
-                content={<div className="capitalize">Notifications</div>}
-                placement="right"
-                className="rounded-md bg-opacity-90"
-                closeDelay={1}
+              <Badge
+                content={notificationCount}
+                color="danger"
+                placement="top-right"
+                size="md"
+                isInvisible={notificationCount === 0}
+                className="border-none bg-blue-shade-200 translate-x-1.5 -translate-y-1.5"
               >
                 <div
-                  className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 bg-white rounded-full flex justify-center items-center `}
-                  onClick={() => router.push(`/notifications`)}
+                  className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 bg-white rounded-full flex justify-center items-center w-10 h-10`}
+                  onClick={() => router.push(`/notifications?active=all`)}
                 >
                   <IoMdNotifications className="size-6 text-blue-shade-200" />
                 </div>
-              </Tooltip>
-            </Badge>
+              </Badge>
+
+              {isHovering && (
+                <div
+                  className="absolute left-16 -top-14 xl:left-20  bg-white rounded-2xl shadow-lg border border-[#C3D3FF] w-96 font-poppins z-50"
+                  onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+                >
+                  {Array.from({ length: 3 }).map((_, index, array) => (
+                    <>
+                      <div className="flex items-center p-4 justify-between">
+                        <div className="flex ">
+                          <Image src={dummy} alt="" className="size-8 mr-3" />
+                          <div>
+                            <p className="text-xs font-semibold hover:text-blue-shade-100 cursor-pointer mb-1">
+                              chain-1.eth booked your session
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              on November 2, 2024 at 5:00 PM
+                            </p>
+                          </div>
+                        </div>
+                        <div className="text-xs text-gray-500">2 hours ago</div>
+                      </div>
+                      {index < array.length - 1 && (
+                        <hr className="border-[#DDDDDD] border-0.5" />
+                      )}
+                    </>
+                  ))}
+                </div>
+              )}
+            </div>
             <Tooltip
               content={<div className="capitalize">Git Book</div>}
               placement="right"
