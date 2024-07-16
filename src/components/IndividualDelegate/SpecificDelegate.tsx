@@ -2,7 +2,7 @@
 import Image from "next/image";
 import React, { use, useEffect, useState } from "react";
 import user from "@/assets/images/daos/profile.png";
-import { FaXTwitter, FaDiscord, FaGithub } from "react-icons/fa6";
+import { FaXTwitter, FaDiscord, FaGithub, FaVoicemail, FaEnvelope } from "react-icons/fa6";
 import { BiSolidMessageRoundedDetail } from "react-icons/bi";
 import { IoCopy, IoShareSocialSharp } from "react-icons/io5";
 import DelegateInfo from "./DelegateInfo";
@@ -78,6 +78,8 @@ function SpecificDelegate({ props }: { props: Type }) {
   const [same, setSame] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [emailId, setEmailId] = useState<string>();
+  const [isEmailVisible, setIsEmailVisible] = useState(false);
 
   const [delegateOpen, setDelegateOpen] = useState(false);
   const address = useAccount();
@@ -401,15 +403,15 @@ function SpecificDelegate({ props }: { props: Type }) {
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
 
-        const raw = JSON.stringify({
-          address: props.individualDelegate,
-          // daoName: props.daoDelegates,
-        });
+        // const raw = JSON.stringify({
+        //   address: props.individualDelegate,
+        //   // daoName: props.daoDelegates,
+        // });
 
         const requestOptions: any = {
-          method: "POST",
+          method: "GET",
           headers: myHeaders,
-          body: raw,
+          // body: raw,
           redirect: "follow",
         };
         const res = await fetch(
@@ -438,6 +440,10 @@ function SpecificDelegate({ props }: { props: Type }) {
             // setResponseFromDB(true);
             setDisplayImage(item.image);
             setDescription(item.description);
+            if (item.isEmailVisible) {
+              setIsEmailVisible(true);
+              setEmailId(item.emailId);
+            }
             const matchingNetwork = item.networks.find(
               (network: any) => network.dao_name === chain?.name
             );
@@ -452,7 +458,6 @@ function SpecificDelegate({ props }: { props: Type }) {
               );
             }
             setDisplayName(item.displayName);
-            // setEmailId(item.emailId);
 
             setSocials({
               twitter: item.socialHandles.twitter,
@@ -604,6 +609,15 @@ function SpecificDelegate({ props }: { props: Type }) {
                       target="_blank">
                       <FaDiscord color="#7C7C7C" size={12} />
                     </Link>
+                    {isEmailVisible && (
+                      <Link
+                        href={`mailto:${emailId}`}
+                        className="border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1"
+                        style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
+                        target="_blank">
+                        <FaEnvelope color="#7C7C7C" size={12} />
+                      </Link>
+                    )}
                     <Link
                       href={
                         socials.github
@@ -651,8 +665,7 @@ function SpecificDelegate({ props }: { props: Type }) {
                       content="Copy profile URL to share on Warpcast or Twitter."
                       placement="bottom"
                       closeDelay={1}
-                      showArrow
-                    >
+                      showArrow>
                       <Button
                         className="bg-gray-200 hover:bg-gray-300"
                         onClick={() => {
@@ -664,8 +677,7 @@ function SpecificDelegate({ props }: { props: Type }) {
                           setTimeout(() => {
                             setIsCopied(false);
                           }, 3000);
-                        }}
-                      >
+                        }}>
                         <IoShareSocialSharp />
                         {isCopied ? "Copied" : "Share profile"}
                       </Button>

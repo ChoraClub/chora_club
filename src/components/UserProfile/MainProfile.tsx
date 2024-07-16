@@ -53,6 +53,7 @@ import { SiDiscourse } from "react-icons/si";
 import { BsDiscord } from "react-icons/bs";
 import { TbBrandGithubFilled } from "react-icons/tb";
 import { CgAttachment } from "react-icons/cg";
+import { cookies } from "next/headers";
 
 function MainProfile() {
   const { isConnected, address } = useAccount();
@@ -87,6 +88,7 @@ function MainProfile() {
   const [selfDelegate, setSelfDelegate] = useState(false);
   const [daoName, setDaoName] = useState("optimism");
   const [isCopied, setIsCopied] = useState(false);
+  const [isToggled, settoggle] = useState(false);
 
   interface ProgressData {
     total: any;
@@ -308,6 +310,42 @@ function MainProfile() {
       return number;
     }
   };
+
+  const handleTogle = async () => {
+    setIsLoading(true);
+    const isEmailVisible = !isToggled;
+    try {
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      if (address) {
+        myHeaders.append("x-wallet-address", address);
+      }
+      const raw = JSON.stringify({
+        address: address,
+        isEmailVisible: isEmailVisible,
+      });
+
+      const requestOptions: any = {
+        method: "PUT",
+        headers: myHeaders,
+        body: raw,
+        redirect: "follow",
+      };
+      const response = await fetch("/api/profile/emailstatus", requestOptions);
+
+      if (!response.ok) {
+        throw new Error("Failed to toggle");
+      }
+
+      const data = await response.json();
+      setIsLoading(false);
+      settoggle(!isToggled);
+      console.log("status successfully change!", data);
+    } catch (error) {
+      console.error("Error following:", error);
+    }
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -321,9 +359,11 @@ function MainProfile() {
             : "";
         console.log("Fetching from DB");
         // const dbResponse = await axios.get(`/api/profile/${address}`);
-
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
+        if (address) {
+          myHeaders.append("x-wallet-address", address);
+        }
 
         const raw = JSON.stringify({
           address: address,
@@ -357,6 +397,7 @@ function MainProfile() {
               setEmailId(item.emailId);
               setTwitter(item.socialHandles.twitter);
               setDiscord(item.socialHandles.discord);
+              settoggle(item.isEmailVisible);
 
               const matchingNetwork = item.networks.find(
                 (network: any) => network.dao_name === dao
@@ -365,7 +406,7 @@ function MainProfile() {
               // If a matching network is found, set the discourse ID
               if (matchingNetwork) {
                 setDiscourse(matchingNetwork.discourse);
-                setDescription(matchingNetwork.description);
+                // setDescription(matchingNetwork.description);
               } else {
                 // Handle the case where no matching network is found
                 console.log(
@@ -555,6 +596,7 @@ function MainProfile() {
         isDelegate: true,
         displayName: displayName,
         emailId: emailId,
+        isEmailVisible: false,
         socialHandles: {
           twitter: twitter,
           discord: discord,
@@ -703,8 +745,7 @@ function MainProfile() {
                 style={{
                   backgroundColor: "#fcfcfc",
                   border: "2px solid #E9E9E9 ",
-                }}
-              >
+                }}>
                 <div className="w-40 h-40 flex items-center justify-content ">
                   <div className="flex justify-center items-center w-40 h-40">
                     <Image
@@ -764,8 +805,7 @@ function MainProfile() {
                         twitter == "" ? "hidden" : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                      target="_blank"
-                    >
+                      target="_blank">
                       <FaXTwitter color="#7C7C7C" size={12} />
                     </Link>
                     <Link
@@ -780,8 +820,7 @@ function MainProfile() {
                         discourse == "" ? "hidden" : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                      target="_blank"
-                    >
+                      target="_blank">
                       <BiSolidMessageRoundedDetail color="#7C7C7C" size={12} />
                     </Link>
                     <Link
@@ -790,8 +829,7 @@ function MainProfile() {
                         discord == "" ? "hidden" : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                      target="_blank"
-                    >
+                      target="_blank">
                       <FaDiscord color="#7C7C7C" size={12} />
                     </Link>
                     <Link
@@ -800,20 +838,17 @@ function MainProfile() {
                         github == "" ? "hidden" : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                      target="_blank"
-                    >
+                      target="_blank">
                       <FaGithub color="#7C7C7C" size={12} />
                     </Link>
                     <Tooltip
                       content="Update your Profile"
                       placement="top"
-                      showArrow
-                    >
+                      showArrow>
                       <span
                         className="border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 cursor-pointer"
                         style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                        onClick={onOpen}
-                      >
+                        onClick={onOpen}>
                         <FaPencil color="#3e3d3d" size={12} />
                       </span>
                     </Tooltip>
@@ -821,10 +856,9 @@ function MainProfile() {
                       isOpen={isOpen}
                       onOpenChange={onOpenChange}
                       className="font-poppins rounded-3xl "
-                      size="xl"
+                      size="2xl"
                       // style={{ '--modal-size': '672px' }}
-                      hideCloseButton
-                    >
+                      hideCloseButton>
                       <ModalContent>
                         {(onClose: any) => (
                           <>
@@ -832,9 +866,8 @@ function MainProfile() {
                               Update your Profile
                               <button
                                 onClick={onClose}
-                                className="text-blue-shade-100 bg-white w-5 h-5  rounded-full flex items-center justify-center font-semibold text-xl"
-                              >
-                                <IoClose className="font-bold size-4"/>
+                                className="text-blue-shade-100 bg-white w-5 h-5  rounded-full flex items-center justify-center font-semibold text-xl">
+                                <IoClose className="font-bold size-4" />
                               </button>
                             </ModalHeader>
                             <ModalBody className="px-10 pb-4 pt-6">
@@ -867,8 +900,7 @@ function MainProfile() {
                                           xmlns="http://www.w3.org/2000/svg"
                                           className="h-12 w-12"
                                           viewBox="0 0 20 20"
-                                          fill="currentColor"
-                                        >
+                                          fill="currentColor">
                                           <path
                                             fillRule="evenodd"
                                             d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
@@ -927,6 +959,31 @@ function MainProfile() {
                                   <div className="text-sm font-semibold flex px-3 items-center gap-1.5">
                                     <TbMailFilled />
                                     Email:
+                                    <Tooltip
+                                      content={
+                                        isToggled
+                                          ? "Your email is now visible to everyone!"
+                                          : "Your email is private and only visible to you."
+                                      }
+                                      placement="right"
+                                      showArrow>
+                                      <label className="cursor-pointer">
+                                        <input
+                                          type="checkbox"
+                                          checked={isToggled}
+                                          onChange={handleTogle}
+                                          disabled={isLoading}
+                                          value=""
+                                          className="sr-only peer"
+                                        />
+                                        <div
+                                          className={`relative w-9 h-5 ${
+                                            isToggled
+                                              ? "bg-green-500"
+                                              : "bg-red-500"
+                                          } peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600`}></div>
+                                      </label>
+                                    </Tooltip>
                                   </div>
                                   <input
                                     type="email"
@@ -1027,8 +1084,7 @@ function MainProfile() {
                               </Button> */}
                               <Button
                                 className="bg-blue-shade-100 rounded-full text-sm font-semibold text-white px-10 mt-3 mb-7 "
-                                onClick={() => handleSubmit()}
-                              >
+                                onClick={() => handleSubmit()}>
                                 {isLoading ? "Saving" : "Save"}
                               </Button>
                             </ModalFooter>
@@ -1049,8 +1105,7 @@ function MainProfile() {
                     content="Copy"
                     placement="bottom"
                     closeDelay={1}
-                    showArrow
-                  >
+                    showArrow>
                     <span className="px-2 cursor-pointer" color="#3E3D3D">
                       <IoCopy onClick={() => handleCopy(`${address}`)} />
                     </span>
@@ -1067,8 +1122,7 @@ function MainProfile() {
                       content="Copy your profile URL to share on Warpcast or Twitter."
                       placement="bottom"
                       closeDelay={1}
-                      showArrow
-                    >
+                      showArrow>
                       <Button
                         className="bg-gray-200 hover:bg-gray-300"
                         onClick={() => {
@@ -1084,8 +1138,7 @@ function MainProfile() {
                           setTimeout(() => {
                             setIsCopied(false);
                           }, 3000);
-                        }}
-                      >
+                        }}>
                         <IoShareSocialSharp />
                         {isCopied ? "Copied" : "Share profile"}
                       </Button>
@@ -1141,8 +1194,7 @@ function MainProfile() {
                     {/* pass address of whom you want to delegate the voting power to */}
                     <button
                       className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
-                      onClick={() => handleDelegateVotes(`${address}`)}
-                    >
+                      onClick={() => handleDelegateVotes(`${address}`)}>
                       Become Delegate
                     </button>
 
@@ -1176,8 +1228,7 @@ function MainProfile() {
                   ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
                   : "border-transparent"
               }`}
-              onClick={() => router.push(path + "?active=info")}
-            >
+              onClick={() => router.push(path + "?active=info")}>
               Info
             </button>
             {selfDelegate === true && (
@@ -1187,8 +1238,7 @@ function MainProfile() {
                     ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
                     : "border-transparent"
                 }`}
-                onClick={() => router.push(path + "?active=votes")}
-              >
+                onClick={() => router.push(path + "?active=votes")}>
                 Past Votes
               </button>
             )}
@@ -1200,8 +1250,7 @@ function MainProfile() {
               }`}
               onClick={() =>
                 router.push(path + "?active=sessions&session=schedule")
-              }
-            >
+              }>
               Sessions
             </button>
             <button
@@ -1212,8 +1261,7 @@ function MainProfile() {
               }`}
               onClick={() =>
                 router.push(path + "?active=officeHours&hours=schedule")
-              }
-            >
+              }>
               Office Hours
             </button>
 
@@ -1224,8 +1272,7 @@ function MainProfile() {
                     ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
                     : "border-transparent"
                 }`}
-                onClick={() => router.push(path + "?active=instant-meet")}
-              >
+                onClick={() => router.push(path + "?active=instant-meet")}>
                 Instant Meet
               </button>
             )}
