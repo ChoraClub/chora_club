@@ -21,7 +21,7 @@ import toast, { Toaster } from "react-hot-toast";
 import Link from "next/link";
 import OPLogo from "@/assets/images/daos/op.png";
 import ArbLogo from "@/assets/images/daos/arbCir.png";
-import ccLogo from "@/assets/images/daos/CC.png";
+import ccLogo from "@/assets/images/daos/CCLogo2.png";
 import {
   Modal,
   ModalContent,
@@ -53,6 +53,7 @@ import { SiDiscourse } from "react-icons/si";
 import { BsDiscord } from "react-icons/bs";
 import { TbBrandGithubFilled } from "react-icons/tb";
 import { CgAttachment } from "react-icons/cg";
+import UpdateProfileModal from "../ComponentUtils/UpdateProfileModal";
 
 function MainProfile() {
   const { isConnected, address } = useAccount();
@@ -61,46 +62,45 @@ function MainProfile() {
   const { publicClient, walletClient } = WalletAndPublicClient();
   const { chain, chains } = useNetwork();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [displayImage, setDisplayImage] = useState("");
-  const [hovered, setHovered] = useState(false);
-  const [profileDetails, setProfileDetails] = useState<any>();
   const router = useRouter();
   const path = usePathname();
   const searchParams = useSearchParams();
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
-  const [displayName, setDisplayName] = useState("");
-  const [emailId, setEmailId] = useState("");
-  const [twitter, setTwitter] = useState("");
-  const [discord, setDiscord] = useState("");
-  const [discourse, setDiscourse] = useState("");
-  const [github, setGithub] = useState("");
   const [description, setDescription] = useState("");
-  const [isDelegate, setIsDelegate] = useState<any>();
+  const [isDelegate, setIsDelegate] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [responseFromDB, setResponseFromDB] = useState<boolean>(false);
   const [karmaImage, setKarmaImage] = useState<any>();
-  const [ensName, setEnsName] = useState("");
+  const [karmaEns, setKarmaEns] = useState("");
   const [karmaDesc, setKarmaDesc] = useState("");
   const [votes, setVotes] = useState<any>();
-  const [descAvailable, setDescAvailable] = useState<boolean>(true);
   const [isPageLoading, setIsPageLoading] = useState(true);
   const [selfDelegate, setSelfDelegate] = useState(false);
   const [daoName, setDaoName] = useState("optimism");
   const [isCopied, setIsCopied] = useState(false);
+  const [modalData, setModalData] = useState({
+    displayImage: "",
+    displayName: "",
+    emailId: "",
+    twitter: "",
+    discord: "",
+    discourse: "",
+    github: "",
+  });
+
+  const [userData, setUserData] = useState({
+    displayImage: "",
+    displayName: "",
+    twitter: "",
+    discord: "",
+    discourse: "",
+    github: "",
+  });
 
   interface ProgressData {
     total: any;
     uploaded: any;
   }
 
-  // useEffect(() => {
-  //   if (chain?.name === "Optimism") {
-  //     setDaoName("optimism");
-  //   } else if (chain?.name === "Arbitrum One") {
-  //     setDaoName("arbitrum");
-  //   }
-  //   console.log("daoName", daoName);
-  // }, [chain, daoName]);
   useEffect(() => {
     if (chain && chain?.name === "Optimism") {
       setDaoName("optimism");
@@ -125,10 +125,10 @@ function MainProfile() {
       }
     }
   }, [
-    isConnected,
-    address,
-    router,
-    session,
+    // isConnected,
+    // address,
+    // router,
+    // session,
     path.includes("profile/undefined"),
   ]);
 
@@ -149,29 +149,10 @@ function MainProfile() {
     const output = await lighthouse.upload(selectedFile, apiKey);
 
     console.log("File Status:", output);
-    setDisplayImage(output.data.Hash);
-
-    let dao = daoName;
-    const response = await axios.put("/api/profile", {
-      address: address,
-      image: displayImage,
-      isDelegate: true,
-      displayName: displayName,
-      emailId: emailId,
-      socialHandles: {
-        twitter: twitter,
-        discord: discord,
-        github: github,
-      },
-      networks: {
-        dao_name: daoName,
-        network: chain?.name,
-        discourse: discourse,
-        description: description,
-      },
-    });
-
-    console.log("response: ", response);
+    setModalData((prevUserData) => ({
+      ...prevUserData,
+      displayImage: output.data.Hash,
+    }));
 
     console.log(
       "Visit at https://gateway.lighthouse.storage/ipfs/" + output.data.Hash
@@ -183,12 +164,6 @@ function MainProfile() {
       const addr = await walletClient.getAddresses();
       const address1 = addr[0];
       let delegateTxAddr = "";
-      // const contractAddress =
-      //   daoName === "optimism"
-      //     ? "0x4200000000000000000000000000000000000042"
-      //     : daoName === "arbitrum"
-      //     ? "0x912CE59144191C1204E64559FE8253a0e49E6548"
-      //     : "";
       const contractAddress =
         chain?.name === "Optimism"
           ? "0x4200000000000000000000000000000000000042"
@@ -226,11 +201,6 @@ function MainProfile() {
       const address1 = addr[0];
 
       const contractAddress =
-        // daoName === "optimism"
-        //   ? "0x4200000000000000000000000000000000000042"
-        //   : daoName === "arbitrum"
-        //   ? "0x912CE59144191C1204E64559FE8253a0e49E6548"
-        //   : "";
         chain?.name === "Optimism"
           ? "0x4200000000000000000000000000000000000042"
           : chain?.name === "Arbitrum One"
@@ -251,76 +221,31 @@ function MainProfile() {
     }
   };
 
-  // useEffect(()=>{
-  //   const getDelegatesVotes = async (address: string) => {
-  //     const addr = await walletClient.getAddresses();
-  //     const address1 = addr[0];
-  //     console.log("Get Votes addr", address1);
-
-  //     console.log(walletClient);
-  //     const votingPower = await publicClient.readContract({
-  //       address: "0x4200000000000000000000000000000000000042",
-  //       abi: dao_abi.abi,
-  //       functionName: "getVotes",
-  //       args: [address],
-  //     });
-  //     console.log("Delegates Votes:", votingPower);
-  //   };
-  //   getDelegatesVotes(`${address}`);
-  // }, [address])
-
   const handleCopy = (addr: string) => {
     copy(addr);
     toast("Address Copied");
   };
 
   const handleInputChange = (fieldName: string, value: string) => {
-    switch (fieldName) {
-      case "displayName":
-        setDisplayName(value);
-        break;
-      case "emailId":
-        setEmailId(value);
-        break;
-      case "twitter":
-        setTwitter(value);
-        break;
-      case "discord":
-        setDiscord(value);
-        break;
-      case "discourse":
-        setDiscourse(value);
-        break;
-      case "github":
-        setGithub(value);
-        break;
-      default:
-        break;
-    }
+    setModalData((prevState) => ({
+      ...prevState,
+      [fieldName]: value,
+    }));
   };
 
-  const formatNumber = (number: number) => {
-    if (number >= 1000000) {
-      return (number / 1000000).toFixed(2) + "m";
-    } else if (number >= 1000) {
-      return (number / 1000).toFixed(2) + "k";
-    } else {
-      return number;
-    }
-  };
   useEffect(() => {
     const fetchData = async () => {
       try {
         // Fetch data from your backend API to check if the address exists
-        // let dao = daoName;
+        console.log("Fetching from DB");
+        // const dbResponse = await axios.get(`/api/profile/${address}`);
+
         let dao =
           chain?.name === "Optimism"
             ? "optimism"
             : chain?.name === "Arbitrum One"
             ? "arbitrum"
             : "";
-        console.log("Fetching from DB");
-        // const dbResponse = await axios.get(`/api/profile/${address}`);
 
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
@@ -339,105 +264,74 @@ function MainProfile() {
         const res = await fetch(`/api/profile/${address}`, requestOptions);
 
         const dbResponse = await res.json();
-        console.log("db Response", dbResponse);
-        if (
-          dbResponse &&
-          Array.isArray(dbResponse.data) &&
-          dbResponse.data.length > 0
-        ) {
-          // Iterate over each item in the response data array
-          for (const item of dbResponse.data) {
-            // Check if address and daoName match
-            if (item.address === address) {
-              console.log("Data found in the database");
-              // Data found in the database, set the state accordingly
-              setResponseFromDB(true);
-              setDisplayImage(item.image);
-              setDisplayName(item.displayName);
-              setEmailId(item.emailId);
-              setTwitter(item.socialHandles.twitter);
-              setDiscord(item.socialHandles.discord);
 
-              const matchingNetwork = item.networks.find(
-                (network: any) => network.dao_name === dao
-              );
+        let karmaDetails;
 
-              // If a matching network is found, set the discourse ID
-              if (matchingNetwork) {
-                setDiscourse(matchingNetwork.discourse);
-                setDescription(matchingNetwork.description);
-              } else {
-                // Handle the case where no matching network is found
-                console.log(
-                  "No matching network found for the specified dao_name"
-                );
-              }
-
-              setGithub(item.socialHandles.github);
-              // Exit the loop since we found a match
-              break;
-            }
-          }
-        } else {
-          console.log(
-            "Data not found in the database, fetching from third-party API"
-          );
-          // Data not found in the database, fetch data from the third-party API
-          let dao =
-            chain?.name === "Optimism"
-              ? "optimism"
-              : chain?.name === "Arbitrum One"
-              ? "arbitrum"
-              : "";
-          const res = await fetch(
+        try {
+          const karmaRes = await fetch(
             `https://api.karmahq.xyz/api/dao/find-delegate?dao=${dao}&user=${address}`
           );
-          if (responseFromDB === false && description == "") {
-            setDescAvailable(false);
+          karmaDetails = await karmaRes.json();
+
+          if (karmaRes.ok) {
+            setKarmaEns(karmaDetails.data.delegate.ensName);
+            setKarmaImage(karmaDetails.data.delegate.profilePicture);
+            setKarmaDesc(
+              karmaDetails.data.delegate.delegatePitch.customFields[1].value
+            );
           }
+          setIsDelegate(true);
+        } catch (e) {
+          console.log("error: ", e);
+          setIsDelegate(false);
+        }
 
-          const details = await res.json();
-          if (res.ok) {
-            // Check if delegate data is present in the response
-            console.log("Response Success----");
-            if (details && details.data && details.data.delegate) {
-              // If delegate data is present, set isDelegate to true
-              console.log("Setting Up Karma's Data---");
-              setIsDelegate(true);
-              setProfileDetails(details.data.delegate);
-              setDescription(
-                details.data.delegate.delegatePitch.customFields[1].value
-              );
-              setDescAvailable(true);
-              if (details.data.delegate.twitterHandle != null) {
-                setTwitter(`${details.data.delegate.twitterHandle}`);
-              }
+        if (dbResponse.data.length > 0) {
+          console.log("db Response", dbResponse.data[0]);
+          setUserData({
+            displayName: dbResponse.data[0].displayName,
+            discord: dbResponse.data[0].socialHandles.discord,
+            discourse: dbResponse.data[0].networks.find(
+              (network: any) => network.dao_name === dao
+            ).discourse,
+            twitter: dbResponse.data[0].socialHandles.twitter,
+            github: dbResponse.data[0].socialHandles.github,
+            displayImage: dbResponse.data[0].image,
+          });
 
-              if (details.data.delegate.discourseHandle != null) {
-                if (dao === "optimism") {
-                  setDiscourse(`${details.data.delegate.discourseHandle}`);
-                  console.log("Discourse", discourse);
-                }
-                if (dao === "arbitrum") {
-                  setDiscourse(`${details.data.delegate.discourseHandle}`);
-                }
-              }
+          setModalData({
+            displayName: dbResponse.data[0].displayName,
+            discord: dbResponse.data[0].socialHandles.discord,
+            discourse: dbResponse.data[0].networks.find(
+              (network: any) => network.dao_name === dao
+            ).discourse,
+            emailId: dbResponse.data[0].emailId,
+            twitter: dbResponse.data[0].socialHandles.twitter,
+            github: dbResponse.data[0].socialHandles.github,
+            displayImage: dbResponse.data[0].image,
+          });
+          setDescription(
+            dbResponse.data[0].networks.find(
+              (network: any) => network.dao_name === dao
+            ).description
+          );
+          setIsPageLoading(false);
+        } else {
+          // const res = await fetch(
+          //   `https://api.karmahq.xyz/api/dao/find-delegate?dao=${dao}&user=${address}`
+          // );
+          // const details = await res.json();
+          // console.log("details: ", details.data.delegate);
 
-              if (details.data.delegate.discordHandle != null) {
-                setDiscord(`${details.data.delegate.discordHandle}`);
-              }
-
-              if (details.data.delegate.githubHandle != null) {
-                setGithub(`${details.data.delegate.githubHandle}`);
-              }
-            } else {
-              // If delegate data is not present, set isDelegate to false
-              setIsDelegate(false);
-            }
-          } else {
-            // If response status is not ok, set isDelegate to false
-            setIsDelegate(false);
-          }
+          setUserData({
+            displayName: karmaDetails.data.delegate.ensName,
+            discord: karmaDetails.data.delegate.discordHandle,
+            discourse: karmaDetails.data.delegate.discourseHandle,
+            twitter: karmaDetails.data.delegate.twitterHandle,
+            github: karmaDetails.data.delegate.githubHandle,
+            displayImage: karmaDetails.data.delegate.profilePicture,
+          });
+          setIsPageLoading(false);
         }
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -445,22 +339,9 @@ function MainProfile() {
     };
 
     fetchData();
-  }, [
-    daoName,
-    chain,
-    address,
-    searchParams.get("session") === "schedule",
-    chain?.name,
-  ]);
+  }, [chain, address]);
 
-  useEffect(() => {
-    setIsPageLoading(false);
-  }, [isPageLoading]);
-
-  const handleDelegate = () => {
-    console.log("IsDelegate Status", isDelegate);
-  };
-  const handleSubmit = async (newDescription?: string) => {
+  const handleSave = async (newDescription?: string) => {
     try {
       // Check if the delegate already exists in the database
       if (newDescription) {
@@ -481,7 +362,7 @@ function MainProfile() {
         await handleAdd(newDescription);
         setIsLoading(false);
         onClose();
-        console.log("Sorry! Doesnt exist");
+        console.log("Sorry! Doesn't exist");
       }
 
       toast.success("Saved");
@@ -495,12 +376,6 @@ function MainProfile() {
   const checkDelegateExists = async (address: any) => {
     try {
       // Make a request to your backend API to check if the address exists
-      let dao =
-        chain?.name === "Optimism"
-          ? "optimism"
-          : chain?.name === "Arbitrum One"
-          ? "arbitrum"
-          : "";
       console.log("Checking");
 
       const myHeaders = new Headers();
@@ -542,29 +417,23 @@ function MainProfile() {
   const handleAdd = async (newDescription?: string) => {
     try {
       // Call the POST API function for adding a new delegate
-      let dao =
-        chain?.name === "Optimism"
-          ? "optimism"
-          : chain?.name === "Arbitrum One"
-          ? "arbitrum"
-          : "";
       console.log("Adding the delegate..");
       const response = await axios.post("/api/profile", {
         address: address,
-        image: displayImage,
+        image: modalData.displayImage,
         isDelegate: true,
-        displayName: displayName,
-        emailId: emailId,
+        displayName: modalData.displayName,
+        emailId: modalData.emailId,
         socialHandles: {
-          twitter: twitter,
-          discord: discord,
-          github: github,
+          twitter: modalData.twitter,
+          discord: modalData.discord,
+          github: modalData.github,
         },
         networks: [
           {
             dao_name: daoName,
             network: chain?.name,
-            discourse: discourse,
+            discourse: modalData.discourse,
             description: newDescription,
           },
         ],
@@ -576,6 +445,14 @@ function MainProfile() {
         // Delegate added successfully
         console.log("Delegate added successfully:", response.data);
         setIsLoading(false);
+        setUserData({
+          displayImage: modalData.displayImage,
+          displayName: modalData.displayName,
+          twitter: modalData.twitter,
+          discord: modalData.discord,
+          discourse: modalData.discourse,
+          github: modalData.github,
+        });
       } else {
         // Handle error response
         console.error("Failed to add delegate:", response.statusText);
@@ -603,20 +480,20 @@ function MainProfile() {
       console.log("Inside Updating Description", newDescription);
       const response: any = await axios.put("/api/profile", {
         address: address,
-        image: displayImage,
+        image: modalData.displayImage,
         isDelegate: true,
-        displayName: displayName,
-        emailId: emailId,
+        displayName: modalData.displayName,
+        emailId: modalData.emailId,
         socialHandles: {
-          twitter: twitter,
-          discord: discord,
-          github: github,
+          twitter: modalData.twitter,
+          discord: modalData.discord,
+          github: modalData.github,
         },
         networks: [
           {
             dao_name: daoName,
             network: chain?.name,
-            discourse: discourse,
+            discourse: modalData.discourse,
             description: newDescription,
           },
         ],
@@ -627,6 +504,14 @@ function MainProfile() {
         // Delegate updated successfully
         console.log("Delegate updated successfully");
         setIsLoading(false);
+        setUserData({
+          displayImage: modalData.displayImage,
+          displayName: modalData.displayName,
+          twitter: modalData.twitter,
+          discord: modalData.discord,
+          discourse: modalData.discourse,
+          github: modalData.github,
+        });
       } else {
         // Handle error response
         console.error("Failed to update delegate:", response.error);
@@ -638,57 +523,6 @@ function MainProfile() {
       setIsLoading(false);
     }
   };
-  useEffect(() => {
-    const fetchData = async () => {
-      console.log("Description", description);
-      try {
-        let dao =
-          chain?.name === "Optimism"
-            ? "optimism"
-            : chain?.name === "Arbitrum One"
-            ? "arbitrum"
-            : "";
-        console.log("Fetching Data...");
-        const res = await fetch(
-          `https://api.karmahq.xyz/api/dao/find-delegate?dao=${dao}&user=${address}`
-        );
-        console.log("Response", res);
-
-        // console.log("Desc.", description)
-        if (res.ok) {
-          const details = await res.json();
-          console.log("Data Fetched...", details.data.delegate.ensName);
-          setEnsName(details.data.delegate.ensName);
-          setKarmaImage(details.data.delegate.profilePicture);
-          setKarmaDesc(
-            details.data.delegate.delegatePitch.customFields[1].value
-          );
-          setVotes(details.data.delegate);
-          console.log("Votes", votes);
-          // setProfileDetails(details.data.delegate);
-
-          // Check if delegate data is present in the response
-          if (details && details.data && details.data.delegate) {
-            // If delegate data is present, set isDelegate to true
-            setIsDelegate(true);
-          } else {
-            // If delegate data is not present, set isDelegate to false
-            setIsDelegate(false);
-          }
-        } else if (res.status === 404) {
-          // If response status is 404, set isDelegate to false
-          setIsDelegate(false);
-        } else {
-          // Handle other error cases
-          setIsDelegate(false);
-        }
-      } catch (err) {
-        console.error("Error fetching data:", err);
-      }
-    };
-
-    fetchData();
-  }, [chain, address, daoName, chain?.name]);
 
   return (
     <>
@@ -697,9 +531,7 @@ function MainProfile() {
           <div className="flex ps-14 py-5 pe-10 justify-between">
             <div className="flex  items-center justify-center">
               <div
-                className="relative object-cover rounded-3xl "
-                onMouseEnter={() => setHovered(true)}
-                onMouseLeave={() => setHovered(false)}
+                className="relative object-cover rounded-3xl"
                 style={{
                   backgroundColor: "#fcfcfc",
                   border: "2px solid #E9E9E9 ",
@@ -709,8 +541,8 @@ function MainProfile() {
                   <div className="flex justify-center items-center w-40 h-40">
                     <Image
                       src={
-                        (displayImage
-                          ? `https://gateway.lighthouse.storage/ipfs/${displayImage}`
+                        (userData.displayImage
+                          ? `https://gateway.lighthouse.storage/ipfs/${userData.displayImage}`
                           : karmaImage) ||
                         (daoName === "optimism"
                           ? OPLogo
@@ -722,7 +554,7 @@ function MainProfile() {
                       width={256}
                       height={256}
                       className={
-                        displayImage
+                        userData.displayImage
                           ? "w-40 h-40 rounded-3xl"
                           : "w-20 h-20 rounded-3xl"
                       }
@@ -732,7 +564,7 @@ function MainProfile() {
                   <Image
                     src={ccLogo}
                     alt="ChoraClub Logo"
-                    className="absolute top-0 right-0"
+                    className="absolute top-0 right-0 bg-white rounded-full"
                     style={{
                       width: "30px",
                       height: "30px",
@@ -746,10 +578,10 @@ function MainProfile() {
               <div className="px-4">
                 <div className=" flex items-center py-1">
                   <div className="font-bold text-lg pr-4">
-                    {ensName || profileDetails?.ensName ? (
-                      ensName || profileDetails?.ensName
-                    ) : displayName ? (
-                      displayName
+                    {karmaEns ? (
+                      karmaEns
+                    ) : userData.displayName ? (
+                      userData.displayName
                     ) : (
                       <>
                         {`${address}`.substring(0, 6)} ...{" "}
@@ -759,9 +591,9 @@ function MainProfile() {
                   </div>
                   <div className="flex gap-3">
                     <Link
-                      href={`https://twitter.com/${twitter}`}
+                      href={`https://twitter.com/${userData.twitter}`}
                       className={`border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 ${
-                        twitter == "" ? "hidden" : ""
+                        userData.twitter == "" ? "hidden" : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
                       target="_blank"
@@ -771,13 +603,13 @@ function MainProfile() {
                     <Link
                       href={
                         daoName === "optimism"
-                          ? `https://gov.optimism.io/u/${discourse}`
+                          ? `https://gov.optimism.io/u/${userData.discourse}`
                           : daoName == "arbitrum"
-                          ? `https://forum.arbitrum.foundation/u/${discourse}`
+                          ? `https://forum.arbitrum.foundation/u/${userData.discourse}`
                           : ""
                       }
                       className={`border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1  ${
-                        discourse == "" ? "hidden" : ""
+                        userData.discourse == "" ? "hidden" : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
                       target="_blank"
@@ -785,9 +617,9 @@ function MainProfile() {
                       <BiSolidMessageRoundedDetail color="#7C7C7C" size={12} />
                     </Link>
                     <Link
-                      href={`https://discord.com/${discord}`}
+                      href={`https://discord.com/${userData.discord}`}
                       className={`border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 ${
-                        discord == "" ? "hidden" : ""
+                        userData.discord == "" ? "hidden" : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
                       target="_blank"
@@ -795,9 +627,9 @@ function MainProfile() {
                       <FaDiscord color="#7C7C7C" size={12} />
                     </Link>
                     <Link
-                      href={`https://github.com/${github}`}
+                      href={`https://github.com/${userData.github}`}
                       className={`border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 ${
-                        github == "" ? "hidden" : ""
+                        userData.github == "" ? "hidden" : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
                       target="_blank"
@@ -817,225 +649,17 @@ function MainProfile() {
                         <FaPencil color="#3e3d3d" size={12} />
                       </span>
                     </Tooltip>
-                    <Modal
+                    <UpdateProfileModal
                       isOpen={isOpen}
-                      onOpenChange={onOpenChange}
-                      className="font-poppins rounded-3xl "
-                      size="xl"
-                      // style={{ '--modal-size': '672px' }}
-                      hideCloseButton
-                    >
-                      <ModalContent>
-                        {(onClose: any) => (
-                          <>
-                            <ModalHeader className="flex justify-between text-2xl font-semibold items-center bg-blue-shade-100 text-white px-8 py-6 ">
-                              Update your Profile
-                              <button
-                                onClick={onClose}
-                                className="text-blue-shade-100 bg-white w-5 h-5  rounded-full flex items-center justify-center font-semibold text-xl"
-                              >
-                                <IoClose className="font-bold size-4"/>
-                              </button>
-                            </ModalHeader>
-                            <ModalBody className="px-10 pb-4 pt-6">
-                              {/* <div className="text-sm font-semibold mb-2">
-                                Upload Profile Image:
-                                
-                              </div> */}
-                              {/* <input
-                                type="file"
-                                ref={fileInputRef}
-                                placeholder="Upload Image"
-                                onChange={(e) => uploadImage(e.target.files)}
-                              /> */}
-
-                              <div className="mb-4">
-                                <div className="text-sm font-semibold mb-2">
-                                  Upload Profile Image:
-                                </div>
-                                <div className="flex items-center">
-                                  <div className="w-24 h-24 bg-gray-100 rounded-md flex items-center justify-center mr-4">
-                                    {displayImage ? (
-                                      <img
-                                        src={`https://gateway.lighthouse.storage/ipfs/${displayImage}`}
-                                        alt="Profile"
-                                        className="w-full h-full object-cover rounded-md"
-                                      />
-                                    ) : (
-                                      <div className="text-gray-400">
-                                        <svg
-                                          xmlns="http://www.w3.org/2000/svg"
-                                          className="h-12 w-12"
-                                          viewBox="0 0 20 20"
-                                          fill="currentColor"
-                                        >
-                                          <path
-                                            fillRule="evenodd"
-                                            d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
-                                            clipRule="evenodd"
-                                          />
-                                        </svg>
-                                      </div>
-                                    )}
-                                  </div>
-                                  <div>
-                                    <p className="text-sm text-gray-600 mb-2">
-                                      Please upload square image, size less than
-                                      100KB
-                                    </p>
-                                    <div className="flex items-center">
-                                      <label className="bg-white  text-blue-shade-100 font-medium text-sm py-3 px-4 rounded-full border cursor-pointer border-blue-shade-100 cursor-point flex gap-2 items-center">
-                                        <CgAttachment />
-                                        <span>Choose File</span>
-                                        <input
-                                          type="file"
-                                          ref={fileInputRef}
-                                          onChange={(e) =>
-                                            uploadImage(e.target.files)
-                                          }
-                                          className="hidden"
-                                        />
-                                      </label>
-                                      <span className="ml-3 text-sm text-gray-600">
-                                        {fileInputRef.current?.files?.[0]
-                                          ?.name || "No File Chosen"}
-                                      </span>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-
-                              <div className="flex gap-6 ">
-                                <div className="flex flex-col basis-1/2 mt-1.5">
-                                  <div className="font-semibold text-sm flex px-3 items-center gap-1.5">
-                                    <FaUserEdit /> Display name:
-                                  </div>
-                                  <input
-                                    type="text"
-                                    value={displayName}
-                                    placeholder="Enter Name"
-                                    className="border border-[#f2eeee] mt-1 bg-white rounded-lg px-3 py-[10px] text-sm text-[#b5b5b5] font-normal"
-                                    onChange={(e) =>
-                                      handleInputChange(
-                                        "displayName",
-                                        e.target.value
-                                      )
-                                    }
-                                  />
-                                </div>
-                                <div className="flex flex-col basis-1/2 mt-1.5 ">
-                                  <div className="text-sm font-semibold flex px-3 items-center gap-1.5">
-                                    <TbMailFilled />
-                                    Email:
-                                  </div>
-                                  <input
-                                    type="email"
-                                    value={emailId}
-                                    placeholder="xxx@gmail.com"
-                                    className="border border-[#f2eeee] mt-1 bg-white rounded-lg px-3 py-[10px] text-sm text-[#b5b5b5] font-normal"
-                                    onChange={(e) =>
-                                      handleInputChange(
-                                        "emailId",
-                                        e.target.value
-                                      )
-                                    }
-                                  />
-                                </div>
-                              </div>
-
-                              <div className="flex gap-6 ">
-                                <div className="flex flex-col basis-1/2 mt-1.5">
-                                  <div className="text-sm font-semibold flex px-3 items-center gap-1.5">
-                                    <FaXTwitter />
-                                    (Formerly Twitter):
-                                  </div>
-                                  <input
-                                    type="url"
-                                    value={twitter}
-                                    placeholder="Enter Twitter Name"
-                                    className="border border-[#f2eeee] mt-1 bg-white rounded-lg px-3 py-[10px] text-sm text-[#b5b5b5] font-normal "
-                                    onChange={(e) =>
-                                      handleInputChange(
-                                        "twitter",
-                                        e.target.value
-                                      )
-                                    }
-                                  />
-                                </div>
-                                <div className="flex flex-col basis-1/2 mt-1.5">
-                                  <div className="text-sm font-semibold flex px-3 items-center gap-1.5">
-                                    <SiDiscourse />
-                                    Discourse:
-                                  </div>
-                                  <input
-                                    type="url"
-                                    value={discourse}
-                                    placeholder="Enter Discourse Name"
-                                    className="border border-[#f2eeee] mt-1 bg-white rounded-lg px-3 py-[10px] text-sm text-[#b5b5b5] font-normal "
-                                    onChange={(e) =>
-                                      handleInputChange(
-                                        "discourse",
-                                        e.target.value
-                                      )
-                                    }
-                                  />
-                                </div>
-                              </div>
-
-                              <div className="flex gap-6 ">
-                                <div className="flex flex-col basis-1/2 mt-1.5">
-                                  <div className="text-sm font-semibold flex px-3 items-center gap-1.5">
-                                    <BsDiscord />
-                                    Discord:
-                                  </div>
-                                  <input
-                                    type="url"
-                                    value={discord}
-                                    placeholder="Enter Discord Name"
-                                    className="border border-[#f2eeee] mt-1 bg-white rounded-lg px-3 py-[10px] text-sm text-[#b5b5b5] font-normal "
-                                    onChange={(e) =>
-                                      handleInputChange(
-                                        "discord",
-                                        e.target.value
-                                      )
-                                    }
-                                  />
-                                </div>
-                                <div className="flex flex-col basis-1/2 mt-1.5">
-                                  <div className="text-sm font-semibold flex px-3 items-center gap-1.5">
-                                    <TbBrandGithubFilled />
-                                    Github:
-                                  </div>
-                                  <input
-                                    type="url"
-                                    value={github}
-                                    placeholder="Enter Github Name"
-                                    className="border border-[#f2eeee] mt-1 bg-white rounded-lg px-3 py-[10px] text-sm text-[#b5b5b5] font-normal "
-                                    onChange={(e) =>
-                                      handleInputChange(
-                                        "github",
-                                        e.target.value
-                                      )
-                                    }
-                                  />
-                                </div>
-                              </div>
-                            </ModalBody>
-                            <ModalFooter className="flex justify-center items-center">
-                              {/* <Button color="default" onPress={onClose}>
-                                Close
-                              </Button> */}
-                              <Button
-                                className="bg-blue-shade-100 rounded-full text-sm font-semibold text-white px-10 mt-3 mb-7 "
-                                onClick={() => handleSubmit()}
-                              >
-                                {isLoading ? "Saving" : "Save"}
-                              </Button>
-                            </ModalFooter>
-                          </>
-                        )}
-                      </ModalContent>
-                    </Modal>
+                      onClose={onClose}
+                      modalData={modalData}
+                      handleInputChange={handleInputChange}
+                      uploadImage={uploadImage}
+                      fileInputRef={fileInputRef}
+                      isLoading={isLoading}
+                      // displayImage={userData.displayImage}
+                      handleSave={handleSave}
+                    />
                   </div>
                 </div>
 
@@ -1091,50 +715,7 @@ function MainProfile() {
                       </Button>
                     </Tooltip>
                   </div>
-                  <Toaster
-                    toastOptions={{
-                      style: {
-                        fontSize: "14px",
-                        backgroundColor: "#3E3D3D",
-                        color: "#fff",
-                        boxShadow: "none",
-                        borderRadius: "50px",
-                        padding: "3px 5px",
-                      },
-                    }}
-                  />
                 </div>
-                {/* {selfDelegate === true
-                  ? votes && (
-                      <div className="flex gap-4 py-1">
-                        <div className="text-[#4F4F4F] border-[0.5px] border-[#D9D9D9] rounded-md px-3 py-1">
-                          <span className="text-blue-shade-200 font-semibold">
-                            {votes.delegatedVotes
-                              ? formatNumber(Number(votes.delegatedVotes))
-                              : "Fetching "}
-                            &nbsp;
-                          </span>
-                          delegated tokens
-                        </div>
-                        <div className="text-[#4F4F4F] border-[0.5px] border-[#D9D9D9] rounded-md px-3 py-1">
-                          <span className="text-blue-shade-200 font-semibold">
-                            {formatNumber(votes.delegatorCount)
-                              ? null
-                              : "Fetching "}
-                          </span>
-                          Delegated from
-                          <span className="text-blue-shade-200 font-semibold">
-                            &nbsp;
-                            {formatNumber(votes.delegatorCount)
-                              ? formatNumber(votes.delegatorCount)
-                              : "number of "}
-                            &nbsp;
-                          </span>
-                          Addresses
-                        </div>
-                      </div>
-                    )
-                  : null} */}
 
                 {selfDelegate === false ? (
                   <div className="pt-2 flex gap-5">
@@ -1145,21 +726,6 @@ function MainProfile() {
                     >
                       Become Delegate
                     </button>
-
-                    {/* <div className="">
-                      <select
-                        value={daoName}
-                        onChange={(e) => setDaoName(e.target.value)}
-                        className="outline-none border border-blue-shade-200 text-blue-shade-200 rounded-full py-2 px-3"
-                      >
-                        <option value="optimism" className="text-gray-700">
-                          Optimism
-                        </option>
-                        <option value="arbitrum" className="text-gray-700">
-                          Arbitrum
-                        </option>
-                      </select>
-                    </div> */}
                   </div>
                 ) : null}
               </div>
@@ -1229,16 +795,6 @@ function MainProfile() {
                 Instant Meet
               </button>
             )}
-            {/* <button
-          className={`border-b-2 py-4 px-2 outline-none ${
-            searchParams.get("active") === "claimNft"
-              ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
-              : "border-transparent"
-          }`}
-          onClick={() => router.push(path + "?active=claimNft")}
-        >
-          Claim NFTs
-        </button> */}
           </div>
 
           <div className="py-6 ps-16">
@@ -1248,9 +804,9 @@ function MainProfile() {
                 description={description}
                 isDelegate={isDelegate}
                 isSelfDelegate={selfDelegate}
-                descAvailable={descAvailable}
+                // descAvailable={descAvailable}
                 onSaveButtonClick={(newDescription?: string) =>
-                  handleSubmit(newDescription)
+                  handleSave(newDescription)
                 }
                 isLoading={isLoading}
                 daoName={daoName}
