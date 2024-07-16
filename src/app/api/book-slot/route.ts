@@ -2,6 +2,8 @@ import { connectDB } from "@/config/connectDB";
 import { NextApiRequest, NextApiResponse } from "next";
 import { NextResponse, NextRequest } from "next/server";
 import { sendMail, compileBookedSessionTemplate } from "@/libs/mail";
+import { io } from "socket.io-client";
+import { SOCKET_BASE_URL } from "@/config/constants";
 
 type Attendee = {
   attendee_address: string;
@@ -107,6 +109,46 @@ export async function POST(
         .toArray();
 
       if (session_type === "session") {
+        const userAddress = attendees[0].attendee_address;
+        const notificationToHost = {
+          receiver_address: host_address,
+          content: `${userAddress} has booked your session on ${dao_name}.`,
+          createdAt: Date.now(),
+          read_status: false,
+          notification_name: "booking",
+          notification_type: "newBookingForHost",
+        };
+
+        const notificationToGuest = {
+          receiver_address: userAddress,
+          content: `Your session on ${dao_name} has been successfully booked with ${host_address}.`,
+          createdAt: Date.now(),
+          read_status: false,
+          notification_name: "booking",
+          notification_type: "newBookingForHost",
+        };
+
+        const notificationCollection = db.collection("notifications");
+
+        const notificationResults = await notificationCollection.insertMany([
+          notificationToHost,
+          notificationToGuest,
+        ]);
+
+        console.log("notificationResults", notificationResults);
+
+        if (notificationResults.insertedCount === 2) {
+          const insertedNotifications = await notificationCollection
+            .find({
+              _id: { $in: Object.values(notificationResults.insertedIds) },
+            })
+            .toArray();
+
+          console.log("insertedNotifications", insertedNotifications);
+        }
+        const socket = io(`${SOCKET_BASE_URL}`, {
+          withCredentials: true,
+        });
         for (const document of documentsForHostEmail) {
           const emailId = document.emailId;
           if (emailId && emailId !== "" && emailId !== undefined) {
@@ -125,10 +167,10 @@ export async function POST(
             }
           }
         }
-      }
+        // }
 
-      if (session_type === "session") {
-        const userAddress = attendees[0].attendee_address;
+        // if (session_type === "session") {
+
         const documentsForUserEmail = await delegateCollection
           .find({ address: userAddress })
           .toArray();
@@ -150,6 +192,20 @@ export async function POST(
             }
           }
         }
+
+        const dataToSendHost = notificationToHost.content;
+        const dataToSendGuest = notificationToGuest.content;
+        socket.on("connect", () => {
+          console.log("Connected to WebSocket server from API");
+          socket.emit("new_session", {
+            host_address,
+            dataToSendHost,
+            userAddress,
+            dataToSendGuest,
+          });
+          console.log("Message sent from API to socket server");
+          socket.disconnect();
+        });
       }
 
       client.close();

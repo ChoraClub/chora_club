@@ -2,9 +2,9 @@ import React from "react";
 import { dataNotification } from "./data";
 import NotificationTile from "./NotificationTile";
 
-function Attestations() {
+function RecordedSessions() {
   const flag1Notifications = dataNotification.notifications.flatMap((dayData) =>
-    dayData.items.filter((item) => item.flag === 5)
+    dayData.items.filter((item) => item.flag === 3)
   );
 
   return (
@@ -27,4 +27,4 @@ function Attestations() {
   );
 }
 
-export default Attestations;
+export default RecordedSessions;
