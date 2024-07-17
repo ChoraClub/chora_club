@@ -54,6 +54,7 @@ import { BsDiscord } from "react-icons/bs";
 import { TbBrandGithubFilled } from "react-icons/tb";
 import { CgAttachment } from "react-icons/cg";
 import UpdateProfileModal from "../ComponentUtils/UpdateProfileModal";
+import { cookies } from "next/headers";
 
 function MainProfile() {
   const { isConnected, address } = useAccount();
@@ -95,6 +96,7 @@ function MainProfile() {
     discourse: "",
     github: "",
   });
+  const [isToggled, settoggle] = useState(false);
 
   interface ProgressData {
     total: any;
@@ -233,6 +235,41 @@ function MainProfile() {
     }));
   };
 
+  const handleToggle = async () => {
+    setIsLoading(true);
+    const isEmailVisible = !isToggled;
+    try {
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      if (address) {
+        myHeaders.append("x-wallet-address", address);
+      }
+      const raw = JSON.stringify({
+        address: address,
+        isEmailVisible: isEmailVisible,
+      });
+
+      const requestOptions: any = {
+        method: "PUT",
+        headers: myHeaders,
+        body: raw,
+        redirect: "follow",
+      };
+      const response = await fetch("/api/profile/emailstatus", requestOptions);
+
+      if (!response.ok) {
+        throw new Error("Failed to toggle");
+      }
+
+      const data = await response.json();
+      setIsLoading(false);
+      settoggle(!isToggled);
+      console.log("status successfully change!", data);
+    } catch (error) {
+      console.error("Error following:", error);
+    }
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -246,9 +283,11 @@ function MainProfile() {
             : chain?.name === "Arbitrum One"
             ? "arbitrum"
             : "";
-
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
+        if (address) {
+          myHeaders.append("x-wallet-address", address);
+        }
 
         const raw = JSON.stringify({
           address: address,
@@ -310,6 +349,7 @@ function MainProfile() {
             github: dbResponse.data[0].socialHandles.github,
             displayImage: dbResponse.data[0].image,
           });
+          settoggle(dbResponse.data[0].isEmailVisible);
           setDescription(
             dbResponse.data[0].networks.find(
               (network: any) => network.dao_name === dao
@@ -424,6 +464,7 @@ function MainProfile() {
         isDelegate: true,
         displayName: modalData.displayName,
         emailId: modalData.emailId,
+        isEmailVisible: false,
         socialHandles: {
           twitter: modalData.twitter,
           discord: modalData.discord,
@@ -659,6 +700,8 @@ function MainProfile() {
                       isLoading={isLoading}
                       // displayImage={userData.displayImage}
                       handleSave={handleSave}
+                      handleToggle={handleToggle}
+                      isToggled={isToggled}
                     />
                   </div>
                 </div>

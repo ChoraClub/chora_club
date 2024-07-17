@@ -34,6 +34,7 @@ interface DelegateRequestBody {
   isDelegate: boolean;
   displayName: string;
   emailId: string;
+  isEmailVisible:boolean;
   socialHandles: {
     twitter: string;
     discord: string;
@@ -74,6 +75,7 @@ interface DelegateResponseBody {
     isDelegate: boolean;
     displayName: string;
     emailId: string;
+    isEmailVisible:boolean;
     socialHandles: {
       twitter: string;
       discord: string;
@@ -94,6 +96,7 @@ export async function POST(
     isDelegate,
     displayName,
     emailId,
+    isEmailVisible,
     socialHandles,
     networks,
   }: DelegateRequestBody = await req.json();
@@ -116,6 +119,7 @@ export async function POST(
       isDelegate,
       displayName,
       emailId,
+      isEmailVisible,
       socialHandles,
       networks,
     });
@@ -157,6 +161,7 @@ export async function PUT(
     isDelegate,
     displayName,
     emailId,
+    isEmailVisible,
     socialHandles,
     networks,
   }: DelegateRequestBody = await req.json();
@@ -169,6 +174,7 @@ export async function PUT(
   console.log("networks: ", networks);
   console.log("emailId:", emailId);
   console.log("socialHandles:", socialHandles);
+  console.log('Emailstatus',isEmailVisible);
 
   try {
     // Connect to your MongoDB database
@@ -187,6 +193,7 @@ export async function PUT(
     if (displayName !== undefined) updateFields.displayName = displayName;
     if (emailId !== undefined) updateFields.emailId = emailId;
     if (socialHandles !== undefined) updateFields.socialHandles = socialHandles;
+    if(isEmailVisible!=undefined) updateFields.isEmailVisible=isEmailVisible;
 
     // const documents = await collection
     //   .find({
