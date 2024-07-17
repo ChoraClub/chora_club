@@ -72,26 +72,18 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
   const [numberOfSessions, setNumberOfSessions] = useState(0);
   const [generatedTimeSlots, setGeneratedTimeSlots] = useState<Array<{ time: string; date: string }>>([]);
   const [startTime, setStartTime] = useState<TimeObject>({ hour: 12, minute: 0, ampm: 'PM' });
-const [endTime, setEndTime] = useState<TimeObject>({ hour: 12, minute: 0, ampm: 'PM' });
+  const [endTime, setEndTime] = useState<TimeObject>({ hour: 12, minute: 0, ampm: 'PM' });
 
   const isEndTimeNextDay = (selectedDate: string, start: TimeObject, end: TimeObject): boolean => {
     const startDateTime = new Date(`${selectedDate}T${start.hour.toString().padStart(2, '0')}:${start.minute.toString().padStart(2, '0')}:00`);
     const endDateTime = new Date(`${selectedDate}T${end.hour.toString().padStart(2, '0')}:${end.minute.toString().padStart(2, '0')}:00`);
   
-    // Adjust hours for PM
     if (start.ampm === 'PM' && start.hour !== 12) startDateTime.setHours(startDateTime.getHours() + 12);
     if (end.ampm === 'PM' && end.hour !== 12) endDateTime.setHours(endDateTime.getHours() + 12);
-  
-    // Adjust for midnight
     if (start.ampm === 'AM' && start.hour === 12) startDateTime.setHours(0);
     if (end.ampm === 'AM' && end.hour === 12) endDateTime.setHours(24);
   
-    // If end time is earlier than start time, it must be the next day
-    if (endDateTime < startDateTime) {
-      endDateTime.setDate(endDateTime.getDate() + 1);
-    }
-  
-    return startDateTime.getDate() !== endDateTime.getDate();
+    return endDateTime <= startDateTime;
   };
 
 
@@ -102,12 +94,12 @@ const [endTime, setEndTime] = useState<TimeObject>({ hour: 12, minute: 0, ampm: 
     if (start.ampm === 'PM' && start.hour !== 12) startDate.setHours(startDate.getHours() + 12);
     if (end.ampm === 'PM' && end.hour !== 12) endDate.setHours(endDate.getHours() + 12);
     if (start.ampm === 'AM' && start.hour === 12) startDate.setHours(0);
-  if (end.ampm === 'AM' && end.hour === 12) endDate.setHours(24);
-
-    if (endDate < startDate) endDate.setDate(endDate.getDate() + 1);
+    if (end.ampm === 'AM' && end.hour === 12) endDate.setHours(24);
+  
+    if (endDate <= startDate) endDate.setDate(endDate.getDate() + 1);
   
     const diffMilliseconds = endDate.getTime() - startDate.getTime();
-  const diffMinutes = diffMilliseconds / 60000;
+    const diffMinutes = diffMilliseconds / 60000;
     return Math.floor(diffMinutes / timeSlotSizeMinutes);
   };
 
@@ -115,13 +107,11 @@ const [endTime, setEndTime] = useState<TimeObject>({ hour: 12, minute: 0, ampm: 
     const { id, value } = e.target;
     const newEndTime = { ...endTime, [id]: id === 'hour' ? parseInt(value) : value };
     
-  
-   if (isEndTimeNextDay(selectedDate, startTime, newEndTime)) {
+    if (isEndTimeNextDay(selectedDate, startTime, newEndTime)) {
       toast.error("You can only select session times for the same day. Please select another date to schedule sessions for the next day.");
       return;
     }
-
-    
+  
     setEndTime(newEndTime);
     const sessions = calculateNumberOfSessions(startTime, newEndTime);
     setNumberOfSessions(sessions);
@@ -132,16 +122,15 @@ useEffect(() => {
 }, [startTime,endTime, numberOfSessions, timeSlotSizeMinutes, selectedDate]);
   
 const generateTimeSlots = () => {
-  if (!selectedDate || !startTime || numberOfSessions <= 0) {
+  if (!selectedDate || !startTime || !endTime || numberOfSessions <= 0) {
     setGeneratedTimeSlots([]);
     setNumberOfSessions(0);
     return;
   }
 
   let slots: Array<{ time: string; date: string }> = [];
-  let currentDate = new Date(`${selectedDate}T00:00:00`); // Start at midnight
+  let currentDate = new Date(`${selectedDate}T00:00:00`);
 
-  // Set the correct starting hour
   let startHour = startTime.hour;
   if (startTime.ampm === 'PM' && startTime.hour !== 12) {
     startHour += 12;
@@ -153,10 +142,6 @@ const generateTimeSlots = () => {
 
   for (let i = 0; i < numberOfSessions; i++) {
     let slotTime = new Date(currentDate.getTime() + i * timeSlotSizeMinutes * 60000);
-
-  if (slotTime.getDate() !== currentDate.getDate()) {
-    break;
-  }
     
     let hours = slotTime.getHours();
     let ampm = hours >= 12 ? 'PM' : 'AM';
@@ -172,6 +157,11 @@ const generateTimeSlots = () => {
         day: 'numeric' 
       })
     });
+
+    // Break if we've reached the end time
+    if (slots[slots.length - 1].time === `${endTime.hour}:${endTime.minute.toString().padStart(2, '0')} ${endTime.ampm}`) {
+      break;
+    }
   }
 
   setGeneratedTimeSlots(slots);
@@ -723,7 +713,7 @@ useEffect(() => {
                   </select>
                   <span>:</span>
                   <select className="p-2 border rounded cursor-pointer" id="minute" value={startTime.minute} onChange={handleStartTimeChange}>
-                    {[0, 15, 30, 45].map((minute) => (
+                    {[0, 30].map((minute) => (
                       <option key={minute} value={minute}>
                         {minute.toString().padStart(2, "0")}
                       </option>
@@ -748,7 +738,7 @@ useEffect(() => {
     </select>
     <span>:</span>
     <select className="p-2 border rounded cursor-pointer" id="minute" value={endTime.minute} onChange={handleEndTimeChange}>
-      {[0, 15, 30, 45].map((minute) => (
+      {[0, 30].map((minute) => (
         <option key={minute} value={minute}>
           {minute.toString().padStart(2, "0")}
         </option>
