@@ -455,6 +455,19 @@ function ProposalMain({ props }: { props: Props }) {
       : cleanedText.slice(0, charLimit) + "...";
   };
 
+  const getVotingPeriodEnd = () => {
+    if (!data || !data.blockTimestamp) return null;
+    
+    const baseTimestamp = new Date(data.blockTimestamp * 1000);
+    const votingPeriod = (props.daoDelegates === "arbitrum") ? 14 : 7;
+    return new Date(baseTimestamp.getTime() + votingPeriod * 24 * 60 * 60 * 1000);
+  };
+
+  const votingPeriodEnd = getVotingPeriodEnd();
+  const currentDate = new Date();
+  const isActive = votingPeriodEnd && 
+  currentDate <= votingPeriodEnd && 
+  !canceledProposals.some(item => item.proposalId === props.id);
   return (
     <>
       <div className="pr-8 pb-5 pl-16 pt-6">
@@ -505,25 +518,26 @@ function ProposalMain({ props }: { props: Props }) {
           </div>
 
           <div
-            className={`rounded-full flex items-center justify-center text-xs h-fit py-0.5 font-medium px-2 w-fit ml-auto ${
-              data && data.blockTimestamp
-                ? new Date() >
-                  new Date(data.blockTimestamp * 1000 + 7 * 24 * 60 * 60 * 1000)
-                  ? "bg-red-100 border border-red-500 text-red-500" // Closed state
-                  : "bg-[#f4d3f9] border border-[#77367a] text-[#77367a]" // Active state
-                : "bg-gray-200 animate-pulse  rounded-full" // Loading state
-            }`}
-          >
-            {data && data.blockTimestamp ? (
-              new Date() >
-              new Date(data.blockTimestamp * 1000 + 7 * 24 * 60 * 60 * 1000) ? (
-                "Closed"
-              ) : (
-                "Active"
-              )
-            ) : (
-              <div className="h-5 w-20"></div>
-            )}
+      className={`rounded-full flex items-center justify-center text-xs h-fit py-0.5 font-medium px-2 w-fit ml-auto ${
+        votingPeriodEnd
+          ? currentDate > votingPeriodEnd
+          ?"bg-[#f4d3f9] border border-[#77367a] text-[#77367a] mr-4"
+            // ? "bg-red-100 border border-red-500 text-red-500" // Closed state
+            : "bg-[#f4d3f9] border border-[#77367a] text-[#77367a] mr-4" // Active state
+          : "bg-gray-200 animate-pulse rounded-full" // Loading state
+      }`}
+    >
+            {canceledProposals.some((item) => item.proposalId === props.id)
+                  ? "Closed"
+                  :votingPeriodEnd ? (
+        currentDate > votingPeriodEnd ? (
+          "Closed"
+        ) : (
+          "Active"
+        )
+      ) : (
+        <div className="h-5 w-20"></div>
+      )}
           </div>
         </div>
         <div className="flex gap-1 my-1 items-center">
@@ -536,35 +550,26 @@ function ProposalMain({ props }: { props: Props }) {
           </div>
 
           <div
-            className={`rounded-full flex items-end justify-center text-xs h-fit py-0.5 border font-medium w-24 ${
-              data && support1Weight
+            className={`rounded-full flex items-end justify-center text-xs h-fit py-0.5 border font-medium w-24 ${data && support1Weight
                 ? props.daoDelegates === "optimism" &&
                   canceledProposals.some((item) => item.proposalId === props.id)
                   ? "bg-red-200 border-red-500 text-red-500"
                   : support1Weight! > support0Weight!
-                  ? "bg-green-200 border-green-600 text-green-600"
-                  : "bg-red-200 border-red-500 text-red-500"
+                    ? "bg-green-200 border-green-600 text-green-600"
+                    : "bg-red-200 border-red-500 text-red-500"
                 : "bg-gray-200 animate-pulse  rounded-full"
-            }`}
-          >
-            {data && support1Weight ? (
-              new Date() >
-              new Date(data.blockTimestamp * 1000 + 7 * 24 * 60 * 60 * 1000) ? (
-                canceledProposals.some(
-                  (item) => item.proposalId === props.id
-                ) ? (
-                  "CANCELLED"
-                ) : support1Weight! > support0Weight! ? (
-                  "SUCCEEDED"
-                ) : (
-                  "DEFEATED"
-                )
-              ) : (
-                "PENDING"
-              )
-            ) : (
-              <div className="h-5 w-20"></div>
-            )}
+              }`}
+          >{data && support1Weight && votingPeriodEnd ? (
+            canceledProposals.some((item) => item.proposalId === props.id)
+              ? "CANCELLED"
+              : currentDate > votingPeriodEnd
+                ? support1Weight! > support0Weight!
+                  ? "SUCCEEDED"
+                  : "DEFEATED"
+                : "PENDING"
+          ) : (
+            <div className="h-5 w-20"></div>
+          )}
           </div>
         </div>
 

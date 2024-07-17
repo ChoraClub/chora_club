@@ -329,14 +329,14 @@ const truncateText = (text: string, charLimit: number) => {
                         : "bg-red-200 border-red-500 text-red-500"
                     }`}
                 >
-                  {
-                    new Date() > new Date(proposal.blockTimestamp * 1000 + 7 * 24 * 60 * 60 * 1000)
-                      ? canceledProposals.some((item) => item.proposalId === proposal.proposalId)
-                        ? "CANCELLED"
-                        : proposal.support1Weight! > proposal.support0Weight!
-                          ? "SUCCEEDED"
-                          : "DEFEATED"
-                      : "PENDING"
+                   {
+                   canceledProposals.some((item) => item.proposalId === proposal.proposalId)
+                   ? "CANCELLED"
+                   : new Date() > new Date(proposal.blockTimestamp * 1000 + (props==="optimism" ? 7:14) * 24 * 60 * 60 * 1000)
+                     ? proposal.support1Weight! > proposal.support0Weight!
+                       ? "SUCCEEDED"
+                       : "DEFEATED"
+                     : "PENDING"
                   }
                 </div>
               ) : (
@@ -359,12 +359,15 @@ const truncateText = (text: string, charLimit: number) => {
               )}
 
               <div className="rounded-full bg-[#f4d3f9] border border-[#77367a] flex items-center justify-center text-[#77367a] text-xs h-fit py-0.5 font-medium px-2">
-                {new Date() >
-                  new Date(
-                    proposal.blockTimestamp * 1000 + 7 * 24 * 60 * 60 * 1000
-                  )
+                {canceledProposals.some((item) => item.proposalId === proposal.proposalId)
                   ? "Closed"
-                  : "Active"}
+                  : new Date() >
+                    new Date(
+                      proposal.blockTimestamp * 1000 +
+                      (props === "arbitrum" ? 14 : 7) * 24 * 60 * 60 * 1000
+                    )
+                    ? "Closed"
+                    : "Active"}
               </div>
             </div>
           </div>
