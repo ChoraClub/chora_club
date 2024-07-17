@@ -165,6 +165,8 @@ export async function PUT(req: NextRequest) {
                   true,
                 [`followings.${existingDaoIndex}.following.${existingFollowingIndex}.isNotification`]:
                   true, // Add isNotification
+                [`followings.${existingDaoIndex}.following.${existingFollowingIndex}.timestamp`]:
+                  new Date(),
               },
             };
             await collection.updateOne(
@@ -179,6 +181,7 @@ export async function PUT(req: NextRequest) {
                   follower_address: delegate_address,
                   isFollowing: true,
                   isNotification: true, // Add isNotification
+                  timestamp: new Date(),
                 } as any,
               },
             };
@@ -198,6 +201,7 @@ export async function PUT(req: NextRequest) {
                     follower_address: delegate_address,
                     isFollowing: true,
                     isNotification: true, // Add isNotification
+                    timestamp: new Date(),
                   },
                 ],
               },
@@ -220,6 +224,7 @@ export async function PUT(req: NextRequest) {
                     follower_address: delegate_address,
                     isFollowing: true,
                     isNotification: true, // Add isNotification
+                    timestamp: new Date(),
                   },
                 ],
               },

@@ -1,6 +1,6 @@
 import { IoClose } from "react-icons/io5";
 // import user1 from "@/assets/images/daos/user1.png";
-import user1 from "@/assets/images/sidebar/favicon.png"
+import user1 from "@/assets/images/sidebar/favicon.png";
 import { FaCalendarDays } from "react-icons/fa6";
 import Image from "next/image";
 import { IoCopy } from "react-icons/io5";
@@ -10,14 +10,23 @@ import copy from "copy-to-clipboard";
 import toast, { Toaster } from "react-hot-toast";
 import { useEffect, useState } from "react";
 import { fetchEnsAvatar } from "@/utils/ENSUtils";
-import style from './FollowingModal.module.css';
+import style from "./FollowingModal.module.css";
 
 interface FollowingModal {
   userFollowings: any;
   toggleFollowing: any;
   toggleNotification: any;
   setfollowingmodel: any;
-  chainName: string | undefined; 
+  chainName: string | undefined;
+}
+function formatDate(timestamp: string) {
+  const date = new Date(timestamp);
+  // const options = { year: "numeric", month: "long" };
+  const options: Intl.DateTimeFormatOptions = {
+    year: "numeric",
+    month: "long",
+  };
+  return `Since ${date.toLocaleDateString("en-US", options)}`;
 }
 
 function FollowingModal({
@@ -25,7 +34,7 @@ function FollowingModal({
   toggleFollowing,
   toggleNotification,
   setfollowingmodel,
-  chainName
+  chainName,
 }: FollowingModal) {
   const handleCopy = (addr: string) => {
     copy(addr);
@@ -33,25 +42,28 @@ function FollowingModal({
     // console.log("user followings", userFollowings)
     // console.log("chain name",chainName)
   };
-  
+
   const handleRedirect = (address: string) => {
     if (chainName) {
-      const lowerCaseChainName = chainName.charAt(0).toLowerCase() + chainName.slice(1);
+      const lowerCaseChainName =
+        chainName.charAt(0).toLowerCase() + chainName.slice(1);
       window.location.href = `/${lowerCaseChainName}/${address}?active=info`;
     } else {
-      console.error('Chain name is undefined');
+      console.error("Chain name is undefined");
     }
   };
 
   const [ensNames, setEnsNames] = useState<any>({});
-  const[ensAvatars, setEnsAvatars]= useState<any>({});
+  const [ensAvatars, setEnsAvatars] = useState<any>({});
 
-  useEffect(()=>{
+  useEffect(() => {
     const fetchEnsNames = async () => {
-    console.log(" user followings",userFollowings)
-    const addresses=userFollowings.map((user:any)=>user.follower_address)
-    const names = await Promise.all(
-        addresses.map(async (address:any) => {
+      console.log(" user followings", userFollowings);
+      const addresses = userFollowings.map(
+        (user: any) => user.follower_address
+      );
+      const names = await Promise.all(
+        addresses.map(async (address: any) => {
           const ensNames = await fetchEnsAvatar(address);
           const ensName = ensNames?.ensName;
 
@@ -66,28 +78,30 @@ function FollowingModal({
       setEnsNames(ensNameMap);
     };
 
-    const fetchEnsAvatars=async()=>{
-        const addresses=userFollowings.map((user:any)=>user.follower_address)
-        const avatars = await Promise.all(
-            addresses.map(async (address:any) => {
-              const ensAvatars = await fetchEnsAvatar(address);
-              const avatar = ensAvatars?.avatar;
-    
-              return { address, avatar };
-            })
-          );
-          const ensAvatarMap: { [address: string]: any } = {};
-          avatars.forEach(({ address, avatar }) => {
-            ensAvatarMap[address] = avatar;
-          });
-        //   console.log("ens name: ", ensNameMap);
-        setEnsAvatars(ensAvatarMap);
-    }
+    const fetchEnsAvatars = async () => {
+      const addresses = userFollowings.map(
+        (user: any) => user.follower_address
+      );
+      const avatars = await Promise.all(
+        addresses.map(async (address: any) => {
+          const ensAvatars = await fetchEnsAvatar(address);
+          const avatar = ensAvatars?.avatar;
+
+          return { address, avatar };
+        })
+      );
+      const ensAvatarMap: { [address: string]: any } = {};
+      avatars.forEach(({ address, avatar }) => {
+        ensAvatarMap[address] = avatar;
+      });
+      //   console.log("ens name: ", ensNameMap);
+      setEnsAvatars(ensAvatarMap);
+    };
     if (userFollowings.length > 0) {
       fetchEnsNames();
     }
     if (userFollowings.length > 0) {
-        fetchEnsAvatars();
+      fetchEnsAvatars();
     }
   }, [userFollowings]);
   return (
@@ -97,32 +111,29 @@ function FollowingModal({
         onClick={(event) => {
           event.stopPropagation();
           setfollowingmodel(false);
-        }}
-      >
+        }}>
         <div
           className="bg-white rounded-[41px] overflow-hidden shadow-lg w-[42%]"
           onClick={(event) => {
             event.stopPropagation();
-          }}
-        >
+          }}>
           <div className="relative">
             <div className="flex text-white bg-[#292929] px-10 items-center justify-between py-7">
               <h2 className="text-xl font-semibold ">Followings</h2>
               <div
                 className="size-5 rounded-full bg-[#F23535] flex items-center justify-center cursor-pointer"
-                onClick={() => setfollowingmodel(false)}
-              >
+                onClick={() => setfollowingmodel(false)}>
                 <IoClose className=" text-white size-4 " />
               </div>
             </div>
-            <div className={` max-h-[60vh] overflow-y-auto ${style.customscrollbar}`}>
+            <div
+              className={` max-h-[60vh] overflow-y-auto ${style.customscrollbar}`}>
               {userFollowings.length > 0 &&
                 userFollowings.map((user: any, index: any) => (
                   <>
                     <div
                       key={index}
-                      className="flex justify-between items-center py-6 px-10"
-                    >
+                      className="flex justify-between items-center py-6 px-10">
                       <div className="flex items-center">
                         <Image
                           src={ensAvatars[user.follower_address] || user1} //add ens avatar
@@ -133,28 +144,36 @@ function FollowingModal({
                         />
                         <div className="gap-1 flex flex-col">
                           <div className="flex gap-2 items-center">
-                            
-                            <div className="font-semibold text-base hover:text-blue-shade-100 cursor-pointer" onClick={() => handleRedirect(user.follower_address)}> 
+                            <div
+                              className="font-semibold text-base hover:text-blue-shade-100 cursor-pointer"
+                              onClick={() =>
+                                handleRedirect(user.follower_address)
+                              }>
                               {/* {user.follower_address.slice(0, 6)}...  */}
                               {/* {user.follower_address.slice(-4)} */}
-                              {ensNames[user.follower_address] || user.follower_address.slice(0,6)+ "..." + user.follower_address.slice(-4)} 
+                              {ensNames[user.follower_address] ||
+                                user.follower_address.slice(0, 6) +
+                                  "..." +
+                                  user.follower_address.slice(-4)}
                             </div>
-                         <IoCopy
-                                className="size-4 hover:text-blue-shade-100 cursor-pointer"
-                                onClick={(event) => {
-                                  event.stopPropagation();
-                                  handleCopy(`${user.follower_address}`);
-                                }}
-                              />                         
-                        </div>
+                            <IoCopy
+                              className="size-4 hover:text-blue-shade-100 cursor-pointer"
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                handleCopy(`${user.follower_address}`);
+                              }}
+                            />
+                          </div>
                           <div className="flex gap-1 items-center">
                             <FaCalendarDays className="size-3" />
-                            <p className="text-sm ">Since October 2023</p>
+                            <p className="text-sm ">
+                              {formatDate(user.timestamp)}
+                            </p>
                           </div>
                         </div>
                       </div>
                       <div className="flex items-center gap-4">
-                      <Tooltip
+                        <Tooltip
                           content={
                             user.isFollowing
                               ? "Unfollow this delegate to stop receiving their updates."
@@ -162,21 +181,19 @@ function FollowingModal({
                           }
                           placement="top"
                           closeDelay={1}
-                          showArrow
-                        >
-                        <button
-                          className={`font-semibold rounded-full justify-center py-[10px] flex items-center w-[127.68px]  ${
-                            user.isFollowing
-                              ? "bg-white text-blue-shade-100 border border-blue-shade-100 hover:bg-blue-shade-400"
-                              : "bg-blue-shade-200 text-white"
-                          }`}
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            toggleFollowing(index, user);
-                          }}
-                        >
-                          {user.isFollowing ? "Unfollow" : "Follow"}
-                        </button>
+                          showArrow>
+                          <button
+                            className={`font-semibold rounded-full justify-center py-[10px] flex items-center w-[127.68px]  ${
+                              user.isFollowing
+                                ? "bg-white text-blue-shade-100 border border-blue-shade-100 hover:bg-blue-shade-400"
+                                : "bg-blue-shade-200 text-white"
+                            }`}
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              toggleFollowing(index, user);
+                            }}>
+                            {user.isFollowing ? "Unfollow" : "Follow"}
+                          </button>
                         </Tooltip>
 
                         <Tooltip
@@ -187,8 +204,7 @@ function FollowingModal({
                           }
                           placement="top"
                           closeDelay={1}
-                          showArrow
-                        >
+                          showArrow>
                           <div className="text-sm border-blue-shade-100 text-blue-shade-100 border rounded-full size-11 flex items-center justify-center cursor-pointer hover:bg-blue-shade-400">
                             {user.isNotification ? (
                               <BiSolidBellRing

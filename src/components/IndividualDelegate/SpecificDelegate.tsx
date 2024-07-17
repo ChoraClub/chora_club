@@ -449,44 +449,51 @@ function SpecificDelegate({ props }: { props: Type }) {
     } else if (isFollowing) {
       setUnfollowmodel(true);
     } else {
-      setLoading(true);
-      let delegate_address: string;
-      let follower_address: string;
-      let dao: string;
-      dao = daoname;
-      let address = await walletClient.getAddresses();
-      follower_address = address[0];
-      delegate_address = props.individualDelegate;
-      try {
-        const response = await fetch("/api/delegate-follow/savefollower", {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            // Add any necessary data
-            delegate_address: delegate_address,
-            follower_address: follower_address,
-            dao: dao,
-          }),
-        });
+      if (walletClient?.chain?.network === props.daoDelegates) {
+        setLoading(true);
+        let delegate_address: string;
+        let follower_address: string;
+        let dao: string;
+        dao = daoname;
+        let address = await walletClient.getAddresses();
+        follower_address = address[0];
+        delegate_address = props.individualDelegate;
+        try {
+          const response = await fetch("/api/delegate-follow/savefollower", {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              // Add any necessary data
+              delegate_address: delegate_address,
+              follower_address: follower_address,
+              dao: dao,
+            }),
+          });
 
-        if (!response.ok) {
-          throw new Error("Failed to follow");
+          if (!response.ok) {
+            throw new Error("Failed to follow");
+          }
+
+          const data = await response.json();
+          setLoading(false);
+          toast.success(
+            "Successfully followed the delegate! Stay tuned for updates."
+          );
+          setFollowers(followers + 1);
+          setTimeout(() => isFollowed(true), 1000);
+          setIsFollowing(true);
+          isNotification(true);
+          console.log("Follow successful:", data);
+        } catch (error) {
+          console.error("Error following:", error);
         }
-
-        const data = await response.json();
-        setLoading(false);
-        toast.success(
-          "Successfully followed the delegate! Stay tuned for updates."
-        );
-        setFollowers(followers + 1);
-        setTimeout(() => isFollowed(true), 1000);
-        setIsFollowing(true);
-        isNotification(true);
-        console.log("Follow successful:", data);
-      } catch (error) {
-        console.error("Error following:", error);
+      } else {
+        toast.error("Switch to appropriate network for follow delegate!");
+        if (openChainModal) {
+          openChainModal();
+        }
       }
     }
   };

@@ -51,7 +51,7 @@ import MainProfileSkeletonLoader from "../SkeletonLoader/MainProfileSkeletonLoad
 import { BASE_URL } from "@/config/constants";
 import { fetchData } from "next-auth/client/_utils";
 import { IoClose } from "react-icons/io5";
-import user1 from '@/assets/images/daos/user1.png';
+import user1 from "@/assets/images/daos/user1.png";
 import { FaCalendarDays } from "react-icons/fa6";
 import FollowingModal from "../utils/FollowingModal";
 
@@ -289,7 +289,7 @@ function MainProfile() {
     copy(addr);
     toast("Address Copied");
   };
-  const handleCloseAndUpdateFollowings = async () => {
+  const handleUpdateFollowings = async () => {
     setLoading(true);
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
@@ -328,7 +328,7 @@ function MainProfile() {
     }
     // Close the modal
     setLoading(false);
-    setfollowingmodel(false);
+    setfollowingmodel(true);
   };
   const toggleFollowing = async (index: number, userupdate: any) => {
     setUserFollowings((prevUsers) =>
@@ -1205,11 +1205,13 @@ function MainProfile() {
                 {/* {isOpentoaster && toast.loading("Saving...")} */}
 
                 {isOpenFollowings && (
-                  <FollowingModal userFollowings={userFollowings}
-                  toggleFollowing={toggleFollowing}
-                  toggleNotification={toggleNotification}
-                  setfollowingmodel={setfollowingmodel}
-                  chainName={chain?.name} />
+                  <FollowingModal
+                    userFollowings={userFollowings}
+                    toggleFollowing={toggleFollowing}
+                    toggleNotification={toggleNotification}
+                    setfollowingmodel={setfollowingmodel}
+                    chainName={chain?.name}
+                  />
                 )}
 
                 {selfDelegate === false ? (
@@ -1225,7 +1227,7 @@ function MainProfile() {
                       className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
                       onClick={() =>
                         followings
-                          ? setfollowingmodel(true)
+                          ? handleUpdateFollowings()
                           : toast.error(
                               "You have 0 following explore delegate profile now!"
                             )

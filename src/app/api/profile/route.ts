@@ -34,6 +34,7 @@ type dao_following = {
   isFollowing: boolean;
   isNotification:boolean;
   follower_address: string;
+  timestamp:Date;
 };
 type followings = {
   dao: string;
