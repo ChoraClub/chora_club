@@ -15,6 +15,10 @@ import Image from "next/image";
 
 import AvailableUserSessions from "./AvailableUserSessions";
 import styles from "./ScheduleUserSessions.module.css";
+// import { Input } from "@nextui-org/react";
+import { TimeInput } from "@nextui-org/react";
+import { Time } from "@internationalized/date";
+import { AbiEncodingLengthMismatchError } from "viem";
 
 interface dataToStore {
   userAddress: `0x${string}` | undefined | null;
@@ -23,6 +27,13 @@ interface dataToStore {
   dateAndRanges: any;
   dao_name: string;
 }
+
+interface TimeObject {
+  hour: number;
+  minute: number;
+  ampm: 'AM' | 'PM';
+}
+
 
 function ScheduledUserSessions({ daoName }: { daoName: string }) {
   const { address } = useAccount();
@@ -34,8 +45,8 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
   const [startMinute, setStartMinute] = useState("");
   const [endHour, setEndHour] = useState("");
   const [endMinute, setEndMinute] = useState("");
-  const [startTime, setStartTime] = useState("");
-  const [endTime, setEndTime] = useState("");
+  // const [startTime, setStartTime] = useState("");
+  // const [endTime, setEndTime] = useState("");
   const [allowedDates, setAllowedDates] = useState<any>([]);
   // const [daoName, setDaoName] = useState("");
   const { chain, chains } = useNetwork();
@@ -58,6 +69,125 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
   const [userRejected, setUserRejected] = useState<Boolean>();
   const [addingEmail, setAddingEmail] = useState<boolean>();
   const [scheduledSuccess, setScheduledSuccess] = useState<boolean>();
+  const [numberOfSessions, setNumberOfSessions] = useState(0);
+  const [generatedTimeSlots, setGeneratedTimeSlots] = useState<Array<{ time: string; date: string }>>([]);
+  const [startTime, setStartTime] = useState<TimeObject>({ hour: 12, minute: 0, ampm: 'PM' });
+const [endTime, setEndTime] = useState<TimeObject>({ hour: 12, minute: 0, ampm: 'PM' });
+
+  const isEndTimeNextDay = (selectedDate: string, start: TimeObject, end: TimeObject): boolean => {
+    const startDateTime = new Date(`${selectedDate}T${start.hour.toString().padStart(2, '0')}:${start.minute.toString().padStart(2, '0')}:00`);
+    const endDateTime = new Date(`${selectedDate}T${end.hour.toString().padStart(2, '0')}:${end.minute.toString().padStart(2, '0')}:00`);
+  
+    // Adjust hours for PM
+    if (start.ampm === 'PM' && start.hour !== 12) startDateTime.setHours(startDateTime.getHours() + 12);
+    if (end.ampm === 'PM' && end.hour !== 12) endDateTime.setHours(endDateTime.getHours() + 12);
+  
+    // Adjust for midnight
+    if (start.ampm === 'AM' && start.hour === 12) startDateTime.setHours(0);
+    if (end.ampm === 'AM' && end.hour === 12) endDateTime.setHours(24);
+  
+    // If end time is earlier than start time, it must be the next day
+    if (endDateTime < startDateTime) {
+      endDateTime.setDate(endDateTime.getDate() + 1);
+    }
+  
+    return startDateTime.getDate() !== endDateTime.getDate();
+  };
+
+
+  const calculateNumberOfSessions = (start: TimeObject, end: TimeObject) => {
+    const startDate = new Date(`2000-01-01T${start.hour.toString().padStart(2, '0')}:${start.minute.toString().padStart(2, '0')}:00`);
+    let endDate = new Date(`2000-01-01T${end.hour.toString().padStart(2, '0')}:${end.minute.toString().padStart(2, '0')}:00`);
+    
+    if (start.ampm === 'PM' && start.hour !== 12) startDate.setHours(startDate.getHours() + 12);
+    if (end.ampm === 'PM' && end.hour !== 12) endDate.setHours(endDate.getHours() + 12);
+    if (start.ampm === 'AM' && start.hour === 12) startDate.setHours(0);
+  if (end.ampm === 'AM' && end.hour === 12) endDate.setHours(24);
+
+    if (endDate < startDate) endDate.setDate(endDate.getDate() + 1);
+  
+    const diffMilliseconds = endDate.getTime() - startDate.getTime();
+  const diffMinutes = diffMilliseconds / 60000;
+    return Math.floor(diffMinutes / timeSlotSizeMinutes);
+  };
+
+  const handleEndTimeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const { id, value } = e.target;
+    const newEndTime = { ...endTime, [id]: id === 'hour' ? parseInt(value) : value };
+    
+  
+   if (isEndTimeNextDay(selectedDate, startTime, newEndTime)) {
+      toast.error("You can only select session times for the same day. Please select another date to schedule sessions for the next day.");
+      return;
+    }
+
+    
+    setEndTime(newEndTime);
+    const sessions = calculateNumberOfSessions(startTime, newEndTime);
+    setNumberOfSessions(sessions);
+  };
+
+useEffect(() => {
+  generateTimeSlots();
+}, [startTime,endTime, numberOfSessions, timeSlotSizeMinutes, selectedDate]);
+  
+const generateTimeSlots = () => {
+  if (!selectedDate || !startTime || numberOfSessions <= 0) {
+    setGeneratedTimeSlots([]);
+    setNumberOfSessions(0);
+    return;
+  }
+
+  let slots: Array<{ time: string; date: string }> = [];
+  let currentDate = new Date(`${selectedDate}T00:00:00`); // Start at midnight
+
+  // Set the correct starting hour
+  let startHour = startTime.hour;
+  if (startTime.ampm === 'PM' && startTime.hour !== 12) {
+    startHour += 12;
+  } else if (startTime.ampm === 'AM' && startTime.hour === 12) {
+    startHour = 0;
+  }
+  
+  currentDate.setHours(startHour, startTime.minute);
+
+  for (let i = 0; i < numberOfSessions; i++) {
+    let slotTime = new Date(currentDate.getTime() + i * timeSlotSizeMinutes * 60000);
+
+  if (slotTime.getDate() !== currentDate.getDate()) {
+    break;
+  }
+    
+    let hours = slotTime.getHours();
+    let ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12; // the hour '0' should be '12'
+    let minutes = slotTime.getMinutes();
+
+    slots.push({
+      time: `${hours}:${minutes.toString().padStart(2, '0')} ${ampm}`,
+      date: slotTime.toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      })
+    });
+  }
+
+  setGeneratedTimeSlots(slots);
+  setNumberOfSessions(slots.length);
+};
+
+  const handleStartTimeChange = (e: any) => {
+    const { id, value } = e.target;
+    const newStartTime = { ...startTime, [id]: id === 'hour' ? parseInt(value) : value };
+    setStartTime(newStartTime);
+  };
+
+useEffect(() => {
+  const sessions = calculateNumberOfSessions(startTime, endTime);
+  setNumberOfSessions(sessions);
+}, [startTime, endTime, timeSlotSizeMinutes]);
 
   const checkUser = async () => {
     try {
@@ -347,14 +477,9 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
     ]);
     setAllowedDates([...allowedDates, selectedDate]);
     setSelectedDate("");
-    setStartHour("");
-    setStartMinute("");
-    setEndHour("");
-    setEndMinute("");
-    setStartTime("");
-    setEndTime("");
-    setSelectedStartTime("");
-    setSelectedEndTime("");
+    setStartTime({ hour: 12, minute: 0, ampm: 'PM' });
+  setEndTime({ hour: 12, minute: 0, ampm: 'PM' });
+  setNumberOfSessions(1);
   };
 
   useEffect(() => {
@@ -377,22 +502,6 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
     setEndTimeOptions(timeOptions);
   }, [timeSlotSizeMinutes]);
 
-  const handleStartTimeChange = (e: any) => {
-    setSelectedStartTime(e.target.value);
-    console.log(e.target.value);
-    const [hour, minute] = e.target.value.split(":");
-    console.log(hour + ":" + minute);
-    setStartHour(hour);
-    setStartMinute(minute);
-  };
-
-  const handleEndTimeChange = (e: any) => {
-    setSelectedEndTime(e.target.value);
-    const [hour, minute] = e.target.value.split(":");
-    console.log(hour + ":" + minute);
-    setEndHour(hour);
-    setEndMinute(minute);
-  };
 
   const currentDate = new Date();
   let formattedDate = currentDate.toLocaleDateString();
@@ -487,7 +596,7 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
   //     setDaoName("arbitrum");
   //   }
   // }, [chain, chain?.name]);
-
+  
   return (
     <>
       <div className="flex flex-col md:flex-row justify-center gap-8 md:gap-10 1.5lg:gap-20 p-4">
@@ -580,7 +689,7 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
               min={formattedDate}
             />
           </div>
-
+          
           <div className="flex flex-col mb-4">
             <label className="text-gray-700 font-semibold flex items-center">
               Select Available Time:
@@ -599,51 +708,97 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
                 </span>
               </Tooltip>
             </label>
+
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="text-gray-500 mt-1">Start Time</label>
-                <div className="relative">
-                  <select
-                    className="appearance-none border border-gray-300 rounded px-3 py-2 mt-1 w-full bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-300 focus:outline-none focus:border-blue-400 dark:focus:border-blue-400 transition duration-300 ease-in-out cursor-pointer"
-                    value={selectedStartTime}
-                    onChange={handleStartTimeChange}
-                  >
-                    {startTimeOptions.map((time) => (
-                      <option
-                        key={time}
-                        value={time}
-                        className={`py-2 px-4 hover:bg-blue-100 dark:hover:bg-gray-700 custom-time-picker-option`}
-                      >
-                        {time}
+                <label className="text-gray-500 mt-2">Start Time</label>
+
+                <div className="rounded-md flex items-center space-x-2">
+                  <select className="p-2 border rounded cursor-pointer" id="hour" value={startTime.hour} onChange={handleStartTimeChange}>
+                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((hour) => (
+                      <option key={hour} value={hour}>
+                        {hour.toString().padStart(2, "0")}
                       </option>
                     ))}
                   </select>
-                  <FaChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none text-gray-400 dark:text-gray-200" />
+                  <span>:</span>
+                  <select className="p-2 border rounded cursor-pointer" id="minute" value={startTime.minute} onChange={handleStartTimeChange}>
+                    {[0, 15, 30, 45].map((minute) => (
+                      <option key={minute} value={minute}>
+                        {minute.toString().padStart(2, "0")}
+                      </option>
+                    ))}
+                  </select>
+                  <select className="p-2 border rounded cursor-pointer" id="ampm" value={startTime.ampm} onChange={handleStartTimeChange}>
+                    <option value="AM">AM</option>
+                    <option value="PM">PM</option>
+                  </select>
                 </div>
               </div>
               <div>
                 <label className="text-gray-500 mt-1">End Time</label>
-                <div className="relative">
-                  <select
-                    className="appearance-none border border-gray-300 rounded px-3 py-2 mt-1 w-full bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-300 focus:outline-none focus:border-blue-400 dark:focus:border-blue-400 transition duration-300 ease-in-out cursor-pointer"
-                    value={selectedEndTime}
-                    onChange={handleEndTimeChange}
-                  >
-                    {endTimeOptions.map((time) => (
-                      <option
-                        key={time}
-                        value={time}
-                        className={`py-2 px-4 hover:bg-blue-100 dark:hover:bg-gray-700 custom-time-picker-option`}
-                        style={{ cursor: "pointer" }}
-                      >
-                        {time}
-                      </option>
-                    ))}
-                  </select>
-                  <FaChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none text-gray-400 dark:text-gray-200" />
-                </div>
+
+                <div className="rounded-md flex items-center space-x-2">
+    <select className="p-2 border rounded cursor-pointer" id="hour" value={endTime.hour} onChange={handleEndTimeChange}>
+      {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((hour) => (
+        <option key={hour} value={hour}>
+          {hour.toString().padStart(2, "0")}
+        </option>
+      ))}
+    </select>
+    <span>:</span>
+    <select className="p-2 border rounded cursor-pointer" id="minute" value={endTime.minute} onChange={handleEndTimeChange}>
+      {[0, 15, 30, 45].map((minute) => (
+        <option key={minute} value={minute}>
+          {minute.toString().padStart(2, "0")}
+        </option>
+      ))}
+    </select>
+    <select className="p-2 border rounded cursor-pointer" id="ampm" value={endTime.ampm} onChange={handleEndTimeChange}>
+      <option value="AM">AM</option>
+      <option value="PM">PM</option>
+    </select>
+  </div>
               </div>
+
             </div>
+
+            <div className="mt-4">
+            <label className="text-gray-700 font-semibold flex items-center">
+              How many sessions scheduled
+            </label>
+            <input
+              type="number"
+              min={1}
+              max={48}
+              placeholder="Enter number"
+              className="border border-gray-300 rounded px-3 py-2 mt-1 w-full cursor-pointer "
+              value={numberOfSessions}
+              readOnly
+            />
+          </div>
+
+                  <div className="flex flex-col gap-2">
+
+              {generatedTimeSlots.length > 0 && (
+                <div className="mt-4">
+                  <h3 className="text-lg font-semibold mb-2">
+                    Generated Time Slots:
+                  </h3>
+                  <div className="grid grid-cols-3 gap-2 w-full">
+                    {generatedTimeSlots.map((slot, index) => (
+                      <div
+                        key={index}
+                        className="border border-gray-300 p-1.5 rounded-md flex flex-col items-center text-left basis-1/3 text-sm font-poppins bg-[#f5f5f5]"
+                      >
+                        <p>{slot.time}</p>
+                        <p>{slot.date}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              </div>
           </div>
 
           <button
