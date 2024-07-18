@@ -294,18 +294,30 @@ function ProposalMain({ props }: { props: Props }) {
     fetchVotes();
   }, []);
 
-  const formatDate = (timestamp: any) => {
-    const date = new Date(timestamp * 1000);
+  const formatDate = (timestamp: number): string => {
+    // Convert the timestamp to milliseconds if it's in seconds
+    const milliseconds = timestamp * 1000;
+    
+    // Create a date object in the local time zone
+    const date = new Date(milliseconds);
+    
+    // Format the date components
     const day = date.getDate();
-    const month = date.toLocaleString("default", { month: "long" });
+    const month = date.toLocaleString("en-US", { month: "long" });
     const year = date.getFullYear();
-    let hours: any = date.getHours();
+    const hours = date.getHours();
     const minutes = String(date.getMinutes()).padStart(2, "0");
     const seconds = String(date.getSeconds()).padStart(2, "0");
     const ampm = hours >= 12 ? "PM" : "AM";
-    hours = hours % 12 || 12; // Convert to 12-hour format and adjust midnight (0) to 12
-    hours = String(hours).padStart(2, "0"); // Pad hours with leading zero if necessary
-    return `${day} ${month}, ${year} ${hours}:${minutes}:${seconds} ${ampm}`;
+    
+    // Format hours for 12-hour clock
+    const formattedHours = String(hours % 12 || 12).padStart(2, "0");
+    
+    // Get the local time zone abbreviation
+    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    
+    // Construct the formatted date string
+    return `${day} ${month}, ${year} ${formattedHours}:${minutes}:${seconds} ${ampm}`;
   };
 
   // New useEffect to handle chart data processing
@@ -455,22 +467,43 @@ function ProposalMain({ props }: { props: Props }) {
       : cleanedText.slice(0, charLimit) + "...";
   };
 
-  const getVotingPeriodEnd = () => {
-    if (!data || !data.blockTimestamp) return null;
+  const getProposalStatus = (data:any, props:any, canceledProposals:any) => {
+    if (!data || !data.blockTimestamp) return { status: null, votingPeriodEnd: null };
     
-    const baseTimestamp = new Date(data.blockTimestamp * 1000);
-    const votingPeriod = (props.daoDelegates === "arbitrum") ? 14 : 7;
-    return new Date(baseTimestamp.getTime() + votingPeriod * 24 * 60 * 60 * 1000);
+    const proposalTime:any = new Date(data.blockTimestamp * 1000);
+    const currentTime:any = new Date();
+    const timeDifference = currentTime - proposalTime;
+    const daysDifference = timeDifference / (24 * 60 * 60 * 1000);
+    const votingPeriod = (props.daoDelegates === "arbitrum") ? 17 : 7;
+    const votingPeriodEnd = new Date(proposalTime.getTime() + votingPeriod * 24 * 60 * 60 * 1000);
+  
+    if (canceledProposals.some((item:any) => item.proposalId === props.id)) {
+      return { status: "Closed", votingPeriodEnd };
+    }
+  
+    if (props.daoDelegates === "arbitrum") {
+      if (daysDifference <= 3) {
+        const daysLeft = Math.ceil(3 - daysDifference);
+        return { status: `${daysLeft} day${daysLeft !== 1 ? 's' : ''} to go`, votingPeriodEnd };
+      } else if (daysDifference <= 17) {
+        return { status: "Active", votingPeriodEnd };
+      }
+    } else {
+      if (daysDifference <= 7) {
+        return { status: "Active", votingPeriodEnd };
+      }
+    }
+  
+    return { status: "Closed", votingPeriodEnd };
   };
-
-  const votingPeriodEnd = getVotingPeriodEnd();
-  const currentDate = new Date();
-  const isActive = votingPeriodEnd && 
-  currentDate <= votingPeriodEnd && 
-  !canceledProposals.some(item => item.proposalId === props.id);
+  
+  // Usage in your component
+  const { status, votingPeriodEnd } = getProposalStatus(data, props, canceledProposals);
+  console.log(status, votingPeriodEnd);
+  const isActive = status === "Active" || status?.includes("day");
   return (
     <>
-      <div className="pr-8 pb-5 pl-16 pt-6">
+      <div className="pr-8 pb-5 pl-16 pt-6 font-poppins">
         <IndividualDaoHeader />
       </div>
 
@@ -519,15 +552,14 @@ function ProposalMain({ props }: { props: Props }) {
 
           <div
       className={`rounded-full flex items-center justify-center text-xs h-fit py-0.5 font-medium px-2 w-fit ml-auto ${
-        votingPeriodEnd
-          ? currentDate > votingPeriodEnd
-          ?"bg-[#f4d3f9] border border-[#77367a] text-[#77367a] mr-4"
-            // ? "bg-red-100 border border-red-500 text-red-500" // Closed state
-            : "bg-[#f4d3f9] border border-[#77367a] text-[#77367a] mr-4" // Active state
-          : "bg-gray-200 animate-pulse rounded-full" // Loading state
+        status
+          ? status === "Closed"
+            ? "bg-[#f4d3f9] border border-[#77367a] text-[#77367a] mr-4"
+            : "bg-[#f4d3f9] border border-[#77367a] text-[#77367a] mr-4"
+          : "bg-gray-200 animate-pulse rounded-full"
       }`}
     >
-            {canceledProposals.some((item) => item.proposalId === props.id)
+            {/* {canceledProposals.some((item) => item.proposalId === props.id)
                   ? "Closed"
                   :votingPeriodEnd ? (
         currentDate > votingPeriodEnd ? (
@@ -537,7 +569,8 @@ function ProposalMain({ props }: { props: Props }) {
         )
       ) : (
         <div className="h-5 w-20"></div>
-      )}
+      )} */}
+      {status ? status : <div className="h-5 w-20"></div>}
           </div>
         </div>
         <div className="flex gap-1 my-1 items-center">
@@ -562,7 +595,7 @@ function ProposalMain({ props }: { props: Props }) {
           >{data && support1Weight && votingPeriodEnd ? (
             canceledProposals.some((item) => item.proposalId === props.id)
               ? "CANCELLED"
-              : currentDate > votingPeriodEnd
+              : new Date() > votingPeriodEnd
                 ? support1Weight! > support0Weight!
                   ? "SUCCEEDED"
                   : "DEFEATED"
