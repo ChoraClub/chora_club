@@ -5,7 +5,7 @@ import { getToken } from "next-auth/jwt";
 
 export async function middleware(request: NextRequest) {
   console.log("Middleware run!");
-  console.log(request);
+  // console.log(request);
   const WalletAddress = request.headers.get("x-wallet-address");
 
   console.log(WalletAddress);

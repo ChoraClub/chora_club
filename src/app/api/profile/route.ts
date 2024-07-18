@@ -34,7 +34,7 @@ interface DelegateRequestBody {
   isDelegate: boolean;
   displayName: string;
   emailId: string;
-  isEmailVisible:boolean;
+  isEmailVisible: boolean;
   socialHandles: {
     twitter: string;
     discord: string;
@@ -75,7 +75,7 @@ interface DelegateResponseBody {
     isDelegate: boolean;
     displayName: string;
     emailId: string;
-    isEmailVisible:boolean;
+    isEmailVisible: boolean;
     socialHandles: {
       twitter: string;
       discord: string;
@@ -174,7 +174,7 @@ export async function PUT(
   console.log("networks: ", networks);
   console.log("emailId:", emailId);
   console.log("socialHandles:", socialHandles);
-  console.log('Emailstatus',isEmailVisible);
+  // console.log('Emailstatus',isEmailVisible);
 
   try {
     // Connect to your MongoDB database
@@ -193,7 +193,7 @@ export async function PUT(
     if (displayName !== undefined) updateFields.displayName = displayName;
     if (emailId !== undefined) updateFields.emailId = emailId;
     if (socialHandles !== undefined) updateFields.socialHandles = socialHandles;
-    if(isEmailVisible!=undefined) updateFields.isEmailVisible=isEmailVisible;
+    // if(isEmailVisible!=undefined) updateFields.isEmailVisible=isEmailVisible;
 
     // const documents = await collection
     //   .find({
@@ -254,7 +254,7 @@ export async function PUT(
       const document = documents[0];
 
       // Check if networks array is provided and is not empty
-      if (networks?.length > 0) {
+      if (document.networks?.length > 0) {
         const existingNetworkIndex = document.networks.findIndex(
           (item: any) => item.dao_name === networks[0].dao_name
         );
@@ -283,6 +283,14 @@ export async function PUT(
             updateQuery
           );
         }
+      } else {
+        console.log("add networks field");
+        const updateQuery = {
+          $set: {
+            networks: [networks[0]],
+          },
+        };
+        await collection.updateOne({ address: document.address }, updateQuery);
       }
     }
 
