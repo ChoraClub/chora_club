@@ -18,7 +18,7 @@ import {
   useDisclosure,
 } from "@nextui-org/react";
 import AttestationModal from "../ComponentUtils/AttestationModal";
-import SessionTileSkeletonLoader from "../SkeletonLoader/SessionTileSkeletonLoader";
+import RecordedSessionsSkeletonLoader from "../SkeletonLoader/RecordedSessionsSkeletonLoader";
 
 interface Session {
   booking_status: string;
@@ -153,7 +153,7 @@ function DelegatesSession({ props }: { props: string }) {
         <AttestationModal props={true} />
       </div> */}
 
-      <div className="pr-36 pt-3">
+      <div className=" pt-3">
         <div className="flex w-fit gap-16 border-1 border-[#7C7C7C] px-6 rounded-xl text-sm">
           {/* <button
             className={`py-2 ${
@@ -181,7 +181,7 @@ function DelegatesSession({ props }: { props: string }) {
           </button>
         </div>
 
-        <div className="py-10">
+        <div className="">
           {/* {searchParams.get("session") === "upcoming" &&
             (dataLoading ? (
               <div className="flex items-center justify-center">
@@ -205,16 +205,16 @@ function DelegatesSession({ props }: { props: string }) {
             ))} */}
           {searchParams.get("session") === "recorded" &&
             (dataLoading ? (
-              <SessionTileSkeletonLoader />
+              <RecordedSessionsSkeletonLoader />
             ) : (
-              <SessionTile
-                sessionDetails={sessionDetails}
-                dataLoading={dataLoading}
-                isEvent="Recorded"
-                isOfficeHour={false}
-                isSession={""}
-              />
-              // <RecordedSessionsTile meetingData={sessionDetails}/>
+              // <SessionTile
+              //   sessionDetails={sessionDetails}
+              //   dataLoading={dataLoading}
+              //   isEvent="Recorded"
+              //   isOfficeHour={false}
+              //   isSession={""}
+              // />
+              <RecordedSessionsTile meetingData={sessionDetails}/>
             ))}
         </div>
       </div>
