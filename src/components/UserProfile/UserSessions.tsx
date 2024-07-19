@@ -124,7 +124,7 @@ function UserSessions({
     <div>
       <div className="pr-32 pt-3">
         <div className="flex gap-16 border-1 border-[#7C7C7C] pl-6 rounded-xl text-sm">
-          {selfDelegate === false && (
+          {selfDelegate === true && (
             <button
               className={`py-2  ${
                 searchParams.get("session") === "schedule"

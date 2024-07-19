@@ -50,9 +50,19 @@ function AvailableSessions() {
   const [isPageLoading, setIsPageLoading] = useState(true);
   const [selectedDao, setSelectedDao] = useState<any>(null);
   const [selectedDate, setSelectedDate] = useState<any>(null);
-  const [startTime, setStartTime] = useState<any>(null);
-  const [endTime, setEndTime] = useState<any>(null);
+  // const [startTime, setStartTime] = useState<any>(null);
+  // const [endTime, setEndTime] = useState<any>(null);
   const [ensNames, setEnsNames] = useState<any>({});
+  const [startTime, setStartTime] = useState({
+    hour: 12,
+    minute: 0,
+    ampm: "AM",
+  });
+  const [endTime, setEndTime] = useState({
+    hour: 12,
+    minute: 0,
+    ampm: "AM",
+  });
 
   useEffect(() => {
     setIsPageLoading(false);
@@ -194,29 +204,87 @@ function AvailableSessions() {
     }
   };
 
-  const handleStartTimeChange = async (
-    e: React.ChangeEvent<HTMLSelectElement>
-  ) => {
-    const selected = e.target.value;
-    console.log("selected startTime", selected);
-    if (selected === "Start Time") {
-      setStartTime(null);
+  useEffect(() => {
+    if (selectedDate && startTime && endTime) {
+      handleTime();
+    }
+  }, [selectedDate, startTime, endTime]);
+
+  const handleTimeChange = (type: any, field: any, value: any) => {
+    if (type === "start") {
+      setStartTime({ ...startTime, [field]: value });
     } else {
-      setStartTime(selected);
+      setEndTime({ ...endTime, [field]: value });
     }
   };
 
-  const handleEndTimeChange = async (
-    e: React.ChangeEvent<HTMLSelectElement>
-  ) => {
-    const selected = e.target.value;
-    console.log("selected endTime", selected);
-    if (selected === "End Time") {
-      setEndTime(null);
-    } else {
-      setEndTime(selected);
+  const handleTime = () => {
+    const start = new Date(
+      `${selectedDate} ${startTime.hour}:${startTime.minute} ${startTime.ampm}`
+    );
+    const end = new Date(
+      `${selectedDate} ${endTime.hour}:${endTime.minute} ${endTime.ampm}`
+    );
+
+    console.log(startTime.hour, "s.t. hour");
+    console.log(startTime.minute, "s.t. minute");
+    console.log(endTime.hour, "e.t. hour");
+    console.log(endTime.minute, "s.t. minute");
+
+    if (end <= start) {
+      end.setDate(end.getDate() + 1);
     }
+
+    const nextDay = new Date(start);
+    nextDay.setDate(nextDay.getDate() + 1);
+    nextDay.setHours(0, 0, 0, 0);
+
+    if (end > nextDay) {
+      toast.error(
+        "Oops! Your end time is on the next day.For multi-day scheduling, please add each day separately."
+      );
+    //   setTimeSlots([]);
+    // setSessions(0);
+      return;
+    }
+
+    
+    let current = new Date(start);
+
+    while (current < end) {
+      // slots.push(new Date(current));
+      current.setMinutes(current.getMinutes() + 30);
+
+      console.log(current, "current");
+    }
+
+    // setTimeSlots(slots);
+    // setSessions(slots.length);
   };
+
+  // const handleStartTimeChange = async (
+  //   e: React.ChangeEvent<HTMLSelectElement>
+  // ) => {
+  //   const selected = e.target.value;
+  //   console.log("selected startTime", selected);
+  //   if (selected === "Start Time") {
+  //     setStartTime(null);
+  //   } else {
+  //     setStartTime(selected);
+  //   }
+  // };
+
+  // const handleEndTimeChange = async (
+  //   e: React.ChangeEvent<HTMLSelectElement>
+  // ) => {
+  //   const selected = e.target.value;
+  //   console.log("selected endTime", selected);
+  //   if (selected === "End Time") {
+  //     setEndTime(null);
+  //   } else {
+  //     setEndTime(selected);
+  //   }
+  // };
 
   const generateTimeOptions = () => {
     const options = [];
@@ -233,9 +301,21 @@ function AvailableSessions() {
 
   const timeOptions = generateTimeOptions();
 
+  // const handleClearTime = () => {
+  //   setStartTime(null);
+  //   setEndTime(null);
+  // };
   const handleClearTime = () => {
-    setStartTime(null);
-    setEndTime(null);
+    setStartTime({
+      hour: 12,
+      minute: 0,
+      ampm: "AM"
+    });
+    setEndTime({
+      hour: 12,
+      minute: 0,
+      ampm: "AM"
+    });
   };
 
   const currentDate = new Date();
@@ -363,32 +443,84 @@ function AvailableSessions() {
           className="rounded-md bg-opacity-90"
           closeDelay={1}
         >
+
           <div className="flex items-center select-container">
+            <div className="bg-white p-[9px] shadow rounded-md">
+
+            
+          <select
+                    value={startTime.hour}
+                    className=" cursor-pointer mr-1"
+                    onChange={(e) =>
+                      handleTimeChange("start", "hour", e.target.value)
+                    }
+                  >
+                    {[...Array(12)].map((_, i) => (
+                      <option key={i} value={String(i + 1).padStart(2, "0")}>
+                        {String(i + 1).padStart(2, "0")}
+                      </option>
+                    ))}
+                  </select>
+                  <span>:</span>
+                  <select
+                    value={startTime.minute}
+                    className="ml-1 cursor-pointer"
+                    onChange={(e) =>
+                      handleTimeChange("start", "minute", e.target.value)
+                    }
+                  >
+                    <option value="00">00</option>
+                    <option value="30">30</option>
+                  </select>
+                  <select
+                    value={startTime.ampm}
+                    className=" cursor-pointer"
+                    onChange={(e) =>
+                      handleTimeChange("start", "ampm", e.target.value)
+                    }
+                  >
+                    <option value="AM">AM</option>
+                    <option value="PM">PM</option>
+                  </select>
+                  </div>
+
+            <span>&nbsp;to&nbsp;</span>
+            <div className="bg-white p-[9px] shadow rounded-md">
             <select
-              value={startTime || "Start Time"}
-              onChange={handleStartTimeChange}
-              className="px-3 py-2 rounded-md shadow mr-1 cursor-pointer"
-            >
-              <option disabled>Start Time</option>
-              {timeOptions.map((time) => (
-                <option key={time} value={time}>
-                  {time}
-                </option>
-              ))}
-            </select>
-            <span>&nbsp;to</span>
-            <select
-              value={endTime || "End Time"}
-              onChange={handleEndTimeChange}
-              className="px-3 py-2 rounded-md shadow ml-2 cursor-pointer"
-            >
-              <option disabled>End Time</option>
-              {timeOptions.map((time) => (
-                <option key={time} value={time}>
-                  {time}
-                </option>
-              ))}
-            </select>
+                    value={endTime.hour}
+                    className="ml-1 cursor-pointer"
+                    onChange={(e) =>
+                      handleTimeChange("end", "hour", e.target.value)
+                    }
+                  >
+                    {[...Array(12)].map((_, i) => (
+                      <option key={i} value={String(i + 1).padStart(2, "0")}>
+                        {String(i + 1).padStart(2, "0")}
+                      </option>
+                    ))}
+                  </select>
+                  <span>:</span>
+                  <select
+                    value={endTime.minute}
+                    className="mr-1 cursor-pointer"
+                    onChange={(e) =>
+                      handleTimeChange("end", "minute", e.target.value)
+                    }
+                  >
+                    <option value="00">00</option>
+                    <option value="30">30</option>
+                  </select>
+                  <select
+                    value={endTime.ampm}
+                    className="cursor-pointer"
+                    onChange={(e) =>
+                      handleTimeChange("end", "ampm", e.target.value)
+                    }
+                  >
+                    <option value="AM">AM</option>
+                    <option value="PM">PM</option>
+                  </select>
+                  </div>
             {(startTime || endTime) && (
               <button
                 onClick={handleClearTime}

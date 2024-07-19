@@ -28,13 +28,6 @@ interface dataToStore {
   dao_name: string;
 }
 
-interface TimeObject {
-  hour: number;
-  minute: number;
-  ampm: 'AM' | 'PM';
-}
-
-
 function ScheduledUserSessions({ daoName }: { daoName: string }) {
   const { address } = useAccount();
   // const address = "0x5e349eca2dc61abcd9dd99ce94d04136151a09ee";
@@ -69,115 +62,81 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
   const [userRejected, setUserRejected] = useState<Boolean>();
   const [addingEmail, setAddingEmail] = useState<boolean>();
   const [scheduledSuccess, setScheduledSuccess] = useState<boolean>();
-  const [numberOfSessions, setNumberOfSessions] = useState(0);
-  const [generatedTimeSlots, setGeneratedTimeSlots] = useState<Array<{ time: string; date: string }>>([]);
-  const [startTime, setStartTime] = useState<TimeObject>({ hour: 12, minute: 0, ampm: 'PM' });
-  const [endTime, setEndTime] = useState<TimeObject>({ hour: 12, minute: 0, ampm: 'PM' });
+  // const [numberOfSessions, setNumberOfSessions] = useState(0);
+  // const [generatedTimeSlots, setGeneratedTimeSlots] = useState<
+  //   Array<{ time: string; date: string }>
+  // >([]);
+  const [timeSlots, setTimeSlots] = useState<Date[]>([]);
+  const [sessions, setSessions] = useState(0);
+  const [startTime, setStartTime] = useState({
+    hour: 12,
+    minute: 0,
+    ampm: "AM",
+  });
+  const [endTime, setEndTime] = useState({
+    hour: 12,
+    minute: 0,
+    ampm: "AM",
+  });
 
-  const isEndTimeNextDay = (selectedDate: string, start: TimeObject, end: TimeObject): boolean => {
-    const startDateTime = new Date(`${selectedDate}T${start.hour.toString().padStart(2, '0')}:${start.minute.toString().padStart(2, '0')}:00`);
-    const endDateTime = new Date(`${selectedDate}T${end.hour.toString().padStart(2, '0')}:${end.minute.toString().padStart(2, '0')}:00`);
-  
-    if (start.ampm === 'PM' && start.hour !== 12) startDateTime.setHours(startDateTime.getHours() + 12);
-    if (end.ampm === 'PM' && end.hour !== 12) endDateTime.setHours(endDateTime.getHours() + 12);
-    if (start.ampm === 'AM' && start.hour === 12) startDateTime.setHours(0);
-    if (end.ampm === 'AM' && end.hour === 12) endDateTime.setHours(24);
-  
-    return endDateTime <= startDateTime;
+
+  useEffect(() => {
+    if (selectedDate && startTime && endTime) {
+      generateTimeSlots();
+    }
+  }, [selectedDate, startTime, endTime]);
+
+  const handleTimeChange = (type: any, field: any, value: any) => {
+    if (type === "start") {
+      setStartTime({ ...startTime, [field]: value });
+    } else {
+      setEndTime({ ...endTime, [field]: value });
+    }
   };
 
+  const generateTimeSlots = () => {
+    const start = new Date(
+      `${selectedDate} ${startTime.hour}:${startTime.minute} ${startTime.ampm}`
+    );
+    const end = new Date(
+      `${selectedDate} ${endTime.hour}:${endTime.minute} ${endTime.ampm}`
+    );
 
-  const calculateNumberOfSessions = (start: TimeObject, end: TimeObject) => {
-    const startDate = new Date(`2000-01-01T${start.hour.toString().padStart(2, '0')}:${start.minute.toString().padStart(2, '0')}:00`);
-    let endDate = new Date(`2000-01-01T${end.hour.toString().padStart(2, '0')}:${end.minute.toString().padStart(2, '0')}:00`);
-    
-    if (start.ampm === 'PM' && start.hour !== 12) startDate.setHours(startDate.getHours() + 12);
-    if (end.ampm === 'PM' && end.hour !== 12) endDate.setHours(endDate.getHours() + 12);
-    if (start.ampm === 'AM' && start.hour === 12) startDate.setHours(0);
-    if (end.ampm === 'AM' && end.hour === 12) endDate.setHours(24);
-  
-    if (endDate <= startDate) endDate.setDate(endDate.getDate() + 1);
-  
-    const diffMilliseconds = endDate.getTime() - startDate.getTime();
-    const diffMinutes = diffMilliseconds / 60000;
-    return Math.floor(diffMinutes / timeSlotSizeMinutes);
-  };
+    console.log(startTime.hour, "s.t. hour");
+    console.log(startTime.minute, "s.t. minute");
+    console.log(endTime.hour, "e.t. hour");
+    console.log(endTime.minute, "s.t. minute");
 
-  const handleEndTimeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const { id, value } = e.target;
-    const newEndTime = { ...endTime, [id]: id === 'hour' ? parseInt(value) : value };
-    
-    if (isEndTimeNextDay(selectedDate, startTime, newEndTime)) {
-      toast.error("You can only select session times for the same day. Please select another date to schedule sessions for the next day.");
+    if (end <= start) {
+      end.setDate(end.getDate() + 1);
+    }
+
+    const nextDay = new Date(start);
+    nextDay.setDate(nextDay.getDate() + 1);
+    nextDay.setHours(0, 0, 0, 0);
+
+    if (end > nextDay) {
+      toast.error(
+        "Oops! Your end time is on the next day.For multi-day scheduling, please add each day separately."
+      );
+      setTimeSlots([]);
+    setSessions(0);
       return;
     }
-  
-    setEndTime(newEndTime);
-    const sessions = calculateNumberOfSessions(startTime, newEndTime);
-    setNumberOfSessions(sessions);
-  };
 
-useEffect(() => {
-  generateTimeSlots();
-}, [startTime,endTime, numberOfSessions, timeSlotSizeMinutes, selectedDate]);
-  
-const generateTimeSlots = () => {
-  if (!selectedDate || !startTime || !endTime || numberOfSessions <= 0) {
-    setGeneratedTimeSlots([]);
-    setNumberOfSessions(0);
-    return;
-  }
+    const slots = [];
+    let current = new Date(start);
 
-  let slots: Array<{ time: string; date: string }> = [];
-  let currentDate = new Date(`${selectedDate}T00:00:00`);
+    while (current < end) {
+      slots.push(new Date(current));
+      current.setMinutes(current.getMinutes() + 30);
 
-  let startHour = startTime.hour;
-  if (startTime.ampm === 'PM' && startTime.hour !== 12) {
-    startHour += 12;
-  } else if (startTime.ampm === 'AM' && startTime.hour === 12) {
-    startHour = 0;
-  }
-  
-  currentDate.setHours(startHour, startTime.minute);
-
-  for (let i = 0; i < numberOfSessions; i++) {
-    let slotTime = new Date(currentDate.getTime() + i * timeSlotSizeMinutes * 60000);
-    
-    let hours = slotTime.getHours();
-    let ampm = hours >= 12 ? 'PM' : 'AM';
-    hours = hours % 12;
-    hours = hours ? hours : 12; // the hour '0' should be '12'
-    let minutes = slotTime.getMinutes();
-
-    slots.push({
-      time: `${hours}:${minutes.toString().padStart(2, '0')} ${ampm}`,
-      date: slotTime.toLocaleDateString('en-US', { 
-        year: 'numeric', 
-        month: 'long', 
-        day: 'numeric' 
-      })
-    });
-
-    // Break if we've reached the end time
-    if (slots[slots.length - 1].time === `${endTime.hour}:${endTime.minute.toString().padStart(2, '0')} ${endTime.ampm}`) {
-      break;
+      console.log(current, "current");
     }
-  }
 
-  setGeneratedTimeSlots(slots);
-  setNumberOfSessions(slots.length);
-};
-
-  const handleStartTimeChange = (e: any) => {
-    const { id, value } = e.target;
-    const newStartTime = { ...startTime, [id]: id === 'hour' ? parseInt(value) : value };
-    setStartTime(newStartTime);
+    setTimeSlots(slots);
+    setSessions(slots.length);
   };
-
-useEffect(() => {
-  const sessions = calculateNumberOfSessions(startTime, endTime);
-  setNumberOfSessions(sessions);
-}, [startTime, endTime, timeSlotSizeMinutes]);
 
   const checkUser = async () => {
     try {
@@ -425,11 +384,17 @@ useEffect(() => {
     }
   };
 
+  // const handleAddSelectedDate = async () => {
+  //   if (!selectedDate || !startHour || !startMinute || !endHour || !endMinute) {
+  //     toast.error("Please select a date and time ranges before adding.");
+  //     return;
+  //   }
   const handleAddSelectedDate = async () => {
-    if (!selectedDate || !startHour || !startMinute || !endHour || !endMinute) {
+    if (!selectedDate || !startTime || !endTime) {
       toast.error("Please select a date and time ranges before adding.");
       return;
     }
+
 
     const newAllData = {
       date: selectedDate,
@@ -467,9 +432,9 @@ useEffect(() => {
     ]);
     setAllowedDates([...allowedDates, selectedDate]);
     setSelectedDate("");
-    setStartTime({ hour: 12, minute: 0, ampm: 'PM' });
-  setEndTime({ hour: 12, minute: 0, ampm: 'PM' });
-  setNumberOfSessions(1);
+    setStartTime({ hour: 12, minute: 0, ampm: "AM" });
+    setEndTime({ hour: 12, minute: 0, ampm: "AM" });
+    setSessions(1);
   };
 
   useEffect(() => {
@@ -491,7 +456,6 @@ useEffect(() => {
     setStartTimeOptions(timeOptions);
     setEndTimeOptions(timeOptions);
   }, [timeSlotSizeMinutes]);
-
 
   const currentDate = new Date();
   let formattedDate = currentDate.toLocaleDateString();
@@ -586,7 +550,7 @@ useEffect(() => {
   //     setDaoName("arbitrum");
   //   }
   // }, [chain, chain?.name]);
-  
+
   return (
     <>
       <div className="flex flex-col md:flex-row justify-center gap-8 md:gap-10 1.5lg:gap-20 p-4">
@@ -679,7 +643,7 @@ useEffect(() => {
               min={formattedDate}
             />
           </div>
-          
+
           <div className="flex flex-col mb-4">
             <label className="text-gray-700 font-semibold flex items-center">
               Select Available Time:
@@ -703,7 +667,7 @@ useEffect(() => {
               <div>
                 <label className="text-gray-500 mt-2">Start Time</label>
 
-                <div className="rounded-md flex items-center space-x-2">
+                {/* <div className="rounded-md flex items-center space-x-2">
                   <select className="p-2 border rounded cursor-pointer" id="hour" value={startTime.hour} onChange={handleStartTimeChange}>
                     {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((hour) => (
                       <option key={hour} value={hour}>
@@ -723,53 +687,148 @@ useEffect(() => {
                     <option value="AM">AM</option>
                     <option value="PM">PM</option>
                   </select>
+                </div> */}
+
+                <div className="rounded-md flex items-center space-x-2">
+                  <select
+                    value={startTime.hour}
+                    className="p-2 border rounded cursor-pointer"
+                    onChange={(e) =>
+                      handleTimeChange("start", "hour", e.target.value)
+                    }
+                  >
+                    {[...Array(12)].map((_, i) => (
+                      <option key={i} value={String(i + 1).padStart(2, "0")}>
+                        {String(i + 1).padStart(2, "0")}
+                      </option>
+                    ))}
+                  </select>
+                  <span>:</span>
+                  <select
+                    value={startTime.minute}
+                    className="p-2 border rounded cursor-pointer"
+                    onChange={(e) =>
+                      handleTimeChange("start", "minute", e.target.value)
+                    }
+                  >
+                    <option value="00">00</option>
+                    <option value="30">30</option>
+                  </select>
+                  <select
+                    value={startTime.ampm}
+                    className="p-2 border rounded cursor-pointer"
+                    onChange={(e) =>
+                      handleTimeChange("start", "ampm", e.target.value)
+                    }
+                  >
+                    <option value="AM">AM</option>
+                    <option value="PM">PM</option>
+                  </select>
                 </div>
               </div>
               <div>
                 <label className="text-gray-500 mt-1">End Time</label>
 
+                {/* <div className="rounded-md flex items-center space-x-2">
+                  <select
+                    className="p-2 border rounded cursor-pointer"
+                    id="hour"
+                    value={endTime.hour}
+                    onChange={handleEndTimeChange}
+                  >
+                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((hour) => (
+                      <option key={hour} value={hour}>
+                        {hour.toString().padStart(2, "0")}
+                      </option>
+                    ))}
+                  </select>
+                  <span>:</span>
+                  <select
+                    className="p-2 border rounded cursor-pointer"
+                    id="minute"
+                    value={endTime.minute}
+                    onChange={handleEndTimeChange}
+                  >
+                    {[0, 30].map((minute) => (
+                      <option key={minute} value={minute}>
+                        {minute.toString().padStart(2, "0")}
+                      </option>
+                    ))}
+                  </select>
+                  <select
+                    className="p-2 border rounded cursor-pointer"
+                    id="ampm"
+                    value={endTime.ampm}
+                    onChange={handleEndTimeChange}
+                  >
+                    <option value="AM">AM</option>
+                    <option value="PM">PM</option>
+                  </select>
+                </div> */}
                 <div className="rounded-md flex items-center space-x-2">
-    <select className="p-2 border rounded cursor-pointer" id="hour" value={endTime.hour} onChange={handleEndTimeChange}>
-      {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((hour) => (
-        <option key={hour} value={hour}>
-          {hour.toString().padStart(2, "0")}
-        </option>
-      ))}
-    </select>
-    <span>:</span>
-    <select className="p-2 border rounded cursor-pointer" id="minute" value={endTime.minute} onChange={handleEndTimeChange}>
-      {[0, 30].map((minute) => (
-        <option key={minute} value={minute}>
-          {minute.toString().padStart(2, "0")}
-        </option>
-      ))}
-    </select>
-    <select className="p-2 border rounded cursor-pointer" id="ampm" value={endTime.ampm} onChange={handleEndTimeChange}>
-      <option value="AM">AM</option>
-      <option value="PM">PM</option>
-    </select>
-  </div>
+                  <select
+                    value={endTime.hour}
+                    className="p-2 border rounded cursor-pointer"
+                    onChange={(e) =>
+                      handleTimeChange("end", "hour", e.target.value)
+                    }
+                  >
+                    {[...Array(12)].map((_, i) => (
+                      <option key={i} value={String(i + 1).padStart(2, "0")}>
+                        {String(i + 1).padStart(2, "0")}
+                      </option>
+                    ))}
+                  </select>
+                  <select
+                    value={endTime.minute}
+                    className="p-2 border rounded cursor-pointer"
+                    onChange={(e) =>
+                      handleTimeChange("end", "minute", e.target.value)
+                    }
+                  >
+                    <option value="00">00</option>
+                    <option value="30">30</option>
+                  </select>
+                  <select
+                    value={endTime.ampm}
+                    className="p-2 border rounded cursor-pointer"
+                    onChange={(e) =>
+                      handleTimeChange("end", "ampm", e.target.value)
+                    }
+                  >
+                    <option value="AM">AM</option>
+                    <option value="PM">PM</option>
+                  </select>
+                </div>
               </div>
-
             </div>
 
             <div className="mt-4">
-            <label className="text-gray-700 font-semibold flex items-center">
-              How many sessions scheduled
-            </label>
-            <input
-              type="number"
-              min={1}
-              max={48}
-              placeholder="Enter number"
-              className="border border-gray-300 rounded px-3 py-2 mt-1 w-full cursor-pointer "
-              value={numberOfSessions}
-              readOnly
-            />
-          </div>
+              <label className="text-gray-700 font-semibold flex items-center">
+                Total Session Count:
+                <Tooltip
+                  content={
+                    <div className="font-poppins p-2 max-w-80 text-black rounded-md">
+                      Displays the number of individual time slots available for
+                      booking, calculated based on your selected time range and
+                      slot duration.
+                    </div>
+                  }
+                  showArrow
+                  placement="right"
+                  delay={1}
+                >
+                  <span className="px-2">
+                    <FaCircleInfo className="cursor-pointer text-blue-500" />
+                  </span>
+                </Tooltip>
+              </label>
+              <div className="border border-gray-300 rounded px-3 py-2 mt-1 w-full cursor-pointer ">
+                {sessions}
+              </div>
+            </div>
 
-                  <div className="flex flex-col gap-2">
-
+            {/* <div className="flex flex-col gap-2">
               {generatedTimeSlots.length > 0 && (
                 <div className="mt-4">
                   <h3 className="text-lg font-semibold mb-2">
@@ -788,7 +847,27 @@ useEffect(() => {
                   </div>
                 </div>
               )}
-              </div>
+            </div> */}
+
+            <div className="flex flex-col gap-2">
+              {timeSlots.length > 0 && (
+                <div className="mt-4">
+                  <h3 className="text-lg font-semibold mb-2">
+                    Generated Time Slots:
+                  </h3>
+                  <div className="grid grid-cols-4 gap-2 w-full">
+                    {timeSlots.map((slot, index) => (
+                      <div
+                        key={index}
+                        className="border border-gray-300 p-1.5 rounded-md flex flex-col items-center text-left basis-1/3 text-sm font-poppins bg-[#f5f5f5]"
+                      >
+                        {slot.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           <button
@@ -837,6 +916,8 @@ useEffect(() => {
                 </div>
               ))}
             </div>
+
+            
           </div>
 
           <button
