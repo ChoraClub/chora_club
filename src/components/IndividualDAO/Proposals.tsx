@@ -20,6 +20,8 @@ interface Proposal {
   votersCount?: number;
   status?: string;
   proposer: string;
+  queueStartTime?:number;
+  queueEndTime?:number;
 }
 
 function Proposals({ props }: { props: string }) {
@@ -128,7 +130,8 @@ function Proposals({ props }: { props: string }) {
       }
     },
     [props]
-  ); const fetchProposals = async () => {
+  ); 
+  const fetchProposals = async () => {
     setLoading(true);
     try {
       let response;
@@ -160,6 +163,18 @@ function Proposals({ props }: { props: string }) {
         }));
       } else {
         newProposals = responseData.data.proposalCreateds;
+        const queueResponse = await fetch("/api/get-arbitrum-queue-info");
+        const queueData = await queueResponse.json();
+        console.log("queueData", queueData);
+        newProposals = newProposals.map((proposal: Proposal) => {
+          const queueInfo = queueData.data.proposalQueueds.find((q: any) => q.proposalId === proposal.proposalId);
+          console.log("queueInfo", queueInfo);
+          return {
+            ...proposal,
+            queueStartTime: queueInfo?.blockTimestamp,
+            queueEndTime: queueInfo?.eta, 
+          };
+        });
       }
       newProposals.sort(
         (a: any, b: any) => b.blockTimestamp - a.blockTimestamp
@@ -190,6 +205,44 @@ function Proposals({ props }: { props: string }) {
   useEffect(() => {
     fetchProposals();
   }, [props]);
+
+  const getProposalStatus = (proposal: Proposal): string => {
+    const currentTime = Date.now() / 1000; // Convert to seconds
+    
+    if (props === "arbitrum") {
+      if (proposal.queueStartTime && proposal.queueEndTime) {
+        if (currentTime < proposal.queueStartTime) {
+          return "PENDING";
+        } else if (currentTime >= proposal.queueStartTime && currentTime < proposal.queueEndTime) {
+          return "QUEUED";
+        } else {
+          return proposal.support1Weight! > proposal.support0Weight! ? "SUCCEEDED" : "DEFEATED";
+        }
+      } else {
+        // Fallback to old logic if queue times are not available
+        const proposalAge = currentTime - proposal.blockTimestamp;
+        // if (proposalAge <= 3 * 24 * 60 * 60) {
+        //   return "PENDING";
+        // } else 
+        if (proposalAge <= 17 * 24 * 60 * 60) {
+          return "PENDING";
+        } else {
+          return proposal.support1Weight! > proposal.support0Weight! ? "SUCCEEDED" : "DEFEATED";
+        }
+      }
+    } else {
+      // Optimism logic
+      if (canceledProposals.some((item) => item.proposalId === proposal.proposalId)) {
+        return "CANCELLED";
+      }
+      const proposalAge = currentTime - proposal.blockTimestamp;
+      if (proposalAge <= 7 * 24 * 60 * 60) {
+        return "PENDING";
+      } else {
+        return proposal.support1Weight! > proposal.support0Weight! ? "SUCCEEDED" : "DEFEATED";
+      }
+    }
+  };
 
   useEffect(() => {
     const fetchVotesForDisplayedProposals = async () => {
@@ -328,17 +381,17 @@ const formatDate = (timestamp: number): string => {
               </Tooltip>
               {proposal.votesLoaded ? (
                 <div
-                  className={`rounded-full flex items-center justify-center text-xs h-fit py-0.5 border font-medium w-24 ${props === "optimism" &&
-                      canceledProposals.some(
-                        (item) => item.proposalId === proposal.proposalId
-                      )
-                      ? "bg-red-200 border-red-500 text-red-500"
-                      : proposal.support1Weight! > proposal.support0Weight!
-                        ? "bg-green-200 border-green-600 text-green-600"
-                        : "bg-red-200 border-red-500 text-red-500"
-                    }`}
-                >
-                   {
+                className={`rounded-full flex items-center justify-center text-xs h-fit py-0.5 border font-medium w-24 ${
+                  getProposalStatus(proposal) === "SUCCEEDED"
+                    ? "bg-green-200 border-green-600 text-green-600"
+                    : getProposalStatus(proposal) === "DEFEATED"
+                    ? "bg-red-200 border-red-500 text-red-500"
+                    : getProposalStatus(proposal) === "QUEUED"
+                    ? "bg-yellow-200 border-yellow-600 text-yellow-600"
+                    : "bg-green-200 border-green-600 text-green-600"
+                }`}
+              >
+                   {/* {
                    canceledProposals.some((item) => item.proposalId === proposal.proposalId)
                    ? "CANCELLED"
                    : new Date() > new Date(proposal.blockTimestamp * 1000 + (props==="optimism" ? 7:17) * 24 * 60 * 60 * 1000)
@@ -346,7 +399,9 @@ const formatDate = (timestamp: number): string => {
                        ? "SUCCEEDED"
                        : "DEFEATED"
                      : "PENDING"
-                  }
+                  } */}
+                  {getProposalStatus(proposal)}  
+
                 </div>
               ) : (
                 <StatusLoader />

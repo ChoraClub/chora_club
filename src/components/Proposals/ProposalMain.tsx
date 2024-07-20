@@ -42,6 +42,8 @@ interface Proposal {
   support1Weight?: number;
   support2Weight?: number;
   votersCount?: number;
+  queueStartTime?: number;
+  queueEndTime?: number;
 }
 import { Tooltip as Tooltips } from "@nextui-org/react";
 import style from "./proposalMain.module.css";
@@ -73,6 +75,8 @@ function ProposalMain({ props }: { props: Props }) {
   const [support1Weight, setSupport1Weight] = useState(0);
   const [isArbitrum, setIsArbitrum] = useState(false);
   const [displayCount, setDisplayCount] = useState(20);
+  const [queueStartTime, setQueueStartTime] = useState<number>();
+  const  [queueEndTime, setQueueEndTime] = useState<number>();
 
   const loadMore = () => {
     const newDisplayCount = displayCount + 20;
@@ -220,6 +224,14 @@ function ProposalMain({ props }: { props: Props }) {
           );
           const result = await response.json();
           setData(result.data.proposalCreateds[0]);
+          
+          const queueResponse = await fetch("/api/get-arbitrum-queue-info");
+          const queueData = await queueResponse.json();
+         
+            const queueInfo = queueData.data.proposalQueueds.find((q: any) => q.proposalId === props.id );
+            console.log("queueInfo", queueInfo);
+            setQueueStartTime(queueInfo?.blockTimestamp);
+            setQueueEndTime(queueInfo?.eta);
         } catch (err: any) {
           setError(err.message);
         }
@@ -501,6 +513,75 @@ function ProposalMain({ props }: { props: Props }) {
   const { status, votingPeriodEnd } = getProposalStatus(data, props, canceledProposals);
   console.log(status, votingPeriodEnd);
   const isActive = status === "Active" || status?.includes("day");
+
+  const getVotingPeriodEnd = () => {
+    if (!data || !data.blockTimestamp) return null;
+    
+    const baseTimestamp = new Date(data.blockTimestamp * 1000);
+    const votingPeriod = (props.daoDelegates === "arbitrum") ? 17 : 7; // Changed to 3 days for Arbitrum
+    return new Date(baseTimestamp.getTime() + votingPeriod * 24 * 60 * 60 * 1000);
+  };
+
+  const votingPeriodEndData = getVotingPeriodEnd();
+  const currentDate = new Date();
+
+  const getProposalStatusData = () => {
+    if (!data || !data.blockTimestamp) return null;
+    
+    const proposalTime:any = new Date(data.blockTimestamp * 1000);
+    const currentTime:any = new Date();
+    const timeDifference = currentTime - proposalTime;
+    const daysDifference = timeDifference / (24 * 60 * 60 * 1000);
+
+    if (canceledProposals.some((item) => item.proposalId === props.id)) {
+      return "CANCELLED";
+    }
+
+    if (props.daoDelegates === "arbitrum") {
+      if (queueStartTime && queueEndTime) {
+        const currentTime = currentDate.getTime() / 1000; // Convert to seconds
+        if (currentTime < queueStartTime) {
+          return currentDate <= votingPeriodEndData! ? "PENDING" : "QUEUED";
+        } else if (currentTime >= queueStartTime && currentTime < queueEndTime) {
+          return "QUEUED";
+        } else {
+          return support1Weight! > support0Weight! ? "SUCCEEDED" : "DEFEATED";
+        }
+      } else {
+        // Fallback to old logic if queue times are not available
+        return currentDate > votingPeriodEndData!
+          ? support1Weight! > support0Weight!
+            ? "SUCCEEDED"
+            : "DEFEATED"
+          : "PENDING";
+      }
+    } else {
+      // Optimism logic
+      return currentDate > votingPeriodEndData!
+        ? support1Weight! > support0Weight!
+          ? "SUCCEEDED"
+          : "DEFEATED"
+        : "PENDING";
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "SUCCEEDED":
+        return "bg-green-200 border-green-600 text-green-600";
+      case "DEFEATED":
+        return "bg-red-200 border-red-500 text-red-500";
+      case "QUEUED":
+        return "bg-yellow-200 border-yellow-600 text-yellow-600";
+      case "CANCELLED":
+        return "bg-red-200 border-red-500 text-red-500";
+      default:
+        return "bg-green-200 border-green-600 text-green-600";
+    }
+  };
+  const Proposalstatus = data && support1Weight ? getProposalStatusData() : null;
+  // const isActive = status === "PENDING" || status?.includes("day");
+
   return (
     <>
       <div className="pr-8 pb-5 pl-16 pt-6 font-poppins">
@@ -583,27 +664,12 @@ function ProposalMain({ props }: { props: Props }) {
           </div>
 
           <div
-            className={`rounded-full flex items-end justify-center text-xs h-fit py-0.5 border font-medium w-24 ${data && support1Weight
-                ? props.daoDelegates === "optimism" &&
-                  canceledProposals.some((item) => item.proposalId === props.id)
-                  ? "bg-red-200 border-red-500 text-red-500"
-                  : support1Weight! > support0Weight!
-                    ? "bg-green-200 border-green-600 text-green-600"
-                    : "bg-red-200 border-red-500 text-red-500"
-                : "bg-gray-200 animate-pulse  rounded-full"
-              }`}
-          >{data && support1Weight && votingPeriodEnd ? (
-            canceledProposals.some((item) => item.proposalId === props.id)
-              ? "CANCELLED"
-              : new Date() > votingPeriodEnd
-                ? support1Weight! > support0Weight!
-                  ? "SUCCEEDED"
-                  : "DEFEATED"
-                : "PENDING"
-          ) : (
-            <div className="h-5 w-20"></div>
-          )}
-          </div>
+      className={`rounded-full flex items-center justify-center text-xs h-fit py-0.5 border font-medium w-24 ${
+        Proposalstatus ? getStatusColor(Proposalstatus) : "bg-gray-200 animate-pulse rounded-full"
+      }`}
+    >
+      {Proposalstatus ? Proposalstatus : <div className="h-5 w-20"></div>}
+    </div>
         </div>
 
         <div className="text-sm mt-3">
