@@ -2,7 +2,7 @@
 import Image from "next/image";
 import React, { use, useEffect, useState } from "react";
 import user from "@/assets/images/daos/profile.png";
-import { FaXTwitter, FaDiscord, FaGithub } from "react-icons/fa6";
+import { FaXTwitter, FaDiscord, FaGithub, FaVoicemail, FaEnvelope } from "react-icons/fa6";
 import { BiSolidMessageRoundedDetail } from "react-icons/bi";
 import { IoCopy, IoShareSocialSharp } from "react-icons/io5";
 import DelegateInfo from "./DelegateInfo";
@@ -78,6 +78,8 @@ function SpecificDelegate({ props }: { props: Type }) {
   const [same, setSame] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [emailId, setEmailId] = useState<string>();
+  const [isEmailVisible, setIsEmailVisible] = useState(false);
 
   const [delegateOpen, setDelegateOpen] = useState(false);
   const address = useAccount();
@@ -401,15 +403,15 @@ function SpecificDelegate({ props }: { props: Type }) {
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
 
-        const raw = JSON.stringify({
-          address: props.individualDelegate,
-          // daoName: props.daoDelegates,
-        });
+        // const raw = JSON.stringify({
+        //   address: props.individualDelegate,
+        //   // daoName: props.daoDelegates,
+        // });
 
         const requestOptions: any = {
-          method: "POST",
+          method: "GET",
           headers: myHeaders,
-          body: raw,
+          // body: raw,
           redirect: "follow",
         };
         const res = await fetch(
@@ -438,8 +440,24 @@ function SpecificDelegate({ props }: { props: Type }) {
             // setResponseFromDB(true);
             setDisplayImage(item.image);
             setDescription(item.description);
+            if (item.isEmailVisible) {
+              setIsEmailVisible(true);
+              setEmailId(item.emailId);
+            }
+            const matchingNetwork = item.networks.find(
+              (network: any) => network.dao_name === chain?.name
+            );
+
+            // If a matching network is found, set the discourse ID
+            if (matchingNetwork) {
+              setDescription(matchingNetwork.description);
+            } else {
+              // Handle the case where no matching network is found
+              console.log(
+                "No matching network found for the specified dao_name"
+              );
+            }
             setDisplayName(item.displayName);
-            // setEmailId(item.emailId);
 
             setSocials({
               twitter: item.socialHandles.twitter,
@@ -492,8 +510,7 @@ function SpecificDelegate({ props }: { props: Type }) {
                 style={{
                   backgroundColor: "#fcfcfc",
                   border: "2px solid #E9E9E9 ",
-                }}
-              >
+                }}>
                 <div className="w-40 h-40 flex items-center justify-content ">
                   <div className="flex justify-center items-center w-40 h-40">
                     <Image
@@ -555,8 +572,7 @@ function SpecificDelegate({ props }: { props: Type }) {
                           : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                      target="_blank"
-                    >
+                      target="_blank">
                       <FaXTwitter color="#7C7C7C" size={12} />
                     </Link>
                     <Link
@@ -575,8 +591,7 @@ function SpecificDelegate({ props }: { props: Type }) {
                           : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                      target="_blank"
-                    >
+                      target="_blank">
                       <BiSolidMessageRoundedDetail color="#7C7C7C" size={12} />
                     </Link>
                     <Link
@@ -591,10 +606,18 @@ function SpecificDelegate({ props }: { props: Type }) {
                           : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                      target="_blank"
-                    >
+                      target="_blank">
                       <FaDiscord color="#7C7C7C" size={12} />
                     </Link>
+                    {isEmailVisible && (
+                      <Link
+                        href={`mailto:${emailId}`}
+                        className="border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1"
+                        style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
+                        target="_blank">
+                        <FaEnvelope color="#7C7C7C" size={12} />
+                      </Link>
+                    )}
                     <Link
                       href={
                         socials.github
@@ -607,8 +630,7 @@ function SpecificDelegate({ props }: { props: Type }) {
                           : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                      target="_blank"
-                    >
+                      target="_blank">
                       <FaGithub color="#7C7C7C" size={12} />
                     </Link>
                   </div>
@@ -624,8 +646,7 @@ function SpecificDelegate({ props }: { props: Type }) {
                     content="Copy"
                     placement="bottom"
                     closeDelay={1}
-                    showArrow
-                  >
+                    showArrow>
                     <span className="px-2 cursor-pointer" color="#3E3D3D">
                       <IoCopy
                         onClick={() => handleCopy(props.individualDelegate)}
@@ -644,8 +665,7 @@ function SpecificDelegate({ props }: { props: Type }) {
                       content="Copy profile URL to share on Warpcast or Twitter."
                       placement="bottom"
                       closeDelay={1}
-                      showArrow
-                    >
+                      showArrow>
                       <Button
                         className="bg-gray-200 hover:bg-gray-300"
                         onClick={() => {
@@ -657,8 +677,7 @@ function SpecificDelegate({ props }: { props: Type }) {
                           setTimeout(() => {
                             setIsCopied(false);
                           }, 3000);
-                        }}
-                      >
+                        }}>
                         <IoShareSocialSharp />
                         {isCopied ? "Copied" : "Share profile"}
                       </Button>
@@ -712,8 +731,7 @@ function SpecificDelegate({ props }: { props: Type }) {
                     //   handleDelegateVotes(`${props.individualDelegate}`)
                     // }
 
-                    onClick={handleDelegateModal}
-                  >
+                    onClick={handleDelegateModal}>
                     Delegate
                   </button>
                 </div>
@@ -731,8 +749,7 @@ function SpecificDelegate({ props }: { props: Type }) {
                   ? " border-blue-shade-200 text-blue-shade-200 font-semibold"
                   : "border-transparent"
               }`}
-              onClick={() => router.push(path + "?active=info")}
-            >
+              onClick={() => router.push(path + "?active=info")}>
               Info
             </button>
             <button
@@ -741,8 +758,7 @@ function SpecificDelegate({ props }: { props: Type }) {
                   ? "text-blue-shade-200 font-semibold border-blue-shade-200"
                   : "border-transparent"
               }`}
-              onClick={() => router.push(path + "?active=pastVotes")}
-            >
+              onClick={() => router.push(path + "?active=pastVotes")}>
               Past Votes
             </button>
             <button
@@ -753,8 +769,7 @@ function SpecificDelegate({ props }: { props: Type }) {
               }`}
               onClick={() =>
                 router.push(path + "?active=delegatesSession&session=book")
-              }
-            >
+              }>
               Sessions
             </button>
             <button
@@ -765,8 +780,7 @@ function SpecificDelegate({ props }: { props: Type }) {
               }`}
               onClick={() =>
                 router.push(path + "?active=officeHours&hours=ongoing")
-              }
-            >
+              }>
               Office Hours
             </button>
           </div>

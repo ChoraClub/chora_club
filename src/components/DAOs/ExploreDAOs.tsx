@@ -205,10 +205,10 @@ function ExploreDAOs() {
             To ensure optimal user experience, please note that our site is
             designed to be responsive on desktop devices.
             <div
-              className="bg-red-600 hover:bg-red-700 p-[5px] rounded-full cursor-pointer absolute top-[6px] right-[6px]"
+              className="bg-gray-50 hover:bg-gray-100 p-[5px] rounded-full cursor-pointer absolute top-[6px] right-[6px]"
               onClick={handleCloseNotification}
             >
-              <ImCross color="#fff" size={7} />
+              <ImCross color="#111" size={7} />
             </div>
           </div>
         </div>

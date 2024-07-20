@@ -81,8 +81,11 @@ const RemotePeer = ({ peerId }: RemotePeerProps) => {
             </div>
           ) : (
             <div className="flex w-24 h-24 rounded-full text-3xl font-semibold items-center justify-center bg-[#004DFF] text-gray-200">
-              {metadata?.displayName[0]?.toUpperCase()}
+              {/* {metadata?.displayName[0]} */}
               {/* <img src={metadata?.avatarUrl} /> */}
+              {metadata?.displayName
+                ? metadata?.displayName[0]?.toUpperCase()
+                : ""}
             </div>
           )}
         </div>
