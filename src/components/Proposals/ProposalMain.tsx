@@ -76,7 +76,7 @@ function ProposalMain({ props }: { props: Props }) {
   const [isArbitrum, setIsArbitrum] = useState(false);
   const [displayCount, setDisplayCount] = useState(20);
   const [queueStartTime, setQueueStartTime] = useState<number>();
-  const  [queueEndTime, setQueueEndTime] = useState<number>();
+  const [queueEndTime, setQueueEndTime] = useState<number>();
 
   const loadMore = () => {
     const newDisplayCount = displayCount + 20;
@@ -84,7 +84,7 @@ function ProposalMain({ props }: { props: Props }) {
   };
 
   useEffect(() => {
-    setIsArbitrum(props?.daoDelegates === "arbitrum"); 
+    setIsArbitrum(props?.daoDelegates === "arbitrum");
   }, []);
 
   const contentRef = useRef<HTMLDivElement>(null);
@@ -129,11 +129,11 @@ function ProposalMain({ props }: { props: Props }) {
     // Convert links [text](url)
     description = description.replace(
       /\[(.+?)\]\((.+?)\)/g,
-      '<a href="$2" class="underline">$1</a>'
+      '<a href="$2" target="_blank" class="underline">$1</a>'
     );
     description = description.replace(
       /<(https?:\/\/[^>]+)>/g,
-      '<a href="$1" class="underline">$1</a>'
+      '<a href="$1" target="_blank" class="underline">$1</a>'
     );
     // Convert bullet points (lines starting with *)
     let inList = false;
@@ -224,14 +224,16 @@ function ProposalMain({ props }: { props: Props }) {
           );
           const result = await response.json();
           setData(result.data.proposalCreateds[0]);
-          
+
           const queueResponse = await fetch("/api/get-arbitrum-queue-info");
           const queueData = await queueResponse.json();
-         
-            const queueInfo = queueData.data.proposalQueueds.find((q: any) => q.proposalId === props.id );
-            console.log("queueInfo", queueInfo);
-            setQueueStartTime(queueInfo?.blockTimestamp);
-            setQueueEndTime(queueInfo?.eta);
+
+          const queueInfo = queueData.data.proposalQueueds.find(
+            (q: any) => q.proposalId === props.id
+          );
+          console.log("queueInfo", queueInfo);
+          setQueueStartTime(queueInfo?.blockTimestamp);
+          setQueueEndTime(queueInfo?.eta);
         } catch (err: any) {
           setError(err.message);
         }
@@ -309,10 +311,10 @@ function ProposalMain({ props }: { props: Props }) {
   const formatDate = (timestamp: number): string => {
     // Convert the timestamp to milliseconds if it's in seconds
     const milliseconds = timestamp * 1000;
-    
+
     // Create a date object in the local time zone
     const date = new Date(milliseconds);
-    
+
     // Format the date components
     const day = date.getDate();
     const month = date.toLocaleString("en-US", { month: "long" });
@@ -321,13 +323,13 @@ function ProposalMain({ props }: { props: Props }) {
     const minutes = String(date.getMinutes()).padStart(2, "0");
     const seconds = String(date.getSeconds()).padStart(2, "0");
     const ampm = hours >= 12 ? "PM" : "AM";
-    
+
     // Format hours for 12-hour clock
     const formattedHours = String(hours % 12 || 12).padStart(2, "0");
-    
+
     // Get the local time zone abbreviation
     const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    
+
     // Construct the formatted date string
     return `${day} ${month}, ${year} ${formattedHours}:${minutes}:${seconds} ${ampm}`;
   };
@@ -479,24 +481,30 @@ function ProposalMain({ props }: { props: Props }) {
       : cleanedText.slice(0, charLimit) + "...";
   };
 
-  const getProposalStatus = (data:any, props:any, canceledProposals:any) => {
-    if (!data || !data.blockTimestamp) return { status: null, votingPeriodEnd: null };
-    
-    const proposalTime:any = new Date(data.blockTimestamp * 1000);
-    const currentTime:any = new Date();
+  const getProposalStatus = (data: any, props: any, canceledProposals: any) => {
+    if (!data || !data.blockTimestamp)
+      return { status: null, votingPeriodEnd: null };
+
+    const proposalTime: any = new Date(data.blockTimestamp * 1000);
+    const currentTime: any = new Date();
     const timeDifference = currentTime - proposalTime;
     const daysDifference = timeDifference / (24 * 60 * 60 * 1000);
-    const votingPeriod = (props.daoDelegates === "arbitrum") ? 17 : 7;
-    const votingPeriodEnd = new Date(proposalTime.getTime() + votingPeriod * 24 * 60 * 60 * 1000);
-  
-    if (canceledProposals.some((item:any) => item.proposalId === props.id)) {
+    const votingPeriod = props.daoDelegates === "arbitrum" ? 17 : 7;
+    const votingPeriodEnd = new Date(
+      proposalTime.getTime() + votingPeriod * 24 * 60 * 60 * 1000
+    );
+
+    if (canceledProposals.some((item: any) => item.proposalId === props.id)) {
       return { status: "Closed", votingPeriodEnd };
     }
-  
+
     if (props.daoDelegates === "arbitrum") {
       if (daysDifference <= 3) {
         const daysLeft = Math.ceil(3 - daysDifference);
-        return { status: `${daysLeft} day${daysLeft !== 1 ? 's' : ''} to go`, votingPeriodEnd };
+        return {
+          status: `${daysLeft} day${daysLeft !== 1 ? "s" : ""} to go`,
+          votingPeriodEnd,
+        };
       } else if (daysDifference <= 17) {
         return { status: "Active", votingPeriodEnd };
       }
@@ -505,21 +513,27 @@ function ProposalMain({ props }: { props: Props }) {
         return { status: "Active", votingPeriodEnd };
       }
     }
-  
+
     return { status: "Closed", votingPeriodEnd };
   };
-  
+
   // Usage in your component
-  const { status, votingPeriodEnd } = getProposalStatus(data, props, canceledProposals);
+  const { status, votingPeriodEnd } = getProposalStatus(
+    data,
+    props,
+    canceledProposals
+  );
   console.log(status, votingPeriodEnd);
   const isActive = status === "Active" || status?.includes("day");
 
   const getVotingPeriodEnd = () => {
     if (!data || !data.blockTimestamp) return null;
-    
+
     const baseTimestamp = new Date(data.blockTimestamp * 1000);
-    const votingPeriod = (props.daoDelegates === "arbitrum") ? 17 : 7; // Changed to 3 days for Arbitrum
-    return new Date(baseTimestamp.getTime() + votingPeriod * 24 * 60 * 60 * 1000);
+    const votingPeriod = props.daoDelegates === "arbitrum" ? 17 : 7; // Changed to 3 days for Arbitrum
+    return new Date(
+      baseTimestamp.getTime() + votingPeriod * 24 * 60 * 60 * 1000
+    );
   };
 
   const votingPeriodEndData = getVotingPeriodEnd();
@@ -527,9 +541,9 @@ function ProposalMain({ props }: { props: Props }) {
 
   const getProposalStatusData = () => {
     if (!data || !data.blockTimestamp) return null;
-    
-    const proposalTime:any = new Date(data.blockTimestamp * 1000);
-    const currentTime:any = new Date();
+
+    const proposalTime: any = new Date(data.blockTimestamp * 1000);
+    const currentTime: any = new Date();
     const timeDifference = currentTime - proposalTime;
     const daysDifference = timeDifference / (24 * 60 * 60 * 1000);
 
@@ -542,7 +556,10 @@ function ProposalMain({ props }: { props: Props }) {
         const currentTime = currentDate.getTime() / 1000; // Convert to seconds
         if (currentTime < queueStartTime) {
           return currentDate <= votingPeriodEndData! ? "PENDING" : "QUEUED";
-        } else if (currentTime >= queueStartTime && currentTime < queueEndTime) {
+        } else if (
+          currentTime >= queueStartTime &&
+          currentTime < queueEndTime
+        ) {
           return "QUEUED";
         } else {
           return support1Weight! > support0Weight! ? "SUCCEEDED" : "DEFEATED";
@@ -579,7 +596,8 @@ function ProposalMain({ props }: { props: Props }) {
         return "bg-green-200 border-green-600 text-green-600";
     }
   };
-  const Proposalstatus = data && support1Weight ? getProposalStatusData() : null;
+  const Proposalstatus =
+    data && support1Weight ? getProposalStatusData() : null;
   // const isActive = status === "PENDING" || status?.includes("day");
 
   return (
@@ -632,14 +650,14 @@ function ProposalMain({ props }: { props: Props }) {
           </div>
 
           <div
-      className={`rounded-full flex items-center justify-center text-xs h-fit py-0.5 font-medium px-2 w-fit ml-auto ${
-        status
-          ? status === "Closed"
-            ? "bg-[#f4d3f9] border border-[#77367a] text-[#77367a] mr-4"
-            : "bg-[#f4d3f9] border border-[#77367a] text-[#77367a] mr-4"
-          : "bg-gray-200 animate-pulse rounded-full"
-      }`}
-    >
+            className={`rounded-full flex items-center justify-center text-xs h-fit py-0.5 font-medium px-2 w-fit ml-auto ${
+              status
+                ? status === "Closed"
+                  ? "bg-[#f4d3f9] border border-[#77367a] text-[#77367a] mr-4"
+                  : "bg-[#f4d3f9] border border-[#77367a] text-[#77367a] mr-4"
+                : "bg-gray-200 animate-pulse rounded-full"
+            }`}
+          >
             {/* {canceledProposals.some((item) => item.proposalId === props.id)
                   ? "Closed"
                   :votingPeriodEnd ? (
@@ -651,7 +669,7 @@ function ProposalMain({ props }: { props: Props }) {
       ) : (
         <div className="h-5 w-20"></div>
       )} */}
-      {status ? status : <div className="h-5 w-20"></div>}
+            {status ? status : <div className="h-5 w-20"></div>}
           </div>
         </div>
         <div className="flex gap-1 my-1 items-center">
@@ -664,12 +682,14 @@ function ProposalMain({ props }: { props: Props }) {
           </div>
 
           <div
-      className={`rounded-full flex items-center justify-center text-xs h-fit py-0.5 border font-medium w-24 ${
-        Proposalstatus ? getStatusColor(Proposalstatus) : "bg-gray-200 animate-pulse rounded-full"
-      }`}
-    >
-      {Proposalstatus ? Proposalstatus : <div className="h-5 w-20"></div>}
-    </div>
+            className={`rounded-full flex items-center justify-center text-xs h-fit py-0.5 border font-medium w-24 ${
+              Proposalstatus
+                ? getStatusColor(Proposalstatus)
+                : "bg-gray-200 animate-pulse rounded-full"
+            }`}
+          >
+            {Proposalstatus ? Proposalstatus : <div className="h-5 w-20"></div>}
+          </div>
         </div>
 
         <div className="text-sm mt-3">
