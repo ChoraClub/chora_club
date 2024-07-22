@@ -327,33 +327,39 @@ function MainProfile() {
 
         if (dbResponse.data.length > 0) {
           console.log("db Response", dbResponse.data[0]);
+          console.log(
+            "dbResponse.data[0]?.networks:",
+            dbResponse.data[0]?.networks
+          );
           setUserData({
-            displayName: dbResponse.data[0].displayName,
-            discord: dbResponse.data[0].socialHandles.discord,
-            discourse: dbResponse.data[0]?.networks?.find(
-              (network: any) => network.dao_name === dao
-            ).discourse,
-            twitter: dbResponse.data[0].socialHandles.twitter,
-            github: dbResponse.data[0].socialHandles.github,
-            displayImage: dbResponse.data[0].image,
+            displayName: dbResponse.data[0]?.displayName,
+            discord: dbResponse.data[0]?.socialHandles?.discord,
+            discourse:
+              dbResponse.data[0]?.networks?.find(
+                (network: any) => network?.dao_name === dao
+              )?.discourse || "",
+            twitter: dbResponse.data[0].socialHandles?.twitter,
+            github: dbResponse.data[0].socialHandles?.github,
+            displayImage: dbResponse.data[0]?.image,
           });
 
           setModalData({
-            displayName: dbResponse.data[0].displayName,
-            discord: dbResponse.data[0].socialHandles.discord,
-            discourse: dbResponse.data[0]?.networks?.find(
-              (network: any) => network.dao_name === dao
-            ).discourse,
-            emailId: dbResponse.data[0].emailId,
-            twitter: dbResponse.data[0].socialHandles.twitter,
-            github: dbResponse.data[0].socialHandles.github,
-            displayImage: dbResponse.data[0].image,
+            displayName: dbResponse.data[0]?.displayName,
+            discord: dbResponse.data[0]?.socialHandles?.discord,
+            discourse:
+              dbResponse.data[0]?.networks?.find(
+                (network: any) => network?.dao_name === dao
+              )?.discourse || "",
+            emailId: dbResponse.data[0]?.emailId,
+            twitter: dbResponse.data[0]?.socialHandles?.twitter,
+            github: dbResponse.data[0]?.socialHandles?.github,
+            displayImage: dbResponse.data[0]?.image,
           });
-          settoggle(dbResponse.data[0].isEmailVisible);
+          settoggle(dbResponse.data[0]?.isEmailVisible);
           setDescription(
             dbResponse.data[0]?.networks?.find(
               (network: any) => network.dao_name === dao
-            ).description
+            )?.description || ""
           );
           setIsPageLoading(false);
         } else {
@@ -420,6 +426,9 @@ function MainProfile() {
 
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
+      if (address) {
+        myHeaders.append("x-wallet-address", address);
+      }
 
       const raw = JSON.stringify({
         address: address,
@@ -458,27 +467,36 @@ function MainProfile() {
     try {
       // Call the POST API function for adding a new delegate
       console.log("Adding the delegate..");
-      const response = await axios.post("/api/profile", {
-        address: address,
-        image: modalData.displayImage,
-        isDelegate: true,
-        displayName: modalData.displayName,
-        emailId: modalData.emailId,
-        isEmailVisible: false,
-        socialHandles: {
-          twitter: modalData.twitter,
-          discord: modalData.discord,
-          github: modalData.github,
-        },
-        networks: [
-          {
-            dao_name: daoName,
-            network: chain?.name,
-            discourse: modalData.discourse,
-            description: newDescription,
+      const response = await axios.post(
+        "/api/profile",
+        {
+          address: address,
+          image: modalData.displayImage,
+          isDelegate: true,
+          displayName: modalData.displayName,
+          emailId: modalData.emailId,
+          isEmailVisible: false,
+          socialHandles: {
+            twitter: modalData.twitter,
+            discord: modalData.discord,
+            github: modalData.github,
           },
-        ],
-      });
+          networks: [
+            {
+              dao_name: daoName,
+              network: chain?.name,
+              discourse: modalData.discourse,
+              description: newDescription,
+            },
+          ],
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            ...(address && { "x-wallet-address": address }),
+          },
+        }
+      );
 
       console.log("Response Add", response);
 
@@ -519,26 +537,40 @@ function MainProfile() {
           : "";
       console.log("Updating");
       console.log("Inside Updating Description", newDescription);
-      const response: any = await axios.put("/api/profile", {
-        address: address,
-        image: modalData.displayImage,
-        isDelegate: true,
-        displayName: modalData.displayName,
-        emailId: modalData.emailId,
-        socialHandles: {
-          twitter: modalData.twitter,
-          discord: modalData.discord,
-          github: modalData.github,
-        },
-        networks: [
-          {
-            dao_name: daoName,
-            network: chain?.name,
-            discourse: modalData.discourse,
-            description: newDescription,
+      // const myHeaders = new Headers();
+      // myHeaders.append("Content-Type", "application/json");
+      // if (address) {
+      //   myHeaders.append("x-wallet-address", address);
+      // }
+      const response: any = await axios.put(
+        "/api/profile",
+        {
+          address: address,
+          image: modalData.displayImage,
+          isDelegate: true,
+          displayName: modalData.displayName,
+          emailId: modalData.emailId,
+          socialHandles: {
+            twitter: modalData.twitter,
+            discord: modalData.discord,
+            github: modalData.github,
           },
-        ],
-      });
+          networks: [
+            {
+              dao_name: daoName,
+              network: chain?.name,
+              discourse: modalData.discourse,
+              description: newDescription,
+            },
+          ],
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            ...(address && { "x-wallet-address": address }),
+          },
+        }
+      );
       console.log("response", response);
       // Handle response from the PUT API function
       if (response.data.success) {
@@ -634,7 +666,9 @@ function MainProfile() {
                     <Link
                       href={`https://twitter.com/${userData.twitter}`}
                       className={`border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 ${
-                        userData.twitter == "" ? "hidden" : ""
+                        userData.twitter == "" || userData.twitter == undefined
+                          ? "hidden"
+                          : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
                       target="_blank"
@@ -650,7 +684,10 @@ function MainProfile() {
                           : ""
                       }
                       className={`border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1  ${
-                        userData.discourse == "" ? "hidden" : ""
+                        userData.discourse == "" ||
+                        userData.discourse == undefined
+                          ? "hidden"
+                          : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
                       target="_blank"
@@ -660,7 +697,9 @@ function MainProfile() {
                     <Link
                       href={`https://discord.com/${userData.discord}`}
                       className={`border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 ${
-                        userData.discord == "" ? "hidden" : ""
+                        userData.discord == "" || userData.discord == undefined
+                          ? "hidden"
+                          : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
                       target="_blank"
@@ -670,7 +709,9 @@ function MainProfile() {
                     <Link
                       href={`https://github.com/${userData.github}`}
                       className={`border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 ${
-                        userData.github == "" ? "hidden" : ""
+                        userData.github == "" || userData.github == undefined
+                          ? "hidden"
+                          : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
                       target="_blank"
