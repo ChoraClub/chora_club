@@ -64,4 +64,40 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
   },
+  events: {
+    async signIn({ user }) {
+      try {
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        if (user.id) {
+          myHeaders.append("x-wallet-address", user.id);
+        }
+
+        const raw = JSON.stringify({
+          address: user.id,
+          isEmailVisible: false,
+        });
+
+        const requestOptions: any = {
+          method: "POST",
+          headers: myHeaders,
+          body: raw,
+          redirect: "follow",
+        };
+        console.log(requestOptions);
+        const res = await fetch(
+          `${BASE_URL}/api/auth/accountcreate`,
+          requestOptions
+        );
+        // console.log("Response:-", res);
+        if (res.status === 200) {
+          console.log("Account created succesfully!");
+        } else if (res.status == 409) {
+          console.log("Resource already exist!");
+        }
+      } catch (error) {
+        console.error("Error in initial profile:", error);
+      }
+    },
+  },
 };

@@ -334,30 +334,32 @@ function MainProfile() {
           setUserData({
             displayName: dbResponse.data[0]?.displayName,
             discord: dbResponse.data[0]?.socialHandles?.discord,
-            discourse: dbResponse.data[0]?.networks?.find(
-              (network: any) => network.dao_name === dao
-            ).discourse,
-            twitter: dbResponse.data[0].socialHandles.twitter,
-            github: dbResponse.data[0].socialHandles.github,
-            displayImage: dbResponse.data[0].image,
+            discourse:
+              dbResponse.data[0]?.networks?.find(
+                (network: any) => network?.dao_name === dao
+              )?.discourse || "",
+            twitter: dbResponse.data[0].socialHandles?.twitter,
+            github: dbResponse.data[0].socialHandles?.github,
+            displayImage: dbResponse.data[0]?.image,
           });
 
           setModalData({
-            displayName: dbResponse.data[0].displayName,
-            discord: dbResponse.data[0].socialHandles.discord,
-            discourse: dbResponse.data[0]?.networks?.find(
-              (network: any) => network.dao_name === dao
-            ).discourse,
-            emailId: dbResponse.data[0].emailId,
-            twitter: dbResponse.data[0].socialHandles.twitter,
-            github: dbResponse.data[0].socialHandles.github,
-            displayImage: dbResponse.data[0].image,
+            displayName: dbResponse.data[0]?.displayName,
+            discord: dbResponse.data[0]?.socialHandles?.discord,
+            discourse:
+              dbResponse.data[0]?.networks?.find(
+                (network: any) => network?.dao_name === dao
+              )?.discourse || "",
+            emailId: dbResponse.data[0]?.emailId,
+            twitter: dbResponse.data[0]?.socialHandles?.twitter,
+            github: dbResponse.data[0]?.socialHandles?.github,
+            displayImage: dbResponse.data[0]?.image,
           });
-          settoggle(dbResponse.data[0].isEmailVisible);
+          settoggle(dbResponse.data[0]?.isEmailVisible);
           setDescription(
             dbResponse.data[0]?.networks?.find(
               (network: any) => network.dao_name === dao
-            ).description
+            )?.description || ""
           );
           setIsPageLoading(false);
         } else {
