@@ -9,9 +9,18 @@ import { useSearchParams } from "next/navigation";
 import { useRouter } from "next-nprogress-bar";
 import IndividualDaoHeader from "../ComponentUtils/IndividualDaoHeader";
 import { LuDot } from "react-icons/lu";
-import chain from "@/assets/images/daos/chain.png";
+import chainImg from "@/assets/images/daos/chain.png";
 import user2 from "@/assets/images/user/user2.svg";
 import user5 from "@/assets/images/user/user5.svg";
+import { useConnectModal, useChainModal } from "@rainbow-me/rainbowkit";
+import VotingPopup from "./VotingPopup";
+import { useAccount } from "wagmi";
+import arb_proposals_abi from '../../artifacts/Dao.sol/arb_proposals_abi.json';
+import op_proposals_abi from '../../artifacts/Dao.sol/op_proposals_abi.json';
+import WalletAndPublicClient from "@/helpers/signer";
+import toast, { Toaster } from "react-hot-toast";
+import { useNetwork } from "wagmi";
+import { hash } from "crypto";
 
 interface ArbitrumVote {
   voter: {
@@ -77,6 +86,96 @@ function ProposalMain({ props }: { props: Props }) {
   const [displayCount, setDisplayCount] = useState(20);
   const [queueStartTime, setQueueStartTime] = useState<number>();
   const [queueEndTime, setQueueEndTime] = useState<number>();
+  const { publicClient, walletClient } = WalletAndPublicClient();
+  const { chain } = useNetwork();
+  const { openChainModal } = useChainModal();
+  const [isVotingOpen, setIsVotingOpen] = useState(false);
+  const { address } = useAccount();
+
+  const voteOnchain = async () => {
+    if (walletClient?.chain?.network !== props.daoDelegates) {
+      toast.error("Please switch to appropriate network to delegate!");
+      if (openChainModal) {
+        openChainModal();
+      }
+    }else{
+      setIsVotingOpen(true);
+    }
+  }
+  const handleVoteSubmit = async (proposalId: string, vote: string[], comment: string) => {
+    console.log('Vote:', vote, 'Comment:', comment);
+    // Handle the vote submission logic here
+    let address;
+    let address1;
+
+    try {
+      address = await walletClient.getAddresses();
+      address1 = address[0];
+    } catch (error) {
+      console.error("Error getting addresses:", error);
+      toast.error("Please connect your MetaMask wallet!");
+      return;
+    }
+
+    if (!address1) {
+      toast.error("Please connect your MetaMask wallet!");
+      return;
+    }
+
+    console.log(address);
+    console.log(address1);
+
+    let chainAddress;
+    if (chain?.name === "Optimism") {
+      chainAddress = "0xcDF27F107725988f2261Ce2256bDfCdE8B382B10";//token contract address
+    } else if (chain?.name === "Arbitrum One") {
+      chainAddress = "0x789fC99093B09aD01C34DC7251D0C89ce743e5a4";
+    } else {
+      return;
+    }
+
+    console.log("walletClient?.chain?.network", walletClient?.chain?.network);
+
+    if (walletClient?.chain === "") {
+      toast.error("Please connect your wallet!");
+    } else if (comment) {
+      if (walletClient?.chain?.network === props.daoDelegates) {
+        try {
+
+          const delegateTx = await walletClient.writeContract({
+            address: chainAddress,
+            abi: props.daoDelegates === "arbitrum" ? arb_proposals_abi : op_proposals_abi,
+            functionName: "castVoteWithReason",
+            args: [proposalId, vote, comment],
+            account: address1,
+          });
+          console.log(delegateTx);
+
+        } catch (e) {
+          toast.error("Transaction failed");
+        }
+      }
+    } else if (!comment) {
+      if (walletClient?.chain?.network === props.daoDelegates) {
+        try {
+          
+          console.log(chainAddress, proposalId, vote, address1)
+          const delegateTx = await walletClient.writeContract({
+            address: chainAddress,
+            abi: props.daoDelegates === "arbitrum" ? arb_proposals_abi : op_proposals_abi,
+            functionName: "castVote",
+            args: [proposalId, vote],
+            account: address1,
+          });
+          console.log(delegateTx);
+        } catch (e) {
+          toast.error("Transaction failed");
+        }
+      }
+    }
+   
+
+  };
 
   const loadMore = () => {
     const newDisplayCount = displayCount + 20;
@@ -473,12 +572,12 @@ function ProposalMain({ props }: { props: Props }) {
 
   const truncateText = (text: string, charLimit: number) => {
     // Remove all '#' characters from the text
-    const cleanedText = text.replace(/#/g, "");
+    const cleanedText = text?.replace(/#/g, "");
 
     // Truncate the cleaned text if necessary
-    return cleanedText.length <= charLimit
+    return cleanedText?.length <= charLimit
       ? cleanedText
-      : cleanedText.slice(0, charLimit) + "...";
+      : cleanedText?.slice(0, charLimit) + "...";
   };
 
   const getProposalStatus = (data: any, props: any, canceledProposals: any) => {
@@ -524,8 +623,7 @@ function ProposalMain({ props }: { props: Props }) {
     canceledProposals
   );
   console.log(status, votingPeriodEnd);
-  const isActive = status === "Active" || status?.includes("day");
-
+  const isActive = status === "Active" && !(props.daoDelegates==="optimism");
   const getVotingPeriodEnd = () => {
     if (!data || !data.blockTimestamp) return null;
 
@@ -645,7 +743,7 @@ function ProposalMain({ props }: { props: Props }) {
               className="rounded-md bg-opacity-90"
               closeDelay={1}
             >
-              <Image src={chain} alt="" className="size-6 cursor-pointer" />
+              <Image src={chainImg} alt="" className="size-6 cursor-pointer" />
             </Tooltips>
           </div>
 
@@ -671,6 +769,25 @@ function ProposalMain({ props }: { props: Props }) {
       )} */}
             {status ? status : <div className="h-5 w-20"></div>}
           </div>
+          {isActive && (
+        <button
+        className="align-middle select-none font-sans font-bold text-center uppercase transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 px-6 rounded-lg bg-blue-600 text-white shadow-md shadow-blue-600/10 hover:shadow-lg hover:shadow-blue-600/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none"
+        type="button"
+        onClick={voteOnchain}
+      >
+        Vote onchain
+      </button>
+      )}
+      <VotingPopup
+        isOpen={isVotingOpen}
+        onClose={() => setIsVotingOpen(false)}
+        onSubmit={handleVoteSubmit}
+        proposalId={props.id}
+        proposalTitle={truncateText(data?.description, 50)}
+        address={address||""}
+        dao={props.daoDelegates}
+        // customOptions={customOptions}
+      />
         </div>
         <div className="flex gap-1 my-1 items-center">
           <div className="flex text-xs font-normal items-center">
