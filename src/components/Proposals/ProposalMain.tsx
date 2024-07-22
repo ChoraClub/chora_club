@@ -91,6 +91,8 @@ function ProposalMain({ props }: { props: Props }) {
   const { openChainModal } = useChainModal();
   const [isVotingOpen, setIsVotingOpen] = useState(false);
   const { address } = useAccount();
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const voteOnchain = async () => {
     if (walletClient?.chain?.network !== props.daoDelegates) {
@@ -186,14 +188,13 @@ function ProposalMain({ props }: { props: Props }) {
     setIsArbitrum(props?.daoDelegates === "arbitrum");
   }, []);
 
-  const contentRef = useRef<HTMLDivElement>(null);
-  const [isExpanded, setIsExpanded] = useState(false);
+
 
   useEffect(() => {
     if (contentRef.current) {
       contentRef.current.style.maxHeight = isExpanded
-        ? `${contentRef.current.scrollHeight}px`
-        : "141px"; // 6 lines * 24px line-height
+      ? `${contentRef.current.scrollHeight}px`
+      : "141px"; // 6 lines * 24px line-height
     }
   }, [isExpanded, data?.description]);
   const toggleExpansion = () => {
@@ -225,14 +226,24 @@ function ProposalMain({ props }: { props: Props }) {
     description = description.replace(/^## (.+)$/gm, "<h2>$1</h2>");
     description = description.replace(/^# (.+)$/gm, "<h1>$1</h1>");
 
+  // Convert image links and regular links
+  description = description.replace(
+    /!\[([^\]]*)\]\(([^)]+)\s*"?([^"]*)"?\)/g,
+    '<img src="$2" alt="$1" title="$3" class="max-w-full h-auto">'
+  );
+   // Convert bare URLs
+   description = description.replace(
+    /<(https?:\/\/[^>]+)>/g,
+    '<a href="$1" target="_blank" class="underline text-blue-600">$1</a>'
+  );
     // Convert links [text](url)
     description = description.replace(
       /\[(.+?)\]\((.+?)\)/g,
-      '<a href="$2" target="_blank" class="underline">$1</a>'
+      '<a href="$2" target="_blank" class="underline text-blue-600">$1</a>'
     );
     description = description.replace(
       /<(https?:\/\/[^>]+)>/g,
-      '<a href="$1" target="_blank" class="underline">$1</a>'
+      '<a href="$1" target="_blank" class="underline text-blue-600">$1</a>'
     );
     // Convert bullet points (lines starting with *)
     let inList = false;
@@ -746,9 +757,19 @@ function ProposalMain({ props }: { props: Props }) {
               <Image src={chainImg} alt="" className="size-6 cursor-pointer" />
             </Tooltips>
           </div>
-
+          <div className="ml-auto">
+          {isActive && (
+       <button
+       className="align-middle select-none font-sans font-bold text-center uppercase transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-2 px-4 rounded-full bg-blue-600 text-white shadow-md shadow-blue-600/10 hover:shadow-lg hover:shadow-blue-600/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none "
+       type="button"
+       onClick={voteOnchain}
+     >
+       Vote onchain
+     </button>
+      )}
+      </div>
           <div
-            className={`rounded-full flex items-center justify-center text-xs h-fit py-0.5 font-medium px-2 w-fit ml-auto ${
+            className={`rounded-full flex items-center justify-center text-xs h-fit py-2 font-medium px-3 w-fit ml-auto ${
               status
                 ? status === "Closed"
                   ? "bg-[#f4d3f9] border border-[#77367a] text-[#77367a] mr-4"
@@ -756,28 +777,8 @@ function ProposalMain({ props }: { props: Props }) {
                 : "bg-gray-200 animate-pulse rounded-full"
             }`}
           >
-            {/* {canceledProposals.some((item) => item.proposalId === props.id)
-                  ? "Closed"
-                  :votingPeriodEnd ? (
-        currentDate > votingPeriodEnd ? (
-          "Closed"
-        ) : (
-          "Active"
-        )
-      ) : (
-        <div className="h-5 w-20"></div>
-      )} */}
             {status ? status : <div className="h-5 w-20"></div>}
           </div>
-          {isActive && (
-        <button
-        className="align-middle select-none font-sans font-bold text-center uppercase transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 px-6 rounded-lg bg-blue-600 text-white shadow-md shadow-blue-600/10 hover:shadow-lg hover:shadow-blue-600/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none"
-        type="button"
-        onClick={voteOnchain}
-      >
-        Vote onchain
-      </button>
-      )}
       <VotingPopup
         isOpen={isVotingOpen}
         onClose={() => setIsVotingOpen(false)}
@@ -817,6 +818,7 @@ function ProposalMain({ props }: { props: Props }) {
           ) : (
             <>
               {/* // data.description */}
+              {console.log(isExpanded)}
               <div
                 ref={contentRef}
                 className={`max-h-full transition-max-height duration-500 ease-in-out overflow-hidden ${

@@ -121,7 +121,7 @@ const VotingPopup: React.FC<VotingPopupProps> = ({
             .then((finalCounting) => {
               console.log(finalCounting);
               console.log("dataa", finalCounting.data);
-              setVotesCount(finalCounting.data.delegate.votesCount);
+              setVotesCount(finalCounting.data.delegate.votesCount?finalCounting.data.delegate.votesCount : 0);
             })
             .catch((error) => {
               console.error("Error:", error);
@@ -133,7 +133,7 @@ const VotingPopup: React.FC<VotingPopupProps> = ({
             })
             .toPromise();
           console.log("voting data", data.data.delegateVotesChangeds[0]);
-          setVotesCount(data.data.delegateVotesChangeds[0]?.newBalance);
+          setVotesCount(data.data.delegateVotesChangeds[0]?.newBalance?data.data.delegateVotesChangeds[0]?.newBalance:0);
         }
       } catch (error) {
         console.error("Error fetching data", error);

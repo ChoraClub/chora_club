@@ -384,7 +384,7 @@ const formatDate = (timestamp: number): string => {
                 className={`rounded-full flex items-center justify-center text-xs h-fit py-0.5 border font-medium w-24 ${
                   getProposalStatus(proposal) === "SUCCEEDED"
                     ? "bg-green-200 border-green-600 text-green-600"
-                    : getProposalStatus(proposal) === "DEFEATED"
+                    : getProposalStatus(proposal) === "DEFEATED" || getProposalStatus(proposal) === "CANCELLED"
                     ? "bg-red-200 border-red-500 text-red-500"
                     : getProposalStatus(proposal) === "QUEUED"
                     ? "bg-yellow-200 border-yellow-600 text-yellow-600"
