@@ -665,7 +665,9 @@ function MainProfile() {
                     <Link
                       href={`https://twitter.com/${userData.twitter}`}
                       className={`border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 ${
-                        userData.twitter == "" ? "hidden" : ""
+                        userData.twitter == "" || userData.twitter == undefined
+                          ? "hidden"
+                          : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
                       target="_blank">
@@ -680,7 +682,10 @@ function MainProfile() {
                           : ""
                       }
                       className={`border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1  ${
-                        userData.discourse == "" ? "hidden" : ""
+                        userData.discourse == "" ||
+                        userData.discourse == undefined
+                          ? "hidden"
+                          : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
                       target="_blank">
@@ -689,7 +694,9 @@ function MainProfile() {
                     <Link
                       href={`https://discord.com/${userData.discord}`}
                       className={`border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 ${
-                        userData.discord == "" ? "hidden" : ""
+                        userData.discord == "" || userData.discord == undefined
+                          ? "hidden"
+                          : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
                       target="_blank">
@@ -698,7 +705,9 @@ function MainProfile() {
                     <Link
                       href={`https://github.com/${userData.github}`}
                       className={`border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 ${
-                        userData.github == "" ? "hidden" : ""
+                        userData.github == "" || userData.github == undefined
+                          ? "hidden"
+                          : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
                       target="_blank">

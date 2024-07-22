@@ -16,6 +16,7 @@ interface DelegateRequestBody {
   displayName: string;
   emailId: string;
   isEmailVisible: boolean;
+  createdAt: Date;
   socialHandles: {
     twitter: string;
     discord: string;
@@ -33,6 +34,7 @@ export async function POST(req: NextRequest, res: NextApiResponse) {
     emailId,
     isEmailVisible,
     socialHandles,
+    createdAt,
     networks,
   }: DelegateRequestBody = await req.json();
 
@@ -56,6 +58,7 @@ export async function POST(req: NextRequest, res: NextApiResponse) {
         displayName,
         emailId,
         isEmailVisible,
+        createdAt,
         socialHandles,
         networks,
       });

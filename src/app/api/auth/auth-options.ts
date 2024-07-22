@@ -76,6 +76,7 @@ export const authOptions: NextAuthOptions = {
         const raw = JSON.stringify({
           address: user.id,
           isEmailVisible: false,
+          createdAt: new Date(),
         });
 
         const requestOptions: any = {
