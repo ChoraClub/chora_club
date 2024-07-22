@@ -17,7 +17,7 @@ button[data-test-id="button-primary"] {
   padding: 13px 15px !important;
   border: none !important;
   font-weight: 500 !important;
-  font-family: 'poppins' !important;
+  font-family: var(--font-poppins);
   margin-left: 3px !important;
   margin-right: 10px !important;
   transform: translateY(-10px);
@@ -31,7 +31,7 @@ button[data-test-id="button-back"]{
   color: #004DFF !important;
   border: 1px solid #004DFF !important;
   font-weight: 500 !important;
-  font-family: 'poppins' !important;
+  font-family: var(--font-poppins);
   transform: translateY(-10px);
   font-size: 13px !important;
   

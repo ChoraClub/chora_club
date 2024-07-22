@@ -7,7 +7,7 @@ import SidebarMain from "@/components/MainSidebar/SidebarMain";
 import RootProviders from "./providers/root-providers";
 import HuddleContextProvider from "@/context/HuddleContextProvider";
 import { useEffect } from "react";
-import FeedbackTile from "@/components/utils/FeedbackTile";
+import FeedbackTile from "@/components/ComponentUtils/FeedbackTile";
 import Script from "next/script";
 import ProgressBarProvider from "@/components/ProgressBarProvider/ProgressBarProvider";
 import MobileResponsiveMessage from "@/components/MobileResponsiveMessage/MobileResponsiveMessage";

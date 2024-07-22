@@ -4,7 +4,7 @@ import UserRecordedHours from "./UserAllOfficeHrs/UserRecordedHours";
 import UserUpcomingHours from "./UserAllOfficeHrs/UserUpcomingHours";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useRouter } from "next-nprogress-bar";
-import Tile from "../utils/Tile";
+import Tile from "../ComponentUtils/Tile";
 import { useNetwork, useAccount } from "wagmi";
 import text1 from "@/assets/images/daos/texture1.png";
 import { Oval } from "react-loader-spinner";
@@ -226,7 +226,7 @@ function UserOfficeHours({
 
           {searchParams.get("hours") === "hosted" &&
             (dataLoading ? (
-              <SessionTileSkeletonLoader/>
+              <SessionTileSkeletonLoader />
             ) : (
               <Tile
                 sessionDetails={sessionDetails}
@@ -237,7 +237,7 @@ function UserOfficeHours({
             ))}
           {searchParams.get("hours") === "attended" &&
             (dataLoading ? (
-              <SessionTileSkeletonLoader/>
+              <SessionTileSkeletonLoader />
             ) : (
               <Tile
                 sessionDetails={sessionDetails}

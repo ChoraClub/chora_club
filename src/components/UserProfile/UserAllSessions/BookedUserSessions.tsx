@@ -6,7 +6,7 @@ import text2 from "@/assets/images/daos/texture2.png";
 import Image from "next/image";
 import { FaCircleCheck, FaCircleXmark, FaCirclePlay } from "react-icons/fa6";
 import { Tooltip } from "@nextui-org/react";
-import EventTile from "../../utils/EventTile";
+import EventTile from "../../ComponentUtils/EventTile";
 import { useAccount, useNetwork } from "wagmi";
 import toast, { Toaster } from "react-hot-toast";
 import { Oval } from "react-loader-spinner";
@@ -50,10 +50,10 @@ function BookedUserSessions({ daoName }: { daoName: string }) {
         filteredData = result.data.filter(
           (session: Session) =>
             session.dao_name === daoName &&
-            session.meeting_status !== "Recorded" 
-            // &&
-            // new Date(session.slot_time).toLocaleString() >=
-            //   currentSlot.toLocaleString()
+            session.meeting_status !== "Recorded"
+          // &&
+          // new Date(session.slot_time).toLocaleString() >=
+          //   currentSlot.toLocaleString()
         );
 
         setSessionDetails(filteredData);
@@ -74,7 +74,7 @@ function BookedUserSessions({ daoName }: { daoName: string }) {
     <>
       <div className="space-y-6">
         {pageLoading ? (
-          <SessionTileSkeletonLoader/>
+          <SessionTileSkeletonLoader />
         ) : sessionDetails.length > 0 ? (
           sessionDetails.map((data, index) => (
             <EventTile

@@ -7,7 +7,7 @@ import { useRouter } from "next-nprogress-bar";
 
 // Assets
 import { Toaster, toast } from "react-hot-toast";
-import { BasicIcons } from "@/assets/BasicIcons";
+import { BasicIcons } from "@/utils/BasicIcons";
 
 // Components
 import FeatCommon from "@/components/ui/FeatCommon";

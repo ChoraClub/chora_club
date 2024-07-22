@@ -1,5 +1,5 @@
 import SpecificDelegate from "@/components/IndividualDelegate/SpecificDelegate";
-import { BASE_URL, IMAGE_URL } from "@/config/constants";
+import { BASE_URL } from "@/config/constants";
 import {
   processAddressOrEnsName,
   resolveENSProfileImage,
@@ -9,6 +9,7 @@ import {
 import { Metadata } from "next";
 import React, { useEffect } from "react";
 import { getFrameMetadata } from "@coinbase/onchainkit/core";
+import { IMAGE_URL } from "@/config/staticDataUtils";
 
 interface Type {
   daoDelegates: string;
@@ -43,12 +44,12 @@ export async function generateMetadata({
   // console.log("avatar...", avatar);
   // const dao_name = params.daoDelegates;
   // const tokenName = "Optimism";
-  
+
   // const imgParams = [
   //   avatar ? `avatar=${encodeURIComponent(avatar.avatar)}` : null,
   //   dao_name ? `dao_name=${encodeURIComponent(dao_name)}` : null,
   // ].filter((param): param is string => param !== null);
-  
+
   const defaultAvatar = IMAGE_URL; // Provide a default value for avatar
   const [avatar] = await Promise.all([
     fetchEnsAvatar(params.individualDelegate),
@@ -56,12 +57,14 @@ export async function generateMetadata({
   console.log("avatar...", avatar);
   const dao_name = params.daoDelegates;
   const tokenName = "Optimism";
-  
+
   const imgParams = [
-    avatar ? `avatar=${encodeURIComponent(avatar?.avatar ?? defaultAvatar)}` : null, // Use nullish coalescing operator to provide a default value for avatar
+    avatar
+      ? `avatar=${encodeURIComponent(avatar?.avatar ?? defaultAvatar)}`
+      : null, // Use nullish coalescing operator to provide a default value for avatar
     dao_name ? `dao_name=${encodeURIComponent(dao_name)}` : null,
   ].filter((param): param is string => param !== null);
-  
+
   console.log("imgParams...", imgParams);
   // .filter(Boolean);
 

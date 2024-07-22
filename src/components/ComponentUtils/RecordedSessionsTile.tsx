@@ -21,6 +21,7 @@ import user9 from "@/assets/images/user/user9.svg";
 // import { parseISO } from "date-fns";
 import posterImage from "@/assets/images/daos/thumbnail1.png";
 import { getEnsName } from "@/utils/ENSUtils";
+import logo from "@/assets/images/daos/CCLogo.png";
 
 interface meeting {
   meetingData: any;
@@ -36,21 +37,6 @@ const getDaoLogo = (daoName: string): StaticImageData => {
   return daoLogos[normalizedName] || arblogo;
 };
 
-// interface SessionData {
-//   session: {
-//     attendees: {
-//       attendee_address: string;
-//     }[];
-//     host_address: string;
-//   };
-//   guestInfo: {
-//     image: string | null;
-//   };
-//   hostInfo: {
-//     image: string | null;
-//   };
-// }
-
 function RecordedSessionsTile({ meetingData }: meeting) {
   console.log("meetingData: ", meetingData);
 
@@ -60,6 +46,8 @@ function RecordedSessionsTile({ meetingData }: meeting) {
   const router = useRouter();
   const [ensHostNames, setEnsHostNames] = useState<any>({});
   const [ensGuestNames, setEnsGuestNames] = useState<any>({});
+  const [loadingHostNames, setLoadingHostNames] = useState<boolean>(true);
+  const [loadingGuestNames, setLoadingGuestNames] = useState<boolean>(true);
 
   const handleCopy = (addr: string) => {
     copy(addr);
@@ -83,37 +71,6 @@ function RecordedSessionsTile({ meetingData }: meeting) {
     [key: string]: StaticImageData;
   }>({});
   const [usedIndices, setUsedIndices] = useState<Set<number>>(new Set());
-
-  // Function to get a random user image
-  // const getRandomUserImage = (): StaticImageData => {
-  //   let randomIndex;
-  //   do {
-  //     randomIndex = Math.floor(Math.random() * userImages.length);
-  //   } while (usedIndices.has(randomIndex));
-
-  //   usedIndices.add(randomIndex);
-  //   return userImages[randomIndex];
-  // };
-
-  // Effect to set the random user image when the component mounts
-  // useEffect(() => {
-  //   const newRandomUserImages: { [key: string]: StaticImageData } = {
-  //     ...randomUserImages,
-  //   };
-
-  //   meetingData.forEach((data: any) => {
-  //     const guestAddress = data.attendees[0].attendee_address;
-  //     const hostAddress = data.host_address;
-  //     if (!data.guestInfo?.image && !newRandomUserImages[guestAddress]) {
-  //       newRandomUserImages[guestAddress] = getRandomUserImage();
-  //     }
-  //     if (!data.hostInfo?.image && !newRandomUserImages[hostAddress]) {
-  //       newRandomUserImages[hostAddress] = getRandomUserImage();
-  //     }
-  //   });
-
-  //   setRandomUserImages(newRandomUserImages);
-  // }, [meetingData]);
 
   const formatTimeAgo = (utcTime: string): string => {
     const parsedTime = new Date(utcTime);
@@ -215,6 +172,7 @@ function RecordedSessionsTile({ meetingData }: meeting) {
       }
       console.log("ensNamesMap", ensNamesMap);
       setEnsHostNames(ensNamesMap);
+      setLoadingHostNames(false);
     };
 
     if (meetingData.length > 0) {
@@ -236,6 +194,7 @@ function RecordedSessionsTile({ meetingData }: meeting) {
       }
       console.log("guest ensNamesMap", ensNamesMap);
       setEnsGuestNames(ensNamesMap);
+      setLoadingGuestNames(false);
     };
 
     if (meetingData.length > 0) {
@@ -243,6 +202,49 @@ function RecordedSessionsTile({ meetingData }: meeting) {
     }
   }, [meetingData]);
 
+  // useEffect(() => {
+  //   const fetchEnsNames = async () => {
+  //     setLoadingHostNames(true);
+  //     setLoadingGuestNames(true);
+
+  //     const ensNamesMapHost: any = {};
+  //     const ensNamesMapGuest: any = {};
+
+  //     // Fetch host names
+  //     await Promise.all(
+  //       meetingData.map(async (data: any) => {
+  //         const ensNames = await getEnsName(data.host_address.toLowerCase());
+  //         const ensName = ensNames?.ensName;
+  //         if (ensName) {
+  //           ensNamesMapHost[data.host_address] = ensName;
+  //         }
+  //       })
+  //     );
+
+  //     setLoadingHostNames(false);
+  //     setEnsHostNames(ensNamesMapHost);
+
+  //     // Fetch guest names
+  //     await Promise.all(
+  //       meetingData.map(async (data: any) => {
+  //         const ensNames = await getEnsName(
+  //           data.attendees[0]?.attendee_address.toLowerCase()
+  //         );
+  //         const ensName = ensNames?.ensName;
+  //         if (ensName) {
+  //           ensNamesMapGuest[data.attendees[0]?.attendee_address] = ensName;
+  //         }
+  //       })
+  //     );
+
+  //     setLoadingGuestNames(false);
+  //     setEnsGuestNames(ensNamesMapGuest);
+  //   };
+
+  //   if (meetingData.length > 0) {
+  //     fetchEnsNames();
+  //   }
+  // }, [meetingData]);
   return (
     <>
       {/* {meetingData && meetingData.length > 0 ? ( */}
@@ -283,11 +285,7 @@ function RecordedSessionsTile({ meetingData }: meeting) {
                 </div>
               ) : (
                 <video
-                  poster={
-                    data.thumbnail_image
-                      ? `https://gateway.lighthouse.storage/ipfs/${data.thumbnail_image}`
-                      : "https://gateway.lighthouse.storage/ipfs/QmekMpcR49QGSPRAnmJsEgWDvM7JKji8bUT4S4oXmYBHYU"
-                  }
+                  poster={`https://gateway.lighthouse.storage/ipfs/${data.thumbnail_image}`}
                   // poster="https://gateway.lighthouse.storage/ipfs/Qmb1JZZieFSENkoYpVD7HRzi61rQCDfVER3fhnxCvmL1DB"
                   ref={(el: any) => (videoRefs.current[index] = el)}
                   loop
@@ -299,6 +297,9 @@ function RecordedSessionsTile({ meetingData }: meeting) {
               )}
               <div className="absolute right-2 bottom-2 text-white text-xs bg-white px-1 bg-opacity-30 rounded-sm">
                 {formatVideoDuration(videoDurations[index] || 0)}
+              </div>
+              <div className="absolute top-2 right-2 bg-black rounded-full">
+                <Image src={logo} alt="image" width={24} />
               </div>
             </div>
             <div className="px-4 py-2">
@@ -344,7 +345,14 @@ function RecordedSessionsTile({ meetingData }: meeting) {
                       className="rounded-full"
                     />
                   </div>
-                  <div>Host: {ensHostNames[data.host_address]}</div>
+                  <div>
+                    Host:{" "}
+                    {loadingHostNames
+                      ? data.host_address.slice(0, 4) +
+                        "..." +
+                        data.host_address.slice(-4)
+                      : ensHostNames[data.host_address]}
+                  </div>
                   <div>
                     <Tooltip
                       content="Copy"
@@ -380,7 +388,11 @@ function RecordedSessionsTile({ meetingData }: meeting) {
                     </div>
                     <div>
                       Guest:{" "}
-                      {ensGuestNames[data.attendees[0]?.attendee_address]}
+                      {loadingGuestNames
+                        ? data.attendees[0]?.attendee_address.slice(0, 4) +
+                          "..." +
+                          data.attendees[0]?.attendee_address.slice(-4)
+                        : ensGuestNames[data.attendees[0]?.attendee_address]}
                     </div>
                     <div>
                       <Tooltip

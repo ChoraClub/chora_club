@@ -1,4 +1,4 @@
-import { ISvgIcons } from "@/components/types";
+import { ISvgIcons } from "@/types";
 
 export const InputIcons: ISvgIcons = {
   search: (

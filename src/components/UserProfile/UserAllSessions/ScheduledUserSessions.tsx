@@ -9,13 +9,13 @@ import { FaChevronDown, FaCircleInfo, FaPlus } from "react-icons/fa6";
 import { Tooltip } from "@nextui-org/react";
 import SchedulingSuccessModal from "./SchedulingSuccessModal";
 import { RxCross2 } from "react-icons/rx";
-import AddEmailModal from "@/components/utils/AddEmailModal";
-import { fetchEnsAvatar } from "@/utils/ENSUtils";
+import AddEmailModal from "@/components/ComponentUtils/AddEmailModal";
 
 import Image from "next/image";
 
 import AvailableUserSessions from "./AvailableUserSessions";
 import styles from "./ScheduleUserSessions.module.css";
+import { fetchEnsAvatar } from "@/utils/ENSUtils";
 
 interface dataToStore {
   userAddress: `0x${string}` | undefined | null;

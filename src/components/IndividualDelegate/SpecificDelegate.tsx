@@ -2,6 +2,7 @@
 import Image from "next/image";
 import React, { use, useEffect, useState } from "react";
 import user from "@/assets/images/daos/profile.png";
+<<<<<<< HEAD
 import { FaXTwitter, FaDiscord, FaGithub } from "react-icons/fa6";
 import {
   BiSolidBellOff,
@@ -9,6 +10,11 @@ import {
   BiSolidMessageRoundedDetail,
 } from "react-icons/bi";
 import { IoCopy } from "react-icons/io5";
+=======
+import { FaXTwitter, FaDiscord, FaGithub, FaVoicemail, FaEnvelope } from "react-icons/fa6";
+import { BiSolidMessageRoundedDetail } from "react-icons/bi";
+import { IoCopy, IoShareSocialSharp } from "react-icons/io5";
+>>>>>>> f9c569ea573e160c0ca4b775323d16beb69691ab
 import DelegateInfo from "./DelegateInfo";
 import DelegateVotes from "./DelegateVotes";
 import DelegateSessions from "./DelegateSessions";
@@ -37,50 +43,34 @@ import ArbLogo from "@/assets/images/daos/arbCir.png";
 import ccLogo from "@/assets/images/daos/CC.png";
 import { Oval } from "react-loader-spinner";
 import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
+<<<<<<< HEAD
+=======
+import {
+  arb_client,
+  DELEGATE_CHANGED_QUERY,
+  GET_LATEST_DELEGATE_VOTES_CHANGED,
+  op_client,
+} from "@/config/staticDataUtils";
+>>>>>>> f9c569ea573e160c0ca4b775323d16beb69691ab
 // import { getEnsNameOfUser } from "../ConnectWallet/ENSResolver";
-import DelegateTileModal from "../utils/delegateTileModal";
+import DelegateTileModal from "../ComponentUtils/delegateTileModal";
 // import { cacheExchange, createClient, fetchExchange, gql } from "urql/core";
 import { set } from "video.js/dist/types/tech/middleware";
 import MainProfileSkeletonLoader from "../SkeletonLoader/MainProfileSkeletonLoader";
 import { fetchEnsAvatar } from "@/utils/ENSUtils";
+<<<<<<< HEAD
 import Confetti from "react-confetti";
 import { connected } from "process";
 import { IoMdNotifications } from "react-icons/io";
 import { IoMdNotificationsOff } from "react-icons/io";
+=======
+import { BASE_URL } from "@/config/constants";
+>>>>>>> f9c569ea573e160c0ca4b775323d16beb69691ab
 
 interface Type {
   daoDelegates: string;
   individualDelegate: string;
 }
-const client = createClient({
-  url: "https://api.studio.thegraph.com/query/68573/op/v0.0.1",
-  exchanges: [cacheExchange, fetchExchange],
-});
-const GET_LATEST_DELEGATE_VOTES_CHANGED = gql`
-  query MyQuery($delegate: String!) {
-    delegateVotesChangeds(
-      first: 1
-      orderBy: blockTimestamp
-      orderDirection: desc
-      where: { delegate: $delegate }
-    ) {
-      newBalance
-    }
-  }
-`;
-
-const DELEGATE_CHANGED_QUERY = gql`
-  query MyQuery($delegator: String!) {
-    delegateChangeds(
-      orderBy: blockTimestamp
-      orderDirection: desc
-      where: { delegator: $delegator }
-      first: 1
-    ) {
-      toDelegate
-    }
-  }
-`;
 
 function SpecificDelegate({ props }: { props: Type }) {
   const { publicClient, walletClient } = WalletAndPublicClient();
@@ -107,6 +97,7 @@ function SpecificDelegate({ props }: { props: Type }) {
   const [same, setSame] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+<<<<<<< HEAD
   const [isFollowing, setIsFollowing] = useState(false);
   const [followers, setFollowers] = useState(0);
   const [followed, isFollowed] = useState(false);
@@ -114,9 +105,14 @@ function SpecificDelegate({ props }: { props: Type }) {
   const [isOpenNotification, setNotificationmodel] = useState(false);
   const [notification, isNotification] = useState(false);
   const [daoname, setDaoName] = useState("");
+=======
+  const [emailId, setEmailId] = useState<string>();
+  const [isEmailVisible, setIsEmailVisible] = useState(false);
+>>>>>>> f9c569ea573e160c0ca4b775323d16beb69691ab
 
   const [delegateOpen, setDelegateOpen] = useState(false);
   const address = useAccount();
+
   const { isConnected } = useAccount();
 
   const handleDelegateModal = async () => {
@@ -129,19 +125,26 @@ function SpecificDelegate({ props }: { props: Type }) {
       setDelegateOpen(true);
       setLoading(true);
       try {
-        const { data } = await client.query(DELEGATE_CHANGED_QUERY, {
-          delegator: address,
-        });
-        // const ens = await getEnsNameOfUser(
-        //   data.delegateChangeds[0]?.toDelegate
-        // );
-        const delegate = data.delegateChangeds[0]?.toDelegate;
+        let data: any;
+        if (props.daoDelegates === "optimism") {
+          data = await op_client.query(DELEGATE_CHANGED_QUERY, {
+            delegator: address,
+          });
+        } else {
+          data = await arb_client.query(DELEGATE_CHANGED_QUERY, {
+            delegator: address,
+          });
+        }
+        console.log("data of individual delegate: ", data);
+        const delegate = data.data.delegateChangeds[0]?.toDelegate;
         console.log("individualDelegate", props.individualDelegate);
-        setSame(delegate === props.individualDelegate);
+        setSame(
+          delegate.toLowerCase() === props.individualDelegate.toLowerCase()
+        );
         // ens
         // ? setDelegate(ens)
         // :
-        setDelegate(delegate.slice(0, 6) + "..." + delegate.slice(-4));
+        setDelegate(delegate);
         setError(null);
       } catch (err: any) {
         setError(err.message);
@@ -241,7 +244,7 @@ function SpecificDelegate({ props }: { props: Type }) {
           });
 
         console.log("Props", props.individualDelegate);
-        const data = await client
+        const data = await op_client
           .query(GET_LATEST_DELEGATE_VOTES_CHANGED, {
             delegate: props.individualDelegate.toString(),
           })
@@ -256,7 +259,7 @@ function SpecificDelegate({ props }: { props: Type }) {
     if (props.individualDelegate) {
       fetchData();
     }
-  }, [client, props.individualDelegate]);
+  }, [op_client, props.individualDelegate]);
 
   useEffect(() => {
     console.log("Network", chain?.network);
@@ -533,15 +536,19 @@ function SpecificDelegate({ props }: { props: Type }) {
       toast.error("Please connect your wallet!");
     } else {
       if (walletClient?.chain?.network === props.daoDelegates) {
-        const delegateTx = await walletClient.writeContract({
-          address: chainAddress,
-          abi: dao_abi.abi,
-          functionName: "delegate",
-          args: [to],
-          account: address1,
-        });
+        try {
+          const delegateTx = await walletClient.writeContract({
+            address: chainAddress,
+            abi: dao_abi.abi,
+            functionName: "delegate",
+            args: [to],
+            account: address1,
+          });
 
-        console.log(delegateTx);
+          console.log(delegateTx);
+        } catch (e) {
+          toast.error("Transaction failed");
+        }
       } else {
         toast.error("Please switch to appropriate network to delegate!");
 
@@ -584,15 +591,15 @@ function SpecificDelegate({ props }: { props: Type }) {
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
 
-        const raw = JSON.stringify({
-          address: props.individualDelegate,
-          // daoName: props.daoDelegates,
-        });
+        // const raw = JSON.stringify({
+        //   address: props.individualDelegate,
+        //   // daoName: props.daoDelegates,
+        // });
 
         const requestOptions: any = {
-          method: "POST",
+          method: "GET",
           headers: myHeaders,
-          body: raw,
+          // body: raw,
           redirect: "follow",
         };
         const res = await fetch(
@@ -621,6 +628,23 @@ function SpecificDelegate({ props }: { props: Type }) {
             // setResponseFromDB(true);
             setDisplayImage(item.image);
             setDescription(item.description);
+            if (item.isEmailVisible) {
+              setIsEmailVisible(true);
+              setEmailId(item.emailId);
+            }
+            const matchingNetwork = item.networks.find(
+              (network: any) => network.dao_name === chain?.name
+            );
+
+            // If a matching network is found, set the discourse ID
+            if (matchingNetwork) {
+              setDescription(matchingNetwork.description);
+            } else {
+              // Handle the case where no matching network is found
+              console.log(
+                "No matching network found for the specified dao_name"
+              );
+            }
             setDisplayName(item.displayName);
 
             let address = await walletClient.getAddresses();
@@ -812,6 +836,15 @@ function SpecificDelegate({ props }: { props: Type }) {
                       target="_blank">
                       <FaDiscord color="#7C7C7C" size={12} />
                     </Link>
+                    {isEmailVisible && (
+                      <Link
+                        href={`mailto:${emailId}`}
+                        className="border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1"
+                        style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
+                        target="_blank">
+                        <FaEnvelope color="#7C7C7C" size={12} />
+                      </Link>
+                    )}
                     <Link
                       href={
                         socials.github
@@ -847,6 +880,39 @@ function SpecificDelegate({ props }: { props: Type }) {
                       />
                     </span>
                   </Tooltip>
+<<<<<<< HEAD
+=======
+                  <div className="flex space-x-2">
+                    {/* <span className="p-2 bg-gray-200 rounded-lg text-black">
+                      {typeof window !== "undefined" &&
+                        `${BASE_URL}/${
+                          chain?.name === "Optimism" ? "optimism" : "arbitrum"
+                        }/${address}?active=info`}
+                      Copy to Share Profile URL on Warpcast
+                    </span> */}
+                    <Tooltip
+                      content="Copy profile URL to share on Warpcast or Twitter."
+                      placement="bottom"
+                      closeDelay={1}
+                      showArrow>
+                      <Button
+                        className="bg-gray-200 hover:bg-gray-300"
+                        onClick={() => {
+                          if (typeof window === "undefined") return;
+                          navigator.clipboard.writeText(
+                            `${BASE_URL}/${props.daoDelegates}/${props.individualDelegate}?active=info`
+                          );
+                          setIsCopied(true);
+                          setTimeout(() => {
+                            setIsCopied(false);
+                          }, 3000);
+                        }}>
+                        <IoShareSocialSharp />
+                        {isCopied ? "Copied" : "Share profile"}
+                      </Button>
+                    </Tooltip>
+                  </div>
+>>>>>>> f9c569ea573e160c0ca4b775323d16beb69691ab
                   <div style={{ zIndex: "21474836462" }}>
                     <Toaster
                       toastOptions={{
@@ -1151,6 +1217,7 @@ function SpecificDelegate({ props }: { props: Type }) {
                   ? ArbLogo
                   : ccLogo)
           }
+          daoName={props.daoDelegates}
           addressCheck={same}
         />
       )}

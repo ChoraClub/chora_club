@@ -4,10 +4,10 @@ import React, { useState, useEffect } from "react";
 import search from "@/assets/images/daos/search.png";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useRouter } from "next-nprogress-bar";
-import Tile from "../utils/Tile";
-import SessionTile from "../utils/SessionTiles";
+import Tile from "../ComponentUtils/Tile";
+import SessionTile from "../ComponentUtils/SessionTiles";
 import { Oval } from "react-loader-spinner";
-import RecordedSessionsTile from "../utils/RecordedSessionsTile";
+import RecordedSessionsTile from "../ComponentUtils/RecordedSessionsTile";
 import {
   Modal,
   ModalContent,
@@ -17,8 +17,8 @@ import {
   Button,
   useDisclosure,
 } from "@nextui-org/react";
-import AttestationModal from "../utils/AttestationModal";
-import SessionTileSkeletonLoader from "../SkeletonLoader/SessionTileSkeletonLoader";
+import AttestationModal from "../ComponentUtils/AttestationModal";
+import RecordedSessionsSkeletonLoader from "../SkeletonLoader/RecordedSessionsSkeletonLoader";
 
 interface Session {
   booking_status: string;
@@ -153,7 +153,7 @@ function DelegatesSession({ props }: { props: string }) {
         <AttestationModal props={true} />
       </div> */}
 
-      <div className="pr-36 pt-3">
+      <div className=" pt-3">
         <div className="flex w-fit gap-16 border-1 border-[#7C7C7C] px-6 rounded-xl text-sm">
           {/* <button
             className={`py-2 ${
@@ -181,7 +181,7 @@ function DelegatesSession({ props }: { props: string }) {
           </button>
         </div>
 
-        <div className="py-10">
+        <div className="">
           {/* {searchParams.get("session") === "upcoming" &&
             (dataLoading ? (
               <div className="flex items-center justify-center">
@@ -204,19 +204,17 @@ function DelegatesSession({ props }: { props: string }) {
               />
             ))} */}
           {searchParams.get("session") === "recorded" &&
-            (dataLoading ? 
-            (
-            <SessionTileSkeletonLoader/>
-            )
-            : (
-              <SessionTile
-                sessionDetails={sessionDetails}
-                dataLoading={dataLoading}
-                isEvent="Recorded"
-                isOfficeHour={false}
-                isSession={""}
-              />
-              // <RecordedSessionsTile meetingData={sessionDetails}/>
+            (dataLoading ? (
+              <RecordedSessionsSkeletonLoader />
+            ) : (
+              // <SessionTile
+              //   sessionDetails={sessionDetails}
+              //   dataLoading={dataLoading}
+              //   isEvent="Recorded"
+              //   isOfficeHour={false}
+              //   isSession={""}
+              // />
+              <RecordedSessionsTile meetingData={sessionDetails}/>
             ))}
         </div>
       </div>

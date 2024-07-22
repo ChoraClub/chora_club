@@ -33,58 +33,7 @@ export const ATTESTATION_ARB_URL =
     ? process.env.NEXT_PUBLIC_SEPOLIA_ATTESTATION_URL
     : process.env.NEXT_PUBLIC_ARB_ATTESTATION_URL;
 
-export const opBlock = [
-  {
-    title: "Forum",
-    link: "https://gov.optimism.io/",
-  },
-  {
-    title: "Website",
-    link: "https://optimism.io/",
-  },
-  {
-    title: "Block Explorer",
-    link: "https://optimistic.etherscan.io/",
-  },
-  {
-    title: "Optimism Twitter Profile",
-    link: "https://twitter.com/Optimism",
-  },
-  {
-    title: "Optimism DAO Twitter Profile",
-    link: "https://twitter.com/OptimismGov",
-  },
-];
 
-export const arbBlock = [
-  {
-    title: "Forum",
-    link: "https://forum.arbitrum.foundation",
-  },
-  {
-    title: "Website",
-    link: "https://arbitrum.io",
-  },
-  {
-    title: "Arbitrum Foundation Website",
-    link: "https://arbitrum.foundation",
-  },
-  {
-    title: "Block Explorer",
-    link: "https://arbiscan.io",
-  },
-  {
-    title: "Arbitrum Twitter Profile",
-    link: "https://twitter.com/arbitrum",
-  },
-  {
-    title: "Arbitrum DAO Twitter Profile",
-    link: "https://twitter.com/DAO_Arbitrum",
-  },
-];
-
-export const IMAGE_URL =
-  "https://gateway.lighthouse.storage/ipfs/QmZRLHd4CwA8btpa2WhbDHju46rnKbYGUFyzojAFXkhbt1";
 
 // For development testing
 //   export const DB_NAME =

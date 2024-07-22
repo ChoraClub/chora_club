@@ -6,13 +6,12 @@ const client = new Client({
   exchanges: [cacheExchange, fetchExchange],
 });
 
-const GET_PROPOSALS = gql`
+const GET_PROPOSALS_QUEUE_INFO = gql`
 query MyQuery {
-  proposalCreateds(orderBy: blockTimestamp, orderDirection: desc, first: 1000) {
+  proposalQueueds(orderBy: blockTimestamp, orderDirection: desc) {
+    eta
     blockTimestamp
-    description
     proposalId
-    proposer
   }
 }`;
 const GET_PROPOSAL = gql`
@@ -36,8 +35,8 @@ export async function GET(req: NextRequest) {
           // Fetch specific proposal
           result = await client.query(GET_PROPOSAL, { proposalId }).toPromise();
       } else {
-          // Fetch all proposals
-          result = await client.query(GET_PROPOSALS, {}).toPromise();
+          // Fetch all proposals in queue
+          result = await client.query(GET_PROPOSALS_QUEUE_INFO, {}).toPromise();
       }
 
       if (result.error) {

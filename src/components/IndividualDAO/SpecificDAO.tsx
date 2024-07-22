@@ -12,7 +12,7 @@ import { useRouter } from "next-nprogress-bar";
 // import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
 import { dao_details } from "@/config/daoDetails";
 import Proposals from "./Proposals";
-import IndividualDaoHeader from "../utils/IndividualDaoHeader";
+import IndividualDaoHeader from "../ComponentUtils/IndividualDaoHeader";
 import AboutDao from "./AboutDao";
 
 const desc = dao_details;
@@ -135,7 +135,7 @@ function SpecificDAO({ props }: { props: { daoDelegates: string } }) {
           </div>
         </div> */}
 
-        <IndividualDaoHeader/>
+        <IndividualDaoHeader />
         <div className="py-5 pr-8">
           {props.daoDelegates === "optimism"
             ? desc.optimism.description
@@ -146,27 +146,23 @@ function SpecificDAO({ props }: { props: { daoDelegates: string } }) {
       </div>
 
       <div className="flex gap-12 bg-[#D9D9D945] pl-16">
-      <button
+        <button
           className={`border-b-2 py-4 px-2 ${
             searchParams.get("active") === "about"
               ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
               : "border-transparent"
           }`}
-          onClick={() =>
-            router.push(path + "?active=about")
-          }
+          onClick={() => router.push(path + "?active=about")}
         >
           About
         </button>
-      <button
+        <button
           className={`border-b-2 py-4 px-2 ${
             searchParams.get("active") === "proposals"
               ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
               : "border-transparent"
           }`}
-          onClick={() =>
-            router.push(path + "?active=proposals")
-          }
+          onClick={() => router.push(path + "?active=proposals")}
         >
           Proposals
         </button>
@@ -204,7 +200,6 @@ function SpecificDAO({ props }: { props: { daoDelegates: string } }) {
         >
           Office hours
         </button>
-        
       </div>
 
       <div className="py-6 px-16">

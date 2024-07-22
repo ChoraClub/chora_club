@@ -11,15 +11,33 @@ import styled from "styled-components";
 import rehypeSanitize from "rehype-sanitize";
 
 const StyledMDEditorWrapper = styled.div`
+  .w-md-editor {
+    background-color: white !important;
+    color: black !important;
+  }
+
+  .w-md-editor-text-pre,
+  .w-md-editor-text-input,
+  .w-md-editor-text {
+    color: black !important;
+  }
+
+  .wmde-markdown {
+    background-color: white !important;
+    color: black !important;
+  }
+
   .w-md-editor-toolbar {
     height: 40px !important;
     border-radius: 20px 20px 0 0 !important;
+    background-color: white !important;
   }
 
   .w-md-editor-toolbar svg {
     width: 18px !important;
     height: 18px !important;
     margin: 0 6px 2px 6px !important;
+    color: black !important;
   }
 
   .w-md-editor {
@@ -57,7 +75,7 @@ interface userInfoProps {
   description: string;
   onSaveButtonClick: (description?: string) => Promise<void>;
   isLoading: boolean;
-  descAvailable: boolean;
+  // descAvailable: boolean;
   karmaDesc: string;
   isDelegate: boolean;
   isSelfDelegate: boolean;
@@ -68,7 +86,7 @@ function UserInfo({
   description,
   onSaveButtonClick,
   isLoading,
-  descAvailable,
+  // descAvailable,
   isDelegate,
   isSelfDelegate,
   karmaDesc,
@@ -95,10 +113,6 @@ function UserInfo({
   const [sessionAttendCount, setSessionAttendCount] = useState(0);
   const [officehoursHostCount, setOfficehoursHostCount] = useState(0);
   const [officehoursAttendCount, setOfficehoursAttendCount] = useState(0);
-  let sessionHostingCount = 0;
-  let sessionAttendingCount = 0;
-  let officehoursHostingCount = 0;
-  let officehoursAttendingCount = 0;
   let dao_name = daoName;
   const [activeButton, setActiveButton] = useState("onchain");
 
