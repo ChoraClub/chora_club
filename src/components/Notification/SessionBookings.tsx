@@ -1,12 +1,8 @@
 import React from "react";
-import { dataNotification } from "./data";
 import NotificationTile from "./NotificationTile";
+import { NotificationProps } from "./NotificationTypeUtils";
 
-function SessionBookings() {
-  const flag1Notifications = dataNotification.notifications.flatMap((dayData) =>
-    dayData.items.filter((item) => item.flag === 1 || item.flag === 2)
-  );
-
+function SessionBookings({ notifications }: NotificationProps) {
   return (
     <div
       className="rounded-2xl bg-white w-full mt-8"
@@ -15,12 +11,12 @@ function SessionBookings() {
           "0 0 18px -7px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
       }}
     >
-      {flag1Notifications.map((item, index) => (
+      {notifications.map((item, index) => (
         <NotificationTile
           key={index}
           data={item}
           index={index}
-          length={flag1Notifications.length}
+          length={notifications.length}
         />
       ))}
     </div>

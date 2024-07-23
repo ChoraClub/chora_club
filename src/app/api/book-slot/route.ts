@@ -67,17 +67,11 @@ export async function POST(
   }: MeetingRequestBody = await req.json();
 
   try {
-    // Connect to your MongoDB database
-    // console.log("Connecting to MongoDB...");
     const client = await connectDB();
-    // console.log("Connected to MongoDB");
 
-    // Access the collection
     const db = client.db();
     const collection = db.collection("meetings");
 
-    // Insert the new meeting document
-    // console.log("Inserting meeting document...");
     const result = await collection.insertOne({
       host_address,
       attendees,
@@ -92,13 +86,8 @@ export async function POST(
       thumbnail_image,
       session_type,
     });
-    // console.log("Meeting document inserted:", result);
-
-    // console.log("MongoDB connection closed");
 
     if (result.insertedId) {
-      // Retrieve the inserted document using the insertedId
-      // console.log("Retrieving inserted document...");
       const insertedDocument = await collection.findOne({
         _id: result.insertedId,
       });
@@ -115,8 +104,9 @@ export async function POST(
           content: `${userAddress} has booked your session on ${dao_name}.`,
           createdAt: Date.now(),
           read_status: false,
-          notification_name: "booking",
-          notification_type: "newBookingForHost",
+          notification_name: "newBookingForHost",
+          notification_title: "Session Booking",
+          notification_type: "newBooking",
         };
 
         const notificationToGuest = {
@@ -124,8 +114,9 @@ export async function POST(
           content: `Your session on ${dao_name} has been successfully booked with ${host_address}.`,
           createdAt: Date.now(),
           read_status: false,
-          notification_name: "booking",
-          notification_type: "newBookingForHost",
+          notification_name: "newBookingForGuest",
+          notification_title: "Session Booking",
+          notification_type: "newBooking",
         };
 
         const notificationCollection = db.collection("notifications");
@@ -149,6 +140,29 @@ export async function POST(
         const socket = io(`${SOCKET_BASE_URL}`, {
           withCredentials: true,
         });
+        const dataToSendHost = notificationToHost;
+        const dataToSendGuest = notificationToGuest;
+        const attendee_address = userAddress;
+        socket.on("connect", () => {
+          console.log("Connected to WebSocket server from API");
+          socket.emit("new_session", {
+            host_address,
+            dataToSendHost,
+            attendee_address,
+            dataToSendGuest,
+          });
+          console.log("Message sent from API to socket server");
+          socket.disconnect();
+        });
+
+        socket.on("connect_error", (err) => {
+          console.error("WebSocket connection error:", err);
+        });
+
+        socket.on("error", (err) => {
+          console.error("WebSocket error:", err);
+        });
+
         for (const document of documentsForHostEmail) {
           const emailId = document.emailId;
           if (emailId && emailId !== "" && emailId !== undefined) {
@@ -192,20 +206,6 @@ export async function POST(
             }
           }
         }
-
-        const dataToSendHost = notificationToHost.content;
-        const dataToSendGuest = notificationToGuest.content;
-        socket.on("connect", () => {
-          console.log("Connected to WebSocket server from API");
-          socket.emit("new_session", {
-            host_address,
-            dataToSendHost,
-            userAddress,
-            dataToSendGuest,
-          });
-          console.log("Message sent from API to socket server");
-          socket.disconnect();
-        });
       }
 
       client.close();
