@@ -63,18 +63,19 @@ function ConnectWalletWithENS() {
                     style={{
                       display: "flex",
                       alignItems: "center",
+                      justifyContent:"center",
                       color: "white",
-                      borderRadius: "12px",
+                      borderRadius: "9999px",
                       borderColor: "white",
                       borderStyle: "solid",
-                      paddingLeft: "10px",
-                      paddingRight: "12px",
-                      paddingTop: "8px",
-                      paddingBottom: "8px",
+                      paddingLeft: "20px",
+                      paddingRight: "20px",
+                      paddingTop: "16px",
+                      paddingBottom: "16px",
                       backgroundColor: "#0500FF",
                       fontWeight: "bold",
                     }}
-                    className="hover:scale-105 hover:transition-all hover:ease-in-out"
+                    className="hover:scale-105 hover:transition-all hover:ease-in-out text-sm"
                   >
                     Connect Wallet
                   </button>

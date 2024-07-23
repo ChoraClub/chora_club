@@ -24,15 +24,17 @@ type network_details = {
   dao_name: string;
   network: string;
   discourse: string;
+  description: string;
 };
 
 interface DelegateRequestBody {
   address: string;
   image: string;
-  description: string;
+  // description: string;
   isDelegate: boolean;
   displayName: string;
   emailId: string;
+  isEmailVisible: boolean;
   socialHandles: {
     twitter: string;
     discord: string;
@@ -69,10 +71,11 @@ interface DelegateResponseBody {
     id: string;
     address: string;
     image: string;
-    description: string;
+    // description: string;
     isDelegate: boolean;
     displayName: string;
     emailId: string;
+    isEmailVisible: boolean;
     socialHandles: {
       twitter: string;
       discord: string;
@@ -90,10 +93,10 @@ export async function POST(
   const {
     address,
     image,
-    description,
     isDelegate,
     displayName,
     emailId,
+    isEmailVisible,
     socialHandles,
     networks,
   }: DelegateRequestBody = await req.json();
@@ -113,10 +116,10 @@ export async function POST(
     const result = await collection.insertOne({
       address,
       image,
-      description,
       isDelegate,
       displayName,
       emailId,
+      isEmailVisible,
       socialHandles,
       networks,
     });
@@ -155,10 +158,10 @@ export async function PUT(
   const {
     address,
     image,
-    description,
     isDelegate,
     displayName,
     emailId,
+    isEmailVisible,
     socialHandles,
     networks,
   }: DelegateRequestBody = await req.json();
@@ -166,12 +169,12 @@ export async function PUT(
   console.log("Received Properties:");
   console.log("address:", address);
   console.log("image:", image);
-  console.log("description:", description);
   console.log("isDelegate:", isDelegate);
   console.log("displayName:", displayName);
   console.log("networks: ", networks);
   console.log("emailId:", emailId);
   console.log("socialHandles:", socialHandles);
+  // console.log('Emailstatus',isEmailVisible);
 
   try {
     // Connect to your MongoDB database
@@ -186,11 +189,11 @@ export async function PUT(
     // Prepare update fields
     const updateFields: any = {};
     if (image !== undefined) updateFields.image = image;
-    if (description !== undefined) updateFields.description = description;
     if (isDelegate !== undefined) updateFields.isDelegate = isDelegate;
     if (displayName !== undefined) updateFields.displayName = displayName;
     if (emailId !== undefined) updateFields.emailId = emailId;
     if (socialHandles !== undefined) updateFields.socialHandles = socialHandles;
+    // if(isEmailVisible!=undefined) updateFields.isEmailVisible=isEmailVisible;
 
     // const documents = await collection
     //   .find({
@@ -251,7 +254,7 @@ export async function PUT(
       const document = documents[0];
 
       // Check if networks array is provided and is not empty
-      if (networks?.length > 0) {
+      if (document.networks?.length > 0) {
         const existingNetworkIndex = document.networks.findIndex(
           (item: any) => item.dao_name === networks[0].dao_name
         );
@@ -280,6 +283,14 @@ export async function PUT(
             updateQuery
           );
         }
+      } else {
+        console.log("add networks field");
+        const updateQuery = {
+          $set: {
+            networks: [networks[0]],
+          },
+        };
+        await collection.updateOne({ address: document.address }, updateQuery);
       }
     }
 
