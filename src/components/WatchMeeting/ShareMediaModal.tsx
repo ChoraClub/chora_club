@@ -137,7 +137,7 @@ function ShareMediaModal({
           </div>
         </div>
       </div>
-      <Toaster
+      {/* <Toaster
         toastOptions={{
           style: {
             fontSize: "14px",
@@ -148,7 +148,7 @@ function ShareMediaModal({
             padding: "3px 5px",
           },
         }}
-      />
+      /> */}
     </>
   );
 }

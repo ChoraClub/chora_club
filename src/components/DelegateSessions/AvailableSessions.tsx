@@ -50,19 +50,35 @@ function AvailableSessions() {
   const [isPageLoading, setIsPageLoading] = useState(true);
   const [selectedDao, setSelectedDao] = useState<any>(null);
   const [selectedDate, setSelectedDate] = useState<any>(null);
-  // const [startTime, setStartTime] = useState<any>(null);
-  // const [endTime, setEndTime] = useState<any>(null);
+  const [startTime, setStartTime] = useState<string | null>(null);
+  const [endTime, setEndTime] = useState<string | null>(null);
   const [ensNames, setEnsNames] = useState<any>({});
-  const [startTime, setStartTime] = useState({
-    hour: 12,
-    minute: 0,
-    ampm: "AM",
-  });
-  const [endTime, setEndTime] = useState({
-    hour: 12,
-    minute: 0,
-    ampm: "AM",
-  });
+
+  const [startHour, setStartHour] = useState("");
+  const [startMinute, setStartMinute] = useState("");
+  const [startPeriod, setStartPeriod] = useState("");
+  const [endHour, setEndHour] = useState("");
+  const [endMinute, setEndMinute] = useState("");
+  const [endPeriod, setEndPeriod] = useState("");
+  const [showStartTimeSelector, setShowStartTimeSelector] = useState(false);
+  const [showEndTimeSelector, setShowEndTimeSelector] = useState(false);
+
+  const convertTo24Hour = (hour: any, minute: any, period: any) => {
+    let hourNum = parseInt(hour, 10);
+    if (period === "PM" && hourNum !== 12) {
+      hourNum += 12;
+    } else if (period === "AM" && hourNum === 12) {
+      hourNum = 0;
+    }
+    return `${hourNum.toString().padStart(2, "0")}:${minute}`;
+  };
+
+  useEffect(() => {
+    const startTime24 = convertTo24Hour(startHour, startMinute, startPeriod);
+    const endTime24 = convertTo24Hour(endHour, endMinute, endPeriod);
+    setStartTime(startTime24);
+    setEndTime(endTime24);
+  }, [startHour, startMinute, startPeriod, endHour, endMinute, endPeriod]);
 
   useEffect(() => {
     setIsPageLoading(false);
@@ -138,7 +154,7 @@ function AvailableSessions() {
           requestOptions
         );
         const response = await result.json();
-
+        console.log(response);
         let resultData;
         console.log("resultData: ", response);
         if (response.success === true) {
@@ -205,86 +221,35 @@ function AvailableSessions() {
   };
 
   useEffect(() => {
-    if (selectedDate && startTime && endTime) {
-      handleTime();
+    if (showStartTimeSelector) {
+      const time24 = convertTo24Hour(startHour, startMinute, startPeriod);
+      setStartTime(time24);
     }
-  }, [selectedDate, startTime, endTime]);
-
-  const handleTimeChange = (type: any, field: any, value: any) => {
-    if (type === "start") {
-      setStartTime({ ...startTime, [field]: value });
-    } else {
-      setEndTime({ ...endTime, [field]: value });
+    if (showEndTimeSelector) {
+      const time24 = convertTo24Hour(endHour, endMinute, endPeriod);
+      setEndTime(time24);
     }
-  };
+  }, [
+    startHour,
+    startMinute,
+    startPeriod,
+    endHour,
+    endMinute,
+    endPeriod,
+    showStartTimeSelector,
+    showEndTimeSelector,
+  ]);
 
-  const handleTime = () => {
-    const start = new Date(
-      `${selectedDate} ${startTime.hour}:${startTime.minute} ${startTime.ampm}`
-    );
-    const end = new Date(
-      `${selectedDate} ${endTime.hour}:${endTime.minute} ${endTime.ampm}`
-    );
-
-    console.log(startTime.hour, "s.t. hour");
-    console.log(startTime.minute, "s.t. minute");
-    console.log(endTime.hour, "e.t. hour");
-    console.log(endTime.minute, "s.t. minute");
-
-    if (end <= start) {
-      end.setDate(end.getDate() + 1);
+  useEffect(() => {
+    if (!showStartTimeSelector) {
+      setStartTime(null);
+    } else if (!showEndTimeSelector) {
+      setEndTime(null);
+    } else if (!showStartTimeSelector && !showEndTimeSelector) {
+      setStartTime(null);
+      setEndTime(null);
     }
-
-    const nextDay = new Date(start);
-    nextDay.setDate(nextDay.getDate() + 1);
-    nextDay.setHours(0, 0, 0, 0);
-
-    if (end > nextDay) {
-      toast.error(
-        "Oops! Your end time is on the next day.For multi-day scheduling, please add each day separately."
-      );
-    //   setTimeSlots([]);
-    // setSessions(0);
-      return;
-    }
-
-    
-    let current = new Date(start);
-
-    while (current < end) {
-      // slots.push(new Date(current));
-      current.setMinutes(current.getMinutes() + 30);
-
-      console.log(current, "current");
-    }
-
-    // setTimeSlots(slots);
-    // setSessions(slots.length);
-  };
-
-  // const handleStartTimeChange = async (
-  //   e: React.ChangeEvent<HTMLSelectElement>
-  // ) => {
-  //   const selected = e.target.value;
-  //   console.log("selected startTime", selected);
-  //   if (selected === "Start Time") {
-  //     setStartTime(null);
-  //   } else {
-  //     setStartTime(selected);
-  //   }
-  // };
-
-  // const handleEndTimeChange = async (
-  //   e: React.ChangeEvent<HTMLSelectElement>
-  // ) => {
-  //   const selected = e.target.value;
-  //   console.log("selected endTime", selected);
-  //   if (selected === "End Time") {
-  //     setEndTime(null);
-  //   } else {
-  //     setEndTime(selected);
-  //   }
-  // };
+  }, [showStartTimeSelector, showEndTimeSelector, endTime, startTime]);
 
   const generateTimeOptions = () => {
     const options = [];
@@ -301,21 +266,33 @@ function AvailableSessions() {
 
   const timeOptions = generateTimeOptions();
 
-  // const handleClearTime = () => {
-  //   setStartTime(null);
-  //   setEndTime(null);
-  // };
   const handleClearTime = () => {
-    setStartTime({
-      hour: 12,
-      minute: 0,
-      ampm: "AM"
-    });
-    setEndTime({
-      hour: 12,
-      minute: 0,
-      ampm: "AM"
-    });
+    setStartTime(null);
+    setEndTime(null);
+    setShowStartTimeSelector(false);
+    setShowEndTimeSelector(false);
+    setStartHour("");
+    setStartMinute("");
+    setStartPeriod("");
+    setEndHour("");
+    setEndMinute("");
+    setEndPeriod("");
+  };
+
+  const handleSetStartTime = () => {
+    setShowStartTimeSelector(true);
+    setStartTime(null);
+    setStartHour("12");
+    setStartMinute("00");
+    setStartPeriod("AM");
+  };
+
+  const handleSetEndTime = () => {
+    setShowEndTimeSelector(true);
+    setEndTime(null);
+    setEndHour("12");
+    setEndMinute("00");
+    setEndPeriod("AM");
   };
 
   const currentDate = new Date();
@@ -443,85 +420,90 @@ function AvailableSessions() {
           className="rounded-md bg-opacity-90"
           closeDelay={1}
         >
-
           <div className="flex items-center select-container">
-            <div className="bg-white p-[9px] shadow rounded-md">
-
-            
-          <select
-                    value={startTime.hour}
-                    className=" cursor-pointer mr-1"
-                    onChange={(e) =>
-                      handleTimeChange("start", "hour", e.target.value)
-                    }
-                  >
-                    {[...Array(12)].map((_, i) => (
-                      <option key={i} value={String(i + 1).padStart(2, "0")}>
-                        {String(i + 1).padStart(2, "0")}
-                      </option>
-                    ))}
-                  </select>
-                  <span>:</span>
-                  <select
-                    value={startTime.minute}
-                    className="ml-1 cursor-pointer"
-                    onChange={(e) =>
-                      handleTimeChange("start", "minute", e.target.value)
-                    }
-                  >
-                    <option value="00">00</option>
-                    <option value="30">30</option>
-                  </select>
-                  <select
-                    value={startTime.ampm}
-                    className=" cursor-pointer"
-                    onChange={(e) =>
-                      handleTimeChange("start", "ampm", e.target.value)
-                    }
-                  >
-                    <option value="AM">AM</option>
-                    <option value="PM">PM</option>
-                  </select>
-                  </div>
+            {!showStartTimeSelector ? (
+              <button
+                onClick={() => handleSetStartTime()}
+                className="px-3 py-2 rounded-md shadow mr-1 cursor-pointer w-[160px]"
+              >
+                Set Start Time
+              </button>
+            ) : (
+              <div className="bg-white p-[9px] shadow rounded-md">
+                <select
+                  className="cursor-pointer mr-1"
+                  value={startHour}
+                  onChange={(e) => setStartHour(e.target.value)}
+                >
+                  {[...Array(12)].map((_, i) => (
+                    <option key={i} value={String(i + 1).padStart(2, "0")}>
+                      {String(i + 1).padStart(2, "0")}
+                    </option>
+                  ))}
+                </select>
+                <span>:</span>
+                <select
+                  value={startMinute}
+                  onChange={(e) => setStartMinute(e.target.value)}
+                  className="ml-1 cursor-pointer"
+                >
+                  <option value="00">00</option>
+                  <option value="30">30</option>
+                </select>
+                <select
+                  className="cursor-pointer"
+                  value={startPeriod}
+                  onChange={(e) => setStartPeriod(e.target.value)}
+                >
+                  <option value="AM">AM</option>
+                  <option value="PM">PM</option>
+                </select>
+              </div>
+            )}
 
             <span>&nbsp;to&nbsp;</span>
-            <div className="bg-white p-[9px] shadow rounded-md">
-            <select
-                    value={endTime.hour}
-                    className="ml-1 cursor-pointer"
-                    onChange={(e) =>
-                      handleTimeChange("end", "hour", e.target.value)
-                    }
-                  >
-                    {[...Array(12)].map((_, i) => (
-                      <option key={i} value={String(i + 1).padStart(2, "0")}>
-                        {String(i + 1).padStart(2, "0")}
-                      </option>
-                    ))}
-                  </select>
-                  <span>:</span>
-                  <select
-                    value={endTime.minute}
-                    className="mr-1 cursor-pointer"
-                    onChange={(e) =>
-                      handleTimeChange("end", "minute", e.target.value)
-                    }
-                  >
-                    <option value="00">00</option>
-                    <option value="30">30</option>
-                  </select>
-                  <select
-                    value={endTime.ampm}
-                    className="cursor-pointer"
-                    onChange={(e) =>
-                      handleTimeChange("end", "ampm", e.target.value)
-                    }
-                  >
-                    <option value="AM">AM</option>
-                    <option value="PM">PM</option>
-                  </select>
-                  </div>
-            {(startTime || endTime) && (
+
+            {!showEndTimeSelector ? (
+              <button
+                onClick={() => handleSetEndTime()}
+                className="px-3 py-2 rounded-md shadow ml-1 w-[160px] cursor-pointer"
+              >
+                Set End Time
+              </button>
+            ) : (
+              <div className="bg-white p-[9px] shadow rounded-md">
+                <select
+                  className="ml-1 cursor-pointer"
+                  value={endHour}
+                  onChange={(e) => setEndHour(e.target.value)}
+                >
+                  {[...Array(12)].map((_, i) => (
+                    <option key={i} value={String(i + 1).padStart(2, "0")}>
+                      {String(i + 1).padStart(2, "0")}
+                    </option>
+                  ))}
+                </select>
+                <span>:</span>
+                <select
+                  className="mr-1 cursor-pointer"
+                  value={endMinute}
+                  onChange={(e) => setEndMinute(e.target.value)}
+                >
+                  <option value="00">00</option>
+                  <option value="30">30</option>
+                </select>
+                <select
+                  className="cursor-pointer"
+                  value={endPeriod}
+                  onChange={(e) => setEndPeriod(e.target.value)}
+                >
+                  <option value="AM">AM</option>
+                  <option value="PM">PM</option>
+                </select>
+              </div>
+            )}
+
+            {(showStartTimeSelector || showEndTimeSelector) && (
               <button
                 onClick={handleClearTime}
                 className="ml-2 text-red-500 px-3 py-1 rounded-md border border-red-500 hover:bg-red-500 hover:text-white focus:outline-none focus:ring-2 focus:ring-red-500"
@@ -624,7 +606,7 @@ function AvailableSessions() {
                               />
                             </div>
                           </Tooltip>
-                          <Toaster
+                          {/* <Toaster
                             toastOptions={{
                               style: {
                                 fontSize: "14px",
@@ -635,7 +617,7 @@ function AvailableSessions() {
                                 padding: "3px 5px",
                               },
                             }}
-                          />
+                          /> */}
                         </div>
                       </div>
                       <div className="mt-2 bg-[#1E1E1E] border border-[#1E1E1E] text-white rounded-md text-xs px-5 py-1 font-semibold w-fit capitalize">
@@ -680,40 +662,44 @@ function AvailableSessions() {
                     </div>
                   </div>
                   <div className="absolute top-3 right-3 gap-1">
-                    <Tooltip
-                      content={
-                        "Received " +
-                        daos.meetingsInfo.counts.onChainCount +
-                        " Onchain attestation"
-                      }
-                      placement="top"
-                      closeDelay={1}
-                      showArrow
-                    >
-                      <div className="flex items-center cursor-pointer bg-white rounded-full px-1 mb-2 gap-2 border border-blue-shade-200">
-                        <div>
-                          <Image src={onChain_link} alt="image" width={20} />
+                    {daos.meetingsInfo.counts.onChainCount > 0 && (
+                      <Tooltip
+                        content={
+                          "Received " +
+                          daos.meetingsInfo.counts.onChainCount +
+                          " Onchain attestation"
+                        }
+                        placement="top"
+                        closeDelay={1}
+                        showArrow
+                      >
+                        <div className="flex items-center cursor-pointer bg-white rounded-full px-1 mb-2 gap-2 border border-blue-shade-200">
+                          <div>
+                            <Image src={onChain_link} alt="image" width={20} />
+                          </div>
+                          {daos.meetingsInfo.counts.onChainCount}
                         </div>
-                        {daos.meetingsInfo.counts.onChainCount}
-                      </div>
-                    </Tooltip>
-                    <Tooltip
-                      content={
-                        "Received " +
-                        daos.meetingsInfo.counts.offChainCount +
-                        " Offchain attestation"
-                      }
-                      placement="top"
-                      closeDelay={1}
-                      showArrow
-                    >
-                      <div className="flex items-center cursor-pointer bg-white rounded-full px-1 gap-2 border border-blue-shade-200">
-                        <div>
-                          <Image src={offChain_link} alt="image" width={20} />
+                      </Tooltip>
+                    )}
+                    {daos.meetingsInfo.counts.offChainCount > 0 && (
+                      <Tooltip
+                        content={
+                          "Received " +
+                          daos.meetingsInfo.counts.offChainCount +
+                          " Offchain attestation"
+                        }
+                        placement="top"
+                        closeDelay={1}
+                        showArrow
+                      >
+                        <div className="flex items-center cursor-pointer bg-white rounded-full px-1 gap-2 border border-blue-shade-200">
+                          <div>
+                            <Image src={offChain_link} alt="image" width={20} />
+                          </div>
+                          {daos.meetingsInfo.counts.offChainCount}
                         </div>
-                        {daos.meetingsInfo.counts.offChainCount}
-                      </div>
-                    </Tooltip>
+                      </Tooltip>
+                    )}
                   </div>
                 </div>
 

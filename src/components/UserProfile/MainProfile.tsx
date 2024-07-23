@@ -971,7 +971,7 @@ function MainProfile() {
                       </Button>
                     </Tooltip>
                   </div>
-                  <Toaster
+                  {/* <Toaster
                     toastOptions={{
                       style: {
                         fontSize: "14px",
@@ -982,7 +982,7 @@ function MainProfile() {
                         padding: "3px 5px",
                       },
                     }}
-                  />
+                  /> */}
                 </div>
                 {/* {selfDelegate === true
                   ? votes && (

@@ -19,6 +19,7 @@ import styles from "./ScheduleUserSessions.module.css";
 import { TimeInput } from "@nextui-org/react";
 import { Time } from "@internationalized/date";
 import { AbiEncodingLengthMismatchError } from "viem";
+import { all } from "axios";
 
 interface dataToStore {
   userAddress: `0x${string}` | undefined | null;
@@ -62,6 +63,7 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
   const [userRejected, setUserRejected] = useState<Boolean>();
   const [addingEmail, setAddingEmail] = useState<boolean>();
   const [scheduledSuccess, setScheduledSuccess] = useState<boolean>();
+  const [sessionCreated, setSessionCreated] = useState(false);
   // const [numberOfSessions, setNumberOfSessions] = useState(0);
   // const [generatedTimeSlots, setGeneratedTimeSlots] = useState<
   //   Array<{ time: string; date: string }>
@@ -69,16 +71,22 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
   const [timeSlots, setTimeSlots] = useState<Date[]>([]);
   const [sessions, setSessions] = useState(0);
   const [startTime, setStartTime] = useState({
-    hour: 12,
-    minute: 0,
+    hour: "12",
+    minute: "00",
     ampm: "AM",
   });
   const [endTime, setEndTime] = useState({
-    hour: 12,
-    minute: 0,
+    hour: "12",
+    minute: "00",
     ampm: "AM",
   });
 
+  const convertTo12Hour = (time: string) => {
+    const [hour, minute] = time.split(":").map(Number);
+    const period = hour >= 12 ? "PM" : "AM";
+    const hour12 = hour % 12 || 12;
+    return `${hour12}:${minute.toString().padStart(2, "0")} ${period}`;
+  };
 
   useEffect(() => {
     if (selectedDate && startTime && endTime) {
@@ -86,7 +94,11 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
     }
   }, [selectedDate, startTime, endTime]);
 
-  const handleTimeChange = (type: any, field: any, value: any) => {
+  const handleTimeChange = (
+    type: "start" | "end",
+    field: "hour" | "minute" | "ampm",
+    value: string
+  ) => {
     if (type === "start") {
       setStartTime({ ...startTime, [field]: value });
     } else {
@@ -120,7 +132,7 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
         "Oops! Your end time is on the next day.For multi-day scheduling, please add each day separately."
       );
       setTimeSlots([]);
-    setSessions(0);
+      setSessions(0);
       return;
     }
 
@@ -277,6 +289,7 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
         setCreateSessionLoading(false);
         setContinueAPICalling(false);
         setScheduledSuccess(true);
+        setSessionCreated(true);
       } else {
         setScheduledSuccess(false);
       }
@@ -395,11 +408,28 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
       return;
     }
 
+    const formatTime = (time: {
+      hour: string;
+      minute: string;
+      ampm: string;
+    }) => {
+      let hour = parseInt(time.hour);
+      if (time.ampm === "PM" && hour !== 12) hour += 12;
+      if (time.ampm === "AM" && hour === 12) hour = 0;
+      return `${hour.toString().padStart(2, "0")}:${time.minute}`;
+    };
+
+    const formattedStartTime = formatTime(startTime);
+    const formattedEndTime = formatTime(endTime);
 
     const newAllData = {
       date: selectedDate,
-      timeRanges: [[startHour, startMinute, endHour, endMinute]],
+      // timeRanges: [[startHour, startMinute, endHour, endMinute]],
+      timeRanges: [[formattedStartTime, formattedEndTime]],
     };
+
+    const [startHour, startMinute] = formattedStartTime.split(":");
+    const [endHour, endMinute] = formattedEndTime.split(":");
 
     setAllData((prevAllData: any) => [...prevAllData, newAllData]);
     const result = await getUTCTime(
@@ -432,9 +462,9 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
     ]);
     setAllowedDates([...allowedDates, selectedDate]);
     setSelectedDate("");
-    setStartTime({ hour: 12, minute: 0, ampm: "AM" });
-    setEndTime({ hour: 12, minute: 0, ampm: "AM" });
-    setSessions(1);
+    setStartTime({ hour: "12", minute: "00", ampm: "AM" });
+    setEndTime({ hour: "12", minute: "00", ampm: "AM" });
+    setSessions(0);
   };
 
   useEffect(() => {
@@ -448,6 +478,7 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
           timeOptions.push(`${formattedHour}:${formattedMinute}`);
         }
       }
+      console.log(allData, "all data");
       return timeOptions;
     };
 
@@ -779,6 +810,7 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
                       </option>
                     ))}
                   </select>
+                  <span>:</span>
                   <select
                     value={endTime.minute}
                     className="p-2 border rounded cursor-pointer"
@@ -859,9 +891,13 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
                     {timeSlots.map((slot, index) => (
                       <div
                         key={index}
-                        className="border border-gray-300 p-1.5 rounded-md flex flex-col items-center text-left basis-1/3 text-sm font-poppins bg-[#f5f5f5]"
+                        className="shadow hover:bg-gray-50 p-1.5 rounded-md flex flex-col items-center text-left basis-1/3 text-sm font-poppins bg-[#f5f5f5]"
                       >
-                        {slot.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}
+                        {slot.toLocaleTimeString("en-US", {
+                          hour: "numeric",
+                          minute: "2-digit",
+                          hour12: true,
+                        })}
                       </div>
                     ))}
                   </div>
@@ -872,7 +908,10 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
 
           <button
             onClick={handleAddSelectedDate}
-            className="bg-blue-shade-400 hover:bg-blue-shade-500 text-[#0500FF] font-semibold py-2 px-4 rounded-md shadow-md transition duration-300 ease-in-out"
+            disabled={sessions === 0}
+            className={`bg-blue-shade-400 hover:bg-blue-shade-500 text-[#0500FF] font-semibold py-2 px-4 rounded-md shadow-md transition duration-300 ease-in-out ${
+              sessions === 0 ? "cursor-not-allowed " : "cursor-pointer"
+            }`}
           >
             <span className="flex items-center gap-3">
               <FaPlus className="" />
@@ -895,9 +934,10 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
                     <p className="text-gray-600">
                       {item.timeRanges
                         .map((time: any) => {
-                          const [startHour, startMinute, endHour, endMinute] =
-                            time;
-                          return `${startHour}:${startMinute} to ${endHour}:${endMinute}`;
+                          const [startTime, endTime] = time;
+                          const start12 = convertTo12Hour(startTime);
+                          const end12 = convertTo12Hour(endTime);
+                          return `${start12} to ${end12}`;
                         })
                         .join(", ")}
                     </p>
@@ -916,8 +956,6 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
                 </div>
               ))}
             </div>
-
-            
           </div>
 
           <button
@@ -944,7 +982,7 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
             )}
           </button>
 
-          <Toaster
+          {/* <Toaster
             toastOptions={{
               style: {
                 fontSize: "14px",
@@ -955,7 +993,7 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
                 padding: "3px 5px",
               },
             }}
-          />
+          /> */}
         </div>
 
         {/* Second box- right side */}
@@ -966,6 +1004,8 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
             daoName={daoName}
             scheduledSuccess={scheduledSuccess}
             setScheduledSuccess={setScheduledSuccess}
+            sessionCreated={sessionCreated}
+            setSessionCreated={setSessionCreated}
           />
         </div>
       </div>
