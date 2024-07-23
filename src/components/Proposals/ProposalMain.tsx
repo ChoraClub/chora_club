@@ -93,6 +93,38 @@ function ProposalMain({ props }: { props: Props }) {
   const { address } = useAccount();
   const contentRef = useRef<HTMLDivElement>(null);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [hasVoted, setHasVoted] = useState(false);
+
+  const checkVoteStatus = async () => {
+    const queryParams = new URLSearchParams({
+      proposalId: props.id,
+      network: props.daoDelegates,
+      voterAddress: address
+    }as any );
+
+    try {
+      const response = await fetch(`/api/get-vote-detail?${queryParams.toString()}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+console.log("response", response)
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const data = await response.json();
+      console.log(data.voterExists)
+      setHasVoted(data.voterExists);
+    } catch (error) {
+      console.error("Error fetching vote status:", error);
+    }
+  };
+
+  useEffect(() => {
+    checkVoteStatus();
+  }, [props, address]);
 
   const voteOnchain = async () => {
     if (walletClient?.chain?.network !== props.daoDelegates) {
@@ -763,6 +795,7 @@ function ProposalMain({ props }: { props: Props }) {
        className="align-middle select-none font-sans font-bold text-center uppercase transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-2 px-4 rounded-full bg-blue-600 text-white shadow-md shadow-blue-600/10 hover:shadow-lg hover:shadow-blue-600/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none "
        type="button"
        onClick={voteOnchain}
+       disabled={hasVoted}
      >
        Vote onchain
      </button>

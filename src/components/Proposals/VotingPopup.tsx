@@ -28,6 +28,14 @@ interface VotingPopupProps {
   customOptions?: VotingOption[];
 }
 
+interface VoteData {
+  address: string;
+  proposalId: string;
+  choice: string[];
+  votingPower?: number;
+  network: string;
+}
+
 const VotingPopup: React.FC<VotingPopupProps> = ({ 
   isOpen, 
   onClose, 
@@ -42,6 +50,8 @@ const VotingPopup: React.FC<VotingPopupProps> = ({
   const [comment, setComment] = useState<string>('');
   const [votesCount, setVotesCount] = useState<number>();
   const [error, setError] = useState<string>('');
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  
 
   const defaultOptions: VotingOption[] = [
     { value: '1', label: 'For' },
@@ -51,15 +61,50 @@ const VotingPopup: React.FC<VotingPopupProps> = ({
 
   const options = customOptions || defaultOptions;
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (votes.length === 0) {
       setError('Please select your choice before submitting.');
       return;
     }
     setError('');
-    onSubmit(proposalId, votes, comment);
-    onClose();
+    setIsSubmitting(true);
+
+    try {
+      // Prepare the vote data
+      const voteData: VoteData = {
+        address,
+        proposalId,
+        choice: votes,
+        votingPower: votesCount,
+        network: dao === "arbitrum" ? "arbitrum" : "optimism"
+      };
+console.log("votedataabcd", voteData)
+      // Make the API call to submit the vote
+      const response = await fetch('/api/submit-vote', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(voteData),
+      });
+console.log("response", response)
+      if (!response.ok) {
+        throw new Error('Failed to submit vote');
+      }
+
+      // If the API call is successful, call the onSubmit prop
+      onSubmit(proposalId, votes, comment);
+      onClose();
+    } catch (error) {
+      console.error('Error submitting vote:', error);
+      setError('Failed to submit vote. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
+
+
 
   const handleVoteChange = (value: string) => {
     if (customOptions) {
