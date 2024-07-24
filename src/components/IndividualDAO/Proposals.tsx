@@ -8,6 +8,7 @@ import user from "@/assets/images/daos/user1.png";
 import chain from "@/assets/images/daos/chain.png";
 import ProposalsSkeletonLoader from "../SkeletonLoader/ProposalsSkeletonLoader";
 import ArbLogo from "@/assets/images/daos/arbCir.png";
+import { dao_details } from "@/config/daoDetails";
 
 interface Proposal {
   proposalId: string;
@@ -349,10 +350,10 @@ const formatDate = (timestamp: number): string => {
             onClick={() => handleClick(proposal)}
           >
             <div className="flex basis-1/2">
-              <Image
-                src={props === "optimism" ? opLogo : ArbLogo}
-                alt=""
-                className="size-10 mx-5"
+            <Image
+                src={dao_details[props as keyof typeof dao_details].logo}
+                alt={`${dao_details[props as keyof typeof dao_details].title} logo`}
+                className="size-10 mx-5 rounded-full"
               />
               <div>
                 <p className="text-base font-medium">
