@@ -375,6 +375,7 @@ function MainProfile() {
         }
       } catch (error) {
         console.error("Error fetching data:", error);
+        setIsPageLoading(false);
       }
     };
 

@@ -59,7 +59,7 @@ const BottomBar = ({ daoName }: { daoName: string }) => {
     setIsScreenShared,
   } = useStudioState();
   const [showModal, setShowModal] = useState(true);
-  const [recordingStatus, setRecordingStatus] = useState<string | null>();
+  const [recordingStatus, setRecordingStatus] = useState<string | null>(null);
   const { startScreenShare, stopScreenShare, shareStream } =
     useLocalScreenShare({
       onProduceStart(data) {
@@ -159,14 +159,22 @@ const BottomBar = ({ daoName }: { daoName: string }) => {
   // }, []);
 
   useEffect(() => {
-    const storedStatus = localStorage.getItem("isMeetingRecorded");
-    console.log("storedStatus: ", storedStatus);
-    setRecordingStatus(storedStatus);
+    const storedStatus = localStorage.getItem("meetingData");
+    if (storedStatus) {
+      const parsedStatus = JSON.parse(storedStatus);
+      console.log("storedStatus: ", parsedStatus);
+      setRecordingStatus(parsedStatus.isMeetingRecorded);
+    }
+    console.log("recordingStatus: ", recordingStatus);
   }, []);
 
   const handleModalClose = async (result: boolean) => {
     if (role === "host") {
-      localStorage.setItem("isMeetingRecorded", result.toString());
+      const meetingData = {
+        meetingId: roomId,
+        isMeetingRecorded: result.toString(),
+      };
+      localStorage.setItem("meetingData", JSON.stringify(meetingData));
       setShowModal(false);
       setRecordingStatus(result.toString());
       console.log(
@@ -278,28 +286,28 @@ const BottomBar = ({ daoName }: { daoName: string }) => {
       console.error("Error handling end call:", error);
     }
 
-    // if (recordingStatus === "true") {
-    try {
-      toast.success("Giving Attestations");
-      const response = await fetch(`/api/get-attest-data`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          roomId: roomId,
-        }),
-      });
-      const response_data = await response.json();
-      console.log("Updated", response_data);
-      if (response_data.success) {
-        toast.success("Attestation successful");
+    if (recordingStatus === "true") {
+      try {
+        toast.success("Giving Attestations");
+        const response = await fetch(`/api/get-attest-data`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            roomId: roomId,
+          }),
+        });
+        const response_data = await response.json();
+        console.log("Updated", response_data);
+        if (response_data.success) {
+          toast.success("Attestation successful");
+        }
+      } catch (e) {
+        console.log("Error in attestation: ", e);
+        toast.error("Attestation denied");
       }
-    } catch (e) {
-      console.log("Error in attestation: ", e);
-      toast.error("Attestation denied");
     }
-    // }
 
     try {
       const requestOptions = {
@@ -343,8 +351,6 @@ const BottomBar = ({ daoName }: { daoName: string }) => {
         console.log("error: ", e);
       }
     }
-
-    localStorage.removeItem("isMeetingRecorded");
   };
 
   return (

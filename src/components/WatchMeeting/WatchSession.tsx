@@ -92,9 +92,11 @@ interface Meeting {
 function WatchSession({
   data,
   collection,
+  sessionDetails,
 }: {
   data: Meeting;
   collection: string;
+  sessionDetails: { title: string; description: string; image: string };
 }) {
   const [showPopup, setShowPopup] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
@@ -190,7 +192,9 @@ function WatchSession({
             data.description.length > 0 ? "border-b" : ""
           }  border-[#CCCCCC]`}
         >
-          <div className="text-lg font-semibold pb-3">{data.title}</div>
+          <div className="text-lg font-semibold pb-3">
+            {sessionDetails.title || data.title}
+          </div>
           <div className="flex justify-between text-sm pe-4 pb-4">
             <div className="flex gap-6">
               <div className="flex items-center gap-2 ">
@@ -459,40 +463,48 @@ function WatchSession({
           </div>
         </div>
 
-        {data.description.length > 0 && (
+        {sessionDetails.description.length > 0 ? (
           <div
             className={`px-6 pt-4 pb-4 rounded-b-3xl bg-white text-[#1E1E1E]`}
           >
-            <>
-              {/* <div
+            {sessionDetails.description}
+          </div>
+        ) : (
+          data.description.length > 0 && (
+            <div
+              className={`px-6 pt-4 pb-4 rounded-b-3xl bg-white text-[#1E1E1E]`}
+            >
+              <>
+                {/* <div
                 className={`${
                   isExpanded ? "max-h-full" : "max-h-24 line-clamp-3"
                 } transition-[max-height] duration-500 ease-in-out `}
               >
                 {data.description}
               </div> */}
-              <div
-                ref={contentRef}
-                className={`max-h-full transition-max-height duration-500 ease-in-out overflow-hidden ${
-                  isExpanded ? "max-h-full" : "max-h-24 line-clamp-3"
-                }`}
-                style={{
-                  maxHeight: isExpanded ? `${contentHeight}px` : "6rem",
-                }}
-              >
-                <div className="overflow-hidden">{data.description}</div>
-              </div>
-
-              {getLineCount(data.description) > 3 && (
-                <button
-                  className="text-sm text-blue-shade-200 mt-2"
-                  onClick={toggleExpansion}
+                <div
+                  ref={contentRef}
+                  className={`max-h-full transition-max-height duration-500 ease-in-out overflow-hidden ${
+                    isExpanded ? "max-h-full" : "max-h-24 line-clamp-3"
+                  }`}
+                  style={{
+                    maxHeight: isExpanded ? `${contentHeight}px` : "6rem",
+                  }}
                 >
-                  {isExpanded ? "View Less" : "View More"}
-                </button>
-              )}
-            </>
-          </div>
+                  <div className="overflow-hidden">{data.description}</div>
+                </div>
+
+                {getLineCount(data.description) > 3 && (
+                  <button
+                    className="text-sm text-blue-shade-200 mt-2"
+                    onClick={toggleExpansion}
+                  >
+                    {isExpanded ? "View Less" : "View More"}
+                  </button>
+                )}
+              </>
+            </div>
+          )
         )}
       </div>
       {modalOpen && (
