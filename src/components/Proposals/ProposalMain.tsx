@@ -95,37 +95,28 @@ function ProposalMain({ props }: { props: Props }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [hasVoted, setHasVoted] = useState(false);
 
-  const checkVoteStatus = async () => {
-    const queryParams = new URLSearchParams({
-      proposalId: props.id,
-      network: props.daoDelegates,
-      voterAddress: address
-    }as any );
+  interface VoteData {
+    address: string;
+    proposalId: string;
+    choice: string[];
+    votingPower?: number;
+    network: string;
+  }
 
-    try {
-      const response = await fetch(`/api/get-vote-detail?${queryParams.toString()}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+const StoreData = async(voteData:VoteData)=>{
+    // Make the API call to submit the vote
+    const response = await fetch('/api/submit-vote', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(voteData),
+    });
 console.log("response", response)
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-
-      const data = await response.json();
-      console.log(data.voterExists)
-      setHasVoted(data.voterExists);
-    } catch (error) {
-      console.error("Error fetching vote status:", error);
+    if (!response.ok) {
+      throw new Error('Failed to submit vote');
     }
-  };
-
-  useEffect(() => {
-    checkVoteStatus();
-  }, [props, address]);
-
+}
   const voteOnchain = async () => {
     if (walletClient?.chain?.network !== props.daoDelegates) {
       toast.error("Please switch to appropriate network to delegate!");
@@ -136,8 +127,8 @@ console.log("response", response)
       setIsVotingOpen(true);
     }
   }
-  const handleVoteSubmit = async (proposalId: string, vote: string[], comment: string) => {
-    console.log('Vote:', vote, 'Comment:', comment);
+  const handleVoteSubmit = async (proposalId: string, vote: string[], comment: string,voteData : VoteData) => {
+
     // Handle the vote submission logic here
     let address;
     let address1;
@@ -183,6 +174,7 @@ console.log("response", response)
             args: [proposalId, vote, comment],
             account: address1,
           });
+          StoreData(voteData);
           console.log(delegateTx);
 
         } catch (e) {
@@ -201,6 +193,7 @@ console.log("response", response)
             args: [proposalId, vote],
             account: address1,
           });
+          StoreData(voteData);
           console.log(delegateTx);
         } catch (e) {
           toast.error("Transaction failed");
@@ -211,6 +204,36 @@ console.log("response", response)
 
   };
 
+  const checkVoteStatus = async () => {
+    const queryParams = new URLSearchParams({
+      proposalId: props.id,
+      network: props.daoDelegates,
+      voterAddress: address
+    }as any );
+
+    try {
+      const response = await fetch(`/api/get-vote-detail?${queryParams.toString()}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const data = await response.json();
+
+      setHasVoted(data.voterExists);
+    } catch (error) {
+      console.error("Error fetching vote status:", error);
+    }
+  };
+
+  useEffect(() => {
+    checkVoteStatus();
+  }, [props, address,handleVoteSubmit]);
   const loadMore = () => {
     const newDisplayCount = displayCount + 20;
     setDisplayCount(newDisplayCount);
@@ -517,38 +540,52 @@ console.log("response", response)
           ) + 1;
         return `Day ${dayNumber}`;
       };
-
+      
       const aggregateDataByDay = (data: typeof sortedVoterList) => {
         const aggregatedData: Record<
           string,
           { For: number; Against: number; date: Date }
         > = {};
-        let cumulativeFor = 0;
-        let cumulativeAgainst = 0;
-
+      
         data.forEach((entry: any) => {
           const timestamp = parseInt(entry.blockTimestamp);
-          const day = getDayFromTimestamp(timestamp);
+          const date = new Date(timestamp * 1000);
+          const day = date.toISOString().split('T')[0]; // YYYY-MM-DD format
           const weight = parseFloat(entry.weight) / 1e18; // Convert wei to ether
-
-          if (entry.support === 1) {
-            cumulativeFor += weight;
-          } else {
-            cumulativeAgainst += weight;
+     
+          if (!aggregatedData[day]) {
+            // Create a new Date object set to midnight UTC for this day
+            const utcMidnight = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+            aggregatedData[day] = {
+              For: 0,
+              Against: 0,
+              date: utcMidnight
+            };
           }
-
-          aggregatedData[day] = {
-            For: cumulativeFor,
-            Against: cumulativeAgainst,
-            date: new Date(timestamp * 1000),
-          };
+      
+          if (entry.support === 1) {
+            aggregatedData[day].For += weight;
+          } else {
+            aggregatedData[day].Against += weight;
+          }
         });
-
+      
+        // Sort the days and calculate cumulative totals
+        const sortedDays = Object.keys(aggregatedData).sort();
+        let cumulativeFor = 0;
+        let cumulativeAgainst = 0;
+      
+        sortedDays.forEach(day => {
+          cumulativeFor += aggregatedData[day].For;
+          cumulativeAgainst += aggregatedData[day].Against;
+          aggregatedData[day].For = cumulativeFor;
+          aggregatedData[day].Against = cumulativeAgainst;
+        });
+      
         return aggregatedData;
       };
-
       const aggregatedData = aggregateDataByDay(sortedVoterList);
-
+console.log(aggregatedData)
       const newChartData = Object.entries(aggregatedData)
         .sort(([, a], [, b]) => a.date.getTime() - b.date.getTime())
         .map(([day, data]) => {
@@ -740,7 +777,39 @@ console.log("response", response)
   const Proposalstatus =
     data && support1Weight ? getProposalStatusData() : null;
   // const isActive = status === "PENDING" || status?.includes("day");
-
+  const CustomXAxisTick = ({ x, y, payload, index, data }:any) => {
+    const firstDate = new Date(data[0].date).toLocaleDateString();
+    const lastDate = new Date(data[data.length - 1].date).toLocaleDateString();
+  
+    // Calculate the width of the x-axis
+    const xAxisWidth = data.length < 1 ? 
+      data[data.length - 1] - data[0]: 
+      300; // fallback width if there's only one data point
+  console.log(xAxisWidth)
+    return (
+      <g>
+        <text
+          x={50}
+          y={y + 15}
+          fill="#718096"
+          fontSize={12}
+          textAnchor="start"
+        >
+          {firstDate}
+        </text>
+        <text
+          x={650}
+          y={y + 15}
+          fill="#718096"
+          fontSize={12}
+          textAnchor="end"
+        >
+          {lastDate}
+        </text>
+      </g>
+    );
+  };
+  
   return (
     <>
       <div className="pr-8 pb-5 pl-16 pt-6 font-poppins">
@@ -1012,8 +1081,17 @@ console.log("response", response)
                 >
                   <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                   <XAxis
-                    dataKey="name"
-                    tick={{ fill: "#718096", fontSize: 12 }}
+                    dataKey="date"
+                    tick={({ x, y, payload, index }) => (
+                      <CustomXAxisTick
+                        x={x}
+                        y={y}
+                        payload={payload}
+                        index={index}
+                        data={chartData}
+                      />
+                    )}
+                    // tick={{ fill: "#718096", fontSize: 12 }}
                     axisLine={{ stroke: "#e2e8f0" }}
                   />
                   <YAxis

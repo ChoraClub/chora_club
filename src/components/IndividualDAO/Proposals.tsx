@@ -361,7 +361,7 @@ const formatDate = (timestamp: number): string => {
                 <div className="flex gap-1">
                   {/* <Image src={user} alt="" className="size-4" /> */}
                   <p className="flex text-xs font-normal items-center">
-                    <span className="text-[#004DFF]"> Started at </span>&nbsp;{formatDate(proposal.blockTimestamp)}
+                    <span className="text-[#004DFF]"> Created at </span>&nbsp;{formatDate(proposal.blockTimestamp)}
                   </p>
                 </div>
               </div>

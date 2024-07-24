@@ -25,6 +25,7 @@ export async function GET(req: NextRequest) {
         });
 
         if (!proposal) {
+            client.close();  
             return new Response(JSON.stringify({ error: "Proposal not found" }), { 
                 status: 404,
                 headers: { 'Content-Type': 'application/json' }

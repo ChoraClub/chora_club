@@ -20,7 +20,7 @@ interface VotingOption {
 interface VotingPopupProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (proposalId: string, vote: string[], comment: string) => void;
+  onSubmit: (proposalId: string, vote: string[], comment: string,voteData: VoteData) => void;
   proposalId: string;
   proposalTitle: string;
   address: string;
@@ -77,23 +77,9 @@ const VotingPopup: React.FC<VotingPopupProps> = ({
         choice: votes,
         votingPower: votesCount,
         network: dao === "arbitrum" ? "arbitrum" : "optimism"
-      };
-console.log("votedataabcd", voteData)
-      // Make the API call to submit the vote
-      const response = await fetch('/api/submit-vote', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(voteData),
-      });
-console.log("response", response)
-      if (!response.ok) {
-        throw new Error('Failed to submit vote');
-      }
-
+      };    
       // If the API call is successful, call the onSubmit prop
-      onSubmit(proposalId, votes, comment);
+      onSubmit(proposalId, votes, comment,voteData);
       onClose();
     } catch (error) {
       console.error('Error submitting vote:', error);
@@ -164,9 +150,7 @@ console.log("response", response)
           })
             .then((result) => result.json())
             .then((finalCounting) => {
-              console.log(finalCounting);
-              console.log("dataa", finalCounting.data);
-              setVotesCount(finalCounting.data.delegate.votesCount?finalCounting.data.delegate.votesCount : 0);
+              setVotesCount(finalCounting.data?.delegate?.votesCount ? finalCounting.data.delegate.votesCount : 0);
             })
             .catch((error) => {
               console.error("Error:", error);
@@ -177,7 +161,6 @@ console.log("response", response)
               delegate: address.toString(),
             })
             .toPromise();
-          console.log("voting data", data.data.delegateVotesChangeds[0]);
           setVotesCount(data.data.delegateVotesChangeds[0]?.newBalance?data.data.delegateVotesChangeds[0]?.newBalance:0);
         }
       } catch (error) {
