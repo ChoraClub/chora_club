@@ -1,14 +1,13 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
-// import { getWalletAddress } from "@/libs/authmiddleware";
 
 export async function middleware(request: NextRequest) {
   console.log("Middleware run!");
   console.log(request);
-  const WalletAddress = request.headers.get("x-wallet-address");
+  const walletAddress = request.headers.get("x-wallet-address");
 
-  console.log(WalletAddress);
+  console.log(walletAddress);
 
   if (!["POST", "PUT", "DELETE"].includes(request.method)) {
     // For other methods, allow the request to proceed without additional checks
@@ -20,7 +19,7 @@ export async function middleware(request: NextRequest) {
     req: request,
     secret: process.env.NEXTAUTH_SECRET,
   });
-  console.log(token);
+  // console.log("token ", token);
 
   if (!token) {
     // If there's no token, the user is not authenticated
@@ -34,18 +33,18 @@ export async function middleware(request: NextRequest) {
   const UserAddress = token.sub;
   console.log(UserAddress);
 
-  console.log("Requested Address:", WalletAddress);
+  console.log("Requested Address:", walletAddress);
 
-  if (UserAddress !== WalletAddress) {
-    // If the user's address doesn't match the requested profile address
-    console.log(
-      `Forbidden access attempt: User ${UserAddress} tried to access profile of ${WalletAddress}`
-    );
-    return new NextResponse(JSON.stringify({ error: "Forbidden" }), {
-      status: 403,
-      headers: { "Content-Type": "application/json" },
-    });
-  }
+  // if (UserAddress !== walletAddress) {
+  //   // If the user's address doesn't match the requested profile address
+  //   console.log(
+  //     `Forbidden access attempt: User ${UserAddress} tried to access profile of ${walletAddress}`
+  //   );
+  //   return new NextResponse(JSON.stringify({ error: "Forbidden" }), {
+  //     status: 403,
+  //     headers: { "Content-Type": "application/json" },
+  //   });
+  // }
 
   // If everything is okay, continue to the API route
   return NextResponse.next();
