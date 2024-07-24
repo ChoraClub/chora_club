@@ -13,17 +13,22 @@ interface AvailableUserSessionsProps {
   setScheduledSuccess: React.Dispatch<
     React.SetStateAction<boolean | undefined>
   >;
+  sessionCreated: boolean;
+  setSessionCreated: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 function AvailableUserSessions({
   daoName,
   scheduledSuccess,
   setScheduledSuccess,
+  sessionCreated,
+  setSessionCreated,
 }: AvailableUserSessionsProps) {
   const { address, isConnected } = useAccount();
   const { chain } = useNetwork();
   const [data, setData] = useState([]);
   const [dataLoading, setDataLoading] = useState<Boolean>(false);
+  const [updateTrigger, setUpdateTrigger] = useState(0);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -50,6 +55,7 @@ function AvailableUserSessions({
           setData(result.data);
           setDataLoading(false);
           // setScheduledSuccess(false);
+          setSessionCreated(false);
         }
       } catch (error) {
         console.error(error);
@@ -58,7 +64,13 @@ function AvailableUserSessions({
       }
     };
     fetchData();
-  }, [daoName, address, scheduledSuccess === true]);
+  }, [
+    daoName,
+    address,
+    scheduledSuccess === true,
+    sessionCreated,
+    updateTrigger,
+  ]);
 
   return (
     // <div className="max-w-xl mt-2 p-8 bg-white rounded-2xl shadow-lg min-w-[34rem] min-h-[35rem]">
@@ -87,6 +99,7 @@ function AvailableUserSessions({
               dao_name={daoName}
               data={data.filter((item: any) => item.timeSlotSizeMinutes === 15)}
               setData={setData}
+              triggerUpdate={() => setUpdateTrigger((prev) => prev + 1)}
             />
           )}
           {data.some((item: any) => item.timeSlotSizeMinutes === 30) && (
@@ -97,6 +110,7 @@ function AvailableUserSessions({
               dao_name={daoName}
               data={data.filter((item: any) => item.timeSlotSizeMinutes === 30)}
               setData={setData}
+              triggerUpdate={() => setUpdateTrigger((prev) => prev + 1)}
             />
           )}
           {data.some((item: any) => item.timeSlotSizeMinutes === 45) && (
@@ -107,6 +121,7 @@ function AvailableUserSessions({
               dao_name={daoName}
               data={data.filter((item: any) => item.timeSlotSizeMinutes === 45)}
               setData={setData}
+              triggerUpdate={() => setUpdateTrigger((prev) => prev + 1)}
             />
           )}
         </>
@@ -115,7 +130,7 @@ function AvailableUserSessions({
           No Scheduled Available Time
         </div>
       )}
-      <Toaster
+      {/* <Toaster
         toastOptions={{
           style: {
             fontSize: "14px",
@@ -126,7 +141,7 @@ function AvailableUserSessions({
             padding: "3px 5px",
           },
         }}
-      />
+      /> */}
     </div>
   );
 }
@@ -140,6 +155,7 @@ function TimeSlotTable({
   address,
   dao_name,
   setData,
+  triggerUpdate,
 }: any) {
   const [deleting, setDeleting] = useState<string | null>(null);
 
@@ -188,7 +204,8 @@ function TimeSlotTable({
                     !(
                       timeRange.startTime === startTime &&
                       timeRange.endTime === endTime &&
-                      item.dateAndRanges.date === date
+                      // item.dateAndRanges.date === date
+                      range.date === date
                     )
                 ),
               })),
@@ -200,6 +217,7 @@ function TimeSlotTable({
             )
         );
       }
+      triggerUpdate();
     } catch (error) {
       console.error(error);
       toast.error("Failed to delete.");

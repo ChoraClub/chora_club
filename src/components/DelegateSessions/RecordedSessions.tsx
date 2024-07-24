@@ -277,7 +277,7 @@ function RecordedSessions() {
           </div>
         )}
       </div>
-      <Toaster
+      {/* <Toaster
         toastOptions={{
           style: {
             fontSize: "14px",
@@ -288,7 +288,7 @@ function RecordedSessions() {
             padding: "3px 5px",
           },
         }}
-      />
+      /> */}
     </>
   );
 }

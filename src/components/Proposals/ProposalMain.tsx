@@ -21,6 +21,7 @@ import WalletAndPublicClient from "@/helpers/signer";
 import toast, { Toaster } from "react-hot-toast";
 import { useNetwork } from "wagmi";
 import { hash } from "crypto";
+import { marked } from "marked";
 
 interface ArbitrumVote {
   voter: {
@@ -69,6 +70,7 @@ import {
 import { RiArrowRightUpLine, RiExternalLinkLine } from "react-icons/ri";
 import ProposalMainVotersSkeletonLoader from "../SkeletonLoader/ProposalMainVotersSkeletonLoader";
 import ProposalMainDescriptionSkeletonLoader from "../SkeletonLoader/ProposalMainDescriptionSkeletonLoader";
+import DOMPurify from "dompurify";
 
 function ProposalMain({ props }: { props: Props }) {
   const router = useRouter();
@@ -239,6 +241,23 @@ console.log("response", response)
     setDisplayCount(newDisplayCount);
   };
 
+  const [formattedTitle, setFormattedTitle] = useState("");
+  const [formattedDescription, setFormattedDescription] = useState("");
+
+  useEffect(() => {
+    const formatDesc = async () => {
+      if (data?.description) {
+        // const formatted = await formatDescription(data.description);
+        // setFormattedDescription(formatted);
+        const { title, content } = await formatDescription(data.description);
+        setFormattedTitle(title);
+        setFormattedDescription(content);
+      }
+    };
+
+    formatDesc();
+  }, [data?.description]);
+
   useEffect(() => {
     setIsArbitrum(props?.daoDelegates === "arbitrum");
   }, []);
@@ -247,9 +266,11 @@ console.log("response", response)
 
   useEffect(() => {
     if (contentRef.current) {
-      contentRef.current.style.maxHeight = isExpanded
-      ? `${contentRef.current.scrollHeight}px`
-      : "141px"; // 6 lines * 24px line-height
+      if (isExpanded) {
+        contentRef.current.style.maxHeight = `${contentRef.current.scrollHeight}px`;
+      } else {
+        contentRef.current.style.maxHeight = "141px"; // 6 lines * 24px line-height
+      }
     }
   }, [isExpanded, data?.description]);
   const toggleExpansion = () => {
@@ -268,73 +289,100 @@ console.log("response", response)
     return Number(wei) / 1e18;
   };
 
-  const formatDescription = (description: any) => {
-    if (!description) return "";
+  const formatDescription = async (
+    description: string
+  ): Promise<{ title: string; content: string }> => {
+    if (!description) return { title: "", content: "" };
 
-    // Convert headers (lines starting with #)
-    description = description.replace(/^# (.+)$/gm, "<h2>$1</h2>");
-    description = description.replace(
-      /(\*\*)(.+?)(\*\*)/g,
-      "<strong>$2</strong>"
-    );
-    description = description.replace(/^### (.+)$/gm, "<h3>$1</h3>");
-    description = description.replace(/^## (.+)$/gm, "<h2>$1</h2>");
-    description = description.replace(/^# (.+)$/gm, "<h1>$1</h1>");
+    const renderer = new marked.Renderer();
+    (renderer as any).link = function (
+      this: typeof marked.Renderer,
+      {
+        href,
+        title,
+        text,
+      }: { href: string; title: string | null; text: string }
+    ): string {
+      // strong
+      const strongPattern = /^\*\*(.*)\*\*$/;
+      const match = text.match(strongPattern);
+      if (match) {
+        text = `<strong>${match[1]}</strong>`;
+      }
 
-  // Convert image links and regular links
-  description = description.replace(
-    /!\[([^\]]*)\]\(([^)]+)\s*"?([^"]*)"?\)/g,
-    '<img src="$2" alt="$1" title="$3" class="max-w-full h-auto">'
-  );
-   // Convert bare URLs
-   description = description.replace(
-    /<(https?:\/\/[^>]+)>/g,
-    '<a href="$1" target="_blank" class="underline text-blue-600">$1</a>'
-  );
-    // Convert links [text](url)
-    description = description.replace(
-      /\[(.+?)\]\((.+?)\)/g,
-      '<a href="$2" target="_blank" class="underline text-blue-600">$1</a>'
-    );
-    description = description.replace(
-      /<(https?:\/\/[^>]+)>/g,
-      '<a href="$1" target="_blank" class="underline text-blue-600">$1</a>'
-    );
-    // Convert bullet points (lines starting with *)
-    let inList = false;
-    description = description
-      .split("\n")
-      .map((line: any) => {
-        if (line.trim().startsWith("*")) {
-          if (!inList) {
-            inList = true;
-            return (
-              '<br/><ul class="list-disc pl-5 mb-3"><li >' +
-              line.trim().substring(1).trim() +
-              "</li>"
-            );
-          }
-          return (
-            '<li class="mb-1">' + line.trim().substring(1).trim() + "</li>"
-          );
-        } else {
-          if (inList) {
-            inList = false;
-            return "</ul>" + line;
-          }
-          return line;
-        }
-      })
-      .join("\n");
+      // em tag
+      const emPattern = /^\*(.*)\*$/;
+      const matchem = text.match(emPattern);
+      if (matchem) {
+        text = `<em>${matchem[1]}</em>`;
+      }
 
-    if (inList) {
-      description += "</ul>";
+      return `<a href="${href}" title="${
+        title || ""
+      }" target="_blank" rel="noopener noreferrer" class="text-blue-shade-100">${text}</a>`;
+    };
+
+    marked.setOptions({
+      breaks: true,
+      gfm: true,
+      renderer: renderer,
+    });
+
+    try {
+      let htmlContent = await marked(description, { renderer });
+      const titleMatch = htmlContent.match(/<h[12][^>]*>(.*?)<\/h[12]>/i);
+      const title = titleMatch ? titleMatch[1].trim() : "";
+      htmlContent = htmlContent.replace(/<h[12][^>]*>.*?<\/h[12]>/i, "");
+
+      htmlContent = htmlContent.replace(/<\/p>/g, "</p><br>");
+      htmlContent = htmlContent.replace(
+        /<br>\s*<\/(ul|ol|blockquote)>/g,
+        "</$1>"
+      );
+      htmlContent = htmlContent.replace(
+        /<a /g,
+        '<a target="_blank" rel="noopener noreferrer" class="text-blue-shade-100 " '
+      );
+      htmlContent = htmlContent.replace(
+        /<ul>/g,
+        '<ul style="list-style-type: disc; padding-left: 2em;">'
+      );
+      htmlContent = htmlContent.replace(
+        /<ol>/g,
+        '<ol style="list-style-type: decimal; padding-left: 2em;">'
+      );
+      htmlContent = htmlContent.replace(
+        /<li>/g,
+        '<li style="margin-bottom: 0.5em;">'
+      );
+
+      if (props.daoDelegates === "arbitrum") {
+        htmlContent = htmlContent.replace(
+          /<h1>/g,
+          '<h1 style="font-weight: 500;font-size:20px; margin-bottom:8px">'
+        );
+        htmlContent = htmlContent.replace(
+          /<h2>/g,
+          '<h2 style="font-weight: 500;font-size:18px; margin-bottom:8px">'
+        );
+        htmlContent = htmlContent.replace(
+          /<h3>/g,
+          '<h3 style="font-weight: 500;font-size:16px; margin-bottom:8px">'
+        );
+        htmlContent = htmlContent.replace(
+          /<a /g,
+          '<a target="_blank" rel="noopener noreferrer" class="text-blue-shade-100 " '
+        );
+      }
+
+      const sanitizedHtml = DOMPurify.sanitize(htmlContent, {
+        ADD_ATTR: ["target", "rel"], // Allow these attributes to pass through sanitization
+      });
+      return { title, content: sanitizedHtml };
+    } catch (error) {
+      console.error("Error formatting description:", error);
+      return { title: "", content: "" }; // or return a default error message
     }
-
-    // Convert remaining newlines to <br> tags
-    description = description.replace(/\n/g, "<br>");
-
-    return description;
   };
 
   useEffect(() => {
@@ -845,7 +893,8 @@ console.log(aggregatedData)
               <div className="h-5 bg-gray-200 animate-pulse w-[50vw] rounded-full"></div>
             ) : (
               <p className="text-3xl font-semibold">
-                {truncateText(data?.description, 50)}
+                {/* {truncateText(data?.description, 50)} */}
+                {formattedTitle}
               </p>
             )}
             <Tooltips
@@ -923,15 +972,13 @@ console.log(aggregatedData)
               {console.log(isExpanded)}
               <div
                 ref={contentRef}
-                className={`max-h-full transition-max-height duration-500 ease-in-out overflow-hidden ${
+                className={` transition-max-height duration-500 ease-in-out overflow-hidden ${
                   isExpanded ? "max-h-full" : "max-h-36"
                 }`}
               >
                 <div
                   className="description-content"
-                  dangerouslySetInnerHTML={{
-                    __html: formatDescription(data?.description || ""),
-                  }}
+                  dangerouslySetInnerHTML={{ __html: formattedDescription }}
                 />
               </div>
               {contentRef.current && contentRef.current.scrollHeight > 144 && (

@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
-// import { getWalletAddress } from "@/libs/authmiddleware";
 
 export async function middleware(request: NextRequest) {
   console.log("Middleware run!");
@@ -20,7 +19,7 @@ export async function middleware(request: NextRequest) {
     req: request,
     secret: process.env.NEXTAUTH_SECRET,
   });
-  console.log(token);
+  // console.log("token ", token);
 
   if (!token) {
     // If there's no token, the user is not authenticated

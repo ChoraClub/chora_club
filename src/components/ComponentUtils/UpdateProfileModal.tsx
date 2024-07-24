@@ -56,18 +56,16 @@ function UpdateProfileModal({
         isOpen={isOpen}
         // onOpenChange={onOpenChange}
         className="font-poppins rounded-3xl "
-        size="xl"
+        size="2xl"
         // style={{ '--modal-size': '672px' }}
-        hideCloseButton
-      >
+        hideCloseButton>
         <ModalContent>
           <>
             <ModalHeader className="flex justify-between text-2xl font-semibold items-center bg-blue-shade-100 text-white px-8 py-6 ">
               Update your Profile
               <button
                 onClick={onClose}
-                className="text-blue-shade-100 bg-white w-5 h-5  rounded-full flex items-center justify-center font-semibold text-xl"
-              >
+                className="text-blue-shade-100 bg-white w-5 h-5  rounded-full flex items-center justify-center font-semibold text-xl">
                 <IoClose className="font-bold size-4" />
               </button>
             </ModalHeader>
@@ -92,8 +90,7 @@ function UpdateProfileModal({
                           xmlns="http://www.w3.org/2000/svg"
                           className="h-12 w-12"
                           viewBox="0 0 20 20"
-                          fill="currentColor"
-                        >
+                          fill="currentColor">
                           <path
                             fillRule="evenodd"
                             d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
@@ -153,8 +150,7 @@ function UpdateProfileModal({
                           : "Your email is private and only visible to you."
                       }
                       placement="right"
-                      showArrow
-                    >
+                      showArrow>
                       <label className="cursor-pointer">
                         <input
                           type="checkbox"
@@ -167,8 +163,7 @@ function UpdateProfileModal({
                         <div
                           className={`relative w-9 h-5 ${
                             isToggled ? "bg-green-500" : "bg-red-500"
-                          } peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600`}
-                        ></div>
+                          } peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600`}></div>
                       </label>
                     </Tooltip>
                   </div>
@@ -256,8 +251,7 @@ function UpdateProfileModal({
                               </Button> */}
               <Button
                 className="bg-blue-shade-100 rounded-full text-sm font-semibold text-white px-10 mt-3 mb-7 "
-                onClick={() => handleSave()}
-              >
+                onClick={() => handleSave()}>
                 {isLoading ? "Saving" : "Save"}
               </Button>
             </ModalFooter>
