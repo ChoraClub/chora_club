@@ -892,7 +892,7 @@ console.log(aggregatedData)
             {loading ? (
               <div className="h-5 bg-gray-200 animate-pulse w-[50vw] rounded-full"></div>
             ) : (
-              <p className="text-3xl font-semibold">
+              <p className="text-2xl font-semibold">
                 {/* {truncateText(data?.description, 50)} */}
                 {formattedTitle}
               </p>
