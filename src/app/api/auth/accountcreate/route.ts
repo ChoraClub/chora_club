@@ -68,9 +68,11 @@ export async function POST(req: NextRequest, res: NextApiResponse) {
         const insertedDocument = await collection.findOne({
           _id: result.insertedId,
         });
+        client.close();
         // console.log("Inserted document retrieved");
         return NextResponse.json({ result: insertedDocument }, { status: 200 });
       } else {
+        client.close();
         return NextResponse.json(
           { error: "Failed to retrieve inserted document" },
           { status: 500 }
