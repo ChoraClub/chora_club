@@ -22,10 +22,11 @@ export async function PUT(req: NextRequest) {
     console.log("Connected to MongoDB");
 
     const db = client.db();
-    const collection = db.collection("delegates");
+    const delegate_follow_collection = db.collection("delegate_follow");
+    const delegates_collection = db.collection("delegates");
 
-    // Find the document by address
-    const document = await collection.findOne({ address });
+    // Find the document by address in delegate_follow collection
+    const document = await delegate_follow_collection.findOne({ address });
 
     if (!document) {
       client.close();
@@ -57,8 +58,8 @@ export async function PUT(req: NextRequest) {
       .filter((follower: any) => follower.isNotification === true)
       .map((follower: any) => follower.address);
 
-    // Find emails associated with follower addresses
-    const followerEmails = await collection
+    // Find emails associated with follower addresses from delegates collection
+    const followerEmails = await delegates_collection
       .find(
         { address: { $in: followerAddresses } },
         { projection: { emailId: 1, address: 1 } }

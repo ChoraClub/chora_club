@@ -24,7 +24,7 @@ export async function PUT(req: NextRequest) {
     console.log("Connected to MongoDB");
 
     const db = client.db();
-    const collection = db.collection("delegates");
+    const collection = db.collection("delegate_follow");
 
     console.log(`Updating delegate document for ${delegate_address}...`);
 

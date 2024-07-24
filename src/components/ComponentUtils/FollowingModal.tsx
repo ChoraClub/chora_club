@@ -17,6 +17,7 @@ interface FollowingModal {
   toggleFollowing: any;
   toggleNotification: any;
   setfollowingmodel: any;
+  isLoading: any;
   chainName: string | undefined;
 }
 function formatDate(timestamp: string) {
@@ -35,6 +36,7 @@ function FollowingModal({
   toggleNotification,
   setfollowingmodel,
   chainName,
+  isLoading,
 }: FollowingModal) {
   const handleCopy = (addr: string) => {
     copy(addr);
@@ -128,7 +130,11 @@ function FollowingModal({
             </div>
             <div
               className={` max-h-[60vh] overflow-y-auto ${style.customscrollbar}`}>
-              {userFollowings.length > 0 &&
+              {isLoading ? (
+                <div className="flex justify-center items-center h-40">
+                  <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-shade-200"></div>
+                </div>
+              ) : userFollowings.length > 0 ? (
                 userFollowings.map((user: any, index: any) => (
                   <>
                     <div
@@ -235,7 +241,12 @@ function FollowingModal({
                       <hr className="border-[#DDDDDD] border-0.5" />
                     )}
                   </>
-                ))}
+                ))
+              ) : (
+                <div className="flex justify-center items-center h-40">
+                  <p>No followings found.</p>
+                </div>
+              )}
             </div>
           </div>
         </div>

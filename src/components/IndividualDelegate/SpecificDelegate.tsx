@@ -2,25 +2,21 @@
 import Image from "next/image";
 import React, { use, useEffect, useState } from "react";
 import user from "@/assets/images/daos/profile.png";
-<<<<<<< HEAD
-import { FaXTwitter, FaDiscord, FaGithub } from "react-icons/fa6";
 import {
-  BiSolidBellOff,
-  BiSolidBellRing,
-  BiSolidMessageRoundedDetail,
-} from "react-icons/bi";
-import { IoCopy } from "react-icons/io5";
-=======
-import { FaXTwitter, FaDiscord, FaGithub, FaVoicemail, FaEnvelope } from "react-icons/fa6";
+  FaXTwitter,
+  FaDiscord,
+  FaGithub,
+  FaVoicemail,
+  FaEnvelope,
+} from "react-icons/fa6";
 import { BiSolidMessageRoundedDetail } from "react-icons/bi";
 import { IoCopy, IoShareSocialSharp } from "react-icons/io5";
->>>>>>> f9c569ea573e160c0ca4b775323d16beb69691ab
 import DelegateInfo from "./DelegateInfo";
 import DelegateVotes from "./DelegateVotes";
 import DelegateSessions from "./DelegateSessions";
 import DelegateOfficeHrs from "./DelegateOfficeHrs";
 import copy from "copy-to-clipboard";
-import { Tooltip, useDisclosure } from "@nextui-org/react";
+import { Button, Tooltip, useDisclosure } from "@nextui-org/react";
 import { StaticImport } from "next/dist/shared/lib/get-img-props";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useRouter } from "next-nprogress-bar";
@@ -43,29 +39,23 @@ import ArbLogo from "@/assets/images/daos/arbCir.png";
 import ccLogo from "@/assets/images/daos/CC.png";
 import { Oval } from "react-loader-spinner";
 import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
-<<<<<<< HEAD
-=======
 import {
   arb_client,
   DELEGATE_CHANGED_QUERY,
   GET_LATEST_DELEGATE_VOTES_CHANGED,
   op_client,
 } from "@/config/staticDataUtils";
->>>>>>> f9c569ea573e160c0ca4b775323d16beb69691ab
 // import { getEnsNameOfUser } from "../ConnectWallet/ENSResolver";
 import DelegateTileModal from "../ComponentUtils/delegateTileModal";
 // import { cacheExchange, createClient, fetchExchange, gql } from "urql/core";
 import { set } from "video.js/dist/types/tech/middleware";
 import MainProfileSkeletonLoader from "../SkeletonLoader/MainProfileSkeletonLoader";
 import { fetchEnsAvatar } from "@/utils/ENSUtils";
-<<<<<<< HEAD
 import Confetti from "react-confetti";
 import { connected } from "process";
 import { IoMdNotifications } from "react-icons/io";
 import { IoMdNotificationsOff } from "react-icons/io";
-=======
 import { BASE_URL } from "@/config/constants";
->>>>>>> f9c569ea573e160c0ca4b775323d16beb69691ab
 
 interface Type {
   daoDelegates: string;
@@ -97,7 +87,6 @@ function SpecificDelegate({ props }: { props: Type }) {
   const [same, setSame] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-<<<<<<< HEAD
   const [isFollowing, setIsFollowing] = useState(false);
   const [followers, setFollowers] = useState(0);
   const [followed, isFollowed] = useState(false);
@@ -105,12 +94,11 @@ function SpecificDelegate({ props }: { props: Type }) {
   const [isOpenNotification, setNotificationmodel] = useState(false);
   const [notification, isNotification] = useState(false);
   const [daoname, setDaoName] = useState("");
-=======
   const [emailId, setEmailId] = useState<string>();
   const [isEmailVisible, setIsEmailVisible] = useState(false);
->>>>>>> f9c569ea573e160c0ca4b775323d16beb69691ab
 
   const [delegateOpen, setDelegateOpen] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
   const address = useAccount();
 
   const { isConnected } = useAccount();
@@ -264,6 +252,7 @@ function SpecificDelegate({ props }: { props: Type }) {
   useEffect(() => {
     console.log("Network", chain?.network);
     const fetchData = async () => {
+      console.log("fetching from karma");
       setIsPageLoading(true);
       try {
         const res = await fetch(
@@ -293,6 +282,7 @@ function SpecificDelegate({ props }: { props: Type }) {
             ? details.data.delegate.githubHandle
             : "",
         });
+        await updateFollowerState();
 
         setIsPageLoading(false);
       } catch (error) {
@@ -302,7 +292,7 @@ function SpecificDelegate({ props }: { props: Type }) {
     };
 
     fetchData();
-  }, []);
+  }, [chain]);
 
   useEffect(() => {
     const checkDelegateStatus = async () => {
@@ -361,6 +351,92 @@ function SpecificDelegate({ props }: { props: Type }) {
     copy(addr);
     toast("Address Copied");
   };
+
+  const updateFollowerState = async () => {
+    console.log("Attempting to call savefollower API");
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    const raw = JSON.stringify({
+      address: props.individualDelegate,
+    });
+
+    const requestOptions: any = {
+      method: "POST",
+      headers: myHeaders,
+      body: raw,
+      redirect: "follow",
+    };
+
+    try {
+      const resp = await fetch(
+        `/api/delegate-follow/savefollower`,
+        requestOptions
+      );
+
+      if (!resp.ok) {
+        throw new Error("Failed to save follower");
+      }
+
+      const data = await resp.json();
+      console.log("API Response:", data);
+
+      if (!data.success || !data.data || data.data.length === 0) {
+        console.log("No data returned from API");
+        return;
+      }
+
+      const followerData = data.data[0];
+      let address = await walletClient.getAddresses();
+      let address_user = address[0].toLowerCase(); // Convert to lowercase for case-insensitive comparison
+      let currentDaoName = "";
+      if (chain?.name === "Optimism") {
+        currentDaoName = "optimism";
+      } else if (chain?.name === "Arbitrum One") {
+        currentDaoName = "arbitrum";
+      }
+
+      console.log("Current DAO:", currentDaoName);
+      console.log("User Address:", address_user);
+
+      const daoFollowers = followerData.followers.find(
+        (dao: any) =>
+          dao.dao_name.toLowerCase() === currentDaoName.toLowerCase()
+      );
+
+      console.log("DAO Followers:", daoFollowers);
+
+      if (daoFollowers) {
+        const follow = daoFollowers.follower.find(
+          (f: any) => f.address.toLowerCase() === address_user
+        );
+
+        console.log("User's follow status:", follow);
+
+        if (follow) {
+          setIsFollowing(follow.isFollowing);
+          isNotification(follow.isNotification); // Changed from isNotification(follow.isNotification)
+        } else {
+          setIsFollowing(false);
+          isNotification(false); // Changed from isNotification(false)
+        }
+
+        const followerCount = daoFollowers.follower.filter(
+          (f: any) => f.isFollowing
+        ).length;
+
+        console.log("Follower count:", followerCount);
+
+        setFollowers(followerCount);
+      } else {
+        setIsFollowing(false);
+        isNotification(false); // Changed from isNotification(false)
+        setFollowers(0);
+      }
+    } catch (error) {
+      console.error("Error in updateFollowerState:", error);
+    }
+  };
+
   const handleConfirm = async (action: number) => {
     let delegate_address: string;
     let follower_address: string;
@@ -559,18 +635,18 @@ function SpecificDelegate({ props }: { props: Type }) {
     }
   };
 
-  // useEffect(() => {
-  //   if (chain) {
-  //     if (chain.name === "Optimism") {
-  //       setDaoName("optimism");
-  //     } else if (chain.name === "Arbitrum One") {
-  //       setDaoName("arbitrum");
-  //     } else {
-  //       // Optional: handle other chains or set a default
-  //       setDaoName("");
-  //     }
-  //   }
-  // }, [chain]);
+  useEffect(() => {
+    if (chain) {
+      if (chain.name === "Optimism") {
+        setDaoName("optimism");
+      } else if (chain.name === "Arbitrum One") {
+        setDaoName("arbitrum");
+      } else {
+        // Optional: handle other chains or set a default
+        setDaoName("");
+      }
+    }
+  }, [chain]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -632,7 +708,7 @@ function SpecificDelegate({ props }: { props: Type }) {
               setIsEmailVisible(true);
               setEmailId(item.emailId);
             }
-            const matchingNetwork = item.networks.find(
+            const matchingNetwork = item.networks?.find(
               (network: any) => network.dao_name === chain?.name
             );
 
@@ -647,42 +723,11 @@ function SpecificDelegate({ props }: { props: Type }) {
             }
             setDisplayName(item.displayName);
 
-            let address = await walletClient.getAddresses();
-            let address_user = address[0];
             if (!isConnected) {
               setIsFollowing(false);
               isNotification(false);
             } else {
-              const daoFollowers = item.followers.find(
-                (dao: any) => dao.dao_name === currentDaoName
-              );
-
-              // alert(currentDaoName);
-
-              if (daoFollowers) {
-                // Find the follower with the matching address
-                const follow = daoFollowers.follower.find(
-                  (f: any) => f.address === address_user
-                );
-
-                // alert(follow);
-
-                if (follow) {
-                  setIsFollowing(follow.isFollowing);
-                  isNotification(follow.isNotification);
-                } else {
-                  setIsFollowing(false);
-                  isNotification(false);
-                }
-
-                // Count followers for the specified DAO where isFollowing is true
-                const followerCount = daoFollowers.follower.filter(
-                  (f: any) => f.isFollowing
-                ).length;
-
-                // alert(followerCount);
-                setFollowers(followerCount);
-              }
+              await updateFollowerState();
             }
             setSocials({
               twitter: item.socialHandles.twitter,
@@ -880,8 +925,6 @@ function SpecificDelegate({ props }: { props: Type }) {
                       />
                     </span>
                   </Tooltip>
-<<<<<<< HEAD
-=======
                   <div className="flex space-x-2">
                     {/* <span className="p-2 bg-gray-200 rounded-lg text-black">
                       {typeof window !== "undefined" &&
@@ -912,7 +955,6 @@ function SpecificDelegate({ props }: { props: Type }) {
                       </Button>
                     </Tooltip>
                   </div>
->>>>>>> f9c569ea573e160c0ca4b775323d16beb69691ab
                   <div style={{ zIndex: "21474836462" }}>
                     <Toaster
                       toastOptions={{

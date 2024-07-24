@@ -259,6 +259,7 @@ function MainProfile() {
     toast("Address Copied");
   };
   const handleUpdateFollowings = async () => {
+    setfollowingmodel(true);
     setLoading(true);
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
@@ -274,7 +275,10 @@ function MainProfile() {
       body: raw,
       redirect: "follow",
     };
-    const res = await fetch(`/api/profile/${address}`, requestOptions);
+    const res = await fetch(
+      `/api/delegate-follow/savefollower`,
+      requestOptions
+    );
 
     const dbResponse = await res.json();
     setDbResponse(dbResponse);
@@ -297,7 +301,6 @@ function MainProfile() {
     }
     // Close the modal
     setLoading(false);
-    setfollowingmodel(true);
   };
   const toggleFollowing = async (index: number, userupdate: any) => {
     setUserFollowings((prevUsers) =>
@@ -408,6 +411,88 @@ function MainProfile() {
     }));
   };
 
+  const updateFollowerState = async () => {
+    console.log("Attempting to call savefollower API");
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    const raw = JSON.stringify({
+      address: address,
+    });
+
+    const requestOptions: any = {
+      method: "POST",
+      headers: myHeaders,
+      body: raw,
+      redirect: "follow",
+    };
+
+    try {
+      const resp = await fetch(
+        `/api/delegate-follow/savefollower`,
+        requestOptions
+      );
+
+      if (!resp.ok) {
+        throw new Error("Failed to fetch follower/following data");
+      }
+
+      const dbResponse = await resp.json();
+      console.log("API Response:", dbResponse);
+
+      if (
+        !dbResponse.success ||
+        !dbResponse.data ||
+        dbResponse.data.length === 0
+      ) {
+        console.log("No data returned from API");
+        return;
+      }
+
+      const userData = dbResponse.data[0];
+      let address = await walletClient.getAddresses();
+      let address_user = address[0].toLowerCase();
+      let currentDaoName = "";
+      if (chain?.name === "Optimism") {
+        currentDaoName = "optimism";
+      } else if (chain?.name === "Arbitrum One") {
+        currentDaoName = "arbitrum";
+      }
+
+      console.log("Current DAO:", currentDaoName);
+      console.log("User Address:", address_user);
+
+      // Process following details
+      const matchDao = userData.followings?.find(
+        (daoItem: any) =>
+          daoItem.dao.toLowerCase() === currentDaoName.toLowerCase()
+      );
+
+      if (matchDao) {
+        const activeFollowings = matchDao.following?.filter(
+          (f: any) => f.isFollowing
+        );
+        setfollowings(activeFollowings.length);
+        setUserFollowings(activeFollowings);
+      } else {
+        setfollowings(0);
+        setUserFollowings([]);
+      }
+
+      const daoFollowers = userData?.followers?.find(
+        (dao: any) => dao.dao_name === currentDaoName
+      );
+
+      const followerCount = daoFollowers?.follower?.filter(
+        (f: any) => f.isFollowing
+      ).length;
+
+      // alert(followerCount);
+      setfollowers(followerCount);
+    } catch (error) {
+      console.error("Error in updateFollowerState:", error);
+    }
+  };
+
   const handleToggle = async () => {
     setIsLoading(true);
     const isEmailVisible = !isToggled;
@@ -501,66 +586,43 @@ function MainProfile() {
         if (dbResponse.data.length > 0) {
           console.log("db Response", dbResponse.data[0]);
           setUserData({
-            displayName: dbResponse.data[0].displayName,
-            discord: dbResponse.data[0].socialHandles.discord,
-            discourse: dbResponse.data[0]?.networks?.find(
-              (network: any) => network.dao_name === dao
-            ).discourse,
-            twitter: dbResponse.data[0].socialHandles.twitter,
-            github: dbResponse.data[0].socialHandles.github,
-            displayImage: dbResponse.data[0].image,
+            displayName: dbResponse.data[0]?.displayName,
+            discord: dbResponse.data[0]?.socialHandles?.discord,
+            discourse:
+              dbResponse.data[0]?.networks?.find(
+                (network: any) => network?.dao_name === dao
+              )?.discourse || "",
+            twitter: dbResponse.data[0]?.socialHandles?.twitter,
+            github: dbResponse.data[0]?.socialHandles?.github,
+            displayImage: dbResponse.data[0]?.image,
           });
 
           setModalData({
-            displayName: dbResponse.data[0].displayName,
-            discord: dbResponse.data[0].socialHandles.discord,
-            discourse: dbResponse.data[0]?.networks?.find(
-              (network: any) => network.dao_name === dao
-            ).discourse,
-            emailId: dbResponse.data[0].emailId,
-            twitter: dbResponse.data[0].socialHandles.twitter,
-            github: dbResponse.data[0].socialHandles.github,
-            displayImage: dbResponse.data[0].image,
+            displayName: dbResponse.data[0]?.displayName,
+            discord: dbResponse.data[0]?.socialHandles?.discord,
+            discourse:
+              dbResponse.data[0]?.networks?.find(
+                (network: any) => network.dao_name === dao
+              )?.discourse || "",
+            emailId: dbResponse.data[0]?.emailId,
+            twitter: dbResponse.data[0]?.socialHandles?.twitter,
+            github: dbResponse.data[0]?.socialHandles?.github,
+            displayImage: dbResponse.data[0]?.image,
           });
-          settoggle(dbResponse.data[0].isEmailVisible);
+          settoggle(dbResponse.data[0]?.isEmailVisible);
           setDescription(
             dbResponse.data[0]?.networks?.find(
               (network: any) => network.dao_name === dao
-            ).description
+            )?.description || ""
           );
 
           if (!isConnected) {
             setfollowings(0);
             setfollowers(0);
           } else {
-            const matchDao = dbResponse.data[0].followings.find(
-              (daoItem: any) => daoItem.dao === dao
-            );
-
-            if (matchDao) {
-              const activeFollowings = matchDao.following.filter(
-                (f: Following) => f.isFollowing
-              );
-              setfollowings(activeFollowings.length);
-              setUserFollowings(activeFollowings);
-            } else {
-              setfollowings(0);
-              setUserFollowings([]);
-            }
-
-            const daoFollowers = dbResponse.data[0].followers.find(
-              (dao: any) => dao.dao_name === daoName
-            );
-
-            const followerCount = daoFollowers.follower.filter(
-              (f: any) => f.isFollowing
-            ).length;
-
-            // alert(followerCount);
-            setfollowers(followerCount);
+            await updateFollowerState();
           }
           setIsPageLoading(false);
-
         } else {
           // const res = await fetch(
           //   `https://api.karmahq.xyz/api/dao/find-delegate?dao=${dao}&user=${address}`
@@ -576,6 +638,7 @@ function MainProfile() {
             github: karmaDetails.data.delegate.githubHandle,
             displayImage: karmaDetails.data.delegate.profilePicture,
           });
+          await updateFollowerState()
           setIsPageLoading(false);
         }
       } catch (error) {
@@ -963,6 +1026,7 @@ function MainProfile() {
                     toggleFollowing={toggleFollowing}
                     toggleNotification={toggleNotification}
                     setfollowingmodel={setfollowingmodel}
+                    isLoading={isLoading}
                     chainName={chain?.name}
                   />
                 )}
@@ -985,7 +1049,7 @@ function MainProfile() {
                               "You have 0 following explore delegate profile now!"
                             )
                       }>
-                      {followings} Following
+                      {followings} Followings
                     </button>
 
                     {/* <div className="">
@@ -1005,16 +1069,20 @@ function MainProfile() {
                   </div>
                 ) : (
                   <div className="pt-2 flex gap-5">
-                    <button
-                      className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
-                      onClick={() => alert("nothing to call")}>
+                    <button className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]">
                       {followers} Followers
                     </button>
 
                     <button
                       className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
-                      onClick={() => setfollowingmodel(true)}>
-                      {followings} Following
+                      onClick={() =>
+                        followings
+                          ? handleUpdateFollowings()
+                          : toast.error(
+                              "You have 0 following explore delegate profile now!"
+                            )
+                      }>
+                      {followings} Followings
                     </button>
                   </div>
                 )}

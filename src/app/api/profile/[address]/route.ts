@@ -17,29 +17,29 @@ import { connectDB } from "@/config/connectDB";
 //   };
 // }
 
-type follow_activity = {
-  action: string;
-  timestamp: Date;
-};
-type dao_following = {
-  isFollowing: boolean;
-  follower_address: string;
-};
-type followings = {
-  dao: string;
-  following: dao_following[];
-};
+// type follow_activity = {
+//   action: string;
+//   timestamp: Date;
+// };
+// type dao_following = {
+//   isFollowing: boolean;
+//   follower_address: string;
+// };
+// type followings = {
+//   dao: string;
+//   following: dao_following[];
+// };
 
-type dao_follower = {
-  address: string;
-  isNotification: boolean;
-  isFollowing: boolean;
-  activity: follow_activity[];
-};
-type follower_details = {
-  dao_name: string;
-  follower: dao_follower[];
-};
+// type dao_follower = {
+//   address: string;
+//   isNotification: boolean;
+//   isFollowing: boolean;
+//   activity: follow_activity[];
+// };
+// type follower_details = {
+//   dao_name: string;
+//   follower: dao_follower[];
+// };
 
 type network_details = {
   dao_name: string;
@@ -61,8 +61,6 @@ interface DelegateRequestBody {
     github: string;
   };
   networks: network_details[];
-  followers: follower_details[];
-  followings: followings[];
 }
 
 // Define the response body type
@@ -101,7 +99,6 @@ interface DelegateResponseBody {
       github: string;
     };
     networks: network_details[];
-    followers: follower_details[];
   } | null;
   error?: string;
 }

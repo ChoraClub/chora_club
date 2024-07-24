@@ -2,6 +2,70 @@ import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/config/connectDB";
 import { dao_details } from "@/config/daoDetails";
 
+type follow_activity = {
+  action: string;
+  timestamp: Date;
+};
+type dao_following = {
+  isFollowing: boolean;
+  follower_address: string;
+};
+type followings = {
+  dao: string;
+  following: dao_following[];
+};
+
+type dao_follower = {
+  address: string;
+  isNotification: boolean;
+  isFollowing: boolean;
+  activity: follow_activity[];
+};
+type follower_details = {
+  dao_name: string;
+  follower: dao_follower[];
+};
+
+interface FollowerResponseBody {
+  address: string;
+  followers: follower_details[];
+  followings: followings[];
+}
+
+export async function POST(
+  req: Request,
+  res: NextResponse<FollowerResponseBody>
+) {
+  try {
+    const client = await connectDB();
+    const db = client.db();
+    const collection = db.collection("delegate_follow");
+    const { address } = await req.json();
+
+    console.log("Finding documents for address in save follower:", address);
+    const documents = await collection
+      .find({
+        address: { $regex: `^${address}$`, $options: "i" },
+      })
+      .toArray();
+
+    console.log(documents[0]);
+
+    client.close();
+
+    return NextResponse.json(
+      { success: true, data: documents },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Error retrieving data in profile:", error);
+    return NextResponse.json(
+      { success: false, error: "Internal Server Error" },
+      { status: 500 }
+    );
+  }
+}
+
 export async function PUT(req: NextRequest) {
   try {
     const { delegate_address, follower_address, dao } = await req.json();
@@ -24,7 +88,19 @@ export async function PUT(req: NextRequest) {
     console.log("Connected to MongoDB");
 
     const db = client.db();
-    const collection = db.collection("delegates");
+
+    const collections = await db
+      .listCollections({ name: "delegate_follow" })
+      .toArray();
+
+    if (collections.length === 0) {
+      await db.createCollection("delegate_follow");
+      console.log("Collection 'delegate_follow' created.");
+    } else {
+      console.log("Collection 'delegate_follow' already exists.");
+    }
+
+    const collection = db.collection("delegate_follow");
 
     console.log(`Updating delegate document for ${delegate_address}...`);
 
@@ -104,6 +180,9 @@ export async function PUT(req: NextRequest) {
         await collection.updateOne(
           { address: { $regex: `^${delegate_address}$`, $options: "i" } },
           {
+            $set: {
+              address: delegate_address,
+            },
             $addToSet: {
               followers: {
                 dao_name: dao,
@@ -194,6 +273,7 @@ export async function PUT(req: NextRequest) {
           console.log("Adding new DAO and following");
           const updateQuery = {
             $push: {
+              address: follower_address,
               followings: {
                 dao: dao_name,
                 following: [
@@ -216,6 +296,7 @@ export async function PUT(req: NextRequest) {
         console.log("Creating followings array with DAO");
         const updateQuery = {
           $set: {
+            address: follower_address,
             followings: [
               {
                 dao: dao,
@@ -233,6 +314,25 @@ export async function PUT(req: NextRequest) {
         };
         await collection.updateOne({ address: document.address }, updateQuery);
       }
+    } else {
+      console.log("Creating new document with address and following");
+      const newDocument = {
+        address: follower_address,
+        followings: [
+          {
+            dao: dao,
+            following: [
+              {
+                follower_address: delegate_address,
+                isFollowing: true,
+                isNotification: true,
+                timestamp: new Date(),
+              },
+            ],
+          },
+        ],
+      };
+      await collection.insertOne(newDocument);
     }
 
     await client.close();
