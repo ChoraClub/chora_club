@@ -7,6 +7,7 @@ import { Time } from "@internationalized/date";
 import { ThreeDots } from "react-loader-spinner";
 import { useAccount } from "wagmi";
 import { useRouter } from "next-nprogress-bar";
+import UpdateSessionDetailsSkeletonLoader from "../SkeletonLoader/UpdateSessionDetailsSkeletonLoader";
 
 function UpdateSessionDetails({ roomId }: { roomId: string }) {
   // localStorage.removeItem("isMeetingRecorded");
@@ -202,7 +203,7 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
           </div>
         </div>
       ) : (
-        "Loading..."
+        <UpdateSessionDetailsSkeletonLoader/>
       )}
     </>
   );
