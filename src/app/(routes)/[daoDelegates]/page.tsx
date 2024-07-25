@@ -2,6 +2,7 @@ import IndividualDAO from "@/components/IndividualDAO/SpecificDAO";
 import PageNotFound from "@/components/PageNotFound/PageNotFound";
 import React from "react";
 import type { Metadata, ResolvingMetadata } from "next";
+import { DEFAULT_METADATA } from "@/utils/metadataUtils";
 
 const metadataConfig: any = {
   optimism: {
@@ -26,6 +27,11 @@ export async function generateMetadata(
 ): Promise<Metadata> {
   const { daoDelegates } = params;
   const delegateMetadata = metadataConfig[daoDelegates];
+
+  if (!delegateMetadata) {
+    // Handle the case where the DAO delegate is not found
+    return DEFAULT_METADATA;
+  }
 
   return {
     metadataBase: new URL("https://app.chora.club/"),
@@ -59,8 +65,7 @@ export async function generateMetadata(
 function page({ params }: { params: { daoDelegates: string } }) {
   return (
     <div>
-      {params.daoDelegates === "optimism" ||
-      params.daoDelegates === "arbitrum" ? (
+      {metadataConfig[params.daoDelegates] ? (
         <IndividualDAO props={params} />
       ) : (
         <PageNotFound />
