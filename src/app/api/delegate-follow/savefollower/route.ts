@@ -273,7 +273,7 @@ export async function PUT(req: NextRequest) {
           console.log("Adding new DAO and following");
           const updateQuery = {
             $push: {
-              address: follower_address,
+              // address: follower_address,
               followings: {
                 dao: dao_name,
                 following: [
@@ -296,7 +296,7 @@ export async function PUT(req: NextRequest) {
         console.log("Creating followings array with DAO");
         const updateQuery = {
           $set: {
-            address: follower_address,
+            // address: follower_address,
             followings: [
               {
                 dao: dao,

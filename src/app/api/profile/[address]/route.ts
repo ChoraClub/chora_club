@@ -93,6 +93,7 @@ interface DelegateResponseBody {
     displayName: string;
     emailId: string;
     isEmailVisible: boolean;
+    createdAt:Date;
     socialHandles: {
       twitter: string;
       discord: string;
