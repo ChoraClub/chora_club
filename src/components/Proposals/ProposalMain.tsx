@@ -114,7 +114,6 @@ const StoreData = async(voteData:VoteData)=>{
       },
       body: JSON.stringify(voteData),
     });
-console.log("response", response)
     if (!response.ok) {
       throw new Error('Failed to submit vote');
     }
@@ -149,8 +148,6 @@ console.log("response", response)
       return;
     }
 
-    console.log(address);
-    console.log(address1);
 
     let chainAddress;
     if (chain?.name === "Optimism") {
@@ -160,8 +157,6 @@ console.log("response", response)
     } else {
       return;
     }
-
-    console.log("walletClient?.chain?.network", walletClient?.chain?.network);
 
     if (walletClient?.chain === "") {
       toast.error("Please connect your wallet!");
@@ -177,7 +172,6 @@ console.log("response", response)
             account: address1,
           });
           StoreData(voteData);
-          console.log(delegateTx);
 
         } catch (e) {
           toast.error("Transaction failed");
@@ -187,8 +181,7 @@ console.log("response", response)
       if (walletClient?.chain?.network === props.daoDelegates) {
         try {
           
-          console.log(chainAddress, proposalId, vote, address1)
-          const delegateTx = await walletClient.writeContract({
+            const delegateTx = await walletClient.writeContract({
             address: chainAddress,
             abi: props.daoDelegates === "arbitrum" ? arb_proposals_abi : op_proposals_abi,
             functionName: "castVote",
@@ -196,7 +189,6 @@ console.log("response", response)
             account: address1,
           });
           StoreData(voteData);
-          console.log(delegateTx);
         } catch (e) {
           toast.error("Transaction failed");
         }
@@ -444,7 +436,6 @@ console.log("response", response)
           const queueInfo = queueData.data.proposalQueueds.find(
             (q: any) => q.proposalId === props.id
           );
-          console.log("queueInfo", queueInfo);
           setQueueStartTime(queueInfo?.blockTimestamp);
           setQueueEndTime(queueInfo?.eta);
         } catch (err: any) {
@@ -592,7 +583,7 @@ console.log("response", response)
       const aggregateDataByDay = (data: typeof sortedVoterList) => {
         const aggregatedData: Record<
           string,
-          { For: number; Against: number; date: Date }
+          { For: number; Against: number;Abstain:number ; date: Date }
         > = {};
       
         data.forEach((entry: any) => {
@@ -607,14 +598,17 @@ console.log("response", response)
             aggregatedData[day] = {
               For: 0,
               Against: 0,
+              Abstain: 0,
               date: utcMidnight
             };
           }
       
           if (entry.support === 1) {
             aggregatedData[day].For += weight;
-          } else {
+          } else if(entry.support === 0) {
             aggregatedData[day].Against += weight;
+          }else{
+            aggregatedData[day].Abstain += weight;
           }
         });
       
@@ -622,29 +616,37 @@ console.log("response", response)
         const sortedDays = Object.keys(aggregatedData).sort();
         let cumulativeFor = 0;
         let cumulativeAgainst = 0;
+        let cumulativeAbstain = 0;
       
         sortedDays.forEach(day => {
           cumulativeFor += aggregatedData[day].For;
           cumulativeAgainst += aggregatedData[day].Against;
+          cumulativeAbstain += aggregatedData[day].Abstain;
           aggregatedData[day].For = cumulativeFor;
           aggregatedData[day].Against = cumulativeAgainst;
+          aggregatedData[day].Abstain = cumulativeAbstain;
         });
       
         return aggregatedData;
       };
       const aggregatedData = aggregateDataByDay(sortedVoterList);
-console.log(aggregatedData)
       const newChartData = Object.entries(aggregatedData)
         .sort(([, a], [, b]) => a.date.getTime() - b.date.getTime())
         .map(([day, data]) => {
           const formattedFor = formatWeight(data.For);
           const formattedAgainst = formatWeight(data.Against);
-
+          const formattedDate = data.date.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: '2-digit'
+          });
+        
           return {
             name: day,
             For: data.For,
             Against: data.Against,
-            date: data.date,
+            Abstain:data.Abstain,
+            date: formattedDate,
           };
         });
       setChartData(newChartData);
@@ -750,7 +752,6 @@ console.log(aggregatedData)
     props,
     canceledProposals
   );
-  console.log(status, votingPeriodEnd);
   const isActive = status === "Active" && !(props.daoDelegates==="optimism");
   const getVotingPeriodEnd = () => {
     if (!data || !data.blockTimestamp) return null;
@@ -825,19 +826,18 @@ console.log(aggregatedData)
   const Proposalstatus =
     data && support1Weight ? getProposalStatusData() : null;
   // const isActive = status === "PENDING" || status?.includes("day");
-  const CustomXAxisTick = ({ x, y, payload, index, data }:any) => {
+  const CustomXAxisTick = ({ x, y, payload, index, data,width }:any) => {
     const firstDate = new Date(data[0].date).toLocaleDateString();
     const lastDate = new Date(data[data.length - 1].date).toLocaleDateString();
-  
+    const padding = 10; 
     // Calculate the width of the x-axis
     const xAxisWidth = data.length < 1 ? 
       data[data.length - 1] - data[0]: 
       300; // fallback width if there's only one data point
-  console.log(xAxisWidth)
     return (
       <g>
         <text
-          x={50}
+          x={padding}
           y={y + 15}
           fill="#718096"
           fontSize={12}
@@ -846,7 +846,7 @@ console.log(aggregatedData)
           {firstDate}
         </text>
         <text
-          x={650}
+          x={width - padding}
           y={y + 15}
           fill="#718096"
           fontSize={12}
@@ -883,64 +883,68 @@ console.log(aggregatedData)
       </div>
 
       <div
-        className={` rounded-[1rem] mx-24 px-12 py-6 transition-shadow duration-300 ease-in-out shadow-xl bg-gray-50 font-poppins relative ${
-          isExpanded ? "h-fit" : "h-fit"
-        }`}
-      >
-        <div className="flex items-center ">
-          <div className="flex gap-2 items-center">
-            {loading ? (
-              <div className="h-5 bg-gray-200 animate-pulse w-[50vw] rounded-full"></div>
-            ) : (
-              <p className="text-2xl font-semibold">
-                {/* {truncateText(data?.description, 50)} */}
-                {formattedTitle}
-              </p>
-            )}
-            <Tooltips
-              showArrow
-              content={<div className="font-poppins">OnChain</div>}
-              placement="right"
-              className="rounded-md bg-opacity-90"
-              closeDelay={1}
-            >
-              <Image src={chainImg} alt="" className="size-6 cursor-pointer" />
-            </Tooltips>
-          </div>
-          <div className="ml-auto">
-          {isActive && (
-       <button
-       className="align-middle select-none font-sans font-bold text-center uppercase transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-2 px-4 rounded-full bg-blue-600 text-white shadow-md shadow-blue-600/10 hover:shadow-lg hover:shadow-blue-600/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none "
-       type="button"
-       onClick={voteOnchain}
-       disabled={hasVoted}
-     >
-       Vote onchain
-     </button>
+  className={`rounded-[1rem] mx-4 md:mx-24 px-4 md:px-12 py-6 transition-shadow duration-300 ease-in-out shadow-xl bg-gray-50 font-poppins relative ${
+    isExpanded ? "h-fit" : "h-fit"
+  }`}
+>
+  <div className="flex items-center justify-between">
+    <div className="flex gap-2 items-center">
+      {loading ? (
+        <div className="h-5 bg-gray-200 animate-pulse w-[50vw] rounded-full"></div>
+      ) : (
+        <p className="text-2xl font-semibold">
+          {formattedTitle}
+        </p>
       )}
+    </div>
+    <div className="flex flex-wrap items-center max-w-[400px] float-left md:max-w-none md:flex-nowrap md:justify-start md:float-none">
+      <div className="flex items-center gap-1 flex-grow w-max	">
+        <Tooltips
+          showArrow
+          content={<div className="font-poppins">OnChain</div>}
+          placement="right"
+          className="rounded-md bg-opacity-90"
+          closeDelay={1}
+        >
+          <Image src={chainImg} alt="" className="w-6 h-6 md:w-6 md:h-6 cursor-pointer flex-shrink-0" />
+        </Tooltips>
       </div>
-          <div
-            className={`rounded-full flex items-center justify-center text-xs h-fit py-2 font-medium px-3 w-fit ml-auto ${
-              status
-                ? status === "Closed"
-                  ? "bg-[#f4d3f9] border border-[#77367a] text-[#77367a] mr-4"
-                  : "bg-[#f4d3f9] border border-[#77367a] text-[#77367a] mr-4"
-                : "bg-gray-200 animate-pulse rounded-full"
-            }`}
+      <div className="flex items-center gap-1 flex-grow  mx-2">
+        {isActive && (
+          <button
+            className="align-middle select-none font-sans font-bold text-center uppercase transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-1 px-2 rounded-full bg-blue-600 text-white shadow-md shadow-blue-600/10 hover:shadow-lg hover:shadow-blue-600/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none flex-shrink-0 w-fit md:w-[100%] md:min-w-[80px] md:max-w-[200px]"
+            type="button"
+            onClick={voteOnchain}
+            disabled={hasVoted}
           >
-            {status ? status : <div className="h-5 w-20"></div>}
-          </div>
-      <VotingPopup
-        isOpen={isVotingOpen}
-        onClose={() => setIsVotingOpen(false)}
-        onSubmit={handleVoteSubmit}
-        proposalId={props.id}
-        proposalTitle={truncateText(data?.description, 50)}
-        address={address||""}
-        dao={props.daoDelegates}
-        // customOptions={customOptions}
-      />
+            Vote onchain
+          </button>
+        )}
+      </div>
+      <div className="flex-shrink-0 mt-2 md:mt-0">
+        <div
+          className={`rounded-full flex items-center justify-center text-xs py-1 px-2 font-medium ${status
+            ? status === "Closed"
+              ? "bg-[#f4d3f9] border border-[#77367a] text-[#77367a]"
+              : "bg-[#f4d3f9] border border-[#77367a] text-[#77367a]"
+            : "bg-gray-200 animate-pulse rounded-full"
+            }`}
+        >
+          {status ? status : <div className="h-4 w-16"></div>}
         </div>
+      </div>
+    </div>
+    <VotingPopup
+      isOpen={isVotingOpen}
+      onClose={() => setIsVotingOpen(false)}
+      onSubmit={handleVoteSubmit}
+      proposalId={props.id}
+      proposalTitle={truncateText(data?.description, 50)}
+      address={address || ""}
+      dao={props.daoDelegates}
+    />
+  </div>
+
         <div className="flex gap-1 my-1 items-center">
           <div className="flex text-xs font-normal items-center">
             {date ? (
@@ -968,8 +972,6 @@ console.log(aggregatedData)
             <p>Error: {error}</p>
           ) : (
             <>
-              {/* // data.description */}
-              {console.log(isExpanded)}
               <div
                 ref={contentRef}
                 className={` transition-max-height duration-500 ease-in-out overflow-hidden ${
@@ -997,14 +999,16 @@ console.log(aggregatedData)
       <h1 className="my-8 mx-24 text-4xl font-semibold text-blue-shade-100 font-poppins">
         Voters
       </h1>
-      <div className="flex mb-6 ml-24 ">
-        <div className="flex gap-8 items-center">
-          <div className="h-[500px] w-[45%] font-poppins px-4 flex items-center justify-center rounded-2xl bg-gray-50 transition-shadow duration-300 ease-in-out shadow-xl">
+      <div className="flex mb-6 xl:ml-24 ml-20">
+        <div className="flex gap-8 items-center w-full">
+          <div className="h-[500px] w-[40%] font-poppins px-4 flex items-center justify-center rounded-2xl bg-gray-50 transition-shadow duration-300 ease-in-out shadow-xl">
             {isLoading ? (
+              <div className="">
               <ProposalMainVotersSkeletonLoader />
+              </div>
             ) : (
               <div
-                className={`flex flex-col gap-2 py-3 pl-3 pr-2 my-3 border-gray-200 ${
+                className={`flex flex-col gap-2 py-3 pl-2 pr-1  xl:pl-3 xl:pr-2 my-3 border-gray-200 ${
                   voterList.length > 5
                     ? `h-[440px] overflow-y-auto ${style.scrollbar}`
                     : "h-fit"
@@ -1020,7 +1024,7 @@ console.log(aggregatedData)
                     .slice(0, displayCount)
                     .map((voter: any, index: any) => (
                       <div
-                        className="flex items-center py-6 px-6 bg-white transition-all duration-300 rounded-2xl border-2 border-transparent hover:border-blue-200 transform hover:-translate-y-1 space-x-6"
+                        className="flex items-center py-6 xl:px-6 px-3 bg-white transition-all duration-300 rounded-2xl border-2 border-transparent hover:border-blue-200 transform hover:-translate-y-1 space-x-6"
                         key={index}
                       >
                         <div className="flex-grow flex items-center space-x-4">
@@ -1028,20 +1032,20 @@ console.log(aggregatedData)
                             <Image
                               src={user2}
                               alt="Profile"
-                              className="w-10 h-10 rounded-full"
+                              className="xl:w-10 w-8 xl:h-10 h-8 rounded-full"
                             />
                           ) : (
                             <Image
                               src={user5}
                               alt="Profile"
-                              className="w-10 h-10 rounded-full"
+                              className="xl:w-10 w-8 h-10 rounded-full"
                             />
                           )}
 
                           <div>
                             <p
                               onClick={() => handleAddressClick(voter.voter)}
-                              className="text-gray-800 font-medium hover:text-blue-600 transition-colors duration-200 cursor-pointer"
+                              className="text-gray-800 xl:text-sm hover:text-blue-600 transition-colors duration-200 cursor-pointer text-xs"
                             >
                               {voter.voter.slice(0, 6)}...
                               {voter.voter.slice(-4)}
@@ -1050,7 +1054,7 @@ console.log(aggregatedData)
                         </div>
                         <div className="flex items-center space-x-4">
                           <div
-                            className={`px-4 py-2 rounded-full text-sm w-36 flex items-center justify-center font-medium ${
+                            className={`xl:px-4 px-2 py-2 rounded-full text-sm xl:w-36 w-25 flex items-center justify-center xl:font-medium text-xs ${
                               voter.support === 1 || voter.type === "for"
                                 ? "bg-green-100 text-green-800"
                                 : "bg-red-100 text-red-800"
@@ -1100,7 +1104,7 @@ console.log(aggregatedData)
 
           {isChartLoading ? (
             <div
-              className="w-[45vw] h-[500px] flex items-center justify-center bg-gray-50 rounded-2xl"
+              className="xl:w-[45vw] w-[45%] h-[500px] flex items-center justify-center bg-gray-50 rounded-2xl"
               style={{ boxShadow: "0px 4px 26.7px 0px rgba(0, 0, 0, 0.10)" }}
             >
               <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-black-shade-900"></div>
@@ -1129,6 +1133,7 @@ console.log(aggregatedData)
                   <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                   <XAxis
                     dataKey="date"
+                    // interval={2}
                     tick={({ x, y, payload, index }) => (
                       <CustomXAxisTick
                         x={x}
@@ -1136,6 +1141,7 @@ console.log(aggregatedData)
                         payload={payload}
                         index={index}
                         data={chartData}
+                        width={payload.length}
                       />
                     )}
                     // tick={{ fill: "#718096", fontSize: 12 }}
@@ -1185,6 +1191,19 @@ console.log(aggregatedData)
                     activeDot={{
                       r: 8,
                       fill: "#F44336",
+                      stroke: "#fff",
+                      strokeWidth: 2,
+                    }}
+                    dot={{ r: 4, strokeWidth: 2, fill: "#fff" }}
+                  />
+                   <Line
+                    type="monotone"
+                    dataKey="Abstain"
+                    stroke="#004DFF"
+                    strokeWidth={3}
+                    activeDot={{
+                      r: 8,
+                      fill: "#004DFF",
                       stroke: "#fff",
                       strokeWidth: 2,
                     }}
