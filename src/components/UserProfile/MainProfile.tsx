@@ -608,7 +608,8 @@ function MainProfile() {
                 style={{
                   backgroundColor: "#fcfcfc",
                   border: "2px solid #E9E9E9 ",
-                }}>
+                }}
+              >
                 <div className="w-40 h-40 flex items-center justify-content ">
                   <div className="flex justify-center items-center w-40 h-40">
                     <Image
@@ -670,7 +671,8 @@ function MainProfile() {
                           : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                      target="_blank">
+                      target="_blank"
+                    >
                       <FaXTwitter color="#7C7C7C" size={12} />
                     </Link>
                     <Link
@@ -688,7 +690,8 @@ function MainProfile() {
                           : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                      target="_blank">
+                      target="_blank"
+                    >
                       <BiSolidMessageRoundedDetail color="#7C7C7C" size={12} />
                     </Link>
                     <Link
@@ -699,7 +702,8 @@ function MainProfile() {
                           : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                      target="_blank">
+                      target="_blank"
+                    >
                       <FaDiscord color="#7C7C7C" size={12} />
                     </Link>
                     <Link
@@ -710,17 +714,20 @@ function MainProfile() {
                           : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                      target="_blank">
+                      target="_blank"
+                    >
                       <FaGithub color="#7C7C7C" size={12} />
                     </Link>
                     <Tooltip
                       content="Update your Profile"
                       placement="top"
-                      showArrow>
+                      showArrow
+                    >
                       <span
                         className="border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 cursor-pointer"
                         style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                        onClick={onOpen}>
+                        onClick={onOpen}
+                      >
                         <FaPencil color="#3e3d3d" size={12} />
                       </span>
                     </Tooltip>
@@ -750,7 +757,8 @@ function MainProfile() {
                     content="Copy"
                     placement="bottom"
                     closeDelay={1}
-                    showArrow>
+                    showArrow
+                  >
                     <span className="px-2 cursor-pointer" color="#3E3D3D">
                       <IoCopy onClick={() => handleCopy(`${address}`)} />
                     </span>
@@ -767,7 +775,8 @@ function MainProfile() {
                       content="Copy your profile URL to share on Warpcast or Twitter."
                       placement="bottom"
                       closeDelay={1}
-                      showArrow>
+                      showArrow
+                    >
                       <Button
                         className="bg-gray-200 hover:bg-gray-300"
                         onClick={() => {
@@ -783,7 +792,8 @@ function MainProfile() {
                           setTimeout(() => {
                             setIsCopied(false);
                           }, 3000);
-                        }}>
+                        }}
+                      >
                         <IoShareSocialSharp />
                         {isCopied ? "Copied" : "Share profile"}
                       </Button>
@@ -796,7 +806,8 @@ function MainProfile() {
                     {/* pass address of whom you want to delegate the voting power to */}
                     <button
                       className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
-                      onClick={() => handleDelegateVotes(`${address}`)}>
+                      onClick={() => handleDelegateVotes(`${address}`)}
+                    >
                       Become Delegate
                     </button>
                   </div>
@@ -815,7 +826,8 @@ function MainProfile() {
                   ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
                   : "border-transparent"
               }`}
-              onClick={() => router.push(path + "?active=info")}>
+              onClick={() => router.push(path + "?active=info")}
+            >
               Info
             </button>
             {selfDelegate === true && (
@@ -825,7 +837,8 @@ function MainProfile() {
                     ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
                     : "border-transparent"
                 }`}
-                onClick={() => router.push(path + "?active=votes")}>
+                onClick={() => router.push(path + "?active=votes")}
+              >
                 Past Votes
               </button>
             )}
@@ -837,7 +850,8 @@ function MainProfile() {
               }`}
               onClick={() =>
                 router.push(path + "?active=sessions&session=schedule")
-              }>
+              }
+            >
               Sessions
             </button>
             <button
@@ -848,7 +862,8 @@ function MainProfile() {
               }`}
               onClick={() =>
                 router.push(path + "?active=officeHours&hours=schedule")
-              }>
+              }
+            >
               Office Hours
             </button>
 
@@ -859,7 +874,8 @@ function MainProfile() {
                     ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
                     : "border-transparent"
                 }`}
-                onClick={() => router.push(path + "?active=instant-meet")}>
+                onClick={() => router.push(path + "?active=instant-meet")}
+              >
                 Instant Meet
               </button>
             )}

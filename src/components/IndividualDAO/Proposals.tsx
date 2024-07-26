@@ -20,6 +20,8 @@ interface Proposal {
   votersCount?: number;
   status?: string;
   proposer: string;
+  queueStartTime?:number;
+  queueEndTime?:number;
 }
 
 function Proposals({ props }: { props: string }) {
@@ -128,7 +130,8 @@ function Proposals({ props }: { props: string }) {
       }
     },
     [props]
-  ); const fetchProposals = async () => {
+  ); 
+  const fetchProposals = async () => {
     setLoading(true);
     try {
       let response;
@@ -160,6 +163,18 @@ function Proposals({ props }: { props: string }) {
         }));
       } else {
         newProposals = responseData.data.proposalCreateds;
+        const queueResponse = await fetch("/api/get-arbitrum-queue-info");
+        const queueData = await queueResponse.json();
+        console.log("queueData", queueData);
+        newProposals = newProposals.map((proposal: Proposal) => {
+          const queueInfo = queueData.data.proposalQueueds.find((q: any) => q.proposalId === proposal.proposalId);
+          console.log("queueInfo", queueInfo);
+          return {
+            ...proposal,
+            queueStartTime: queueInfo?.blockTimestamp,
+            queueEndTime: queueInfo?.eta, 
+          };
+        });
       }
       newProposals.sort(
         (a: any, b: any) => b.blockTimestamp - a.blockTimestamp
@@ -190,6 +205,44 @@ function Proposals({ props }: { props: string }) {
   useEffect(() => {
     fetchProposals();
   }, [props]);
+
+  const getProposalStatus = (proposal: Proposal): string => {
+    const currentTime = Date.now() / 1000; // Convert to seconds
+    
+    if (props === "arbitrum") {
+      if (proposal.queueStartTime && proposal.queueEndTime) {
+        if (currentTime < proposal.queueStartTime) {
+          return "PENDING";
+        } else if (currentTime >= proposal.queueStartTime && currentTime < proposal.queueEndTime) {
+          return "QUEUED";
+        } else {
+          return proposal.support1Weight! > proposal.support0Weight! ? "SUCCEEDED" : "DEFEATED";
+        }
+      } else {
+        // Fallback to old logic if queue times are not available
+        const proposalAge = currentTime - proposal.blockTimestamp;
+        // if (proposalAge <= 3 * 24 * 60 * 60) {
+        //   return "PENDING";
+        // } else 
+        if (proposalAge <= 17 * 24 * 60 * 60) {
+          return "PENDING";
+        } else {
+          return proposal.support1Weight! > proposal.support0Weight! ? "SUCCEEDED" : "DEFEATED";
+        }
+      }
+    } else {
+      // Optimism logic
+      if (canceledProposals.some((item) => item.proposalId === proposal.proposalId)) {
+        return "CANCELLED";
+      }
+      const proposalAge = currentTime - proposal.blockTimestamp;
+      if (proposalAge <= 7 * 24 * 60 * 60) {
+        return "PENDING";
+      } else {
+        return proposal.support1Weight! > proposal.support0Weight! ? "SUCCEEDED" : "DEFEATED";
+      }
+    }
+  };
 
   useEffect(() => {
     const fetchVotesForDisplayedProposals = async () => {
@@ -255,23 +308,32 @@ const truncateText = (text: string, charLimit: number) => {
 };
 
 
-  const formatDate = (timestamp: number) => {
-    // Convert IST timestamp to UTC
-    const utcTimestamp = timestamp - (5.5 * 60 * 60); // Subtract 5 hours and 30 minutes
-    
-    const date = new Date(utcTimestamp * 1000);
-    const day = date.getUTCDate();
-    const month = date.toLocaleString("en-US", { month: "long", timeZone: "UTC" });
-    const year = date.getUTCFullYear();
-    let hours: number | string = date.getUTCHours();
-    const minutes = String(date.getUTCMinutes()).padStart(2, "0");
-    const seconds = String(date.getUTCSeconds()).padStart(2, "0");
-    const ampm = hours >= 12 ? "PM" : "AM";
-    hours = hours % 12 || 12;
-    hours = String(hours).padStart(2, "0");
-    
-    return `${day} ${month}, ${year} ${hours}:${minutes}:${seconds} ${ampm} UTC`;
+const formatDate = (timestamp: number): string => {
+  // Convert the timestamp to milliseconds if it's in seconds
+  const milliseconds = timestamp * 1000;
+  
+  // Create a date object in the local time zone
+  const date = new Date(milliseconds);
+  
+  // Format the date components
+  const day = date.getDate();
+  const month = date.toLocaleString("en-US", { month: "long" });
+  const year = date.getFullYear();
+  const hours = date.getHours();
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  const seconds = String(date.getSeconds()).padStart(2, "0");
+  const ampm = hours >= 12 ? "PM" : "AM";
+  
+  // Format hours for 12-hour clock
+  const formattedHours = String(hours % 12 || 12).padStart(2, "0");
+  
+  // Get the local time zone abbreviation
+  const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  
+  // Construct the formatted date string
+  return `${day} ${month}, ${year} ${formattedHours}:${minutes}:${seconds} ${ampm}`;
 };
+
 
   if (loading && displayedProposals.length === 0)
     return <ProposalsSkeletonLoader />;
@@ -299,7 +361,7 @@ const truncateText = (text: string, charLimit: number) => {
                 <div className="flex gap-1">
                   {/* <Image src={user} alt="" className="size-4" /> */}
                   <p className="flex text-xs font-normal items-center">
-                    Started at {formatDate(proposal.blockTimestamp)}
+                    <span className="text-[#004DFF]"> Started at </span>&nbsp;{formatDate(proposal.blockTimestamp)}
                   </p>
                 </div>
               </div>
@@ -319,25 +381,27 @@ const truncateText = (text: string, charLimit: number) => {
               </Tooltip>
               {proposal.votesLoaded ? (
                 <div
-                  className={`rounded-full flex items-center justify-center text-xs h-fit py-0.5 border font-medium w-24 ${props === "optimism" &&
-                      canceledProposals.some(
-                        (item) => item.proposalId === proposal.proposalId
-                      )
-                      ? "bg-red-200 border-red-500 text-red-500"
-                      : proposal.support1Weight! > proposal.support0Weight!
-                        ? "bg-green-200 border-green-600 text-green-600"
-                        : "bg-red-200 border-red-500 text-red-500"
-                    }`}
-                >
-                   {
+                className={`rounded-full flex items-center justify-center text-xs h-fit py-0.5 border font-medium w-24 ${
+                  getProposalStatus(proposal) === "SUCCEEDED"
+                    ? "bg-green-200 border-green-600 text-green-600"
+                    : getProposalStatus(proposal) === "DEFEATED"
+                    ? "bg-red-200 border-red-500 text-red-500"
+                    : getProposalStatus(proposal) === "QUEUED"
+                    ? "bg-yellow-200 border-yellow-600 text-yellow-600"
+                    : "bg-green-200 border-green-600 text-green-600"
+                }`}
+              >
+                   {/* {
                    canceledProposals.some((item) => item.proposalId === proposal.proposalId)
                    ? "CANCELLED"
-                   : new Date() > new Date(proposal.blockTimestamp * 1000 + (props==="optimism" ? 7:14) * 24 * 60 * 60 * 1000)
+                   : new Date() > new Date(proposal.blockTimestamp * 1000 + (props==="optimism" ? 7:17) * 24 * 60 * 60 * 1000)
                      ? proposal.support1Weight! > proposal.support0Weight!
                        ? "SUCCEEDED"
                        : "DEFEATED"
                      : "PENDING"
-                  }
+                  } */}
+                  {getProposalStatus(proposal)}  
+
                 </div>
               ) : (
                 <StatusLoader />
@@ -359,15 +423,33 @@ const truncateText = (text: string, charLimit: number) => {
               )}
 
               <div className="rounded-full bg-[#f4d3f9] border border-[#77367a] flex items-center justify-center text-[#77367a] text-xs h-fit py-0.5 font-medium px-2">
-                {canceledProposals.some((item) => item.proposalId === proposal.proposalId)
-                  ? "Closed"
-                  : new Date() >
-                    new Date(
-                      proposal.blockTimestamp * 1000 +
-                      (props === "arbitrum" ? 14 : 7) * 24 * 60 * 60 * 1000
-                    )
-                    ? "Closed"
-                    : "Active"}
+              {(() => {
+                  if (canceledProposals.some((item) => item.proposalId === proposal.proposalId)) {
+                    return "Closed";
+                  }
+
+                  const currentTime: any = new Date();
+                  const proposalTime: any = new Date(proposal.blockTimestamp * 1000);
+                  const timeDifference = currentTime - proposalTime;
+                  const daysDifference = timeDifference / (24 * 60 * 60 * 1000);
+
+                  if (props === "arbitrum") {
+                    if (daysDifference <= 3) {
+                      const daysLeft = Math.ceil(3 - daysDifference);
+                      return `${daysLeft} day${daysLeft !== 1 ? 's' : ''} to go`;
+                    } else if (daysDifference <= 17) {
+                      return "Active";
+                    } else {
+                      return "Closed";
+                    }
+                  } else {
+                    if (daysDifference <= 7) {
+                      return "Active";
+                    } else {
+                      return "Closed";
+                    }
+                  }
+                })()}
               </div>
             </div>
           </div>

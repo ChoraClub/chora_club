@@ -4,9 +4,10 @@ import { getToken } from "next-auth/jwt";
 
 export async function middleware(request: NextRequest) {
   console.log("Middleware run!");
-  const WalletAddress = request.headers.get("x-wallet-address");
+  console.log(request);
+  const walletAddress = request.headers.get("x-wallet-address");
 
-  console.log("wallet address", WalletAddress);
+  console.log(walletAddress);
 
   if (!["POST", "PUT", "DELETE"].includes(request.method)) {
     // For other methods, allow the request to proceed without additional checks
@@ -32,18 +33,18 @@ export async function middleware(request: NextRequest) {
   const UserAddress = token.sub;
   console.log(UserAddress);
 
-  console.log("Requested Address:", WalletAddress);
+  console.log("Requested Address:", walletAddress);
 
-  if (UserAddress !== WalletAddress) {
-    // If the user's address doesn't match the requested profile address
-    console.log(
-      `Forbidden access attempt: User ${UserAddress} tried to access profile of ${WalletAddress}`
-    );
-    return new NextResponse(JSON.stringify({ error: "Forbidden" }), {
-      status: 403,
-      headers: { "Content-Type": "application/json" },
-    });
-  }
+  // if (UserAddress !== walletAddress) {
+  //   // If the user's address doesn't match the requested profile address
+  //   console.log(
+  //     `Forbidden access attempt: User ${UserAddress} tried to access profile of ${walletAddress}`
+  //   );
+  //   return new NextResponse(JSON.stringify({ error: "Forbidden" }), {
+  //     status: 403,
+  //     headers: { "Content-Type": "application/json" },
+  //   });
+  // }
 
   // If everything is okay, continue to the API route
   return NextResponse.next();
