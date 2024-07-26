@@ -11,6 +11,7 @@ import UpdateSessionDetailsSkeletonLoader from "../SkeletonLoader/UpdateSessionD
 import not_found from "@/assets/images/daos/404.png";
 import Image from "next/image";
 import PageNotFound from "../PageNotFound/PageNotFound";
+import SessionHostedModal from "../ComponentUtils/SessionHostedModal";
 
 function UpdateSessionDetails({ roomId }: { roomId: string }) {
   // localStorage.removeItem("isMeetingRecorded");
@@ -38,6 +39,7 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
   const { address } = useAccount();
   const router = useRouter();
   const [showPopup, setShowPopup] = useState(false);
+  const [showHostPopup, setShowHostPopup] = useState(false);
 
   useEffect(() => {
     console.log("room id: ", roomId);
@@ -122,7 +124,8 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
           const responseData = await response.json();
           console.log("responseData: ", responseData);
           setLoading(false);
-          router.push(`/profile/${address}?active=sessions&session=hosted`);
+          setShowHostPopup(true);
+          // router.push(`/profile/${address}?active=sessions&session=hosted`);
         } else {
           setLoading(false);
           // setData(null);
@@ -233,6 +236,7 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
       ) : (
         <UpdateSessionDetailsSkeletonLoader />
       )}
+      {showHostPopup && <SessionHostedModal data={data} />}
     </div>
   );
 }
