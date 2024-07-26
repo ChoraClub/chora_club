@@ -1,5 +1,11 @@
 "use client";
-import React, { useEffect, useState, useRef, useCallback } from "react";
+import React, {
+  useEffect,
+  useState,
+  useRef,
+  useCallback,
+  RefObject,
+} from "react";
 import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
 import Image from "next/image";
 import user1 from "@/assets/images/daos/user1.png";
@@ -15,8 +21,8 @@ import user5 from "@/assets/images/user/user5.svg";
 import { useConnectModal, useChainModal } from "@rainbow-me/rainbowkit";
 import VotingPopup from "./VotingPopup";
 import { useAccount } from "wagmi";
-import arb_proposals_abi from '../../artifacts/Dao.sol/arb_proposals_abi.json';
-import op_proposals_abi from '../../artifacts/Dao.sol/op_proposals_abi.json';
+import arb_proposals_abi from "../../artifacts/Dao.sol/arb_proposals_abi.json";
+import op_proposals_abi from "../../artifacts/Dao.sol/op_proposals_abi.json";
 import WalletAndPublicClient from "@/helpers/signer";
 import toast, { Toaster } from "react-hot-toast";
 import { useNetwork } from "wagmi";
@@ -96,6 +102,7 @@ function ProposalMain({ props }: { props: Props }) {
   const contentRef = useRef<HTMLDivElement>(null);
   const [isExpanded, setIsExpanded] = useState(false);
   const [hasVoted, setHasVoted] = useState(false);
+  const chartContainerRef = useRef<HTMLDivElement | null>(null);
 
   interface VoteData {
     address: string;
@@ -105,31 +112,35 @@ function ProposalMain({ props }: { props: Props }) {
     network: string;
   }
 
-const StoreData = async(voteData:VoteData)=>{
+  const StoreData = async (voteData: VoteData) => {
     // Make the API call to submit the vote
-    const response = await fetch('/api/submit-vote', {
-      method: 'PUT',
+    const response = await fetch("/api/submit-vote", {
+      method: "PUT",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(voteData),
     });
     if (!response.ok) {
-      throw new Error('Failed to submit vote');
+      throw new Error("Failed to submit vote");
     }
-}
+  };
   const voteOnchain = async () => {
     if (walletClient?.chain?.network !== props.daoDelegates) {
       toast.error("Please switch to appropriate network to delegate!");
       if (openChainModal) {
         openChainModal();
       }
-    }else{
+    } else {
       setIsVotingOpen(true);
     }
-  }
-  const handleVoteSubmit = async (proposalId: string, vote: string[], comment: string,voteData : VoteData) => {
-
+  };
+  const handleVoteSubmit = async (
+    proposalId: string,
+    vote: string[],
+    comment: string,
+    voteData: VoteData
+  ) => {
     // Handle the vote submission logic here
     let address;
     let address1;
@@ -148,10 +159,9 @@ const StoreData = async(voteData:VoteData)=>{
       return;
     }
 
-
     let chainAddress;
     if (chain?.name === "Optimism") {
-      chainAddress = "0xcDF27F107725988f2261Ce2256bDfCdE8B382B10";//token contract address
+      chainAddress = "0xcDF27F107725988f2261Ce2256bDfCdE8B382B10"; //token contract address
     } else if (chain?.name === "Arbitrum One") {
       chainAddress = "0x789fC99093B09aD01C34DC7251D0C89ce743e5a4";
     } else {
@@ -163,16 +173,17 @@ const StoreData = async(voteData:VoteData)=>{
     } else if (comment) {
       if (walletClient?.chain?.network === props.daoDelegates) {
         try {
-
           const delegateTx = await walletClient.writeContract({
             address: chainAddress,
-            abi: props.daoDelegates === "arbitrum" ? arb_proposals_abi : op_proposals_abi,
+            abi:
+              props.daoDelegates === "arbitrum"
+                ? arb_proposals_abi
+                : op_proposals_abi,
             functionName: "castVoteWithReason",
             args: [proposalId, vote, comment],
             account: address1,
           });
           StoreData(voteData);
-
         } catch (e) {
           toast.error("Transaction failed");
         }
@@ -180,10 +191,12 @@ const StoreData = async(voteData:VoteData)=>{
     } else if (!comment) {
       if (walletClient?.chain?.network === props.daoDelegates) {
         try {
-          
-            const delegateTx = await walletClient.writeContract({
+          const delegateTx = await walletClient.writeContract({
             address: chainAddress,
-            abi: props.daoDelegates === "arbitrum" ? arb_proposals_abi : op_proposals_abi,
+            abi:
+              props.daoDelegates === "arbitrum"
+                ? arb_proposals_abi
+                : op_proposals_abi,
             functionName: "castVote",
             args: [proposalId, vote],
             account: address1,
@@ -194,27 +207,28 @@ const StoreData = async(voteData:VoteData)=>{
         }
       }
     }
-   
-
   };
 
   const checkVoteStatus = async () => {
     const queryParams = new URLSearchParams({
       proposalId: props.id,
       network: props.daoDelegates,
-      voterAddress: address
-    }as any );
+      voterAddress: address,
+    } as any);
 
     try {
-      const response = await fetch(`/api/get-vote-detail?${queryParams.toString()}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      const response = await fetch(
+        `/api/get-vote-detail?${queryParams.toString()}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       if (!response.ok) {
-        throw new Error('Network response was not ok');
+        throw new Error("Network response was not ok");
       }
 
       const data = await response.json();
@@ -227,7 +241,7 @@ const StoreData = async(voteData:VoteData)=>{
 
   useEffect(() => {
     checkVoteStatus();
-  }, [props, address,handleVoteSubmit]);
+  }, [props, address, handleVoteSubmit]);
   const loadMore = () => {
     const newDisplayCount = displayCount + 20;
     setDisplayCount(newDisplayCount);
@@ -253,8 +267,6 @@ const StoreData = async(voteData:VoteData)=>{
   useEffect(() => {
     setIsArbitrum(props?.daoDelegates === "arbitrum");
   }, []);
-
-
 
   useEffect(() => {
     if (contentRef.current) {
@@ -579,46 +591,52 @@ const StoreData = async(voteData:VoteData)=>{
           ) + 1;
         return `Day ${dayNumber}`;
       };
-      
+
       const aggregateDataByDay = (data: typeof sortedVoterList) => {
         const aggregatedData: Record<
           string,
-          { For: number; Against: number;Abstain:number ; date: Date }
+          { For: number; Against: number; Abstain: number; date: Date }
         > = {};
-      
+
         data.forEach((entry: any) => {
           const timestamp = parseInt(entry.blockTimestamp);
           const date = new Date(timestamp * 1000);
-          const day = date.toISOString().split('T')[0]; // YYYY-MM-DD format
+          const day = date.toISOString().split("T")[0]; // YYYY-MM-DD format
           const weight = parseFloat(entry.weight) / 1e18; // Convert wei to ether
-     
+
           if (!aggregatedData[day]) {
             // Create a new Date object set to midnight UTC for this day
-            const utcMidnight = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+            const utcMidnight = new Date(
+              Date.UTC(
+                date.getUTCFullYear(),
+                date.getUTCMonth(),
+                date.getUTCDate()
+              )
+            );
             aggregatedData[day] = {
               For: 0,
               Against: 0,
               Abstain: 0,
-              date: utcMidnight
+              date: utcMidnight,
             };
           }
-      
+
           if (entry.support === 1) {
             aggregatedData[day].For += weight;
-          } else if(entry.support === 0) {
+          } else if (entry.support === 0) {
             aggregatedData[day].Against += weight;
-          }else{
+          } else {
             aggregatedData[day].Abstain += weight;
           }
         });
-      
+
         // Sort the days and calculate cumulative totals
         const sortedDays = Object.keys(aggregatedData).sort();
         let cumulativeFor = 0;
         let cumulativeAgainst = 0;
         let cumulativeAbstain = 0;
-      
-        sortedDays.forEach(day => {
+
+        sortedDays.forEach((day) => {
           cumulativeFor += aggregatedData[day].For;
           cumulativeAgainst += aggregatedData[day].Against;
           cumulativeAbstain += aggregatedData[day].Abstain;
@@ -626,7 +644,7 @@ const StoreData = async(voteData:VoteData)=>{
           aggregatedData[day].Against = cumulativeAgainst;
           aggregatedData[day].Abstain = cumulativeAbstain;
         });
-      
+
         return aggregatedData;
       };
       const aggregatedData = aggregateDataByDay(sortedVoterList);
@@ -635,17 +653,17 @@ const StoreData = async(voteData:VoteData)=>{
         .map(([day, data]) => {
           const formattedFor = formatWeight(data.For);
           const formattedAgainst = formatWeight(data.Against);
-          const formattedDate = data.date.toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'short',
-            day: '2-digit'
+          const formattedDate = data.date.toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "short",
+            day: "2-digit",
           });
-        
+
           return {
             name: day,
             For: data.For,
             Against: data.Against,
-            Abstain:data.Abstain,
+            Abstain: data.Abstain,
             date: formattedDate,
           };
         });
@@ -752,7 +770,7 @@ const StoreData = async(voteData:VoteData)=>{
     props,
     canceledProposals
   );
-  const isActive = status === "Active" && !(props.daoDelegates==="optimism");
+  const isActive = status === "Active" && !(props.daoDelegates === "optimism");
   const getVotingPeriodEnd = () => {
     if (!data || !data.blockTimestamp) return null;
 
@@ -825,42 +843,59 @@ const StoreData = async(voteData:VoteData)=>{
   };
   const Proposalstatus =
     data && support1Weight ? getProposalStatusData() : null;
-  // const isActive = status === "PENDING" || status?.includes("day");
-  const CustomXAxisTick = ({ x, y, payload, index, data,width }:any) => {
-    const firstDate = new Date(data[0].date).toLocaleDateString();
-    const lastDate = new Date(data[data.length - 1].date).toLocaleDateString();
-    const padding = 10; 
-    // Calculate the width of the x-axis
-    const xAxisWidth = data.length < 1 ? 
-      data[data.length - 1] - data[0]: 
-      300; // fallback width if there's only one data point
-    return (
-      <g>
-        <text
-          x={padding}
-          y={y + 15}
-          fill="#718096"
-          fontSize={12}
-          textAnchor="start"
-        >
-          {firstDate}
-        </text>
-        <text
-          x={width - padding}
-          y={y + 15}
-          fill="#718096"
-          fontSize={12}
-          textAnchor="end"
-        >
-          {lastDate}
-        </text>
-      </g>
-    );
+  const CustomXAxisTick = ({
+    x,
+    y,
+    payload,
+    index,
+    data,
+    width,
+  }: {
+    x: number;
+    y: number;
+    payload: any;
+    index: number;
+    data: any[];
+    width: number;
+  }) => {
+    const firstDate = data[0].date;
+    const lastDate = data[data.length - 1].date;
+
+    const leftPadding = 70;
+    const rightPadding = 30;
+    const fontSize = width < 400 ? 10 : 12;
+
+    if (index === 0) {
+      return (
+        <g>
+          <text
+            x={leftPadding}
+            y={y + 15}
+            fill="#718096"
+            fontSize={fontSize}
+            textAnchor="start"
+          >
+            {firstDate}
+          </text>
+          <text
+            x={width - rightPadding}
+            y={y + 15}
+            fill="#718096"
+            fontSize={fontSize}
+            textAnchor="end"
+          >
+            {lastDate}
+          </text>
+        </g>
+      );
+    }
+
+    return null;
   };
-  
+
   return (
     <>
-      <div className="pr-8 pb-5 pl-16 pt-6 font-poppins">
+      <div className="pr-16 pb-5 pl-24 pt-6 font-poppins">
         <IndividualDaoHeader />
       </div>
 
@@ -883,67 +918,70 @@ const StoreData = async(voteData:VoteData)=>{
       </div>
 
       <div
-  className={`rounded-[1rem] mx-4 md:mx-24 px-4 md:px-12 py-6 transition-shadow duration-300 ease-in-out shadow-xl bg-gray-50 font-poppins relative ${
-    isExpanded ? "h-fit" : "h-fit"
-  }`}
->
-  <div className="flex items-center justify-between">
-    <div className="flex gap-2 items-center">
-      {loading ? (
-        <div className="h-5 bg-gray-200 animate-pulse w-[50vw] rounded-full"></div>
-      ) : (
-        <p className="text-2xl font-semibold">
-          {formattedTitle}
-        </p>
-      )}
-    </div>
-    <div className="flex flex-wrap items-center max-w-[400px] float-left md:max-w-none md:flex-nowrap md:justify-start md:float-none">
-      <div className="flex items-center gap-1 flex-grow w-max	">
-        <Tooltips
-          showArrow
-          content={<div className="font-poppins">OnChain</div>}
-          placement="right"
-          className="rounded-md bg-opacity-90"
-          closeDelay={1}
-        >
-          <Image src={chainImg} alt="" className="w-6 h-6 md:w-6 md:h-6 cursor-pointer flex-shrink-0" />
-        </Tooltips>
-      </div>
-      <div className="flex items-center gap-1 flex-grow  mx-2">
-        {isActive && (
-          <button
-            className="align-middle select-none font-sans font-bold text-center uppercase transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-1 px-2 rounded-full bg-blue-600 text-white shadow-md shadow-blue-600/10 hover:shadow-lg hover:shadow-blue-600/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none flex-shrink-0 w-fit md:w-[100%] md:min-w-[80px] md:max-w-[200px]"
-            type="button"
-            onClick={voteOnchain}
-            disabled={hasVoted}
-          >
-            Vote onchain
-          </button>
-        )}
-      </div>
-      <div className="flex-shrink-0 mt-2 md:mt-0">
-        <div
-          className={`rounded-full flex items-center justify-center text-xs py-1 px-2 font-medium ${status
-            ? status === "Closed"
-              ? "bg-[#f4d3f9] border border-[#77367a] text-[#77367a]"
-              : "bg-[#f4d3f9] border border-[#77367a] text-[#77367a]"
-            : "bg-gray-200 animate-pulse rounded-full"
-            }`}
-        >
-          {status ? status : <div className="h-4 w-16"></div>}
+        className={`rounded-[1rem] mx-20 md:mx-24 px-4 md:px-12 py-6 transition-shadow duration-300 ease-in-out shadow-xl bg-gray-50 font-poppins relative ${
+          isExpanded ? "h-fit" : "h-fit"
+        }`}
+      >
+        <div className="flex items-center justify-between">
+          <div className="flex gap-2 items-center">
+            {loading ? (
+              <div className="h-5 bg-gray-200 animate-pulse w-[50vw] rounded-full"></div>
+            ) : (
+              <p className="text-2xl font-semibold">{formattedTitle}</p>
+            )}
+          </div>
+          <div className="flex flex-wrap items-center max-w-[400px] float-left md:max-w-none md:flex-nowrap md:justify-start md:float-none">
+            <div className="flex items-center gap-1 flex-grow w-max	">
+              <Tooltips
+                showArrow
+                content={<div className="font-poppins">OnChain</div>}
+                placement="right"
+                className="rounded-md bg-opacity-90"
+                closeDelay={1}
+              >
+                <Image
+                  src={chainImg}
+                  alt=""
+                  className="w-6 h-6 md:w-6 md:h-6 cursor-pointer flex-shrink-0"
+                />
+              </Tooltips>
+            </div>
+            <div className="flex items-center gap-1 flex-grow  mx-2">
+              {isActive && (
+                <button
+                  className="align-middle select-none font-sans font-bold text-center uppercase transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-1 px-2 rounded-full bg-blue-600 text-white shadow-md shadow-blue-600/10 hover:shadow-lg hover:shadow-blue-600/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none flex-shrink-0 w-fit md:w-[100%] md:min-w-[80px] md:max-w-[200px]"
+                  type="button"
+                  onClick={voteOnchain}
+                  disabled={hasVoted}
+                >
+                  Vote onchain
+                </button>
+              )}
+            </div>
+            <div className="flex-shrink-0 mt-2 md:mt-0">
+              <div
+                className={`rounded-full flex items-center justify-center text-xs py-1 px-2 font-medium ${
+                  status
+                    ? status === "Closed"
+                      ? "bg-[#f4d3f9] border border-[#77367a] text-[#77367a]"
+                      : "bg-[#f4d3f9] border border-[#77367a] text-[#77367a]"
+                    : "bg-gray-200 animate-pulse rounded-full"
+                }`}
+              >
+                {status ? status : <div className="h-4 w-16"></div>}
+              </div>
+            </div>
+          </div>
+          <VotingPopup
+            isOpen={isVotingOpen}
+            onClose={() => setIsVotingOpen(false)}
+            onSubmit={handleVoteSubmit}
+            proposalId={props.id}
+            proposalTitle={truncateText(data?.description, 50)}
+            address={address || ""}
+            dao={props.daoDelegates}
+          />
         </div>
-      </div>
-    </div>
-    <VotingPopup
-      isOpen={isVotingOpen}
-      onClose={() => setIsVotingOpen(false)}
-      onSubmit={handleVoteSubmit}
-      proposalId={props.id}
-      proposalTitle={truncateText(data?.description, 50)}
-      address={address || ""}
-      dao={props.daoDelegates}
-    />
-  </div>
 
         <div className="flex gap-1 my-1 items-center">
           <div className="flex text-xs font-normal items-center">
@@ -999,12 +1037,12 @@ const StoreData = async(voteData:VoteData)=>{
       <h1 className="my-8 mx-24 text-4xl font-semibold text-blue-shade-100 font-poppins">
         Voters
       </h1>
-      <div className="flex mb-6 xl:ml-24 ml-20">
+      <div className="flex mb-6  mx-24">
         <div className="flex gap-8 items-center w-full">
           <div className="h-[500px] w-[40%] font-poppins px-4 flex items-center justify-center rounded-2xl bg-gray-50 transition-shadow duration-300 ease-in-out shadow-xl">
             {isLoading ? (
               <div className="">
-              <ProposalMainVotersSkeletonLoader />
+                <ProposalMainVotersSkeletonLoader />
               </div>
             ) : (
               <div
@@ -1054,7 +1092,7 @@ const StoreData = async(voteData:VoteData)=>{
                         </div>
                         <div className="flex items-center space-x-4">
                           <div
-                            className={`xl:px-4 px-2 py-2 rounded-full text-sm xl:w-36 w-25 flex items-center justify-center xl:font-medium text-xs ${
+                            className={`xl:px-4 px-2 py-2 rounded-full xl:text-sm xl:w-36 w-25 flex items-center justify-center xl:font-medium text-xs ${
                               voter.support === 1 || voter.type === "for"
                                 ? "bg-green-100 text-green-800"
                                 : "bg-red-100 text-red-800"
@@ -1104,14 +1142,14 @@ const StoreData = async(voteData:VoteData)=>{
 
           {isChartLoading ? (
             <div
-              className="xl:w-[45vw] w-[45%] h-[500px] flex items-center justify-center bg-gray-50 rounded-2xl"
+              className="xl:w-[46.5vw] w-[45%] h-[500px] flex items-center justify-center bg-gray-50 rounded-2xl"
               style={{ boxShadow: "0px 4px 26.7px 0px rgba(0, 0, 0, 0.10)" }}
             >
               <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-black-shade-900"></div>
             </div>
           ) : voterList && chartData.length === 0 ? (
             <div
-              className="w-[45vw] h-[500px] flex items-center justify-center bg-gray-50 rounded-2xl"
+              className="w-[46.5vw] h-[500px] flex items-center justify-center bg-gray-50 rounded-2xl"
               style={{ boxShadow: "0px 4px 26.7px 0px rgba(0, 0, 0, 0.10)" }}
             >
               <p className="text-lg font-poppins text-gray-500">
@@ -1119,7 +1157,10 @@ const StoreData = async(voteData:VoteData)=>{
               </p>
             </div>
           ) : (
-            <div className="w-[45vw] transition-shadow duration-300 ease-in-out shadow-xl h-[500px] rounded-2xl flex text-sm items-center justify-center bg-gray-50 font-poppins">
+            <div
+              ref={chartContainerRef}
+              className="w-[46.5vw] transition-shadow duration-300 ease-in-out shadow-xl h-[500px] rounded-2xl flex text-sm items-center justify-center bg-gray-50 font-poppins"
+            >
               <ResponsiveContainer width="100%" height={400}>
                 <LineChart
                   data={chartData}
@@ -1133,19 +1174,15 @@ const StoreData = async(voteData:VoteData)=>{
                   <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                   <XAxis
                     dataKey="date"
-                    // interval={2}
-                    tick={({ x, y, payload, index }) => (
+                    tick={(props) => (
                       <CustomXAxisTick
-                        x={x}
-                        y={y}
-                        payload={payload}
-                        index={index}
+                        {...props}
                         data={chartData}
-                        width={payload.length}
+                        width={chartContainerRef.current?.clientWidth ?? 600}
                       />
                     )}
-                    // tick={{ fill: "#718096", fontSize: 12 }}
                     axisLine={{ stroke: "#e2e8f0" }}
+                    tickLine={false}
                   />
                   <YAxis
                     tickFormatter={formatYAxis}
@@ -1196,7 +1233,7 @@ const StoreData = async(voteData:VoteData)=>{
                     }}
                     dot={{ r: 4, strokeWidth: 2, fill: "#fff" }}
                   />
-                   <Line
+                  <Line
                     type="monotone"
                     dataKey="Abstain"
                     stroke="#004DFF"

@@ -342,7 +342,7 @@ const formatDate = (timestamp: number): string => {
 
   return (
     <>
-      <div className="mr-16 rounded-[2rem] mt-4">
+      <div className="mr-3 rounded-[2rem] mt-4">
         {displayedProposals.map((proposal: Proposal, index: number) => (
           <div
             key={index}
