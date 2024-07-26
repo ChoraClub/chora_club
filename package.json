@@ -39,6 +39,7 @@
     "graphql": "^16.8.1",
     "handlebar": "^1.0.0",
     "handlebars": "^4.7.8",
+    "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.383.0",
     "luxon": "^3.4.4",
     "marked": "^13.0.1",
@@ -72,6 +73,7 @@
   },
   "devDependencies": {
     "@captainwalterdev/daytimescheduler": "^1.0.15",
+    "@types/jsonwebtoken": "^9.0.6",
     "@types/luxon": "^3.4.2",
     "@types/node": "^20",
     "@types/react": "^18.2.55",

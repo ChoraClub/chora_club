@@ -1,84 +1,87 @@
 import { connectDB } from "@/config/connectDB";
-import { NextApiRequest, NextApiResponse } from "next";
+import { NextApiResponse } from "next";
 import { NextResponse, NextRequest } from "next/server";
+import jwt from "jsonwebtoken";
 
-type network_details = {
-  dao_name: string;
-  network: string;
-  discourse: string;
-  description: string;
-};
+interface JwtPayload {
+  address: string;
+}
 
 interface DelegateRequestBody {
   address: string;
-  image: string;
-  isDelegate: boolean;
-  displayName: string;
-  emailId: string;
   isEmailVisible: boolean;
   createdAt: Date;
-  socialHandles: {
-    twitter: string;
-    discord: string;
-    github: string;
-  };
-  networks: network_details[];
 }
 
 export async function POST(req: NextRequest, res: NextApiResponse) {
-  const {
-    address,
-    image,
-    isDelegate,
-    displayName,
-    emailId,
-    isEmailVisible,
-    socialHandles,
-    createdAt,
-    networks,
-  }: DelegateRequestBody = await req.json();
-
+  let client;
   try {
-    const client = await connectDB();
+    // JWT verification
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return NextResponse.json(
+        { error: "Missing or invalid authorization token" },
+        { status: 401 }
+      );
+    }
+    const token = authHeader.split(" ")[1];
 
+    let UserAddress;
+    try {
+      const decoded = jwt.verify(
+        token,
+        process.env.NEXTAUTH_SECRET!
+      ) as JwtPayload;
+      UserAddress = decoded.address;
+    } catch (error) {
+      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
+    }
+
+    const { address, isEmailVisible, createdAt }: DelegateRequestBody =
+      await req.json();
+
+    client = await connectDB();
     const db = client.db();
     const collection = db.collection("delegates");
 
     const WalletAddress = req.headers.get("x-wallet-address");
 
-    const documents = await collection
-      .find({ address: { $regex: `^${WalletAddress}$`, $options: "i" } })
-      .toArray();
+    if (!WalletAddress || UserAddress !== WalletAddress) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
-    if (documents.length == 0 && WalletAddress) {
-      const result = await collection.insertOne({
-        address,
-        image,
-        isDelegate,
-        displayName,
-        emailId,
-        isEmailVisible,
-        createdAt,
-        socialHandles,
-        networks,
+    const existingDocument = await collection.findOne({
+      address: { $regex: `^${WalletAddress}$`, $options: "i" },
+    });
+
+    if (existingDocument) {
+      return NextResponse.json({ result: "Already Exists!" }, { status: 409 });
+    }
+
+    const newDocument = {
+      address,
+      isEmailVisible,
+      createdAt,
+      image: null,
+      isDelegate: null,
+      displayName: null,
+      emailId: null,
+      socialHandles: null,
+      networks: null,
+    };
+
+    const result = await collection.insertOne(newDocument);
+
+    if (result.insertedId) {
+      const insertedDocument = await collection.findOne({
+        _id: result.insertedId,
       });
-      console.log("Delegate document inserted:", result);
-
-      if (result.insertedId) {
-        const insertedDocument = await collection.findOne({
-          _id: result.insertedId,
-        });
-        // console.log("Inserted document retrieved");
-        return NextResponse.json({ result: insertedDocument }, { status: 200 });
-      } else {
-        return NextResponse.json(
-          { error: "Failed to retrieve inserted document" },
-          { status: 500 }
-        );
-      }
+      return NextResponse.json({ result: insertedDocument }, { status: 200 });
     } else {
-      client.close();
-      return NextResponse.json({ result: "Already Exist!" }, { status: 409 });
+      return NextResponse.json(
+        { error: "Failed to insert document" },
+        { status: 500 }
+      );
     }
   } catch (error) {
     console.error("Error storing delegate:", error);
@@ -86,5 +89,9 @@ export async function POST(req: NextRequest, res: NextApiResponse) {
       { error: "Internal Server Error" },
       { status: 500 }
     );
+  } finally {
+    if (client) {
+      await client.close();
+    }
   }
 }
