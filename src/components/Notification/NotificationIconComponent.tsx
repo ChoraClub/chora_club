@@ -199,7 +199,7 @@ function NotificationIconComponent() {
           </div>
         </Badge>
 
-        {isHovering && (
+        {/* {isHovering && (
           <div
             className="absolute left-20 bottom-4 xl:left-24 bg-white rounded-2xl shadow-lg border border-[#C3D3FF] w-96 font-poppins z-50"
             onMouseEnter={handleMouseEnter}
@@ -231,9 +231,7 @@ function NotificationIconComponent() {
                       {formatTimestampOrDate(data.createdAt)}
                     </div>
                   </div>
-                  {/* {index < combinedNotifications.slice(0, 3).length - 1 && ( */}
                   <hr className="border-[#DDDDDD] border-0.5" />
-                  {/* )} */}
                 </React.Fragment>
               ))
             ) : (
@@ -252,7 +250,7 @@ function NotificationIconComponent() {
               </button>
             </div>
           </div>
-        )}
+        )} */}
       </div>
     </>
   );
