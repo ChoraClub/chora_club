@@ -32,6 +32,7 @@ export async function POST(req: NextRequest, res: NextApiResponse) {
         token,
         process.env.NEXTAUTH_SECRET!
       ) as JwtPayload;
+      // console.log("Decoded", decoded);
       UserAddress = decoded.address;
     } catch (error) {
       return NextResponse.json({ error: "Invalid token" }, { status: 401 });

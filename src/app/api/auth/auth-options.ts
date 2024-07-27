@@ -5,22 +5,8 @@ import { SiweMessage } from "siwe";
 import { BASE_URL } from "@/config/constants";
 import jwt from "jsonwebtoken";
 
-async function AccountCreate(user: any) {
-  console.log("wallet come", user);
-
-  const token = jwt.sign(
-    {
-      address: user,
-    },
-    process.env.NEXTAUTH_SECRET!, // Make sure to set this in your environment variables
-    { expiresIn: "10m" } // Token expires in 1 hour
-  );
-
-  console.log("token generated here line number 89:-", token);
-
+async function AccountCreate(user: any, token: any) {
   try {
-    console.log("user::", user);
-
     const res = await fetch(`${BASE_URL}/api/auth/accountcreate`, {
       method: "POST",
       headers: {
@@ -101,10 +87,28 @@ export const authOptions: NextAuthOptions = {
   },
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
+    async jwt({ token, account }) {
+      if (account) {
+        // Create a new JWT access token
+        const accessToken = jwt.sign(
+          {
+            sub: token.sub, // Use the user's address as the subject
+            address: token.sub,
+          },
+          process.env.NEXTAUTH_SECRET!,
+          { expiresIn: "10m" } // Token expires in 1 hour, adjust as needed
+        );
+
+        // Add the access token to the token object
+        // console.log("Access token", accessToken);
+        AccountCreate(token.sub, accessToken);
+        token.accessToken = accessToken;
+      }
+      return token;
+    },
     async session({ session, token }: { session: any; token: any }) {
       session.address = token.sub;
       session.user.name = token.sub;
-      AccountCreate(session.address);
       return session;
     },
   },
