@@ -189,7 +189,6 @@ function NotificationIconComponent() {
           content={""}
           color="danger"
           shape="circle"
-          // placement="top-right"
           className={hasUnreadNotifications ? styles.pulseBadge : ""}
         >
           <div

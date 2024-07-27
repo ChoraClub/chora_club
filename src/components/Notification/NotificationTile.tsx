@@ -30,53 +30,6 @@ function NotificationTile({ data, index, length }: NotificationTileProps) {
     setDocId(data?._id);
   }, [data, readStatus, docId]);
 
-  // const markAsRead = async () => {
-  //   try {
-  //     const myHeaders = new Headers();
-  //     myHeaders.append("Content-Type", "application/json");
-
-  //     const raw = JSON.stringify({
-  //       id: data?._id,
-  //       receiver_address: data.receiver_address,
-  //     });
-
-  //     const requestOptions: RequestInit = {
-  //       method: "POST",
-  //       headers: myHeaders,
-  //       body: raw,
-  //     };
-  //     const response = await fetch(
-  //       "/api/notifications/mark-as-read",
-  //       requestOptions
-  //     );
-  //   } catch (error) {
-  //     console.error("Error marking all as read:", error);
-  //   }
-  // };
-
-  // const handleRedirection = async () => {
-  //   console.log("tileData", tileData);
-  //   console.log("readStatus", readStatus);
-  //   console.log("_id", docId);
-  //   if (tileData.notification_type === "newBooking") {
-  //     if (tileData.notification_name === "newBookingForHost") {
-  //       console.log("For host");
-  //       router.push(
-  //         `${BASE_URL}/profile/${tileData.receiver_address}?active=sessions&session=book`
-  //       );
-  //     } else if (tileData.notification_name === "newBookingForGuest") {
-  //       console.log("For guest");
-  //       router.push(
-  //         `${BASE_URL}/profile/${tileData.receiver_address}?active=sessions&session=attending`
-  //       );
-  //     }
-  //   }
-  //   if (!readStatus) {
-  //     const result = await markAsRead();
-  //     console.log("result", result);
-  //   }
-  // };
-
   const handleTileRedirection = async () => {
     await handleRedirection(tileData, router, markAsRead);
   };

@@ -13,6 +13,7 @@ import { useAccount } from "wagmi";
 import { useSocket } from "@/app/hooks/useSocket";
 import { PiEnvelopeOpen } from "react-icons/pi";
 import { useSession } from "next-auth/react";
+import { MagnifyingGlass } from "react-loader-spinner";
 
 function NotificationMain() {
   const { data: session, status } = useSession();
@@ -25,8 +26,10 @@ function NotificationMain() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [socketId, setSocketId] = useState<string | null>(null);
   const [newNotifications, setNewNotifications] = useState<Notification[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const fetchNotifications = async () => {
+    setIsLoading(true);
     try {
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
@@ -44,19 +47,10 @@ function NotificationMain() {
     } catch (error) {
       console.error("Error fetching notifications:", error);
       return null;
+    } finally {
+      setIsLoading(false);
     }
   };
-
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     if (session) {
-  //       const result = await fetchNotifications();
-  //       const data = await result.data;
-  //       setNotifications(data);
-  //     }
-  //   };
-  //   fetchData();
-  // }, [address, session]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -244,20 +238,33 @@ function NotificationMain() {
         </div>
       </div>
       <div className="px-16">
-        {searchParams.get("active") === "all" && (
-          <NotificationAll notifications={combinedNotifications} />
-        )}
-        {searchParams.get("active") === "sessionBookings" && (
-          <SessionBookings notifications={sessionBookings} />
-        )}
-        {searchParams.get("active") === "recordedSessions" && (
-          <RecordedSessions notifications={recordedSessions} />
-        )}
-        {searchParams.get("active") === "followers" && (
-          <Followers notifications={followers} />
-        )}
-        {searchParams.get("active") === "attestations" && (
-          <Attestation notifications={attestations} />
+        {isLoading ? ( // Show loader if loading
+          <div className="flex justify-center items-center h-64">
+            <MagnifyingGlass
+              color={"#123abc"}
+              visible={isLoading}
+              height="80"
+              width="80"
+            />
+          </div>
+        ) : (
+          <>
+            {searchParams.get("active") === "all" && (
+              <NotificationAll notifications={combinedNotifications} />
+            )}
+            {searchParams.get("active") === "sessionBookings" && (
+              <SessionBookings notifications={sessionBookings} />
+            )}
+            {searchParams.get("active") === "recordedSessions" && (
+              <RecordedSessions notifications={recordedSessions} />
+            )}
+            {searchParams.get("active") === "followers" && (
+              <Followers notifications={followers} />
+            )}
+            {searchParams.get("active") === "attestations" && (
+              <Attestation notifications={attestations} />
+            )}
+          </>
         )}
       </div>
     </div>
