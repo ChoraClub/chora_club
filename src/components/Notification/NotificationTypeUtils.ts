@@ -1,4 +1,6 @@
 export interface Notification {
+  id?: string;
+  _id?: string;
   receiver_address: string;
   content: string;
   createdAt: number;

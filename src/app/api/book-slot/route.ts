@@ -4,6 +4,8 @@ import { NextResponse, NextRequest } from "next/server";
 import { sendMail, compileBookedSessionTemplate } from "@/libs/mail";
 import { io } from "socket.io-client";
 import { SOCKET_BASE_URL } from "@/config/constants";
+import { getEnsName } from "@/utils/ENSUtils";
+import { truncateAddress } from "@/utils/text";
 
 type Attendee = {
   attendee_address: string;
@@ -97,11 +99,33 @@ export async function POST(
         .find({ address: host_address })
         .toArray();
 
+      const slotDate = new Date(slot_time);
+      const options: any = {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "numeric",
+        minute: "numeric",
+        hour12: true,
+      };
+      const localSlotTime = slotDate.toLocaleString("en-US", options);
+
       if (session_type === "session") {
         const userAddress = attendees[0].attendee_address;
+        const ensNameOrUserAddress = await getEnsName(userAddress);
+        let userENSNameOrAddress = ensNameOrUserAddress?.ensNameOrAddress;
+        if (userENSNameOrAddress === undefined) {
+          userENSNameOrAddress = truncateAddress(userAddress);
+        }
+        const ensNameOrHostAddress = await getEnsName(host_address);
+        let hostENSNameOrAddress = ensNameOrHostAddress?.ensNameOrAddress;
+        if (hostENSNameOrAddress === undefined) {
+          hostENSNameOrAddress = truncateAddress(userAddress);
+        }
         const notificationToHost = {
           receiver_address: host_address,
-          content: `${userAddress} has booked your session on ${dao_name}.`,
+          content: `Great news! 🎉 ${userENSNameOrAddress} has just booked a session with you on ${dao_name}. The session is scheduled on ${localSlotTime} and will focus on ${title}.`,
           createdAt: Date.now(),
           read_status: false,
           notification_name: "newBookingForHost",
@@ -111,7 +135,7 @@ export async function POST(
 
         const notificationToGuest = {
           receiver_address: userAddress,
-          content: `Your session on ${dao_name} has been successfully booked with ${host_address}.`,
+          content: `Congratulations! 🎉 Your session on ${dao_name} titled "${title}" has been successfully booked with ${hostENSNameOrAddress}. The session will take place on ${localSlotTime}.`,
           createdAt: Date.now(),
           read_status: false,
           notification_name: "newBookingForGuest",
@@ -137,12 +161,23 @@ export async function POST(
 
           console.log("insertedNotifications", insertedNotifications);
         }
+        const dataToSendHost = {
+          ...notificationToHost,
+          _id: notificationResults.insertedIds[0],
+        };
+        const dataToSendGuest = {
+          ...notificationToGuest,
+          _id: notificationResults.insertedIds[1],
+        };
+
+        const attendee_address = userAddress;
+
+        console.log("dataToSendHost", dataToSendHost);
+        console.log("dataToSendGuest", dataToSendGuest);
+
         const socket = io(`${SOCKET_BASE_URL}`, {
           withCredentials: true,
         });
-        const dataToSendHost = notificationToHost;
-        const dataToSendGuest = notificationToGuest;
-        const attendee_address = userAddress;
         socket.on("connect", () => {
           console.log("Connected to WebSocket server from API");
           socket.emit("new_session", {
@@ -173,7 +208,7 @@ export async function POST(
                 subject: "Session Booked",
                 body: compileBookedSessionTemplate(
                   "Your session has been Booked.",
-                  "You can Approve or Reject."
+                  notificationToHost.content
                 ),
               });
             } catch (error) {
@@ -198,7 +233,7 @@ export async function POST(
                 subject: "Session Booked",
                 body: compileBookedSessionTemplate(
                   "🎉 Hooray! Your session is officially booked! ",
-                  "Get ready for an amazing experience."
+                  notificationToGuest.content
                 ),
               });
             } catch (error) {
@@ -215,6 +250,7 @@ export async function POST(
         { status: 200 }
       );
     } else {
+      client.close();
       return NextResponse.json(
         { error: "Failed to retrieve inserted document" },
         { status: 500 }

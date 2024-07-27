@@ -2,40 +2,127 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import user1 from "../../assets/images/notifications/user1.svg";
 import { NotificationTileProps } from "./NotificationTypeUtils";
+import { BASE_URL } from "@/config/constants";
+import { useRouter } from "next-nprogress-bar";
+import { FaClock } from "react-icons/fa";
+import { IoCheckmarkCircle } from "react-icons/io5";
+import { BsDatabaseFillCheck } from "react-icons/bs";
+import { PiVideoFill } from "react-icons/pi";
+import { FaUserCheck } from "react-icons/fa6";
+import { GiChaingun } from "react-icons/gi";
+import { formatTimestampOrDate } from "@/utils/FormatTimestampUtils";
+import {
+  getBackgroundColor,
+  getIcon,
+  handleRedirection,
+  markAsRead,
+} from "./NotificationActions";
 
 function NotificationTile({ data, index, length }: NotificationTileProps) {
-  const [readStatus, setReadStatus] = useState<boolean>();
+  const router = useRouter();
+  const [readStatus, setReadStatus] = useState<boolean>(data.read_status);
+  const [tileData, setTileData] = useState(data);
+  const [docId, setDocId] = useState(data?._id);
+
   useEffect(() => {
-    console.log("data::", data);
-    console.log("read status", data.read_status);
+    setTileData(data);
     setReadStatus(data.read_status);
-  }, [data, readStatus]);
+    setDocId(data?._id);
+  }, [data, readStatus, docId]);
+
+  // const markAsRead = async () => {
+  //   try {
+  //     const myHeaders = new Headers();
+  //     myHeaders.append("Content-Type", "application/json");
+
+  //     const raw = JSON.stringify({
+  //       id: data?._id,
+  //       receiver_address: data.receiver_address,
+  //     });
+
+  //     const requestOptions: RequestInit = {
+  //       method: "POST",
+  //       headers: myHeaders,
+  //       body: raw,
+  //     };
+  //     const response = await fetch(
+  //       "/api/notifications/mark-as-read",
+  //       requestOptions
+  //     );
+  //   } catch (error) {
+  //     console.error("Error marking all as read:", error);
+  //   }
+  // };
+
+  // const handleRedirection = async () => {
+  //   console.log("tileData", tileData);
+  //   console.log("readStatus", readStatus);
+  //   console.log("_id", docId);
+  //   if (tileData.notification_type === "newBooking") {
+  //     if (tileData.notification_name === "newBookingForHost") {
+  //       console.log("For host");
+  //       router.push(
+  //         `${BASE_URL}/profile/${tileData.receiver_address}?active=sessions&session=book`
+  //       );
+  //     } else if (tileData.notification_name === "newBookingForGuest") {
+  //       console.log("For guest");
+  //       router.push(
+  //         `${BASE_URL}/profile/${tileData.receiver_address}?active=sessions&session=attending`
+  //       );
+  //     }
+  //   }
+  //   if (!readStatus) {
+  //     const result = await markAsRead();
+  //     console.log("result", result);
+  //   }
+  // };
+
+  const handleTileRedirection = async () => {
+    await handleRedirection(tileData, router, markAsRead);
+  };
   return (
     <>
       <div
-        className={`flex justify-between items-center rounded-md p-5 cursor-pointer hover:bg-gray-50 bg-gray-200 
-            ${readStatus === true ? `bg-white` : ``}`}
+        className={`flex justify-between items-center rounded-md p-5 cursor-pointer hover:scale-[100.3%]
+          hover:shadow-md
+          bg-gray-200 text-black ${readStatus ? "bg-white text-gray-500" : ""}`}
+        onClick={handleTileRedirection}
       >
         <div className="flex gap-5">
-          <div className="flex items-center justify-center rounded-full bg-[#FFD3DE] h-14 w-14">
-            <Image src={user1} alt="" className="object-cover" />
+          <div
+            className="flex items-center justify-center rounded-full h-14 w-14 min-w-14"
+            style={{ backgroundColor: getBackgroundColor(tileData) }}
+          >
+            {getIcon(tileData)}
           </div>
           <div className="flex flex-col gap-1 justify-center">
-            <h1 className="font-semibold text-sm flex gap-2 items-center">
+            <h1
+              className={`font-semibold text-sm flex gap-2 items-center text-black ${
+                readStatus ? "text-gray-500" : ""
+              }`}
+            >
               {data.notification_title}
             </h1>
-            <p className="font-normal text-sm text-[#717171]">{data.content}</p>
+            <p
+              className={`font-normal text-sm text-[#414141] ${
+                readStatus ? "text-gray-500" : ""
+              }`}
+            >
+              {data.content}
+            </p>
           </div>
         </div>
         <div
-          className={`text-[#3e3e3e] text-xs font-normal ${
-            readStatus === true ? `text-[#717171]` : `text-[#000000] font-bold`
+          className={`text-xs text-black font-bold min-w-24 flex items-center justify-center ${
+            readStatus ? "text-gray-500 font-normal" : ""
           }`}
         >
-          {new Date(data.createdAt).toLocaleString()}
+          {formatTimestampOrDate(data.createdAt)}
         </div>
       </div>
-      {index < length - 1 && <hr className="border-[#DDDDDD] border-0.5" />}
+      {index < length - 1 && (
+        <hr className="border-[#DDDDDD] border-0.5 mx-2" />
+      )}
     </>
   );
 }
