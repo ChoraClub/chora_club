@@ -212,8 +212,12 @@
 <<<<<<< HEAD
 =======
   name cbw-sdk
+<<<<<<< HEAD
 >>>>>>> f9c569ea573e160c0ca4b775323d16beb69691ab
 >>>>>>> 6ccff548b44b62c63416631af74de67c99fb5f35
+=======
+>>>>>>> daf24b8606803e162f76098a3fe5b6154b12fec8
+>>>>>>> cf789d9f86ec890fda02a2b70791f11359ca3925
   version "3.9.3"
   resolved "https://registry.yarnpkg.com/@coinbase/wallet-sdk/-/wallet-sdk-3.9.3.tgz#daf10cb0c85d0363315b7270cb3f02bedc408aab"
   integrity sha512-N/A2DRIf0Y3PHc1XAMvbBUu4zisna6qAdqABMZwBMNEfWrXpAwx16pZGkYCLGE+Rvv1edbcB2LYDRnACNcmCiw==
@@ -11492,7 +11496,7 @@ slash@^3.0.0:
   resolved "https://registry.yarnpkg.com/slash/-/slash-3.0.0.tgz#6539be870c165adbd5240220dbe361f1bc4d4634"
   integrity sha512-g9Q1haeby36OSStwb4ntCGGGaKsaVSjQ68fBxoQcutl5fS1vuY18H3wSt3jFyFtrkx+Kz0V1G85A4MyAdDMi2Q==
 
-socket.io-client@^4.5.1:
+socket.io-client@^4.5.1, socket.io-client@^4.7.5:
   version "4.7.5"
   resolved "https://registry.yarnpkg.com/socket.io-client/-/socket.io-client-4.7.5.tgz#919be76916989758bdc20eec63f7ee0ae45c05b7"
   integrity sha512-sJ/tqHOCe7Z50JCBCXrsY3I2k03iOiUe+tj1OmKeD2lXPiGH/RUCdTZFoqVyN7l1MnpIzPrGtLcijffmeouNlQ==

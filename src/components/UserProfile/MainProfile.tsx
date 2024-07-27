@@ -151,6 +151,7 @@ function MainProfile() {
       // console.log("newPath", newPath);
       router.replace(`${newPath}`);
     } else if (!isConnected && !session) {
+      console.log("inside else if !isConnected && !session");
       if (openConnectModal) {
         openConnectModal();
       } else {
@@ -158,10 +159,10 @@ function MainProfile() {
       }
     }
   }, [
-    // isConnected,
-    // address,
-    // router,
-    // session,
+    isConnected,
+    address,
+    router,
+    session,
     path.includes("profile/undefined"),
   ]);
 

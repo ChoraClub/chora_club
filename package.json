@@ -66,6 +66,7 @@
     "recharts": "^2.12.7",
     "rehype-sanitize": "^6.0.0",
     "siwe": "^2.3.2",
+    "socket.io-client": "^4.7.5",
     "tailwindcss-scrollbar": "^0.1.0",
     "urql": "^4.0.6",
     "uuid": "^9.0.1",

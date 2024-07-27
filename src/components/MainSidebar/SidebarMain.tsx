@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import logo from "@/assets/images/daos/CCLogo.png";
 // import logo from "@/assets/images/sidebar/favicon.png";
 import rocket from "@/assets/images/sidebar/rocket.png";
@@ -26,14 +26,19 @@ import "./tour.css";
 import Joyride from "react-joyride";
 import { title } from "process";
 import { Placement } from "react-joyride";
+import { IoMdNotifications } from "react-icons/io";
+import dummy from "@/assets/images/daos/user2.png";
+
 import { Poppins } from "next/font/google";
 import { MdImportantDevices } from "react-icons/md";
-import { IoMdNotifications } from "react-icons/io";
+import NotificationIconComponent from "../Notification/NotificationIconComponent";
+
 function Sidebar() {
   const [isTourOpen, setIsTourOpen] = useState(false);
   // const [isClient, setIsClient] = useState(false);
   const [hasSeenTour, setHasSeenTour] = useState(true);
   const [notificationCount, setNotificationCount] = useState(1);
+  const [isHovering, setIsHovering] = useState(false);
 
   const tourSteps = [
     {
@@ -233,6 +238,25 @@ function Sidebar() {
   const { address, isConnected } = useAccount();
   const { data: session, status } = useSession();
   const sessionLoading = status === "loading";
+  // const hoverRef = useRef<HTMLDivElement>(null);
+  // const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // useEffect(() => {
+  //   return () => {
+  //     if (timeoutRef.current) clearTimeout(timeoutRef.current);
+  //   };
+  // }, []);
+
+  // const handleMouseEnter = () => {
+  //   if (timeoutRef.current) clearTimeout(timeoutRef.current);
+  //   setIsHovering(true);
+  // };
+
+  // const handleMouseLeave = () => {
+  //   timeoutRef.current = setTimeout(() => {
+  //     setIsHovering(false);
+  //   }, 300); // 300ms delay before hiding
+  // };
 
   useEffect(() => {
     // console.log(session, sessionLoading, isConnected);
@@ -325,12 +349,14 @@ function Sidebar() {
               src={logo}
               alt={"image"}
               width={40}
-              className="xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 logo bg-black rounded-full p-1"></Image>
+              className="xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 logo bg-black rounded-full p-1"
+            ></Image>
             <Tooltip
               content="DAOs"
               placement="right"
               className="rounded-md bg-opacity-90"
-              closeDelay={1}>
+              closeDelay={1}
+            >
               <Link href={"/"}>
                 <Image
                   priority
@@ -341,14 +367,16 @@ function Sidebar() {
                     pathname.endsWith(`/`)
                       ? "border-white border-2 rounded-full"
                       : ""
-                  }`}></Image>
+                  }`}
+                ></Image>
               </Link>
             </Tooltip>
             <Tooltip
               content="Office Hours"
               placement="right"
               className="rounded-md bg-opacity-90"
-              closeDelay={1}>
+              closeDelay={1}
+            >
               <Link href={"/office-hours?hours=ongoing"}>
                 <Image
                   priority
@@ -359,14 +387,16 @@ function Sidebar() {
                     pathname.includes(`/office-hours`)
                       ? "border-white border-2 rounded-full"
                       : ""
-                  }`}></Image>
+                  }`}
+                ></Image>
               </Link>
             </Tooltip>
             <Tooltip
               content="Sessions"
               placement="right"
               className="rounded-md bg-opacity-90"
-              closeDelay={1}>
+              closeDelay={1}
+            >
               <Link href={"/sessions?active=recordedSessions"}>
                 <Image
                   priority
@@ -378,32 +408,37 @@ function Sidebar() {
                     pathname.includes(`/sessions`)
                       ? "border-white border-2 rounded-full"
                       : ""
-                  }`}></Image>
+                  }`}
+                ></Image>
               </Link>
             </Tooltip>
           </div>
           <div className="h-full">
             <div
-              className={`flex flex-col items-center gap-y-4 py-7 h-full bg-blue-shade-300 rounded-2xl overflow-y-auto ${styles.scrollbar}`}>
+              className={`flex flex-col items-center gap-y-4 py-7 h-full bg-blue-shade-300 rounded-2xl overflow-y-auto ${styles.scrollbar}`}
+            >
               {storedDao ? (
                 storedDao.map((data, index) => (
                   <div
                     key={index}
                     className="flex flex-col items-center"
                     onMouseOver={() => handleMouseOver(index)}
-                    onMouseOut={() => handleMouseOut(index)}>
+                    onMouseOut={() => handleMouseOut(index)}
+                  >
                     <Badge
                       isInvisible={!badgeVisiblity[index]}
                       content={<IoClose />}
                       className="p-[0.1rem] cursor-pointer border-blue-shade-300"
                       color="danger"
                       size="sm"
-                      onClick={() => handleBadgeClick(data[0])}>
+                      onClick={() => handleBadgeClick(data[0])}
+                    >
                       <Tooltip
                         content={<div className="capitalize">{data[0]}</div>}
                         placement="right"
                         className="rounded-md bg-opacity-90"
-                        closeDelay={1}>
+                        closeDelay={1}
+                      >
                         <Link href={`/${data[0]}?active=about`}>
                           <Image
                             key={index}
@@ -416,7 +451,8 @@ function Sidebar() {
                                 ? "border-white border-[2.5px]"
                                 : ""
                             }`}
-                            priority={true}></Image>
+                            priority={true}
+                          ></Image>
                         </Link>
                       </Tooltip>
                     </Badge>
@@ -428,21 +464,25 @@ function Sidebar() {
             </div>
           </div>
           <div className="flex flex-col items-center gap-y-4 pt-5">
+            <NotificationIconComponent />
             <Tooltip
               content={<div className="capitalize">Notifications</div>}
               placement="right"
               className="rounded-md bg-opacity-90"
-              closeDelay={1}>
+              closeDelay={1}
+            >
               <Badge
                 content={notificationCount}
                 color="danger"
                 placement="top-right"
                 size="md"
                 isInvisible={notificationCount === 0}
-                className="border-none bg-blue-shade-200 translate-x-1.5 -translate-y-1.5">
+                className="border-none bg-blue-shade-200 translate-x-1.5 -translate-y-1.5"
+              >
                 <div
                   className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 bg-white rounded-full flex justify-center items-center `}
-                  onClick={() => router.push(`/notifications`)}>
+                  onClick={() => router.push(`/notifications`)}
+                >
                   <IoMdNotifications className="size-6 text-blue-shade-200" />
                 </div>
               </Badge>
@@ -451,7 +491,8 @@ function Sidebar() {
               content={<div className="capitalize">Git Book</div>}
               placement="right"
               className="rounded-md bg-opacity-90"
-              closeDelay={1}>
+              closeDelay={1}
+            >
               <Link href={"https://docs.chora.club/"} target="_blank">
                 <Image
                   src={gitbook}
@@ -467,7 +508,8 @@ function Sidebar() {
                 content={<div className="capitalize">Wallet</div>}
                 placement="right"
                 className="rounded-md bg-opacity-90"
-                closeDelay={1}>
+                closeDelay={1}
+              >
                 {isPageLoading || sessionLoading ? (
                   <Image
                     src={user}
@@ -484,7 +526,8 @@ function Sidebar() {
                 content={<div className="capitalize">Profile</div>}
                 placement="right"
                 className="rounded-md bg-opacity-90"
-                closeDelay={1}>
+                closeDelay={1}
+              >
                 <Image
                   src={user}
                   alt={"image"}
