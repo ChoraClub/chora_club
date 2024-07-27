@@ -20,6 +20,27 @@ import { NextResponse, NextRequest } from "next/server";
 //   };
 // }
 
+type follow_activity = {
+  action: string;
+  timestamp: Date;
+};
+type follower_details = {
+  address: string;
+  isNotification: boolean;
+  isFollowing: boolean;
+  activity: follow_activity[];
+};
+type dao_following = {
+  isFollowing: boolean;
+  isNotification:boolean;
+  follower_address: string;
+  timestamp:Date;
+};
+type followings = {
+  dao: string;
+  following: dao_following[];
+};
+
 type network_details = {
   dao_name: string;
   network: string;
@@ -41,6 +62,8 @@ interface DelegateRequestBody {
     github: string;
   };
   networks: network_details[];
+  followers: follower_details[];
+  followings: followings[];
 }
 
 // Define the response body type
@@ -82,6 +105,8 @@ interface DelegateResponseBody {
       github: string;
     };
     networks: network_details[];
+    followers: follower_details[];
+    followings: followings[];
   } | null;
   error?: string;
 }

@@ -2,7 +2,13 @@
 import Image from "next/image";
 import React, { use, useEffect, useState } from "react";
 import user from "@/assets/images/daos/profile.png";
-import { FaXTwitter, FaDiscord, FaGithub, FaVoicemail, FaEnvelope } from "react-icons/fa6";
+import {
+  FaXTwitter,
+  FaDiscord,
+  FaGithub,
+  FaVoicemail,
+  FaEnvelope,
+} from "react-icons/fa6";
 import { BiSolidMessageRoundedDetail } from "react-icons/bi";
 import { IoCopy, IoShareSocialSharp } from "react-icons/io5";
 import DelegateInfo from "./DelegateInfo";
@@ -10,7 +16,7 @@ import DelegateVotes from "./DelegateVotes";
 import DelegateSessions from "./DelegateSessions";
 import DelegateOfficeHrs from "./DelegateOfficeHrs";
 import copy from "copy-to-clipboard";
-import { Button, Tooltip } from "@nextui-org/react";
+import { Button, Tooltip, useDisclosure } from "@nextui-org/react";
 import { StaticImport } from "next/dist/shared/lib/get-img-props";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useRouter } from "next-nprogress-bar";
@@ -45,6 +51,10 @@ import DelegateTileModal from "../ComponentUtils/delegateTileModal";
 import { set } from "video.js/dist/types/tech/middleware";
 import MainProfileSkeletonLoader from "../SkeletonLoader/MainProfileSkeletonLoader";
 import { fetchEnsAvatar } from "@/utils/ENSUtils";
+import Confetti from "react-confetti";
+import { connected } from "process";
+import { IoMdNotifications } from "react-icons/io";
+import { IoMdNotificationsOff } from "react-icons/io";
 import { BASE_URL } from "@/config/constants";
 
 interface Type {
@@ -73,16 +83,26 @@ function SpecificDelegate({ props }: { props: Type }) {
   const [description, setDescription] = useState("");
   // const provider = new ethers.BrowserProvider(window?.ethereum);
   const [displayEnsName, setDisplayEnsName] = useState<string>();
-  const [isCopied, setIsCopied] = useState(false);
   const [delegate, setDelegate] = useState("");
   const [same, setSame] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [followers, setFollowers] = useState(0);
+  const [followed, isFollowed] = useState(false);
+  const [isOpenunfollow, setUnfollowmodel] = useState(false);
+  const [isOpenNotification, setNotificationmodel] = useState(false);
+  const [notification, isNotification] = useState(false);
+  const [daoname, setDaoName] = useState("");
   const [emailId, setEmailId] = useState<string>();
   const [isEmailVisible, setIsEmailVisible] = useState(false);
 
   const [delegateOpen, setDelegateOpen] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
   const address = useAccount();
+  const [followerCountLoading, setFollowerCountLoading] = useState(true);
+  const [notificationLoading, setNotificationLoading] = useState(false);
+  const [isFollowStatusLoading, setIsFollowStatusLoading] = useState(true);
 
   const { isConnected } = useAccount();
 
@@ -235,6 +255,7 @@ function SpecificDelegate({ props }: { props: Type }) {
   useEffect(() => {
     console.log("Network", chain?.network);
     const fetchData = async () => {
+      console.log("fetching from karma");
       setIsPageLoading(true);
       try {
         const res = await fetch(
@@ -264,6 +285,8 @@ function SpecificDelegate({ props }: { props: Type }) {
             ? details.data.delegate.githubHandle
             : "",
         });
+        await updateFollowerState();
+        await setFollowerscount();
 
         setIsPageLoading(false);
       } catch (error) {
@@ -273,7 +296,7 @@ function SpecificDelegate({ props }: { props: Type }) {
     };
 
     fetchData();
-  }, []);
+  }, [chain]);
 
   useEffect(() => {
     const checkDelegateStatus = async () => {
@@ -333,6 +356,292 @@ function SpecificDelegate({ props }: { props: Type }) {
     toast("Address Copied");
   };
 
+  const setFollowerscount = async () => {
+    const myHeaders = new Headers();
+    // setFollowerCountLoading(true);
+    myHeaders.append("Content-Type", "application/json");
+    const raw = JSON.stringify({
+      address: props.individualDelegate,
+    });
+
+    const requestOptions: any = {
+      method: "POST",
+      headers: myHeaders,
+      body: raw,
+      redirect: "follow",
+    };
+
+    try {
+      const resp = await fetch(
+        `/api/delegate-follow/savefollower`,
+        requestOptions
+      );
+
+      if (!resp.ok) {
+        throw new Error("Failed to save follower");
+      }
+
+      const data = await resp.json();
+      console.log("API Response:", data);
+
+      if (!data.success || !data.data || data.data.length === 0) {
+        console.log("No data returned from API");
+        return;
+      }
+
+      const followerData = data.data[0];
+      const daoFollowers = followerData.followers.find(
+        (dao: any) =>
+          dao.dao_name.toLowerCase() === props.daoDelegates.toLowerCase()
+      );
+
+      if (daoFollowers) {
+        const followerCount = daoFollowers.follower.filter(
+          (f: any) => f.isFollowing
+        ).length;
+
+        console.log(`Follower count for ${daoname}:`, followerCount);
+        setFollowers(followerCount);
+        setFollowerCountLoading(false);
+      }
+    } catch {
+      console.log("no followers found something went wrong!");
+      setFollowers(0);
+      setFollowerCountLoading(false);
+    }
+  };
+
+  const updateFollowerState = async () => {
+    // console.log("Attempting to call savefollower API");
+    setIsFollowStatusLoading(true);
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    const raw = JSON.stringify({
+      address: props.individualDelegate,
+    });
+
+    const requestOptions: any = {
+      method: "POST",
+      headers: myHeaders,
+      body: raw,
+      redirect: "follow",
+    };
+
+    try {
+      const resp = await fetch(
+        `/api/delegate-follow/savefollower`,
+        requestOptions
+      );
+
+      if (!resp.ok) {
+        throw new Error("Failed to save follower");
+      }
+
+      const data = await resp.json();
+      console.log("API Response:", data);
+
+      if (!data.success || !data.data || data.data.length === 0) {
+        console.log("No data returned from API");
+        return;
+      }
+
+      const followerData = data.data[0];
+      let address = await walletClient.getAddresses();
+      let address_user = address[0].toLowerCase(); // Convert to lowercase for case-insensitive comparison
+      let currentDaoName = "";
+      if (chain?.name === "Optimism") {
+        currentDaoName = "optimism";
+      } else if (chain?.name === "Arbitrum One") {
+        currentDaoName = "arbitrum";
+      }
+
+      console.log("Current DAO:", currentDaoName);
+      console.log("User Address:", address_user);
+
+      const daoFollowers = followerData.followers.find(
+        (dao: any) =>
+          dao.dao_name.toLowerCase() === currentDaoName.toLowerCase()
+      );
+
+      console.log("DAO Followers:", daoFollowers);
+
+      if (daoFollowers) {
+        const follow = daoFollowers.follower.find(
+          (f: any) => f.address.toLowerCase() === address_user
+        );
+
+        console.log("User's follow status:", follow);
+
+        if (follow) {
+          setIsFollowing(follow.isFollowing);
+          isNotification(follow.isNotification); // Changed from isNotification(follow.isNotification)
+        } else {
+          setIsFollowing(false);
+          isNotification(false); // Changed from isNotification(false)
+        }
+
+        // const followerCount = daoFollowers.follower.filter(
+        //   (f: any) => f.isFollowing
+        // ).length;
+
+        // console.log("Follower count:", followerCount);
+
+        // setFollowers(followerCount);
+      } else {
+        setIsFollowing(false);
+        isNotification(false); // Changed from isNotification(false)
+        setFollowers(0);
+      }
+    } catch (error) {
+      console.error("Error in updateFollowerState:", error);
+    } finally {
+      setIsFollowStatusLoading(false);
+    }
+  };
+
+  const handleConfirm = async (action: number) => {
+    let delegate_address: string;
+    let follower_address: string;
+    let dao: string;
+    dao = daoname;
+    let address = await walletClient.getAddresses();
+    follower_address = address[0];
+    delegate_address = props.individualDelegate;
+
+    if (action == 1) {
+      setLoading(true);
+      try {
+        const response = await fetch("/api/delegate-follow/updatefollower", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            // Add any necessary data
+            delegate_address: delegate_address,
+            follower_address: follower_address,
+            action: action,
+            dao: dao,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to unfollow");
+        }
+
+        const data = await response.json();
+        setLoading(false);
+        setUnfollowmodel(false);
+        setIsFollowing(false);
+        isNotification(false);
+        setFollowers(followers - 1);
+        isFollowed(false);
+        toast.success("You unfollow delegate!");
+        console.log("unFollow successful:", data);
+      } catch (error) {
+        console.error("Error following:", error);
+      }
+    } else if (action == 2) {
+      if (!isConnected) {
+        toast.error("Please connect your wallet!");
+      } else if (!isFollowing) {
+        toast.error(
+          "You have to follow delegate first in order to get notification!"
+        );
+      } else {
+        let updatenotification: boolean;
+        updatenotification = !notification;
+        setNotificationLoading(true);
+        try {
+          const response = await fetch("/api/delegate-follow/updatefollower", {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              // Add any necessary data
+              delegate_address: delegate_address,
+              follower_address: follower_address,
+              action: action,
+              dao: dao,
+              updatenotification: updatenotification,
+            }),
+          });
+
+          if (!response.ok) {
+            throw new Error("Failed to notification");
+          }
+
+          toast.success("Succefully update notification status!");
+          const data = await response.json();
+          isNotification(!notification);
+          console.log("notification successful:", data);
+        } catch (error) {
+          console.error("Error following:", error);
+        } finally {
+          setNotificationLoading(false);
+        }
+      }
+    }
+  };
+
+  const handleFollow = async () => {
+    if (!isConnected) {
+      if (openConnectModal) {
+        openConnectModal();
+      }
+    } else if (isFollowing) {
+      setUnfollowmodel(true);
+    } else {
+      if (walletClient?.chain?.network === props.daoDelegates) {
+        setLoading(true);
+        let delegate_address: string;
+        let follower_address: string;
+        let dao: string;
+        dao = daoname;
+        let address = await walletClient.getAddresses();
+        follower_address = address[0];
+        delegate_address = props.individualDelegate;
+        try {
+          const response = await fetch("/api/delegate-follow/savefollower", {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              // Add any necessary data
+              delegate_address: delegate_address,
+              follower_address: follower_address,
+              dao: dao,
+            }),
+          });
+
+          if (!response.ok) {
+            throw new Error("Failed to follow");
+          }
+
+          const data = await response.json();
+          setLoading(false);
+          toast.success(
+            "Successfully followed the delegate! Stay tuned for updates."
+          );
+          setFollowers(followers + 1);
+          setTimeout(() => isFollowed(true), 1000);
+          setIsFollowing(true);
+          isNotification(true);
+          console.log("Follow successful:", data);
+        } catch (error) {
+          setLoading(false);
+          console.error("Error following:", error);
+        }
+      } else {
+        toast.error("Switch to appropriate network for follow delegate!");
+        if (openChainModal) {
+          openChainModal();
+        }
+      }
+    }
+  };
   const handleDelegateVotes = async (to: string) => {
     let address;
     let address1;
@@ -393,7 +702,28 @@ function SpecificDelegate({ props }: { props: Type }) {
   };
 
   useEffect(() => {
+    if (chain) {
+      if (chain.name === "Optimism") {
+        setDaoName("optimism");
+      } else if (chain.name === "Arbitrum One") {
+        setDaoName("arbitrum");
+      } else {
+        // Optional: handle other chains or set a default
+        setDaoName("");
+      }
+    }
+  }, [chain]);
+
+  useEffect(() => {
     const fetchData = async () => {
+      let currentDaoName = "";
+      if (chain?.name === "Optimism") {
+        currentDaoName = "optimism";
+      } else if (chain?.name === "Arbitrum One") {
+        currentDaoName = "arbitrum";
+      }
+
+      setDaoName(currentDaoName);
       try {
         // Fetch data from your backend API to check if the address exists
 
@@ -444,7 +774,7 @@ function SpecificDelegate({ props }: { props: Type }) {
               setIsEmailVisible(true);
               setEmailId(item.emailId);
             }
-            const matchingNetwork = item.networks.find(
+            const matchingNetwork = item.networks?.find(
               (network: any) => network.dao_name === chain?.name
             );
 
@@ -459,6 +789,13 @@ function SpecificDelegate({ props }: { props: Type }) {
             }
             setDisplayName(item.displayName);
 
+            if (!isConnected) {
+              setIsFollowing(false);
+              isNotification(false);
+            } else {
+              await updateFollowerState();
+              await setFollowerscount();
+            }
             setSocials({
               twitter: item.socialHandles.twitter,
               discord: item.socialHandles.discord,
@@ -496,6 +833,7 @@ function SpecificDelegate({ props }: { props: Type }) {
       {isPageLoading && <MainProfileSkeletonLoader />}
       {!(isPageLoading || (!isDelegate && !selfDelegate)) ? (
         <div className="font-poppins">
+          {/* {followed && <Confetti recycle={false} numberOfPieces={550} />} */}
           <div className="flex ps-14 py-5 justify-between">
             <div className="flex">
               {/* <Image
@@ -505,12 +843,14 @@ function SpecificDelegate({ props }: { props: Type }) {
             height={256}
             className="w-40 rounded-3xl"
           /> */}
+
               <div
                 className="relative object-cover rounded-3xl"
                 style={{
                   backgroundColor: "#fcfcfc",
                   border: "2px solid #E9E9E9 ",
-                }}>
+                }}
+              >
                 <div className="w-40 h-40 flex items-center justify-content ">
                   <div className="flex justify-center items-center w-40 h-40">
                     <Image
@@ -572,7 +912,8 @@ function SpecificDelegate({ props }: { props: Type }) {
                           : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                      target="_blank">
+                      target="_blank"
+                    >
                       <FaXTwitter color="#7C7C7C" size={12} />
                     </Link>
                     <Link
@@ -591,7 +932,8 @@ function SpecificDelegate({ props }: { props: Type }) {
                           : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                      target="_blank">
+                      target="_blank"
+                    >
                       <BiSolidMessageRoundedDetail color="#7C7C7C" size={12} />
                     </Link>
                     <Link
@@ -606,7 +948,8 @@ function SpecificDelegate({ props }: { props: Type }) {
                           : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                      target="_blank">
+                      target="_blank"
+                    >
                       <FaDiscord color="#7C7C7C" size={12} />
                     </Link>
                     {isEmailVisible && (
@@ -614,7 +957,8 @@ function SpecificDelegate({ props }: { props: Type }) {
                         href={`mailto:${emailId}`}
                         className="border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1"
                         style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                        target="_blank">
+                        target="_blank"
+                      >
                         <FaEnvelope color="#7C7C7C" size={12} />
                       </Link>
                     )}
@@ -630,7 +974,8 @@ function SpecificDelegate({ props }: { props: Type }) {
                           : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                      target="_blank">
+                      target="_blank"
+                    >
                       <FaGithub color="#7C7C7C" size={12} />
                     </Link>
                   </div>
@@ -644,9 +989,10 @@ function SpecificDelegate({ props }: { props: Type }) {
 
                   <Tooltip
                     content="Copy"
-                    placement="bottom"
+                    placement="right"
                     closeDelay={1}
-                    showArrow>
+                    showArrow
+                  >
                     <span className="px-2 cursor-pointer" color="#3E3D3D">
                       <IoCopy
                         onClick={() => handleCopy(props.individualDelegate)}
@@ -665,7 +1011,8 @@ function SpecificDelegate({ props }: { props: Type }) {
                       content="Copy profile URL to share on Warpcast or Twitter."
                       placement="bottom"
                       closeDelay={1}
-                      showArrow>
+                      showArrow
+                    >
                       <Button
                         className="bg-gray-200 hover:bg-gray-300"
                         onClick={() => {
@@ -677,14 +1024,15 @@ function SpecificDelegate({ props }: { props: Type }) {
                           setTimeout(() => {
                             setIsCopied(false);
                           }, 3000);
-                        }}>
+                        }}
+                      >
                         <IoShareSocialSharp />
                         {isCopied ? "Copied" : "Share profile"}
                       </Button>
                     </Tooltip>
                   </div>
                   <div style={{ zIndex: "21474836462" }}>
-                    <Toaster
+                    {/* <Toaster
                       toastOptions={{
                         style: {
                           fontSize: "14px",
@@ -695,11 +1043,26 @@ function SpecificDelegate({ props }: { props: Type }) {
                           padding: "3px 5px",
                         },
                       }}
-                    />
+                    /> */}
                   </div>
                 </div>
 
                 <div className="flex gap-4 py-1">
+                  <div className="text-[#4F4F4F] border-[0.5px] border-[#D9D9D9] rounded-md px-3 py-1 flex justify-center items-center w-[109px]">
+                    {followerCountLoading ? (
+                      <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-blue-shade-100"></div>
+                    ) : (
+                      <>
+                        <span className="text-blue-shade-200 font-semibold">
+                          {followers ? followers : 0}
+                          &nbsp;
+                        </span>
+                        {followers === 0 || followers === 1
+                          ? "Follower"
+                          : "Followers"}
+                      </>
+                    )}
+                  </div>
                   <div className="text-[#4F4F4F] border-[0.5px] border-[#D9D9D9] rounded-md px-3 py-1">
                     <span className="text-blue-shade-200 font-semibold">
                       {props.daoDelegates === "arbitrum"
@@ -724,16 +1087,160 @@ function SpecificDelegate({ props }: { props: Type }) {
                   </div>
                 </div>
 
-                <div className="pt-2">
+                <div className="pt-2 flex space-x-4 items-center">
                   <button
                     className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
                     // onClick={() =>
                     //   handleDelegateVotes(`${props.individualDelegate}`)
                     // }
 
-                    onClick={handleDelegateModal}>
+                    onClick={handleDelegateModal}
+                  >
                     Delegate
                   </button>
+
+                  <button
+                    className={`font-bold text-white rounded-full w-[138.5px] h-[44px] py-[10px] flex justify-center items-center ${
+                      isFollowing ? "bg-blue-shade-200" : "bg-black"
+                    }`}
+                    onClick={handleFollow}
+                  >
+                    {isFollowStatusLoading ? (
+                      <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div>
+                    ) : loading ? (
+                      <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div>
+                    ) : isFollowing ? (
+                      "Following"
+                    ) : (
+                      "Follow"
+                    )}
+                  </button>
+
+                  <Tooltip
+                    content={
+                      notification
+                        ? "Click to mute delegate activity alerts."
+                        : "Don't miss out! Click to get alerts on delegate activity."
+                    }
+                    placement="top"
+                    closeDelay={1}
+                    showArrow
+                  >
+                    <div
+                      className={`border  rounded-full flex items-center justify-center size-10  ${
+                        isFollowing
+                          ? "cursor-pointer border-blue-shade-200"
+                          : "cursor-not-allowed border-gray-200"
+                      }`}
+                      onClick={() =>
+                        isFollowing && !notificationLoading && handleConfirm(2)
+                      }
+                    >
+                      {notificationLoading ? (
+                        <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-blue-shade-100"></div>
+                      ) : isFollowing ? (
+                        notification ? (
+                          <IoMdNotifications className="text-blue-shade-200 size-6" />
+                        ) : (
+                          <IoMdNotificationsOff className="text-blue-shade-200 size-6" />
+                        )
+                      ) : (
+                        <IoMdNotifications className="text-gray-200 size-6" />
+                      )}
+                    </div>
+                  </Tooltip>
+
+                  {isOpenunfollow && (
+                    <div className="font-poppins z-[70] fixed inset-0 flex items-center justify-center backdrop-blur-md">
+                      <div className="bg-white rounded-[41px] overflow-hidden shadow-lg w-1/2">
+                        <div className="relative">
+                          <div className="flex flex-col gap-1 text-white bg-[#292929] p-4 py-7">
+                            <h2 className="text-lg font-semibold mx-4">
+                              Are you sure you want to unfollow this delegate?
+                            </h2>
+                          </div>
+                          <div className="px-8 py-4">
+                            <p className="mt-4 text-center">
+                              By unfollowing, you will miss out on important
+                              updates, exclusive alerts of delegate. Stay
+                              connected to keep up with all the latest
+                              activities!
+                            </p>
+                          </div>
+                          <div className="flex justify-center px-8 py-4">
+                            <button
+                              className="bg-gray-300 text-gray-700 px-8 py-3 font-semibold rounded-full mr-4"
+                              onClick={() => setUnfollowmodel(false)}
+                            >
+                              Cancel
+                            </button>
+                            <button
+                              className="bg-red-500 text-white px-8 py-3 font-semibold rounded-full"
+                              onClick={() => handleConfirm(1)}
+                            >
+                              {loading ? (
+                                <Oval
+                                  visible={true}
+                                  height="20"
+                                  width="20"
+                                  color="white"
+                                  secondaryColor="#cdccff"
+                                  ariaLabel="oval-loading"
+                                />
+                              ) : (
+                                "Unfollow"
+                              )}
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* <Tooltip
+                    content={
+                      notification
+                        ? "Click to mute delegate activity alerts."
+                        : "Don't miss out! Click to get alerts on delegate activity."
+                    }
+                    placement="top"
+                    closeDelay={1}
+                    showArrow> */}
+                  {/* <button
+                      className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[5px] flex items-center mr-2"
+                      onClick={() => {
+                        if (notification) {
+                          setNotificationmodel(true);
+                        } else {
+                          handleConfirm(2);
+                        }
+                      }}
+                    > */}
+                  {/* <div
+                      className="flex items-center cursor-pointer"
+                      onClick={() => {
+                        if (notification) {
+                          handleConfirm(2);
+                        } else {
+                          handleConfirm(2);
+                        }
+                      }}>
+                      {isFollowing &&
+                        (notification ? (
+                          <BiSolidBellRing
+                            className=""
+                            color="bg-blue-shade-200"
+                            size={24}
+                          />
+                        ) : (
+                          <BiSolidBellOff
+                            className="mr-1"
+                            color="bg-blue-shade-200"
+                            size={24}
+                          />
+                        ))}
+                    </div>
+                  </Tooltip> */}
                 </div>
               </div>
             </div>
@@ -749,7 +1256,8 @@ function SpecificDelegate({ props }: { props: Type }) {
                   ? " border-blue-shade-200 text-blue-shade-200 font-semibold"
                   : "border-transparent"
               }`}
-              onClick={() => router.push(path + "?active=info")}>
+              onClick={() => router.push(path + "?active=info")}
+            >
               Info
             </button>
             <button
@@ -758,7 +1266,8 @@ function SpecificDelegate({ props }: { props: Type }) {
                   ? "text-blue-shade-200 font-semibold border-blue-shade-200"
                   : "border-transparent"
               }`}
-              onClick={() => router.push(path + "?active=pastVotes")}>
+              onClick={() => router.push(path + "?active=pastVotes")}
+            >
               Past Votes
             </button>
             <button
@@ -769,7 +1278,8 @@ function SpecificDelegate({ props }: { props: Type }) {
               }`}
               onClick={() =>
                 router.push(path + "?active=delegatesSession&session=book")
-              }>
+              }
+            >
               Sessions
             </button>
             <button
@@ -780,7 +1290,8 @@ function SpecificDelegate({ props }: { props: Type }) {
               }`}
               onClick={() =>
                 router.push(path + "?active=officeHours&hours=ongoing")
-              }>
+              }
+            >
               Office Hours
             </button>
           </div>

@@ -8,6 +8,7 @@ import user from "@/assets/images/daos/user1.png";
 import chain from "@/assets/images/daos/chain.png";
 import ProposalsSkeletonLoader from "../SkeletonLoader/ProposalsSkeletonLoader";
 import ArbLogo from "@/assets/images/daos/arbCir.png";
+import { dao_details } from "@/config/daoDetails";
 
 interface Proposal {
   proposalId: string;
@@ -341,7 +342,7 @@ const formatDate = (timestamp: number): string => {
 
   return (
     <>
-      <div className="mr-16 rounded-[2rem] mt-4">
+      <div className="mr-3 rounded-[2rem] mt-4">
         {displayedProposals.map((proposal: Proposal, index: number) => (
           <div
             key={index}
@@ -349,10 +350,10 @@ const formatDate = (timestamp: number): string => {
             onClick={() => handleClick(proposal)}
           >
             <div className="flex basis-1/2">
-              <Image
-                src={props === "optimism" ? opLogo : ArbLogo}
-                alt=""
-                className="size-10 mx-5"
+            <Image
+                src={dao_details[props as keyof typeof dao_details].logo}
+                alt={`${dao_details[props as keyof typeof dao_details].title} logo`}
+                className="size-10 mx-5 rounded-full"
               />
               <div>
                 <p className="text-base font-medium">
@@ -361,7 +362,7 @@ const formatDate = (timestamp: number): string => {
                 <div className="flex gap-1">
                   {/* <Image src={user} alt="" className="size-4" /> */}
                   <p className="flex text-xs font-normal items-center">
-                    <span className="text-[#004DFF]"> Started at </span>&nbsp;{formatDate(proposal.blockTimestamp)}
+                    <span className="text-[#004DFF]"> Created at </span>&nbsp;{formatDate(proposal.blockTimestamp)}
                   </p>
                 </div>
               </div>
@@ -384,7 +385,7 @@ const formatDate = (timestamp: number): string => {
                 className={`rounded-full flex items-center justify-center text-xs h-fit py-0.5 border font-medium w-24 ${
                   getProposalStatus(proposal) === "SUCCEEDED"
                     ? "bg-green-200 border-green-600 text-green-600"
-                    : getProposalStatus(proposal) === "DEFEATED"
+                    : getProposalStatus(proposal) === "DEFEATED" || getProposalStatus(proposal) === "CANCELLED"
                     ? "bg-red-200 border-red-500 text-red-500"
                     : getProposalStatus(proposal) === "QUEUED"
                     ? "bg-yellow-200 border-yellow-600 text-yellow-600"

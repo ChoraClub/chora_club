@@ -2,6 +2,10 @@ import { connectDB } from "@/config/connectDB";
 import { NextApiRequest, NextApiResponse } from "next";
 import { NextResponse, NextRequest } from "next/server";
 import { sendMail, compileBookedSessionTemplate } from "@/libs/mail";
+import { io } from "socket.io-client";
+import { SOCKET_BASE_URL } from "@/config/constants";
+import { getEnsName } from "@/utils/ENSUtils";
+import { truncateAddress } from "@/utils/text";
 
 type Attendee = {
   attendee_address: string;
@@ -65,17 +69,11 @@ export async function POST(
   }: MeetingRequestBody = await req.json();
 
   try {
-    // Connect to your MongoDB database
-    // console.log("Connecting to MongoDB...");
     const client = await connectDB();
-    // console.log("Connected to MongoDB");
 
-    // Access the collection
     const db = client.db();
     const collection = db.collection("meetings");
 
-    // Insert the new meeting document
-    // console.log("Inserting meeting document...");
     const result = await collection.insertOne({
       host_address,
       attendees,
@@ -90,13 +88,8 @@ export async function POST(
       thumbnail_image,
       session_type,
     });
-    // console.log("Meeting document inserted:", result);
-
-    // console.log("MongoDB connection closed");
 
     if (result.insertedId) {
-      // Retrieve the inserted document using the insertedId
-      // console.log("Retrieving inserted document...");
       const insertedDocument = await collection.findOne({
         _id: result.insertedId,
       });
@@ -106,7 +99,105 @@ export async function POST(
         .find({ address: host_address })
         .toArray();
 
+      const slotDate = new Date(slot_time);
+      const options: any = {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "numeric",
+        minute: "numeric",
+        hour12: true,
+      };
+      const localSlotTime = slotDate.toLocaleString("en-US", options);
+
       if (session_type === "session") {
+        const userAddress = attendees[0].attendee_address;
+        const ensNameOrUserAddress = await getEnsName(userAddress);
+        let userENSNameOrAddress = ensNameOrUserAddress?.ensNameOrAddress;
+        if (userENSNameOrAddress === undefined) {
+          userENSNameOrAddress = truncateAddress(userAddress);
+        }
+        const ensNameOrHostAddress = await getEnsName(host_address);
+        let hostENSNameOrAddress = ensNameOrHostAddress?.ensNameOrAddress;
+        if (hostENSNameOrAddress === undefined) {
+          hostENSNameOrAddress = truncateAddress(userAddress);
+        }
+        const notificationToHost = {
+          receiver_address: host_address,
+          content: `Great news! 🎉 ${userENSNameOrAddress} has just booked a session with you on ${dao_name}. The session is scheduled on ${localSlotTime} and will focus on ${title}.`,
+          createdAt: Date.now(),
+          read_status: false,
+          notification_name: "newBookingForHost",
+          notification_title: "Session Booking",
+          notification_type: "newBooking",
+        };
+
+        const notificationToGuest = {
+          receiver_address: userAddress,
+          content: `Congratulations! 🎉 Your session on ${dao_name} titled "${title}" has been successfully booked with ${hostENSNameOrAddress}. The session will take place on ${localSlotTime}.`,
+          createdAt: Date.now(),
+          read_status: false,
+          notification_name: "newBookingForGuest",
+          notification_title: "Session Booking",
+          notification_type: "newBooking",
+        };
+
+        const notificationCollection = db.collection("notifications");
+
+        const notificationResults = await notificationCollection.insertMany([
+          notificationToHost,
+          notificationToGuest,
+        ]);
+
+        console.log("notificationResults", notificationResults);
+
+        if (notificationResults.insertedCount === 2) {
+          const insertedNotifications = await notificationCollection
+            .find({
+              _id: { $in: Object.values(notificationResults.insertedIds) },
+            })
+            .toArray();
+
+          console.log("insertedNotifications", insertedNotifications);
+        }
+        const dataToSendHost = {
+          ...notificationToHost,
+          _id: notificationResults.insertedIds[0],
+        };
+        const dataToSendGuest = {
+          ...notificationToGuest,
+          _id: notificationResults.insertedIds[1],
+        };
+
+        const attendee_address = userAddress;
+
+        console.log("dataToSendHost", dataToSendHost);
+        console.log("dataToSendGuest", dataToSendGuest);
+
+        const socket = io(`${SOCKET_BASE_URL}`, {
+          withCredentials: true,
+        });
+        socket.on("connect", () => {
+          console.log("Connected to WebSocket server from API");
+          socket.emit("new_session", {
+            host_address,
+            dataToSendHost,
+            attendee_address,
+            dataToSendGuest,
+          });
+          console.log("Message sent from API to socket server");
+          socket.disconnect();
+        });
+
+        socket.on("connect_error", (err) => {
+          console.error("WebSocket connection error:", err);
+        });
+
+        socket.on("error", (err) => {
+          console.error("WebSocket error:", err);
+        });
+
         for (const document of documentsForHostEmail) {
           const emailId = document.emailId;
           if (emailId && emailId !== "" && emailId !== undefined) {
@@ -117,7 +208,7 @@ export async function POST(
                 subject: "Session Booked",
                 body: compileBookedSessionTemplate(
                   "Your session has been Booked.",
-                  "You can Approve or Reject."
+                  notificationToHost.content
                 ),
               });
             } catch (error) {
@@ -125,10 +216,10 @@ export async function POST(
             }
           }
         }
-      }
+        // }
 
-      if (session_type === "session") {
-        const userAddress = attendees[0].attendee_address;
+        // if (session_type === "session") {
+
         const documentsForUserEmail = await delegateCollection
           .find({ address: userAddress })
           .toArray();
@@ -142,7 +233,7 @@ export async function POST(
                 subject: "Session Booked",
                 body: compileBookedSessionTemplate(
                   "🎉 Hooray! Your session is officially booked! ",
-                  "Get ready for an amazing experience."
+                  notificationToGuest.content
                 ),
               });
             } catch (error) {
@@ -159,6 +250,7 @@ export async function POST(
         { status: 200 }
       );
     } else {
+      client.close();
       return NextResponse.json(
         { error: "Failed to retrieve inserted document" },
         { status: 500 }
