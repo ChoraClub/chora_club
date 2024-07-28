@@ -85,7 +85,7 @@ export async function PUT(req: NextRequest) {
             `Dear ${address.slice(0, 6)}...${address.slice(
               -4
             )},\nWe're thrilled to inform you that ${delegateInfo} a delegate from a ${capitalizedDAO} DAO you're following has just scheduled a new session!`,
-            "Don't miss out—book your spot now to dive deeper into the Web3 Ecosystem."
+            `Don't miss out—book your spot now to dive deeper into the Web3 Ecosystem navigate to this link \n https://app.chora.club/${daoName}/${delegate_address}?active=delegatesSession&session=book`
           ),
         });
         console.log(`Email sent successfully to ${emailId}`);
