@@ -66,7 +66,7 @@ function NotificationTile({ data, index, length }: NotificationTileProps) {
           </div>
         </div>
         <div
-          className={`text-xs text-black font-bold min-w-24 flex items-center justify-center ${
+          className={`text-xs text-black font-semibold min-w-24 flex items-center justify-center ${
             readStatus ? "text-gray-500 font-normal" : ""
           }`}
         >
