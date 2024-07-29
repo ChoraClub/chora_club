@@ -383,7 +383,7 @@ function Sidebar() {
                   src={office}
                   alt={"image"}
                   width={40}
-                  className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 office${
+                  className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 office ${
                     pathname.includes(`/office-hours`)
                       ? "border-white border-2 rounded-full"
                       : ""
