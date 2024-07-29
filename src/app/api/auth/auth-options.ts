@@ -3,6 +3,35 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { getCsrfToken } from "next-auth/react";
 import { SiweMessage } from "siwe";
 import { BASE_URL } from "@/config/constants";
+import jwt from "jsonwebtoken";
+
+async function AccountCreate(user: any, token: any) {
+  try {
+    const res = await fetch(`${BASE_URL}/api/auth/accountcreate`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-wallet-address": user,
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        address: user,
+        isEmailVisible: false,
+        createdAt: new Date(),
+      }),
+    });
+
+    if (res.status === 200) {
+      console.log("Account created successfully!");
+    } else if (res.status === 409) {
+      console.log("Resource already exists!");
+    } else {
+      console.log("Unexpected response:", await res.text());
+    }
+  } catch (error) {
+    console.error("Error in initial profile:", error);
+  }
+}
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -58,47 +87,29 @@ export const authOptions: NextAuthOptions = {
   },
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
+    async jwt({ token, account }) {
+      if (account) {
+        // Create a new JWT access token
+        const accessToken = jwt.sign(
+          {
+            sub: token.sub, // Use the user's address as the subject
+            address: token.sub,
+          },
+          process.env.NEXTAUTH_SECRET!,
+          { expiresIn: "10m" } // Token expires in 1 hour, adjust as needed
+        );
+
+        // Add the access token to the token object
+        // console.log("Access token", accessToken);
+        AccountCreate(token.sub, accessToken);
+        token.accessToken = accessToken;
+      }
+      return token;
+    },
     async session({ session, token }: { session: any; token: any }) {
       session.address = token.sub;
       session.user.name = token.sub;
       return session;
-    },
-  },
-  events: {
-    async signIn({ user }) {
-      try {
-        const myHeaders = new Headers();
-        myHeaders.append("Content-Type", "application/json");
-        if (user.id) {
-          myHeaders.append("x-wallet-address", user.id);
-        }
-
-        const raw = JSON.stringify({
-          address: user.id,
-          isEmailVisible: false,
-          createdAt: new Date(),
-        });
-
-        const requestOptions: any = {
-          method: "POST",
-          headers: myHeaders,
-          body: raw,
-          redirect: "follow",
-        };
-        console.log(requestOptions);
-        const res = await fetch(
-          `${BASE_URL}/api/auth/accountcreate`,
-          requestOptions
-        );
-        // console.log("Response:-", res);
-        if (res.status === 200) {
-          console.log("Account created succesfully!");
-        } else if (res.status == 409) {
-          console.log("Resource already exist!");
-        }
-      } catch (error) {
-        console.error("Error in initial profile:", error);
-      }
     },
   },
 };
