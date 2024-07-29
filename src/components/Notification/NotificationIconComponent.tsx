@@ -231,9 +231,7 @@ function NotificationIconComponent() {
                       {formatTimestampOrDate(data.createdAt)}
                     </div>
                   </div>
-                  {/* {index < combinedNotifications.slice(0, 3).length - 1 && ( */}
                   <hr className="border-[#DDDDDD] border-0.5" />
-                  {/* )} */}
                 </React.Fragment>
               ))
             ) : (

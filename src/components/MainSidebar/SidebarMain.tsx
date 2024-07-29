@@ -383,7 +383,7 @@ function Sidebar() {
                   src={office}
                   alt={"image"}
                   width={40}
-                  className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 office${
+                  className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 office ${
                     pathname.includes(`/office-hours`)
                       ? "border-white border-2 rounded-full"
                       : ""
@@ -465,28 +465,6 @@ function Sidebar() {
           </div>
           <div className="flex flex-col items-center gap-y-4 pt-5">
             <NotificationIconComponent />
-            <Tooltip
-              content={<div className="capitalize">Notifications</div>}
-              placement="right"
-              className="rounded-md bg-opacity-90"
-              closeDelay={1}
-            >
-              <Badge
-                content={notificationCount}
-                color="danger"
-                placement="top-right"
-                size="md"
-                isInvisible={notificationCount === 0}
-                className="border-none bg-blue-shade-200 translate-x-1.5 -translate-y-1.5"
-              >
-                <div
-                  className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 bg-white rounded-full flex justify-center items-center `}
-                  onClick={() => router.push(`/notifications`)}
-                >
-                  <IoMdNotifications className="size-6 text-blue-shade-200" />
-                </div>
-              </Badge>
-            </Tooltip>
             <Tooltip
               content={<div className="capitalize">Git Book</div>}
               placement="right"
