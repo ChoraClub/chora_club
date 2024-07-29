@@ -1,5 +1,5 @@
+import NotificationMain from "@/components/Notification/NotificationMain";
 import React from "react";
-import NotificationMain from '@/components/Notification/NotificationMain'
 function page() {
   return (
     <div>

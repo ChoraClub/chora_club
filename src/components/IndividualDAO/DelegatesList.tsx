@@ -716,7 +716,7 @@ function DelegatesList({ props }: { props: string }) {
                       </div>
                     </div>
                     <div style={{ zIndex: "21474836462" }}>
-                      <Toaster
+                      {/* <Toaster
                         toastOptions={{
                           style: {
                             fontSize: "14px",
@@ -727,7 +727,7 @@ function DelegatesList({ props }: { props: string }) {
                             padding: "3px 5px",
                           },
                         }}
-                      />
+                      /> */}
                     </div>
                   </div>
                   {delegateOpen && (

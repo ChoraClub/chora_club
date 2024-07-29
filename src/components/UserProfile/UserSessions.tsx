@@ -116,7 +116,7 @@ function UserSessions({
   // }, [searchParams.get("session")]);
 
   useEffect(() => {
-    if (selfDelegate === false && searchParams.get("session") === "schedule") {
+    if (selfDelegate === true && searchParams.get("session") === "schedule") {
       router.replace(path + "?active=sessions&session=attending");
     }
   }, [selfDelegate]);
