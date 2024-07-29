@@ -14,6 +14,7 @@ import { useSocket } from "@/app/hooks/useSocket";
 import { PiEnvelopeOpen } from "react-icons/pi";
 import { useSession } from "next-auth/react";
 import { MagnifyingGlass } from "react-loader-spinner";
+import toast from "react-hot-toast";
 
 function NotificationMain() {
   const { data: session, status } = useSession();
@@ -202,7 +203,8 @@ function NotificationMain() {
                 ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
                 : "border-transparent"
             }`}
-            onClick={() => router.push(path + "?active=recordedSessions")}
+            // onClick={() => router.push(path + "?active=recordedSessions")}
+            onClick={() => toast("Coming Soon 🚀")}
           >
             Recorded Sessions
           </button>
@@ -212,7 +214,8 @@ function NotificationMain() {
                 ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
                 : "border-transparent"
             }`}
-            onClick={() => router.push(path + "?active=followers")}
+            // onClick={() => router.push(path + "?active=followers")}
+            onClick={() => toast("Coming Soon 🚀")}
           >
             Followers
           </button>
@@ -222,7 +225,8 @@ function NotificationMain() {
                 ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
                 : "border-transparent"
             }`}
-            onClick={() => router.push(path + "?active=attestations")}
+            // onClick={() => router.push(path + "?active=attestations")}
+            onClick={() => toast("Coming Soon 🚀")}
           >
             Attestations
           </button>
@@ -238,7 +242,7 @@ function NotificationMain() {
         </div>
       </div>
       <div className="px-16">
-        {isLoading ? ( // Show loader if loading
+        {isLoading ? (
           <div className="flex justify-center items-center h-64">
             <MagnifyingGlass
               color={"#123abc"}
@@ -249,20 +253,28 @@ function NotificationMain() {
           </div>
         ) : (
           <>
-            {searchParams.get("active") === "all" && (
-              <NotificationAll notifications={combinedNotifications} />
-            )}
-            {searchParams.get("active") === "sessionBookings" && (
-              <SessionBookings notifications={sessionBookings} />
-            )}
-            {searchParams.get("active") === "recordedSessions" && (
-              <RecordedSessions notifications={recordedSessions} />
-            )}
-            {searchParams.get("active") === "followers" && (
-              <Followers notifications={followers} />
-            )}
-            {searchParams.get("active") === "attestations" && (
-              <Attestation notifications={attestations} />
+            {combinedNotifications.length === 0 ? (
+              <div className="flex justify-center items-center h-64">
+                <p className="text-xl text-gray-500">No new notifications</p>
+              </div>
+            ) : (
+              <>
+                {searchParams.get("active") === "all" && (
+                  <NotificationAll notifications={combinedNotifications} />
+                )}
+                {searchParams.get("active") === "sessionBookings" && (
+                  <SessionBookings notifications={sessionBookings} />
+                )}
+                {/* {searchParams.get("active") === "recordedSessions" && (
+                  <RecordedSessions notifications={recordedSessions} />
+                )}
+                {searchParams.get("active") === "followers" && (
+                  <Followers notifications={followers} />
+                )}
+                {searchParams.get("active") === "attestations" && (
+                  <Attestation notifications={attestations} />
+                )} */}
+              </>
             )}
           </>
         )}
