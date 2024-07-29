@@ -51,8 +51,13 @@ function UpdateProfileModal({
   isToggled,
 }: ProfileModalProps) {
   return (
-    <div>
+    <div onClick={
+      onClose
+      }>
       <Modal
+      onClick={(event) => {
+        event.stopPropagation();
+      }}
         isOpen={isOpen}
         // onOpenChange={onOpenChange}
         className="font-poppins rounded-3xl "

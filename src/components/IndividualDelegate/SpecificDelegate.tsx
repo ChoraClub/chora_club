@@ -357,6 +357,7 @@ function SpecificDelegate({ props }: { props: Type }) {
   };
 
   const setFollowerscount = async () => {
+    setFollowerCountLoading(true);
     const myHeaders = new Headers();
     // setFollowerCountLoading(true);
     myHeaders.append("Content-Type", "application/json");
@@ -402,13 +403,15 @@ function SpecificDelegate({ props }: { props: Type }) {
 
         console.log(`Follower count for ${daoname}:`, followerCount);
         setFollowers(followerCount);
-        setFollowerCountLoading(false);
+        // setFollowerCountLoading(false);
       }
     } catch {
       console.log("no followers found something went wrong!");
       setFollowers(0);
       setFollowerCountLoading(false);
-    }
+    }finally {
+    setFollowerCountLoading(false);
+  }
   };
 
   const updateFollowerState = async () => {
@@ -534,9 +537,10 @@ function SpecificDelegate({ props }: { props: Type }) {
         setUnfollowmodel(false);
         setIsFollowing(false);
         isNotification(false);
-        setFollowers(followers - 1);
+        // setFollowers(followers - 1);
+        setFollowers((prev) => prev - 1);
         isFollowed(false);
-        toast.success("You unfollow delegate!");
+        toast.success("You have unfollowed the Delegate.");
         console.log("unFollow successful:", data);
       } catch (error) {
         console.error("Error following:", error);
@@ -572,7 +576,7 @@ function SpecificDelegate({ props }: { props: Type }) {
             throw new Error("Failed to notification");
           }
 
-          toast.success("Succefully update notification status!");
+          toast.success("Successfully updated notification status!");
           const data = await response.json();
           isNotification(!notification);
           console.log("notification successful:", data);
@@ -623,13 +627,17 @@ function SpecificDelegate({ props }: { props: Type }) {
           const data = await response.json();
           setLoading(false);
           toast.success(
-            "Successfully followed the delegate! Stay tuned for updates."
+            "Successfully followed the Delegate! Stay tuned for their updates."
           );
-          setFollowers(followers + 1);
+          // setFollowers(followers + 1);
+          setFollowers((prev) => prev + 1); 
           setTimeout(() => isFollowed(true), 1000);
           setIsFollowing(true);
           isNotification(true);
           console.log("Follow successful:", data);
+
+          // Then update the follower count from the server
+          await setFollowerscount();
         } catch (error) {
           setLoading(false);
           console.error("Error following:", error);
