@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, ReactEventHandler } from "react";
 import { DateTime } from "luxon";
-import { useAccount, useNetwork } from "wagmi";
+import { useAccount } from "wagmi";
 import toast, { Toaster } from "react-hot-toast";
 import { Oval } from "react-loader-spinner";
 import { FaChevronDown, FaCircleInfo, FaPlus } from "react-icons/fa6";
@@ -38,7 +38,7 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
   const [endTime, setEndTime] = useState("");
   const [allowedDates, setAllowedDates] = useState<any>([]);
   // const [daoName, setDaoName] = useState("");
-  const { chain, chains } = useNetwork();
+  const { chain } = useAccount();
   const [utcStartTime, setUtcStartTime] = useState("");
   const [utcEndTime, setUtcEndTime] = useState("");
   const [allData, setAllData] = useState<any>([]);
@@ -493,8 +493,7 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
       <div className="flex flex-col md:flex-row justify-center gap-8 md:gap-10 1.5lg:gap-20 p-4">
         {/* First box- left side */}
         <div
-          className={`w-full md:w-auto p-8 bg-white rounded-2xl ${styles.boxshadow} basis-1/2`}
-        >
+          className={`w-full md:w-auto p-8 bg-white rounded-2xl ${styles.boxshadow} basis-1/2`}>
           <div className="mb-4">
             <label className="text-gray-700 font-semibold flex items-center">
               Select DAO Name:
@@ -508,8 +507,7 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
                 }
                 showArrow
                 placement="right"
-                delay={1}
-              >
+                delay={1}>
                 <span className="px-2">
                   <FaCircleInfo className="cursor-pointer text-blue-500" />
                 </span>
@@ -534,8 +532,7 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
                 }
                 showArrow
                 placement="right"
-                delay={1}
-              >
+                delay={1}>
                 <span className="px-2">
                   <FaCircleInfo className="cursor-pointer text-blue-500" />
                 </span>
@@ -544,8 +541,7 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
             <select
               value={timeSlotSizeMinutes}
               onChange={(e: any) => setTimeSlotSizeMinutes(e.target.value)}
-              className="border border-gray-300 rounded px-3 py-2 mt-1 w-full cursor-pointer"
-            >
+              className="border border-gray-300 rounded px-3 py-2 mt-1 w-full cursor-pointer">
               {/* <option value={15}>15 minutes</option> */}
               <option value={30}>30 minutes</option>
               <option value={45} disabled>
@@ -565,8 +561,7 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
                 }
                 showArrow
                 placement="right"
-                delay={1}
-              >
+                delay={1}>
                 <span className="px-2">
                   <FaCircleInfo className="cursor-pointer text-blue-500" />
                 </span>
@@ -592,8 +587,7 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
                 }
                 showArrow
                 placement="right"
-                delay={1}
-              >
+                delay={1}>
                 <span className="px-2">
                   <FaCircleInfo className="cursor-pointer text-blue-500" />
                 </span>
@@ -606,14 +600,12 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
                   <select
                     className="appearance-none border border-gray-300 rounded px-3 py-2 mt-1 w-full bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-300 focus:outline-none focus:border-blue-400 dark:focus:border-blue-400 transition duration-300 ease-in-out cursor-pointer"
                     value={selectedStartTime}
-                    onChange={handleStartTimeChange}
-                  >
+                    onChange={handleStartTimeChange}>
                     {startTimeOptions.map((time) => (
                       <option
                         key={time}
                         value={time}
-                        className={`py-2 px-4 hover:bg-blue-100 dark:hover:bg-gray-700 custom-time-picker-option`}
-                      >
+                        className={`py-2 px-4 hover:bg-blue-100 dark:hover:bg-gray-700 custom-time-picker-option`}>
                         {time}
                       </option>
                     ))}
@@ -627,15 +619,13 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
                   <select
                     className="appearance-none border border-gray-300 rounded px-3 py-2 mt-1 w-full bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-300 focus:outline-none focus:border-blue-400 dark:focus:border-blue-400 transition duration-300 ease-in-out cursor-pointer"
                     value={selectedEndTime}
-                    onChange={handleEndTimeChange}
-                  >
+                    onChange={handleEndTimeChange}>
                     {endTimeOptions.map((time) => (
                       <option
                         key={time}
                         value={time}
                         className={`py-2 px-4 hover:bg-blue-100 dark:hover:bg-gray-700 custom-time-picker-option`}
-                        style={{ cursor: "pointer" }}
-                      >
+                        style={{ cursor: "pointer" }}>
                         {time}
                       </option>
                     ))}
@@ -648,8 +638,7 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
 
           <button
             onClick={handleAddSelectedDate}
-            className="bg-blue-shade-400 hover:bg-blue-shade-500 text-[#0500FF] font-semibold py-2 px-4 rounded-md shadow-md transition duration-300 ease-in-out"
-          >
+            className="bg-blue-shade-400 hover:bg-blue-shade-500 text-[#0500FF] font-semibold py-2 px-4 rounded-md shadow-md transition duration-300 ease-in-out">
             <span className="flex items-center gap-3">
               <FaPlus className="" />
               Add Session
@@ -664,8 +653,7 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
               {allData.map((item: any, index: any) => (
                 <div
                   key={index}
-                  className="bg-white p-4 rounded-lg shadow-md flex justify-between items-center"
-                >
+                  className="bg-white p-4 rounded-lg shadow-md flex justify-between items-center">
                   <div>
                     <p className="font-semibold text-gray-700">{item.date}</p>
                     <p className="text-gray-600">
@@ -685,8 +673,7 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
                       createSessionLoading
                         ? "opacity-50 cursor-not-allowed"
                         : "hover:bg-red-100"
-                    }`}
-                  >
+                    }`}>
                     Remove
                   </button>
                 </div>
@@ -701,8 +688,7 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
                 ? "bg-green-400 cursor-not-allowed"
                 : "bg-green-600 hover:bg-green-700"
             } text-white font-bold py-3 px-4 rounded-3xl mt-4 w-[160px] flex justify-center items-center`}
-            disabled={createSessionLoading}
-          >
+            disabled={createSessionLoading}>
             {createSessionLoading ? (
               <Oval
                 visible={true}
@@ -734,8 +720,7 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
 
         {/* Second box- right side */}
         <div
-          className={`w-full md:w-auto p-8 bg-white rounded-2xl ${styles.boxshadow} basis-1/2`}
-        >
+          className={`w-full md:w-auto p-8 bg-white rounded-2xl ${styles.boxshadow} basis-1/2`}>
           <AvailableUserSessions
             daoName={daoName}
             scheduledSuccess={scheduledSuccess}

@@ -24,7 +24,7 @@ import {
   usePeerIds,
   useRoom,
 } from "@huddle01/react/hooks";
-import { useAccount, useNetwork } from "wagmi";
+import { useAccount } from "wagmi";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { Role } from "@huddle01/server-sdk/auth";
 import { Oval, TailSpin } from "react-loader-spinner";
@@ -54,7 +54,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   const { push } = useRouter();
-  const { chain, chains } = useNetwork();
+  const { chain } = useAccount();
   const [profileDetails, setProfileDetails] = useState<any>();
 
   // Huddle Hooks
@@ -350,8 +350,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
                   <button
                     onClick={() => setIsOpen((prev) => !prev)}
                     type="button"
-                    className="text-white absolute bottom-0 right-0 z-10"
-                  >
+                    className="text-white absolute bottom-0 right-0 z-10">
                     {BasicIcons.edit}
                   </button>
                   <FeatCommon
@@ -360,8 +359,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
                       isOpen
                         ? "absolute top-4 block"
                         : "absolute top-1/2 -translate-y-1/2 hidden "
-                    }
-                  >
+                    }>
                     <div className="relative mt-5">
                       <div className="grid-cols-3 grid h-full w-full place-items-center gap-6  px-6 ">
                         {profileDetails?.image && (
@@ -388,8 +386,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
                               isActive={avatarUrl === url}
                               onClick={() => {
                                 setAvatarUrl(url);
-                              }}
-                            >
+                              }}>
                               <Image
                                 src={url}
                                 alt={`avatar-${i}`}
@@ -458,8 +455,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
                       : "bg-blue-shade-200 transition-transform transform hover:scale-105 duration-300"
                   }`}
                   onClick={handleStartSpaces}
-                  disabled={isLoading}
-                >
+                  disabled={isLoading}>
                   {isJoining ? "Joining Spaces..." : "Start meeting"}
                   {!isJoining && (
                     <Image
@@ -487,8 +483,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
                 <Link
                   // onClick={() => push(`/profile/${address}?active=info`)}
                   href={`/profile/${address}?active=info`}
-                  className="px-6 py-3 bg-white text-blue-shade-200 rounded-full shadow-lg hover:bg-blue-shade-200 hover:text-white transition duration-300 ease-in-out"
-                >
+                  className="px-6 py-3 bg-white text-blue-shade-200 rounded-full shadow-lg hover:bg-blue-shade-200 hover:text-white transition duration-300 ease-in-out">
                   Back to Profile
                 </Link>
               </div>

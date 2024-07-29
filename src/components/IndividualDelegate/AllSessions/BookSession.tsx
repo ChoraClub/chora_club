@@ -456,7 +456,7 @@ function BookSession({ props }: { props: Type }) {
         // Check if the slot is booked
         const isBooked = bookedSlots.some((bookedSlot: any) => {
           return (
-            dateFns.isSameDay(startTime, bookedSlot) &&
+            dateFns?.isSameDay(startTime, bookedSlot) &&
             slotTime.getHours() === bookedSlot.getHours() &&
             slotTime.getMinutes() === bookedSlot.getMinutes()
           );
@@ -573,8 +573,7 @@ function BookSession({ props }: { props: Type }) {
               marginTop: "2rem",
               boxShadow: "0px 4px 50.8px 0px rgba(0, 0, 0, 0.11)",
               width: "fit-content",
-            }}
-          >
+            }}>
             <StyledTimePickerContainer>
               <DayTimeScheduler
                 allowedDates={allowedDates}
@@ -595,8 +594,7 @@ function BookSession({ props }: { props: Type }) {
       {isOpen && (
         <div
           className="font-poppins z-[70] fixed inset-0 flex items-center justify-center backdrop-blur-md"
-          style={{ boxShadow: " 0px 0px 45px -17px rgba(0,0,0,0.75)" }}
-        >
+          style={{ boxShadow: " 0px 0px 45px -17px rgba(0,0,0,0.75)" }}>
           <div className="bg-white rounded-[41px] overflow-hidden shadow-lg w-1/2">
             <div className="relative">
               <div className="flex flex-col gap-1 text-white bg-[#292929] p-4 py-7">
@@ -607,8 +605,7 @@ function BookSession({ props }: { props: Type }) {
                     onClick={() => {
                       onClose();
                       setIsScheduling(false);
-                    }}
-                  >
+                    }}>
                     <MdCancel size={28} color="white" />
                   </button>
                 </h2>
@@ -644,8 +641,7 @@ function BookSession({ props }: { props: Type }) {
                   <div className="mt-4 border rounded-xl p-4 relative">
                     <button
                       className="absolute top-2 right-3"
-                      onClick={handleGetMailModalClose}
-                    >
+                      onClick={handleGetMailModalClose}>
                       <MdCancel size={25} />
                     </button>
                     <h2 className="text-blue-shade-200 font-semibold text-base">
@@ -666,8 +662,7 @@ function BookSession({ props }: { props: Type }) {
                       <button
                         onClick={handleSubmit}
                         className="bg-black text-white px-8 py-3 rounded-3xl hover:bg-gray-900"
-                        disabled={addingEmail}
-                      >
+                        disabled={addingEmail}>
                         {addingEmail ? (
                           <div className="flex items-center justify-center px-3 py-[0.15rem]">
                             <ThreeDots
@@ -700,8 +695,7 @@ function BookSession({ props }: { props: Type }) {
                 <button
                   className="bg-blue-shade-200 text-white px-8 py-3 font-semibold rounded-full"
                   onClick={checkBeforeApiCall}
-                  disabled={confirmSave}
-                >
+                  disabled={confirmSave}>
                   {confirmSave ? (
                     <div className="flex items-center">
                       <Oval

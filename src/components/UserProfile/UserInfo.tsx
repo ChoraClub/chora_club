@@ -2,14 +2,13 @@ import { useRouter } from "next-nprogress-bar";
 import React, { ChangeEvent, useState, useEffect } from "react";
 import { Oval, RotatingLines } from "react-loader-spinner";
 import { useAccount } from "wagmi";
-import { useNetwork } from "wagmi";
+// import { useNetwork } from "wagmi";
 // import 'react-quill/dist/quill.snow.css';
-// import './quillCustomStyles.css'; 
+// import './quillCustomStyles.css';
 
-import dynamic from 'next/dynamic';
-import styled from 'styled-components';
+import dynamic from "next/dynamic";
+import styled from "styled-components";
 import rehypeSanitize from "rehype-sanitize";
-
 
 const StyledMDEditorWrapper = styled.div`
   .w-md-editor-toolbar {
@@ -24,17 +23,16 @@ const StyledMDEditorWrapper = styled.div`
   }
 
   .w-md-editor {
-  border-radius:15px !important;
- 
+    border-radius: 15px !important;
   }
   .w-md-editor-content {
-  margin:12px 0 12px 0 !important;
-   font-family:'Poppins', sans-serif !important;
+    margin: 12px 0 12px 0 !important;
+    font-family: "Poppins", sans-serif !important;
   }
   .wmde-markdown {
-    font-family: 'Poppins', sans-serif !important;
+    font-family: "Poppins", sans-serif !important;
   }
-    .wmde-markdown ul {
+  .wmde-markdown ul {
     list-style-type: disc !important;
     padding-left: 20px !important;
   }
@@ -43,7 +41,6 @@ const StyledMDEditorWrapper = styled.div`
     list-style-type: decimal !important;
     padding-left: 20px !important;
   }
-  
 `;
 
 // const ReactQuill = dynamic(
@@ -55,7 +52,6 @@ const MDEditor = dynamic(
   () => import("@uiw/react-md-editor").then((mod) => mod.default),
   { ssr: false }
 );
-
 
 interface userInfoProps {
   description: string;
@@ -80,7 +76,7 @@ function UserInfo({
 }: userInfoProps) {
   const { address } = useAccount();
   // const address = "0x5e349eca2dc61abcd9dd99ce94d04136151a09ee";
-  const { chain, chains } = useNetwork();
+  const { chain } = useAccount();
   // const [description, setDescription] = useState(
   //   "Type your description here..."
   // );
@@ -106,37 +102,36 @@ function UserInfo({
   let dao_name = daoName;
   const [activeButton, setActiveButton] = useState("onchain");
 
-
   const [originalDesc, setOriginalDesc] = useState(description || karmaDesc);
-  
+
   useEffect(() => {
     // Check if the window object exists (client-side)
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       // Access document object here
-      console.log('document name ', document.title);
+      console.log("document name ", document.title);
     }
   }, []);
 
   const toolbarOptions = [
-    ['bold', 'italic', 'underline', 'strike'], 
-    ['blockquote', 'code-block'],
+    ["bold", "italic", "underline", "strike"],
+    ["blockquote", "code-block"],
 
-    [{ header: 1 }, { header: 2 }], 
-    [{ list: 'ordered' }, { list: 'bullet' }],
-    [{ script: 'sub' }, { script: 'super' }], 
-    [{ indent: '-1' }, { indent: '+1' }], 
-    [{ direction: 'rtl' }], 
+    [{ header: 1 }, { header: 2 }],
+    [{ list: "ordered" }, { list: "bullet" }],
+    [{ script: "sub" }, { script: "super" }],
+    [{ indent: "-1" }, { indent: "+1" }],
+    [{ direction: "rtl" }],
 
-    [{ size: ['small', false, 'large', 'huge'] }], 
+    [{ size: ["small", false, "large", "huge"] }],
     [{ header: [1, 2, 3, 4, 5, 6, false] }],
 
-    [{ color: [] }, { background: [] }], 
+    [{ color: [] }, { background: [] }],
     [{ font: [] }],
     [{ align: [] }],
 
-    ['clean'], 
+    ["clean"],
 
-    ['link', 'image', 'video'], 
+    ["link", "image", "video"],
   ];
 
   const fetchAttestation = async (buttonType: string) => {
@@ -375,8 +370,7 @@ function UserInfo({
               ? "text-[#3E3D3D] font-bold"
               : "text-[#7C7C7C]"
           } `}
-          onClick={() => fetchAttestation("onchain")}
-        >
+          onClick={() => fetchAttestation("onchain")}>
           Onchain
         </button>
         <button
@@ -385,8 +379,7 @@ function UserInfo({
               ? "text-[#3E3D3D] font-bold"
               : "text-[#7C7C7C]"
           }`}
-          onClick={() => fetchAttestation("offchain")}
-        >
+          onClick={() => fetchAttestation("offchain")}>
           Offchain
         </button>
       </div>
@@ -396,8 +389,7 @@ function UserInfo({
             <div
               key={index}
               className={`bg-[#3E3D3D] text-white rounded-2xl px-3 py-7 cursor-pointer`}
-              onClick={() => router.push(`${key.ref}`)}
-            >
+              onClick={() => router.push(`${key.ref}`)}>
               <div className="font-semibold text-3xl text-center pb-2">
                 {isSessionHostedLoading &&
                 isSessionAttendedLoading &&
@@ -424,13 +416,10 @@ function UserInfo({
       </div>
 
       {isSelfDelegate ? (
-
-      <div
-        style={{ boxShadow: "0px 4px 30.9px 0px rgba(0, 0, 0, 0.12)" }}
-        className={`flex flex-col justify-between min-h-48 rounded-xl my-7 me-32 p-6
-        ${isEditing ? "outline" : ""}`}
-      >
-        
+        <div
+          style={{ boxShadow: "0px 4px 30.9px 0px rgba(0, 0, 0, 0.12)" }}
+          className={`flex flex-col justify-between min-h-48 rounded-xl my-7 me-32 p-6
+        ${isEditing ? "outline" : ""}`}>
           {/* <ReactQuill
             readOnly={!isEditing}
             value={isEditing ? tempDesc :( description || karmaDesc)}
@@ -441,35 +430,28 @@ function UserInfo({
             placeholder={"Type your description here ..."}
           /> */}
 
-          
-
-<StyledMDEditorWrapper>
-
-<MDEditor
-          value={isEditing ? tempDesc : (description || karmaDesc)}
-          onChange={handleDescChange}
-          preview={isEditing ? "live" : "preview"}
-          height={300}
-          hideToolbar={!isEditing}
-    visibleDragbar={false}
-    previewOptions={{
-      rehypePlugins: [[rehypeSanitize]],
-    }}
-          // style={{
-            //   backgroundColor: '#f5f5f5',
-            //   fontSize: '16px',
-            // }}
-            textareaProps={{
-              placeholder: "Type your description here..."
-            }}
+          <StyledMDEditorWrapper>
+            <MDEditor
+              value={isEditing ? tempDesc : description || karmaDesc}
+              onChange={handleDescChange}
+              preview={isEditing ? "live" : "preview"}
+              height={300}
+              hideToolbar={!isEditing}
+              visibleDragbar={false}
+              previewOptions={{
+                rehypePlugins: [[rehypeSanitize]],
+              }}
+              // style={{
+              //   backgroundColor: '#f5f5f5',
+              //   fontSize: '16px',
+              // }}
+              textareaProps={{
+                placeholder: "Type your description here...",
+              }}
             />
-            </StyledMDEditorWrapper>
-          
+          </StyledMDEditorWrapper>
 
-       
-       
-
-        {/* <textarea
+          {/* <textarea
           readOnly={!isEditing}
           className="outline-none min-h-48"
           onChange={handleDescChange}
@@ -478,36 +460,32 @@ function UserInfo({
           // style={{height:"200px",width:"250px"}}
         /> */}
 
-        <div className="flex justify-end mt-3">
-          {isEditing ? (
-            <>
-            <button
-                className="bg-blue-shade-100 text-white text-sm py-1 px-3 rounded-full font-semibold mr-2"
-                onClick={handleCancelClick}
-              >
-                Cancel
+          <div className="flex justify-end mt-3">
+            {isEditing ? (
+              <>
+                <button
+                  className="bg-blue-shade-100 text-white text-sm py-1 px-3 rounded-full font-semibold mr-2"
+                  onClick={handleCancelClick}>
+                  Cancel
+                </button>
+                <button
+                  className="bg-blue-shade-100 text-white text-sm py-1 px-3 rounded-full font-semibold"
+                  onClick={handleSaveClick}>
+                  {loading ? "Saving" : "Save"}
+                </button>
+              </>
+            ) : (
+              <button
+                className="bg-blue-shade-100 text-white text-sm py-1 px-4  rounded-full font-semibold"
+                onClick={() => setEditing(true)}>
+                Edit
               </button>
-            <button
-              className="bg-blue-shade-100 text-white text-sm py-1 px-3 rounded-full font-semibold"
-              onClick={handleSaveClick}
-            >
-              {loading ? "Saving" : "Save"}
-            </button>
-            </>
-          ):
-
-          (
-            <button
-              className="bg-blue-shade-100 text-white text-sm py-1 px-4  rounded-full font-semibold"
-              onClick={() => setEditing(true)}
-            >
-              Edit
-            </button>
-          )}
+            )}
+          </div>
         </div>
-      </div>
-      ): (<></>)
-    }
+      ) : (
+        <></>
+      )}
     </div>
   );
 }

@@ -1,6 +1,8 @@
 import { createWalletClient, createPublicClient, custom } from "viem";
 import { optimism, arbitrum } from "viem/chains";
-import { useNetwork } from "wagmi";
+// import { useNetwork } from "wagmi";
+import { useAccount } from "wagmi";
+
 import { defineChain } from "viem";
 
 declare global {
@@ -33,19 +35,19 @@ const optimismSepolia = defineChain({
       webSocket: [
         "wss://opt-sepolia.g.alchemy.com/v2/WRQwCsk2ip0sMcZ7zJYQKgyQfWj1qm61",
       ],
-    }
+    },
   },
   blockExplorers: {
     default: { name: "Explorer", url: "https://explorer.zora.energy" },
   },
-  network: ""
+  network: "",
 });
 
 const WalletAndPublicClient = () => {
   let publicClient: any;
   let walletClient: any;
 
-  const { chain } = useNetwork();
+  const { chain } = useAccount();
   let chainName: any;
   console.log("the chain", chain?.name);
   if (chain?.name === "Optimism") {

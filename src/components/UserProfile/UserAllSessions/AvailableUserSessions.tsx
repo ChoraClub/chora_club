@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { ImBin } from "react-icons/im";
 import { FaPencilAlt } from "react-icons/fa";
 import toast, { Toaster } from "react-hot-toast";
-import { useNetwork, useAccount } from "wagmi";
+import { useAccount } from "wagmi";
 import { Grid } from "react-loader-spinner";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -21,7 +21,7 @@ function AvailableUserSessions({
   setScheduledSuccess,
 }: AvailableUserSessionsProps) {
   const { address, isConnected } = useAccount();
-  const { chain } = useNetwork();
+  const { chain } = useAccount();
   const [data, setData] = useState([]);
   const [dataLoading, setDataLoading] = useState<Boolean>(false);
 
@@ -258,8 +258,7 @@ function TimeSlotTable({
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 10 }}
-                  className="bg-white shadow-md rounded-lg p-4 flex justify-between items-center"
-                >
+                  className="bg-white shadow-md rounded-lg p-4 flex justify-between items-center">
                   <div>
                     <p className="font-semibold">
                       {convertUTCToLocalDate(dateRange.date)}
@@ -269,8 +268,7 @@ function TimeSlotTable({
                   <div className="flex space-x-2">
                     <button
                       className="p-2 text-blue-600 hover:text-blue-800"
-                      onClick={handleButtonClick}
-                    >
+                      onClick={handleButtonClick}>
                       <FaPencilAlt />
                     </button>
                     <button
@@ -286,8 +284,7 @@ function TimeSlotTable({
                           endTime: dateRange.utcTime_endTime,
                         });
                       }}
-                      disabled={deleting === dateRange.date}
-                    >
+                      disabled={deleting === dateRange.date}>
                       <ImBin />
                     </button>
                   </div>

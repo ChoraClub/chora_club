@@ -9,7 +9,7 @@ import text2 from "@/assets/images/daos/texture2.png";
 import EventTile from "../utils/EventTile";
 // import HostedUserSessions from "./UserAllSessions/HostedUserSessions";
 // import AttendedUserSessions from "./UserAllSessions/AttendedUserSessions";
-import { useNetwork, useAccount } from "wagmi";
+import { useAccount } from "wagmi";
 import Tile from "../utils/Tile";
 import SessionTile from "../utils/SessionTiles";
 import { Oval } from "react-loader-spinner";
@@ -49,7 +49,7 @@ function UserSessions({
   const router = useRouter();
   const path = usePathname();
   const searchParams = useSearchParams();
-  const { chain, chains } = useNetwork();
+  const { chain } = useAccount();
   const [sessionDetails, setSessionDetails] = useState([]);
   const [dataLoading, setDataLoading] = useState(true);
   // const [daoName, setDaoName] = useState("");
@@ -133,8 +133,7 @@ function UserSessions({
               }`}
               onClick={() =>
                 router.push(path + "?active=sessions&session=schedule")
-              }
-            >
+              }>
               Schedule
             </button>
           )}
@@ -148,8 +147,7 @@ function UserSessions({
               }`}
               onClick={() =>
                 router.push(path + "?active=sessions&session=book")
-              }
-            >
+              }>
               Booked
             </button>
           )}
@@ -161,8 +159,7 @@ function UserSessions({
             }`}
             onClick={() =>
               router.push(path + "?active=sessions&session=attending")
-            }
-          >
+            }>
             Attending
           </button>
           {selfDelegate === true && (
@@ -174,8 +171,7 @@ function UserSessions({
               }`}
               onClick={() =>
                 router.push(path + "?active=sessions&session=hosted")
-              }
-            >
+              }>
               Hosted
             </button>
           )}
@@ -187,8 +183,7 @@ function UserSessions({
             }`}
             onClick={() =>
               router.push(path + "?active=sessions&session=attended")
-            }
-          >
+            }>
             Attended
           </button>
         </div>
@@ -207,7 +202,7 @@ function UserSessions({
           {selfDelegate === true &&
             searchParams.get("session") === "hosted" &&
             (dataLoading ? (
-              <SessionTileSkeletonLoader/>
+              <SessionTileSkeletonLoader />
             ) : (
               <SessionTile
                 sessionDetails={hostedDetails}
@@ -219,7 +214,7 @@ function UserSessions({
             ))}
           {searchParams.get("session") === "attended" &&
             (dataLoading ? (
-              <SessionTileSkeletonLoader/>
+              <SessionTileSkeletonLoader />
             ) : (
               <SessionTile
                 sessionDetails={attendedDetails}
