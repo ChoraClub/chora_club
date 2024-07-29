@@ -1040,7 +1040,7 @@ function SpecificDelegate({ props }: { props: Type }) {
                     </Tooltip>
                   </div>
                   <div style={{ zIndex: "21474836462" }}>
-                    <Toaster
+                    {/* <Toaster
                       toastOptions={{
                         style: {
                           fontSize: "14px",
@@ -1051,7 +1051,7 @@ function SpecificDelegate({ props }: { props: Type }) {
                           padding: "3px 5px",
                         },
                       }}
-                    />
+                    /> */}
                   </div>
                 </div>
 

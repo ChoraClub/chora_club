@@ -33,7 +33,10 @@ export const ATTESTATION_ARB_URL =
     ? process.env.NEXT_PUBLIC_SEPOLIA_ATTESTATION_URL
     : process.env.NEXT_PUBLIC_ARB_ATTESTATION_URL;
 
-
+export const SOCKET_BASE_URL =
+  process.env.NODE_ENV === "development"
+    ? process.env.NEXT_PUBLIC_SOCKET_LOCAL_URL
+    : process.env.NEXT_PUBLIC_SOCKET_HOSTED_URL;
 
 // For development testing
 //   export const DB_NAME =
