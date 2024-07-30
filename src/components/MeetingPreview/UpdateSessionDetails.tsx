@@ -11,6 +11,7 @@ import UpdateSessionDetailsSkeletonLoader from "../SkeletonLoader/UpdateSessionD
 import not_found from "@/assets/images/daos/404.png";
 import Image from "next/image";
 import PageNotFound from "../PageNotFound/PageNotFound";
+import { IoClose } from "react-icons/io5";
 
 function UpdateSessionDetails({ roomId }: { roomId: string }) {
   // localStorage.removeItem("isMeetingRecorded");
@@ -37,7 +38,10 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
   const [dataLoading, setDataLoading] = useState(true);
   const { address } = useAccount();
   const router = useRouter();
-  const [showPopup, setShowPopup] = useState(false);
+  const [showPopup, setShowPopup] = useState(true);
+  {
+    /*change condition*/
+  }
 
   useEffect(() => {
     console.log("room id: ", roomId);
@@ -134,80 +138,78 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
   return (
     <div className="font-poppins">
       {!dataLoading ? (
-        address?.toLowerCase() === data.host_address.toLowerCase() ? (
+        address?.toLowerCase() === data?.host_address.toLowerCase() ? (
           <div className="py-5 px-16 ">
             {showPopup && (
-              <div className="w-1/2 mx-auto transition-all duration-300 ease-in-out bg-blue-shade-100 text-white px-4 py-2 rounded-full shadow-lg mb-4">
-                <div className="flex items-center justify-between">
-                  <span>Thank you for taking the session on CC</span>
-                  <button className="ml-4" onClick={() => setShowPopup(false)}>
-                    ✕
+              <div className=" mx-auto transition-all duration-300 ease-in-out bg-white text-black px-4 py-3 rounded-lg w-fit mb-4" style={{ boxShadow: "0px 4px 26.7px 0px rgba(0, 0, 0, 0.10)" }}>
+                <div className="flex items-center font-semibold text-sm justify-between">
+                  <span>🙂 Thank you for taking the session on CC</span>
+                  <button className="ml-4 rounded-full" onClick={() => setShowPopup(true)}>
+                    <IoClose className="text-white font-semibold bg-black size-4 rounded-full"/>
+                    {/*change condition*/}
                   </button>
                 </div>
               </div>
             )}
-            <div
-              className={`text-2xl transition-all duration-300 ease-in-out ${
-                showPopup ? "mt-4" : "mt-0"
-              }`}
-            >
-              Please add a title and description for your session so that other
-              users can easily understand what it&apos;s about before watching.
-              You can edit this information later if needed.
-            </div>
-            <div className="flex flex-col justify-end gap-5 py-4">
-              <div className="flex justify-end">
-                <ButtonGroup>
-                  <Button
-                    onClick={() => setViewMode("edit")}
-                    className={
-                      viewMode === "edit"
-                        ? "bg-blue-shade-200 text-white"
-                        : "bg-white border border-blue-shade-200 text-blue-shade-200"
-                    }
-                  >
-                    Edit
-                  </Button>
-                  <Button
-                    onClick={() => setViewMode("preview")}
-                    className={
-                      viewMode === "preview"
-                        ? "bg-blue-shade-200 text-white"
-                        : "bg-white border border-blue-shade-200 text-blue-shade-200"
-                    }
-                  >
-                    Preview
-                  </Button>
-                </ButtonGroup>
+            <div className="justify-between flex border rounded-3xl py-6 px-8 gap-10 items-center mb-10">
+              <div
+                className={`text-lg transition-all duration-300 ease-in-out`}
+              >
+                Please add a title and description for your session so that
+                other users can easily understand what it&apos;s about before
+                watching. You can edit this information later if needed.
               </div>
+              <div className="flex">
+                  <Button
+                  onClick={() => setViewMode("edit")}
+                  className={`rounded-l-full ${
+                    viewMode === "edit"
+                      ? "bg-black text-white"
+                      : "bg-white border border-black text-black"
+                  }`}
+                >
+                  Edit
+                </Button>
+                <Button
+                  onClick={() => setViewMode("preview")}
+                  className={`rounded-r-full ${
+                    viewMode === "preview"
+                      ? "bg-black text-white"
+                      : "bg-white border border-black text-black"
+                  }`}
+                >
+                  Preview
+                </Button>
+                </div>
             </div>
             <div>
               {viewMode === "edit" ? (
-                <>
+                <div className="rounded-3xl px-8 py-6"
+                style={{ boxShadow: "0px 4px 26.7px 0px rgba(0, 0, 0, 0.10)" }}>
                   <EditSessionDetails
                     data={data}
                     sessionDetails={sessionDetails}
                     onSessionDetailsChange={handleSessionDetailsChange}
                   />
-                  <div className="flex gap-4">
+                  <div className="flex justify-center">
                     <Button
-                      className="bg-blue-shade-200 text-white"
+                      className="bg-blue-shade-200 rounded-full px-10 text-white"
                       onClick={() => setViewMode("preview")}
                     >
                       Next
                     </Button>
                   </div>
-                </>
+                </div>
               ) : (
-                <div className="flex flex-col w-[60%] mx-auto">
+                <div className="flex flex-col w-[70%] mx-auto">
                   <SessionPreview
                     data={data}
                     collection={collection}
                     sessionDetails={sessionDetails}
                   />
-                  <div className="flex justify-end gap-4">
+                  <div className="flex justify-center ">
                     <Button
-                      className="bg-blue-shade-200 text-white"
+                      className="bg-blue-shade-200 text-white rounded-full px-10"
                       onClick={() => handleUpdate()}
                     >
                       {loading ? (
