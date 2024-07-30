@@ -11,6 +11,7 @@ import { useRouter } from "next-nprogress-bar";
 import Link from "next/link";
 import text1 from "@/assets/images/daos/texture1.png";
 import text2 from "@/assets/images/daos/texture2.png";
+
 // import { getEnsName } from "../ConnectWallet/ENSResolver";
 import {
   Modal,
@@ -21,6 +22,7 @@ import {
   Button,
   useDisclosure,
 } from "@nextui-org/react";
+import { useAccount } from "wagmi";
 interface RoomDetails {
   message: string;
   data: {
@@ -74,6 +76,7 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
   const [startLoading, setStartLoading] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [rejectionReason, setRejectionReason] = useState("");
+  const { address } = useAccount();
 
   useEffect(() => {
     setIsPageLoading(false);
@@ -112,6 +115,9 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
       // console.log(meeting_status);
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
+      if (address) {
+        myHeaders.append("x-wallet-address", address);
+      }
 
       const raw = await JSON.stringify({
         id: id,
@@ -150,8 +156,7 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
       <div
         key={tileIndex}
         className="flex justify-between p-5 rounded-[2rem]"
-        style={{ boxShadow: "0px 4px 26.7px 0px rgba(0, 0, 0, 0.10)" }}
-      >
+        style={{ boxShadow: "0px 4px 26.7px 0px rgba(0, 0, 0, 0.10)" }}>
         <div className="flex">
           <Image
             src={data.img || text1}
@@ -208,8 +213,7 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
                 : data.booking_status === "Rejected"
                 ? "border border-red-600 text-red-600"
                 : "border border-yellow-500 text-yellow-500"
-            }`}
-          >
+            }`}>
             {data.booking_status}
             {/* Approve */}
           </div>
@@ -233,8 +237,7 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
                     content="Start Session"
                     placement="top"
                     closeDelay={1}
-                    showArrow
-                  >
+                    showArrow>
                     <span className="cursor-pointer">
                       <FaCirclePlay
                         size={35}
@@ -253,8 +256,7 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
                   content="Reject Session"
                   placement="top"
                   closeDelay={1}
-                  showArrow
-                >
+                  showArrow>
                   <span className="cursor-pointer">
                     <FaCircleXmark onClick={onOpen} size={35} color="#b91c1c" />
                   </span>
@@ -288,14 +290,12 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
                         <div className="flex justify-end px-8 py-4">
                           <button
                             className="bg-gray-300 text-gray-700 px-8 py-3 font-semibold rounded-full mr-4"
-                            onClick={onClose}
-                          >
+                            onClick={onClose}>
                             Cancel
                           </button>
                           <button
                             className="bg-red-500 text-white px-8 py-3 font-semibold rounded-full"
-                            onClick={() => confirmSlot(data._id, "Rejected")}
-                          >
+                            onClick={() => confirmSlot(data._id, "Rejected")}>
                             {startLoading ? (
                               <Oval
                                 visible={true}
@@ -333,8 +333,7 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
                     content="Approve"
                     placement="top"
                     closeDelay={1}
-                    showArrow
-                  >
+                    showArrow>
                     <span className="cursor-pointer">
                       <FaCircleCheck
                         onClick={() => confirmSlot(data._id, "Approved")}
@@ -353,8 +352,7 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
                   setStartLoading(true);
                   router.push(`/meeting/session/${data.meetingId}/lobby`);
                 }}
-                className="text-center bg-blue-shade-100 rounded-full font-bold text-white py-2 text-xs cursor-pointer"
-              >
+                className="text-center bg-blue-shade-100 rounded-full font-bold text-white py-2 text-xs cursor-pointer">
                 {startLoading ? (
                   <div className="flex justify-center items-center">
                     <Oval

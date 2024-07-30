@@ -206,13 +206,16 @@ SessionTileProps) {
       daoName: dao,
     };
 
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    if (address) {
+      myHeaders.append("x-wallet-address", address);
+    }
+
     // Configure the request options
     const requestOptions = {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        // Add any other headers required by your API
-      },
+      headers: myHeaders,
       body: JSON.stringify(data),
     };
 

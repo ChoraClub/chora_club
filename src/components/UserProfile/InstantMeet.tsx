@@ -95,9 +95,15 @@ function InstantMeet({ isDelegate, selfDelegate, daoName }: instantMeetProps) {
 
     console.log("requestData", requestData);
 
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    if (address) {
+      myHeaders.append("x-wallet-address", address);
+    }
+
     const requestOptions: any = {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: myHeaders,
       body: JSON.stringify(requestData),
       redirect: "follow",
     };
@@ -218,8 +224,7 @@ function InstantMeet({ isDelegate, selfDelegate, daoName }: instantMeetProps) {
                             },
                           },
                         },
-                      }}
-                    >
+                      }}>
                       <div>
                         <div className="group border rounded-3xl bg-[#E5E5EA] flex items-center justify-center p-8 hover:bg-blue-shade-100 hover:shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
                           <Image
@@ -257,8 +262,7 @@ function InstantMeet({ isDelegate, selfDelegate, daoName }: instantMeetProps) {
               <div className="text-center transition-transform transform hover:scale-105 duration-300">
                 <button
                   className="bg-blue-shade-200 py-3 px-6 rounded-full text-white font-semibold"
-                  onClick={onOpen}
-                >
+                  onClick={onOpen}>
                   Start an instant meet
                 </button>
               </div>
@@ -273,8 +277,7 @@ function InstantMeet({ isDelegate, selfDelegate, daoName }: instantMeetProps) {
           onClose();
           // setIsScheduling(false);
         }}
-        className="font-poppins"
-      >
+        className="font-poppins">
         <ModalContent>
           <>
             <ModalHeader className="flex flex-col gap-1">
@@ -313,15 +316,13 @@ function InstantMeet({ isDelegate, selfDelegate, daoName }: instantMeetProps) {
                 onClick={() => {
                   onClose();
                   // setIsScheduling(false);
-                }}
-              >
+                }}>
                 Close
               </Button>
               <Button
                 color="primary"
                 onClick={startInstantMeet}
-                isDisabled={confirmSave}
-              >
+                isDisabled={confirmSave}>
                 {confirmSave ? (
                   <div className="flex items-center justify-center">
                     <Oval
