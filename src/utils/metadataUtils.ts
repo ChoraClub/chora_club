@@ -7,7 +7,7 @@ export const DEFAULT_METADATA: Metadata = {
   openGraph: {
     title: "Chora Club - Page Not Found",
     description: "The requested page does not exist.",
-    url: "https://app.chora.club/404",
+    url: "https://app.chora.club/",
     siteName: "Chora Club",
     images: [
       {

@@ -2,39 +2,55 @@ import React from "react";
 
 const UpdateSessionDetailsSkeletonLoader = () => {
   return (
-    <div className="py-5 px-16 font-poppins">
-        <div className="w-full rounded-md bg-gray-200 animate-pulse h-8 mb-3"></div>
-        <div className="w-3/4 rounded-md bg-gray-200 animate-pulse h-8"></div>
-      <div className="w-full flex justify-end mt-4">
-        <div className="space-y-2 items-end">
-          <div className="flex">
-            <div className="h-10 w-20 bg-gray-200 rounded-l-md animate-pulse"></div>
-            <div className="h-10 w-20 bg-gray-200 rounded-r-md animate-pulse ml-px"></div>
+<>
+    <div className="border rounded-3xl py-6 px-8 mx-10 gap-10 items-center mb-10 mt-4 flex justify-between">
+      <div className="flex flex-col gap-3">
+        <div className="bg-gray-200 animate-pulse w-[60vw] h-6 rounded-md "></div>
+        <div className="bg-gray-200 animate-pulse w-[50vw] h-6 rounded-md "></div>
+      </div>
+      <div className="flex gap-[1px]">
+        <div className="rounded-l-full bg-gray-200 animate-pulse w-24 h-8"></div>
+        <div className="rounded-r-full bg-gray-200 animate-pulse w-24 h-8"></div>
+      </div>
+    </div>
+    
+    <div
+      className="rounded-3xl px-8 mx-10 py-8"
+      style={{
+        boxShadow: "0px 4px 26.7px 0px rgba(0, 0, 0, 0.10)",
+      }}
+    >
+      {/* Skeleton loader */}
+      <div className="animate-pulse relative">
+        <div className="animate-pulse bg-gray-200 absolute top-6 right-6 w-56 h-10 rounded-full"></div>
+        {/* Thumbnail Image skeleton */}
+        <div className="mb-6">
+          <div className="h-6 w-40 bg-gray-200 rounded-md mb-2 animate-pulse"></div>
+          <div className="flex gap-3 items-end">
+          <div className="h-24 w-40 bg-gray-200 rounded-md animate-pulse"></div>
+          <div className="h-16 w-60 rounded-md animate-pulse bg-gray-200"></div>
           </div>
-          <div className="w-40 h-10 bg-gray-200 rounded-md animate-pulse"></div>
+        </div>
+        
+        {/* Session Title skeleton */}
+        <div className="mb-6">
+          <div className="h-6 w-40 bg-gray-200 rounded-md mb-2"></div>
+          <div className="h-10 w-full bg-gray-200 rounded-md"></div>
+        </div>
+        
+        {/* Session Description skeleton */}
+        <div className="mb-6">
+          <div className="h-6 w-40 bg-gray-200 rounded-md mb-2"></div>
+          <div className="h-48 w-full bg-gray-200 rounded-md"></div>
         </div>
       </div>
-        {/* Skeleton for EditSessionDetails */}
-        <div className="">
 
-          <div className="h-5 bg-gray-200 rounded-md animate-pulse w-32 mb-2"></div>
-          <div className="w-40 h-24 bg-gray-200 rounded-md animate-pulse mb-4 "></div>
-          <div className="flex gap-6 mb-4">
-            <div className="h-10 bg-gray-200 rounded-md w-1/4 animate-pulse"></div>
-            <div className="h-10 bg-gray-200 rounded-md w-1/5 animate-pulse"></div>
-          </div>
+      <div className="w-full flex justify-center">
+        <div className="rounded-full animate-pulse bg-gray-200 w-36 h-10"></div>
+      </div>
 
-          <div className="h-5 bg-gray-200 rounded-md animate-pulse w-24 mb-2"></div>
-          <div className="h-3 bg-gray-200 rounded-md animate-pulse w-32 mb-2"></div>
-          <div className="h-8 bg-gray-200 w-3/4 rounded-md animate-pulse mb-4"></div>
-
-          <div className="h-5 bg-gray-200 rounded-md animate-pulse w-24 mb-2"></div>
-          <div className="h-3 bg-gray-200 rounded-md animate-pulse w-32 mb-2"></div>
-          <div className="h-24 bg-gray-200 w-3/4 rounded-md animate-pulse mb-4"></div>
-
-          <div className="h-10 w-24 rounded-full bg-gray-200 animate-pulse"></div>
-        </div>
-    </div>
+      </div>
+      </>
   );
 };
 

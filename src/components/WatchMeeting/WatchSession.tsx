@@ -515,7 +515,7 @@ function WatchSession({
           onClose={handleModalClose}
         />
       )}
-      <Toaster
+      {/* <Toaster
         toastOptions={{
           style: {
             fontSize: "14px",
@@ -526,7 +526,7 @@ function WatchSession({
             padding: "3px 5px",
           },
         }}
-      />
+      /> */}
 
       {shareModal && (
         <ShareMediaModal

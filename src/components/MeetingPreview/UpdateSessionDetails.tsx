@@ -12,6 +12,7 @@ import not_found from "@/assets/images/daos/404.png";
 import Image from "next/image";
 import PageNotFound from "../PageNotFound/PageNotFound";
 import { IoClose } from "react-icons/io5";
+import SessionHostedModal from "../ComponentUtils/SessionHostedModal";
 
 function UpdateSessionDetails({ roomId }: { roomId: string }) {
   // localStorage.removeItem("isMeetingRecorded");
@@ -39,9 +40,7 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
   const { address } = useAccount();
   const router = useRouter();
   const [showPopup, setShowPopup] = useState(true);
-  {
-    /*change condition*/
-  }
+  const [showHostPopup, setShowHostPopup] = useState(false);
 
   useEffect(() => {
     console.log("room id: ", roomId);
@@ -126,7 +125,8 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
           const responseData = await response.json();
           console.log("responseData: ", responseData);
           setLoading(false);
-          router.push(`/profile/${address}?active=sessions&session=hosted`);
+          setShowHostPopup(true);
+          // router.push(`/profile/${address}?active=sessions&session=hosted`);
         } else {
           setLoading(false);
           // setData(null);
@@ -141,12 +141,17 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
         address?.toLowerCase() === data?.host_address.toLowerCase() ? (
           <div className="py-5 px-16 ">
             {showPopup && (
-              <div className=" mx-auto transition-all duration-300 ease-in-out bg-white text-black px-4 py-3 rounded-lg w-fit mb-4" style={{ boxShadow: "0px 4px 26.7px 0px rgba(0, 0, 0, 0.10)" }}>
+              <div
+                className=" mx-auto transition-all duration-300 ease-in-out bg-white text-black px-4 py-3 rounded-lg w-fit mb-4"
+                style={{ boxShadow: "0px 4px 26.7px 0px rgba(0, 0, 0, 0.10)" }}
+              >
                 <div className="flex items-center font-semibold text-sm justify-between">
                   <span>🙂 Thank you for taking the session on CC</span>
-                  <button className="ml-4 rounded-full" onClick={() => setShowPopup(true)}>
-                    <IoClose className="text-white font-semibold bg-black size-4 rounded-full"/>
-                    {/*change condition*/}
+                  <button
+                    className="ml-4 rounded-full flex items-center"
+                    onClick={() => setShowPopup(false)}
+                  >
+                    <IoClose className="text-white font-semibold bg-black size-4 rounded-full" />
                   </button>
                 </div>
               </div>
@@ -160,7 +165,7 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
                 watching. You can edit this information later if needed.
               </div>
               <div className="flex">
-                  <Button
+                <Button
                   onClick={() => setViewMode("edit")}
                   className={`rounded-l-full ${
                     viewMode === "edit"
@@ -180,12 +185,16 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
                 >
                   Preview
                 </Button>
-                </div>
+              </div>
             </div>
             <div>
               {viewMode === "edit" ? (
-                <div className="rounded-3xl px-8 py-6"
-                style={{ boxShadow: "0px 4px 26.7px 0px rgba(0, 0, 0, 0.10)" }}>
+                <div
+                  className="rounded-3xl px-8 py-6"
+                  style={{
+                    boxShadow: "0px 4px 26.7px 0px rgba(0, 0, 0, 0.10)",
+                  }}
+                >
                   <EditSessionDetails
                     data={data}
                     sessionDetails={sessionDetails}
@@ -193,7 +202,7 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
                   />
                   <div className="flex justify-center">
                     <Button
-                      className="bg-blue-shade-200 rounded-full px-10 text-white"
+                      className="bg-blue-shade-200 rounded-full font-semibold px-10 text-white"
                       onClick={() => setViewMode("preview")}
                     >
                       Next
@@ -209,7 +218,7 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
                   />
                   <div className="flex justify-center ">
                     <Button
-                      className="bg-blue-shade-200 text-white rounded-full px-10"
+                      className="bg-blue-shade-200 text-white font-semibold rounded-full px-10"
                       onClick={() => handleUpdate()}
                     >
                       {loading ? (
@@ -235,6 +244,7 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
       ) : (
         <UpdateSessionDetailsSkeletonLoader />
       )}
+      {showHostPopup && <SessionHostedModal data={data} />}
     </div>
   );
 }
