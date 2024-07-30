@@ -22,10 +22,15 @@ function SessionHostedModal({ data }: any) {
 
   const shareOnTwitter = () => {
     const url = encodeURIComponent(link);
+    // const text = encodeURIComponent(
+    //   `${data.title} ${decodeURIComponent(
+    //     url
+    //   )} via @ChoraClub\n\n#choraclub #session #growth`
+    // );
     const text = encodeURIComponent(
-      `${data.title} ${decodeURIComponent(
-        url
-      )} via @ChoraClub\n\n#choraclub #session #growth`
+      `Just wrapped up an incredible session in @ChoraClub! 🎉 Thrilled to share my knowledge and help new users dive into the Web3 ecosystem.
+Check out the session here:👇\n ${decodeURIComponent(url)}
+#Web3 #ChoraClub`
     );
 
     // Twitter share URL
@@ -52,18 +57,21 @@ function SessionHostedModal({ data }: any) {
         <div className="absolute inset-0 backdrop-blur-md"></div>
 
         <div className="px-8 pb-14 pt-20 border z-50 rounded-[30px] bg-white flex flex-col items-center text-center gap-3 relative w-[56%]">
-        <Confetti recycle={true} className="size-[100%]" />
-        <IoClose className="text-white cursor-pointer font-semibold bg-black size-5 rounded-full absolute top-8 right-8"  onClick={() =>
-                  router.push(
-                    `/profile/${data.host_address}?active=sessions&session=hosted`
-                  )
-                }/>
+          <Confetti recycle={true} className="size-[100%]" />
+          <IoClose
+            className="text-white cursor-pointer font-semibold bg-black size-5 rounded-full absolute top-8 right-8"
+            onClick={() =>
+              router.push(
+                `/profile/${data.host_address}?active=sessions&session=hosted`
+              )
+            }
+          />
           <h2 className="text-[40px] font-bold mb-4 text-blue-shade-200">
-            Congratulations for taking the Session! 
+            Congratulations for taking the Session!
           </h2>
           <p className="mb-1 text-base">
             Your session is now live and can be viewed by everyone on the Chora
-            Club Platform. 
+            Club Platform.
           </p>
           <p className="mb-8 text-base">
             Share the video URL with your audience to maximize its reach. If
@@ -80,8 +88,8 @@ function SessionHostedModal({ data }: any) {
                   className={`cursor-pointer ${
                     copySuccess ? "text-blue-shade-200" : ""
                   }`}
-                  />
-                  Copy URL
+                />
+                Copy URL
               </button>
             </div>
             <div>
