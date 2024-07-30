@@ -64,10 +64,17 @@ export async function sendMail({
   }
 }
 
-export function compileBookedSessionTemplate(title: string, content: string) {
+export function compileBookedSessionTemplate(
+  title: string,
+  title2: string,
+  title3: string,
+  content: string
+) {
   const template = handlebars.compile(bookedSessionTemplate);
   const htmlBody = template({
     title: title,
+    title2: title2,
+    title3: title3,
     content: content,
   });
   return htmlBody;

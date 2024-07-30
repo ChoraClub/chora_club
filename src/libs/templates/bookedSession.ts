@@ -166,10 +166,12 @@ export const bookedSessionTemplate = `
 															<td class="pad">
 																<div style="font-family: Tahoma, Verdana, sans-serif">
 																	<div class style="font-size: 12px; font-family: Tahoma, Verdana, Segoe, sans-serif; mso-line-height-alt: 14.399999999999999px; color: #555555; line-height: 1.2;">
-																		<p style="margin: 0; font-size: 16px; text-align: center; mso-line-height-alt: 19.2px;"><strong>Exciting update!,{{title}}</strong></p>
+																		<p style="margin: 0;margin-bottom:10px;font-size: 16px; text-align:center; mso-line-height-alt: 19.2px;"><strong>🚀️ Exciting Update!</strong></p>
+																		<p style="margin:0;margin-bottom:10px;font-size:16px;text-align:center;mso-line-height-alt:19.2px"><strong>{{title}},</strong></p>
+																		<p style="margin:0;margin-bottom:10px;font-size:16px;text-align:center;mso-line-height-alt:19.2px"><strong>{{title2}}</strong></p>
 																	</div>
 																</div>
-															</td>
+															</td
 														</tr>
 													</table>
 												</td>
@@ -192,6 +194,7 @@ export const bookedSessionTemplate = `
 														<tr>
 															<td class="pad" style="padding-bottom:5px;padding-left:60px;padding-right:60px;padding-top:5px;">
 																<div style="color:#878787;direction:ltr;font-family:Tahoma, Verdana, Segoe, sans-serif;font-size:16px;font-weight:400;letter-spacing:0px;line-height:120%;text-align:center;mso-line-height-alt:19.2px;">
+																    <p style="margin:0;margin-bottom:10px">{{title3}}</p>
 																	<p style="margin: 0;">{{content}}</p>
 																</div>
 															</td>
