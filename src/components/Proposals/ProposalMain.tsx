@@ -228,7 +228,8 @@ function ProposalMain({ props }: { props: Props }) {
       );
 
       if (!response.ok) {
-        throw new Error("Network response was not ok");
+        // throw new Error("Network response was not ok");
+        console.log("Network response was not ok");
       }
 
       const data = await response.json();
@@ -321,9 +322,8 @@ function ProposalMain({ props }: { props: Props }) {
         text = `<em>${matchem[1]}</em>`;
       }
 
-      return `<a href="${href}" title="${
-        title || ""
-      }" target="_blank" rel="noopener noreferrer" class="text-blue-shade-100">${text}</a>`;
+      return `<a href="${href}" title="${title || ""
+        }" target="_blank" rel="noopener noreferrer" class="text-blue-shade-100">${text}</a>`;
     };
 
     marked.setOptions({
@@ -522,7 +522,7 @@ function ProposalMain({ props }: { props: Props }) {
 
   useEffect(() => {
     fetchVotes();
-  }, []);
+  }, [support0Weight, support1Weight]);
 
   const formatDate = (timestamp: number): string => {
     // Convert the timestamp to milliseconds if it's in seconds
@@ -688,9 +688,9 @@ function ProposalMain({ props }: { props: Props }) {
     isArbitrum
       ? window.open(`https://arbiscan.io/tx/${transactionHash}`, "_blank")
       : window.open(
-          `https://optimistic.etherscan.io/tx/${transactionHash}`,
-          "_blank"
-        );
+        `https://optimistic.etherscan.io/tx/${transactionHash}`,
+        "_blank"
+      );
   };
 
   const shareOnTwitter = () => {
@@ -772,6 +772,7 @@ function ProposalMain({ props }: { props: Props }) {
   );
   const isActive = status === "Active" && !(props.daoDelegates === "optimism");
   const getVotingPeriodEnd = () => {
+    console.log(data);
     if (!data || !data.blockTimestamp) return null;
 
     const baseTimestamp = new Date(data.blockTimestamp * 1000);
@@ -811,11 +812,14 @@ function ProposalMain({ props }: { props: Props }) {
         }
       } else {
         // Fallback to old logic if queue times are not available
-        return currentDate > votingPeriodEndData!
-          ? support1Weight! > support0Weight!
-            ? "SUCCEEDED"
-            : "DEFEATED"
-          : "PENDING";
+        console.log(currentDate, votingPeriodEndData);
+        return !votingPeriodEndData
+          ? "PENDING"
+          : currentDate > votingPeriodEndData
+            ? support1Weight > support0Weight
+              ? "SUCCEEDED"
+              : "DEFEATED"
+            : "PENDING";
       }
     } else {
       // Optimism logic
@@ -841,8 +845,12 @@ function ProposalMain({ props }: { props: Props }) {
         return "bg-green-200 border-green-600 text-green-600";
     }
   };
-  const Proposalstatus =
-    data && support1Weight ? getProposalStatusData() : null;
+
+  const proposal_status = getProposalStatusData();
+
+  const Proposalstatus = (data && support1Weight >= 0) || support1Weight ? proposal_status : null;
+
+  console.log(Proposalstatus, data, support1Weight);
   const CustomXAxisTick = ({
     x,
     y,
@@ -918,9 +926,8 @@ function ProposalMain({ props }: { props: Props }) {
       </div>
 
       <div
-        className={`rounded-[1rem] mx-20 md:mx-24 px-4 md:px-12 py-6 transition-shadow duration-300 ease-in-out shadow-xl bg-gray-50 font-poppins relative ${
-          isExpanded ? "h-fit" : "h-fit"
-        }`}
+        className={`rounded-[1rem] mx-20 md:mx-24 px-4 md:px-12 py-6 transition-shadow duration-300 ease-in-out shadow-xl bg-gray-50 font-poppins relative ${isExpanded ? "h-fit" : "h-fit"
+          }`}
       >
         <div className="flex items-center justify-between">
           <div className="flex gap-2 items-center">
@@ -960,13 +967,12 @@ function ProposalMain({ props }: { props: Props }) {
             </div>
             <div className="flex-shrink-0 mt-2 md:mt-0">
               <div
-                className={`rounded-full flex items-center justify-center text-xs py-1 px-2 font-medium ${
-                  status
+                className={`rounded-full flex items-center justify-center text-xs py-1 px-2 font-medium ${status
                     ? status === "Closed"
                       ? "bg-[#f4d3f9] border border-[#77367a] text-[#77367a]"
                       : "bg-[#f4d3f9] border border-[#77367a] text-[#77367a]"
                     : "bg-gray-200 animate-pulse rounded-full"
-                }`}
+                  }`}
               >
                 {status ? status : <div className="h-4 w-16"></div>}
               </div>
@@ -991,16 +997,20 @@ function ProposalMain({ props }: { props: Props }) {
               <div className="animate-pulse bg-gray-200  h-4 w-32 rounded-full"></div>
             )}
           </div>
-
-          <div
-            className={`rounded-full flex items-center justify-center text-xs h-fit py-0.5 border font-medium w-24 ${
-              Proposalstatus
-                ? getStatusColor(Proposalstatus)
-                : "bg-gray-200 animate-pulse rounded-full"
-            }`}
-          >
-            {Proposalstatus ? Proposalstatus : <div className="h-5 w-20"></div>}
-          </div>
+          {isLoading? (
+            <div
+              className={`rounded-full flex items-center justify-center text-xs h-fit py-0.5 border font-medium w-24 bg-gray-200 animate-pulse rounded-full`}
+            >
+               <div className="h-5 w-20"></div>
+            </div>) : (
+            <div
+              className={`rounded-full flex items-center justify-center text-xs h-fit py-0.5 border font-medium w-24 ${Proposalstatus
+                  ? getStatusColor(Proposalstatus)
+                  : "bg-gray-200 animate-pulse rounded-full"
+                }`}
+            >
+              {Proposalstatus ? Proposalstatus : <div className="h-5 w-20"></div>}
+            </div>)}
         </div>
 
         <div className="text-sm mt-3">
@@ -1012,9 +1022,8 @@ function ProposalMain({ props }: { props: Props }) {
             <>
               <div
                 ref={contentRef}
-                className={` transition-max-height duration-500 ease-in-out overflow-hidden ${
-                  isExpanded ? "max-h-full" : "max-h-36"
-                }`}
+                className={` transition-max-height duration-500 ease-in-out overflow-hidden ${isExpanded ? "max-h-full" : "max-h-36"
+                  }`}
               >
                 <div
                   className="description-content"
@@ -1046,11 +1055,10 @@ function ProposalMain({ props }: { props: Props }) {
               </div>
             ) : (
               <div
-                className={`flex flex-col gap-2 py-3 pl-2 pr-1  xl:pl-3 xl:pr-2 my-3 border-gray-200 ${
-                  voterList.length > 5
+                className={`flex flex-col gap-2 py-3 pl-2 pr-1  xl:pl-3 xl:pr-2 my-3 border-gray-200 ${voterList.length > 5
                     ? `h-[440px] overflow-y-auto ${style.scrollbar}`
                     : "h-fit"
-                }`}
+                  }`}
               >
                 {voterList.length === 0 ? (
                   <div className="flex items-center justify-center h-full text-gray-500">
@@ -1092,11 +1100,10 @@ function ProposalMain({ props }: { props: Props }) {
                         </div>
                         <div className="flex items-center space-x-4">
                           <div
-                            className={`xl:px-4 px-2 py-2 rounded-full xl:text-sm xl:w-36 w-25 flex items-center justify-center xl:font-medium text-xs ${
-                              voter.support === 1 || voter.type === "for"
+                            className={`xl:px-4 px-2 py-2 rounded-full xl:text-sm xl:w-36 w-25 flex items-center justify-center xl:font-medium text-xs ${voter.support === 1 || voter.type === "for"
                                 ? "bg-green-100 text-green-800"
                                 : "bg-red-100 text-red-800"
-                            }`}
+                              }`}
                           >
                             {formatWeight(voter.weight / 10 ** 18)}
                             &nbsp;

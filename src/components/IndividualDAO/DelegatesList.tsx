@@ -34,6 +34,12 @@ import {
   op_client,
 } from "@/config/staticDataUtils";
 
+// Create a cache object outside of the component to persist across re-renders
+const cache: any = {
+  optimism: null,
+  arbitrum: null,
+};
+let pageCache: any = null;
 function DelegatesList({ props }: { props: string }) {
   const [delegateData, setDelegateData] = useState<any>({ delegates: [] });
   const { openChainModal } = useChainModal();
@@ -92,71 +98,114 @@ function DelegatesList({ props }: { props: string }) {
     setIsShowing(!KarmaCreditClosed);
   }, []);
 
-  // let uniqueDelegates = new Set();
   useEffect(() => {
-    const fetchData = async (lastCursor: string | null) => {
-      try {
-        setDataLoading(true);
-        console.log("its props", props);
-        console.log("currentPage", currentPage);
-        const res = await fetch(
-          props === "arbitrum"
-            ? `/api/get-arbitrum-delegatelist?lastCursor=${lastCursor || ""}`
-            : `/api/get-delegatelist?currentPage=${currentPage}`
-        );
-        console.log("res", res);
-        if (!res.ok) {
-          throw new Error(`HTTP error! status: ${res.status}`);
-        }
-
-        const daoInfo = await res.json();
-
-        let formattedDelegates;
-        if (props === "arbitrum") {
-          formattedDelegates = daoInfo.delegates.nodes.map((delegate: any) => {
-            return {
-              delegate: delegate.account.address,
-              adjustedBalance: delegate.votesCount / 10 ** 18,
-              ensName: delegate.account.ens,
-              profilePicture: delegate.account.picture,
-            };
-          });
-        } else {
-          formattedDelegates = await Promise.all(
-            daoInfo.map(async (delegate: any) => {
-              // const ensName = await getEnsNameOfUser(delegate._id);
-              const avatar = await fetchEnsAvatar(delegate._id);
-              // console.log("avatar", avatar);
-              return {
-                delegate: delegate._id,
-                adjustedBalance: delegate.adjustedBalance,
-                newBalance: delegate.newBalance,
-                profilePicture: avatar?.avatar,
-                ensName: avatar?.ensName,
-              };
-            })
-          );
-        }
-
-        setDelegateData((prevData: any) => ({
-          delegates: [...prevData.delegates, ...formattedDelegates],
-        }));
-
-        setTempData((prevData: any) => ({
-          delegates: [...prevData.delegates, ...formattedDelegates],
-        }));
-
-        setLastCursor(daoInfo.delegates?.pageInfo?.lastCursor);
-        setDataLoading(false);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setPageLoading(false);
-      }
-    };
-
-    fetchData(lastCursor || "");
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('currentPage', currentPage.toString());
+    }
   }, [currentPage]);
+
+  // let uniqueDelegates = new Set();
+  // useEffect(() => {
+  const fetchData = async (lastCursor: string | null) => {
+    try {
+      setDataLoading(true);
+      console.log("its props", props);
+      console.log("currentPage", currentPage);
+      const res = await fetch(
+        props === "arbitrum"
+          ? `/api/get-arbitrum-delegatelist?lastCursor=${lastCursor || ""}`
+          : `/api/get-delegatelist?currentPage=${currentPage}`
+      );
+      console.log("res", res);
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+
+      const daoInfo = await res.json();
+      let formattedDelegates;
+      if (props === "arbitrum") {
+        formattedDelegates = daoInfo.delegates.nodes.map((delegate: any) => {
+          return {
+            delegate: delegate.account.address,
+            adjustedBalance: delegate.votesCount / 10 ** 18,
+            ensName: delegate.account.ens,
+            profilePicture: delegate.account.picture,
+          };
+        });
+      } else {
+        formattedDelegates = await Promise.all(
+          daoInfo.map(async (delegate: any) => {
+            // const ensName = await getEnsNameOfUser(delegate._id);
+            const avatar = await fetchEnsAvatar(delegate._id);
+            // console.log("avatar", avatar);
+            return {
+              delegate: delegate._id,
+              adjustedBalance: delegate.adjustedBalance,
+              newBalance: delegate.newBalance,
+              profilePicture: avatar?.avatar,
+              ensName: avatar?.ensName,
+            };
+          })
+        );
+      }
+
+      setDelegateData((prevData: any) => ({
+        delegates: [...prevData.delegates, ...formattedDelegates],
+      }));
+      // { delegates : [...formattedDelegates]};
+      setTempData((prevData: any) => ({
+        delegates: [...prevData.delegates, ...formattedDelegates],
+      }));
+
+      setLastCursor(daoInfo.delegates?.pageInfo?.lastCursor);
+      console.log("lastCursor", daoInfo);
+      setDataLoading(false);
+      cache[props] = {
+        delegates: [...(cache[props]?.delegates || []), ...formattedDelegates],
+        lastCursor: daoInfo.delegates?.pageInfo?.lastCursor || null,
+      };
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setPageLoading(false);
+    }
+  };
+
+  // fetchData(lastCursor || "");
+  // }, [currentPage]);
+  // useEffect(() => {
+  //   fetchData(lastCursor || "");
+  // },[currentPage]);
+
+  useEffect(() => {
+    console.log(cache[props]);
+    if (cache[props]) {
+      console.log("Using cached data");
+      // Use cached data if available
+      console.log("pageCache", pageCache);
+      console.log(cache[props]);
+      setDelegateData(cache[props]);
+      setCurrentPage(pageCache + 1);
+      setTempData(cache[props]);
+      setLastCursor(cache[props].lastCursor || null);
+      setPageLoading(false);
+      setDataLoading(false);
+    } else {
+      // Fetch data if not in cache
+      console.log("Fetching data");
+      setDataLoading(true);
+      fetchData(null);
+      setDataLoading(false);
+    }
+  }, [props]);
+
+  useEffect(() => {
+    console.log("last", lastCursor)
+    if (currentPage > 0 || lastCursor) {
+      fetchData(lastCursor || "");
+    }
+  }, [currentPage]);
+
   const debounce = (func: (...args: any[]) => void, wait: number) => {
     let timeout: NodeJS.Timeout;
     return (...args: any[]) => {
@@ -284,6 +333,7 @@ function DelegatesList({ props }: { props: string }) {
     ) {
       console.log("fetching more data");
       setCurrentPage((prev) => prev + 1);
+      pageCache = currentPage + 1;
     }
   }, 200); // Adjust the debounce wait time as necessary
 
@@ -626,8 +676,8 @@ function DelegatesList({ props }: { props: string }) {
                               ? props == "optimism"
                                 ? OPLogo
                                 : props == "arbitrum"
-                                ? ARBLogo
-                                : ""
+                                  ? ARBLogo
+                                  : ""
                               : delegate.profilePicture
                           }
                           alt="Image not found"
@@ -662,11 +712,11 @@ function DelegatesList({ props }: { props: string }) {
                             ) : (
                               <span>
                                 {delegate.ensName ===
-                                "[693c70956042e4295f0c73589e9ac0850b5b7d276a02639b83331ec323549b88].sismo.eth"
+                                  "[693c70956042e4295f0c73589e9ac0850b5b7d276a02639b83331ec323549b88].sismo.eth"
                                   ? "lindajxie.eth"
                                   : delegate.ensName.length > 15
-                                  ? delegate.ensName.slice(0, 15) + "..."
-                                  : delegate.ensName}
+                                    ? delegate.ensName.slice(0, 15) + "..."
+                                    : delegate.ensName}
                                 {/* {delegate.ensName.length > 15
                                 ? delegate.ensName.slice(0, 15) + "..."
                                 : delegate.ensName} */}
@@ -741,22 +791,22 @@ function DelegatesList({ props }: { props: string }) {
                       delegateName={
                         !selectedDelegate?.ensName
                           ? selectedDelegate.delegate?.slice(0, 6) +
-                            "..." +
-                            selectedDelegate.delegate?.slice(-4)
+                          "..." +
+                          selectedDelegate.delegate?.slice(-4)
                           : selectedDelegate.ensName ===
                             "[693c70956042e4295f0c73589e9ac0850b5b7d276a02639b83331ec323549b88].sismo.eth"
-                          ? "lindajxie.eth"
-                          : selectedDelegate.ensName?.length > 15
-                          ? selectedDelegate.ensName?.slice(0, 15) + "..."
-                          : selectedDelegate.ensName
+                            ? "lindajxie.eth"
+                            : selectedDelegate.ensName?.length > 15
+                              ? selectedDelegate.ensName?.slice(0, 15) + "..."
+                              : selectedDelegate.ensName
                       }
                       displayImage={
                         selectedDelegate?.profilePicture == null
                           ? props == "optimism"
                             ? OPLogo
                             : props == "arbitrum"
-                            ? ARBLogo
-                            : ""
+                              ? ARBLogo
+                              : ""
                           : selectedDelegate.profilePicture
                       }
                       daoName={props}
