@@ -9,6 +9,7 @@ import chain from "@/assets/images/daos/chain.png";
 import ProposalsSkeletonLoader from "../SkeletonLoader/ProposalsSkeletonLoader";
 import ArbLogo from "@/assets/images/daos/arbCir.png";
 import { dao_details } from "@/config/daoDetails";
+import { RiErrorWarningLine } from 'react-icons/ri';
 
 interface Proposal {
   proposalId: string;
@@ -34,14 +35,28 @@ function Proposals({ props }: { props: string }) {
   const [currentPage, setCurrentPage] = useState(1);
   const [canceledProposals, setCanceledProposals] = useState<any[]>([]);
   const proposalsPerPage = 7;
+
+  const ErrorDisplay = ({ message, onRetry }:any) => (
+    <div className="flex flex-col items-center justify-center p-8 bg-red-50 rounded-lg shadow-md">
+      <RiErrorWarningLine className="text-red-500 text-5xl mb-4" />
+      <h2 className="text-2xl font-bold text-red-700 mb-2">Oops! Something went wrong</h2>
+      <p className="text-red-600 text-center mb-6">{message}</p>
+      <button 
+        onClick={onRetry} 
+        className="px-6 py-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors duration-300"
+      >
+        Try Again
+      </button>
+    </div>
+  );
   
   const VoteLoader = () => (
-    <div className=" flex justify-center items-center w-24">
+    <div className=" flex justify-center items-center w-32">
       <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-black-shade-900"></div>
     </div>
   );
   const StatusLoader = () => (
-    <div className="flex items-center justify-center w-32">
+    <div className="flex items-center justify-center w-24">
       <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-black-shade-900"></div>
     </div>
   );
@@ -143,6 +158,9 @@ function Proposals({ props }: { props: string }) {
           `/api/get-arbitrumproposals`
         );
       }
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
       const responseData = await response.json();
       let newProposals;
       if (props === "optimism") {
@@ -197,7 +215,15 @@ function Proposals({ props }: { props: string }) {
       });
     } catch (error: any) {
       console.error("Error fetching data:", error);
-      setError(error.message);
+      if (error.name === 'TypeError' && error.message === 'Failed to fetch') {
+        setError("Please check your internet connection and try again.");
+      } else if (error.name === 'TimeoutError') {
+        setError("The request is taking longer than expected. Please try again.");
+      } else if (error.name === 'SyntaxError') {
+        setError("We're having trouble processing the data. Please try again later.");
+      } else {
+        setError("Unable to load proposals. Please try again in a few moments.");
+      }
     } finally {
       setLoading(false);
     }
@@ -260,7 +286,7 @@ function Proposals({ props }: { props: string }) {
         setDisplayedProposals(updatedProposals);
       } catch (error: any) {
         console.error("Error fetching votes:", error);
-        setError(error.message);
+        setError("Unable to fetch vote details. Please try again later.");
       } finally {
         setLoading(false);
       }
@@ -338,11 +364,25 @@ const formatDate = (timestamp: number): string => {
 
   if (loading && displayedProposals.length === 0)
     return <ProposalsSkeletonLoader />;
-  if (error) return <p>Error: {error}</p>;
+
+  const handleRetry = () => {
+    setError(null);
+    fetchProposals();
+    window.location.reload();
+  };
+
+  if (error) return (
+    <div className="flex justify-center items-center min-h-[400px]">
+      <ErrorDisplay 
+        message={error}
+        onRetry={handleRetry}
+      />
+    </div>
+  );
 
   return (
     <>
-      <div className="mr-16 rounded-[2rem] mt-4">
+      <div className="mr-[16px] rounded-[2rem] mt-4">
         {displayedProposals.map((proposal: Proposal, index: number) => (
           <div
             key={index}
