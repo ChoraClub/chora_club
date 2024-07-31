@@ -316,7 +316,7 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
               // Add any necessary data
               address: address,
               daoName: daoName,
-              EnsName: EnsName,
+              ensName: EnsName,
             }),
           });
 

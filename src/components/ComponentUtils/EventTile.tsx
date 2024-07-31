@@ -93,7 +93,7 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
   };
 
   const confirmSlot = async (id: any, status: any) => {
-    // console.log("confirmSlot clicked");
+    // console.log("confirm_Slot clicked");
     // console.log("id:", id);
     // console.log("status:", status);
     setStartLoading(true);
@@ -119,6 +119,9 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
         booking_status: status,
         meetingId: roomId,
         rejectionReason: rejectionReason,
+        title: data.title,
+        slot_time: data.slot_time,
+        dao_name: data.dao_name,
       });
 
       const requestOptions = await {
