@@ -617,6 +617,7 @@ function BookSession({ props }: { props: Type }) {
                 <div className="mt-4">
                   <label className="block mb-2 font-semibold">Title:</label>
                   <input
+                    disabled={confirmSave}
                     type="text"
                     name="title"
                     value={modalData.title}
@@ -631,6 +632,7 @@ function BookSession({ props }: { props: Type }) {
                     Description:
                   </label>
                   <textarea
+                    disabled={confirmSave}
                     name="description"
                     value={modalData.description}
                     onChange={handleModalInputChange}
@@ -645,6 +647,7 @@ function BookSession({ props }: { props: Type }) {
                     <button
                       className="absolute top-2 right-3"
                       onClick={handleGetMailModalClose}
+                      disabled={addingEmail}
                     >
                       <MdCancel size={25} />
                     </button>

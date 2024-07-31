@@ -6,7 +6,11 @@ import copy from "copy-to-clipboard";
 import { Tooltip } from "@nextui-org/react";
 import user from "@/assets/images/daos/user3.png";
 import { FaXTwitter, FaDiscord, FaGithub } from "react-icons/fa6";
-import { BiSolidMessageRoundedDetail } from "react-icons/bi";
+import {
+  BiSolidBellOff,
+  BiSolidBellRing,
+  BiSolidMessageRoundedDetail,
+} from "react-icons/bi";
 import { IoCopy, IoShareSocialSharp } from "react-icons/io5";
 import UserInfo from "./UserInfo";
 import UserVotes from "./UserVotes";
@@ -45,6 +49,10 @@ import { useConnectModal } from "@rainbow-me/rainbowkit";
 import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
 import MainProfileSkeletonLoader from "../SkeletonLoader/MainProfileSkeletonLoader";
 import { BASE_URL } from "@/config/constants";
+import { fetchData } from "next-auth/client/_utils";
+import user1 from "@/assets/images/daos/user1.png";
+import { FaCalendarDays } from "react-icons/fa6";
+import FollowingModal from "../ComponentUtils/FollowingModal";
 import { IoClose } from "react-icons/io5";
 import "./MainProfile.module.css";
 import { FaUserEdit } from "react-icons/fa";
@@ -78,6 +86,15 @@ function MainProfile() {
   const [selfDelegate, setSelfDelegate] = useState(false);
   const [daoName, setDaoName] = useState("optimism");
   const [isCopied, setIsCopied] = useState(false);
+  const [followings, setfollowings] = useState(0);
+  const [followers, setfollowers] = useState(0);
+  const [isFollowing, setfollwing] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [notification, setnotification] = useState(true);
+  const [isOpenFollowings, setfollowingmodel] = useState(false);
+  const [isOpentoaster, settoaster] = useState(false);
+  const [userFollowings, setUserFollowings] = useState<Following[]>([]);
+  const [dbResponse, setDbResponse] = useState<any>(null);
   const [modalData, setModalData] = useState({
     displayImage: "",
     displayName: "",
@@ -103,6 +120,20 @@ function MainProfile() {
     uploaded: any;
   }
 
+  interface Following {
+    follower_address: string;
+    isFollowing: boolean;
+    isNotification: boolean;
+  }
+
+  // useEffect(() => {
+  //   if (chain?.name === "Optimism") {
+  //     setDaoName("optimism");
+  //   } else if (chain?.name === "Arbitrum One") {
+  //     setDaoName("arbitrum");
+  //   }
+  //   console.log("daoName", daoName);
+  // }, [chain, daoName]);
   useEffect(() => {
     if (chain && chain?.name === "Optimism") {
       setDaoName("optimism");
@@ -120,6 +151,7 @@ function MainProfile() {
       // console.log("newPath", newPath);
       router.replace(`${newPath}`);
     } else if (!isConnected && !session) {
+      console.log("inside else if !isConnected && !session");
       if (openConnectModal) {
         openConnectModal();
       } else {
@@ -127,10 +159,10 @@ function MainProfile() {
       }
     }
   }, [
-    // isConnected,
-    // address,
-    // router,
-    // session,
+    isConnected,
+    address,
+    router,
+    session,
     path.includes("profile/undefined"),
   ]);
 
@@ -227,12 +259,241 @@ function MainProfile() {
     copy(addr);
     toast("Address Copied");
   };
+  const handleUpdateFollowings = async () => {
+    setfollowingmodel(true);
+    setLoading(true);
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+
+    const raw = JSON.stringify({
+      address: address,
+      // daoName: dao,
+    });
+
+    const requestOptions: any = {
+      method: "POST",
+      headers: myHeaders,
+      body: raw,
+      redirect: "follow",
+    };
+    const res = await fetch(
+      `/api/delegate-follow/savefollower`,
+      requestOptions
+    );
+
+    const dbResponse = await res.json();
+    setDbResponse(dbResponse);
+
+    for (const item of dbResponse.data) {
+      const matchDao = item.followings.find(
+        (daoItem: any) => daoItem.dao === daoName
+      );
+
+      if (matchDao) {
+        const activeFollowings = matchDao.following.filter(
+          (f: Following) => f.isFollowing
+        );
+        setfollowings(activeFollowings.length);
+        setUserFollowings(activeFollowings);
+      } else {
+        setfollowings(0);
+        setUserFollowings([]);
+      }
+    }
+    // Close the modal
+    setLoading(false);
+  };
+  const toggleFollowing = async (index: number, userupdate: any) => {
+    setUserFollowings((prevUsers) =>
+      prevUsers.map((user, i) =>
+        i === index ? { ...user, isFollowing: !user.isFollowing } : user
+      )
+    );
+
+    if (!userupdate.isFollowing) {
+      setfollowings(followings + 1);
+
+      try {
+        const response = await fetch("/api/delegate-follow/savefollower", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            // Add any necessary data
+            delegate_address: userupdate.follower_address,
+            follower_address: address,
+            dao: daoName,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to follow");
+        }
+
+        const data = await response.json();
+        settoaster(false);
+        console.log("Follow successful:", data);
+      } catch (error) {
+        console.error("Error following:", error);
+      }
+    } else {
+      setfollowings(followings - 1);
+      setLoading(true);
+      settoaster(true);
+      try {
+        const response = await fetch("/api/delegate-follow/updatefollower", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            // Add any necessary data
+            delegate_address: userupdate.follower_address,
+            follower_address: address,
+            action: 1,
+            dao: daoName,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to unfollow");
+        }
+
+        const data = await response.json();
+        settoaster(false);
+        setLoading(false);
+        console.log("unFollow successful:", data);
+      } catch (error) {
+        setLoading(false);
+        console.error("Error following:", error);
+      }
+    }
+  };
+
+  const toggleNotification = async (index: number, userupdate: any) => {
+    setUserFollowings((prevUsers) =>
+      prevUsers.map((user, i) =>
+        i === index ? { ...user, isNotification: !user.isNotification } : user
+      )
+    );
+    settoaster(true);
+
+    try {
+      const response = await fetch("/api/delegate-follow/updatefollower", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          // Add any necessary data
+          delegate_address: userupdate.follower_address,
+          follower_address: address,
+          action: 2,
+          dao: daoName,
+          updatenotification: !userupdate.isNotification,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to notification");
+      }
+
+      const data = await response.json();
+      settoaster(false);
+      console.log("notification successful:", data);
+    } catch (error) {
+      console.error("Error following:", error);
+    }
+  };
 
   const handleInputChange = (fieldName: string, value: string) => {
     setModalData((prevState) => ({
       ...prevState,
       [fieldName]: value,
     }));
+  };
+
+  const updateFollowerState = async () => {
+    console.log("Attempting to call savefollower API");
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    const raw = JSON.stringify({
+      address: address,
+    });
+
+    const requestOptions: any = {
+      method: "POST",
+      headers: myHeaders,
+      body: raw,
+      redirect: "follow",
+    };
+
+    try {
+      const resp = await fetch(
+        `/api/delegate-follow/savefollower`,
+        requestOptions
+      );
+
+      if (!resp.ok) {
+        throw new Error("Failed to fetch follower/following data");
+      }
+
+      const dbResponse = await resp.json();
+      console.log("API Response:", dbResponse);
+
+      if (
+        !dbResponse.success ||
+        !dbResponse.data ||
+        dbResponse.data.length === 0
+      ) {
+        console.log("No data returned from API");
+        return;
+      }
+
+      const userData = dbResponse.data[0];
+      let address = await walletClient.getAddresses();
+      let address_user = address[0].toLowerCase();
+      let currentDaoName = "";
+      if (chain?.name === "Optimism") {
+        currentDaoName = "optimism";
+      } else if (chain?.name === "Arbitrum One") {
+        currentDaoName = "arbitrum";
+      }
+
+      console.log("Current DAO:", currentDaoName);
+      console.log("User Address:", address_user);
+
+      // Process following details
+      const matchDao = userData.followings?.find(
+        (daoItem: any) =>
+          daoItem.dao.toLowerCase() === currentDaoName.toLowerCase()
+      );
+
+      if (matchDao) {
+        const activeFollowings = matchDao.following?.filter(
+          (f: any) => f.isFollowing
+        );
+        setfollowings(activeFollowings.length);
+        setUserFollowings(activeFollowings);
+      } else {
+        setfollowings(0);
+        setUserFollowings([]);
+      }
+
+      const daoFollowers = userData?.followers?.find(
+        (dao: any) => dao.dao_name === currentDaoName
+      );
+
+      const followerCount = daoFollowers?.follower?.filter(
+        (f: any) => f.isFollowing
+      ).length;
+
+      // alert(followerCount);
+      setfollowers(followerCount);
+    } catch (error) {
+      console.error("Error in updateFollowerState:", error);
+    }
   };
 
   const handleToggle = async () => {
@@ -361,6 +622,13 @@ function MainProfile() {
               (network: any) => network.dao_name === dao
             )?.description || ""
           );
+
+          if (!isConnected) {
+            setfollowings(0);
+            setfollowers(0);
+          } else {
+            await updateFollowerState();
+          }
           setIsPageLoading(false);
         } else {
           // const res = await fetch(
@@ -377,6 +645,7 @@ function MainProfile() {
             github: karmaDetails.data.delegate.githubHandle,
             displayImage: karmaDetails.data.delegate.profilePicture,
           });
+          await updateFollowerState();
           setIsPageLoading(false);
         }
       } catch (error) {
@@ -608,8 +877,7 @@ function MainProfile() {
                 style={{
                   backgroundColor: "#fcfcfc",
                   border: "2px solid #E9E9E9 ",
-                }}
-              >
+                }}>
                 <div className="w-40 h-40 flex items-center justify-content ">
                   <div className="flex justify-center items-center w-40 h-40">
                     <Image
@@ -671,8 +939,7 @@ function MainProfile() {
                           : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                      target="_blank"
-                    >
+                      target="_blank">
                       <FaXTwitter color="#7C7C7C" size={12} />
                     </Link>
                     <Link
@@ -690,8 +957,7 @@ function MainProfile() {
                           : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                      target="_blank"
-                    >
+                      target="_blank">
                       <BiSolidMessageRoundedDetail color="#7C7C7C" size={12} />
                     </Link>
                     <Link
@@ -702,8 +968,7 @@ function MainProfile() {
                           : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                      target="_blank"
-                    >
+                      target="_blank">
                       <FaDiscord color="#7C7C7C" size={12} />
                     </Link>
                     <Link
@@ -714,20 +979,17 @@ function MainProfile() {
                           : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                      target="_blank"
-                    >
+                      target="_blank">
                       <FaGithub color="#7C7C7C" size={12} />
                     </Link>
                     <Tooltip
                       content="Update your Profile"
                       placement="top"
-                      showArrow
-                    >
+                      showArrow>
                       <span
                         className="border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 cursor-pointer"
                         style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                        onClick={onOpen}
-                      >
+                        onClick={onOpen}>
                         <FaPencil color="#3e3d3d" size={12} />
                       </span>
                     </Tooltip>
@@ -757,8 +1019,7 @@ function MainProfile() {
                     content="Copy"
                     placement="bottom"
                     closeDelay={1}
-                    showArrow
-                  >
+                    showArrow>
                     <span className="px-2 cursor-pointer" color="#3E3D3D">
                       <IoCopy onClick={() => handleCopy(`${address}`)} />
                     </span>
@@ -775,8 +1036,7 @@ function MainProfile() {
                       content="Copy your profile URL to share on Warpcast or Twitter."
                       placement="bottom"
                       closeDelay={1}
-                      showArrow
-                    >
+                      showArrow>
                       <Button
                         className="bg-gray-200 hover:bg-gray-300"
                         onClick={() => {
@@ -792,8 +1052,7 @@ function MainProfile() {
                           setTimeout(() => {
                             setIsCopied(false);
                           }, 3000);
-                        }}
-                      >
+                        }}>
                         <IoShareSocialSharp />
                         {isCopied ? "Copied" : "Share profile"}
                       </Button>
@@ -801,17 +1060,74 @@ function MainProfile() {
                   </div>
                 </div>
 
+                {/* {isOpentoaster && toast.loading("Saving...")} */}
+
+                {isOpenFollowings && (
+                  <FollowingModal
+                    userFollowings={userFollowings}
+                    toggleFollowing={toggleFollowing}
+                    toggleNotification={toggleNotification}
+                    setfollowingmodel={setfollowingmodel}
+                    isLoading={isLoading}
+                    chainName={chain?.name}
+                  />
+                )}
+
                 {selfDelegate === false ? (
                   <div className="pt-2 flex gap-5">
                     {/* pass address of whom you want to delegate the voting power to */}
                     <button
                       className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
-                      onClick={() => handleDelegateVotes(`${address}`)}
-                    >
+                      onClick={() => handleDelegateVotes(`${address}`)}>
                       Become Delegate
                     </button>
+
+                    <button
+                      className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
+                      onClick={() =>
+                        followings
+                          ? handleUpdateFollowings()
+                          : toast.error(
+                              "You have 0 following explore delegate profile now!"
+                            )
+                      }>
+                      {followings} Followings
+                    </button>
+
+                    {/* <div className="">
+                      <select
+                        value={daoName}
+                        onChange={(e) => setDaoName(e.target.value)}
+                        className="outline-none border border-blue-shade-200 text-blue-shade-200 rounded-full py-2 px-3"
+                      >
+                        <option value="optimism" className="text-gray-700">
+                          Optimism
+                        </option>
+                        <option value="arbitrum" className="text-gray-700">
+                          Arbitrum
+                        </option>
+                      </select>
+                    </div> */}
                   </div>
-                ) : null}
+                ) : (
+                  <div className="pt-2 flex gap-5">
+                    <button className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]">
+                      {followers} Followers
+                    </button>
+
+                    <button
+                      className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
+                      onClick={() =>
+                        followings
+                          ? handleUpdateFollowings()
+                          : toast.error(
+                              "You have 0 following explore delegate profile now!"
+                            )
+                      }>
+                      {followings} Followings
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
             <div>
@@ -826,8 +1142,7 @@ function MainProfile() {
                   ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
                   : "border-transparent"
               }`}
-              onClick={() => router.push(path + "?active=info")}
-            >
+              onClick={() => router.push(path + "?active=info")}>
               Info
             </button>
             {selfDelegate === true && (
@@ -837,8 +1152,7 @@ function MainProfile() {
                     ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
                     : "border-transparent"
                 }`}
-                onClick={() => router.push(path + "?active=votes")}
-              >
+                onClick={() => router.push(path + "?active=votes")}>
                 Past Votes
               </button>
             )}
@@ -850,8 +1164,7 @@ function MainProfile() {
               }`}
               onClick={() =>
                 router.push(path + "?active=sessions&session=schedule")
-              }
-            >
+              }>
               Sessions
             </button>
             <button
@@ -862,8 +1175,7 @@ function MainProfile() {
               }`}
               onClick={() =>
                 router.push(path + "?active=officeHours&hours=schedule")
-              }
-            >
+              }>
               Office Hours
             </button>
 
@@ -874,8 +1186,7 @@ function MainProfile() {
                     ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
                     : "border-transparent"
                 }`}
-                onClick={() => router.push(path + "?active=instant-meet")}
-              >
+                onClick={() => router.push(path + "?active=instant-meet")}>
                 Instant Meet
               </button>
             )}

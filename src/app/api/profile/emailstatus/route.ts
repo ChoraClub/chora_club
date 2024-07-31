@@ -27,6 +27,7 @@ export async function PUT(req: NextRequest) {
       .toArray();
 
     if (documents.length === 0) {
+      client.close();
       return NextResponse.json(
         { message: "No document found with the provided address" },
         { status: 404 }
@@ -45,6 +46,8 @@ export async function PUT(req: NextRequest) {
         _id: documents[0]._id,
       });
 
+      client.close();
+
       return NextResponse.json(
         {
           message: "Email visibility updated successfully",
@@ -53,6 +56,7 @@ export async function PUT(req: NextRequest) {
         { status: 200 }
       );
     } else {
+      client.close();
       return NextResponse.json(
         { message: "Failed to update email visibility" },
         { status: 500 }

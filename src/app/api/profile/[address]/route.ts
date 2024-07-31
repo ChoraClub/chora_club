@@ -16,6 +16,31 @@ import { connectDB } from "@/config/connectDB";
 //     github: string;
 //   };
 // }
+
+// type follow_activity = {
+//   action: string;
+//   timestamp: Date;
+// };
+// type dao_following = {
+//   isFollowing: boolean;
+//   follower_address: string;
+// };
+// type followings = {
+//   dao: string;
+//   following: dao_following[];
+// };
+
+// type dao_follower = {
+//   address: string;
+//   isNotification: boolean;
+//   isFollowing: boolean;
+//   activity: follow_activity[];
+// };
+// type follower_details = {
+//   dao_name: string;
+//   follower: dao_follower[];
+// };
+
 type network_details = {
   dao_name: string;
   network: string;

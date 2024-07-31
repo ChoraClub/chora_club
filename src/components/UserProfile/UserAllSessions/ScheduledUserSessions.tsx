@@ -20,6 +20,7 @@ import { TimeInput } from "@nextui-org/react";
 import { Time } from "@internationalized/date";
 import { AbiEncodingLengthMismatchError } from "viem";
 import { all } from "axios";
+import { fetchEnsAvatar } from "@/utils/ENSUtils";
 
 interface dataToStore {
   userAddress: `0x${string}` | undefined | null;
@@ -149,6 +150,7 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
     setTimeSlots(slots);
     setSessions(slots.length);
   };
+  const [EnsName, setDisplayEnsName] = useState<string>();
 
   const checkUser = async () => {
     try {
@@ -209,6 +211,18 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
       handleApplyButtonClick();
     }
   }, [continueAPICalling]);
+
+  useEffect(() => {
+    const fetchEnsName = async () => {
+      const ensName = await fetchEnsAvatar(address ? address : "");
+      if (ensName) {
+        setDisplayEnsName(ensName?.ensName);
+      } else {
+        setDisplayEnsName("");
+      }
+    };
+    fetchEnsName();
+  }, [chain, address]);
 
   useEffect(() => {
     console.log("userRejected in useEffect", userRejected);
@@ -290,6 +304,30 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
         setContinueAPICalling(false);
         setScheduledSuccess(true);
         setSessionCreated(true);
+
+        //calling api endpoint for sending mail to user who follow this delegate
+        try {
+          const response = await fetch("/api/delegate-follow/send-mails", {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              // Add any necessary data
+              address: address,
+              daoName: daoName,
+              EnsName: EnsName,
+            }),
+          });
+
+          if (!response.ok) {
+            throw new Error("Failed to send mails");
+          }
+
+          const data = await response.json();
+        } catch (error) {
+          console.error("Something going wrong!", error);
+        }
       } else {
         setScheduledSuccess(false);
       }
@@ -703,6 +741,18 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
                     {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((hour) => (
                       <option key={hour} value={hour}>
                         {hour.toString().padStart(2, "0")}
+                <label className="text-gray-500 mt-1">Start Time</label>
+                <div className="relative">
+                  <select
+                    className="appearance-none border border-gray-300 rounded px-3 py-2 mt-1 w-full bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-300 focus:outline-none focus:border-blue-400 dark:focus:border-blue-400 transition duration-300 ease-in-out cursor-pointer"
+                    value={selectedStartTime}
+                    onChange={handleStartTimeChange}>
+                    {startTimeOptions.map((time) => (
+                      <option
+                        key={time}
+                        value={time}
+                        className={`py-2 px-4 hover:bg-blue-100 dark:hover:bg-gray-700 custom-time-picker-option`}>
+                        {time}
                       </option>
                     ))}
                   </select>
@@ -770,6 +820,16 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
                     {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((hour) => (
                       <option key={hour} value={hour}>
                         {hour.toString().padStart(2, "0")}
+                    className="appearance-none border border-gray-300 rounded px-3 py-2 mt-1 w-full bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-300 focus:outline-none focus:border-blue-400 dark:focus:border-blue-400 transition duration-300 ease-in-out cursor-pointer"
+                    value={selectedEndTime}
+                    onChange={handleEndTimeChange}>
+                    {endTimeOptions.map((time) => (
+                      <option
+                        key={time}
+                        value={time}
+                        className={`py-2 px-4 hover:bg-blue-100 dark:hover:bg-gray-700 custom-time-picker-option`}
+                        style={{ cursor: "pointer" }}>
+                        {time}
                       </option>
                     ))}
                   </select>
