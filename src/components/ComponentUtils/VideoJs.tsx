@@ -15,6 +15,7 @@ function VideoJs({ options, onReady }: { options: any; onReady: any }) {
       const videoElement = document.createElement("video-js");
 
       videoElement.classList.add("vjs-big-play-centered");
+      // videoElement.classList.add("vjs-theme-fantasy");
       videoRef.current?.appendChild(videoElement);
 
       const player = (playerRef.current = videojs(videoElement, options, () => {

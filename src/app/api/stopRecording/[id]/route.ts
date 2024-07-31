@@ -4,7 +4,7 @@ import { Recorder } from "@huddle01/server-sdk/recorder";
 interface Recordings {
   url: any;
   id: string;
-  recordingUrl: string;
+  recordingUrl?: string;
   recordingSize: number;
 }
 
@@ -52,11 +52,11 @@ export async function GET(
           );
           const data = await response.json();
 
-          const { recordings } = data as { recordings: Recordings[] };
+          const { recordings } = await data as { recordings: Recordings[] };
 
           resolve(
             NextResponse.json(
-              { video_uri: recordings[0].recordingUrl },
+              { video_uri: recordings[0]?.recordingUrl },
               { status: 200 }
             )
           );
