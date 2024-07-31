@@ -30,6 +30,11 @@ function WatchComponentMain({ props }: { props: { id: string } }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [watchSessionHeight, setWatchSessionHeight] = useState<number | 0>();
 
+  const sessionDetails = {
+    title: "",
+    description: "",
+    image: "",
+  };
   useEffect(() => {
     async function fetchData() {
       try {
@@ -81,11 +86,20 @@ function WatchComponentMain({ props }: { props: { id: string } }) {
             <ConnectWalletWithENS />
           </div>
 
-          <div className="grid grid-cols-3 gap-y-4 gap-x-4 1.7xl:gap-x-6 pt-6 relative 1.7xl:pr-14 pr-4 lg:pr-5 xl-pr-10"> 
+          <div className="grid grid-cols-3 gap-y-4 gap-x-4 1.7xl:gap-x-6 pt-6 relative 1.7xl:pr-14 pr-4 lg:pr-5 xl-pr-10">
             {/* Left side */}
             <div className="sticky top-10 z-10 col-span-2 space-y-5 font-poppins pb-10 ">
-              <WatchSessionVideo data={data} collection={collection} />
-              <WatchSession data={data} collection={collection} />
+              <WatchSessionVideo
+                data={data}
+                collection={collection}
+                autoplay={true}
+                sessionDetails={sessionDetails}
+              />
+              <WatchSession
+                data={data}
+                collection={collection}
+                sessionDetails={sessionDetails}
+              />
 
               {/* /Video Recommendation */}
               {/* <WatchVideoRecommendation /> */}
@@ -112,7 +126,7 @@ function WatchComponentMain({ props }: { props: { id: string } }) {
           </div>
         </div>
       ) : (
-    <WatchComponentSkeletonLoader/>
+        <WatchComponentSkeletonLoader />
       )}
     </>
   );

@@ -53,6 +53,7 @@ export async function PUT(req: NextRequest, res: NextResponse) {
       );
     }
 
+    client.close();
     return NextResponse.json(
       { success: true, data: existingDocument },
       { status: 200 }
