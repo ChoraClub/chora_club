@@ -36,7 +36,7 @@ import { useConnectModal, useChainModal } from "@rainbow-me/rainbowkit";
 import { useAccount, useNetwork } from "wagmi";
 import OPLogo from "@/assets/images/daos/op.png";
 import ArbLogo from "@/assets/images/daos/arbCir.png";
-import ccLogo from "@/assets/images/daos/CC.png";
+import ccLogo from "@/assets/images/daos/CCLogo2.png";
 import { Oval } from "react-loader-spinner";
 import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
 import {
@@ -886,7 +886,7 @@ function SpecificDelegate({ props }: { props: Type }) {
                   <Image
                     src={ccLogo}
                     alt="ChoraClub Logo"
-                    className="absolute top-0 right-0"
+                    className="absolute top-0 right-0 bg-white rounded-full"
                     style={{
                       width: "30px",
                       height: "30px",
