@@ -309,27 +309,29 @@ const BottomBar = ({ daoName }: { daoName: string }) => {
       }
     }
 
-    try {
-      const requestOptions = {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          meetingId: roomId,
-          meetingType: meetingCategory,
-          recordedStatus: recordingStatus,
-          meetingStatus: recordingStatus === "true" ? "Recorded" : "Finished",
-        }),
-      };
+    if (role === "host") {
+      try {
+        const requestOptions = {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            meetingId: roomId,
+            meetingType: meetingCategory,
+            recordedStatus: recordingStatus,
+            meetingStatus: recordingStatus === "true" ? "Recorded" : "Finished",
+          }),
+        };
 
-      const response = await fetch(
-        "/api/update-recording-status",
-        requestOptions
-      );
-      console.log("Response: ", response);
-    } catch (e) {
-      console.log("Error: ", e);
+        const response = await fetch(
+          "/api/update-recording-status",
+          requestOptions
+        );
+        console.log("Response: ", response);
+      } catch (e) {
+        console.log("Error: ", e);
+      }
     }
 
     if (meetingCategory === "officehours") {

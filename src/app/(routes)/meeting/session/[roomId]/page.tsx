@@ -44,6 +44,7 @@ import { NestedPeerListIcons } from "@/utils/PeerListIcons";
 import logo from "@/assets/images/daos/CCLogo1.png";
 import Image from "next/image";
 import UpdateSessionDetails from "@/components/MeetingPreview/UpdateSessionDetails";
+import PopupSlider from "@/components/FeedbackPopup/PopupSlider";
 
 export default function Component({ params }: { params: { roomId: string } }) {
   const { isVideoOn, enableVideo, disableVideo, stream } = useLocalVideo();
@@ -91,29 +92,48 @@ export default function Component({ params }: { params: { roomId: string } }) {
   const [isAllowToEnter, setIsAllowToEnter] = useState<boolean>();
   const [notAllowedMessage, setNotAllowedMessage] = useState<string>();
   const [videoStreamTrack, setVideoStreamTrack] = useState<any>("");
+  const [showFeedbackPopups, setShowFeedbackPopups] = useState(false);
+  const [hasResponded, setHasResponded] = useState(false);
+
   const { state } = useRoom({
     onLeave: async ({ reason }) => {
       if (reason === "CLOSED") {
-        setModalOpen(true);
-        if (role === "host") {
-          const storedStatus = localStorage.getItem("meetingData");
-          if (storedStatus) {
-            const parsedStatus = JSON.parse(storedStatus);
-            console.log("storedStatus: ", parsedStatus);
-            if (parsedStatus.isMeetingRecorded === "true") {
-              router.push(
-                `/meeting/session/${params.roomId}/update-session-details`
-              );
-            } else {
-              setHostModalOpen(true);
-            }
-          }
+        if (hasResponded) {
+          setShowFeedbackPopups(false);
+          handlePopupRedirection();
+        } else {
+          setShowFeedbackPopups(true);
         }
       } else {
         router.push(`/meeting/session/${params.roomId}/lobby`);
       }
     },
   });
+
+  const handleFeedbackPopupsClose = () => {
+    setShowFeedbackPopups(false);
+    handlePopupRedirection();
+  };
+
+  const handlePopupRedirection = () => {
+    if (role === "host") {
+      const storedStatus = localStorage.getItem("meetingData");
+      if (storedStatus) {
+        const parsedStatus = JSON.parse(storedStatus);
+        console.log("storedStatus: ", parsedStatus);
+        if (parsedStatus.isMeetingRecorded === "true") {
+          router.push(
+            `/meeting/session/${params.roomId}/update-session-details`
+          );
+        } else {
+          console.log("Open modal");
+          setHostModalOpen(true);
+        }
+      }
+    } else if (role === "guest") {
+      setModalOpen(true);
+    }
+  };
 
   const { updateMetadata } = useLocalPeer<{
     displayName: string;
@@ -552,6 +572,17 @@ export default function Component({ params }: { params: { roomId: string } }) {
           )}
         </>
       )}
+
+      {role !== null && address !== undefined && showFeedbackPopups && (
+        <PopupSlider
+          role={role}
+          address={address}
+          daoName={daoName}
+          meetingId={params.roomId}
+          onClose={handleFeedbackPopupsClose}
+        />
+      )}
+
       {role === "guest" && modalOpen && (
         <AttestationModal isOpen={modalOpen} onClose={handleModalClose} />
       )}

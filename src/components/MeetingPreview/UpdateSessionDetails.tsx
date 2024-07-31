@@ -146,7 +146,7 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
                 style={{ boxShadow: "0px 4px 26.7px 0px rgba(0, 0, 0, 0.10)" }}
               >
                 <div className="flex items-center font-semibold text-sm justify-between">
-                  <span>🙂 Thank you for taking the session on CC</span>
+                  <span>🙂 Thank you for taking the session on Chora Club</span>
                   <button
                     className="ml-4 rounded-full flex items-center"
                     onClick={() => setShowPopup(false)}

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { FaStar } from "react-icons/fa6";
 import { ImCross } from "react-icons/im";
+import { Oval } from "react-loader-spinner";
 
 const popups = [
   {
@@ -17,11 +18,23 @@ const popups = [
   },
 ];
 
-function PopupSlider() {
+function PopupSlider({
+  role,
+  address,
+  daoName,
+  meetingId,
+  onClose,
+}: {
+  role: string;
+  address: string;
+  daoName: string;
+  meetingId: string;
+  onClose: () => void;
+}) {
   const [currentPopup, setCurrentPopup] = useState(0);
   const [responses, setResponses] = useState<any>({});
-  const [isClosed, setIsClosed] = useState(false);
   const [hoverRating, setHoverRating] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleResponse = (emoji: any) => {
     setResponses({ ...responses, [currentPopup]: emoji });
@@ -40,8 +53,9 @@ function PopupSlider() {
     }
   };
 
-  const handleSubmit = () => {
-    setIsClosed(true);
+  const handleSubmit = async () => {
+    // setIsClosed(true);
+    setIsSubmitting(true);
     console.log("Responses submitted:", responses);
 
     try {
@@ -49,30 +63,37 @@ function PopupSlider() {
         method: "POST",
         redirect: "follow",
         body: JSON.stringify({
-          address: "",
-          role: "",
+          address: address,
+          role: role,
           data: {
             platformExperience: {
-              userResponse: "",
+              userResponse: responses[0],
               timestamp: Date.now(),
-              dao: "",
-              meetingId: "",
+              dao: daoName,
+              meetingId: meetingId,
             },
             platformRecommendation: {
-              userResponse: "",
+              userResponse: responses[1],
               timestamp: Date.now(),
-              dao: "",
-              meetingId: "",
+              dao: daoName,
+              meetingId: meetingId,
             },
           },
         }),
       };
+
+      const response = await fetch("/api/store-feedback", requestOptions);
+
+      const result = await response.json();
+      console.log(result);
+      if (result.success) {
+        setIsSubmitting(false);
+        onClose();
+      }
     } catch (e) {
       console.log("Error while storing feedback: ", e);
     }
   };
-
-  if (isClosed) return null;
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50 font-poppins">
@@ -83,7 +104,8 @@ function PopupSlider() {
         </div>
         <button
           className="absolute top-3 right-3 bg-gray-100 p-2 rounded-full hover:bg-gray-200"
-          onClick={() => setIsClosed(true)}
+          onClick={onClose}
+          disabled={isSubmitting}
         >
           <ImCross color="#111" size={7} />
         </button>
@@ -125,9 +147,11 @@ function PopupSlider() {
         <div className="flex justify-between">
           <button
             onClick={prevPopup}
-            disabled={currentPopup === 0}
+            disabled={currentPopup === 0 || isSubmitting}
             className={`text-sm font-semibold px-4 ${
-              currentPopup === 0 ? "opacity-50 cursor-not-allowed" : ""
+              currentPopup === 0 || isSubmitting
+                ? "opacity-50 cursor-not-allowed"
+                : ""
             }`}
           >
             Previous
@@ -154,7 +178,20 @@ function PopupSlider() {
                   : "bg-green-800"
               }`}
             >
-              Submit
+              {isSubmitting ? (
+                <div className="flex items-center justify-center px-4">
+                  <Oval
+                    visible={true}
+                    height="18"
+                    width="18"
+                    color="#ffffff"
+                    secondaryColor="#cdccff"
+                    ariaLabel="oval-loading"
+                  />
+                </div>
+              ) : (
+                "Submit"
+              )}
             </button>
           )}
         </div>
