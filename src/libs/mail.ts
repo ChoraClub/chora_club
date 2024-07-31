@@ -1,6 +1,7 @@
 const nodemailer = require("nodemailer");
 import * as handlebars from "handlebars";
 import { bookedSessionTemplate } from "./templates/bookedSession";
+import { DelegateFollowerTemplate } from "./templates/delegatefollowers";
 
 export async function sendMail({
   to,
@@ -64,18 +65,29 @@ export async function sendMail({
   }
 }
 
-export function compileBookedSessionTemplate(
-  title: string,
-  title2: string,
-  title3: string,
-  content: string
-) {
+export function compileBookedSessionTemplate(title: string, content: string) {
   const template = handlebars.compile(bookedSessionTemplate);
   const htmlBody = template({
     title: title,
-    title2: title2,
-    title3: title3,
     content: content,
+  });
+  return htmlBody;
+}
+
+export function compileDelegateFollowersTemplate(
+  userGreeting: string,
+  notificationMessage: string,
+  ctaMessage: string,
+  linkPrompt: string,
+  bookingLink: string
+) {
+  const template = handlebars.compile(DelegateFollowerTemplate);
+  const htmlBody = template({
+    userGreeting: userGreeting,
+    notificationMessage: notificationMessage,
+    ctaMessage: ctaMessage,
+    linkPrompt: linkPrompt,
+    bookingLink: bookingLink,
   });
   return htmlBody;
 }

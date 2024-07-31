@@ -1,4 +1,4 @@
-export const bookedSessionTemplate = `
+export const DelegateFollowerTemplate = `
 <!DOCTYPE html>
 <html xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" lang="en">
 
@@ -153,11 +153,11 @@ export const bookedSessionTemplate = `
 							</tr>
 						</tbody>
 					</table>
-					<table class="row row-3" align="center" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;">
+					<table class="row row-3" align="left" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;">
 						<tbody>
 							<tr>
 								<td>
-									<table class="row-content stack" align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; background-color: #ffffff; color: #000000; width: 765px; margin: 0 auto;" width="765">
+									<table class="row-content stack" align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; background-color: #ffffff; color: #000000; width: 765px; margin: 0 auto;"  width="765">
 										<tbody>
 											<tr>
 												<td class="column column-1" width="100%" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; font-weight: 400; text-align: left; padding-bottom: 5px; padding-top: 5px; vertical-align: top; border-top: 0px; border-right: 0px; border-bottom: 0px; border-left: 0px;">
@@ -165,11 +165,13 @@ export const bookedSessionTemplate = `
 														<tr>
 															<td class="pad">
 																<div style="font-family: Tahoma, Verdana, sans-serif">
-																	<div class style="font-size: 12px; font-family: Tahoma, Verdana, Segoe, sans-serif; mso-line-height-alt: 14.399999999999999px; color: #555555; line-height: 1.2;">
-																		<p style="margin: 0; font-size: 16px; text-align: center; mso-line-height-alt: 19.2px;"><strong>Exciting update!,{{title}}</strong></p>
+																	<div class style="font-size: 12px; font-family: Tahoma, Verdana, Segoe, sans-serif; mso-line-height-alt: 14.399999999999999px; color: #000000; line-height: 1.2;margin-left:10px;">
+																		<p style="margin:0;margin-bottom:10px;font-size: 16px; text-align:left; mso-line-height-alt: 19.2px;">Exciting Update! 🚀️</p>
+																		<p style="margin:0;margin-bottom:10px;font-size:16px;text-align:left;mso-line-height-alt:19.2px">{{userGreeting}},</p>
+																		<p style="margin:0;font-size:16px;text-align:left;mso-line-height-alt:19.2px">{{notificationMessage}}</p>
 																	</div>
 																</div>
-															</td>
+															</td
 														</tr>
 													</table>
 												</td>
@@ -180,7 +182,7 @@ export const bookedSessionTemplate = `
 							</tr>
 						</tbody>
 					</table>
-					<table class="row row-4" align="center" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;">
+					<table class="row row-4" align="left" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;">
 						<tbody>
 							<tr>
 								<td>
@@ -190,9 +192,11 @@ export const bookedSessionTemplate = `
 												<td class="column column-1" width="100%" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; font-weight: 400; text-align: left; padding-bottom: 20px; vertical-align: top; border-top: 0px; border-right: 0px; border-bottom: 0px; border-left: 0px;">
 													<table class="paragraph_block block-1" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; word-break: break-word;">
 														<tr>
-															<td class="pad" style="padding-bottom:5px;padding-left:60px;padding-right:60px;padding-top:5px;">
-																<div style="color:#878787;direction:ltr;font-family:Tahoma, Verdana, Segoe, sans-serif;font-size:16px;font-weight:400;letter-spacing:0px;line-height:120%;text-align:center;mso-line-height-alt:19.2px;">
-																	<p style="margin: 0;">{{content}}</p>
+															<td class="pad" style="padding-bottom:5px;padding-left:10px;marging-left:10px;padding-right:60px;">
+																<div style="color:#000000;direction:ltr;font-family:Tahoma, Verdana, Segoe, sans-serif;font-size:16px;font-weight:400;letter-spacing:0px;line-height:120%;text-align:left;mso-line-height-alt:19.2px;margin-left:10px;">
+																    <p style="margin:0;text-align:left;margin-bottom:10px">{{ctaMessage}}</p>
+																	<p style="margin:0;text-align:left;margin-bottom:10px">{{linkPrompt}}</p>
+																	<p style="margin: 0;text-align:left">{{bookingLink}}</p>
 																</div>
 															</td>
 														</tr>
