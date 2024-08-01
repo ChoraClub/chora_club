@@ -1,6 +1,6 @@
 import { IoClose } from "react-icons/io5";
-// import user1 from "@/assets/images/daos/user1.png";
-import user1 from "@/assets/images/sidebar/favicon.png";
+import user1 from "@/assets/images/daos/CCLogo2.png";
+// import user1 from "@/assets/images/sidebar/favicon.png";
 import { FaCalendarDays } from "react-icons/fa6";
 import Image from "next/image";
 import { IoCopy } from "react-icons/io5";

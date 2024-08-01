@@ -15,7 +15,7 @@ import { FaCircleInfo } from "react-icons/fa6";
 import { Tooltip } from "@nextui-org/react";
 import text1 from "@/assets/images/daos/texture1.png";
 import clockIcn from "@/assets/images/daos/icon_clock.png";
-import ccLogo from "@/assets/images/daos/CC.png";
+import ccLogo from "@/assets/images/daos/CCLogo2.png";
 import OPLogo from "@/assets/images/daos/op.png";
 import ArbLogo from "@/assets/images/daos/arbCir.png";
 import "@/components/DelegateSessions/DelegateSessionsMain.module.css";
@@ -563,7 +563,7 @@ function AvailableSessions() {
                         <Image
                           src={ccLogo}
                           alt="ChoraClub Logo"
-                          className="absolute top-0 right-0"
+                          className="absolute top-0 right-0 rounded-full bg-white"
                           style={{
                             width: "30px",
                             height: "30px",
