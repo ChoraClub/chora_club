@@ -512,7 +512,7 @@ function Proposals({ props }: { props: string }) {
                 placement="bottom"
                 className="rounded-md bg-opacity-90"
                 closeDelay={1}
-              >
+              > 
                 <div>
                   <Image src={chain} alt="" className="size-8" />
                 </div>
