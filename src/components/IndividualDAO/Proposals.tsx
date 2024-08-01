@@ -24,7 +24,7 @@ interface Proposal {
   queueStartTime?: number;
   queueEndTime?: number;
 }
-// Create a cache object outside of the component to persist across re-renders
+// Create a cache object outside of the component to persist acrnulls re-renders
 const cache: any = {
   optimism: null,
   arbitrum: null,
@@ -141,13 +141,8 @@ function Proposals({ props }: { props: string }) {
   const fetchProposals = async () => {
     setLoading(true);
     try {
+      console.log("cache", cache)
 
-      if (cache[props]) {
-        setAllProposals(cache[props]);
-        setDisplayedProposals(cache[props].slice(0, proposalsPerPage));
-        setLoading(false);
-        return;
-      }
       let response;
       if (props === "optimism") {
         response = await fetch("/api/get-proposals");
@@ -175,6 +170,7 @@ function Proposals({ props }: { props: string }) {
           ...p,
           votesLoaded: false,
         }));
+        cache[props] = newProposals;
       } else {
         newProposals = responseData.data.proposalCreateds;
         const queueResponse = await fetch("/api/get-arbitrum-queue-info");
@@ -195,6 +191,7 @@ function Proposals({ props }: { props: string }) {
       );
 
       cache[props] = newProposals;
+      console.log("cache arbitrum", cache['arbitrum'])
       setAllProposals((prevProposals) => {
         const updatedProposals = [...prevProposals, ...newProposals];
         return updatedProposals.sort(
@@ -209,6 +206,7 @@ function Proposals({ props }: { props: string }) {
           Math.min(newDisplayed.length, prevDisplayed.length + proposalsPerPage)
         );
       });
+
     } catch (error: any) {
       console.error("Error fetching data:", error);
       setError(error.message);
@@ -218,25 +216,47 @@ function Proposals({ props }: { props: string }) {
   };
 
   useEffect(() => {
-    console.log("pageCache", pageCache);
+    const fetchVotesForDisplayedProposals = async () => {
+      setLoading(true);
+      try {
+        const updatedProposals = await Promise.all(
+          displayedProposals.map(async (proposal) => {
+            if (!proposal.votesLoaded) {
+              return await fetchVotes(proposal);
+            }
+            console.log("proposal", proposal);
+            return proposal;
+          })
+        );
+
+        pageCache = { updatedProposals }
+        console.log("updatedProposals", updatedProposals);
+        setDisplayedProposals(updatedProposals);
+      } catch (error: any) {
+        console.error("Error fetching votes:", error);
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (displayedProposals.some((proposal) => !proposal.votesLoaded)) {
+      fetchVotesForDisplayedProposals();
+    }
+  }, [displayedProposals, fetchVotes, props]);
+
+
+  useEffect(() => {
     const proposals = async () => {
-      if (pageCache && props === pageCache.dao) {
-        setDisplayedProposals(pageCache.proposals);
-        setCurrentPage(pageCache.currentPage);
+      if (pageCache) {
+        setDisplayedProposals(pageCache.updatedProposals);
+        // setCurrentPage(pageCache);
         setLoading(false);
       } else {
         console.log("fetching proposals");
         await fetchProposals();
         console.log("fetching proposals done");
       }
-
-      return () => {
-        pageCache = {
-          dao: props,
-          proposals: displayedProposals,
-          currentPage: currentPage
-        };
-      };
     }
     proposals();
   }, [props]);
@@ -279,38 +299,18 @@ function Proposals({ props }: { props: string }) {
     }
   };
 
-  useEffect(() => {
-    const fetchVotesForDisplayedProposals = async () => {
-      setLoading(true);
-      try {
-        const updatedProposals = await Promise.all(
-          displayedProposals.map(async (proposal) => {
-            if (!proposal.votesLoaded) {
-              return await fetchVotes(proposal);
-            }
-            return proposal;
-          })
-        );
-        setDisplayedProposals(updatedProposals);
-      } catch (error: any) {
-        console.error("Error fetching votes:", error);
-        setError(error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (displayedProposals.some((proposal) => !proposal.votesLoaded)) {
-      fetchVotesForDisplayedProposals();
-    }
-  }, [displayedProposals, fetchVotes, props]);
-
   const loadMoreProposals = useCallback(() => {
     if (props === "optimism") {
-      const nextPage = currentPage + 1;
+      let nextPage; 
+      if(pageCache) {
+        nextPage = (pageCache.updatedProposals.length/7 )+ 1;
+      }else{
+         nextPage = currentPage + 1;
+      }
+      console.log("nextPage", nextPage);
       const startIndex = (nextPage - 1) * proposalsPerPage;
       const endIndex = startIndex + proposalsPerPage;
-      const newProposals = allProposals.slice(startIndex, endIndex);
+      const newProposals = cache[props].slice(startIndex, endIndex);
       setDisplayedProposals((prevProposals) => [
         ...prevProposals,
         ...newProposals,
@@ -319,7 +319,8 @@ function Proposals({ props }: { props: string }) {
     } else {
       // For Arbitrum
       const currentLength = displayedProposals.length;
-      const moreProposals = allProposals.slice(
+      console.log("currentLength", currentLength, allProposals);
+      const moreProposals = cache[props].slice(
         currentLength,
         currentLength + proposalsPerPage
       );
@@ -328,7 +329,7 @@ function Proposals({ props }: { props: string }) {
         ...moreProposals,
       ]);
 
-      if (currentLength + proposalsPerPage >= allProposals.length) {
+      if (currentLength + proposalsPerPage >= cache[props].length) {
         fetchProposals();
       }
     }
@@ -417,12 +418,12 @@ function Proposals({ props }: { props: string }) {
               {proposal.votesLoaded ? (
                 <div
                   className={`rounded-full flex items-center justify-center text-xs h-fit py-0.5 border font-medium w-24 ${getProposalStatus(proposal) === "SUCCEEDED"
-                      ? "bg-green-200 border-green-600 text-green-600"
-                      : getProposalStatus(proposal) === "DEFEATED" || getProposalStatus(proposal) === "CANCELLED"
-                        ? "bg-red-200 border-red-500 text-red-500"
-                        : getProposalStatus(proposal) === "QUEUED"
-                          ? "bg-yellow-200 border-yellow-600 text-yellow-600"
-                          : "bg-green-200 border-green-600 text-green-600"
+                    ? "bg-green-200 border-green-600 text-green-600"
+                    : getProposalStatus(proposal) === "DEFEATED" || getProposalStatus(proposal) === "CANCELLED"
+                      ? "bg-red-200 border-red-500 text-red-500"
+                      : getProposalStatus(proposal) === "QUEUED"
+                        ? "bg-yellow-200 border-yellow-600 text-yellow-600"
+                        : "bg-green-200 border-green-600 text-green-600"
                     }`}
                 >
                   {/* {
@@ -496,8 +497,7 @@ function Proposals({ props }: { props: string }) {
             </div>
           </div>
         ))}
-
-        {displayedProposals.length < allProposals.length && (
+        {displayedProposals?.length < (cache[props]?.length && allProposals.length) && (
           <div className="flex items-center justify-center">
             <button
               onClick={loadMoreProposals}
