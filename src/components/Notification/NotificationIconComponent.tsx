@@ -14,7 +14,7 @@ import { BsDatabaseFillCheck } from "react-icons/bs";
 import { PiVideoFill } from "react-icons/pi";
 import { FaUserCheck } from "react-icons/fa6";
 import { GiChaingun } from "react-icons/gi";
-import { formatTimestampOrDate } from "@/utils/FormatTimestampUtils";
+import { formatTimestampOrDate } from "@/utils/NotificationUtils";
 import styles from "./NotificationIconComponent.module.css";
 import {
   getBackgroundColor,

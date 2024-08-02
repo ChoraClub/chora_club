@@ -6,6 +6,10 @@ import { io } from "socket.io-client";
 import { SOCKET_BASE_URL } from "@/config/constants";
 import { getEnsName } from "@/utils/ENSUtils";
 import { truncateAddress } from "@/utils/text";
+import {
+  formatSlotDateAndTime,
+  getDisplayNameOrAddr,
+} from "@/utils/NotificationUtils";
 
 type Attendee = {
   attendee_address: string;
@@ -99,30 +103,37 @@ export async function POST(
         .find({ address: host_address })
         .toArray();
 
-      const slotDate = new Date(slot_time);
-      const options: any = {
-        weekday: "long",
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-        hour: "numeric",
-        minute: "numeric",
-        hour12: true,
-      };
-      const localSlotTime = slotDate.toLocaleString("en-US", options);
+      // const slotDate = new Date(slot_time);
+      // const options: any = {
+      //   weekday: "long",
+      //   year: "numeric",
+      //   month: "long",
+      //   day: "numeric",
+      //   hour: "numeric",
+      //   minute: "numeric",
+      //   hour12: true,
+      // };
+      // const localSlotTime = slotDate.toLocaleString("en-US", options);
+
+      // const localSlotTime = await formatSlotDateAndTime(slot_time);
+      const localSlotTime = await formatSlotDateAndTime({
+        dateInput: slot_time,
+      });
 
       if (session_type === "session") {
-        const userAddress = attendees[0].attendee_address;
-        const ensNameOrUserAddress = await getEnsName(userAddress);
-        let userENSNameOrAddress = ensNameOrUserAddress?.ensNameOrAddress;
-        if (userENSNameOrAddress === undefined) {
-          userENSNameOrAddress = truncateAddress(userAddress);
-        }
-        const ensNameOrHostAddress = await getEnsName(host_address);
-        let hostENSNameOrAddress = ensNameOrHostAddress?.ensNameOrAddress;
-        if (hostENSNameOrAddress === undefined) {
-          hostENSNameOrAddress = truncateAddress(userAddress);
-        }
+        const guestAddress = attendees[0].attendee_address;
+        // const ensNameOrUserAddress = await getEnsName(guestAddress);
+        // let userENSNameOrAddress = ensNameOrUserAddress?.ensNameOrAddress;
+        // if (userENSNameOrAddress === undefined) {
+        //   userENSNameOrAddress = truncateAddress(guestAddress);
+        // }
+        const userENSNameOrAddress = await getDisplayNameOrAddr(guestAddress);
+        // const ensNameOrHostAddress = await getEnsName(host_address);
+        // let hostENSNameOrAddress = ensNameOrHostAddress?.ensNameOrAddress;
+        // if (hostENSNameOrAddress === undefined) {
+        //   hostENSNameOrAddress = truncateAddress(userAddress);
+        // }
+        const hostENSNameOrAddress = await getDisplayNameOrAddr(host_address);
         const notificationToHost = {
           receiver_address: host_address,
           content: `Great news! 🎉 ${userENSNameOrAddress} has just booked a session with you on ${dao_name}. The session is scheduled on ${localSlotTime} and will focus on ${title}.`,
@@ -134,7 +145,7 @@ export async function POST(
         };
 
         const notificationToGuest = {
-          receiver_address: userAddress,
+          receiver_address: guestAddress,
           content: `Congratulations! 🎉 Your session on ${dao_name} titled "${title}" has been successfully booked with ${hostENSNameOrAddress}. The session will take place on ${localSlotTime}.`,
           createdAt: Date.now(),
           read_status: false,
@@ -170,7 +181,7 @@ export async function POST(
           _id: notificationResults.insertedIds[1],
         };
 
-        const attendee_address = userAddress;
+        const attendee_address = guestAddress;
 
         console.log("dataToSendHost", dataToSendHost);
         console.log("dataToSendGuest", dataToSendGuest);
@@ -221,7 +232,7 @@ export async function POST(
         // if (session_type === "session") {
 
         const documentsForUserEmail = await delegateCollection
-          .find({ address: userAddress })
+          .find({ address: guestAddress })
           .toArray();
         for (const document of documentsForUserEmail) {
           const emailId = document.emailId;

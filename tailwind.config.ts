@@ -12,9 +12,9 @@ const config: Config = {
     extend: {
       screens: {
         "2.5xl": "2100px",
-        "1.5xl":"1350px",
-        "1.7xl":"1450px",
-        "1.5lg":"1200px",
+        "1.5xl": "1350px",
+        "1.7xl": "1450px",
+        "1.5lg": "1200px",
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
@@ -41,11 +41,21 @@ const config: Config = {
         "black-shade-1000": "#3E3D3D",
         "green-shade-100": "#00CE78",
         "green-shade-200": "#25d366",
-
+        "gradient-start": "#4ade80", // green-400
+        "gradient-end": "#06b6d4", // cyan-500
       },
       fontFamily: {
         quanty: ["var(--font-quanty)"],
         poppins: ["var(--font-poppins)"],
+      },
+      keyframes: {
+        fadeIn: {
+          "0%": { opacity: "0", transform: "translateY(-20px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
+        },
+      },
+      animation: {
+        fadeIn: "fadeIn 1s ease-out",
       },
     },
   },

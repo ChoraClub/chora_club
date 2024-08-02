@@ -19,7 +19,6 @@ export async function GET(req: NextRequest, context: { params: Params }) {
       .find({ meetingId, meeting_status: "Recorded" })
       .toArray();
 
-
     const officeHoursDocuments = await officeHoursCollection
       .find({ meetingId, meeting_status: "inactive" })
       .toArray();
@@ -55,6 +54,7 @@ export async function GET(req: NextRequest, context: { params: Params }) {
           return session;
         })
       );
+      client.close();
       return NextResponse.json(
         { success: true, collection: "meetings", data: mergedData },
         { status: 200 }
@@ -89,6 +89,7 @@ export async function GET(req: NextRequest, context: { params: Params }) {
           return session;
         })
       );
+      client.close();
       return NextResponse.json(
         {
           success: true,
@@ -98,12 +99,9 @@ export async function GET(req: NextRequest, context: { params: Params }) {
         { status: 200 }
       );
     } else {
-      return NextResponse.json(
-        { success: true, data: null },
-        { status: 404 }
-      );
+      client.close();
+      return NextResponse.json({ success: true, data: null }, { status: 404 });
     }
-    client.close();
   } catch (error) {
     console.error(
       "Error retrieving data in meeting session data by id:",

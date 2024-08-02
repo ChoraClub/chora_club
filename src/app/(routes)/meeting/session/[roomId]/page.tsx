@@ -43,6 +43,7 @@ import ParticipantTile from "@/components/Huddle/ParticipantTile";
 import { NestedPeerListIcons } from "@/utils/PeerListIcons";
 import logo from "@/assets/images/daos/CCLogo1.png";
 import Image from "next/image";
+import UpdateSessionDetails from "@/components/MeetingPreview/UpdateSessionDetails";
 
 export default function Component({ params }: { params: { roomId: string } }) {
   const { isVideoOn, enableVideo, disableVideo, stream } = useLocalVideo();
@@ -81,7 +82,8 @@ export default function Component({ params }: { params: { roomId: string } }) {
   const { metadata, role } = useLocalPeer<PeerMetadata>();
   const { videoTrack, shareStream } = useLocalScreenShare();
   const [modalOpen, setModalOpen] = useState(false);
-  const [hostAddress, setHostAddress] = useState();
+  const [hostModalOpen, setHostModalOpen] = useState(false);
+  const [hostAddress, setHostAddress] = useState<any>();
   const [daoName, setDaoName] = useState<any>();
   const { address } = useAccount();
   const { push } = useRouter();
@@ -90,8 +92,26 @@ export default function Component({ params }: { params: { roomId: string } }) {
   const [notAllowedMessage, setNotAllowedMessage] = useState<string>();
   const [videoStreamTrack, setVideoStreamTrack] = useState<any>("");
   const { state } = useRoom({
-    onLeave: async () => {
-      setModalOpen(true);
+    onLeave: async ({ reason }) => {
+      if (reason === "CLOSED") {
+        setModalOpen(true);
+        if (role === "host") {
+          const storedStatus = localStorage.getItem("meetingData");
+          if (storedStatus) {
+            const parsedStatus = JSON.parse(storedStatus);
+            console.log("storedStatus: ", parsedStatus);
+            if (parsedStatus.isMeetingRecorded === "true") {
+              router.push(
+                `/meeting/session/${params.roomId}/update-session-details`
+              );
+            } else {
+              setHostModalOpen(true);
+            }
+          }
+        }
+      } else {
+        router.push(`/meeting/session/${params.roomId}/lobby`);
+      }
     },
   });
 
@@ -178,23 +198,25 @@ export default function Component({ params }: { params: { roomId: string } }) {
   };
 
   useEffect(() => {
-    const myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-
-    const raw = JSON.stringify({
-      roomId: params.roomId,
-      meetingType: "session",
-    });
-
-    const requestOptions: any = {
-      method: "POST",
-      headers: myHeaders,
-      body: raw,
-      redirect: "follow",
-    };
-
     async function verifyMeetingId() {
       try {
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+
+        if (address) {
+          myHeaders.append("x-wallet-address", address);
+        }
+        const raw = JSON.stringify({
+          roomId: params.roomId,
+          meetingType: "session",
+        });
+
+        const requestOptions: any = {
+          method: "POST",
+          headers: myHeaders,
+          body: raw,
+          redirect: "follow",
+        };
         const response = await fetch("/api/verify-meeting-id", requestOptions);
         const result = await response.json();
 
@@ -235,7 +257,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
     }
 
     verifyMeetingId();
-  }, [params.roomId, isAllowToEnter, notAllowedMessage]);
+  }, [params.roomId, isAllowToEnter, notAllowedMessage, address]);
 
   useEffect(() => {
     if (state === "idle" && isAllowToEnter) {
@@ -482,7 +504,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
         name={metadata?.displayName}
         localPeerId={peerId}
       /> */}
-          <BottomBar daoName={daoName} />
+          <BottomBar daoName={daoName} hostAddress={hostAddress} />
         </div>
       ) : (
         <>
@@ -530,8 +552,11 @@ export default function Component({ params }: { params: { roomId: string } }) {
           )}
         </>
       )}
-      {modalOpen && (
+      {role === "guest" && modalOpen && (
         <AttestationModal isOpen={modalOpen} onClose={handleModalClose} />
+      )}
+      {role === "host" && hostModalOpen && (
+        <AttestationModal isOpen={hostModalOpen} onClose={handleModalClose} />
       )}
     </>
   );

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/config/connectDB";
-import { sendMail, compileBookedSessionTemplate } from "@/libs/mail";
+import { sendMail, compileDelegateFollowersTemplate } from "@/libs/mail";
 
 export async function PUT(req: NextRequest) {
   try {
@@ -81,11 +81,12 @@ export async function PUT(req: NextRequest) {
           to: emailId,
           name: "Chora Club",
           subject: "Your Delegate Has Scheduled a New Session",
-          body: compileBookedSessionTemplate(
-            `Dear ${address.slice(0, 6)}...${address.slice(
-              -4
-            )},\nWe're thrilled to inform you that ${delegateInfo} a delegate from a ${capitalizedDAO} DAO you're following has just scheduled a new session!`,
-            "Don't miss out—book your spot now to dive deeper into the Web3 Ecosystem."
+          body: compileDelegateFollowersTemplate(
+            `Hi ${address}`,
+            `\nWe're thrilled to let you know that ${delegateInfo} a delegate from a ${capitalizedDAO} DAO you're following has just made new time slots available for you to book!🎉️`,
+            `Don’t miss this chance to dive deeper into the Web3 Ecosystem.`,
+            `🌐️ Click the link below to book your spot and explore the latest insights:Book Your Spot Now!👇️ `,
+            `\n https://app.chora.club/${daoName}/${delegate_address}?active=delegatesSession&session=book`
           ),
         });
         console.log(`Email sent successfully to ${emailId}`);

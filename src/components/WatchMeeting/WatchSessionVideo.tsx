@@ -64,19 +64,24 @@ interface Meeting {
     | "Ongoing"; // Assuming meeting status can only be active or inactive
   session_type: string;
   hostProfileInfo: HostProfileInfo;
+  thumbnail_image: string;
 }
 
 function WatchSessionVideo({
   data,
   collection,
+  autoplay,
+  sessionDetails,
 }: {
   data: Meeting;
   collection: string;
+  autoplay: boolean;
+  sessionDetails: { title: string; description: string; image: string };
 }) {
   const playerRef = React.useRef(null);
 
   const videoJsOptions = {
-    autoplay: true,
+    autoplay: autoplay,
     controls: true,
     responsive: true,
     fluid: true,
@@ -86,6 +91,9 @@ function WatchSessionVideo({
         forward: 10,
       },
     },
+    poster: sessionDetails.image
+      ? `https://gateway.lighthouse.storage/ipfs/${sessionDetails.image}`
+      : `https://gateway.lighthouse.storage/ipfs/${data.thumbnail_image}`,
     sources: [
       {
         src: data.video_uri,
