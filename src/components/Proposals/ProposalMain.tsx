@@ -772,7 +772,6 @@ function ProposalMain({ props }: { props: Props }) {
   );
   const isActive = status === "Active" && !(props.daoDelegates === "optimism");
   const getVotingPeriodEnd = () => {
-    console.log(data);
     if (!data || !data.blockTimestamp) return null;
 
     const baseTimestamp = new Date(data.blockTimestamp * 1000);
@@ -812,7 +811,6 @@ function ProposalMain({ props }: { props: Props }) {
         }
       } else {
         // Fallback to old logic if queue times are not available
-        console.log(currentDate, votingPeriodEndData);
         return !votingPeriodEndData
           ? "PENDING"
           : currentDate > votingPeriodEndData
@@ -850,7 +848,6 @@ function ProposalMain({ props }: { props: Props }) {
 
   const Proposalstatus = (data && support1Weight >= 0) || support1Weight ? proposal_status : null;
 
-  console.log(Proposalstatus, data, support1Weight);
   const CustomXAxisTick = ({
     x,
     y,
@@ -968,10 +965,10 @@ function ProposalMain({ props }: { props: Props }) {
             <div className="flex-shrink-0 mt-2 md:mt-0">
               <div
                 className={`rounded-full flex items-center justify-center text-xs py-1 px-2 font-medium ${status
-                    ? status === "Closed"
-                      ? "bg-[#f4d3f9] border border-[#77367a] text-[#77367a]"
-                      : "bg-[#f4d3f9] border border-[#77367a] text-[#77367a]"
-                    : "bg-gray-200 animate-pulse rounded-full"
+                  ? status === "Closed"
+                    ? "bg-[#f4d3f9] border border-[#77367a] text-[#77367a]"
+                    : "bg-[#f4d3f9] border border-[#77367a] text-[#77367a]"
+                  : "bg-gray-200 animate-pulse rounded-full"
                   }`}
               >
                 {status ? status : <div className="h-4 w-16"></div>}
@@ -997,16 +994,16 @@ function ProposalMain({ props }: { props: Props }) {
               <div className="animate-pulse bg-gray-200  h-4 w-32 rounded-full"></div>
             )}
           </div>
-          {isLoading? (
+          {isLoading ? (
             <div
               className={`rounded-full flex items-center justify-center text-xs h-fit py-0.5 border font-medium w-24 bg-gray-200 animate-pulse rounded-full`}
             >
-               <div className="h-5 w-20"></div>
+              <div className="h-5 w-20"></div>
             </div>) : (
             <div
               className={`rounded-full flex items-center justify-center text-xs h-fit py-0.5 border font-medium w-24 ${Proposalstatus
-                  ? getStatusColor(Proposalstatus)
-                  : "bg-gray-200 animate-pulse rounded-full"
+                ? getStatusColor(Proposalstatus)
+                : "bg-gray-200 animate-pulse rounded-full"
                 }`}
             >
               {Proposalstatus ? Proposalstatus : <div className="h-5 w-20"></div>}
@@ -1056,8 +1053,8 @@ function ProposalMain({ props }: { props: Props }) {
             ) : (
               <div
                 className={`flex flex-col gap-2 py-3 pl-2 pr-1  xl:pl-3 xl:pr-2 my-3 border-gray-200 ${voterList.length > 5
-                    ? `h-[440px] overflow-y-auto ${style.scrollbar}`
-                    : "h-fit"
+                  ? `h-[440px] overflow-y-auto ${style.scrollbar}`
+                  : "h-fit"
                   }`}
               >
                 {voterList.length === 0 ? (
@@ -1100,14 +1097,12 @@ function ProposalMain({ props }: { props: Props }) {
                         </div>
                         <div className="flex items-center space-x-4">
                           <div
-                            className={`xl:px-4 px-2 py-2 rounded-full xl:text-sm xl:w-36 w-25 flex items-center justify-center xl:font-medium text-xs ${voter.support === 1 || voter.type === "for"
-                                ? "bg-green-100 text-green-800"
-                                : "bg-red-100 text-red-800"
+                            className={`xl:px-4 px-2 py-2 rounded-full xl:text-sm xl:w-36 w-25 flex items-center justify-center xl:font-medium text-xs ${voter.support === 1 ? "bg-green-100 text-green-800" : voter.support === 0 ? "bg-red-100 text-red-800" : "bg-blue-100 text-blue-800"
                               }`}
                           >
                             {formatWeight(voter.weight / 10 ** 18)}
                             &nbsp;
-                            {voter.support === 1 ? "For" : "Against"}
+                            {voter.support === 1 ? "For" : voter.support === 0 ? "Against" : "Abstain"}
                           </div>
                           <Tooltips
                             showArrow
