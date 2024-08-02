@@ -28,6 +28,30 @@ import toast, { Toaster } from "react-hot-toast";
 import { useNetwork } from "wagmi";
 import { hash } from "crypto";
 import { marked } from "marked";
+import { createPublicClient, http } from 'viem'
+import { arbitrum } from 'viem/chains'
+import { Tooltip as Tooltips } from "@nextui-org/react";
+import style from "./proposalMain.module.css";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
+import { RiArrowRightUpLine, RiExternalLinkLine } from "react-icons/ri";
+import ProposalMainVotersSkeletonLoader from "../SkeletonLoader/ProposalMainVotersSkeletonLoader";
+import ProposalMainDescriptionSkeletonLoader from "../SkeletonLoader/ProposalMainDescriptionSkeletonLoader";
+import DOMPurify from "dompurify";
+
+// Create a client
+const client = createPublicClient({
+  chain: arbitrum,
+  transport: http()
+})
 
 interface ArbitrumVote {
   voter: {
@@ -61,22 +85,7 @@ interface Proposal {
   queueStartTime?: number;
   queueEndTime?: number;
 }
-import { Tooltip as Tooltips } from "@nextui-org/react";
-import style from "./proposalMain.module.css";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from "recharts";
-import { RiArrowRightUpLine, RiExternalLinkLine } from "react-icons/ri";
-import ProposalMainVotersSkeletonLoader from "../SkeletonLoader/ProposalMainVotersSkeletonLoader";
-import ProposalMainDescriptionSkeletonLoader from "../SkeletonLoader/ProposalMainDescriptionSkeletonLoader";
-import DOMPurify from "dompurify";
+
 
 function ProposalMain({ props }: { props: Props }) {
   const router = useRouter();
@@ -111,6 +120,27 @@ function ProposalMain({ props }: { props: Props }) {
     votingPower?: number;
     network: string;
   }
+       
+const getContractAddress = async (txHash:`0x${string}`) => {  
+  try {
+    // Get the transaction
+    const transaction = await client.getTransaction({ hash: txHash })
+
+    // Get the transaction receipt
+    const transactionReceipt = await client.getTransactionReceipt({ hash: txHash })
+
+   if (transaction.to) {
+      // This was a regular transaction to a contract
+      return transaction.to;
+    } else {
+      return "Not a contract interaction or creation"
+    }
+
+  } catch (error) {
+    console.error('Error:', error)
+    return "Error retrieving transaction information"
+  }
+}
 
   const StoreData = async (voteData: VoteData) => {
     // Make the API call to submit the vote
@@ -163,7 +193,7 @@ function ProposalMain({ props }: { props: Props }) {
     if (chain?.name === "Optimism") {
       chainAddress = "0xcDF27F107725988f2261Ce2256bDfCdE8B382B10"; //token contract address
     } else if (chain?.name === "Arbitrum One") {
-      chainAddress = "0x789fC99093B09aD01C34DC7251D0C89ce743e5a4";
+    chainAddress = await getContractAddress(data.transactionHash);
     } else {
       return;
     }
@@ -934,7 +964,7 @@ function ProposalMain({ props }: { props: Props }) {
               <p className="text-2xl font-semibold">{formattedTitle}</p>
             )}
           </div>
-          <div className="flex flex-wrap items-center max-w-[400px] float-left md:max-w-none md:flex-nowrap md:justify-start md:float-none">
+          <div className="flex flex-wrap items-center w-[20%] max-w-[400px] float-left md:max-w-none md:flex-nowrap md:justify-start md:float-none">
             <div className="flex items-center gap-1 flex-grow w-max	">
               <Tooltips
                 showArrow
@@ -953,7 +983,7 @@ function ProposalMain({ props }: { props: Props }) {
             <div className="flex items-center gap-1 flex-grow  mx-2">
               {isActive && (
                 <button
-                  className="align-middle select-none font-sans font-bold text-center uppercase transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-1 px-2 rounded-full bg-blue-600 text-white shadow-md shadow-blue-600/10 hover:shadow-lg hover:shadow-blue-600/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none flex-shrink-0 w-fit md:w-[100%] md:min-w-[80px] md:max-w-[200px]"
+                  className="align-middle select-none font-sans font-bold text-center uppercase transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-1 px-2 rounded-full bg-blue-600 text-white shadow-md shadow-blue-600/10 hover:shadow-lg hover:shadow-blue-600/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none flex-shrink-0 w-fit md:w-[100%]  md:max-w-[200px]"
                   type="button"
                   onClick={voteOnchain}
                   disabled={hasVoted}
