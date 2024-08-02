@@ -26,7 +26,13 @@ import { opBlock, arbBlock } from "@/config/staticDataUtils";
 import MeetingRecordingModal from "../ComponentUtils/MeetingRecordingModal";
 import ReactionBar from "./ReactionBar";
 
-const BottomBar = ({ daoName }: { daoName: string }) => {
+const BottomBar = ({
+  daoName,
+  hostAddress,
+}: {
+  daoName: string;
+  hostAddress: string;
+}) => {
   const { isAudioOn, enableAudio, disableAudio } = useLocalAudio();
   const { isVideoOn, enableVideo, disableVideo } = useLocalVideo();
   const [showLeaveDropDown, setShowLeaveDropDown] = useState<boolean>(false);
@@ -202,23 +208,21 @@ const BottomBar = ({ daoName }: { daoName: string }) => {
     setIsLoading(true);
     // Check if the user is the host
 
-    const response = await fetch(`/api/get-host`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        meetingId: roomId,
-      }),
-    });
-    const response_data = await response.json();
-    const host_address = await response_data.address;
+    // const response = await fetch(`/api/get-host`, {
+    //   method: "POST",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //   },
+    //   body: JSON.stringify({
+    //     meetingId: roomId,
+    //   }),
+    // });
+    // const response_data = await response.json();
+    // const host_address = await response_data.address;
 
-    console.log("host address", host_address);
+    // console.log("host address", host_address);
 
     if (role === "host" && recordingStatus === "true") {
-      console.log("addresses: ", address, host_address);
-
       await handleStopRecording(); // Do not proceed with API calls if not the host
     }
 
@@ -235,7 +239,7 @@ const BottomBar = ({ daoName }: { daoName: string }) => {
     } else {
       return;
     }
-    
+
     if (role === "host") {
       let meetingType;
       if (meetingCategory === "officehours") {
@@ -262,7 +266,7 @@ const BottomBar = ({ daoName }: { daoName: string }) => {
 
         const response2 = await fetch("/api/end-call", requestOptions);
         const result = await response2.text();
-        console.log(result);
+        console.log("result in end call::", result);
       } catch (error) {
         console.error("Error handling end call:", error);
       }
@@ -316,7 +320,7 @@ const BottomBar = ({ daoName }: { daoName: string }) => {
 
     if (meetingCategory === "officehours") {
       try {
-        const res = await fetch(`/api/update-office-hours/${host_address}`, {
+        const res = await fetch(`/api/update-office-hours/${hostAddress}`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
