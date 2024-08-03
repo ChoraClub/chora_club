@@ -964,7 +964,7 @@ const getContractAddress = async (txHash:`0x${string}`) => {
               <p className="text-2xl font-semibold">{formattedTitle}</p>
             )}
           </div>
-          <div className="flex flex-wrap items-center w-[20%] max-w-[400px] float-left md:max-w-none md:flex-nowrap md:justify-start md:float-none">
+          <div className="flex flex-wrap items-center w-[24%] max-w-[400px] float-left md:max-w-none md:flex-nowrap md:justify-start md:float-none">
             <div className="flex items-center gap-1 flex-grow w-max	">
               <Tooltips
                 showArrow
