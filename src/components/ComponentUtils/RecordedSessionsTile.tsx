@@ -22,9 +22,14 @@ import user9 from "@/assets/images/user/user9.svg";
 import posterImage from "@/assets/images/daos/thumbnail1.png";
 import { getEnsName } from "@/utils/ENSUtils";
 import logo from "@/assets/images/daos/CCLogo.png";
+import ClaimButton from "./ClaimButton";
+import EditButton from "./EditButton";
+import { useAccount } from "wagmi"; 
 
 interface meeting {
   meetingData: any;
+  showClaimButton?: boolean;
+  session?: string; 
 }
 
 type DaoName = "optimism" | "arbitrum";
@@ -37,13 +42,14 @@ const getDaoLogo = (daoName: string): StaticImageData => {
   return daoLogos[normalizedName] || arblogo;
 };
 
-function RecordedSessionsTile({ meetingData }: meeting) {
+function RecordedSessionsTile({ meetingData , showClaimButton,session}: meeting) {
   console.log("meetingData: ", meetingData);
 
   const [hoveredVideo, setHoveredVideo] = useState<number | null>(null);
   const videoRefs = useRef<any>([]);
   const [videoDurations, setVideoDurations] = useState<any>({});
   const router = useRouter();
+  const { address } = useAccount();
   const [ensHostNames, setEnsHostNames] = useState<any>({});
   const [ensGuestNames, setEnsGuestNames] = useState<any>({});
   const [loadingHostNames, setLoadingHostNames] = useState<boolean>(true);
@@ -202,49 +208,6 @@ function RecordedSessionsTile({ meetingData }: meeting) {
     }
   }, [meetingData]);
 
-  // useEffect(() => {
-  //   const fetchEnsNames = async () => {
-  //     setLoadingHostNames(true);
-  //     setLoadingGuestNames(true);
-
-  //     const ensNamesMapHost: any = {};
-  //     const ensNamesMapGuest: any = {};
-
-  //     // Fetch host names
-  //     await Promise.all(
-  //       meetingData.map(async (data: any) => {
-  //         const ensNames = await getEnsName(data.host_address.toLowerCase());
-  //         const ensName = ensNames?.ensName;
-  //         if (ensName) {
-  //           ensNamesMapHost[data.host_address] = ensName;
-  //         }
-  //       })
-  //     );
-
-  //     setLoadingHostNames(false);
-  //     setEnsHostNames(ensNamesMapHost);
-
-  //     // Fetch guest names
-  //     await Promise.all(
-  //       meetingData.map(async (data: any) => {
-  //         const ensNames = await getEnsName(
-  //           data.attendees[0]?.attendee_address.toLowerCase()
-  //         );
-  //         const ensName = ensNames?.ensName;
-  //         if (ensName) {
-  //           ensNamesMapGuest[data.attendees[0]?.attendee_address] = ensName;
-  //         }
-  //       })
-  //     );
-
-  //     setLoadingGuestNames(false);
-  //     setEnsGuestNames(ensNamesMapGuest);
-  //   };
-
-  //   if (meetingData.length > 0) {
-  //     fetchEnsNames();
-  //   }
-  // }, [meetingData]);
   return (
     <>
       {/* {meetingData && meetingData.length > 0 ? ( */}
@@ -253,7 +216,10 @@ function RecordedSessionsTile({ meetingData }: meeting) {
           <div
             key={index}
             className="border border-[#D9D9D9] rounded-3xl cursor-pointer"
-            onClick={() => router.push(`/watch/${data.meetingId}`)}
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              router.push(`/watch/${data.meetingId}`)}}
             onMouseEnter={() => setHoveredVideo(index)}
             onMouseLeave={() => setHoveredVideo(null)}
           >
@@ -416,6 +382,22 @@ function RecordedSessionsTile({ meetingData }: meeting) {
                   ""
                 )}
               </div>
+            </div>
+            <div className="px-4 pb-2 flex justify-center space-x-2">
+          {showClaimButton && (
+              <ClaimButton
+                meetingId={data.meetingId}
+                meetingType={data.session_type === "session" ? 2 : 1}
+                startTime={data.attestations[0]?.startTime}
+                endTime={data.attestations[0]?.endTime}
+                dao={data.dao_name}
+                address={address || ''}
+                onChainId={data.onchain_host_uid || data.attendees[0]?.onchain_attendee_uid}
+              />
+            )}
+            {session==="hosted" && (
+              <EditButton sessionData={data}/>
+            )}
             </div>
           </div>
         ))}

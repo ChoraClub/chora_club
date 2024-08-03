@@ -1,0 +1,153 @@
+/* .button {
+    position: relative;
+    transition: all 0.3s ease-in-out;
+    padding-block: 0.5rem;
+    padding-inline: 1.25rem;
+    background-color: #004DFF;
+    border-radius: 9999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #ffff;
+    gap: 10px;
+    font-weight: bold;
+    border: 3px solid #ffffff4d;
+    outline: none;
+    overflow: hidden;
+    font-size: 16px;
+  }
+  .icon {
+    width: 16px;
+    height: 16px;
+    transition: all 0.3s ease-in-out;
+  }
+  
+  .button:hover {
+    transform: scale(1.05);
+    border-color: #fff9;
+  }
+  
+  .button:hover .icon {
+    transform: translate(4px);
+  }
+  
+  .button:hover::before {
+    animation: shine 1.5s ease-out infinite;
+  }
+  
+  .button::before {
+    content: "";
+    position: absolute;
+    width: 100px;
+    height: 100%;
+    background-image: linear-gradient(
+      120deg,
+      rgba(255, 255, 255, 0) 30%,
+      rgba(255, 255, 255, 0.8),
+      rgba(255, 255, 255, 0) 70%
+    );
+    top: 0;
+    left: -100px;
+    opacity: 0.6;
+  }
+  
+  @keyframes shine {
+    0% {
+      left: -100px;
+    }
+  
+    60% {
+      left: 100%;
+    }
+  
+    to {
+      left: 100%;
+    }
+  }
+  
+
+  .hover:hover{
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  transform: scale(1.01);
+  transition: transform 0.3s ease-in-out;
+  } */
+
+  .button {
+    /* width: 100%; */
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3px 20px;
+    border-radius: 22px;
+    font-weight: 600;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #ffffff;
+    background: linear-gradient(45deg, #004DFF, #00A3FF);
+    border: none;
+    cursor: pointer;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 77, 255, 0.2);
+  }
+  
+  .button:not(:disabled):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 77, 255, 0.3);
+  }
+  
+  .button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+  
+  .claimed {
+    background: linear-gradient(45deg, #28a745, #34d058);
+  }
+  
+  .buttonText {
+    position: relative;
+    z-index: 1;
+  }
+  
+  .iconWrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    margin-left: 10px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.2);
+    overflow: hidden;
+  }
+  
+  .icon {
+    font-size: 16px;
+    color: #ffffff;
+    transition: transform 0.3s ease;
+  }
+  
+  .button:not(:disabled):hover .icon {
+    transform: scale(1.2);
+  }
+  
+  .button::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%);
+    transform: scale(0);
+    transition: transform 0.5s ease-out;
+  }
+  
+  .button:not(:disabled):hover::before {
+    transform: scale(1);
+  }

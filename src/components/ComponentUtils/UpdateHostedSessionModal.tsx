@@ -1,4 +1,4 @@
-import React from "react";
+import React,{ useEffect } from "react";
 import { Oval } from "react-loader-spinner";
 
 interface SessionTileProps {
@@ -22,12 +22,28 @@ function UpdateHostedSessionModal({
   handleChange,
   loading,
 }: SessionTileProps) {
+  useEffect(() => {
+    // Lock scrolling when the modal is open
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [isOpen]);
   return (
     <>
       <div className="fixed inset-0 flex items-center justify-center z-50  overflow-hidden">
         <div
           className="absolute inset-0 backdrop-blur-md"
-          onClick={onClose}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onClose();
+          }}
         ></div>
         <div className="p-7 border z-50 rounded-2xl w-[35vw]  bg-white flex flex-col gap-3">
           <div className="text-blue-shade-100 flex justify-center items-center text-3xl font-semibold">
@@ -68,7 +84,11 @@ function UpdateHostedSessionModal({
           <div className="mt-4 flex gap-2 justify-end">
             <button
               className="bg-blue-shade-100 rounded-lg py-2 px-4 text-white"
-              onClick={() => onSave(sessionData)}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onSave(sessionData)
+              }}
             >
               {loading ? (
                 <div className="flex items-center justify-center top-10">
@@ -87,7 +107,11 @@ function UpdateHostedSessionModal({
             </button>
             <button
               className="bg-[#D9D9D945] rounded-lg py-2 px-3"
-              onClick={onClose}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onClose();
+              }}
             >
               Cancel
             </button>

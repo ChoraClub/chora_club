@@ -10,10 +10,8 @@ import EventTile from "../ComponentUtils/EventTile";
 // import HostedUserSessions from "./UserAllSessions/HostedUserSessions";
 // import AttendedUserSessions from "./UserAllSessions/AttendedUserSessions";
 import { useNetwork, useAccount } from "wagmi";
-import Tile from "../ComponentUtils/Tile";
-import SessionTile from "../ComponentUtils/SessionTiles";
-import { Oval } from "react-loader-spinner";
-import SessionTileSkeletonLoader from "../SkeletonLoader/SessionTileSkeletonLoader";
+import RecordedSessionsTile from "../ComponentUtils/RecordedSessionsTile";
+import RecordedSessionsSkeletonLoader from "../SkeletonLoader/RecordedSessionsSkeletonLoader";
 
 interface UserSessionsProps {
   isDelegate: boolean | undefined;
@@ -110,11 +108,6 @@ function UserSessions({
     attendedDetails,
   ]);
 
-  // useEffect(() => {
-  //   setDataLoading(true);
-  //   setSessionDetails([]);
-  // }, [searchParams.get("session")]);
-
   useEffect(() => {
     if (selfDelegate === true && searchParams.get("session") === "schedule") {
       router.replace(path + "?active=sessions&session=attending");
@@ -122,7 +115,7 @@ function UserSessions({
   }, [selfDelegate]);
   return (
     <div>
-      <div className="pr-32 pt-3">
+      <div className="pr-14 pt-3">
         <div className="flex gap-16 border-1 border-[#7C7C7C] pl-6 rounded-xl text-sm">
           {selfDelegate === true && (
             <button
@@ -207,27 +200,22 @@ function UserSessions({
           {selfDelegate === true &&
             searchParams.get("session") === "hosted" &&
             (dataLoading ? (
-              <SessionTileSkeletonLoader />
+              <RecordedSessionsSkeletonLoader />
             ) : (
-              <SessionTile
-                sessionDetails={hostedDetails}
-                dataLoading={dataLoading}
-                isEvent="Recorded"
-                isOfficeHour={false}
-                isSession="hosted"
-              />
+              <RecordedSessionsTile
+              meetingData={hostedDetails}
+              showClaimButton={true}
+              session="hosted"
+            />
             ))}
           {searchParams.get("session") === "attended" &&
             (dataLoading ? (
-              <SessionTileSkeletonLoader />
+              <RecordedSessionsSkeletonLoader />
             ) : (
-              <SessionTile
-                sessionDetails={attendedDetails}
-                dataLoading={dataLoading}
-                isEvent="Recorded"
-                isOfficeHour={false}
-                isSession="attended"
-              />
+              <RecordedSessionsTile
+              meetingData={attendedDetails}
+              showClaimButton={true}
+            />
             ))}
         </div>
       </div>
