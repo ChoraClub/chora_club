@@ -8,6 +8,11 @@
     "start": "next start",
     "lint": "next lint"
   },
+  "engines": {
+    "node": ">=20.0.0",
+    "yarn": ">=1.22.0",
+    "npm": "please-use-yarn"
+  },
   "dependencies": {
     "@coinbase/onchainkit": "^0.20.1",
     "@ethereum-attestation-service/eas-sdk": "^2.1.4",

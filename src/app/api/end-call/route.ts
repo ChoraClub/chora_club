@@ -20,36 +20,6 @@ interface MeetingTimePerEOA {
   [key: string]: number;
 }
 
-// async function updateVideoURI(meetingId: string, video_uri: string) {
-//   const myHeaders = new Headers();
-//   myHeaders.append("Content-Type", "application/json");
-
-//   const raw = JSON.stringify({ meetingId, video_uri });
-
-//   const baseUrl = BASE_URL;
-
-//   const requestOptions = {
-//     method: "POST",
-//     headers: myHeaders,
-//     body: raw,
-//   };
-
-//   try {
-//     const response = await fetch(
-//       `${baseUrl}/api/update-video-uri`,
-//       requestOptions
-//     );
-//     if (!response.ok) {
-//       throw new Error("Failed to update video URI");
-//     }
-//     const result = await response.text();
-//     console.log(result);
-//   } catch (error) {
-//     console.error("Error updating video URI:", error);
-//     // Handle error if required
-//   }
-// }
-
 export async function POST(req: NextRequest, res: NextResponse) {
   try {
     const {
