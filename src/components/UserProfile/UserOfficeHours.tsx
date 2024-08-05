@@ -123,6 +123,7 @@ function UserOfficeHours({
         setDataLoading(false);
       } catch (error) {
         console.error(error);
+        setDataLoading(false);
       }
     };
 

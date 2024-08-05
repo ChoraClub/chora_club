@@ -91,6 +91,7 @@ function UserSessions({
       }
     } catch (error) {
       console.log("error in catch", error);
+      setDataLoading(false);
     }
   };
 

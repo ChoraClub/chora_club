@@ -61,10 +61,6 @@ const StyledMDEditorWrapper = styled.div`
   }
 `;
 
-// const ReactQuill = dynamic(
-//   () => import('react-quill').then((mod) => mod.default),
-//   { ssr: false }
-// );
 
 const MDEditor = dynamic(
   () => import("@uiw/react-md-editor").then((mod) => mod.default),
@@ -199,6 +195,7 @@ function UserInfo({
         }
       } catch (e) {
         console.log("Error: ", e);
+        setSessionHostedLoading(false);
       }
     };
 
@@ -300,6 +297,7 @@ function UserInfo({
         }
       } catch (e) {
         console.log("Error: ", e);
+        setOfficeHoursAttendedLoading(false);
       }
     };
 

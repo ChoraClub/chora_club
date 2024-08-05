@@ -263,6 +263,7 @@ function MainProfile() {
   const handleUpdateFollowings = async () => {
     setfollowingmodel(true);
     setLoading(true);
+    try{
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
 
@@ -281,6 +282,9 @@ function MainProfile() {
       `/api/delegate-follow/savefollower`,
       requestOptions
     );
+    if (!res.ok) {
+      throw new Error(`HTTP error! status: ${res.status}`);
+    }
 
     const dbResponse = await res.json();
     setDbResponse(dbResponse);
@@ -301,8 +305,12 @@ function MainProfile() {
         setUserFollowings([]);
       }
     }
-    // Close the modal
+  } catch (error) {
+    console.error("Error updating followings:", error);
+    toast.error("Failed to update followings. Please try again.");
+  } finally {
     setLoading(false);
+  }
   };
   const toggleFollowing = async (index: number, userupdate: any) => {
     setUserFollowings((prevUsers) =>
@@ -524,11 +532,12 @@ function MainProfile() {
       }
 
       const data = await response.json();
-      setIsLoading(false);
       settoggle(!isToggled);
       console.log("status successfully change!", data);
     } catch (error) {
       console.error("Error following:", error);
+    } finally{
+      setIsLoading(false);
     }
   };
 
@@ -1168,7 +1177,12 @@ function MainProfile() {
                   : "border-transparent"
               }`}
               onClick={() =>
-                router.push(path + "?active=sessions&session=schedule")
+                router.push(
+                  path +
+                    `?active=sessions&session=${
+                      selfDelegate ? "schedule" : "attending"
+                    }`
+                )
               }>
               Sessions
             </button>

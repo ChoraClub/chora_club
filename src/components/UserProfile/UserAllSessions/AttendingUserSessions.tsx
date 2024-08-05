@@ -62,6 +62,7 @@ function AttendingUserSessions({ daoName }: { daoName: string }) {
       }
     } catch (error) {
       console.log("error in catch", error);
+      setPageLoading(false);
     }
   };
 

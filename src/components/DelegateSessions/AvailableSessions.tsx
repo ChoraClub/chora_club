@@ -164,9 +164,10 @@ function AvailableSessions() {
         }
         setAPIData(resultData);
         setDaoInfo(resultData);
-        setIsPageLoading(false);
       } catch (error) {
         console.error("Error Fetching Data of availability:", error);
+      }finally{
+        setIsPageLoading(false);
       }
     };
     fetchData();
