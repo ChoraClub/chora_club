@@ -25,12 +25,13 @@ interface Proposal {
   queueStartTime?: number;
   queueEndTime?: number;
 }
-// Create a cache object outside of the component to persist across re-renders
+// Create a cache object outside of the component to persist acrnulls re-renders
 const cache: any = {
   optimism: null,
   arbitrum: null,
 };
-let pageCache: any = null;
+let optimismCache: any = null;
+let arbitrumCache: any = null;
 
 function Proposals({ props }: { props: string }) {
   const router = useRouter();
@@ -41,6 +42,9 @@ function Proposals({ props }: { props: string }) {
   const [currentPage, setCurrentPage] = useState(1);
   const [canceledProposals, setCanceledProposals] = useState<any[]>([]);
   const proposalsPerPage = 7;
+  const isOptimism = (props === "optimism");
+  const currentCache = isOptimism ? optimismCache : arbitrumCache;
+
 
   const VoteLoader = () => (
     <div className=" flex justify-center items-center w-32">
@@ -176,16 +180,15 @@ function Proposals({ props }: { props: string }) {
           ...p,
           votesLoaded: false,
         }));
+        cache[props] = newProposals;
       } else {
         newProposals = responseData.data.proposalCreateds;
         const queueResponse = await fetch("/api/get-arbitrum-queue-info");
         const queueData = await queueResponse.json();
-        console.log("queueData", queueData);
         newProposals = newProposals.map((proposal: Proposal) => {
           const queueInfo = queueData.data.proposalQueueds.find(
             (q: any) => q.proposalId === proposal.proposalId
           );
-          console.log("queueInfo", queueInfo);
           return {
             ...proposal,
             queueStartTime: queueInfo?.blockTimestamp,
@@ -235,25 +238,55 @@ function Proposals({ props }: { props: string }) {
   };
 
   useEffect(() => {
-    console.log("pageCache", pageCache);
+    const fetchVotesForDisplayedProposals = async () => {
+      setLoading(true);
+      try {
+        const updatedProposals = await Promise.all(
+          displayedProposals.map(async (proposal) => {
+            if (!proposal.votesLoaded) {
+              return await fetchVotes(proposal);
+            }
+            return proposal;
+          })
+        );
+
+        if (isOptimism) {
+          optimismCache = { updatedProposals, props };
+        } else {
+          arbitrumCache = { updatedProposals, props };
+        }
+        setDisplayedProposals(updatedProposals);
+      } catch (error: any) {
+        console.error("Error fetching votes:", error);
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (displayedProposals.some((proposal) => !proposal.votesLoaded)) {
+      fetchVotesForDisplayedProposals();
+    }
+  }, [displayedProposals, fetchVotes, props]);
+
+
+  useEffect(() => {
     const proposals = async () => {
-      if (pageCache && props === pageCache.dao) {
-        setDisplayedProposals(pageCache.proposals);
-        setCurrentPage(pageCache.currentPage);
+      if (currentCache && currentCache.props === props) {
+        setDisplayedProposals(currentCache.updatedProposals);
+        // setCurrentPage(pageCache);
         setLoading(false);
       } else {
-        console.log("fetching proposals");
         await fetchProposals();
-        console.log("fetching proposals done");
       }
 
-      return () => {
-        pageCache = {
-          dao: props,
-          proposals: displayedProposals,
-          currentPage: currentPage,
-        };
-      };
+      // return () => {
+      //   pageCache = {
+      //     dao: props,
+      //     proposals: displayedProposals,
+      //     currentPage: currentPage,
+      //   };
+      // };
     };
     proposals();
   }, [props]);
@@ -309,38 +342,17 @@ function Proposals({ props }: { props: string }) {
     }
   };
 
-  useEffect(() => {
-    const fetchVotesForDisplayedProposals = async () => {
-      setLoading(true);
-      try {
-        const updatedProposals = await Promise.all(
-          displayedProposals.map(async (proposal) => {
-            if (!proposal.votesLoaded) {
-              return await fetchVotes(proposal);
-            }
-            return proposal;
-          })
-        );
-        setDisplayedProposals(updatedProposals);
-      } catch (error: any) {
-        console.error("Error fetching votes:", error);
-        setError("Unable to fetch vote details. Please try again later.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (displayedProposals.some((proposal) => !proposal.votesLoaded)) {
-      fetchVotesForDisplayedProposals();
-    }
-  }, [displayedProposals, fetchVotes, props]);
-
   const loadMoreProposals = useCallback(() => {
     if (props === "optimism") {
-      const nextPage = currentPage + 1;
+      let nextPage;
+      if (currentCache) {
+        nextPage = (currentCache.updatedProposals.length / proposalsPerPage) + 1;
+      } else {
+        nextPage = currentPage + 1;
+      }
       const startIndex = (nextPage - 1) * proposalsPerPage;
       const endIndex = startIndex + proposalsPerPage;
-      const newProposals = allProposals.slice(startIndex, endIndex);
+      const newProposals = cache[props].slice(startIndex, endIndex);
       setDisplayedProposals((prevProposals) => [
         ...prevProposals,
         ...newProposals,
@@ -349,7 +361,7 @@ function Proposals({ props }: { props: string }) {
     } else {
       // For Arbitrum
       const currentLength = displayedProposals.length;
-      const moreProposals = allProposals.slice(
+      const moreProposals = cache[props].slice(
         currentLength,
         currentLength + proposalsPerPage
       );
@@ -358,7 +370,7 @@ function Proposals({ props }: { props: string }) {
         ...moreProposals,
       ]);
 
-      if (currentLength + proposalsPerPage >= allProposals.length) {
+      if (currentLength + proposalsPerPage >= cache[props].length) {
         fetchProposals();
       }
     }
@@ -428,9 +440,8 @@ function Proposals({ props }: { props: string }) {
             <div className="flex basis-1/2">
               <Image
                 src={dao_details[props as keyof typeof dao_details].logo}
-                alt={`${
-                  dao_details[props as keyof typeof dao_details].title
-                } logo`}
+                alt={`${dao_details[props as keyof typeof dao_details].title
+                  } logo`}
                 className="size-10 mx-5 rounded-full"
               />
               <div>
@@ -461,16 +472,15 @@ function Proposals({ props }: { props: string }) {
               </Tooltip>
               {proposal.votesLoaded ? (
                 <div
-                  className={`rounded-full flex items-center justify-center text-xs h-fit py-0.5 border font-medium w-24 ${
-                    getProposalStatus(proposal) === "SUCCEEDED"
+                  className={`rounded-full flex items-center justify-center text-xs h-fit py-0.5 border font-medium w-24 ${getProposalStatus(proposal) === "SUCCEEDED"
                       ? "bg-green-200 border-green-600 text-green-600"
                       : getProposalStatus(proposal) === "DEFEATED" ||
                         getProposalStatus(proposal) === "CANCELLED"
-                      ? "bg-red-200 border-red-500 text-red-500"
-                      : getProposalStatus(proposal) === "QUEUED"
-                      ? "bg-yellow-200 border-yellow-600 text-yellow-600"
-                      : "bg-green-200 border-green-600 text-green-600"
-                  }`}
+                        ? "bg-red-200 border-red-500 text-red-500"
+                        : getProposalStatus(proposal) === "QUEUED"
+                          ? "bg-yellow-200 border-yellow-600 text-yellow-600"
+                          : "bg-green-200 border-green-600 text-green-600"
+                    }`}
                 >
                   {/* {
                    canceledProposals.some((item) => item.proposalId === proposal.proposalId)
@@ -490,23 +500,22 @@ function Proposals({ props }: { props: string }) {
               {proposal.votesLoaded ? (
                 <div
                   className={`py-0.5 rounded-md text-sm font-medium flex justify-center items-center w-32 
-                  ${
-                    proposal.support1Weight! === 0 &&
-                    proposal.support0Weight! === 0 &&
-                    proposal.support2Weight! === 0
+                  ${proposal.support1Weight! === 0 &&
+                      proposal.support0Weight! === 0 &&
+                      proposal.support2Weight! === 0
                       ? "bg-yellow-200 border-yellow-600 text-yellow-600"
                       : proposal.support1Weight! > proposal.support0Weight!
-                      ? "text-[#639b55] border-[#639b55] bg-[#dbf8d4]"
-                      : "bg-[#fa989a] text-[#e13b15] border-[#e13b15]"
-                  }`}
+                        ? "text-[#639b55] border-[#639b55] bg-[#dbf8d4]"
+                        : "bg-[#fa989a] text-[#e13b15] border-[#e13b15]"
+                    }`}
                 >
                   {proposal.support1Weight! === 0 &&
-                  proposal.support0Weight! === 0 &&
-                  proposal.support2Weight! === 0
+                    proposal.support0Weight! === 0 &&
+                    proposal.support2Weight! === 0
                     ? "Yet to start"
                     : proposal.support1Weight! > proposal.support0Weight!
-                    ? `${formatWeight(proposal.support1Weight!)} FOR`
-                    : `${formatWeight(proposal.support0Weight!)} AGAINST`}
+                      ? `${formatWeight(proposal.support1Weight!)} FOR`
+                      : `${formatWeight(proposal.support0Weight!)} AGAINST`}
                 </div>
               ) : (
                 <VoteLoader />
@@ -533,9 +542,8 @@ function Proposals({ props }: { props: string }) {
                     if (props === "arbitrum") {
                       if (daysDifference <= 3) {
                         const daysLeft = Math.ceil(3 - daysDifference);
-                        return `${daysLeft} day${
-                          daysLeft !== 1 ? "s" : ""
-                        } to go`;
+                        return `${daysLeft} day${daysLeft !== 1 ? "s" : ""
+                          } to go`;
                       } else if (daysDifference <= 17) {
                         return "Active";
                       } else {
@@ -554,8 +562,7 @@ function Proposals({ props }: { props: string }) {
             </div>
           </div>
         ))}
-
-        {displayedProposals.length < allProposals.length && (
+        {displayedProposals?.length < cache[props]?.length && (
           <div className="flex items-center justify-center">
             <button
               onClick={loadMoreProposals}
