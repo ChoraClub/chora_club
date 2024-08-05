@@ -5,6 +5,7 @@ import text1 from "@/assets/images/daos/texture1.png";
 import Tile from "../ComponentUtils/Tile";
 import { Oval } from "react-loader-spinner";
 import SessionTileSkeletonLoader from "../SkeletonLoader/SessionTileSkeletonLoader";
+import {useAccount} from "wagmi";
 
 interface Type {
   daoDelegates: string;
@@ -27,6 +28,7 @@ function DelegateOfficeHrs({ props }: { props: Type }) {
   const router = useRouter();
   const path = usePathname();
   const searchParams = useSearchParams();
+  const {address}=useAccount();
 
   const [sessionDetails, setSessionDetails] = useState([]);
   const [dataLoading, setDataLoading] = useState(true);
@@ -39,6 +41,9 @@ function DelegateOfficeHrs({ props }: { props: Type }) {
         setDataLoading(true);
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
+        if (address) {
+          myHeaders.append("x-wallet-address", address);
+        }
 
         const raw = JSON.stringify({
           address: props.individualDelegate,
@@ -127,8 +132,7 @@ function DelegateOfficeHrs({ props }: { props: Type }) {
             }`}
             onClick={() =>
               router.push(path + "?active=officeHours&hours=ongoing")
-            }
-          >
+            }>
             Ongoing
           </button>
           <button
@@ -139,8 +143,7 @@ function DelegateOfficeHrs({ props }: { props: Type }) {
             }`}
             onClick={() =>
               router.push(path + "?active=officeHours&hours=upcoming")
-            }
-          >
+            }>
             Upcoming
           </button>
           <button
@@ -151,8 +154,7 @@ function DelegateOfficeHrs({ props }: { props: Type }) {
             }`}
             onClick={() =>
               router.push(path + "?active=officeHours&hours=hosted")
-            }
-          >
+            }>
             Hosted
           </button>
           <button
@@ -163,8 +165,7 @@ function DelegateOfficeHrs({ props }: { props: Type }) {
             }`}
             onClick={() =>
               router.push(path + "?active=officeHours&hours=attended")
-            }
-          >
+            }>
             Attended
           </button>
         </div>

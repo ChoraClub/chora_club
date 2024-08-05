@@ -221,6 +221,9 @@ function BookSession({ props }: { props: Type }) {
     try {
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
+      if (address) {
+        myHeaders.append("x-wallet-address", address);
+      }
 
       const raw = JSON.stringify({
         address: address,
@@ -506,6 +509,9 @@ function BookSession({ props }: { props: Type }) {
             setAddingEmail(true);
             const myHeaders = new Headers();
             myHeaders.append("Content-Type", "application/json");
+            if (address) {
+              myHeaders.append("x-wallet-address", address);
+            }
 
             const raw = JSON.stringify({
               address: address,

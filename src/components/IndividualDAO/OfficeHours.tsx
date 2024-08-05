@@ -6,6 +6,8 @@ import { useRouter } from "next-nprogress-bar";
 import Tile from "../ComponentUtils/Tile";
 import { Oval } from "react-loader-spinner";
 import SessionTileSkeletonLoader from "../SkeletonLoader/SessionTileSkeletonLoader";
+import { headers } from "next/headers";
+import { useAccount } from "wagmi";
 
 interface Session {
   _id: string;
@@ -24,6 +26,7 @@ function OfficeHours({ props }: { props: string }) {
   const path = usePathname();
   const searchParams = useSearchParams();
   const dao_name = props;
+  const { address } = useAccount();
   // const dao_name = props.charAt(0).toUpperCase() + props.slice(1);
 
   const [sessionDetails, setSessionDetails] = useState([]);
@@ -36,6 +39,9 @@ function OfficeHours({ props }: { props: string }) {
         setDataLoading(true);
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
+        if (address) {
+          myHeaders.append("x-wallet-address", address);
+        }
 
         const raw = JSON.stringify({
           dao_name: dao_name,
@@ -90,8 +96,15 @@ function OfficeHours({ props }: { props: string }) {
         dao_name: dao_name,
       });
 
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      if (address) {
+        myHeaders.append("x-wallet-address", address);
+      }
+
       const requestOptions: any = {
         method: "POST",
+        headers: myHeaders,
         body: raw,
         redirect: "follow",
       };
@@ -126,16 +139,14 @@ function OfficeHours({ props }: { props: string }) {
     <div>
       <div
         style={{ background: "rgba(238, 237, 237, 0.36)" }}
-        className="flex border-[0.5px] border-black w-1/3 rounded-full my-4 font-poppins"
-      >
+        className="flex border-[0.5px] border-black w-1/3 rounded-full my-4 font-poppins">
         <input
           type="text"
           placeholder="Search by title and host address"
           style={{ background: "rgba(238, 237, 237, 0.36)" }}
           className="pl-5 rounded-full outline-none w-full"
           value={searchQuery}
-          onChange={(e) => handleSearchChange(e.target.value)}
-        ></input>
+          onChange={(e) => handleSearchChange(e.target.value)}></input>
         <span className="flex items-center bg-black rounded-full px-5 py-2">
           <Image src={search} alt="search" width={20} />
         </span>
@@ -151,8 +162,7 @@ function OfficeHours({ props }: { props: string }) {
             }`}
             onClick={() =>
               router.push(path + "?active=officeHours&hours=ongoing")
-            }
-          >
+            }>
             Ongoing
           </button>
           <button
@@ -163,8 +173,7 @@ function OfficeHours({ props }: { props: string }) {
             }`}
             onClick={() =>
               router.push(path + "?active=officeHours&hours=upcoming")
-            }
-          >
+            }>
             Upcoming
           </button>
           <button
@@ -175,8 +184,7 @@ function OfficeHours({ props }: { props: string }) {
             }`}
             onClick={() =>
               router.push(path + "?active=officeHours&hours=recorded")
-            }
-          >
+            }>
             Recorded
           </button>
         </div>

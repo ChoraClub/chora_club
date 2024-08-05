@@ -23,6 +23,7 @@ import AvailableSessionsSkeletonLoader from "../SkeletonLoader/AvailableSessions
 import { getEnsName } from "@/utils/ENSUtils";
 import onChain_link from "@/assets/images/watchmeeting/onChain_link.png";
 import offChain_link from "@/assets/images/watchmeeting/offChain_link.png";
+import { useAccount, useNetwork } from "wagmi";
 
 interface Type {
   ensName: string;
@@ -53,6 +54,7 @@ function AvailableSessions() {
   const [startTime, setStartTime] = useState<string | null>(null);
   const [endTime, setEndTime] = useState<string | null>(null);
   const [ensNames, setEnsNames] = useState<any>({});
+  const { address } = useAccount();
 
   const [startHour, setStartHour] = useState("");
   const [startMinute, setStartMinute] = useState("");
@@ -90,6 +92,9 @@ function AvailableSessions() {
       try {
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
+        if (address) {
+          myHeaders.append("x-wallet-address", address);
+        }
 
         let dateToSend = null;
 
@@ -341,16 +346,14 @@ function AvailableSessions() {
       <div className="flex gap-7 bg-[#D9D9D945] p-4 mt-4 rounded-2xl font-poppins">
         <div
           style={{ background: "rgba(238, 237, 237, 0.36)" }}
-          className="flex border-[0.5px] border-black w-fit rounded-full  "
-        >
+          className="flex border-[0.5px] border-black w-fit rounded-full  ">
           <input
             type="text"
             placeholder="Search by Address"
             style={{ background: "rgba(238, 237, 237, 0.36)" }}
             className="pl-5 rounded-full outline-none text-sm"
             value={searchQuery}
-            onChange={(e) => handleSearchChange(e.target.value)}
-          ></input>
+            onChange={(e) => handleSearchChange(e.target.value)}></input>
           <span className="flex items-center bg-black rounded-full px-5 py-2 cursor-pointer">
             <Image
               className="min-w-[25px]"
@@ -371,14 +374,12 @@ function AvailableSessions() {
             }
             placement="bottom"
             className="rounded-md bg-opacity-90"
-            closeDelay={1}
-          >
+            closeDelay={1}>
             <select
               value={selectedDao}
               // onChange={(e) => setSelectedDao(e.target.value)}
               onChange={handleDaoChange}
-              className="px-3 py-2 rounded-md shadow cursor-pointer"
-            >
+              className="px-3 py-2 rounded-md shadow cursor-pointer">
               <option value="All-DAOS">All DAOs</option>
               <option value="optimism">Optimism</option>
               <option value="arbitrum">Arbitrum</option>
@@ -396,8 +397,7 @@ function AvailableSessions() {
             }
             placement="bottom"
             className="rounded-md bg-opacity-90"
-            closeDelay={1}
-          >
+            closeDelay={1}>
             <input
               type="date"
               value={selectedDate}
@@ -418,14 +418,12 @@ function AvailableSessions() {
           }
           placement="bottom"
           className="rounded-md bg-opacity-90"
-          closeDelay={1}
-        >
+          closeDelay={1}>
           <div className="flex items-center select-container">
             {!showStartTimeSelector ? (
               <button
                 onClick={() => handleSetStartTime()}
-                className="px-3 py-2 rounded-md shadow mr-1 cursor-pointer w-[160px]"
-              >
+                className="px-3 py-2 rounded-md shadow mr-1 cursor-pointer w-[160px]">
                 Set Start Time
               </button>
             ) : (
@@ -433,8 +431,7 @@ function AvailableSessions() {
                 <select
                   className="cursor-pointer mr-1"
                   value={startHour}
-                  onChange={(e) => setStartHour(e.target.value)}
-                >
+                  onChange={(e) => setStartHour(e.target.value)}>
                   {[...Array(12)].map((_, i) => (
                     <option key={i} value={String(i + 1).padStart(2, "0")}>
                       {String(i + 1).padStart(2, "0")}
@@ -445,16 +442,14 @@ function AvailableSessions() {
                 <select
                   value={startMinute}
                   onChange={(e) => setStartMinute(e.target.value)}
-                  className="ml-1 cursor-pointer"
-                >
+                  className="ml-1 cursor-pointer">
                   <option value="00">00</option>
                   <option value="30">30</option>
                 </select>
                 <select
                   className="cursor-pointer"
                   value={startPeriod}
-                  onChange={(e) => setStartPeriod(e.target.value)}
-                >
+                  onChange={(e) => setStartPeriod(e.target.value)}>
                   <option value="AM">AM</option>
                   <option value="PM">PM</option>
                 </select>
@@ -466,8 +461,7 @@ function AvailableSessions() {
             {!showEndTimeSelector ? (
               <button
                 onClick={() => handleSetEndTime()}
-                className="px-3 py-2 rounded-md shadow ml-1 w-[160px] cursor-pointer"
-              >
+                className="px-3 py-2 rounded-md shadow ml-1 w-[160px] cursor-pointer">
                 Set End Time
               </button>
             ) : (
@@ -475,8 +469,7 @@ function AvailableSessions() {
                 <select
                   className="ml-1 cursor-pointer"
                   value={endHour}
-                  onChange={(e) => setEndHour(e.target.value)}
-                >
+                  onChange={(e) => setEndHour(e.target.value)}>
                   {[...Array(12)].map((_, i) => (
                     <option key={i} value={String(i + 1).padStart(2, "0")}>
                       {String(i + 1).padStart(2, "0")}
@@ -487,16 +480,14 @@ function AvailableSessions() {
                 <select
                   className="mr-1 cursor-pointer"
                   value={endMinute}
-                  onChange={(e) => setEndMinute(e.target.value)}
-                >
+                  onChange={(e) => setEndMinute(e.target.value)}>
                   <option value="00">00</option>
                   <option value="30">30</option>
                 </select>
                 <select
                   className="cursor-pointer"
                   value={endPeriod}
-                  onChange={(e) => setEndPeriod(e.target.value)}
-                >
+                  onChange={(e) => setEndPeriod(e.target.value)}>
                   <option value="AM">AM</option>
                   <option value="PM">PM</option>
                 </select>
@@ -506,8 +497,7 @@ function AvailableSessions() {
             {(showStartTimeSelector || showEndTimeSelector) && (
               <button
                 onClick={handleClearTime}
-                className="ml-2 text-red-500 px-3 py-1 rounded-md border border-red-500 hover:bg-red-500 hover:text-white focus:outline-none focus:ring-2 focus:ring-red-500"
-              >
+                className="ml-2 text-red-500 px-3 py-1 rounded-md border border-red-500 hover:bg-red-500 hover:text-white focus:outline-none focus:ring-2 focus:ring-red-500">
                 Clear Time
               </button>
             )}
@@ -526,8 +516,7 @@ function AvailableSessions() {
                 style={{
                   boxShadow: "0px 4px 50.8px 0px rgba(0, 0, 0, 0.11)",
                 }}
-                className="rounded-3xl flex flex-col bg-white"
-              >
+                className="rounded-3xl flex flex-col bg-white">
                 <div className="border-b-2 mb-4 relative">
                   <div className="flex items-center py-5 px-5 rounded-tl-3xl rounded-tr-3xl">
                     <div
@@ -535,8 +524,7 @@ function AvailableSessions() {
                       style={{
                         backgroundColor: "#fcfcfc",
                         border: "2px solid #E9E9E9 ",
-                      }}
-                    >
+                      }}>
                       <div className="w-32 h-32 flex items-center justify-content ">
                         <div className="flex justify-center items-center w-32 h-32">
                           <Image
@@ -593,12 +581,10 @@ function AvailableSessions() {
                             content="Copy"
                             placement="right"
                             closeDelay={1}
-                            showArrow
-                          >
+                            showArrow>
                             <div
                               className="pl-2 pt-[2px] cursor-pointer"
-                              color="#3E3D3D"
-                            >
+                              color="#3E3D3D">
                               <IoCopy
                                 onClick={() =>
                                   handleCopy(`${daos.session.userAddress}`)
@@ -631,8 +617,7 @@ function AvailableSessions() {
                             overflowY: "hidden",
                             scrollbarWidth: "none",
                             msOverflowStyle: "none",
-                          }}
-                        >
+                          }}>
                           <div style={{ display: "flex" }}>
                             {daos.session.dateAndRanges
                               .flatMap((dateRange: any) => dateRange.date)
@@ -647,8 +632,7 @@ function AvailableSessions() {
                               .map((date: string, index: number) => (
                                 <div
                                   key={index}
-                                  className="text-black bg-[#f7f7f7c3] rounded-2xl font-semibold text-small border-[0.5px] border-[#D9D9D9] px-3 py-1 mr-4"
-                                >
+                                  className="text-black bg-[#f7f7f7c3] rounded-2xl font-semibold text-small border-[0.5px] border-[#D9D9D9] px-3 py-1 mr-4">
                                   {
                                     new Date(date)
                                       .toLocaleString()
@@ -671,8 +655,7 @@ function AvailableSessions() {
                         }
                         placement="top"
                         closeDelay={1}
-                        showArrow
-                      >
+                        showArrow>
                         <div className="flex items-center cursor-pointer bg-white rounded-full px-1 mb-2 gap-2 border border-blue-shade-200">
                           <div>
                             <Image src={onChain_link} alt="image" width={20} />
@@ -690,8 +673,7 @@ function AvailableSessions() {
                         }
                         placement="top"
                         closeDelay={1}
-                        showArrow
-                      >
+                        showArrow>
                         <div className="flex items-center cursor-pointer bg-white rounded-full px-1 gap-2 border border-blue-shade-200">
                           <div>
                             <Image src={offChain_link} alt="image" width={20} />
@@ -735,8 +717,7 @@ function AvailableSessions() {
                           `/${daos.session.dao_name}/${daos.session.userAddress}?active=delegatesSession&session=book`
                         )
                       }
-                      className="bg-black text-white py-4 px-6 rounded-[36px] text-sm w-[11rem] hover:bg-[#333333] focus:outline-none focus:ring-2 focus:ring-gray-400 font-medium"
-                    >
+                      className="bg-black text-white py-4 px-6 rounded-[36px] text-sm w-[11rem] hover:bg-[#333333] focus:outline-none focus:ring-2 focus:ring-gray-400 font-medium">
                       Book Session
                     </button>
                   </div>
@@ -771,8 +752,7 @@ const HoverableImage = ({
     <div
       className="hoverable-image"
       onMouseEnter={() => setHoveredItem(index)}
-      onMouseLeave={() => setHoveredItem(null)}
-    >
+      onMouseLeave={() => setHoveredItem(null)}>
       {hoveredItem === index ? (
         <div className="counts">
           <p>{counts}</p>

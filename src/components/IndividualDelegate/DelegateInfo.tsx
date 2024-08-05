@@ -8,8 +8,9 @@ import {
   RotatingLines,
   ThreeDots,
 } from "react-loader-spinner";
-import styles from './DelegateInfo.module.css'
-import { marked } from 'marked';
+import styles from "./DelegateInfo.module.css";
+import { marked } from "marked";
+import { useAccount } from "wagmi";
 
 interface Type {
   daoDelegates: string;
@@ -35,10 +36,8 @@ function DelegateInfo({ props, desc }: { props: Type; desc: string }) {
   const [activeButton, setActiveButton] = useState("onchain");
   const [loadingOpAgora, setLoadingOpAgora] = useState(false);
   const [loadingKarma, setLoadingKarma] = useState(false);
-  const [convertedDescription, setConvertedDescription] = useState<string>('');
-
-  
-
+  const [convertedDescription, setConvertedDescription] = useState<string>("");
+  const { address } = useAccount();
 
   useEffect(() => {
     if (activeButton === "onchain") {
@@ -137,11 +136,14 @@ function DelegateInfo({ props, desc }: { props: Type; desc: string }) {
 
     const officeHoursHosted = async () => {
       try {
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        if (address) {
+          myHeaders.append("x-wallet-address", address);
+        }
         const response = await fetch(`/api/get-officehours-address`, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: myHeaders,
           body: JSON.stringify({
             address: props.individualDelegate,
           }),
@@ -243,71 +245,74 @@ function DelegateInfo({ props, desc }: { props: Type; desc: string }) {
       ));
   };
 
-  const convertMarkdownToHtml = async(markdown: string):Promise<string> => {
+  const convertMarkdownToHtml = async (markdown: string): Promise<string> => {
     return await marked.parse(markdown);
   };
 
   useEffect(() => {
     const fetchData = async () => {
-      if(props.daoDelegates === 'arbitrum') {
-      try {
-        setLoadingKarma(true);
-        setLoading(true);
-        const res = await fetch(
-          `/api/get-arbitrum-delegatelist?user=${props.individualDelegate}`
-        );
-        const details = await res.json();
-        console.log("Details: ", details);
-        console.log("Desc: ", details.delegate.statement.statement);
-        // setKarmaDescription(details.delegate.statement.statement);
-        const statementHtml = await convertMarkdownToHtml(details.delegate.statement.statement);
-        setKarmaDescription(details.delegate.statement.statement);
-        setConvertedDescription(statementHtml);setLoadingKarma(false);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        setLoadingKarma(false);
-        setLoading(false);
-      }
-      setLoading(false);
-    }else{
-      try {
-        setLoading(true);
-        setLoadingOpAgora(true);
-        console.log(props.individualDelegate);
-        const res = await fetch(
-          `/api/get-statement?individualDelegate=${props.individualDelegate}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            // body: JSON.stringify({ individualDelegate: props.individualDelegate }),
-          }
-        );
-
-        if (!res.ok) {
-          throw new Error("Failed to fetch data");
+      if (props.daoDelegates === "arbitrum") {
+        try {
+          setLoadingKarma(true);
+          setLoading(true);
+          const res = await fetch(
+            `/api/get-arbitrum-delegatelist?user=${props.individualDelegate}`
+          );
+          const details = await res.json();
+          console.log("Details: ", details);
+          console.log("Desc: ", details.delegate.statement.statement);
+          // setKarmaDescription(details.delegate.statement.statement);
+          const statementHtml = await convertMarkdownToHtml(
+            details.delegate.statement.statement
+          );
+          setKarmaDescription(details.delegate.statement.statement);
+          setConvertedDescription(statementHtml);
+          setLoadingKarma(false);
+          setLoading(false);
+        } catch (error) {
+          console.error("Error fetching data:", error);
+          setLoadingKarma(false);
+          setLoading(false);
         }
-
-        const data = await res.json();
-        const statement = data.statement.payload.delegateStatement;
-        console.log("statement", statement);
-        // setOpAgoraDescription(statement);
-        // setConvertedDescription(convertMarkdownToHtml(statement));
-        const statementHtml = await convertMarkdownToHtml(statement);
-        setOpAgoraDescription(statement);
-        setConvertedDescription(statementHtml);
-        setLoadingOpAgora(false);
         setLoading(false);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        setLoadingOpAgora(false);
+      } else {
+        try {
+          setLoading(true);
+          setLoadingOpAgora(true);
+          console.log(props.individualDelegate);
+          const res = await fetch(
+            `/api/get-statement?individualDelegate=${props.individualDelegate}`,
+            {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              // body: JSON.stringify({ individualDelegate: props.individualDelegate }),
+            }
+          );
+
+          if (!res.ok) {
+            throw new Error("Failed to fetch data");
+          }
+
+          const data = await res.json();
+          const statement = data.statement.payload.delegateStatement;
+          console.log("statement", statement);
+          // setOpAgoraDescription(statement);
+          // setConvertedDescription(convertMarkdownToHtml(statement));
+          const statementHtml = await convertMarkdownToHtml(statement);
+          setOpAgoraDescription(statement);
+          setConvertedDescription(statementHtml);
+          setLoadingOpAgora(false);
+          setLoading(false);
+        } catch (error) {
+          console.error("Error fetching data:", error);
+          setLoadingOpAgora(false);
+          setLoading(false);
+        }
         setLoading(false);
       }
-      setLoading(false);
-    }
-  }
+    };
     fetchData();
   }, [props.individualDelegate, props.daoDelegates]);
 
@@ -323,8 +328,7 @@ function DelegateInfo({ props, desc }: { props: Type; desc: string }) {
               ? "text-[#3E3D3D] font-bold"
               : "text-[#7C7C7C]"
           } `}
-          onClick={() => fetchAttestation("onchain")}
-        >
+          onClick={() => fetchAttestation("onchain")}>
           Onchain
         </button>
         <button
@@ -333,8 +337,7 @@ function DelegateInfo({ props, desc }: { props: Type; desc: string }) {
               ? "text-[#3E3D3D] font-bold"
               : "text-[#7C7C7C]"
           }`}
-          onClick={() => fetchAttestation("offchain")}
-        >
+          onClick={() => fetchAttestation("offchain")}>
           Offchain
         </button>
       </div>
@@ -344,8 +347,7 @@ function DelegateInfo({ props, desc }: { props: Type; desc: string }) {
             <div
               key={index}
               className="bg-[#3E3D3D] text-white rounded-2xl px-3 py-5 cursor-pointer"
-              onClick={() => router.push(`${key.ref}`)}
-            >
+              onClick={() => router.push(`${key.ref}`)}>
               <div className="font-semibold text-3xl text-center pb-2">
                 {isSessionHostedLoading &&
                 isSessionAttendedLoading &&
@@ -374,12 +376,12 @@ function DelegateInfo({ props, desc }: { props: Type; desc: string }) {
       <div
         style={{ boxShadow: "0px 4px 30.9px 0px rgba(0, 0, 0, 0.12)" }}
         className={`rounded-xl my-7 me-32 py-6 px-7 text-sm ${
-          desc && loadingKarma && loadingOpAgora? "" : "min-h-52"
-        }`}
-      >
+          desc && loadingKarma && loadingOpAgora ? "" : "min-h-52"
+        }`}>
         <div className="flex">
-
-        <h1 className={`text-3xl font-semibold mb-3 ${styles.heading}`}>Delegate Statement</h1>
+          <h1 className={`text-3xl font-semibold mb-3 ${styles.heading}`}>
+            Delegate Statement
+          </h1>
         </div>
         {loadingOpAgora || loadingKarma || loading ? (
           <div className="flex pt-6 justify-center">
@@ -393,52 +395,53 @@ function DelegateInfo({ props, desc }: { props: Type; desc: string }) {
           </div>
         ) : desc !== "" && desc !== null ? (
           desc
-        ) :
-        // props.daoDelegates === 'optimism' && opAgoraDescription ? ( // Check for opAgoraDescription
+        ) : // props.daoDelegates === 'optimism' && opAgoraDescription ? ( // Check for opAgoraDescription
         //   renderParagraphs(opAgoraDescription)
-//           <div
-//       dangerouslySetInnerHTML={{
-//         __html: opAgoraDescription
-//           // // .replace(/### (.*)/g, '<h3>$1</h3><br/>')
-//           // // .replace(/## (.*)/g, '<h2>$1</h2>')
-//           // .replace(/\*\*\*\*(.*)\*\*\*\*/g, '<br/><strong>$1</strong><br/>')
-//           // .replace(/\*\*(.*)\*\*/g, '<br/><strong>$1</strong><br/>')
-//           // .replace(/- (.*)/g, '<li>$1</li>')
-//           // // .replace(/\n/g, '<br />'),
-//           // // .replace(/###\*\*(.*)\*\*/g, '<br/><h3><strong>$1<strong></h3><br/>')
-//           // // .replace(/###\*\*\*\*(.*)\*\*\*\*/g, '<br/><h3><strong><strong>$1</strong></strong></h3><br/>')
-//           // // .replace(/##\*\*\*\*(.*)\*\*\*\*/g, '<br/><h2><strong><strong>$1</strong></strong></h2><br/>')
-//           // // .replace(/##\*\*(.*)\*\*/g, '<br/><h2><strong>$1<strong></h2><br/>')
-//           // .replace(/### (.*)/g, '<br/><h3>$1</h3><br/>')
-//           // .replace(/## (.*)/g, '<br/><h2>$1</h2><br/>')
-//           // .replace(/\*(.*)/g, '<li>$1</li>')
-//           // .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" style="text-decoration: underline;">$1</a>')
+        //           <div
+        //       dangerouslySetInnerHTML={{
+        //         __html: opAgoraDescription
+        //           // // .replace(/### (.*)/g, '<h3>$1</h3><br/>')
+        //           // // .replace(/## (.*)/g, '<h2>$1</h2>')
+        //           // .replace(/\*\*\*\*(.*)\*\*\*\*/g, '<br/><strong>$1</strong><br/>')
+        //           // .replace(/\*\*(.*)\*\*/g, '<br/><strong>$1</strong><br/>')
+        //           // .replace(/- (.*)/g, '<li>$1</li>')
+        //           // // .replace(/\n/g, '<br />'),
+        //           // // .replace(/###\*\*(.*)\*\*/g, '<br/><h3><strong>$1<strong></h3><br/>')
+        //           // // .replace(/###\*\*\*\*(.*)\*\*\*\*/g, '<br/><h3><strong><strong>$1</strong></strong></h3><br/>')
+        //           // // .replace(/##\*\*\*\*(.*)\*\*\*\*/g, '<br/><h2><strong><strong>$1</strong></strong></h2><br/>')
+        //           // // .replace(/##\*\*(.*)\*\*/g, '<br/><h2><strong>$1<strong></h2><br/>')
+        //           // .replace(/### (.*)/g, '<br/><h3>$1</h3><br/>')
+        //           // .replace(/## (.*)/g, '<br/><h2>$1</h2><br/>')
+        //           // .replace(/\*(.*)/g, '<li>$1</li>')
+        //           // .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" style="text-decoration: underline;">$1</a>')
 
-
-//           // .replace(/### (.*)/g, '<h3 style="font-size:22px">$1</h3>')
-//           // .replace(/## (.*)/g, '<h2 style="font-size:22px">$1</h2>')
-//           .replace(/### (.*?)\n/g, '<h3 style="font-size:18px;line-height:1;display:block;margin:0;font-weight:500">$1</h3>')
-// .replace(/## (.*?)\n/g, '<h2 style="font-size:18px;line-height:1;display:block;margin:0;font-weight:600">$1</h2>')
-//           .replace(/\*\*\*(.*)\*\*\*/g, '<strong>$1</strong>')
-//           .replace(/\*\*(.*)\*\*/g, '<strong style="font-size:18px">$1</strong>')
-//           .replace(/- (.*)/g, '<li>$1</li>')
-//           .replace(/\* (.*)/g, '<li style="margin-top: 1rem;margin-bottom:-1rem">$1</li>')
-//           .replace(
-//             /\[(.*?)\]\((.*?)\)/g,
-//             '<a href="$2" target="_blank" style="text-decoration: underline;">$1</a>'
-//           )
-//           .replace(/\n/g, '<br/>')
-//           // .replace(/\*\*(.*)\*\*/g, '<strong>$1</strong>')
-//           .replace(/\*([^*]*)\*/g, '<h2>$1</h2>')
-//           .replace(/(\*{3})(.*)\1/g, '<strong>$2</strong>')
-//           .replace(/(?<!<h3.*?>)\n(?!<\/h3>)/g, '<br/>')
-//           .replace(/(?<!<h2.*?>)\n(?!<\/h2>)/g, '<br/>')
-//       }}
-//     />
+        //           // .replace(/### (.*)/g, '<h3 style="font-size:22px">$1</h3>')
+        //           // .replace(/## (.*)/g, '<h2 style="font-size:22px">$1</h2>')
+        //           .replace(/### (.*?)\n/g, '<h3 style="font-size:18px;line-height:1;display:block;margin:0;font-weight:500">$1</h3>')
+        // .replace(/## (.*?)\n/g, '<h2 style="font-size:18px;line-height:1;display:block;margin:0;font-weight:600">$1</h2>')
+        //           .replace(/\*\*\*(.*)\*\*\*/g, '<strong>$1</strong>')
+        //           .replace(/\*\*(.*)\*\*/g, '<strong style="font-size:18px">$1</strong>')
+        //           .replace(/- (.*)/g, '<li>$1</li>')
+        //           .replace(/\* (.*)/g, '<li style="margin-top: 1rem;margin-bottom:-1rem">$1</li>')
+        //           .replace(
+        //             /\[(.*?)\]\((.*?)\)/g,
+        //             '<a href="$2" target="_blank" style="text-decoration: underline;">$1</a>'
+        //           )
+        //           .replace(/\n/g, '<br/>')
+        //           // .replace(/\*\*(.*)\*\*/g, '<strong>$1</strong>')
+        //           .replace(/\*([^*]*)\*/g, '<h2>$1</h2>')
+        //           .replace(/(\*{3})(.*)\1/g, '<strong>$2</strong>')
+        //           .replace(/(?<!<h3.*?>)\n(?!<\/h3>)/g, '<br/>')
+        //           .replace(/(?<!<h2.*?>)\n(?!<\/h2>)/g, '<br/>')
+        //       }}
+        //     />
         // ) : karmaDescription ? (
         //   renderParagraphs(karmaDescription)
         convertedDescription ? (
-          <div dangerouslySetInnerHTML={{ __html: convertedDescription }} className={`${styles.delegateStatement} rounded-xl my-7 me-32 py-6 px-7 text-sm`} />
+          <div
+            dangerouslySetInnerHTML={{ __html: convertedDescription }}
+            className={`${styles.delegateStatement} rounded-xl my-7 me-32 py-6 px-7 text-sm`}
+          />
         ) : (
           <div className="font-semibold text-base flex justify-center items-center">
             Delegate has not provided a description

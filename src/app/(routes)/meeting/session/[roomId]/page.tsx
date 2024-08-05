@@ -43,6 +43,7 @@ import ParticipantTile from "@/components/Huddle/ParticipantTile";
 import { NestedPeerListIcons } from "@/utils/PeerListIcons";
 import logo from "@/assets/images/daos/CCLogo1.png";
 import Image from "next/image";
+import { headers } from "next/headers";
 
 export default function Component({ params }: { params: { roomId: string } }) {
   const { isVideoOn, enableVideo, disableVideo, stream } = useLocalVideo();
@@ -180,6 +181,9 @@ export default function Component({ params }: { params: { roomId: string } }) {
   useEffect(() => {
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
+    if (address) {
+      myHeaders.append("x-wallet-address", address);
+    }
 
     const raw = JSON.stringify({
       roomId: params.roomId,
@@ -269,6 +273,12 @@ export default function Component({ params }: { params: { roomId: string } }) {
 
         console.log("All attendees: ", attendees);
 
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        if (address) {
+          myHeaders.append("x-wallet-address", address);
+        }
+
         const raw = JSON.stringify({
           meetingId: params.roomId,
           attendees: attendees,
@@ -277,6 +287,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
         // Make the API request
         const requestOptions = {
           method: "PUT",
+          headers: myHeaders,
           body: raw,
         };
 
@@ -317,8 +328,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
                 }
                 placement="left"
                 className="rounded-md bg-opacity-90 max-w-96"
-                closeDelay={1}
-              >
+                closeDelay={1}>
                 <span>
                   <PiRecordFill color="#c42727" size={22} />
                 </span>
@@ -349,8 +359,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
                           setTimeout(() => {
                             setIsCopied(false);
                           }, 3000);
-                        }}
-                      >
+                        }}>
                         {isCopied ? "Copied" : "Copy"}
                       </Button>
                     </div>
@@ -368,8 +377,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
               backgroundPosition: "center",
               backgroundSize: "cover",
               backgroundRepeat: "no-repeat",
-            }}
-          >
+            }}>
             <div className="flex w-full h-full">
               {shareStream && (
                 <div className="w-3/4">
@@ -392,8 +400,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
                   isScreenShared
                     ? "flex flex-col w-1/4 gap-2"
                     : "flex flex-wrap gap-3 w-full"
-                )}
-              >
+                )}>
                 {role !== Role.BOT && (
                   <GridContainer
                     className={clsx(
@@ -404,8 +411,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
                               ? "h-[49%]"
                               : ""
                           }`
-                    )}
-                  >
+                    )}>
                     <div className="absolute left-1/2 -translate-x-1/2 mb-2 text-4xl z-10">
                       {reaction}
                     </div>
@@ -496,8 +502,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
                 <Link
                   // onClick={() => push(`/profile/${address}?active=info`)}
                   href={`/profile/${address}?active=info`}
-                  className="px-6 py-3 bg-white text-blue-shade-200 rounded-full shadow-lg hover:bg-blue-shade-200 hover:text-white transition duration-300 ease-in-out"
-                >
+                  className="px-6 py-3 bg-white text-blue-shade-200 rounded-full shadow-lg hover:bg-blue-shade-200 hover:text-white transition duration-300 ease-in-out">
                   Back to Profile
                 </Link>
               </div>

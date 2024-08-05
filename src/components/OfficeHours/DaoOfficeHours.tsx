@@ -15,7 +15,7 @@ import { Tooltip } from "@nextui-org/react";
 import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
 import { RxCross2 } from "react-icons/rx";
 import SessionTileSkeletonLoader from "../SkeletonLoader/SessionTileSkeletonLoader";
-
+import {useAccount} from "wagmi";
 interface Type {
   img: StaticImageData;
   title: string;
@@ -47,6 +47,8 @@ function DaoOfficeHours() {
   const [sessionDetails, setSessionDetails] = useState<Type[]>([]);
   const [dataLoading, setDataLoading] = useState(true);
   const [showComingSoon, setShowComingSoon] = useState(true);
+
+  const {address}=useAccount();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -100,8 +102,15 @@ function DaoOfficeHours() {
     if (query.length > 0) {
       setDataLoading(true);
 
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      if (address) {
+        myHeaders.append("x-wallet-address", address);
+      }
+
       const requestOptions: any = {
         method: "POST",
+        headers:myHeaders,
         body: JSON.stringify({
           dao_name: null,
         }),
@@ -149,8 +158,7 @@ function DaoOfficeHours() {
             }
             placement="right"
             className="rounded-md bg-opacity-90 max-w-96"
-            closeDelay={1}
-          >
+            closeDelay={1}>
             <div>Office Hours</div>
           </Tooltip>
         </div>
@@ -167,8 +175,7 @@ function DaoOfficeHours() {
           </p>
           <button
             onClick={() => setShowComingSoon(false)}
-            className="text-yellow-700 hover:text-yellow-800 ps-3"
-          >
+            className="text-yellow-700 hover:text-yellow-800 ps-3">
             <RxCross2 size={18} />
           </button>
         </div>
@@ -182,8 +189,7 @@ function DaoOfficeHours() {
                 ? "text-[#3E3D3D] font-bold"
                 : "text-[#7C7C7C]"
             }`}
-            onClick={() => router.push(path + "?hours=ongoing")}
-          >
+            onClick={() => router.push(path + "?hours=ongoing")}>
             Ongoing
           </button>
           <button
@@ -192,8 +198,7 @@ function DaoOfficeHours() {
                 ? "text-[#3E3D3D] font-bold"
                 : "text-[#7C7C7C]"
             }`}
-            onClick={() => router.push(path + "?hours=upcoming")}
-          >
+            onClick={() => router.push(path + "?hours=upcoming")}>
             Upcoming
           </button>
           <button
@@ -202,24 +207,21 @@ function DaoOfficeHours() {
                 ? "text-[#3E3D3D] font-bold"
                 : "text-[#7C7C7C]"
             }`}
-            onClick={() => router.push(path + "?hours=recorded")}
-          >
+            onClick={() => router.push(path + "?hours=recorded")}>
             Recorded
           </button>
         </div>
 
         <div
           style={{ background: "rgba(238, 237, 237, 0.36)" }}
-          className="flex border-[0.5px] border-black w-1/3 rounded-full my-8 font-poppins"
-        >
+          className="flex border-[0.5px] border-black w-1/3 rounded-full my-8 font-poppins">
           <input
             type="text"
             placeholder="Search by title or host address"
             style={{ background: "rgba(238, 237, 237, 0.36)" }}
             className="pl-5 rounded-full outline-none w-full py-2"
             value={searchQuery}
-            onChange={(e) => handleSearchChange(e.target.value)}
-          ></input>
+            onChange={(e) => handleSearchChange(e.target.value)}></input>
           <span className="flex items-center bg-black rounded-full px-6 py-2">
             <Image src={search} alt="search" width={22} />
           </span>

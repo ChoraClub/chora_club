@@ -114,11 +114,16 @@ function ProposalMain({ props }: { props: Props }) {
 
   const StoreData = async (voteData: VoteData) => {
     // Make the API call to submit the vote
+
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    if (address) {
+      myHeaders.append("x-wallet-address", address);
+    }
+
     const response = await fetch("/api/submit-vote", {
       method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: myHeaders,
       body: JSON.stringify(voteData),
     });
     if (!response.ok) {
@@ -873,8 +878,7 @@ function ProposalMain({ props }: { props: Props }) {
             y={y + 15}
             fill="#718096"
             fontSize={fontSize}
-            textAnchor="start"
-          >
+            textAnchor="start">
             {firstDate}
           </text>
           <text
@@ -882,8 +886,7 @@ function ProposalMain({ props }: { props: Props }) {
             y={y + 15}
             fill="#718096"
             fontSize={fontSize}
-            textAnchor="end"
-          >
+            textAnchor="end">
             {lastDate}
           </text>
         </g>
@@ -903,15 +906,13 @@ function ProposalMain({ props }: { props: Props }) {
       <div className="flex gap-4 mx-24 mb-8 mt-5 font-poppins">
         <div
           className="text-white bg-blue-shade-100 rounded-full py-1.5 px-4 flex justify-center items-center gap-1 cursor-pointer"
-          onClick={handleBack}
-        >
+          onClick={handleBack}>
           <IoArrowBack />
           Back
         </div>
         <div
           className="text-white bg-blue-shade-100 rounded-full py-1.5 px-4 flex justify-center items-center gap-1 cursor-pointer"
-          onClick={shareOnTwitter}
-        >
+          onClick={shareOnTwitter}>
           Share
           <IoShareSocialSharp />
         </div>
@@ -920,8 +921,7 @@ function ProposalMain({ props }: { props: Props }) {
       <div
         className={`rounded-[1rem] mx-20 md:mx-24 px-4 md:px-12 py-6 transition-shadow duration-300 ease-in-out shadow-xl bg-gray-50 font-poppins relative ${
           isExpanded ? "h-fit" : "h-fit"
-        }`}
-      >
+        }`}>
         <div className="flex items-center justify-between">
           <div className="flex gap-2 items-center">
             {loading ? (
@@ -937,8 +937,7 @@ function ProposalMain({ props }: { props: Props }) {
                 content={<div className="font-poppins">OnChain</div>}
                 placement="right"
                 className="rounded-md bg-opacity-90"
-                closeDelay={1}
-              >
+                closeDelay={1}>
                 <Image
                   src={chainImg}
                   alt=""
@@ -952,8 +951,7 @@ function ProposalMain({ props }: { props: Props }) {
                   className="align-middle select-none font-sans font-bold text-center uppercase transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-1 px-2 rounded-full bg-blue-600 text-white shadow-md shadow-blue-600/10 hover:shadow-lg hover:shadow-blue-600/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none flex-shrink-0 w-fit md:w-[100%] md:min-w-[80px] md:max-w-[200px]"
                   type="button"
                   onClick={voteOnchain}
-                  disabled={hasVoted}
-                >
+                  disabled={hasVoted}>
                   Vote onchain
                 </button>
               )}
@@ -966,8 +964,7 @@ function ProposalMain({ props }: { props: Props }) {
                       ? "bg-[#f4d3f9] border border-[#77367a] text-[#77367a]"
                       : "bg-[#f4d3f9] border border-[#77367a] text-[#77367a]"
                     : "bg-gray-200 animate-pulse rounded-full"
-                }`}
-              >
+                }`}>
                 {status ? status : <div className="h-4 w-16"></div>}
               </div>
             </div>
@@ -997,8 +994,7 @@ function ProposalMain({ props }: { props: Props }) {
               Proposalstatus
                 ? getStatusColor(Proposalstatus)
                 : "bg-gray-200 animate-pulse rounded-full"
-            }`}
-          >
+            }`}>
             {Proposalstatus ? Proposalstatus : <div className="h-5 w-20"></div>}
           </div>
         </div>
@@ -1014,8 +1010,7 @@ function ProposalMain({ props }: { props: Props }) {
                 ref={contentRef}
                 className={` transition-max-height duration-500 ease-in-out overflow-hidden ${
                   isExpanded ? "max-h-full" : "max-h-36"
-                }`}
-              >
+                }`}>
                 <div
                   className="description-content"
                   dangerouslySetInnerHTML={{ __html: formattedDescription }}
@@ -1024,8 +1019,7 @@ function ProposalMain({ props }: { props: Props }) {
               {contentRef.current && contentRef.current.scrollHeight > 144 && (
                 <button
                   className="text-sm text-blue-shade-200 mt-2"
-                  onClick={toggleExpansion}
-                >
+                  onClick={toggleExpansion}>
                   {isExpanded ? "View Less" : "View More"}
                 </button>
               )}
@@ -1050,8 +1044,7 @@ function ProposalMain({ props }: { props: Props }) {
                   voterList.length > 5
                     ? `h-[440px] overflow-y-auto ${style.scrollbar}`
                     : "h-fit"
-                }`}
-              >
+                }`}>
                 {voterList.length === 0 ? (
                   <div className="flex items-center justify-center h-full text-gray-500">
                     ⏳ No Participation: This proposal hasn&apos;t received any
@@ -1063,8 +1056,7 @@ function ProposalMain({ props }: { props: Props }) {
                     .map((voter: any, index: any) => (
                       <div
                         className="flex items-center py-6 xl:px-6 px-3 bg-white transition-all duration-300 rounded-2xl border-2 border-transparent hover:border-blue-200 transform hover:-translate-y-1 space-x-6"
-                        key={index}
-                      >
+                        key={index}>
                         <div className="flex-grow flex items-center space-x-4">
                           {isArbitrum ? (
                             <Image
@@ -1083,8 +1075,7 @@ function ProposalMain({ props }: { props: Props }) {
                           <div>
                             <p
                               onClick={() => handleAddressClick(voter.voter)}
-                              className="text-gray-800 xl:text-sm hover:text-blue-600 transition-colors duration-200 cursor-pointer text-xs"
-                            >
+                              className="text-gray-800 xl:text-sm hover:text-blue-600 transition-colors duration-200 cursor-pointer text-xs">
                               {voter.voter.slice(0, 6)}...
                               {voter.voter.slice(-4)}
                             </p>
@@ -1096,8 +1087,7 @@ function ProposalMain({ props }: { props: Props }) {
                               voter.support === 1 || voter.type === "for"
                                 ? "bg-green-100 text-green-800"
                                 : "bg-red-100 text-red-800"
-                            }`}
-                          >
+                            }`}>
                             {formatWeight(voter.weight / 10 ** 18)}
                             &nbsp;
                             {voter.support === 1 ? "For" : "Against"}
@@ -1111,14 +1101,12 @@ function ProposalMain({ props }: { props: Props }) {
                             }
                             placement="right"
                             className="rounded-md bg-opacity-90"
-                            closeDelay={1}
-                          >
+                            closeDelay={1}>
                             <button
                               onClick={() =>
                                 handleTransactionClick(voter.transactionHash)
                               }
-                              className="text-blue-600 hover:text-blue-800 transition-colors duration-200"
-                            >
+                              className="text-blue-600 hover:text-blue-800 transition-colors duration-200">
                               <RiExternalLinkLine className="w-5 h-5" />
                             </button>
                           </Tooltips>
@@ -1130,8 +1118,7 @@ function ProposalMain({ props }: { props: Props }) {
                   <div className="flex justify-center items-center mt-6">
                     <button
                       onClick={loadMore}
-                      className="bg-blue-shade-100 text-white py-2 px-4 w-fit rounded-lg font-medium"
-                    >
+                      className="bg-blue-shade-100 text-white py-2 px-4 w-fit rounded-lg font-medium">
                       Load More
                     </button>
                   </div>
@@ -1143,15 +1130,13 @@ function ProposalMain({ props }: { props: Props }) {
           {isChartLoading ? (
             <div
               className="xl:w-[46.5vw] w-[45%] h-[500px] flex items-center justify-center bg-gray-50 rounded-2xl"
-              style={{ boxShadow: "0px 4px 26.7px 0px rgba(0, 0, 0, 0.10)" }}
-            >
+              style={{ boxShadow: "0px 4px 26.7px 0px rgba(0, 0, 0, 0.10)" }}>
               <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-black-shade-900"></div>
             </div>
           ) : voterList && chartData.length === 0 ? (
             <div
               className="w-[46.5vw] h-[500px] flex items-center justify-center bg-gray-50 rounded-2xl"
-              style={{ boxShadow: "0px 4px 26.7px 0px rgba(0, 0, 0, 0.10)" }}
-            >
+              style={{ boxShadow: "0px 4px 26.7px 0px rgba(0, 0, 0, 0.10)" }}>
               <p className="text-lg font-poppins text-gray-500">
                 📊 Chart Empty: No votes have been recorded on this chart.{" "}
               </p>
@@ -1159,8 +1144,7 @@ function ProposalMain({ props }: { props: Props }) {
           ) : (
             <div
               ref={chartContainerRef}
-              className="w-[46.5vw] transition-shadow duration-300 ease-in-out shadow-xl h-[500px] rounded-2xl flex text-sm items-center justify-center bg-gray-50 font-poppins"
-            >
+              className="w-[46.5vw] transition-shadow duration-300 ease-in-out shadow-xl h-[500px] rounded-2xl flex text-sm items-center justify-center bg-gray-50 font-poppins">
               <ResponsiveContainer width="100%" height={400}>
                 <LineChart
                   data={chartData}
@@ -1169,8 +1153,7 @@ function ProposalMain({ props }: { props: Props }) {
                     right: 30,
                     left: 20,
                     bottom: 30,
-                  }}
-                >
+                  }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                   <XAxis
                     dataKey="date"

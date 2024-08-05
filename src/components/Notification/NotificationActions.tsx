@@ -7,6 +7,7 @@ import { BsDatabaseFillCheck } from "react-icons/bs";
 import { PiVideoFill } from "react-icons/pi";
 import { GiChaingun } from "react-icons/gi";
 import { BASE_URL } from "@/config/constants";
+import { useAccount } from "wagmi";
 
 export const getBackgroundColor = (data: any) => {
   if (data?.notification_type === "newBooking") {
@@ -51,9 +52,14 @@ export const getIcon = (data: any) => {
 };
 
 export const markAsRead = async (data: any): Promise<void> => {
+  const { address } = useAccount();
+
   try {
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
+    if (address) {
+      myHeaders.append("x-wallet-address", address);
+    }
 
     const raw = JSON.stringify({
       id: data?._id,

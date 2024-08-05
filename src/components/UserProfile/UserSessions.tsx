@@ -60,11 +60,14 @@ function UserSessions({
   const getUserMeetingData = async () => {
     try {
       // setDataLoading(true);
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      if (address) {
+        myHeaders.append("x-wallet-address", address);
+      }
       const response = await fetch(`/api/get-sessions`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: myHeaders,
         body: JSON.stringify({
           address: address,
           dao_name: daoName,
@@ -133,8 +136,7 @@ function UserSessions({
               }`}
               onClick={() =>
                 router.push(path + "?active=sessions&session=schedule")
-              }
-            >
+              }>
               Schedule
             </button>
           )}
@@ -148,8 +150,7 @@ function UserSessions({
               }`}
               onClick={() =>
                 router.push(path + "?active=sessions&session=book")
-              }
-            >
+              }>
               Booked
             </button>
           )}
@@ -161,8 +162,7 @@ function UserSessions({
             }`}
             onClick={() =>
               router.push(path + "?active=sessions&session=attending")
-            }
-          >
+            }>
             Attending
           </button>
           {selfDelegate === true && (
@@ -174,8 +174,7 @@ function UserSessions({
               }`}
               onClick={() =>
                 router.push(path + "?active=sessions&session=hosted")
-              }
-            >
+              }>
               Hosted
             </button>
           )}
@@ -187,8 +186,7 @@ function UserSessions({
             }`}
             onClick={() =>
               router.push(path + "?active=sessions&session=attended")
-            }
-          >
+            }>
             Attended
           </button>
         </div>

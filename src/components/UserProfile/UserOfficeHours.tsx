@@ -49,6 +49,9 @@ function UserOfficeHours({
         setDataLoading(true);
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
+        if (address) {
+          myHeaders.append("x-wallet-address", address);
+        }
 
         const raw = JSON.stringify({
           address: address,
@@ -151,8 +154,7 @@ function UserOfficeHours({
           </p>
           <button
             onClick={() => setShowComingSoon(false)}
-            className="text-yellow-700 hover:text-yellow-800 ps-3"
-          >
+            className="text-yellow-700 hover:text-yellow-800 ps-3">
             <RxCross2 size={18} />
           </button>
         </div>
@@ -168,8 +170,7 @@ function UserOfficeHours({
               }`}
               onClick={() =>
                 router.push(path + "?active=officeHours&hours=schedule")
-              }
-            >
+              }>
               Schedule
             </button>
           )}
@@ -183,8 +184,7 @@ function UserOfficeHours({
               }`}
               onClick={() =>
                 router.push(path + "?active=officeHours&hours=upcoming")
-              }
-            >
+              }>
               Upcoming
             </button>
           )}
@@ -197,8 +197,7 @@ function UserOfficeHours({
               }`}
               onClick={() =>
                 router.push(path + "?active=officeHours&hours=hosted")
-              }
-            >
+              }>
               Hosted
             </button>
           )}
@@ -210,8 +209,7 @@ function UserOfficeHours({
             }`}
             onClick={() =>
               router.push(path + "?active=officeHours&hours=attended")
-            }
-          >
+            }>
             Attended
           </button>
         </div>

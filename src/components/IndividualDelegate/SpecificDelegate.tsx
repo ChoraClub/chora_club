@@ -99,12 +99,12 @@ function SpecificDelegate({ props }: { props: Type }) {
 
   const [delegateOpen, setDelegateOpen] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
-  const address = useAccount();
+  // const address = useAccount();
   const [followerCountLoading, setFollowerCountLoading] = useState(true);
   const [notificationLoading, setNotificationLoading] = useState(false);
   const [isFollowStatusLoading, setIsFollowStatusLoading] = useState(true);
 
-  const { isConnected } = useAccount();
+  const { isConnected, address } = useAccount();
 
   const handleDelegateModal = async () => {
     if (!isConnected) {
@@ -360,6 +360,9 @@ function SpecificDelegate({ props }: { props: Type }) {
     const myHeaders = new Headers();
     // setFollowerCountLoading(true);
     myHeaders.append("Content-Type", "application/json");
+    if (address) {
+      myHeaders.append("x-wallet-address", address);
+    }
     const raw = JSON.stringify({
       address: props.individualDelegate,
     });
@@ -416,6 +419,9 @@ function SpecificDelegate({ props }: { props: Type }) {
     setIsFollowStatusLoading(true);
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
+    if (address) {
+      myHeaders.append("x-wallet-address", address);
+    }
     const raw = JSON.stringify({
       address: props.individualDelegate,
     });
@@ -510,12 +516,15 @@ function SpecificDelegate({ props }: { props: Type }) {
 
     if (action == 1) {
       setLoading(true);
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      if (address) {
+        myHeaders.append("x-wallet-address", address);
+      }
       try {
         const response = await fetch("/api/delegate-follow/updatefollower", {
           method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: myHeaders,
           body: JSON.stringify({
             // Add any necessary data
             delegate_address: delegate_address,
@@ -552,12 +561,15 @@ function SpecificDelegate({ props }: { props: Type }) {
         let updatenotification: boolean;
         updatenotification = !notification;
         setNotificationLoading(true);
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        if (address) {
+          myHeaders.append("x-wallet-address", address);
+        }
         try {
           const response = await fetch("/api/delegate-follow/updatefollower", {
             method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
+            headers: myHeaders,
             body: JSON.stringify({
               // Add any necessary data
               delegate_address: delegate_address,
@@ -602,12 +614,15 @@ function SpecificDelegate({ props }: { props: Type }) {
         let address = await walletClient.getAddresses();
         follower_address = address[0];
         delegate_address = props.individualDelegate;
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        if (address) {
+          myHeaders.append("x-wallet-address", address);
+        }
         try {
           const response = await fetch("/api/delegate-follow/savefollower", {
             method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
+            headers: myHeaders,
             body: JSON.stringify({
               // Add any necessary data
               delegate_address: delegate_address,
@@ -849,8 +864,7 @@ function SpecificDelegate({ props }: { props: Type }) {
                 style={{
                   backgroundColor: "#fcfcfc",
                   border: "2px solid #E9E9E9 ",
-                }}
-              >
+                }}>
                 <div className="w-40 h-40 flex items-center justify-content ">
                   <div className="flex justify-center items-center w-40 h-40">
                     <Image
@@ -912,8 +926,7 @@ function SpecificDelegate({ props }: { props: Type }) {
                           : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                      target="_blank"
-                    >
+                      target="_blank">
                       <FaXTwitter color="#7C7C7C" size={12} />
                     </Link>
                     <Link
@@ -932,8 +945,7 @@ function SpecificDelegate({ props }: { props: Type }) {
                           : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                      target="_blank"
-                    >
+                      target="_blank">
                       <BiSolidMessageRoundedDetail color="#7C7C7C" size={12} />
                     </Link>
                     <Link
@@ -948,8 +960,7 @@ function SpecificDelegate({ props }: { props: Type }) {
                           : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                      target="_blank"
-                    >
+                      target="_blank">
                       <FaDiscord color="#7C7C7C" size={12} />
                     </Link>
                     {isEmailVisible && (
@@ -957,8 +968,7 @@ function SpecificDelegate({ props }: { props: Type }) {
                         href={`mailto:${emailId}`}
                         className="border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1"
                         style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                        target="_blank"
-                      >
+                        target="_blank">
                         <FaEnvelope color="#7C7C7C" size={12} />
                       </Link>
                     )}
@@ -974,8 +984,7 @@ function SpecificDelegate({ props }: { props: Type }) {
                           : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                      target="_blank"
-                    >
+                      target="_blank">
                       <FaGithub color="#7C7C7C" size={12} />
                     </Link>
                   </div>
@@ -991,8 +1000,7 @@ function SpecificDelegate({ props }: { props: Type }) {
                     content="Copy"
                     placement="right"
                     closeDelay={1}
-                    showArrow
-                  >
+                    showArrow>
                     <span className="px-2 cursor-pointer" color="#3E3D3D">
                       <IoCopy
                         onClick={() => handleCopy(props.individualDelegate)}
@@ -1011,8 +1019,7 @@ function SpecificDelegate({ props }: { props: Type }) {
                       content="Copy profile URL to share on Warpcast or Twitter."
                       placement="bottom"
                       closeDelay={1}
-                      showArrow
-                    >
+                      showArrow>
                       <Button
                         className="bg-gray-200 hover:bg-gray-300"
                         onClick={() => {
@@ -1024,8 +1031,7 @@ function SpecificDelegate({ props }: { props: Type }) {
                           setTimeout(() => {
                             setIsCopied(false);
                           }, 3000);
-                        }}
-                      >
+                        }}>
                         <IoShareSocialSharp />
                         {isCopied ? "Copied" : "Share profile"}
                       </Button>
@@ -1094,8 +1100,7 @@ function SpecificDelegate({ props }: { props: Type }) {
                     //   handleDelegateVotes(`${props.individualDelegate}`)
                     // }
 
-                    onClick={handleDelegateModal}
-                  >
+                    onClick={handleDelegateModal}>
                     Delegate
                   </button>
 
@@ -1103,8 +1108,7 @@ function SpecificDelegate({ props }: { props: Type }) {
                     className={`font-bold text-white rounded-full w-[138.5px] h-[44px] py-[10px] flex justify-center items-center ${
                       isFollowing ? "bg-blue-shade-200" : "bg-black"
                     }`}
-                    onClick={handleFollow}
-                  >
+                    onClick={handleFollow}>
                     {isFollowStatusLoading ? (
                       <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div>
                     ) : loading ? (
@@ -1124,8 +1128,7 @@ function SpecificDelegate({ props }: { props: Type }) {
                     }
                     placement="top"
                     closeDelay={1}
-                    showArrow
-                  >
+                    showArrow>
                     <div
                       className={`border  rounded-full flex items-center justify-center size-10  ${
                         isFollowing
@@ -1134,8 +1137,7 @@ function SpecificDelegate({ props }: { props: Type }) {
                       }`}
                       onClick={() =>
                         isFollowing && !notificationLoading && handleConfirm(2)
-                      }
-                    >
+                      }>
                       {notificationLoading ? (
                         <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-blue-shade-100"></div>
                       ) : isFollowing ? (
@@ -1170,14 +1172,12 @@ function SpecificDelegate({ props }: { props: Type }) {
                           <div className="flex justify-center px-8 py-4">
                             <button
                               className="bg-gray-300 text-gray-700 px-8 py-3 font-semibold rounded-full mr-4"
-                              onClick={() => setUnfollowmodel(false)}
-                            >
+                              onClick={() => setUnfollowmodel(false)}>
                               Cancel
                             </button>
                             <button
                               className="bg-red-500 text-white px-8 py-3 font-semibold rounded-full"
-                              onClick={() => handleConfirm(1)}
-                            >
+                              onClick={() => handleConfirm(1)}>
                               {loading ? (
                                 <Oval
                                   visible={true}
@@ -1256,8 +1256,7 @@ function SpecificDelegate({ props }: { props: Type }) {
                   ? " border-blue-shade-200 text-blue-shade-200 font-semibold"
                   : "border-transparent"
               }`}
-              onClick={() => router.push(path + "?active=info")}
-            >
+              onClick={() => router.push(path + "?active=info")}>
               Info
             </button>
             <button
@@ -1266,8 +1265,7 @@ function SpecificDelegate({ props }: { props: Type }) {
                   ? "text-blue-shade-200 font-semibold border-blue-shade-200"
                   : "border-transparent"
               }`}
-              onClick={() => router.push(path + "?active=pastVotes")}
-            >
+              onClick={() => router.push(path + "?active=pastVotes")}>
               Past Votes
             </button>
             <button
@@ -1278,8 +1276,7 @@ function SpecificDelegate({ props }: { props: Type }) {
               }`}
               onClick={() =>
                 router.push(path + "?active=delegatesSession&session=book")
-              }
-            >
+              }>
               Sessions
             </button>
             <button
@@ -1290,8 +1287,7 @@ function SpecificDelegate({ props }: { props: Type }) {
               }`}
               onClick={() =>
                 router.push(path + "?active=officeHours&hours=ongoing")
-              }
-            >
+              }>
               Office Hours
             </button>
           </div>

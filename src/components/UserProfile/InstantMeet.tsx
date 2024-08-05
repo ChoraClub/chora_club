@@ -64,11 +64,16 @@ function InstantMeet({ isDelegate, selfDelegate, daoName }: instantMeetProps) {
 
   const startInstantMeet = async () => {
     setConfirmSave(true);
+
+    let getHeaders = new Headers();
+    getHeaders.append("Content-Type", "application/json");
+    if (address) {
+      getHeaders.append("x-wallet-address", address);
+    }
+
     const res = await fetch(`/api/create-room`, {
       method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: getHeaders,
     });
     const result = await res.json();
     const roomId = await result.data;

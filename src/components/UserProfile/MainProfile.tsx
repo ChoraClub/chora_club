@@ -63,6 +63,7 @@ import { TbBrandGithubFilled } from "react-icons/tb";
 import { CgAttachment } from "react-icons/cg";
 import UpdateProfileModal from "../ComponentUtils/UpdateProfileModal";
 import { cookies } from "next/headers";
+import { m } from "framer-motion";
 
 function MainProfile() {
   const { isConnected, address } = useAccount();
@@ -264,6 +265,9 @@ function MainProfile() {
     setLoading(true);
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
+    if (address) {
+      myHeaders.append("x-wallet-address", address);
+    }
 
     const raw = JSON.stringify({
       address: address,
@@ -312,13 +316,16 @@ function MainProfile() {
 
     if (!userupdate.isFollowing) {
       setfollowings(followings + 1);
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      if (address) {
+        myHeaders.append("x-wallet-address", address);
+      }
 
       try {
         const response = await fetch("/api/delegate-follow/savefollower", {
           method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: myHeaders,
           body: JSON.stringify({
             // Add any necessary data
             delegate_address: userupdate.follower_address,
@@ -342,11 +349,14 @@ function MainProfile() {
       setLoading(true);
       settoaster(true);
       try {
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        if (address) {
+          myHeaders.append("x-wallet-address", address);
+        }
         const response = await fetch("/api/delegate-follow/updatefollower", {
           method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: myHeaders,
           body: JSON.stringify({
             // Add any necessary data
             delegate_address: userupdate.follower_address,
@@ -380,11 +390,14 @@ function MainProfile() {
     settoaster(true);
 
     try {
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      if (address) {
+        myHeaders.append("x-wallet-address", address);
+      }
       const response = await fetch("/api/delegate-follow/updatefollower", {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: myHeaders,
         body: JSON.stringify({
           // Add any necessary data
           delegate_address: userupdate.follower_address,
@@ -418,6 +431,9 @@ function MainProfile() {
     console.log("Attempting to call savefollower API");
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
+    if (address) {
+      myHeaders.append("x-wallet-address", address);
+    }
     const raw = JSON.stringify({
       address: address,
     });
@@ -736,42 +752,48 @@ function MainProfile() {
     try {
       // Call the POST API function for adding a new delegate
       console.log("Adding the delegate..");
-      const response = await axios.post(
-        "/api/profile",
-        {
-          address: address,
-          image: modalData.displayImage,
-          isDelegate: true,
-          displayName: modalData.displayName,
-          emailId: modalData.emailId,
-          isEmailVisible: false,
-          socialHandles: {
-            twitter: modalData.twitter,
-            discord: modalData.discord,
-            github: modalData.github,
-          },
-          networks: [
-            {
-              dao_name: daoName,
-              network: chain?.name,
-              discourse: modalData.discourse,
-              description: newDescription,
-            },
-          ],
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            ...(address && { "x-wallet-address": address }),
-          },
-        }
-      );
 
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      if (address) {
+        myHeaders.append("x-wallet-address", address);
+      }
+
+      const raw = JSON.stringify({
+        address: address,
+        image: modalData.displayImage,
+        isDelegate: true,
+        displayName: modalData.displayName,
+        emailId: modalData.emailId,
+        isEmailVisible: false,
+        socialHandles: {
+          twitter: modalData.twitter,
+          discord: modalData.discord,
+          github: modalData.github,
+        },
+        networks: [
+          {
+            dao_name: daoName,
+            network: chain?.name,
+            discourse: modalData.discourse,
+            description: newDescription,
+          },
+        ],
+      });
+
+      const requestOptions: any = {
+        method: "POST",
+        headers: myHeaders,
+        body: raw,
+        redirect: "follow",
+      };
+
+      const response = await fetch("/api/profile/", requestOptions);
       console.log("Response Add", response);
 
       if (response.status === 200) {
         // Delegate added successfully
-        console.log("Delegate added successfully:", response.data);
+        console.log("Delegate added successfully:", response.status);
         setIsLoading(false);
         setUserData({
           displayImage: modalData.displayImage,

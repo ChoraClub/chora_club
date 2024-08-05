@@ -19,6 +19,7 @@ import {
 } from "@nextui-org/react";
 import AttestationModal from "../ComponentUtils/AttestationModal";
 import RecordedSessionsSkeletonLoader from "../SkeletonLoader/RecordedSessionsSkeletonLoader";
+import { useAccount } from "wagmi";
 
 interface Session {
   booking_status: string;
@@ -45,6 +46,8 @@ function DelegatesSession({ props }: { props: string }) {
   const [tempSession, setTempSession] = useState([]);
   const [dataLoading, setDataLoading] = useState(true);
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
+
+  const { address } = useAccount();
 
   // console.log("propspropsprops", dao_name);
 
@@ -104,8 +107,15 @@ function DelegatesSession({ props }: { props: string }) {
         dao_name: dao_name,
       });
 
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      if (address) {
+        myHeaders.append("x-wallet-address", address);
+      }
+
       const requestOptions: any = {
         method: "POST",
+        headers: myHeaders,
         body: raw,
         redirect: "follow",
       };
@@ -135,16 +145,14 @@ function DelegatesSession({ props }: { props: string }) {
     <div className="font-poppins">
       <div
         style={{ background: "rgba(238, 237, 237, 0.36)" }}
-        className="flex border-[0.5px] border-black w-1/3 rounded-full my-4 font-poppins"
-      >
+        className="flex border-[0.5px] border-black w-1/3 rounded-full my-4 font-poppins">
         <input
           type="text"
           placeholder="Search by title and host address"
           style={{ background: "rgba(238, 237, 237, 0.36)" }}
           className="pl-5 rounded-full outline-none w-full"
           value={searchQuery}
-          onChange={(e) => handleSearchChange(e.target.value)}
-        ></input>
+          onChange={(e) => handleSearchChange(e.target.value)}></input>
         <span className="flex items-center bg-black rounded-full px-5 py-2">
           <Image src={search} alt="search" width={20} />
         </span>
@@ -175,8 +183,7 @@ function DelegatesSession({ props }: { props: string }) {
             }`}
             onClick={() =>
               router.push(path + "?active=delegatesSession&session=recorded")
-            }
-          >
+            }>
             Recorded
           </button>
         </div>
@@ -214,7 +221,7 @@ function DelegatesSession({ props }: { props: string }) {
               //   isOfficeHour={false}
               //   isSession={""}
               // />
-              <RecordedSessionsTile meetingData={sessionDetails}/>
+              <RecordedSessionsTile meetingData={sessionDetails} />
             ))}
         </div>
       </div>

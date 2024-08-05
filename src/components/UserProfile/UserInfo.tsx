@@ -236,11 +236,14 @@ function UserInfo({
 
     const officeHoursHosted = async () => {
       try {
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        if (address) {
+          myHeaders.append("x-wallet-address", address);
+        }
         const response = await fetch(`/api/get-officehours-address`, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: myHeaders,
           body: JSON.stringify({
             address: address,
           }),
@@ -384,8 +387,7 @@ function UserInfo({
               ? "text-[#3E3D3D] font-bold"
               : "text-[#7C7C7C]"
           } `}
-          onClick={() => fetchAttestation("onchain")}
-        >
+          onClick={() => fetchAttestation("onchain")}>
           Onchain
         </button>
         <button
@@ -394,8 +396,7 @@ function UserInfo({
               ? "text-[#3E3D3D] font-bold"
               : "text-[#7C7C7C]"
           }`}
-          onClick={() => fetchAttestation("offchain")}
-        >
+          onClick={() => fetchAttestation("offchain")}>
           Offchain
         </button>
       </div>
@@ -405,8 +406,7 @@ function UserInfo({
             <div
               key={index}
               className={`bg-[#3E3D3D] text-white rounded-2xl px-3 py-7 cursor-pointer`}
-              onClick={() => router.push(`${key.ref}`)}
-            >
+              onClick={() => router.push(`${key.ref}`)}>
               <div className="font-semibold text-3xl text-center pb-2">
                 {isSessionHostedLoading &&
                 isSessionAttendedLoading &&
@@ -436,8 +436,7 @@ function UserInfo({
         <div
           style={{ boxShadow: "0px 4px 30.9px 0px rgba(0, 0, 0, 0.12)" }}
           className={`flex flex-col justify-between min-h-48 rounded-xl my-7 me-32 p-6
-        ${isEditing ? "outline" : ""}`}
-        >
+        ${isEditing ? "outline" : ""}`}>
           {/* <ReactQuill
             readOnly={!isEditing}
             value={isEditing ? tempDesc :( description || karmaDesc)}
@@ -483,22 +482,19 @@ function UserInfo({
               <>
                 <button
                   className="bg-blue-shade-100 text-white text-sm py-1 px-3 rounded-full font-semibold mr-2"
-                  onClick={handleCancelClick}
-                >
+                  onClick={handleCancelClick}>
                   Cancel
                 </button>
                 <button
                   className="bg-blue-shade-100 text-white text-sm py-1 px-3 rounded-full font-semibold"
-                  onClick={handleSaveClick}
-                >
+                  onClick={handleSaveClick}>
                   {loading ? "Saving" : "Save"}
                 </button>
               </>
             ) : (
               <button
                 className="bg-blue-shade-100 text-white text-sm py-1 px-4  rounded-full font-semibold"
-                onClick={() => setEditing(true)}
-              >
+                onClick={() => setEditing(true)}>
                 Edit
               </button>
             )}

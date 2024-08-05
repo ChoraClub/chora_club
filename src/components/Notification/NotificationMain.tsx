@@ -34,6 +34,9 @@ function NotificationMain() {
     try {
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
+      if (address) {
+        myHeaders.append("x-wallet-address", address);
+      }
 
       const raw = JSON.stringify({ address });
 
@@ -130,6 +133,9 @@ function NotificationMain() {
     try {
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
+      if (address) {
+        myHeaders.append("x-wallet-address", address);
+      }
 
       const raw = JSON.stringify({
         markAll: true,
@@ -183,8 +189,7 @@ function NotificationMain() {
                 ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
                 : "border-transparent"
             }`}
-            onClick={() => router.push(path + "?active=all")}
-          >
+            onClick={() => router.push(path + "?active=all")}>
             All
           </button>
           <button
@@ -193,8 +198,7 @@ function NotificationMain() {
                 ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
                 : "border-transparent"
             }`}
-            onClick={() => router.push(path + "?active=sessionBookings")}
-          >
+            onClick={() => router.push(path + "?active=sessionBookings")}>
             Session Bookings
           </button>
           <button
@@ -204,8 +208,7 @@ function NotificationMain() {
                 : "border-transparent"
             }`}
             // onClick={() => router.push(path + "?active=recordedSessions")}
-            onClick={() => toast("Coming Soon 🚀")}
-          >
+            onClick={() => toast("Coming Soon 🚀")}>
             Recorded Sessions
           </button>
           <button
@@ -215,8 +218,7 @@ function NotificationMain() {
                 : "border-transparent"
             }`}
             // onClick={() => router.push(path + "?active=followers")}
-            onClick={() => toast("Coming Soon 🚀")}
-          >
+            onClick={() => toast("Coming Soon 🚀")}>
             Followers
           </button>
           <button
@@ -226,16 +228,14 @@ function NotificationMain() {
                 : "border-transparent"
             }`}
             // onClick={() => router.push(path + "?active=attestations")}
-            onClick={() => toast("Coming Soon 🚀")}
-          >
+            onClick={() => toast("Coming Soon 🚀")}>
             Attestations
           </button>
         </div>
         <div className="ml-auto pe-16">
           <button
             className="my-4 py-2 px-4 border border-blue-shade-100 text-blue-shade-100 rounded-xl flex items-center shadow-md hover:bg-blue-shade-100 hover:text-white transition duration-300 ease-in-out font-bold"
-            onClick={markAllAsRead}
-          >
+            onClick={markAllAsRead}>
             <PiEnvelopeOpen className="mr-2" width={10} />
             Mark all as read
           </button>
