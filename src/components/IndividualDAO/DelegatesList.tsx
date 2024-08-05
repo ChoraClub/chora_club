@@ -19,6 +19,7 @@ import { useConnectModal, useChainModal } from "@rainbow-me/rainbowkit";
 import dao_abi from "../../artifacts/Dao.sol/GovernanceToken.json";
 import { useAccount, useNetwork } from "wagmi";
 import WalletAndPublicClient from "@/helpers/signer";
+import ErrorDisplay from "../ComponentUtils/ErrorDisplay";
 // import { getEnsNameOfUser } from "../ConnectWallet/ENSResolver";
 import {
   processAddressOrEnsName,
@@ -33,7 +34,6 @@ import {
   DELEGATE_CHANGED_QUERY,
   op_client,
 } from "@/config/staticDataUtils";
-import { RiErrorWarningLine } from "react-icons/ri";
 
 // Create a cache object outside of the component to persist across re-renders
 const cache: any = {
@@ -76,47 +76,13 @@ function DelegatesList({ props }: { props: string }) {
     setDelegateData({ delegates: [] });
     setTempData({ delegates: [] });
     window.location.reload();
-    // Retry fetching data
-    // fetchData(null);
   };
 
-  const ErrorDisplay = ({ message, onRetry }: any) => (
-    <div className="flex flex-col items-center justify-center p-8 bg-red-50 rounded-lg shadow-md">
-      <RiErrorWarningLine className="text-red-500 text-5xl mb-4" />
-      <h2 className="text-2xl font-bold text-red-700 mb-2">
-        Oops! Something went wrong
-      </h2>
-      <p className="text-red-600 text-center mb-6">{message}</p>
-      <button
-        onClick={onRetry}
-        className="px-6 py-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors duration-300"
-      >
-        Try Again
-      </button>
-    </div>
-  );
 
   const handleClose = () => {
     setIsShowing(false);
     sessionStorage.setItem("KarmaCreditClosed", JSON.stringify(true));
   };
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       console.log("inside useEffect");
-
-  //       const [avatar] = await Promise.all([
-  //         fetchEnsAvatar("0x5e349eca2dc61abcd9dd99ce94d04136151a09ee"),
-  //       ]);
-
-  //       console.log("avatar...", avatar);
-  //     } catch (error) {
-  //       console.error("Error fetching ENS avatar:", error);
-  //     }
-  //   };
-
-  //   fetchData();
-  // }, []);
 
   useEffect(() => {
     const KarmaCreditClosed = JSON.parse(
@@ -316,76 +282,7 @@ function DelegatesList({ props }: { props: string }) {
       timeout = setTimeout(() => func(...args), wait);
     };
   };
-  // const handleSearchChange = async (query: string) => {
-  //   console.log("query: ", query.length);
-
-  //   setSearchQuery(query);
-  //   setPageLoading(true);
-
-  //   if (query.length > 0) {
-  //     // console.log("Delegate data: ", query, delegateData);
-  //     // console.log(delegateData);
-  //     setIsSearching(true);
-  //     window.removeEventListener("scroll", handleScroll);
-  //     console.log(props)
-  //     console.log("lowercasee", query.toLowerCase())
-  //     const res = await fetch(
-  //       props === "optimism" ? `/api/get-delegatelist?user=${query.toLowerCase()}` : `/api/get-arbitrum-delegatelist?user=${query}`
-  //       // `https://api.karmahq.xyz/api/dao/search-delegate?user=${query}&pageSize=10&offset=0&period=lifetime&order=desc&dao=${props}`
-  //     );
-  //     console.log("res: ", res);
-  //     let filtered: any = await res.json();
-  //     filtered.delegate === null ? filtered = [] : null;
-  //     console.log(filtered);
-
-  //     if (props === "optimism") {
-  //       const formattedDelegates = await Promise.all(
-  //         filtered.map(async (delegate: any) => {
-  //           // const ensName = await getEnsNameOfUser(delegate._id);
-  //           return {
-  //             delegate: delegate._id,
-  //             adjustedBalance: delegate.adjustedBalance,
-  //             newBalance: delegate.newBalance,
-  //             // ensName: ensName,
-  //           };
-  //         })
-  //       );
-  //       console.log("formate", formattedDelegates);
-
-  //       setDelegateData({ delegates: [...formattedDelegates] });
-
-  //       setPageLoading(false);
-  //     } else {
-  //       let formattedDelegates: any;
-  //       filtered.delegate ? formattedDelegates = {
-  //         delegate: filtered.delegate?.account.address,
-  //         adjustedBalance: filtered.delegate?.votesCount / 10 ** 18,
-  //         ensName: filtered.delegate?.account.ens,
-  //       } : formattedDelegates = [];
-  //       console.log("formattedDelegates", formattedDelegates)
-  //       // setDelegateData({ delegates: [formattedDelegates] });
-  //       setDelegateData({ delegates: Array.isArray(formattedDelegates) ? formattedDelegates : [formattedDelegates] });
-
-  //       setPageLoading(false);
-
-  //     }
-
-  //   } else {
-
-  //     setIsSearching(false);
-  //     setDelegateData({ ...delegateData, delegates: tempData.delegates });
-  //     setPageLoading(false);
-  //     window.addEventListener("scroll", handleScroll);
-  //   }
-  // };
-  // // Debounced version of handleSearchChange
-  // const debouncedHandleSearchChange = debounce(handleSearchChange, 300); // Delay of 300ms
-
-  // // Use the debounced function instead of handleSearchChange
-  // const handleSearchChangeWithDebounce = async (query: string) => {
-  //   debouncedHandleSearchChange(query);
-  // };
-  const handleSearchChange = async (query: string) => {
+    const handleSearchChange = async (query: string) => {
     // console.log("query: ", query.length);
 
     setSearchQuery(query);
@@ -476,20 +373,6 @@ function DelegatesList({ props }: { props: string }) {
     copy(addr);
     toast("Address Copied");
   };
-  // const handleMouseMove = (event:any,index:any) => {
-  //   const rect = event.currentTarget.getBoundingClientRect();
-  //   const x = event.clientX - rect.left;
-  //   const y = event.clientY - rect.top;
-
-  //   setCirclePosition({ x, y });
-  //   setClickedTileIndex(index);
-  //   console.log(circlePosition);
-
-  //   setTimeout(() => {
-  //     setClickedTileIndex(null);
-  //   }, 1500); // Adjust the time as needed
-
-  // };
 
   const WalletOpen = async (to: string) => {
     const adr = await walletClient.getAddresses();
@@ -892,18 +775,6 @@ function DelegatesList({ props }: { props: string }) {
                       </div>
                     </div>
                     <div style={{ zIndex: "21474836462" }}>
-                      {/* <Toaster
-                        toastOptions={{
-                          style: {
-                            fontSize: "14px",
-                            backgroundColor: "#3E3D3D",
-                            color: "#fff",
-                            boxShadow: "none",
-                            borderRadius: "50px",
-                            padding: "3px 5px",
-                          },
-                        }}
-                      /> */}
                     </div>
                   </div>
                   {delegateOpen && (

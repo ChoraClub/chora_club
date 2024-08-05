@@ -392,7 +392,9 @@ function RecordedSessionsTile({ meetingData , showClaimButton,session}: meeting)
                 endTime={data.attestations[0]?.endTime}
                 dao={data.dao_name}
                 address={address || ''}
-                onChainId={data.onchain_host_uid || data.attendees[0]?.onchain_attendee_uid}
+                onChainId={session === "hosted"
+                  ? data.onchain_host_uid
+                  : data.attendees[0]?.onchain_attendee_uid}
               />
             )}
             {session==="hosted" && (

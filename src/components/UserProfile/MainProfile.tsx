@@ -252,6 +252,7 @@ function MainProfile() {
       console.log(delegateTx);
     } catch (error) {
       console.log("Error:", error);
+      toast.error("Failed to delegate votes. Please try again.");
     }
   };
 
@@ -650,6 +651,7 @@ function MainProfile() {
         }
       } catch (error) {
         console.error("Error fetching data:", error);
+        toast.error("Failed to load profile data. Please try again later.");
         setIsPageLoading(false);
       }
     };

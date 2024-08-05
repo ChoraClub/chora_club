@@ -1,63 +1,4 @@
-// import React from 'react';
-// import { Oval } from "react-loader-spinner";
-// import { FaGift } from "react-icons/fa6";
-// import { Tooltip } from "@nextui-org/react";
-// import styles from "./ClaimButton.module.css";
-
-// interface ClaimButtonProps {
-//   isClaiming: boolean;
-//   isClaimed: boolean;
-//   onChainId: string | undefined;
-//   onClick: (e: React.MouseEvent) => void;
-// }
-
-// const ClaimButton: React.FC<ClaimButtonProps> = ({ isClaiming, isClaimed, onChainId, onClick }) => {
-//   return (
-//     <Tooltip
-//       content={
-//         isClaiming
-//           ? "Claiming Onchain Attestation"
-//           : onChainId || isClaimed
-//           ? "Received Onchain Attestation"
-//           : "Claim Onchain Attestation"
-//       }
-//       placement="top"
-//       showArrow
-//     >
-//       <button
-//         className={styles.button}
-//         onClick={onClick}
-//         disabled={!!onChainId || isClaiming || isClaimed}
-//       >
-//         {isClaiming ? (
-//           <div className="flex items-center justify-center px-3">
-//             <Oval
-//               visible={true}
-//               height="20"
-//               width="20"
-//               color="#fff"
-//               secondaryColor="#cdccff"
-//               ariaLabel="oval-loading"
-//             />
-//           </div>
-//         ) : onChainId || isClaimed ? (
-//           "Claimed"
-//         ) : (
-//           <>
-//             <div className="flex items-center justify-center translate-y-[1px]">
-//               Claim
-//             </div>
-//             <FaGift className={styles.icon} />
-//           </>
-//         )}
-//       </button>
-//     </Tooltip>
-//   );
-// };
-
-// export default ClaimButton;
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Oval } from "react-loader-spinner";
 import { FaCheck, FaGift } from "react-icons/fa6";
 import { Tooltip } from "@nextui-org/react";
@@ -86,10 +27,16 @@ const ClaimButton: React.FC<ClaimButtonProps> = ({
   onChainId
 }) => {
   const [isClaiming, setIsClaiming] = useState(false);
-  // const [isClaimed, setIsClaimed] = useState(!!onChainId);
-  const [isClaimed, setIsClaimed] = useState(false);
+  const [isClaimed, setIsClaimed] = useState(!!onChainId);
 
-  const handleAttestationOnchain = async () => {
+  useEffect(() => {
+    setIsClaimed(!!onChainId);
+  }, [onChainId]);
+
+  const handleAttestationOnchain = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (isClaimed || isClaiming) return;
+
     setIsClaiming(true);
     if (
       typeof window.ethereum === "undefined" ||
@@ -127,7 +74,11 @@ const ClaimButton: React.FC<ClaimButtonProps> = ({
         body: JSON.stringify(data),
       });
 
-      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+      // if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(`HTTP error! status: ${res.status}, message: ${errorText}`);
+      }
 
       const attestationObject = await res.json();
       const provider = new ethers.BrowserProvider(window?.ethereum);
@@ -171,9 +122,9 @@ const ClaimButton: React.FC<ClaimButtonProps> = ({
           toast.success("On-chain attestation claimed successfully!");
         }
       }
-    } catch (error) {
-      console.error("Error:", error);
-      toast.error("Failed to claim on-chain attestation.");
+    } catch (error:any) {
+      console.error("Error claim:", error.message);
+      toast.error(`Failed to claim on-chain attestation`);
     } finally {
       setIsClaiming(false);
     }
@@ -195,16 +146,15 @@ const ClaimButton: React.FC<ClaimButtonProps> = ({
         className={`${styles.button} ${
           !!onChainId || isClaimed ? styles.claimed : ""
         } w-full `}
-        onClick={(e) => {
-          e.stopPropagation();
-          handleAttestationOnchain();
-        }}
+        onClick={
+          handleAttestationOnchain
+        }
         disabled={!!onChainId || isClaiming || isClaimed}
       >
         <span className={styles.buttonText}>
           {isClaiming
             ? "Claiming..."
-            : onChainId || isClaimed
+            : isClaimed
             ? "Claimed"
             : "Claim"}
         </span>
@@ -218,7 +168,7 @@ const ClaimButton: React.FC<ClaimButtonProps> = ({
               secondaryColor="#cdccff"
               ariaLabel="oval-loading"
             />
-          ) : onChainId || isClaimed ? (
+          ) : isClaimed ? (
             <FaCheck className={styles.icon} />
           ) : (
             <FaGift className={styles.icon} />
