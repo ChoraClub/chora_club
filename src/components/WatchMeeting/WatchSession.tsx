@@ -19,7 +19,7 @@ import { useRouter } from "next-nprogress-bar";
 import "./WatchSession.module.css";
 import ShareMediaModal from "./ShareMediaModal";
 import { BASE_URL } from "@/config/constants";
-import { Toaster } from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
 import { Tooltip } from "@nextui-org/react";
 import { getEnsName } from "@/utils/ENSUtils";
 
@@ -234,12 +234,20 @@ function WatchSession({
                   >
                     <Link
                       href={
-                        data.dao_name === ("optimism" || "Optimism")
+                        data.uid_host
+                        ? data.dao_name === ("optimism" || "Optimism")
                           ? `https://optimism.easscan.org/offchain/attestation/view/${data.uid_host}`
                           : data.dao_name === ("arbitrum" || "Arbitrum")
                           ? `https://arbitrum.easscan.org/offchain/attestation/view/${data.uid_host}`
                           : ""
+                        : "#"
                       }
+                      onClick={(e) => {
+                        if (!data.uid_host) {
+                          e.preventDefault();
+                          toast.error("Offchain attestation not available");
+                        }
+                      }}
                       target="_blank"
                     >
                       <Image
@@ -264,12 +272,20 @@ function WatchSession({
                   >
                     <Link
                       href={
-                        data.dao_name === ("optimism" || "Optimism")
+                        data.onchain_host_uid 
+                        ? data.dao_name === ("optimism" || "Optimism")
                           ? `https://optimism.easscan.org/attestation/view/${data.onchain_host_uid}`
                           : data.dao_name === ("arbitrum" || "Arbitrum")
                           ? `https://arbitrum.easscan.org/attestation/view/${data.onchain_host_uid}`
                           : ""
+                        : "#"
                       }
+                      onClick={(e) => {
+                        if (!data.onchain_host_uid ) {
+                          e.preventDefault();
+                          toast.error("Onchain attestation not available");
+                        }
+                      }}
                       target="_blank"
                     >
                       <Image

@@ -7,6 +7,9 @@ import text1 from "@/assets/images/daos/texture1.png";
 import SessionTile from "../ComponentUtils/SessionTiles";
 import { Oval } from "react-loader-spinner";
 import SessionTileSkeletonLoader from "../SkeletonLoader/SessionTileSkeletonLoader";
+import RecordedSessionsTile from "../ComponentUtils/RecordedSessionsTile";
+import RecordedSessionsSkeletonLoader from "../SkeletonLoader/RecordedSessionsSkeletonLoader";
+import ErrorDisplay from "../ComponentUtils/ErrorDisplay";
 
 type Attendee = {
   attendee_address: string;
@@ -40,8 +43,7 @@ function DelegateSessions({ props }: { props: Type }) {
   const [dataLoading, setDataLoading] = useState(true);
   const [sessionDetails, setSessionDetails] = useState([]);
   const dao_name = props.daoDelegates;
-
-  // const dao_name = daoName.charAt(0).toUpperCase() + daoName.slice(1);
+  const [error, setError] = useState<string | null>(null);
 
   const getMeetingData = async () => {
     try {
@@ -52,7 +54,6 @@ function DelegateSessions({ props }: { props: Type }) {
         dao_name: dao_name,
         address: props.individualDelegate,
       });
-      // console.log("raw", raw);
       const requestOptions: any = {
         method: "POST",
         headers: myHeaders,
@@ -66,9 +67,7 @@ function DelegateSessions({ props }: { props: Type }) {
 
       if (result) {
         const resultData = await result.data;
-        // console.log("resultData", resultData);
         if (Array.isArray(resultData)) {
-          // setDataLoading(true);
           let filteredData: any = resultData;
           if (searchParams.get("session") === "upcoming") {
             setDataLoading(true);
@@ -101,8 +100,6 @@ function DelegateSessions({ props }: { props: Type }) {
             console.log("attended filtered: ", filteredData);
             setSessionDetails(filteredData);
           }
-          // console.log("filtered", filteredData);
-          // setSessionDetails(filteredData);
           setDataLoading(false);
         } else {
           setDataLoading(false);
@@ -112,6 +109,8 @@ function DelegateSessions({ props }: { props: Type }) {
       }
     } catch (error) {
       console.log("error in catch", error);
+      setDataLoading(false);
+      setError("An unexpected error occurred. Please refresh the page and try again.");
     }
   };
 
@@ -123,6 +122,21 @@ function DelegateSessions({ props }: { props: Type }) {
     sessionDetails,
     searchParams.get("session"),
   ]);
+
+  const handleRetry = () => {
+    setError(null);
+    getMeetingData();
+    window.location.reload();
+  };
+  
+  if (error) return (
+    <div className="flex justify-center items-center min-h-[400px]">
+      <ErrorDisplay 
+        message={error}
+        onRetry={handleRetry}
+      />
+    </div>
+  );
 
   return (
     <div>
@@ -222,27 +236,43 @@ function DelegateSessions({ props }: { props: Type }) {
             ))} */}
           {searchParams.get("session") === "hosted" &&
             (dataLoading ? (
-              <SessionTileSkeletonLoader />
+              <RecordedSessionsSkeletonLoader />
+            ) : sessionDetails.length === 0 ? (
+              <div className="flex flex-col justify-center items-center pt-10">
+            <div className="text-5xl">☹️</div>{" "}
+            <div className="pt-4 font-semibold text-lg">
+            Oops, no such result available!
+            </div>
+            </div>
             ) : (
-              <SessionTile
-                sessionDetails={sessionDetails}
-                dataLoading={dataLoading}
-                isEvent="Recorded"
-                isOfficeHour={false}
-                isSession=""
-              />
+              // <SessionTile
+              //   sessionDetails={sessionDetails}
+              //   dataLoading={dataLoading}
+              //   isEvent="Recorded"
+              //   isOfficeHour={false}
+              //   isSession=""
+              // />
+              <RecordedSessionsTile meetingData={sessionDetails}/>
             ))}
           {searchParams.get("session") === "attended" &&
             (dataLoading ? (
-              <SessionTileSkeletonLoader />
+              <RecordedSessionsSkeletonLoader />
+            ) : sessionDetails.length === 0 ? (
+              <div className="flex flex-col justify-center items-center pt-10">
+            <div className="text-5xl">☹️</div>{" "}
+            <div className="pt-4 font-semibold text-lg">
+            Oops, no such result available!
+            </div>
+            </div>
             ) : (
-              <SessionTile
-                sessionDetails={sessionDetails}
-                dataLoading={dataLoading}
-                isEvent="Recorded"
-                isOfficeHour={false}
-                isSession=""
-              />
+              // <SessionTile
+              //   sessionDetails={sessionDetails}
+              //   dataLoading={dataLoading}
+              //   isEvent="Recorded"
+              //   isOfficeHour={false}
+              //   isSession=""
+              // />
+              <RecordedSessionsTile meetingData={sessionDetails}/>
             ))}
         </div>
       </div>
