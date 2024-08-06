@@ -204,11 +204,14 @@ function UserInfo({
 
     const sessionAttended = async () => {
       try {
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        if (address) {
+          myHeaders.append("x-wallet-address", address);
+        }
         const response = await fetch(`/api/get-session-data/${address}`, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: myHeaders,
           body: JSON.stringify({
             dao_name: dao_name,
           }),
@@ -274,11 +277,14 @@ function UserInfo({
 
     const officeHoursAttended = async () => {
       try {
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        if (address) {
+          myHeaders.append("x-wallet-address", address);
+        }
         const response = await fetch(`/api/get-attendee-individual`, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: myHeaders,
           body: JSON.stringify({
             attendee_address: address,
           }),

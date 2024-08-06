@@ -2,9 +2,12 @@ import { connectDB } from "@/config/connectDB";
 import { BASE_URL } from "@/config/constants";
 import { NextRequest, NextResponse } from "next/server";
 
-async function delegateAttestationOnchain(data: any) {
+async function delegateAttestationOffchain(data: any) {
   const myHeaders = new Headers();
   myHeaders.append("Content-Type", "application/json");
+  if(data.recipient){
+    myHeaders.append("x-wallet-address",data.recipient);
+  }
   const baseUrl = BASE_URL;
   const raw = JSON.stringify(data);
   console.log("raw", raw);
@@ -134,7 +137,7 @@ async function delegateAndSetAttestation(
   endTime: number,
   daoName: string
 ) {
-  await delegateAttestationOnchain({
+  await delegateAttestationOffchain({
     recipient,
     meetingId,
     meetingType,

@@ -29,20 +29,20 @@
 
 /* DelegateInfo.module.css */
 .delegateStatement h1 {
-    font-size: 24px;
-    /* font-weight: bold; */
+    font-size: 20px;
+    font-weight: 500;
     margin-bottom: 16px;
   }
   
   
   .delegateStatement h2 {
-    font-size: 20px;
-    /* font-weight: bold; */
+    font-size: 18px;
+    font-weight: 500;
     margin-bottom: 12px;
   }
   .delegateStatement h3 {
-    font-size: 18px;
-    /* font-weight: bold; */
+    font-size: 16px;
+    font-weight: 500;
     margin-bottom: 12px;
   }
   
@@ -66,4 +66,15 @@
   .delegateStatement a {
     color: #0070f3;
     text-decoration: underline;
+  }
+
+  .preFormatted {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    background-color: #f4f4f4;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 10px;
+    margin: 10px 0;
+    font-family: monospace;
   }

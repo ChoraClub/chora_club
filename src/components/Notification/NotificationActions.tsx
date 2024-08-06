@@ -3,7 +3,10 @@
 import React from "react";
 import { FaClock, FaUserCheck } from "react-icons/fa";
 import { IoCheckmarkCircle } from "react-icons/io5";
-import { BsDatabaseFillCheck } from "react-icons/bs";
+import {
+  BsDatabaseFillCheck,
+  BsFillExclamationCircleFill,
+} from "react-icons/bs";
 import { PiVideoFill } from "react-icons/pi";
 import { GiChaingun } from "react-icons/gi";
 import { BASE_URL } from "@/config/constants";
@@ -15,6 +18,8 @@ export const getBackgroundColor = (data: any) => {
       return "#FFE6CC";
     } else if (data?.notification_name === "newBookingForGuest") {
       return "#D4F1E0";
+    } else if (data?.notification_name === "sessionRejectionForGuest") {
+      return "#fcc5b8";
     }
   } else if (data?.notification_type === "recordedSession") {
     return "#E5CCFF";
@@ -36,6 +41,8 @@ export const getIcon = (data: any) => {
       return <FaClock color="#FF8A00" size={18} />;
     } else if (data?.notification_name === "newBookingForGuest") {
       return <IoCheckmarkCircle color="#00C259" size={18} />;
+    } else if (data?.notification_name === "sessionRejectionForGuest") {
+      return <BsFillExclamationCircleFill color="#f7552d" size={18} />;
     }
   } else if (data?.notification_type === "recordedSession") {
     return <PiVideoFill color="#9747FF" size={18} />;
@@ -95,6 +102,10 @@ export const handleRedirection = async (
         `${BASE_URL}/profile/${data.receiver_address}?active=sessions&session=book`
       );
     } else if (data.notification_name === "newBookingForGuest") {
+      router.push(
+        `${BASE_URL}/profile/${data.receiver_address}?active=sessions&session=attending`
+      );
+    } else if (data.notification_name === "sessionRejectionForGuest") {
       router.push(
         `${BASE_URL}/profile/${data.receiver_address}?active=sessions&session=attending`
       );

@@ -20,6 +20,8 @@ import {
 import AttestationModal from "../ComponentUtils/AttestationModal";
 import RecordedSessionsSkeletonLoader from "../SkeletonLoader/RecordedSessionsSkeletonLoader";
 import { useAccount } from "wagmi";
+import { RiErrorWarningLine } from "react-icons/ri";
+import { TimeoutError } from "viem";
 
 interface Session {
   booking_status: string;
@@ -46,10 +48,25 @@ function DelegatesSession({ props }: { props: string }) {
   const [tempSession, setTempSession] = useState([]);
   const [dataLoading, setDataLoading] = useState(true);
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
+  const [error, setError] = useState<string | null>(null);
 
   const { address } = useAccount();
 
   // console.log("propspropsprops", dao_name);
+
+  const ErrorDisplay = ({ message, onRetry }:any) => (
+    <div className="flex flex-col items-center justify-center p-8 bg-red-50 rounded-lg shadow-md">
+      <RiErrorWarningLine className="text-red-500 text-5xl mb-4" />
+      <h2 className="text-2xl font-bold text-red-700 mb-2">Oops! Something went wrong</h2>
+      <p className="text-red-600 text-center mb-6">{message}</p>
+      <button 
+        onClick={onRetry} 
+        className="px-6 py-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors duration-300"
+      >
+        Try Again
+      </button>
+    </div>
+  );
 
   useEffect(() => {
     const fetchData = async () => {
@@ -87,8 +104,20 @@ function DelegatesSession({ props }: { props: string }) {
         }
         // setSessionDetails(filtered);
         // console.log("filtered", filtered);
-      } catch (error) {
+      } catch (error:any) {
         console.error("Error fetching data", error);
+        if (error.name === 'TypeError' && error.message === 'Failed to fetch') {
+          setError("Please check your internet connection and try again.");
+        } else if (error.name === 'TimeoutError') {
+          setError("The request is taking longer than expected. Please try again.");
+        } else if (error.name === 'SyntaxError') {
+          setError("We're having trouble processing the data. Please try again later.");
+        } else {
+          setError("An unexpected error occurred. Please refresh the page and try again.");
+        }
+        setDataLoading(false);
+      }finally{
+        setDataLoading(false);
       }
     };
     fetchData();
@@ -103,6 +132,7 @@ function DelegatesSession({ props }: { props: string }) {
 
     if (query.length > 0) {
       setDataLoading(true);
+      try {
       const raw = JSON.stringify({
         dao_name: dao_name,
       });
@@ -120,6 +150,9 @@ function DelegatesSession({ props }: { props: string }) {
         redirect: "follow",
       };
       const res = await fetch(`/api/search-session/${query}`, requestOptions);
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
       const result = await res.json();
       const resultData = await result.data;
 
@@ -130,16 +163,51 @@ function DelegatesSession({ props }: { props: string }) {
           } else if (searchParams.get("session") === "recorded") {
             return session.meeting_status === "Recorded";
           }
+          return false;
         });
         console.log("filtered: ", filtered);
         setSessionDetails(filtered);
-        setDataLoading(false);
+        setError(null);
+      }else {
+        throw new Error("API request was not successful");
       }
+      //   setDataLoading(false);
+      // }
+    } catch (error: any) {
+      console.error("Error in handleSearchChange:", error);
+      if (error.name === 'TypeError' && error.message === 'Failed to fetch') {
+        setError("Please check your internet connection and try again.");
+      } else if (error.name === 'TimeoutError') {
+        setError("The request is taking longer than expected. Please try again.");
+      } else if (error.name === 'SyntaxError') {
+        setError("We're having trouble processing the data. Please try again later.");
+      } else {
+        setError("An unexpected error occurred. Please try again.");
+      }
+    } finally {
+      setDataLoading(false);
+    }
     } else {
       setSessionDetails(tempSession);
+      setError(null);
       setDataLoading(false);
     }
   };
+
+  const handleRetry = () => {
+    setError(null);
+    // fetchData();
+    window.location.reload();
+  };
+
+  if (error) return (
+    <div className="flex justify-center items-center min-h-[400px]">
+      <ErrorDisplay 
+        message={error}
+        onRetry={handleRetry}
+      />
+    </div>
+  );
 
   return (
     <div className="font-poppins">
@@ -213,16 +281,19 @@ function DelegatesSession({ props }: { props: string }) {
           {searchParams.get("session") === "recorded" &&
             (dataLoading ? (
               <RecordedSessionsSkeletonLoader />
-            ) : (
-              // <SessionTile
-              //   sessionDetails={sessionDetails}
-              //   dataLoading={dataLoading}
-              //   isEvent="Recorded"
-              //   isOfficeHour={false}
-              //   isSession={""}
-              // />
-              <RecordedSessionsTile meetingData={sessionDetails} />
-            ))}
+            ) : sessionDetails.length > 0 ?(
+              <RecordedSessionsTile meetingData={sessionDetails}/>
+            ):(
+              <div className="flex flex-col justify-center items-center pt-10">
+                <div className="text-5xl">☹️</div>
+                <div className="pt-4 font-semibold text-lg">
+                  {searchQuery 
+                    ? `No results found for "${searchQuery}"`
+                    : "Oops, no such result available!"}
+                </div>
+              </div>
+            ) 
+            )}
         </div>
       </div>
     </div>

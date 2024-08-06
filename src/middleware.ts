@@ -25,7 +25,7 @@ export async function middleware(request: NextRequest) {
   const walletAddress = request.headers.get("x-wallet-address");
 
   console.log(
-    "Appened headers wallet address line number 10 :-",
+    "Appened headers wallet address line number:-",
     walletAddress
   );
 
@@ -34,14 +34,14 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  console.log("Upcoming request method line number 20 :-", request.method);
+  console.log("Upcoming request method line number :-", request.method);
 
   const token = await getToken({
     req: request,
     secret: process.env.NEXTAUTH_SECRET,
   });
 
-  console.log("Token generated using nextauth line number 27 :-", token);
+  console.log("Token generated using nextauth line number :-", token);
 
   if (!token) {
     // If there's no token, the user is not authenticated
@@ -49,13 +49,14 @@ export async function middleware(request: NextRequest) {
       status: 401,
       headers: { "Content-Type": "application/json" },
     });
+    
   }
 
   // Extract the user address from the token
   const UserAddress = token.sub;
 
   console.log(
-    "Exracted user address from token line number 41 :- ",
+    "Exracted user address from token line number :- ",
     UserAddress
   );
 
@@ -70,18 +71,19 @@ export async function middleware(request: NextRequest) {
       status: 403,
       headers: { "Content-Type": "application/json" },
     });
-  } else {
-    console.log(
-      `Processed further to calling API to user with wallet address :- ${walletAddress} `
-    );
-    return new NextResponse(JSON.stringify({ message: "Accepted" }), {
-      status: 202,
-      headers: { "Content-Type": "application/json" },
-    });
   }
+  //  else {
+  //   console.log(
+  //     `Processed further to calling API to user with wallet address :- ${walletAddress} `
+  //   );
+  //   return new NextResponse(JSON.stringify({ message: "Accepted" }), {
+  //     status: 202,
+  //     headers: { "Content-Type": "application/json" },
+  //   });
+  // }
 
   // If everything is okay, continue to the API route
-  // return NextResponse.next();
+  return NextResponse.next();
 }
 
 // See "Matching Paths" below to learn more
@@ -116,5 +118,9 @@ export const config = {
     "/api/search-session/:path*",
     "/api/store-availability/:path*",
     "/api/submit-vote/:path*",
+    "/api/get-session-data/:path*",
+    "/api/attest-offchain/:path*",
+    "/api/get-attendee-individual/:path*",
+    "/api/get-dao-sessions/:path*",
   ],
 };

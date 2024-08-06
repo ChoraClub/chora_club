@@ -13,6 +13,7 @@ query MyQuery {
     description
     proposalId
     proposer
+    transactionHash
   }
 }`;
 const GET_PROPOSAL = gql`
@@ -22,6 +23,7 @@ query MyQuery($proposalId: String!) {
     description
     proposalId
     proposer
+    transactionHash
   }
 }`;
 

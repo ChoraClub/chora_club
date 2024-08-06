@@ -29,7 +29,13 @@ export async function POST(req: NextRequest, res: NextApiResponse) {
     const otherCollection = db.collection("meetings");
     const otherMeeting = await otherCollection.findOneAndUpdate(
       { meetingId },
-      { $set: { video_uri, thumbnail_image: randomCID } }
+      {
+        $set: {
+          video_uri,
+          thumbnail_image: randomCID,
+          meeting_status: "Recorded",
+        },
+      }
     );
 
     if (!officeHoursMeeting && !otherMeeting) {

@@ -26,7 +26,13 @@ import { opBlock, arbBlock } from "@/config/staticDataUtils";
 import MeetingRecordingModal from "../ComponentUtils/MeetingRecordingModal";
 import ReactionBar from "./ReactionBar";
 
-const BottomBar = ({ daoName }: { daoName: string }) => {
+const BottomBar = ({
+  daoName,
+  hostAddress,
+}: {
+  daoName: string;
+  hostAddress: string;
+}) => {
   const { isAudioOn, enableAudio, disableAudio } = useLocalAudio();
   const { isVideoOn, enableVideo, disableVideo } = useLocalVideo();
   const [showLeaveDropDown, setShowLeaveDropDown] = useState<boolean>(false);
@@ -59,7 +65,7 @@ const BottomBar = ({ daoName }: { daoName: string }) => {
     setIsScreenShared,
   } = useStudioState();
   const [showModal, setShowModal] = useState(true);
-  const [recordingStatus, setRecordingStatus] = useState<string | null>();
+  const [recordingStatus, setRecordingStatus] = useState<string | null>(null);
   const { startScreenShare, stopScreenShare, shareStream } =
     useLocalScreenShare({
       onProduceStart(data) {
@@ -110,26 +116,6 @@ const BottomBar = ({ daoName }: { daoName: string }) => {
     },
   });
 
-  const handleRecording = async () => {
-    if (isRecording) {
-      const stopRecording = await fetch(
-        `/rec/stopRecording?roomId=${room.roomId}`
-      );
-      const res = await stopRecording.json();
-      if (res) {
-        setIsRecording(false);
-      }
-    } else {
-      const startRecording = await fetch(
-        `/rec/startRecording?roomId=${room.roomId}`
-      );
-      const { msg } = await startRecording.json();
-      if (msg) {
-        setIsRecording(true);
-      }
-    }
-  };
-
   const handleStopRecording = async () => {
     console.log("stop recording");
     if (!roomId) {
@@ -162,14 +148,22 @@ const BottomBar = ({ daoName }: { daoName: string }) => {
   // }, []);
 
   useEffect(() => {
-    const storedStatus = localStorage.getItem("isMeetingRecorded");
-    console.log("storedStatus: ", storedStatus);
-    setRecordingStatus(storedStatus);
+    const storedStatus = localStorage.getItem("meetingData");
+    if (storedStatus) {
+      const parsedStatus = JSON.parse(storedStatus);
+      console.log("storedStatus: ", parsedStatus);
+      setRecordingStatus(parsedStatus.isMeetingRecorded);
+    }
+    console.log("recordingStatus: ", recordingStatus);
   }, []);
 
   const handleModalClose = async (result: boolean) => {
     if (role === "host") {
-      localStorage.setItem("isMeetingRecorded", result.toString());
+      const meetingData = {
+        meetingId: roomId,
+        isMeetingRecorded: result.toString(),
+      };
+      localStorage.setItem("meetingData", JSON.stringify(meetingData));
       setShowModal(false);
       setRecordingStatus(result.toString());
       console.log(
@@ -177,12 +171,12 @@ const BottomBar = ({ daoName }: { daoName: string }) => {
       );
 
       if (result) {
-        startRecordingAutomatically();
+        startRecording();
       }
     }
   };
 
-  const startRecordingAutomatically = async () => {
+  const startRecording = async () => {
     try {
       const status = await fetch(`/api/startRecording/${params.roomId}`);
       if (!status.ok) {
@@ -217,27 +211,21 @@ const BottomBar = ({ daoName }: { daoName: string }) => {
     setIsLoading(true);
     // Check if the user is the host
 
-    const myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-    if (address) {
-      myHeaders.append("x-wallet-address", address);
-    }
+    // const response = await fetch(`/api/get-host`, {
+    //   method: "POST",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //   },
+    //   body: JSON.stringify({
+    //     meetingId: roomId,
+    //   }),
+    // });
+    // const response_data = await response.json();
+    // const host_address = await response_data.address;
 
-    const response = await fetch(`/api/get-host`, {
-      method: "POST",
-      headers: myHeaders,
-      body: JSON.stringify({
-        meetingId: roomId,
-      }),
-    });
-    const response_data = await response.json();
-    const host_address = await response_data.address;
-
-    console.log("host address", host_address);
+    // console.log("host address", host_address);
 
     if (role === "host" && recordingStatus === "true") {
-      console.log("addresses: ", address, host_address);
-
       await handleStopRecording(); // Do not proceed with API calls if not the host
     }
 
@@ -255,89 +243,91 @@ const BottomBar = ({ daoName }: { daoName: string }) => {
       return;
     }
 
-    let meetingType;
-    if (meetingCategory === "officehours") {
-      meetingType = 2;
-    } else if (meetingCategory === "session") {
-      meetingType = 1;
-    } else {
-      meetingType = 0;
-    }
-
-    try {
-      const myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
-      if (address) {
-        myHeaders.append("x-wallet-address", address);
+    if (role === "host") {
+      let meetingType;
+      if (meetingCategory === "officehours") {
+        meetingType = 2;
+      } else if (meetingCategory === "session") {
+        meetingType = 1;
+      } else {
+        meetingType = 0;
       }
-      const requestOptions = {
-        method: "POST",
-        headers: myHeaders,
-        body: JSON.stringify({
-          roomId: roomId,
-          meetingType: meetingType,
-          dao_name: daoName,
-        }),
-      };
-      // console.log("req optionnnn", requestOptions);
 
-      const response2 = await fetch("/api/end-call", requestOptions);
-      const result = await response2.text();
-      console.log(result);
-    } catch (error) {
-      console.error("Error handling end call:", error);
-    }
+      try {
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        if (address) {
+          myHeaders.append("x-wallet-address", address);
+        }
+        const requestOptions = {
+          method: "POST",
+          headers: myHeaders,
+          body: JSON.stringify({
+            roomId: roomId,
+            meetingType: meetingType,
+            dao_name: daoName,
+          }),
+        };
+        // console.log("req optionnnn", requestOptions);
 
-    // if (recordingStatus === "true") {
-    try {
-      toast.success("Giving Attestations");
-      const myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
-      if (address) {
-        myHeaders.append("x-wallet-address", address);
+        const response2 = await fetch("/api/end-call", requestOptions);
+        const result = await response2.text();
+        console.log("result in end call::", result);
+      } catch (error) {
+        console.error("Error handling end call:", error);
       }
-      const response = await fetch(`/api/get-attest-data`, {
-        method: "POST",
-        headers: myHeaders,
-        body: JSON.stringify({
-          roomId: roomId,
-        }),
-      });
-      const response_data = await response.json();
-      console.log("Updated", response_data);
-      if (response_data.success) {
-        toast.success("Attestation successful");
-      }
-    } catch (e) {
-      console.log("Error in attestation: ", e);
-      toast.error("Attestation denied");
-    }
-    // }
 
-    try {
-      const myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
-      if (address) {
-        myHeaders.append("x-wallet-address", address);
+      if (recordingStatus === "true") {
+        try {
+          toast.success("Giving Attestations");
+          const myHeaders = new Headers();
+          myHeaders.append("Content-Type", "application/json");
+          if (address) {
+            myHeaders.append("x-wallet-address", address);
+          }
+          const response = await fetch(`/api/get-attest-data`, {
+            method: "POST",
+            headers: myHeaders,
+            body: JSON.stringify({
+              roomId: roomId,
+            }),
+          });
+          const response_data = await response.json();
+          console.log("Updated", response_data);
+          if (response_data.success) {
+            toast.success("Attestation successful");
+          }
+        } catch (e) {
+          console.log("Error in attestation: ", e);
+          toast.error("Attestation denied");
+        }
       }
-      const requestOptions = {
-        method: "PUT",
-        headers: myHeaders,
-        body: JSON.stringify({
-          meetingId: roomId,
-          meetingType: meetingCategory,
-          recordedStatus: recordingStatus,
-          meetingStatus: recordingStatus === "true" ? "Recorded" : "Finished",
-        }),
-      };
 
-      const response = await fetch(
-        "/api/update-recording-status",
-        requestOptions
-      );
-      console.log("Response: ", response);
-    } catch (e) {
-      console.log("Error: ", e);
+      try {
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        if (address) {
+          myHeaders.append("x-wallet-address", address);
+        }
+        const requestOptions = {
+          method: "PUT",
+          headers: myHeaders,
+          body: JSON.stringify({
+            meetingId: roomId,
+            meetingType: meetingCategory,
+            recordedStatus: recordingStatus,
+            meetingStatus: recordingStatus === "true" ? "Recorded" : "Finished",
+          }),
+        };
+
+        const response = await fetch(
+          "/api/update-recording-status",
+          requestOptions
+        );
+        console.log("Response: ", response);
+      } catch (e) {
+        console.log("Error: ", e);
+      }
     }
 
     if (meetingCategory === "officehours") {
@@ -347,7 +337,7 @@ const BottomBar = ({ daoName }: { daoName: string }) => {
         myHeaders.append("x-wallet-address", address);
       }
       try {
-        const res = await fetch(`/api/update-office-hours/${host_address}`, {
+        const res = await fetch(`/api/update-office-hours/${hostAddress}`, {
           method: "PUT",
           headers: myHeaders,
         });
@@ -362,8 +352,6 @@ const BottomBar = ({ daoName }: { daoName: string }) => {
         console.log("error: ", e);
       }
     }
-
-    localStorage.removeItem("isMeetingRecorded");
   };
 
   return (

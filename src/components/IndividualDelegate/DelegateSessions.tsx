@@ -7,6 +7,7 @@ import text1 from "@/assets/images/daos/texture1.png";
 import SessionTile from "../ComponentUtils/SessionTiles";
 import { Oval } from "react-loader-spinner";
 import SessionTileSkeletonLoader from "../SkeletonLoader/SessionTileSkeletonLoader";
+import {useAccount} from "wagmi";
 
 type Attendee = {
   attendee_address: string;
@@ -40,6 +41,7 @@ function DelegateSessions({ props }: { props: Type }) {
   const [dataLoading, setDataLoading] = useState(true);
   const [sessionDetails, setSessionDetails] = useState([]);
   const dao_name = props.daoDelegates;
+  const {address} =useAccount();
 
   // const dao_name = daoName.charAt(0).toUpperCase() + daoName.slice(1);
 
@@ -47,6 +49,9 @@ function DelegateSessions({ props }: { props: Type }) {
     try {
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
+      if (address) {
+        myHeaders.append("x-wallet-address", address);
+      }
 
       const raw = JSON.stringify({
         dao_name: dao_name,
@@ -136,8 +141,7 @@ function DelegateSessions({ props }: { props: Type }) {
             }`}
             onClick={() =>
               router.push(path + "?active=delegatesSession&session=book")
-            }
-          >
+            }>
             Book
           </button>
           {/* <button
@@ -172,8 +176,7 @@ function DelegateSessions({ props }: { props: Type }) {
             }`}
             onClick={() =>
               router.push(path + "?active=delegatesSession&session=hosted")
-            }
-          >
+            }>
             Hosted
           </button>
           <button
@@ -184,8 +187,7 @@ function DelegateSessions({ props }: { props: Type }) {
             }`}
             onClick={() =>
               router.push(path + "?active=delegatesSession&session=attended")
-            }
-          >
+            }>
             Attended
           </button>
         </div>

@@ -277,6 +277,10 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
           myHeaders.append("x-wallet-address", address);
         }
 
+        if (address) {
+          myHeaders.append("x-wallet-address", address);
+        }
+
         const raw = JSON.stringify({
           address: address,
           // daoName: dao,
