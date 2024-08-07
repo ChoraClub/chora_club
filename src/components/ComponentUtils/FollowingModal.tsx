@@ -19,6 +19,7 @@ interface FollowingModal {
   setfollowingmodel: any;
   isLoading: any;
   chainName: string | undefined;
+  handleUpdateFollowings: any;
 }
 function formatDate(timestamp: string) {
   const date = new Date(timestamp);
@@ -37,6 +38,7 @@ function FollowingModal({
   setfollowingmodel,
   chainName,
   isLoading,
+  handleUpdateFollowings,
 }: FollowingModal) {
   const handleCopy = (addr: string) => {
     copy(addr);
@@ -130,6 +132,12 @@ function FollowingModal({
             </div>
             <div
               className={` max-h-[60vh] overflow-y-auto ${style.customscrollbar}`}>
+              <div>
+                <button onClick={handleUpdateFollowings("optimism")}>OP</button>
+                <button onClick={handleUpdateFollowings("arbitrum")}>
+                  ARB
+                </button>
+              </div>
               {isLoading ? (
                 <div className="flex justify-center items-center h-40">
                   <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-shade-200"></div>

@@ -259,7 +259,7 @@ function MainProfile() {
     copy(addr);
     toast("Address Copied");
   };
-  const handleUpdateFollowings = async () => {
+  const handleUpdateFollowings = async (daoname: string) => {
     setfollowingmodel(true);
     setLoading(true);
     const myHeaders = new Headers();
@@ -286,7 +286,7 @@ function MainProfile() {
 
     for (const item of dbResponse.data) {
       const matchDao = item.followings.find(
-        (daoItem: any) => daoItem.dao === daoName
+        (daoItem: any) => daoItem.dao === daoname
       );
 
       if (matchDao) {
@@ -1071,6 +1071,7 @@ function MainProfile() {
                     setfollowingmodel={setfollowingmodel}
                     isLoading={isLoading}
                     chainName={chain?.name}
+                    handleUpdateFollowings={handleUpdateFollowings}
                   />
                 )}
 
@@ -1087,7 +1088,7 @@ function MainProfile() {
                       className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
                       onClick={() =>
                         followings
-                          ? handleUpdateFollowings()
+                          ? handleUpdateFollowings(daoName)
                           : toast.error(
                               "You're not following anyone yet. Start exploring delegate profiles now!"
                             )
@@ -1113,16 +1114,17 @@ function MainProfile() {
                 ) : (
                   <div className="pt-2 flex gap-5">
                     <button className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]">
-                      {followers} {" "}{followers === 0 || followers === 1
-                          ? "Follower"
-                          : "Followers"}
+                      {followers}{" "}
+                      {followers === 0 || followers === 1
+                        ? "Follower"
+                        : "Followers"}
                     </button>
 
                     <button
                       className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
                       onClick={() =>
                         followings
-                          ? handleUpdateFollowings()
+                          ? handleUpdateFollowings(daoName)
                           : toast.error(
                               "You're not following anyone yet. Start exploring delegate profiles now!"
                             )
