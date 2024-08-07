@@ -14,9 +14,14 @@ import { BsDatabaseFillCheck } from "react-icons/bs";
 import { PiVideoFill } from "react-icons/pi";
 import { FaUserCheck } from "react-icons/fa6";
 import { GiChaingun } from "react-icons/gi";
-import { formatTimestampOrDate } from "@/utils/FormatTimestampUtils";
+import { formatTimestampOrDate } from "@/utils/NotificationUtils";
 import styles from "./NotificationIconComponent.module.css";
-import { getBackgroundColor, getIcon } from "./NotificationActions";
+import {
+  getBackgroundColor,
+  getIcon,
+  handleRedirection,
+  markAsRead,
+} from "./NotificationActions";
 
 function NotificationIconComponent() {
   const router = useRouter();
@@ -176,6 +181,10 @@ function NotificationIconComponent() {
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   );
 
+  const handleMarkAndRedirection = async ({ data }: any) => {
+    await handleRedirection(data, router, markAsRead);
+  };
+
   return (
     <>
       <div
@@ -205,42 +214,62 @@ function NotificationIconComponent() {
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
           >
-            {combinedNotifications.length > 0 ? (
-              combinedNotifications.slice(0, 3).map((data, index) => (
-                <React.Fragment key={index}>
-                  <div className="flex items-center p-4 justify-between">
-                    <div className="flex gap-3">
-                      <span
-                        className="flex items-center justify-center rounded-full h-10 w-10 min-w-10"
-                        style={{
-                          backgroundColor: getBackgroundColor(data),
-                        }}
+            <div className="rounded-t-2xl overflow-hidden">
+              {combinedNotifications.length > 0 ? (
+                combinedNotifications.slice(0, 3).map((data, index) => (
+                  <>
+                    <div
+                      key={index}
+                      className={`flex items-center p-4 justify-between cursor-pointer bg-gray-200 text-black ${
+                        data.read_status ? "bg-white text-gray-500" : ""
+                      }`}
+                      onClick={() => handleMarkAndRedirection({ data })}
+                    >
+                      <div className="flex gap-3">
+                        <span
+                          className="flex items-center justify-center rounded-full h-10 w-10 min-w-10"
+                          style={{
+                            backgroundColor: getBackgroundColor(data),
+                          }}
+                        >
+                          {getIcon(data)}
+                        </span>
+                        <div>
+                          <p
+                            className={`text-xs font-semibold mb-1 line-clamp-1 text-black ${
+                              data.read_status ? "text-gray-500" : ""
+                            }`}
+                          >
+                            {data.notification_title}
+                          </p>
+                          <p
+                            className={`text-xs line-clamp-2 text-[#414141] ${
+                              data.read_status ? "text-gray-500" : ""
+                            }`}
+                          >
+                            {data.content}
+                          </p>
+                        </div>
+                      </div>
+                      <div
+                        className={`text-xs min-w-12 text-black font-semibold flex items-center justify-center ${
+                          data.read_status ? "text-gray-500 font-normal" : ""
+                        }`}
                       >
-                        {getIcon(data)}
-                      </span>
-                      <div>
-                        <p className="text-xs font-semibold cursor-default mb-1 line-clamp-1">
-                          {data.notification_title}
-                        </p>
-                        <p className="text-xs text-gray-500 line-clamp-2">
-                          {data.content}
-                        </p>
+                        {formatTimestampOrDate(data.createdAt)}
                       </div>
                     </div>
-                    <div className="text-xs text-gray-500 min-w-12 flex items-center justify-center">
-                      {formatTimestampOrDate(data.createdAt)}
-                    </div>
-                  </div>
-                  <hr className="border-[#DDDDDD] border-0.5" />
-                </React.Fragment>
-              ))
-            ) : (
-              <div className="flex flex-col items-center justify-center p-4">
-                <p className="text-gray-500 text-xs">
-                  No new notifications at the moment.
-                </p>
-              </div>
-            )}
+                    <hr className="border-[#DDDDDD] border-0.5" />
+                  </>
+                ))
+              ) : (
+                <div className="flex flex-col items-center justify-center p-4">
+                  <p className="text-gray-500 text-xs">
+                    No new notifications at the moment.
+                  </p>
+                </div>
+              )}
+            </div>
             <div className="flex justify-center p-4">
               <button
                 className="text-xs text-blue-shade-100 hover:text-blue-shade-200"

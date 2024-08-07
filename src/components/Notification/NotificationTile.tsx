@@ -10,7 +10,7 @@ import { BsDatabaseFillCheck } from "react-icons/bs";
 import { PiVideoFill } from "react-icons/pi";
 import { FaUserCheck } from "react-icons/fa6";
 import { GiChaingun } from "react-icons/gi";
-import { formatTimestampOrDate } from "@/utils/FormatTimestampUtils";
+import { formatTimestampOrDate } from "@/utils/NotificationUtils";
 import {
   getBackgroundColor,
   getIcon,
@@ -66,7 +66,7 @@ function NotificationTile({ data, index, length }: NotificationTileProps) {
           </div>
         </div>
         <div
-          className={`text-xs text-black font-bold min-w-24 flex items-center justify-center ${
+          className={`text-xs text-black font-semibold min-w-24 flex items-center justify-center ${
             readStatus ? "text-gray-500 font-normal" : ""
           }`}
         >

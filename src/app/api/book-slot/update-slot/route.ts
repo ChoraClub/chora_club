@@ -3,6 +3,12 @@ import { MongoClient, MongoClientOptions, ObjectId } from "mongodb";
 import { NextResponse, NextRequest } from "next/server";
 import { connectDB } from "@/config/connectDB";
 import { sendMail, compileBookedSessionTemplate } from "@/libs/mail";
+import { SOCKET_BASE_URL } from "@/config/constants";
+import { io } from "socket.io-client";
+import {
+  formatSlotDateAndTime,
+  getDisplayNameOrAddr,
+} from "@/utils/NotificationUtils";
 
 interface UpdateBookingStatusResponse {
   success: boolean;
@@ -14,8 +20,16 @@ export async function PUT(
   res: NextResponse<UpdateBookingStatusResponse>
 ) {
   try {
-    const { id, meeting_status, booking_status, meetingId, rejectionReason } =
-      await req.json();
+    const {
+      id,
+      meeting_status,
+      booking_status,
+      meetingId,
+      rejectionReason,
+      title,
+      slot_time,
+      dao_name,
+    } = await req.json();
 
     // Validate the ID and booking_status
     if (
@@ -70,6 +84,71 @@ export async function PUT(
     console.log("host_address", host_address);
     console.log("attendeeAddress", attendeeAddress);
 
+    if (booking_status === "Rejected") {
+      // const localSlotTime = await formatSlotDateAndTime(slot_time);
+      const localSlotTime = await formatSlotDateAndTime({
+        dateInput: slot_time,
+      });
+      const hostENSNameOrAddress = await getDisplayNameOrAddr(host_address);
+      const notificationToGuest = {
+        receiver_address: attendeeAddress,
+        content: `The session titled "${title}" on ${dao_name}, scheduled on ${localSlotTime}, has been rejected by the delegate ${hostENSNameOrAddress}.`,
+        createdAt: Date.now(),
+        read_status: false,
+        notification_name: "sessionRejectionForGuest",
+        notification_title: "Session Rejected",
+        notification_type: "newBooking",
+      };
+
+      const notificationCollection = db.collection("notifications");
+
+      const notificationResults = await notificationCollection.insertOne(
+        notificationToGuest
+      );
+
+      console.log("notificationResults", notificationResults);
+
+      if (notificationResults.acknowledged === true) {
+        const insertedNotifications = await notificationCollection
+          .find({
+            _id: { $in: Object.values(notificationResults.insertedId) },
+          })
+          .toArray();
+
+        console.log("insertedNotifications", insertedNotifications);
+      }
+
+      const dataToSendGuest = {
+        ...notificationToGuest,
+        _id: notificationResults.insertedId,
+      };
+
+      const attendee_address = attendeeAddress;
+
+      console.log("dataToSendGuest", dataToSendGuest);
+
+      const socket = io(`${SOCKET_BASE_URL}`, {
+        withCredentials: true,
+      });
+      socket.on("connect", () => {
+        console.log("Connected to WebSocket server from API");
+        socket.emit("reject_session", {
+          attendee_address,
+          dataToSendGuest,
+        });
+        console.log("Message sent from API to socket server");
+        socket.disconnect();
+      });
+
+      socket.on("connect_error", (err) => {
+        console.error("WebSocket connection error:", err);
+      });
+
+      socket.on("error", (err) => {
+        console.error("WebSocket error:", err);
+      });
+    }
+
     const delegateCollection = db.collection("delegates");
     const documentsForUserEmail = await delegateCollection
       .find({ address: attendeeAddress })
@@ -77,21 +156,22 @@ export async function PUT(
     for (const document of documentsForUserEmail) {
       const emailId = document.emailId;
       if (emailId && emailId !== "" && emailId !== undefined) {
-        if (booking_status === "Approved") {
-          try {
-            await sendMail({
-              to: emailId,
-              name: "Chora Club",
-              subject: "Session Booked",
-              body: compileBookedSessionTemplate(
-                "Your Session has been Approved.",
-                "The Session you have booked has been approved by the delegate."
-              ),
-            });
-          } catch (error) {
-            console.error("Error sending mail:", error);
-          }
-        } else if (booking_status === "Rejected") {
+        // if (booking_status === "Approved") {
+        //   try {
+        //     await sendMail({
+        //       to: emailId,
+        //       name: "Chora Club",
+        //       subject: "Session Booked",
+        //       body: compileBookedSessionTemplate(
+        //         "Your Session has been Approved.",
+        //         "The Session you have booked has been approved by the delegate."
+        //       ),
+        //     });
+        //   } catch (error) {
+        //     console.error("Error sending mail:", error);
+        //   }
+        // } else
+        if (booking_status === "Rejected") {
           try {
             await sendMail({
               to: emailId,

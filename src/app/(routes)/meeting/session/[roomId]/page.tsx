@@ -84,7 +84,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
   const { videoTrack, shareStream } = useLocalScreenShare();
   const [modalOpen, setModalOpen] = useState(false);
   const [hostModalOpen, setHostModalOpen] = useState(false);
-  const [hostAddress, setHostAddress] = useState();
+  const [hostAddress, setHostAddress] = useState<any>();
   const [daoName, setDaoName] = useState<any>();
   const { address } = useAccount();
   const { push } = useRouter();
@@ -562,7 +562,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
         name={metadata?.displayName}
         localPeerId={peerId}
       /> */}
-          <BottomBar daoName={daoName} />
+          <BottomBar daoName={daoName} hostAddress={hostAddress} />
         </div>
       ) : (
         <>

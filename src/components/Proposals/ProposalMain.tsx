@@ -28,6 +28,30 @@ import toast, { Toaster } from "react-hot-toast";
 import { useNetwork } from "wagmi";
 import { hash } from "crypto";
 import { marked } from "marked";
+import { createPublicClient, http } from 'viem'
+import { arbitrum } from 'viem/chains'
+import { Tooltip as Tooltips } from "@nextui-org/react";
+import style from "./proposalMain.module.css";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
+import { RiArrowRightUpLine, RiExternalLinkLine } from "react-icons/ri";
+import ProposalMainVotersSkeletonLoader from "../SkeletonLoader/ProposalMainVotersSkeletonLoader";
+import ProposalMainDescriptionSkeletonLoader from "../SkeletonLoader/ProposalMainDescriptionSkeletonLoader";
+import DOMPurify from "dompurify";
+
+// Create a client
+const client = createPublicClient({
+  chain: arbitrum,
+  transport: http()
+})
 
 interface ArbitrumVote {
   voter: {
@@ -61,22 +85,7 @@ interface Proposal {
   queueStartTime?: number;
   queueEndTime?: number;
 }
-import { Tooltip as Tooltips } from "@nextui-org/react";
-import style from "./proposalMain.module.css";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from "recharts";
-import { RiArrowRightUpLine, RiExternalLinkLine } from "react-icons/ri";
-import ProposalMainVotersSkeletonLoader from "../SkeletonLoader/ProposalMainVotersSkeletonLoader";
-import ProposalMainDescriptionSkeletonLoader from "../SkeletonLoader/ProposalMainDescriptionSkeletonLoader";
-import DOMPurify from "dompurify";
+
 
 function ProposalMain({ props }: { props: Props }) {
   const router = useRouter();
@@ -111,6 +120,27 @@ function ProposalMain({ props }: { props: Props }) {
     votingPower?: number;
     network: string;
   }
+       
+const getContractAddress = async (txHash:`0x${string}`) => {  
+  try {
+    // Get the transaction
+    const transaction = await client.getTransaction({ hash: txHash })
+
+    // Get the transaction receipt
+    const transactionReceipt = await client.getTransactionReceipt({ hash: txHash })
+
+   if (transaction.to) {
+      // This was a regular transaction to a contract
+      return transaction.to;
+    } else {
+      return "Not a contract interaction or creation"
+    }
+
+  } catch (error) {
+    console.error('Error:', error)
+    return "Error retrieving transaction information"
+  }
+}
 
   const StoreData = async (voteData: VoteData) => {
     // Make the API call to submit the vote
@@ -163,7 +193,7 @@ function ProposalMain({ props }: { props: Props }) {
     if (chain?.name === "Optimism") {
       chainAddress = "0xcDF27F107725988f2261Ce2256bDfCdE8B382B10"; //token contract address
     } else if (chain?.name === "Arbitrum One") {
-      chainAddress = "0x789fC99093B09aD01C34DC7251D0C89ce743e5a4";
+    chainAddress = await getContractAddress(data.transactionHash);
     } else {
       return;
     }
@@ -228,7 +258,8 @@ function ProposalMain({ props }: { props: Props }) {
       );
 
       if (!response.ok) {
-        throw new Error("Network response was not ok");
+        // throw new Error("Network response was not ok");
+        console.log("Network response was not ok");
       }
 
       const data = await response.json();
@@ -321,9 +352,8 @@ function ProposalMain({ props }: { props: Props }) {
         text = `<em>${matchem[1]}</em>`;
       }
 
-      return `<a href="${href}" title="${
-        title || ""
-      }" target="_blank" rel="noopener noreferrer" class="text-blue-shade-100">${text}</a>`;
+      return `<a href="${href}" title="${title || ""
+        }" target="_blank" rel="noopener noreferrer" class="text-blue-shade-100">${text}</a>`;
     };
 
     marked.setOptions({
@@ -522,7 +552,7 @@ function ProposalMain({ props }: { props: Props }) {
 
   useEffect(() => {
     fetchVotes();
-  }, []);
+  }, [support0Weight, support1Weight]);
 
   const formatDate = (timestamp: number): string => {
     // Convert the timestamp to milliseconds if it's in seconds
@@ -688,9 +718,9 @@ function ProposalMain({ props }: { props: Props }) {
     isArbitrum
       ? window.open(`https://arbiscan.io/tx/${transactionHash}`, "_blank")
       : window.open(
-          `https://optimistic.etherscan.io/tx/${transactionHash}`,
-          "_blank"
-        );
+        `https://optimistic.etherscan.io/tx/${transactionHash}`,
+        "_blank"
+      );
   };
 
   const shareOnTwitter = () => {
@@ -811,11 +841,13 @@ function ProposalMain({ props }: { props: Props }) {
         }
       } else {
         // Fallback to old logic if queue times are not available
-        return currentDate > votingPeriodEndData!
-          ? support1Weight! > support0Weight!
-            ? "SUCCEEDED"
-            : "DEFEATED"
-          : "PENDING";
+        return !votingPeriodEndData
+          ? "PENDING"
+          : currentDate > votingPeriodEndData
+            ? support1Weight > support0Weight
+              ? "SUCCEEDED"
+              : "DEFEATED"
+            : "PENDING";
       }
     } else {
       // Optimism logic
@@ -841,8 +873,11 @@ function ProposalMain({ props }: { props: Props }) {
         return "bg-green-200 border-green-600 text-green-600";
     }
   };
-  const Proposalstatus =
-    data && support1Weight ? getProposalStatusData() : null;
+
+  const proposal_status = getProposalStatusData();
+
+  const Proposalstatus = (data && support1Weight >= 0) || support1Weight ? proposal_status : null;
+
   const CustomXAxisTick = ({
     x,
     y,
@@ -918,9 +953,8 @@ function ProposalMain({ props }: { props: Props }) {
       </div>
 
       <div
-        className={`rounded-[1rem] mx-20 md:mx-24 px-4 md:px-12 py-6 transition-shadow duration-300 ease-in-out shadow-xl bg-gray-50 font-poppins relative ${
-          isExpanded ? "h-fit" : "h-fit"
-        }`}
+        className={`rounded-[1rem] mx-20 md:mx-24 px-4 md:px-12 py-6 transition-shadow duration-300 ease-in-out shadow-xl bg-gray-50 font-poppins relative ${isExpanded ? "h-fit" : "h-fit"
+          }`}
       >
         <div className="flex items-center justify-between">
           <div className="flex gap-2 items-center">
@@ -930,7 +964,7 @@ function ProposalMain({ props }: { props: Props }) {
               <p className="text-2xl font-semibold">{formattedTitle}</p>
             )}
           </div>
-          <div className="flex flex-wrap items-center max-w-[400px] float-left md:max-w-none md:flex-nowrap md:justify-start md:float-none">
+          <div className="flex flex-wrap items-center w-[24%] max-w-[400px] float-left md:max-w-none md:flex-nowrap md:justify-start md:float-none">
             <div className="flex items-center gap-1 flex-grow w-max	">
               <Tooltips
                 showArrow
@@ -949,7 +983,7 @@ function ProposalMain({ props }: { props: Props }) {
             <div className="flex items-center gap-1 flex-grow  mx-2">
               {isActive && (
                 <button
-                  className="align-middle select-none font-sans font-bold text-center uppercase transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-1 px-2 rounded-full bg-blue-600 text-white shadow-md shadow-blue-600/10 hover:shadow-lg hover:shadow-blue-600/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none flex-shrink-0 w-fit md:w-[100%] md:min-w-[80px] md:max-w-[200px]"
+                  className="align-middle select-none font-sans font-bold text-center uppercase transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-1 px-2 rounded-full bg-blue-600 text-white shadow-md shadow-blue-600/10 hover:shadow-lg hover:shadow-blue-600/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none flex-shrink-0 w-fit md:w-[100%]  md:max-w-[200px]"
                   type="button"
                   onClick={voteOnchain}
                   disabled={hasVoted}
@@ -960,13 +994,12 @@ function ProposalMain({ props }: { props: Props }) {
             </div>
             <div className="flex-shrink-0 mt-2 md:mt-0">
               <div
-                className={`rounded-full flex items-center justify-center text-xs py-1 px-2 font-medium ${
-                  status
-                    ? status === "Closed"
-                      ? "bg-[#f4d3f9] border border-[#77367a] text-[#77367a]"
-                      : "bg-[#f4d3f9] border border-[#77367a] text-[#77367a]"
-                    : "bg-gray-200 animate-pulse rounded-full"
-                }`}
+                className={`rounded-full flex items-center justify-center text-xs py-1 px-2 font-medium ${status
+                  ? status === "Closed"
+                    ? "bg-[#f4d3f9] border border-[#77367a] text-[#77367a]"
+                    : "bg-[#f4d3f9] border border-[#77367a] text-[#77367a]"
+                  : "bg-gray-200 animate-pulse rounded-full"
+                  }`}
               >
                 {status ? status : <div className="h-4 w-16"></div>}
               </div>
@@ -991,16 +1024,20 @@ function ProposalMain({ props }: { props: Props }) {
               <div className="animate-pulse bg-gray-200  h-4 w-32 rounded-full"></div>
             )}
           </div>
-
-          <div
-            className={`rounded-full flex items-center justify-center text-xs h-fit py-0.5 border font-medium w-24 ${
-              Proposalstatus
+          {isLoading ? (
+            <div
+              className={`rounded-full flex items-center justify-center text-xs h-fit py-0.5 border font-medium w-24 bg-gray-200 animate-pulse rounded-full`}
+            >
+              <div className="h-5 w-20"></div>
+            </div>) : (
+            <div
+              className={`rounded-full flex items-center justify-center text-xs h-fit py-0.5 border font-medium w-24 ${Proposalstatus
                 ? getStatusColor(Proposalstatus)
                 : "bg-gray-200 animate-pulse rounded-full"
-            }`}
-          >
-            {Proposalstatus ? Proposalstatus : <div className="h-5 w-20"></div>}
-          </div>
+                }`}
+            >
+              {Proposalstatus ? Proposalstatus : <div className="h-5 w-20"></div>}
+            </div>)}
         </div>
 
         <div className="text-sm mt-3">
@@ -1012,9 +1049,8 @@ function ProposalMain({ props }: { props: Props }) {
             <>
               <div
                 ref={contentRef}
-                className={` transition-max-height duration-500 ease-in-out overflow-hidden ${
-                  isExpanded ? "max-h-full" : "max-h-36"
-                }`}
+                className={` transition-max-height duration-500 ease-in-out overflow-hidden ${isExpanded ? "max-h-full" : "max-h-36"
+                  }`}
               >
                 <div
                   className="description-content"
@@ -1046,11 +1082,10 @@ function ProposalMain({ props }: { props: Props }) {
               </div>
             ) : (
               <div
-                className={`flex flex-col gap-2 py-3 pl-2 pr-1  xl:pl-3 xl:pr-2 my-3 border-gray-200 ${
-                  voterList.length > 5
-                    ? `h-[440px] overflow-y-auto ${style.scrollbar}`
-                    : "h-fit"
-                }`}
+                className={`flex flex-col gap-2 py-3 pl-2 pr-1  xl:pl-3 xl:pr-2 my-3 border-gray-200 ${voterList.length > 5
+                  ? `h-[440px] overflow-y-auto ${style.scrollbar}`
+                  : "h-fit"
+                  }`}
               >
                 {voterList.length === 0 ? (
                   <div className="flex items-center justify-center h-full text-gray-500">
@@ -1092,15 +1127,12 @@ function ProposalMain({ props }: { props: Props }) {
                         </div>
                         <div className="flex items-center space-x-4">
                           <div
-                            className={`xl:px-4 px-2 py-2 rounded-full xl:text-sm xl:w-36 w-25 flex items-center justify-center xl:font-medium text-xs ${
-                              voter.support === 1 || voter.type === "for"
-                                ? "bg-green-100 text-green-800"
-                                : "bg-red-100 text-red-800"
-                            }`}
+                            className={`xl:px-4 px-2 py-2 rounded-full xl:text-sm xl:w-36 w-25 flex items-center justify-center xl:font-medium text-xs ${voter.support === 1 ? "bg-green-100 text-green-800" : voter.support === 0 ? "bg-red-100 text-red-800" : "bg-blue-100 text-blue-800"
+                              }`}
                           >
                             {formatWeight(voter.weight / 10 ** 18)}
                             &nbsp;
-                            {voter.support === 1 ? "For" : "Against"}
+                            {voter.support === 1 ? "For" : voter.support === 0 ? "Against" : "Abstain"}
                           </div>
                           <Tooltips
                             showArrow

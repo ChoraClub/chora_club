@@ -1089,10 +1089,10 @@ function MainProfile() {
                         followings
                           ? handleUpdateFollowings()
                           : toast.error(
-                              "You have 0 following explore delegate profile now!"
+                              "You're not following anyone yet. Start exploring delegate profiles now!"
                             )
                       }>
-                      {followings} Followings
+                      {followings} Following
                     </button>
 
                     {/* <div className="">
@@ -1113,7 +1113,9 @@ function MainProfile() {
                 ) : (
                   <div className="pt-2 flex gap-5">
                     <button className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]">
-                      {followers} Followers
+                      {followers} {" "}{followers === 0 || followers === 1
+                          ? "Follower"
+                          : "Followers"}
                     </button>
 
                     <button
@@ -1122,7 +1124,7 @@ function MainProfile() {
                         followings
                           ? handleUpdateFollowings()
                           : toast.error(
-                              "You have 0 following explore delegate profile now!"
+                              "You're not following anyone yet. Start exploring delegate profiles now!"
                             )
                       }>
                       {followings} Followings

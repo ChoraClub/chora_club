@@ -32,9 +32,9 @@ type follower_details = {
 };
 type dao_following = {
   isFollowing: boolean;
-  isNotification:boolean;
+  isNotification: boolean;
   follower_address: string;
-  timestamp:Date;
+  timestamp: Date;
 };
 type followings = {
   dao: string;
@@ -199,7 +199,6 @@ export async function PUT(
   console.log("networks: ", networks);
   console.log("emailId:", emailId);
   console.log("socialHandles:", socialHandles);
-  // console.log('Emailstatus',isEmailVisible);
 
   try {
     // Connect to your MongoDB database
@@ -210,6 +209,9 @@ export async function PUT(
     // Access the collection
     const db = client.db();
     const collection = db.collection("delegates");
+    const documents = await collection
+      .find({ address: { $regex: `^${address}$`, $options: "i" } })
+      .toArray();
 
     // Prepare update fields
     const updateFields: any = {};
@@ -218,104 +220,51 @@ export async function PUT(
     if (displayName !== undefined) updateFields.displayName = displayName;
     if (emailId !== undefined) updateFields.emailId = emailId;
     if (socialHandles !== undefined) updateFields.socialHandles = socialHandles;
-    // if(isEmailVisible!=undefined) updateFields.isEmailVisible=isEmailVisible;
-
-    // const documents = await collection
-    //   .find({
-    //     address: { $regex: `^${address}$`, $options: "i" },
-    //     // daoName: daoName,
-    //   })
-    //   .toArray();
-
-    // let flag=0;
-    // documents[0].networks.map((item: any) => {
-    //   if(item.network==networks[0].network){
-    //     flag=1;
-    //   }
-    // });
-
-    // if(flag==1){
-    //   //update give discourse if user try to update discourse
-    //   console.log('exist call');
-    //   documents[0].networks=networks;
-
-    // }
-    // else{
-    //   console.log('push call');
-    //   documents[0].networks.push(networks);
-    // }
-
-    const documents = await collection
-      .find({ address: { $regex: `^${address}$`, $options: "i" } })
-      .toArray();
-
-    // if (documents.length > 0) {
-    //   const document = documents[0];
-    //   const existingNetworkIndex = document.networks.findIndex(
-    //     (item: any) => item.dao_name === networks[0].dao_name
-    //   );
-
-    //   if (existingNetworkIndex !== -1) {
-    //     console.log("exist call");
-    //     const updateQuery = {
-    //       $set: {
-    //         [`networks.${existingNetworkIndex}`]: networks[0],
-    //       },
-    //     };
-    //     await collection.updateOne({ address: document.address }, updateQuery);
-    //   } else {
-    //     console.log("push call");
-    //     const updateQuery = {
-    //       $push: {
-    //         networks: networks[0],
-    //       },
-    //     };
-    //     /* @ts-ignore */
-    //     await collection.updateOne({ address: document.address }, updateQuery);
-    //   }
-    // }
-
-    if (documents.length > 0) {
-      const document = documents[0];
-
-      // Check if networks array is provided and is not empty
-      if (document.networks?.length > 0) {
-        const existingNetworkIndex = document.networks.findIndex(
-          (item: any) => item.dao_name === networks[0].dao_name
-        );
-
-        if (existingNetworkIndex !== -1) {
-          console.log("exist call");
+    if (networks !== undefined) {
+      if (documents.length > 0) {
+        const document = documents[0];
+        console.log("document::", document);
+        if (document.networks?.length > 0) {
+          const existingNetworkIndex = document.networks.findIndex(
+            (item: any) => item.dao_name === networks[0].dao_name
+          );
+          console.log("existingNetworkIndex", existingNetworkIndex);
+          if (existingNetworkIndex !== -1) {
+            console.log("exist call");
+            const updateQuery = {
+              $set: {
+                [`networks.${existingNetworkIndex}`]: networks[0],
+              },
+            };
+            await collection.updateOne(
+              { address: document.address },
+              updateQuery
+            );
+          } else {
+            console.log("push call");
+            const updateQuery = {
+              $push: {
+                networks: networks[0],
+              },
+            };
+            await collection.updateOne(
+              { address: document.address },
+              /* @ts-ignore */
+              updateQuery
+            );
+          }
+        } else {
+          console.log("add networks field");
           const updateQuery = {
             $set: {
-              [`networks.${existingNetworkIndex}`]: networks[0],
+              networks: [networks[0]],
             },
           };
           await collection.updateOne(
             { address: document.address },
-            updateQuery
-          );
-        } else {
-          console.log("push call");
-          const updateQuery = {
-            $push: {
-              networks: networks[0],
-            },
-          };
-          await collection.updateOne(
-            { address: document.address },
-            /* @ts-ignore */
             updateQuery
           );
         }
-      } else {
-        console.log("add networks field");
-        const updateQuery = {
-          $set: {
-            networks: [networks[0]],
-          },
-        };
-        await collection.updateOne({ address: document.address }, updateQuery);
       }
     }
 

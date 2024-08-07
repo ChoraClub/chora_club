@@ -33,7 +33,14 @@ import {
   DELEGATE_CHANGED_QUERY,
   op_client,
 } from "@/config/staticDataUtils";
+import { RiErrorWarningLine } from "react-icons/ri";
 
+// Create a cache object outside of the component to persist across re-renders
+const cache: any = {
+  optimism: null,
+  arbitrum: null,
+};
+let pageCache: any = null;
 function DelegatesList({ props }: { props: string }) {
   const [delegateData, setDelegateData] = useState<any>({ delegates: [] });
   const { openChainModal } = useChainModal();
@@ -55,13 +62,39 @@ function DelegatesList({ props }: { props: string }) {
   const [delegateOpen, setDelegateOpen] = useState(false);
   const [delegateDetails, setDelegateDetails] = useState<any>();
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
   const [same, setSame] = useState(false);
   const { chain, chains } = useNetwork();
   const [delegateInfo, setDelegateInfo] = useState<any>();
   const [selectedDelegate, setSelectedDelegate] = useState<any>(null);
 
   const address = useAccount();
+
+  const handleRetry = () => {
+    setError(null);
+    setCurrentPage(0);
+    setDelegateData({ delegates: [] });
+    setTempData({ delegates: [] });
+    window.location.reload();
+    // Retry fetching data
+    // fetchData(null);
+  };
+
+  const ErrorDisplay = ({ message, onRetry }: any) => (
+    <div className="flex flex-col items-center justify-center p-8 bg-red-50 rounded-lg shadow-md">
+      <RiErrorWarningLine className="text-red-500 text-5xl mb-4" />
+      <h2 className="text-2xl font-bold text-red-700 mb-2">
+        Oops! Something went wrong
+      </h2>
+      <p className="text-red-600 text-center mb-6">{message}</p>
+      <button
+        onClick={onRetry}
+        className="px-6 py-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors duration-300"
+      >
+        Try Again
+      </button>
+    </div>
+  );
 
   const handleClose = () => {
     setIsShowing(false);
@@ -92,10 +125,10 @@ function DelegatesList({ props }: { props: string }) {
     setIsShowing(!KarmaCreditClosed);
   }, []);
 
-  // let uniqueDelegates = new Set();
   useEffect(() => {
     const fetchData = async (lastCursor: string | null) => {
       try {
+        // throw new Error(`fake error :${TimeoutError}`)
         setDataLoading(true);
         console.log("its props", props);
         console.log("currentPage", currentPage);
@@ -148,15 +181,134 @@ function DelegatesList({ props }: { props: string }) {
 
         setLastCursor(daoInfo.delegates?.pageInfo?.lastCursor);
         setDataLoading(false);
-      } catch (error) {
+      } catch (error: any) {
         console.error("Error fetching data:", error);
+        if (error.name === "TypeError" && error.message === "Failed to fetch") {
+          setError("Please check your internet connection and try again.");
+        } else if (error.name === "TimeoutError") {
+          setError(
+            "The request is taking longer than expected. Please try again."
+          );
+        } else if (error.name === "SyntaxError") {
+          setError(
+            "We're having trouble processing the data. Please try again later."
+          );
+        } else {
+          setError(
+            "Unable to load delegates. Please try again in a few moments."
+          );
+        }
       } finally {
         setPageLoading(false);
+        setDataLoading(false);
       }
     };
 
     fetchData(lastCursor || "");
   }, [currentPage]);
+
+  // let uniqueDelegates = new Set();
+  // useEffect(() => {
+  const fetchData = async (lastCursor: string | null) => {
+    try {
+      setDataLoading(true);
+      console.log("its props", props);
+      console.log("currentPage", currentPage);
+      const res = await fetch(
+        props === "arbitrum"
+          ? `/api/get-arbitrum-delegatelist?lastCursor=${lastCursor || ""}`
+          : `/api/get-delegatelist?currentPage=${currentPage}`
+      );
+      console.log("res", res);
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+
+      const daoInfo = await res.json();
+      let formattedDelegates;
+      if (props === "arbitrum") {
+        formattedDelegates = daoInfo.delegates.nodes.map((delegate: any) => {
+          return {
+            delegate: delegate.account.address,
+            adjustedBalance: delegate.votesCount / 10 ** 18,
+            ensName: delegate.account.ens,
+            profilePicture: delegate.account.picture,
+          };
+        });
+      } else {
+        formattedDelegates = await Promise.all(
+          daoInfo.map(async (delegate: any) => {
+            // const ensName = await getEnsNameOfUser(delegate._id);
+            const avatar = await fetchEnsAvatar(delegate._id);
+            // console.log("avatar", avatar);
+            return {
+              delegate: delegate._id,
+              adjustedBalance: delegate.adjustedBalance,
+              newBalance: delegate.newBalance,
+              profilePicture: avatar?.avatar,
+              ensName: avatar?.ensName,
+            };
+          })
+        );
+      }
+
+      setDelegateData((prevData: any) => ({
+        delegates: [...prevData.delegates, ...formattedDelegates],
+      }));
+      // { delegates : [...formattedDelegates]};
+      setTempData((prevData: any) => ({
+        delegates: [...prevData.delegates, ...formattedDelegates],
+      }));
+
+      setLastCursor(daoInfo.delegates?.pageInfo?.lastCursor);
+      console.log("lastCursor", daoInfo);
+      setDataLoading(false);
+      cache[props] = {
+        delegates: [...(cache[props]?.delegates || []), ...formattedDelegates],
+        lastCursor: daoInfo.delegates?.pageInfo?.lastCursor || null,
+      };
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setPageLoading(false);
+    }
+  };
+
+  // fetchData(lastCursor || "");
+  // }, [currentPage]);
+  // useEffect(() => {
+  //   fetchData(lastCursor || "");
+  // },[currentPage]);
+
+  useEffect(() => {
+    console.log(cache[props]);
+    if (cache[props]) {
+      console.log("Using cached data");
+      // Use cached data if available
+      console.log("pageCache", pageCache);
+      console.log(cache[props]);
+      setDelegateData(cache[props]);
+      setCurrentPage(pageCache + 1);
+      setTempData(cache[props]);
+      setLastCursor(cache[props].lastCursor || null);
+      setPageLoading(false);
+      setDataLoading(false);
+    } else {
+      // Fetch data if not in cache
+      console.log("Fetching data");
+      setDataLoading(true);
+      fetchData(null);
+      setDataLoading(false);
+    }
+  }, [props]);
+
+  useEffect(() => {
+    console.log("last", lastCursor);
+    if (currentPage > 0 || lastCursor) {
+      fetchData(lastCursor || "");
+    }
+  }, [currentPage]);
+
   const debounce = (func: (...args: any[]) => void, wait: number) => {
     let timeout: NodeJS.Timeout;
     return (...args: any[]) => {
@@ -245,27 +397,41 @@ function DelegatesList({ props }: { props: string }) {
       setIsSearching(true);
       window.removeEventListener("scroll", handleScroll);
 
-      const res = await fetch(
-        `https://api.karmahq.xyz/api/dao/search-delegate?user=${query}&pageSize=10&offset=0&period=lifetime&order=desc&dao=${props}`
-      );
-      const filtered = await res.json().then((delegates) => delegates.data);
+      try {
+        const res = await fetch(
+          `https://api.karmahq.xyz/api/dao/search-delegate?user=${query}&pageSize=10&offset=0&period=lifetime&order=desc&dao=${props}`
+        );
+        const filtered = await res.json().then((delegates) => delegates.data);
 
-      console.log(
-        "Filtered Data: ",
-        query,
-        filtered.delegates[0].publicAddress
-      );
-      const formattedDelegates = filtered.delegates.map((delegate: any) => ({
-        // console.log("delegate",delegate)
-        delegate: delegate.publicAddress,
-        adjustedBalance: delegate.delegatedVotes,
-        // newBalance: delegate.newBalance,
-        profilePicture: delegate.profilePicture, // Assuming `avatar` is a property of delegate
-        ensName: delegate.ensName, // Uncomment if ensName is needed and exists
-      }));
-      console.log("formattedDelegates", formattedDelegates);
-      setDelegateData({ delegates: formattedDelegates });
-      setPageLoading(false);
+        // console.log(
+        //   "Filtered Data: ",
+        //   query,
+        //   filtered.delegates[0].publicAddress
+        // );
+
+        if (filtered.delegates && filtered.delegates.length > 0) {
+          const formattedDelegates = filtered.delegates.map(
+            (delegate: any) => ({
+              // console.log("delegate",delegate)
+              delegate: delegate.publicAddress,
+              adjustedBalance: delegate.delegatedVotes,
+              // newBalance: delegate.newBalance,
+              profilePicture: delegate.profilePicture, // Assuming `avatar` is a property of delegate
+              ensName: delegate.ensName, // Uncomment if ensName is needed and exists
+            })
+          );
+          console.log("formattedDelegates", formattedDelegates);
+          setDelegateData({ delegates: formattedDelegates });
+          // setPageLoading(false);
+        } else {
+          // No results found
+          setDelegateData({ delegates: [] });
+        }
+      } catch (error) {
+        console.error("Error fetching search results:", error);
+        setDelegateData({ delegates: [] });
+        setPageLoading(false);
+      }
     } else {
       // console.log("in else");
       setIsSearching(false);
@@ -273,6 +439,7 @@ function DelegatesList({ props }: { props: string }) {
       setPageLoading(false);
       window.addEventListener("scroll", handleScroll);
     }
+    setPageLoading(false);
   };
 
   const handleScroll = debounce(() => {
@@ -284,6 +451,7 @@ function DelegatesList({ props }: { props: string }) {
     ) {
       console.log("fetching more data");
       setCurrentPage((prev) => prev + 1);
+      pageCache = currentPage + 1;
     }
   }, 200); // Adjust the debounce wait time as necessary
 
@@ -536,6 +704,14 @@ function DelegatesList({ props }: { props: string }) {
     }
   };
 
+  if (error) {
+    return (
+      <div className="flex justify-center items-center min-h-[400px]">
+        <ErrorDisplay message={error} onRetry={handleRetry} />
+      </div>
+    );
+  }
+
   return (
     <div>
       {isShowing && (
@@ -782,7 +958,9 @@ function DelegatesList({ props }: { props: string }) {
           <div className="flex flex-col justify-center items-center pt-10">
             <div className="text-5xl">☹️</div>{" "}
             <div className="pt-4 font-semibold text-lg">
-              Oops, no such result available!
+              {searchQuery
+                ? `No results found for "${searchQuery}"`
+                : "Oops, no such result available!"}
             </div>
           </div>
         )}

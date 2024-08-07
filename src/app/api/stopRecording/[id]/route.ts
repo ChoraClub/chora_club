@@ -27,45 +27,22 @@ export async function GET(
     process.env.NEXT_PUBLIC_API_KEY
   );
 
-  const recording = await recorder.stop({
-    roomId: roomId as string,
-  });
+  try {
+    const recording = await recorder.stop({ roomId: roomId as string });
+    console.log("recording", recording);
 
-  console.log("recording", recording);
+    const { msg } = recording;
 
-  const { msg } = recording;
-
-  if (msg === "Stopped") {
-    return new Promise((resolve, reject) => {
-      setTimeout(async () => {
-        try {
-          const headers: Record<string, string> = {};
-          if (process.env.NEXT_PUBLIC_API_KEY) {
-            headers["x-api-key"] = process.env.NEXT_PUBLIC_API_KEY;
-          }
-
-          const response = await fetch(
-            "https://api.huddle01.com/api/v1/get-recordings",
-            {
-              headers,
-            }
-          );
-          const data = await response.json();
-
-          const { recordings } = await data as { recordings: Recordings[] };
-
-          resolve(
-            NextResponse.json(
-              { video_uri: recordings[0]?.recordingUrl },
-              { status: 200 }
-            )
-          );
-        } catch (error) {
-          reject(error);
-        }
-      }, 10000); // 5 seconds timeout
-    });
+    if (msg === "Stopped") {
+      return NextResponse.json({ success: true }, { status: 200 });
+    } else {
+      return NextResponse.json({ success: false }, { status: 400 });
+    }
+  } catch (error) {
+    console.error("Error stopping recording:", error);
+    return NextResponse.json(
+      { error: "Failed to stop recording", success: false },
+      { status: 500 }
+    );
   }
-
-  return NextResponse.json({ recording }, { status: 200 });
 }
