@@ -26,8 +26,8 @@ export async function POST(req: NextRequest, res: NextApiResponse) {
 
     // Update video_uri in the other collection
     const randomCID = getRandomElementFromArray(imageCIDs);
-    const otherCollection = db.collection("meetings");
-    const otherMeeting = await otherCollection.findOneAndUpdate(
+    const meetingsCollection = db.collection("meetings");
+    const sessionMeeting = await meetingsCollection.findOneAndUpdate(
       { meetingId },
       {
         $set: {
@@ -38,7 +38,7 @@ export async function POST(req: NextRequest, res: NextApiResponse) {
       }
     );
 
-    if (!officeHoursMeeting && !otherMeeting) {
+    if (!officeHoursMeeting && !sessionMeeting) {
       return NextResponse.json(
         { message: "Meeting not found with the given meetingId" },
         { status: 404 }

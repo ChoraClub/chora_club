@@ -98,7 +98,7 @@ const BottomBar = ({ daoName }: { daoName: string }) => {
 
         try {
           const response = await fetch("/api/update-video-uri", requestOptions);
-          const result = await response.text();
+          const result = await response.json();
           console.log(result);
         } catch (error) {
           console.error(error);

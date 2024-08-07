@@ -25,10 +25,12 @@ export async function POST(
         [`${roleField}.hasResponded`]: true,
       },
       $push: {
-        [`${roleField}.feedbackType.platformExperience`]:
-          data.platformExperience,
-        [`${roleField}.feedbackType.platformRecommendation`]:
-          data.platformRecommendation,
+        [`${roleField}.feedbackType.platformExperience`]: {
+          $each: data.platformExperience,
+        },
+        [`${roleField}.feedbackType.platformRecommendation`]: {
+          $each: data.platformRecommendation,
+        },
       },
     };
 

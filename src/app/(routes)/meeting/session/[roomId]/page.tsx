@@ -93,12 +93,41 @@ export default function Component({ params }: { params: { roomId: string } }) {
   const [notAllowedMessage, setNotAllowedMessage] = useState<string>();
   const [videoStreamTrack, setVideoStreamTrack] = useState<any>("");
   const [showFeedbackPopups, setShowFeedbackPopups] = useState(false);
-  const [hasResponded, setHasResponded] = useState(false);
+  const [meetingRecordingStatus, setMeetingRecordingStatus] =
+    useState<boolean>();
 
   const { state } = useRoom({
     onLeave: async ({ reason }) => {
       if (reason === "CLOSED") {
-        if (hasResponded) {
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+
+        if (address) {
+          myHeaders.append("x-wallet-address", address);
+        }
+
+        const raw = JSON.stringify({
+          address: address,
+          role: role,
+        });
+
+        const requestOptions: any = {
+          method: "POST",
+          headers: myHeaders,
+          body: raw,
+          redirect: "follow",
+        };
+
+        const response = await fetch(
+          "/api/feedback/get-feedback-status",
+          requestOptions
+        );
+
+        const result = await response.json();
+
+        console.log("result: ", result);
+
+        if (result.data) {
           setShowFeedbackPopups(false);
           handlePopupRedirection();
         } else {
@@ -207,6 +236,15 @@ export default function Component({ params }: { params: { roomId: string } }) {
       changeAudio();
     }
   }, [audioInputDevice]);
+
+  useEffect(() => {
+    const storedStatus = localStorage.getItem("meetingData");
+    if (storedStatus) {
+      const parsedStatus = JSON.parse(storedStatus);
+      console.log("storedStatus: ", parsedStatus);
+      setMeetingRecordingStatus(parsedStatus.isMeetingRecorded);
+    }
+  }, []);
 
   const handleModalClose = () => {
     setModalOpen(false);
@@ -587,7 +625,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
         <AttestationModal isOpen={modalOpen} onClose={handleModalClose} />
       )}
       {role === "host" && hostModalOpen && (
-        <AttestationModal isOpen={modalOpen} onClose={handleModalClose} />
+        <AttestationModal isOpen={hostModalOpen} onClose={handleModalClose} />
       )}
     </>
   );
