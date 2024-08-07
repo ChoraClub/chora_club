@@ -544,9 +544,7 @@ function MainProfile() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch data from your backend API to check if the address exists
         console.log("Fetching from DB");
-        // const dbResponse = await axios.get(`/api/profile/${address}`);
 
         let dao =
           chain?.name === "Optimism"
@@ -641,11 +639,6 @@ function MainProfile() {
           }
           setIsPageLoading(false);
         } else {
-          // const res = await fetch(
-          //   `https://api.karmahq.xyz/api/dao/find-delegate?dao=${dao}&user=${address}`
-          // );
-          // const details = await res.json();
-          // console.log("details: ", details.data.delegate);
 
           setUserData({
             displayName: karmaDetails.data.delegate.ensName,
@@ -794,12 +787,10 @@ function MainProfile() {
           github: modalData.github,
         });
       } else {
-        // Handle error response
         console.error("Failed to add delegate:", response.statusText);
         setIsLoading(false);
       }
     } catch (error) {
-      // Handle API call error
       console.error("Error calling POST API:", error);
       setIsLoading(false);
     }
@@ -808,7 +799,6 @@ function MainProfile() {
   // Function to handle updating an existing delegate
   const handleUpdate = async (newDescription?: string) => {
     try {
-      // Call the PUT API function for updating an existing delegate
 
       let dao =
         chain?.name === "Optimism"
@@ -818,11 +808,6 @@ function MainProfile() {
           : "";
       console.log("Updating");
       console.log("Inside Updating Description", newDescription);
-      // const myHeaders = new Headers();
-      // myHeaders.append("Content-Type", "application/json");
-      // if (address) {
-      //   myHeaders.append("x-wallet-address", address);
-      // }
       const response: any = await axios.put(
         "/api/profile",
         {
@@ -853,9 +838,7 @@ function MainProfile() {
         }
       );
       console.log("response", response);
-      // Handle response from the PUT API function
       if (response.data.success) {
-        // Delegate updated successfully
         console.log("Delegate updated successfully");
         setIsLoading(false);
         setUserData({
@@ -867,12 +850,10 @@ function MainProfile() {
           github: modalData.github,
         });
       } else {
-        // Handle error response
         console.error("Failed to update delegate:", response.error);
         setIsLoading(false);
       }
     } catch (error) {
-      // Handle API call error
       console.error("Error calling PUT API:", error);
       setIsLoading(false);
     }
@@ -1037,13 +1018,6 @@ function MainProfile() {
                     </span>
                   </Tooltip>
                   <div className="flex space-x-2">
-                    {/* <span className="p-2 bg-gray-200 rounded-lg text-black">
-                      {typeof window !== "undefined" &&
-                        `${BASE_URL}/${
-                          chain?.name === "Optimism" ? "optimism" : "arbitrum"
-                        }/${address}?active=info`}
-                      Copy to Share Profile URL on Warpcast
-                    </span> */}
                     <Tooltip
                       content="Copy your profile URL to share on Warpcast or Twitter."
                       placement="bottom"
@@ -1071,8 +1045,6 @@ function MainProfile() {
                     </Tooltip>
                   </div>
                 </div>
-
-                {/* {isOpentoaster && toast.loading("Saving...")} */}
 
                 {isOpenFollowings && (
                   <FollowingModal
@@ -1105,21 +1077,6 @@ function MainProfile() {
                       }>
                       {followings} Following
                     </button>
-
-                    {/* <div className="">
-                      <select
-                        value={daoName}
-                        onChange={(e) => setDaoName(e.target.value)}
-                        className="outline-none border border-blue-shade-200 text-blue-shade-200 rounded-full py-2 px-3"
-                      >
-                        <option value="optimism" className="text-gray-700">
-                          Optimism
-                        </option>
-                        <option value="arbitrum" className="text-gray-700">
-                          Arbitrum
-                        </option>
-                      </select>
-                    </div> */}
                   </div>
                 ) : (
                   <div className="pt-2 flex gap-5">
@@ -1262,7 +1219,6 @@ function MainProfile() {
             ) : (
               ""
             )}
-            {/* {searchParams.get("active") === "claimNft" ? <ClaimNFTs /> : ""} */}
           </div>
         </div>
       ) : (

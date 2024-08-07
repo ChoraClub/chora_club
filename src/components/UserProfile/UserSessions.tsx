@@ -4,14 +4,10 @@ import BookedUserSessions from "./UserAllSessions/BookedUserSessions";
 import AttendingUserSessions from "./UserAllSessions/AttendingUserSessions";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useRouter } from "next-nprogress-bar";
-import text1 from "@/assets/images/daos/texture1.png";
-import text2 from "@/assets/images/daos/texture2.png";
-import EventTile from "../ComponentUtils/EventTile";
-// import HostedUserSessions from "./UserAllSessions/HostedUserSessions";
-// import AttendedUserSessions from "./UserAllSessions/AttendedUserSessions";
 import { useNetwork, useAccount } from "wagmi";
 import RecordedSessionsTile from "../ComponentUtils/RecordedSessionsTile";
 import RecordedSessionsSkeletonLoader from "../SkeletonLoader/RecordedSessionsSkeletonLoader";
+import ErrorDisplay from "../ComponentUtils/ErrorDisplay";
 
 interface UserSessionsProps {
   isDelegate: boolean | undefined;
@@ -21,7 +17,7 @@ interface UserSessionsProps {
 
 type Attendee = {
   attendee_address: string;
-  attendee_uid?: string; // Making attendee_uid optional
+  attendee_uid?: string; 
 };
 
 interface Session {
@@ -50,14 +46,18 @@ function UserSessions({
   const { chain, chains } = useNetwork();
   const [sessionDetails, setSessionDetails] = useState([]);
   const [dataLoading, setDataLoading] = useState(true);
-  // const [daoName, setDaoName] = useState("");
   const [attendedDetails, setAttendedDetails] = useState([]);
   const [hostedDetails, setHostedDetails] = useState([]);
+  const [error, setError] = useState<string | null>(null);
 
-  let dao_name = "";
+  const handleRetry = () => {
+    setError(null);
+    getUserMeetingData();
+    window.location.reload();
+  };
+
   const getUserMeetingData = async () => {
     try {
-      // setDataLoading(true);
       const response = await fetch(`/api/get-sessions`, {
         method: "POST",
         headers: {
@@ -69,28 +69,20 @@ function UserSessions({
         }),
       });
 
-      // console.log("Response", response);
-
       const result = await response.json();
-      console.log("result", result);
       if (result.success) {
         const hostedData = await result.hostedMeetings;
-        console.log("hostedData", hostedData);
         const attendedData = await result.attendedMeetings;
-        console.log("attendedData", attendedData);
         setDataLoading(true);
         if (searchParams.get("session") === "hosted") {
-          // setSessionDetails(hostedData);
           setHostedDetails(hostedData);
-          console.log("in session hosted");
         } else if (searchParams.get("session") === "attended") {
-          // setSessionDetails(attendedData);
           setAttendedDetails(attendedData);
         }
         setDataLoading(false);
       }
     } catch (error) {
-      console.log("error in catch", error);
+      setError("Unable to load sessions. Please try again in a few moments.");
       setDataLoading(false);
     }
   };
@@ -114,6 +106,14 @@ function UserSessions({
       router.replace(path + "?active=sessions&session=attending");
     }
   }, [selfDelegate]);
+
+  if (error) {
+    return (
+      <div className="flex justify-center items-center min-h-[400px]">
+        <ErrorDisplay message={error} onRetry={handleRetry} />
+      </div>
+    );
+  }
   return (
     <div>
       <div className="pr-14 pt-3">
@@ -202,21 +202,36 @@ function UserSessions({
             searchParams.get("session") === "hosted" &&
             (dataLoading ? (
               <RecordedSessionsSkeletonLoader />
+            ) : hostedDetails.length === 0 ? (
+              <div className="flex flex-col justify-center items-center pt-10">
+                <div className="text-5xl">☹️</div>{" "}
+                <div className="pt-4 font-semibold text-lg">
+                  Oops, no such result available!
+                </div>
+              </div>
             ) : (
               <RecordedSessionsTile
-              meetingData={hostedDetails}
-              showClaimButton={true}
-              session="hosted"
-            />
+                meetingData={hostedDetails}
+                showClaimButton={true}
+                session="hosted"
+              />
             ))}
+
           {searchParams.get("session") === "attended" &&
             (dataLoading ? (
               <RecordedSessionsSkeletonLoader />
+            ) : attendedDetails.length === 0 ? (
+              <div className="flex flex-col justify-center items-center pt-10">
+                <div className="text-5xl">☹️</div>{" "}
+                <div className="pt-4 font-semibold text-lg">
+                  Oops, no such result available!
+                </div>
+              </div>
             ) : (
               <RecordedSessionsTile
-              meetingData={attendedDetails}
-              showClaimButton={true}
-            />
+                meetingData={attendedDetails}
+                showClaimButton={true}
+              />
             ))}
         </div>
       </div>

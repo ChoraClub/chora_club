@@ -115,9 +115,7 @@ function UserInfo({
   const [originalDesc, setOriginalDesc] = useState(description || karmaDesc);
 
   useEffect(() => {
-    // Check if the window object exists (client-side)
     if (typeof window !== "undefined") {
-      // Access document object here
       console.log("document name ", document.title);
     }
   }, []);
@@ -243,7 +241,6 @@ function UserInfo({
           }),
         });
         const result = await response.json();
-        // console.log("office hours result: ", result);
         if (result.length > 0) {
           result.forEach((item: any) => {
             if (
@@ -254,7 +251,6 @@ function UserInfo({
               officehoursHostingCount++;
             }
 
-            // console.log("office hours host count: ", officehoursHostingCount);
             setOfficehoursHostCount(officehoursHostingCount);
             setOfficeHoursHostedLoading(false);
           });
@@ -278,7 +274,6 @@ function UserInfo({
           }),
         });
         const result = await response.json();
-        // console.log("office hours attended result: ", result);
         if (result.length > 0) {
           result.forEach((item: any) => {
             if (
@@ -343,16 +338,10 @@ function UserInfo({
     );
   }
 
-  // const handleDescChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
-  //   setTempDesc(event.target.value);
-  //   console.log("Temp Desc", event.target.value);
-  // };
 
   const handleDescChange = (value?: string) => {
-    // Update the tempDesc state with the new value
     setTempDesc(value || "");
     console.log("Temp Desc", value);
-    // setEditing(true);
   };
 
   const handleSaveClick = async () => {
@@ -364,12 +353,12 @@ function UserInfo({
   };
 
   const handleCancelClick = () => {
-    setTempDesc(originalDesc); // Restore the original description
-    setEditing(false); // Set isEditing to false
+    setTempDesc(originalDesc); 
+    setEditing(false); 
   };
 
   useEffect(() => {
-    setOriginalDesc(description || karmaDesc); // Update originalDesc whenever description or karmaDesc changes
+    setOriginalDesc(description || karmaDesc); 
     setTempDesc(description || karmaDesc);
   }, [description, karmaDesc]);
 
@@ -436,15 +425,6 @@ function UserInfo({
           className={`flex flex-col justify-between min-h-48 rounded-xl my-7 me-32 p-6
         ${isEditing ? "outline" : ""}`}
         >
-          {/* <ReactQuill
-            readOnly={!isEditing}
-            value={isEditing ? tempDesc :( description || karmaDesc)}
-            onChange={handleDescChange}
-            modules={{
-              toolbar: toolbarOptions,
-            }}
-            placeholder={"Type your description here ..."}
-          /> */}
 
           <StyledMDEditorWrapper>
             <MDEditor
@@ -457,24 +437,11 @@ function UserInfo({
               previewOptions={{
                 rehypePlugins: [[rehypeSanitize]],
               }}
-              // style={{
-              //   backgroundColor: '#f5f5f5',
-              //   fontSize: '16px',
-              // }}
               textareaProps={{
                 placeholder: "Type your description here...",
               }}
             />
           </StyledMDEditorWrapper>
-
-          {/* <textarea
-          readOnly={!isEditing}
-          className="outline-none min-h-48"
-          onChange={handleDescChange}
-          value={isEditing ? tempDesc : description || karmaDesc}
-          placeholder={"Type your description here..."}
-          // style={{height:"200px",width:"250px"}}
-        /> */}
 
           <div className="flex justify-end mt-3">
             {isEditing ? (

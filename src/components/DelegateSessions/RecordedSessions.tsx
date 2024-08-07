@@ -50,13 +50,10 @@ function RecordedSessions() {
       }
 
       const resultData = await response.json();
-      // console.log("result data: ", resultData);
 
       if (resultData.success) {
-        console.log("result data: ", resultData.data);
         setMeetingData(resultData.data);
         setSearchMeetingData(resultData.data);
-        // setIsLoading(false);
       } else {
         throw new Error(resultData.message || "Failed to fetch meeting data");
       }
@@ -90,12 +87,10 @@ function RecordedSessions() {
     setSearchQuery(query);
     if (query) {
       const filtered = searchMeetingData.filter((item: any) => {
-        // Convert both query and userAddress to lowercase for case-insensitive matching
         const lowercaseQuery = query.toLowerCase();
         const lowercaseAddress = item.host_address.toLowerCase();
         const lowercaseTitle = item.title.toLowerCase();
 
-        // Check if the lowercase userAddress includes the lowercase query
         return (
           lowercaseAddress.includes(lowercaseQuery) ||
           lowercaseTitle.includes(lowercaseQuery)
@@ -201,18 +196,6 @@ function RecordedSessions() {
           </div>
         )}
       </div>
-      {/* <Toaster
-        toastOptions={{
-          style: {
-            fontSize: "14px",
-            backgroundColor: "#3E3D3D",
-            color: "#fff",
-            boxShadow: "none",
-            borderRadius: "50px",
-            padding: "3px 5px",
-          },
-        }}
-      /> */}
     </>
   );
 }

@@ -20,7 +20,6 @@ import dao_abi from "../../artifacts/Dao.sol/GovernanceToken.json";
 import { useAccount, useNetwork } from "wagmi";
 import WalletAndPublicClient from "@/helpers/signer";
 import ErrorDisplay from "../ComponentUtils/ErrorDisplay";
-// import { getEnsNameOfUser } from "../ConnectWallet/ENSResolver";
 import {
   processAddressOrEnsName,
   resolveENSProfileImage,
@@ -35,7 +34,6 @@ import {
   op_client,
 } from "@/config/staticDataUtils";
 
-// Create a cache object outside of the component to persist across re-renders
 const cache: any = {
   optimism: null,
   arbitrum: null,
@@ -94,7 +92,6 @@ function DelegatesList({ props }: { props: string }) {
   useEffect(() => {
     const fetchData = async (lastCursor: string | null) => {
       try {
-        // throw new Error(`fake error :${TimeoutError}`)
         setDataLoading(true);
         console.log("its props", props);
         console.log("currentPage", currentPage);
@@ -123,9 +120,7 @@ function DelegatesList({ props }: { props: string }) {
         } else {
           formattedDelegates = await Promise.all(
             daoInfo.map(async (delegate: any) => {
-              // const ensName = await getEnsNameOfUser(delegate._id);
               const avatar = await fetchEnsAvatar(delegate._id);
-              // console.log("avatar", avatar);
               return {
                 delegate: delegate._id,
                 adjustedBalance: delegate.adjustedBalance,
@@ -173,8 +168,6 @@ function DelegatesList({ props }: { props: string }) {
     fetchData(lastCursor || "");
   }, [currentPage]);
 
-  // let uniqueDelegates = new Set();
-  // useEffect(() => {
   const fetchData = async (lastCursor: string | null) => {
     try {
       setDataLoading(true);
@@ -204,9 +197,7 @@ function DelegatesList({ props }: { props: string }) {
       } else {
         formattedDelegates = await Promise.all(
           daoInfo.map(async (delegate: any) => {
-            // const ensName = await getEnsNameOfUser(delegate._id);
             const avatar = await fetchEnsAvatar(delegate._id);
-            // console.log("avatar", avatar);
             return {
               delegate: delegate._id,
               adjustedBalance: delegate.adjustedBalance,
@@ -221,7 +212,6 @@ function DelegatesList({ props }: { props: string }) {
       setDelegateData((prevData: any) => ({
         delegates: [...prevData.delegates, ...formattedDelegates],
       }));
-      // { delegates : [...formattedDelegates]};
       setTempData((prevData: any) => ({
         delegates: [...prevData.delegates, ...formattedDelegates],
       }));
@@ -240,17 +230,10 @@ function DelegatesList({ props }: { props: string }) {
     }
   };
 
-  // fetchData(lastCursor || "");
-  // }, [currentPage]);
-  // useEffect(() => {
-  //   fetchData(lastCursor || "");
-  // },[currentPage]);
-
   useEffect(() => {
     console.log(cache[props]);
     if (cache[props]) {
       console.log("Using cached data");
-      // Use cached data if available
       console.log("pageCache", pageCache);
       console.log(cache[props]);
       setDelegateData(cache[props]);
@@ -260,7 +243,6 @@ function DelegatesList({ props }: { props: string }) {
       setPageLoading(false);
       setDataLoading(false);
     } else {
-      // Fetch data if not in cache
       console.log("Fetching data");
       setDataLoading(true);
       fetchData(null);
@@ -283,14 +265,10 @@ function DelegatesList({ props }: { props: string }) {
     };
   };
     const handleSearchChange = async (query: string) => {
-    // console.log("query: ", query.length);
-
     setSearchQuery(query);
     setPageLoading(true);
 
     if (query.length > 0) {
-      // console.log("Delegate data: ", query, delegateData);
-      // console.log(delegateData);
       setIsSearching(true);
       window.removeEventListener("scroll", handleScroll);
 
@@ -300,21 +278,13 @@ function DelegatesList({ props }: { props: string }) {
         );
         const filtered = await res.json().then((delegates) => delegates.data);
 
-        // console.log(
-        //   "Filtered Data: ",
-        //   query,
-        //   filtered.delegates[0].publicAddress
-        // );
-
         if (filtered.delegates && filtered.delegates.length > 0) {
           const formattedDelegates = filtered.delegates.map(
             (delegate: any) => ({
-              // console.log("delegate",delegate)
               delegate: delegate.publicAddress,
               adjustedBalance: delegate.delegatedVotes,
-              // newBalance: delegate.newBalance,
-              profilePicture: delegate.profilePicture, // Assuming `avatar` is a property of delegate
-              ensName: delegate.ensName, // Uncomment if ensName is needed and exists
+              profilePicture: delegate.profilePicture, 
+              ensName: delegate.ensName,
             })
           );
           console.log("formattedDelegates", formattedDelegates);
@@ -495,18 +465,12 @@ function DelegatesList({ props }: { props: string }) {
             delegator: address,
           });
         }
-        // const ens = await getEnsNameOfUser(
-        //   data.delegateChangeds[0]?.toDelegate
-        // );
         console.log("data of individual delegate: ", data.data);
         const delegate = data.data.delegateChangeds[0]?.toDelegate;
         console.log("individualDelegate", delegate);
         setSame(
           delegate.toLowerCase() === delegateObject.delegate.toLowerCase()
         );
-        // ens
-        // ? setDelegate(ens)
-        // :
         console.log("delegate N/A: ", delegate);
         setDelegateDetails(delegate);
         setError(null);
@@ -607,14 +571,6 @@ function DelegatesList({ props }: { props: string }) {
             sourcing accurate data and it will be available soon.
           </span>{" "}
           &nbsp;
-          {/* <a
-            href="http://karmahq.xyz"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-500 font-medium hover:underline"
-          >
-            Click Here!🚀
-          </a> */}
           <button
             className="flex ml-auto items-center justify-center p-1 text-gray-500 hover:text-red-500 bg-white border border-gray-300 rounded-md"
             onClick={handleClose}
@@ -666,7 +622,6 @@ function DelegatesList({ props }: { props: string }) {
                 <>
                   <div
                     onClick={(event) => {
-                      // handleMouseMove(event,index);
                       router.push(
                         `/${props}/${delegate.delegate}?active=info  `
                       );
@@ -726,9 +681,6 @@ function DelegatesList({ props }: { props: string }) {
                                   : delegate.ensName.length > 15
                                   ? delegate.ensName.slice(0, 15) + "..."
                                   : delegate.ensName}
-                                {/* {delegate.ensName.length > 15
-                                ? delegate.ensName.slice(0, 15) + "..."
-                                : delegate.ensName} */}
                               </span>
                             )}
                           </div>

@@ -11,6 +11,7 @@ import { useAccount, useNetwork } from "wagmi";
 import toast, { Toaster } from "react-hot-toast";
 import { Oval } from "react-loader-spinner";
 import SessionTileSkeletonLoader from "@/components/SkeletonLoader/SessionTileSkeletonLoader";
+import ErrorDisplay from "@/components/ComponentUtils/ErrorDisplay";
 
 interface Session {
   booking_status: string;
@@ -31,6 +32,13 @@ function BookedUserSessions({ daoName }: { daoName: string }) {
   // const address = "0x5e349eca2dc61abcd9dd99ce94d04136151a09ee";
   const [sessionDetails, setSessionDetails] = useState([]);
   const [pageLoading, setPageLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleRetry = () => {
+    setError(null);
+    getMeetingData();
+    window.location.reload();
+  };
 
   const getMeetingData = async () => {
     try {
@@ -51,9 +59,6 @@ function BookedUserSessions({ daoName }: { daoName: string }) {
           (session: Session) =>
             session.dao_name === daoName &&
             session.meeting_status !== "Recorded"
-          // &&
-          // new Date(session.slot_time).toLocaleString() >=
-          //   currentSlot.toLocaleString()
         );
 
         setSessionDetails(filteredData);
@@ -63,6 +68,7 @@ function BookedUserSessions({ daoName }: { daoName: string }) {
       }
     } catch (error) {
       console.log("error in catch", error);
+      setError("Unable to load sessions. Please try again in a few moments.");
       setPageLoading(false);
     }
   };
@@ -70,6 +76,14 @@ function BookedUserSessions({ daoName }: { daoName: string }) {
   useEffect(() => {
     getMeetingData();
   }, [address, sessionDetails]);
+
+  if (error) {
+    return (
+      <div className="flex justify-center items-center min-h-[400px]">
+        <ErrorDisplay message={error} onRetry={handleRetry} />
+      </div>
+    );
+  }
 
   return (
     <>

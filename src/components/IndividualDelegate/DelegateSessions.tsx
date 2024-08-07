@@ -1,19 +1,14 @@
 import React, { useState, useEffect } from "react";
-import Tile from "../ComponentUtils/Tile";
 import BookSession from "./AllSessions/BookSession";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useRouter } from "next-nprogress-bar";
-import text1 from "@/assets/images/daos/texture1.png";
-import SessionTile from "../ComponentUtils/SessionTiles";
-import { Oval } from "react-loader-spinner";
-import SessionTileSkeletonLoader from "../SkeletonLoader/SessionTileSkeletonLoader";
 import RecordedSessionsTile from "../ComponentUtils/RecordedSessionsTile";
 import RecordedSessionsSkeletonLoader from "../SkeletonLoader/RecordedSessionsSkeletonLoader";
 import ErrorDisplay from "../ComponentUtils/ErrorDisplay";
 
 type Attendee = {
   attendee_address: string;
-  attendee_uid?: string; // Making attendee_uid optional
+  attendee_uid?: string;
 };
 
 interface Session {
@@ -63,7 +58,6 @@ function DelegateSessions({ props }: { props: Type }) {
 
       const response = await fetch("/api/get-dao-sessions", requestOptions);
       const result = await response.json();
-      console.log("result in get meetinggggg", result);
 
       if (result) {
         const resultData = await result.data;
@@ -74,7 +68,6 @@ function DelegateSessions({ props }: { props: Type }) {
             filteredData = resultData.filter((session: Session) => {
               return session.meeting_status === "Upcoming";
             });
-            console.log("upcoming filtered: ", filteredData);
             setSessionDetails(filteredData);
           } else if (searchParams.get("session") === "hosted") {
             setDataLoading(true);
@@ -84,7 +77,6 @@ function DelegateSessions({ props }: { props: Type }) {
                 session.host_address.toLowerCase() === props.individualDelegate
               );
             });
-            console.log("hosted filtered: ", filteredData);
             setSessionDetails(filteredData);
           } else if (searchParams.get("session") === "attended") {
             setDataLoading(true);
@@ -97,7 +89,6 @@ function DelegateSessions({ props }: { props: Type }) {
                 )
               );
             });
-            console.log("attended filtered: ", filteredData);
             setSessionDetails(filteredData);
           }
           setDataLoading(false);
@@ -108,9 +99,10 @@ function DelegateSessions({ props }: { props: Type }) {
         setDataLoading(false);
       }
     } catch (error) {
-      console.log("error in catch", error);
       setDataLoading(false);
-      setError("An unexpected error occurred. Please refresh the page and try again.");
+      setError(
+        "An unexpected error occurred. Please refresh the page and try again."
+      );
     }
   };
 
@@ -128,15 +120,13 @@ function DelegateSessions({ props }: { props: Type }) {
     getMeetingData();
     window.location.reload();
   };
-  
-  if (error) return (
-    <div className="flex justify-center items-center min-h-[400px]">
-      <ErrorDisplay 
-        message={error}
-        onRetry={handleRetry}
-      />
-    </div>
-  );
+
+  if (error)
+    return (
+      <div className="flex justify-center items-center min-h-[400px]">
+        <ErrorDisplay message={error} onRetry={handleRetry} />
+      </div>
+    );
 
   return (
     <div>
@@ -154,30 +144,6 @@ function DelegateSessions({ props }: { props: Type }) {
           >
             Book
           </button>
-          {/* <button
-            className={`py-2  ${
-              searchParams.get("session") === "ongoing"
-                ? "text-[#3E3D3D] font-bold"
-                : "text-[#7C7C7C]"
-            }`}
-            onClick={() =>
-              router.push(path + "?active=delegatesSession&session=ongoing")
-            }
-          >
-            Ongoing
-          </button> */}
-          {/* <button
-            className={`py-2 ${
-              searchParams.get("session") === "upcoming"
-                ? "text-[#3E3D3D] font-bold"
-                : "text-[#7C7C7C]"
-            }`}
-            onClick={() =>
-              router.push(path + "?active=delegatesSession&session=upcoming")
-            }
-          >
-            Upcoming
-          </button> */}
           <button
             className={`py-2 ${
               searchParams.get("session") === "hosted"
@@ -208,71 +174,31 @@ function DelegateSessions({ props }: { props: Type }) {
           {searchParams.get("session") === "book" && (
             <BookSession props={props} />
           )}
-          {/* {searchParams.get("session") === "ongoing" && (
-            <>
-            <Tile sessionDetails={sessionDetails} dataLoading={dataLoading} isEvent="Ongoing" isOfficeHour={false} />
-            </>
-          )} */}
-          {/* {searchParams.get("session") === "upcoming" &&
-            (dataLoading ? (
-              <div className="flex items-center justify-center">
-                <Oval
-                  visible={true}
-                  height="40"
-                  width="40"
-                  color="#0500FF"
-                  secondaryColor="#cdccff"
-                  ariaLabel="oval-loading"
-                />
-              </div>
-            ) : (
-              <SessionTile
-                sessionDetails={sessionDetails}
-                dataLoading={dataLoading}
-                isEvent="Upcoming"
-                isOfficeHour={false}
-                isSession=""
-              />
-            ))} */}
           {searchParams.get("session") === "hosted" &&
             (dataLoading ? (
               <RecordedSessionsSkeletonLoader />
             ) : sessionDetails.length === 0 ? (
               <div className="flex flex-col justify-center items-center pt-10">
-            <div className="text-5xl">☹️</div>{" "}
-            <div className="pt-4 font-semibold text-lg">
-            Oops, no such result available!
-            </div>
-            </div>
+                <div className="text-5xl">☹️</div>{" "}
+                <div className="pt-4 font-semibold text-lg">
+                  Oops, no such result available!
+                </div>
+              </div>
             ) : (
-              // <SessionTile
-              //   sessionDetails={sessionDetails}
-              //   dataLoading={dataLoading}
-              //   isEvent="Recorded"
-              //   isOfficeHour={false}
-              //   isSession=""
-              // />
-              <RecordedSessionsTile meetingData={sessionDetails}/>
+              <RecordedSessionsTile meetingData={sessionDetails} />
             ))}
           {searchParams.get("session") === "attended" &&
             (dataLoading ? (
               <RecordedSessionsSkeletonLoader />
             ) : sessionDetails.length === 0 ? (
               <div className="flex flex-col justify-center items-center pt-10">
-            <div className="text-5xl">☹️</div>{" "}
-            <div className="pt-4 font-semibold text-lg">
-            Oops, no such result available!
-            </div>
-            </div>
+                <div className="text-5xl">☹️</div>{" "}
+                <div className="pt-4 font-semibold text-lg">
+                  Oops, no such result available!
+                </div>
+              </div>
             ) : (
-              // <SessionTile
-              //   sessionDetails={sessionDetails}
-              //   dataLoading={dataLoading}
-              //   isEvent="Recorded"
-              //   isOfficeHour={false}
-              //   isSession=""
-              // />
-              <RecordedSessionsTile meetingData={sessionDetails}/>
+              <RecordedSessionsTile meetingData={sessionDetails} />
             ))}
         </div>
       </div>

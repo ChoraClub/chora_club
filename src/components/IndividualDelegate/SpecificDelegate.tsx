@@ -1008,13 +1008,6 @@ function SpecificDelegate({ props }: { props: Type }) {
                     </span>
                   </Tooltip>
                   <div className="flex space-x-2">
-                    {/* <span className="p-2 bg-gray-200 rounded-lg text-black">
-                      {typeof window !== "undefined" &&
-                        `${BASE_URL}/${
-                          chain?.name === "Optimism" ? "optimism" : "arbitrum"
-                        }/${address}?active=info`}
-                      Copy to Share Profile URL on Warpcast
-                    </span> */}
                     <Tooltip
                       content="Copy profile URL to share on Warpcast or Twitter."
                       placement="bottom"
@@ -1040,18 +1033,6 @@ function SpecificDelegate({ props }: { props: Type }) {
                     </Tooltip>
                   </div>
                   <div style={{ zIndex: "21474836462" }}>
-                    {/* <Toaster
-                      toastOptions={{
-                        style: {
-                          fontSize: "14px",
-                          backgroundColor: "#3E3D3D",
-                          color: "#fff",
-                          boxShadow: "none",
-                          borderRadius: "50px",
-                          padding: "3px 5px",
-                        },
-                      }}
-                    /> */}
                   </div>
                 </div>
 
@@ -1098,10 +1079,6 @@ function SpecificDelegate({ props }: { props: Type }) {
                 <div className="pt-2 flex space-x-4 items-center">
                   <button
                     className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
-                    // onClick={() =>
-                    //   handleDelegateVotes(`${props.individualDelegate}`)
-                    // }
-
                     onClick={handleDelegateModal}
                   >
                     Delegate
@@ -1204,51 +1181,6 @@ function SpecificDelegate({ props }: { props: Type }) {
                       </div>
                     </div>
                   )}
-
-                  {/* <Tooltip
-                    content={
-                      notification
-                        ? "Click to mute delegate activity alerts."
-                        : "Don't miss out! Click to get alerts on delegate activity."
-                    }
-                    placement="top"
-                    closeDelay={1}
-                    showArrow> */}
-                  {/* <button
-                      className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[5px] flex items-center mr-2"
-                      onClick={() => {
-                        if (notification) {
-                          setNotificationmodel(true);
-                        } else {
-                          handleConfirm(2);
-                        }
-                      }}
-                    > */}
-                  {/* <div
-                      className="flex items-center cursor-pointer"
-                      onClick={() => {
-                        if (notification) {
-                          handleConfirm(2);
-                        } else {
-                          handleConfirm(2);
-                        }
-                      }}>
-                      {isFollowing &&
-                        (notification ? (
-                          <BiSolidBellRing
-                            className=""
-                            color="bg-blue-shade-200"
-                            size={24}
-                          />
-                        ) : (
-                          <BiSolidBellOff
-                            className="mr-1"
-                            color="bg-blue-shade-200"
-                            size={24}
-                          />
-                        ))}
-                    </div>
-                  </Tooltip> */}
                 </div>
               </div>
             </div>
@@ -1343,7 +1275,6 @@ function SpecificDelegate({ props }: { props: Type }) {
           delegateName={
             delegateInfo?.ensName ||
             displayEnsName || (
-              // displayName ||
               <>
                 {props.individualDelegate.slice(0, 6)}...
                 {props.individualDelegate.slice(-4)}

@@ -25,6 +25,7 @@ import logo from "@/assets/images/daos/CCLogo.png";
 import ClaimButton from "./ClaimButton";
 import EditButton from "./EditButton";
 import { useAccount } from "wagmi"; 
+import Link from "next/link";
 
 interface meeting {
   meetingData: any;
@@ -43,7 +44,6 @@ const getDaoLogo = (daoName: string): StaticImageData => {
 };
 
 function RecordedSessionsTile({ meetingData , showClaimButton,session}: meeting) {
-  console.log("meetingData: ", meetingData);
 
   const [hoveredVideo, setHoveredVideo] = useState<number | null>(null);
   const videoRefs = useRef<any>([]);
@@ -72,7 +72,6 @@ function RecordedSessionsTile({ meetingData , showClaimButton,session}: meeting)
     user9,
   ];
 
-  // State to store the randomly selected user images
   const [randomUserImages, setRandomUserImages] = useState<{
     [key: string]: StaticImageData;
   }>({});
@@ -118,7 +117,6 @@ function RecordedSessionsTile({ meetingData , showClaimButton,session}: meeting)
     if (progressBar) {
       const progressDiv = progressBar as HTMLDivElement;
       const percentage = (currentTime / duration) * 100;
-      console.log("percentage: ", percentage);
       progressDiv.style.width = `${percentage}%`;
     }
   };
@@ -141,7 +139,6 @@ function RecordedSessionsTile({ meetingData , showClaimButton,session}: meeting)
 
       videoElement.addEventListener("timeupdate", handleTimeUpdate);
 
-      // Clean up the event listener when the component unmounts or video changes
       return () => {
         videoElement.removeEventListener("timeupdate", handleTimeUpdate);
       };
@@ -176,7 +173,6 @@ function RecordedSessionsTile({ meetingData , showClaimButton,session}: meeting)
           ensNamesMap[data.host_address] = ensName;
         }
       }
-      console.log("ensNamesMap", ensNamesMap);
       setEnsHostNames(ensNamesMap);
       setLoadingHostNames(false);
     };
@@ -198,7 +194,6 @@ function RecordedSessionsTile({ meetingData , showClaimButton,session}: meeting)
           ensNamesMap[data.attendees[0]?.attendee_address] = ensName;
         }
       }
-      console.log("guest ensNamesMap", ensNamesMap);
       setEnsGuestNames(ensNamesMap);
       setLoadingGuestNames(false);
     };
@@ -210,7 +205,6 @@ function RecordedSessionsTile({ meetingData , showClaimButton,session}: meeting)
 
   return (
     <>
-      {/* {meetingData && meetingData.length > 0 ? ( */}
       <div className="grid min-[475px]:grid-cols- md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-10 py-8 font-poppins">
         {meetingData.map((data: any, index: number) => (
           <div
@@ -223,9 +217,6 @@ function RecordedSessionsTile({ meetingData , showClaimButton,session}: meeting)
             onMouseEnter={() => setHoveredVideo(index)}
             onMouseLeave={() => setHoveredVideo(null)}
           >
-            {/* <div
-                  className={`w-full h-44 rounded-t-3xl bg-black object-cover object-center relative ${styles.container}`}
-                > */}
             <div
               className={`w-full h-44 rounded-t-3xl bg-black object-cover object-center relative `}
             >
@@ -252,7 +243,6 @@ function RecordedSessionsTile({ meetingData , showClaimButton,session}: meeting)
               ) : (
                 <video
                   poster={`https://gateway.lighthouse.storage/ipfs/${data.thumbnail_image}`}
-                  // poster="https://gateway.lighthouse.storage/ipfs/Qmb1JZZieFSENkoYpVD7HRzi61rQCDfVER3fhnxCvmL1DB"
                   ref={(el: any) => (videoRefs.current[index] = el)}
                   loop
                   muted
@@ -312,12 +302,20 @@ function RecordedSessionsTile({ meetingData , showClaimButton,session}: meeting)
                     />
                   </div>
                   <div>
-                    Host:{" "}
-                    {loadingHostNames
-                      ? data.host_address.slice(0, 4) +
-                        "..." +
-                        data.host_address.slice(-4)
-                      : ensHostNames[data.host_address]}
+                  <span className="font-medium">Host: </span>
+                    <Link
+                      href={`/${data.dao_name}/${data.host_address}?active=info`}
+                      onClick={(event:any) => {
+                        event.stopPropagation();
+                      }}
+                      className="cursor-pointer hover:text-blue-shade-200 ml-1"
+                    >
+                      {loadingHostNames
+                        ? data.host_address.slice(0, 4) +
+                          "..." +
+                          data.host_address.slice(-4)
+                        : ensHostNames[data.host_address]}
+                    </Link>
                   </div>
                   <div>
                     <Tooltip
@@ -353,12 +351,14 @@ function RecordedSessionsTile({ meetingData , showClaimButton,session}: meeting)
                       />
                     </div>
                     <div>
-                      Guest:{" "}
+                    <span className="font-medium">Guest: </span>
+                    <span>
                       {loadingGuestNames
                         ? data.attendees[0]?.attendee_address.slice(0, 4) +
                           "..." +
                           data.attendees[0]?.attendee_address.slice(-4)
                         : ensGuestNames[data.attendees[0]?.attendee_address]}
+                      </span>
                     </div>
                     <div>
                       <Tooltip
