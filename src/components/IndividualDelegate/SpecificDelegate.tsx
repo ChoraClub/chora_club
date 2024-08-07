@@ -451,12 +451,7 @@ function SpecificDelegate({ props }: { props: Type }) {
       const followerData = data.data[0];
       let address = await walletClient.getAddresses();
       let address_user = address[0].toLowerCase(); // Convert to lowercase for case-insensitive comparison
-      let currentDaoName = "";
-      if (chain?.name === "Optimism") {
-        currentDaoName = "optimism";
-      } else if (chain?.name === "Arbitrum One") {
-        currentDaoName = "arbitrum";
-      }
+      let currentDaoName = props.daoDelegates;  
 
       console.log("Current DAO:", currentDaoName);
       console.log("User Address:", address_user);
@@ -601,7 +596,7 @@ function SpecificDelegate({ props }: { props: Type }) {
       let delegate_address: string;
       let follower_address: string;
       let dao: string;
-      alert(props.daoDelegates);
+      // alert(props.daoDelegates);
       dao = props.daoDelegates;
       let address = await walletClient.getAddresses();
       follower_address = address[0];

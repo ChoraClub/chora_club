@@ -114,7 +114,6 @@ function MainProfile() {
     github: "",
   });
   const [isToggled, settoggle] = useState(false);
-
   interface ProgressData {
     total: any;
     uploaded: any;
@@ -128,7 +127,7 @@ function MainProfile() {
 
   // useEffect(() => {
   //   if (chain?.name === "Optimism") {
-  //     setDaoName("optimism");
+  //     set  ("optimism");
   //   } else if (chain?.name === "Arbitrum One") {
   //     setDaoName("arbitrum");
   //   }
@@ -259,7 +258,9 @@ function MainProfile() {
     copy(addr);
     toast("Address Copied");
   };
-  const handleUpdateFollowings = async (daoname: string) => {
+  const handleUpdateFollowings = async (daoname: string,isChange:number) => {
+    console.log("daoName", daoname);
+    // setUnfollowDao(daoname);
     setfollowingmodel(true);
     setLoading(true);
     const myHeaders = new Headers();
@@ -293,7 +294,9 @@ function MainProfile() {
         const activeFollowings = matchDao.following.filter(
           (f: Following) => f.isFollowing
         );
+        if(isChange==1){
         setfollowings(activeFollowings.length);
+        }
         setUserFollowings(activeFollowings);
       } else {
         setfollowings(0);
@@ -303,7 +306,8 @@ function MainProfile() {
     // Close the modal
     setLoading(false);
   };
-  const toggleFollowing = async (index: number, userupdate: any) => {
+  const toggleFollowing = async (index: number, userupdate: any,unfollowDao:any) => {
+    // alert(unfollowDao);
     setUserFollowings((prevUsers) =>
       prevUsers.map((user, i) =>
         i === index ? { ...user, isFollowing: !user.isFollowing } : user
@@ -323,7 +327,7 @@ function MainProfile() {
             // Add any necessary data
             delegate_address: userupdate.follower_address,
             follower_address: address,
-            dao: daoName,
+            dao: unfollowDao,
           }),
         });
 
@@ -352,7 +356,7 @@ function MainProfile() {
             delegate_address: userupdate.follower_address,
             follower_address: address,
             action: 1,
-            dao: daoName,
+            dao: unfollowDao,
           }),
         });
 
@@ -371,7 +375,7 @@ function MainProfile() {
     }
   };
 
-  const toggleNotification = async (index: number, userupdate: any) => {
+  const toggleNotification = async (index: number, userupdate: any,notificationdao:any) => {
     setUserFollowings((prevUsers) =>
       prevUsers.map((user, i) =>
         i === index ? { ...user, isNotification: !user.isNotification } : user
@@ -390,7 +394,7 @@ function MainProfile() {
           delegate_address: userupdate.follower_address,
           follower_address: address,
           action: 2,
-          dao: daoName,
+          dao: notificationdao,
           updatenotification: !userupdate.isNotification,
         }),
       });
@@ -1088,7 +1092,7 @@ function MainProfile() {
                       className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
                       onClick={() =>
                         followings
-                          ? handleUpdateFollowings(daoName)
+                          ? handleUpdateFollowings(daoName,1)
                           : toast.error(
                               "You're not following anyone yet. Start exploring delegate profiles now!"
                             )
@@ -1124,7 +1128,7 @@ function MainProfile() {
                       className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
                       onClick={() =>
                         followings
-                          ? handleUpdateFollowings(daoName)
+                          ? handleUpdateFollowings(daoName,1)
                           : toast.error(
                               "You're not following anyone yet. Start exploring delegate profiles now!"
                             )

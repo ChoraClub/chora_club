@@ -11,6 +11,10 @@ import toast, { Toaster } from "react-hot-toast";
 import { useEffect, useState } from "react";
 import { fetchEnsAvatar } from "@/utils/ENSUtils";
 import style from "./FollowingModal.module.css";
+import oplogo from "@/assets/images/daos/op.png";
+import arbcir from "@/assets/images/daos/arbCir.png";
+import { useNetwork } from "wagmi";
+
 
 interface FollowingModal {
   userFollowings: any;
@@ -59,8 +63,17 @@ function FollowingModal({
 
   const [ensNames, setEnsNames] = useState<any>({});
   const [ensAvatars, setEnsAvatars] = useState<any>({});
+  const [chainame,setChainName]=useState("");
+  const { chain, chains } = useNetwork();
 
   useEffect(() => {
+
+    // if (chain && chain?.name === "Optimism") {
+    //   setChainName("optimism");
+    // } else if (chain && chain?.name === "Arbitrum One") {
+    //   setChainName("arbitrum");
+    // }
+
     const fetchEnsNames = async () => {
       console.log(" user followings", userFollowings);
       const addresses = userFollowings.map(
@@ -132,12 +145,27 @@ function FollowingModal({
             </div>
             <div
               className={` max-h-[60vh] overflow-y-auto ${style.customscrollbar}`}>
-              <div>
-                <button onClick={handleUpdateFollowings("optimism")}>OP</button>
-                <button onClick={handleUpdateFollowings("arbitrum")}>
-                  ARB
-                </button>
+              <div className="flex ml-10 mt-5 gap-5 ">
+                <button
+              className="border border-[#CCCCCC] px-4 py-1  rounded-lg text-lg flex items-center gap-1.5"
+              onClick={() => {handleUpdateFollowings("optimism",0)
+                setChainName("optimism")
+              }}
+            >
+              <Image src={oplogo} alt="optimism" width={23} className="" />
+              Optimism
+            </button>
+            <button
+              className="border border-[#CCCCCC] px-4 py-1 rounded-lg text-lg flex items-center gap-1.5"
+              onClick={() => {handleUpdateFollowings("arbitrum",0)
+                setChainName("arbitrum")
+              }}
+            >
+              <Image src={arbcir} alt="arbitrum" width={23} className="" />
+              Arbitrum
+            </button>
               </div>
+              <hr className="border-t border-gray-300 my-6 mx-10" />
               {isLoading ? (
                 <div className="flex justify-center items-center h-40">
                   <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-shade-200"></div>
@@ -204,7 +232,7 @@ function FollowingModal({
                             }`}
                             onClick={(event) => {
                               event.stopPropagation();
-                              toggleFollowing(index, user);
+                              toggleFollowing(index, user,chainame);
                             }}>
                             {user.isFollowing ? "Unfollow" : "Follow"}
                           </button>
@@ -227,7 +255,7 @@ function FollowingModal({
                                 size={20}
                                 onClick={(event) => {
                                   event.stopPropagation();
-                                  toggleNotification(index, user);
+                                  toggleNotification(index, user,chainame);
                                 }}
                               />
                             ) : (
@@ -237,7 +265,7 @@ function FollowingModal({
                                 size={20}
                                 onClick={(event) => {
                                   event.stopPropagation();
-                                  toggleNotification(index, user);
+                                  toggleNotification(index, user,chainame);
                                 }}
                               />
                             )}
