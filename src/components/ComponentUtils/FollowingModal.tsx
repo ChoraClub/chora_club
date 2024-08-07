@@ -15,7 +15,6 @@ import oplogo from "@/assets/images/daos/op.png";
 import arbcir from "@/assets/images/daos/arbCir.png";
 import { useNetwork } from "wagmi";
 
-
 interface FollowingModal {
   userFollowings: any;
   toggleFollowing: any;
@@ -63,17 +62,19 @@ function FollowingModal({
 
   const [ensNames, setEnsNames] = useState<any>({});
   const [ensAvatars, setEnsAvatars] = useState<any>({});
-  const [chainame,setChainName]=useState("");
+  const [NetworkofUser, setChainName] = useState("");
   const { chain, chains } = useNetwork();
+  const [activeButton, setActiveButton] = useState("");
+
+  if (chain && chain?.name === "Optimism") {
+    setChainName("optimism");
+    setActiveButton("optimism");
+  } else if (chain && chain?.name === "Arbitrum One") {
+    setChainName("arbitrum");
+    setActiveButton("arbitrum");
+  }
 
   useEffect(() => {
-
-    // if (chain && chain?.name === "Optimism") {
-    //   setChainName("optimism");
-    // } else if (chain && chain?.name === "Arbitrum One") {
-    //   setChainName("arbitrum");
-    // }
-
     const fetchEnsNames = async () => {
       console.log(" user followings", userFollowings);
       const addresses = userFollowings.map(
@@ -147,23 +148,33 @@ function FollowingModal({
               className={` max-h-[60vh] overflow-y-auto ${style.customscrollbar}`}>
               <div className="flex ml-10 mt-5 gap-5 ">
                 <button
-              className="border border-[#CCCCCC] px-4 py-1  rounded-lg text-lg flex items-center gap-1.5"
-              onClick={() => {handleUpdateFollowings("optimism",0)
-                setChainName("optimism")
-              }}
-            >
-              <Image src={oplogo} alt="optimism" width={23} className="" />
-              Optimism
-            </button>
-            <button
-              className="border border-[#CCCCCC] px-4 py-1 rounded-lg text-lg flex items-center gap-1.5"
-              onClick={() => {handleUpdateFollowings("arbitrum",0)
-                setChainName("arbitrum")
-              }}
-            >
-              <Image src={arbcir} alt="arbitrum" width={23} className="" />
-              Arbitrum
-            </button>
+                  className={`border border-[#CCCCCC] px-4 py-1 rounded-lg text-lg flex items-center gap-1.5 ${
+                    activeButton === "optimism"
+                      ? "bg-[#8E8E8E] text-white"
+                      : "bg-[#F5F5F5] text-[#3E3D3D]"
+                  }`}
+                  onClick={() => {
+                    handleUpdateFollowings("optimism", 0);
+                    setChainName("optimism");
+                    setActiveButton("optimism");
+                  }}>
+                  <Image src={oplogo} alt="optimism" width={23} className="" />
+                  Optimism
+                </button>
+                <button
+                  className={`border border-[#CCCCCC] px-4 py-1 rounded-lg text-lg flex items-center gap-1.5 ${
+                    activeButton === "arbitrum"
+                      ? "bg-[#8E8E8E] text-white"
+                      : "bg-[#F5F5F5] text-[#3E3D3D]"
+                  }`}
+                  onClick={() => {
+                    handleUpdateFollowings("arbitrum", 0);
+                    setChainName("arbitrum");
+                    setActiveButton("arbitrum");
+                  }}>
+                  <Image src={arbcir} alt="arbitrum" width={23} className="" />
+                  Arbitrum
+                </button>
               </div>
               <hr className="border-t border-gray-300 my-6 mx-10" />
               {isLoading ? (
@@ -232,7 +243,7 @@ function FollowingModal({
                             }`}
                             onClick={(event) => {
                               event.stopPropagation();
-                              toggleFollowing(index, user,chainame);
+                              toggleFollowing(index, user, NetworkofUser);
                             }}>
                             {user.isFollowing ? "Unfollow" : "Follow"}
                           </button>
@@ -255,7 +266,11 @@ function FollowingModal({
                                 size={20}
                                 onClick={(event) => {
                                   event.stopPropagation();
-                                  toggleNotification(index, user,chainame);
+                                  toggleNotification(
+                                    index,
+                                    user,
+                                    NetworkofUser
+                                  );
                                 }}
                               />
                             ) : (
@@ -265,7 +280,11 @@ function FollowingModal({
                                 size={20}
                                 onClick={(event) => {
                                   event.stopPropagation();
-                                  toggleNotification(index, user,chainame);
+                                  toggleNotification(
+                                    index,
+                                    user,
+                                    NetworkofUser
+                                  );
                                 }}
                               />
                             )}

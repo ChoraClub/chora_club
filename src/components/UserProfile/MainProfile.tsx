@@ -258,7 +258,7 @@ function MainProfile() {
     copy(addr);
     toast("Address Copied");
   };
-  const handleUpdateFollowings = async (daoname: string,isChange:number) => {
+  const handleUpdateFollowings = async (daoname: string, isChange: number) => {
     console.log("daoName", daoname);
     // setUnfollowDao(daoname);
     setfollowingmodel(true);
@@ -294,8 +294,8 @@ function MainProfile() {
         const activeFollowings = matchDao.following.filter(
           (f: Following) => f.isFollowing
         );
-        if(isChange==1){
-        setfollowings(activeFollowings.length);
+        if (isChange == 1) {
+          setfollowings(activeFollowings.length);
         }
         setUserFollowings(activeFollowings);
       } else {
@@ -306,7 +306,11 @@ function MainProfile() {
     // Close the modal
     setLoading(false);
   };
-  const toggleFollowing = async (index: number, userupdate: any,unfollowDao:any) => {
+  const toggleFollowing = async (
+    index: number,
+    userupdate: any,
+    unfollowDao: any
+  ) => {
     // alert(unfollowDao);
     setUserFollowings((prevUsers) =>
       prevUsers.map((user, i) =>
@@ -315,7 +319,9 @@ function MainProfile() {
     );
 
     if (!userupdate.isFollowing) {
-      setfollowings(followings + 1);
+      if (daoName === unfollowDao) {
+        setfollowings(followings + 1);
+      }
 
       try {
         const response = await fetch("/api/delegate-follow/savefollower", {
@@ -342,7 +348,9 @@ function MainProfile() {
         console.error("Error following:", error);
       }
     } else {
-      setfollowings(followings - 1);
+      if (daoName === unfollowDao) {
+        setfollowings(followings - 1);
+      }
       setLoading(true);
       settoaster(true);
       try {
@@ -375,7 +383,11 @@ function MainProfile() {
     }
   };
 
-  const toggleNotification = async (index: number, userupdate: any,notificationdao:any) => {
+  const toggleNotification = async (
+    index: number,
+    userupdate: any,
+    notificationdao: any
+  ) => {
     setUserFollowings((prevUsers) =>
       prevUsers.map((user, i) =>
         i === index ? { ...user, isNotification: !user.isNotification } : user
@@ -1092,7 +1104,7 @@ function MainProfile() {
                       className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
                       onClick={() =>
                         followings
-                          ? handleUpdateFollowings(daoName,1)
+                          ? handleUpdateFollowings(daoName, 1)
                           : toast.error(
                               "You're not following anyone yet. Start exploring delegate profiles now!"
                             )
@@ -1128,7 +1140,7 @@ function MainProfile() {
                       className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
                       onClick={() =>
                         followings
-                          ? handleUpdateFollowings(daoName,1)
+                          ? handleUpdateFollowings(daoName, 1)
                           : toast.error(
                               "You're not following anyone yet. Start exploring delegate profiles now!"
                             )
