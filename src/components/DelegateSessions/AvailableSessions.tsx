@@ -5,17 +5,12 @@ import search from "@/assets/images/daos/search.png";
 import Image, { StaticImageData } from "next/image";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useRouter } from "next-nprogress-bar";
-import { Oval } from "react-loader-spinner";
 import { IoCopy } from "react-icons/io5";
 import copy from "copy-to-clipboard";
 import toast, { Toaster } from "react-hot-toast";
-import opImg from "@/assets/images/daos/op.png";
-import arbImg from "@/assets/images/daos/arbitrum.jpg";
-import { FaCircleInfo } from "react-icons/fa6";
 import { Tooltip } from "@nextui-org/react";
-import text1 from "@/assets/images/daos/texture1.png";
 import clockIcn from "@/assets/images/daos/icon_clock.png";
-import ccLogo from "@/assets/images/daos/CC.png";
+import ccLogo from "@/assets/images/daos/CCLogo2.png";
 import OPLogo from "@/assets/images/daos/op.png";
 import ArbLogo from "@/assets/images/daos/arbCir.png";
 import "@/components/DelegateSessions/DelegateSessionsMain.module.css";
@@ -23,6 +18,7 @@ import AvailableSessionsSkeletonLoader from "../SkeletonLoader/AvailableSessions
 import { getEnsName } from "@/utils/ENSUtils";
 import onChain_link from "@/assets/images/watchmeeting/onChain_link.png";
 import offChain_link from "@/assets/images/watchmeeting/offChain_link.png";
+import ErrorDisplay from "../ComponentUtils/ErrorDisplay";
 
 interface Type {
   ensName: string;
@@ -42,8 +38,6 @@ interface Type {
 
 function AvailableSessions() {
   const router = useRouter();
-  const path = usePathname();
-  const searchParams = useSearchParams();
   const [daoInfo, setDaoInfo] = useState<Array<Type>>([]);
   const [APIData, setAPIData] = useState<any>([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -62,6 +56,13 @@ function AvailableSessions() {
   const [endPeriod, setEndPeriod] = useState("");
   const [showStartTimeSelector, setShowStartTimeSelector] = useState(false);
   const [showEndTimeSelector, setShowEndTimeSelector] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [initialFetchComplete, setInitialFetchComplete] = useState(false);
+
+  const handleRetry = () => {
+    setError(null);
+    fetchData();
+  };
 
   const convertTo24Hour = (hour: any, minute: any, period: any) => {
     let hourNum = parseInt(hour, 10);
@@ -80,95 +81,85 @@ function AvailableSessions() {
     setEndTime(endTime24);
   }, [startHour, startMinute, startPeriod, endHour, endMinute, endPeriod]);
 
-  useEffect(() => {
-    setIsPageLoading(false);
-  }, []);
+  const fetchData = async () => {
+    setIsPageLoading(true);
+    try {
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setIsPageLoading(true);
-      try {
-        const myHeaders = new Headers();
-        myHeaders.append("Content-Type", "application/json");
-
-        let dateToSend = null;
-
-        console.log("selectedDao", selectedDao);
-        console.log("selectedDate", selectedDate);
-        console.log("startTime", startTime);
-        console.log("endTime", endTime);
-
-        const currentDate = new Date();
-        let newDate = currentDate.toLocaleDateString();
-        if (newDate.length !== 10 || !newDate.match(/^\d{4}-\d{2}-\d{2}$/)) {
-          const year = currentDate.getFullYear();
-          const month = String(currentDate.getMonth() + 1).padStart(2, "0");
-          const day = String(currentDate.getDate()).padStart(2, "0");
-          newDate = `${year}-${month}-${day}`;
-        }
-
-        console.log("currentDate", newDate);
-
-        const startDateTime = (await startTime)
-          ? new Date(`${newDate} ${startTime}:00`)
-          : null;
-
-        const endDateTime = (await endTime)
-          ? new Date(`${newDate} ${endTime}:00`)
-          : null;
-
-        console.log("startDateTime", startDateTime);
-        console.log("endDateTime", endDateTime);
-
-        const startTimeToSend = startDateTime
-          ?.toISOString()
-          .split("T")[1]
-          .substring(0, 5);
-
-        const endTimeToSend = endDateTime
-          ?.toISOString()
-          .split("T")[1]
-          .substring(0, 5);
-
-        console.log("startTimeToSend", startTimeToSend);
-        console.log("endTimeToSend", endTimeToSend);
-
-        const raw = JSON.stringify({
-          dao_name: selectedDao,
-          date: selectedDate,
-          startTime: startTimeToSend ? startTimeToSend : null,
-          endTime: endTimeToSend ? endTimeToSend : null,
-        });
-
-        // console.log("")
-
-        const requestOptions: any = {
-          method: "POST",
-          headers: myHeaders,
-          body: raw,
-        };
-
-        console.log("requestOptions", requestOptions);
-        const result = await fetch(
-          "/api/get-availability/filter",
-          requestOptions
-        );
-        const response = await result.json();
-        console.log(response);
-        let resultData;
-        console.log("resultData: ", response);
-        if (response.success === true) {
-          console.log("response", response.data);
-          resultData = await response.data;
-          console.log("resultData", resultData);
-        }
-        setAPIData(resultData);
-        setDaoInfo(resultData);
-        setIsPageLoading(false);
-      } catch (error) {
-        console.error("Error Fetching Data of availability:", error);
+      const currentDate = new Date();
+      let newDate = currentDate.toLocaleDateString();
+      if (newDate.length !== 10 || !newDate.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        const year = currentDate.getFullYear();
+        const month = String(currentDate.getMonth() + 1).padStart(2, "0");
+        const day = String(currentDate.getDate()).padStart(2, "0");
+        newDate = `${year}-${month}-${day}`;
       }
-    };
+
+      let startTimeToSend = null;
+      let endTimeToSend = null;
+
+      if (startTime) {
+        try {
+          const startDateTime = new Date(`${newDate} ${startTime}:00`);
+          startTimeToSend = startDateTime
+            .toISOString()
+            .split("T")[1]
+            .substring(0, 5);
+        } catch (error) {
+          console.error("Invalid start time:", error);
+        }
+      }
+
+      if (endTime) {
+        try {
+          const endDateTime = new Date(`${newDate} ${endTime}:00`);
+          endTimeToSend = endDateTime
+            .toISOString()
+            .split("T")[1]
+            .substring(0, 5);
+        } catch (error) {
+          console.error("Invalid end time:", error);
+        }
+      }
+
+      const raw = JSON.stringify({
+        dao_name: selectedDao,
+        date: selectedDate,
+        startTime: startTimeToSend ? startTimeToSend : null,
+        endTime: endTimeToSend ? endTimeToSend : null,
+      });
+
+      const requestOptions: any = {
+        method: "POST",
+        headers: myHeaders,
+        body: raw,
+      };
+
+      const result = await fetch(
+        "/api/get-availability/filter",
+        requestOptions
+      );
+      if (!result.ok) {
+        throw new Error(`HTTP error! status: ${result.status}`);
+      }
+      const response = await result.json();
+      let resultData;
+      if (response.success === true) {
+        resultData = await response.data;
+      }
+      setAPIData(resultData);
+      setDaoInfo(resultData);
+      setInitialFetchComplete(true);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      setError("Failed to fetch data. Please try again later.");
+    } finally {
+      setIsPageLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchData();
   }, [selectedDao, selectedDate, startTime, endTime]);
 
@@ -181,11 +172,9 @@ function AvailableSessions() {
     setSearchQuery(query);
     if (query) {
       const filtered = APIData.filter((item: any) => {
-        // Convert both query and userAddress to lowercase for case-insensitive matching
         const lowercaseQuery = query.toLowerCase();
         const lowercaseAddress = item.session.userAddress.toLowerCase();
 
-        // Check if the lowercase userAddress includes the lowercase query
         return lowercaseAddress.includes(lowercaseQuery);
       });
 
@@ -197,23 +186,16 @@ function AvailableSessions() {
 
   const handleDaoChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selected = e.target.value;
-    // setSelectedDao(selected);
-    let filtered: any;
     if (selected === "All-DAOS") {
-      // setDaoInfo(APIData);
       setSelectedDao(null);
     } else {
-      // filtered = APIData.filter((item) => item.dao_name === selected);
-      // setDaoInfo(filtered);
       setSelectedDao(selected);
     }
   };
 
   const handleDateChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = e.target.value;
-    console.log("selected date", selected);
     if (selected === "") {
-      console.log("its empty string");
       setSelectedDate(null);
     } else {
       setSelectedDate(selected);
@@ -264,8 +246,6 @@ function AvailableSessions() {
     return options;
   };
 
-  const timeOptions = generateTimeOptions();
-
   const handleClearTime = () => {
     setStartTime(null);
     setEndTime(null);
@@ -307,27 +287,25 @@ function AvailableSessions() {
     formattedDate = `${year}-${month}-${day}`;
   }
 
-  // console.log("formattedDate", formattedDate);
-
-  // console.log("currentDate", currentDate);
-
   useEffect(() => {
     const fetchEnsNames = async () => {
-      console.log("dao info: ", daoInfo);
       const addresses = daoInfo.map((dao: any) => dao.userInfo[0]?.address);
-      console.log("addresses: ", addresses);
       const names = await Promise.all(
         addresses.map(async (address) => {
-          const ensNames = await getEnsName(address);
-          const ensName = ensNames?.ensName;
-          return { address, ensName };
+          try {
+            const ensNames = await getEnsName(address);
+            const ensName = ensNames?.ensName;
+            return { address, ensName };
+          } catch (error) {
+            console.error(`Error fetching ENS name for ${address}:`, error);
+            return { address, ensName: null };
+          }
         })
       );
       const ensNameMap: { [address: string]: any } = {};
       names.forEach(({ address, ensName }) => {
         ensNameMap[address] = ensName;
       });
-      console.log("ens name: ", ensNameMap);
       setEnsNames(ensNameMap);
     };
 
@@ -335,6 +313,13 @@ function AvailableSessions() {
       fetchEnsNames();
     }
   }, [daoInfo]);
+
+  if (error)
+    return (
+      <div className="flex justify-center items-center min-h-[400px]">
+        <ErrorDisplay message={error} onRetry={handleRetry} />
+      </div>
+    );
 
   return (
     <div className="pe-10">
@@ -375,7 +360,6 @@ function AvailableSessions() {
           >
             <select
               value={selectedDao}
-              // onChange={(e) => setSelectedDao(e.target.value)}
               onChange={handleDaoChange}
               className="px-3 py-2 rounded-md shadow cursor-pointer"
             >
@@ -403,7 +387,6 @@ function AvailableSessions() {
               value={selectedDate}
               onChange={handleDateChange}
               min={formattedDate}
-              // onChange={(e) => setSelectedDate(e.target.value)}
               className="px-3 py-2 shadow mr-1 rounded-md cursor-pointer"
             />
           </Tooltip>
@@ -516,7 +499,7 @@ function AvailableSessions() {
       </div>
 
       <div className="pt-8 font-poppins">
-        {isPageLoading ? (
+        {!initialFetchComplete || isPageLoading ? (
           <AvailableSessionsSkeletonLoader />
         ) : daoInfo && daoInfo?.length > 0 ? (
           <div className="overflow-auto font-poppins grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 2xl:grid-cols-2 gap-12 py-5 px-10">
@@ -563,7 +546,7 @@ function AvailableSessions() {
                         <Image
                           src={ccLogo}
                           alt="ChoraClub Logo"
-                          className="absolute top-0 right-0"
+                          className="absolute top-0 right-0 rounded-full bg-white"
                           style={{
                             width: "30px",
                             height: "30px",
@@ -606,18 +589,6 @@ function AvailableSessions() {
                               />
                             </div>
                           </Tooltip>
-                          {/* <Toaster
-                            toastOptions={{
-                              style: {
-                                fontSize: "14px",
-                                backgroundColor: "#3E3D3D",
-                                color: "#fff",
-                                boxShadow: "none",
-                                borderRadius: "50px",
-                                padding: "3px 5px",
-                              },
-                            }}
-                          /> */}
                         </div>
                       </div>
                       <div className="mt-2 bg-[#1E1E1E] border border-[#1E1E1E] text-white rounded-md text-xs px-5 py-1 font-semibold w-fit capitalize">
@@ -718,17 +689,6 @@ function AvailableSessions() {
                     </span>
                   </div>
                   <div className="w-[40%] flex justify-end ">
-                    {/* <button
-                      onClick={() =>
-                        router.push(
-                          `/${daos.dao_name}/${daos.userAddress}?active=delegatesSession&session=book `
-                        )
-                      }
-                      className="bg-black text-white py-4 px-6 rounded-[36px] text-sm w-[11rem] relative  hover:bg-[#333333] focus:outline-none focus:ring-2 focus:ring-gray-400"
-                    >
-                      <span className="relative">Book Session</span>
-                      <span className="absolute top-0 left-0 w-full h-full bg-white opacity-0 transition-opacity duration-300"></span>
-                    </button> */}
                     <button
                       onClick={() =>
                         router.push(
@@ -748,7 +708,9 @@ function AvailableSessions() {
           <div className="flex flex-col justify-center items-center pt-10">
             <div className="text-5xl">☹️</div>{" "}
             <div className="pt-4 font-semibold text-lg">
-              Oops, no such result available!
+              {searchQuery
+                ? `No results found for "${searchQuery}"`
+                : "Oops, no such result available!"}
             </div>
           </div>
         )}

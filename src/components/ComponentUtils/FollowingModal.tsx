@@ -1,6 +1,6 @@
 import { IoClose } from "react-icons/io5";
-// import user1 from "@/assets/images/daos/user1.png";
-import user1 from "@/assets/images/sidebar/favicon.png";
+import user1 from "@/assets/images/daos/CCLogo2.png";
+// import user1 from "@/assets/images/sidebar/favicon.png";
 import { FaCalendarDays } from "react-icons/fa6";
 import Image from "next/image";
 import { IoCopy } from "react-icons/io5";
@@ -11,6 +11,9 @@ import toast, { Toaster } from "react-hot-toast";
 import { useEffect, useState } from "react";
 import { fetchEnsAvatar } from "@/utils/ENSUtils";
 import style from "./FollowingModal.module.css";
+import oplogo from "@/assets/images/daos/op.png";
+import arbcir from "@/assets/images/daos/arbCir.png";
+import { useNetwork } from "wagmi";
 
 interface FollowingModal {
   userFollowings: any;
@@ -19,6 +22,7 @@ interface FollowingModal {
   setfollowingmodel: any;
   isLoading: any;
   chainName: string | undefined;
+  handleUpdateFollowings: any;
 }
 function formatDate(timestamp: string) {
   const date = new Date(timestamp);
@@ -37,6 +41,7 @@ function FollowingModal({
   setfollowingmodel,
   chainName,
   isLoading,
+  handleUpdateFollowings,
 }: FollowingModal) {
   const handleCopy = (addr: string) => {
     copy(addr);
@@ -57,10 +62,23 @@ function FollowingModal({
 
   const [ensNames, setEnsNames] = useState<any>({});
   const [ensAvatars, setEnsAvatars] = useState<any>({});
-
+  const [NetworkofUser, setChainName] = useState("");
+  const { chain, chains } = useNetwork();
+  const [activeButton, setActiveButton] = useState("");
+useEffect(() => {
+  if (chain && chain?.name === "Optimism") {
+    setChainName("optimism");
+    setActiveButton("optimism");
+  } else if (chain && chain?.name === "Arbitrum One") {
+    setChainName("arbitrum");
+    setActiveButton("arbitrum");
+  }
+},[chain])
+  
   useEffect(() => {
+   
     const fetchEnsNames = async () => {
-      console.log(" user followings", userFollowings);
+      // console.log(" user followings", userFollowings);
       const addresses = userFollowings.map(
         (user: any) => user.follower_address
       );
@@ -76,7 +94,7 @@ function FollowingModal({
       names.forEach(({ address, ensName }) => {
         ensNameMap[address] = ensName;
       });
-      console.log("ens name: ", ensNameMap);
+      // console.log("ens name: ", ensNameMap);
       setEnsNames(ensNameMap);
     };
 
@@ -130,6 +148,37 @@ function FollowingModal({
             </div>
             <div
               className={` max-h-[60vh] overflow-y-auto ${style.customscrollbar}`}>
+              <div className="flex ml-10 mt-5 gap-5 ">
+                <button
+                  className={`border border-[#CCCCCC] px-4 py-1 rounded-lg text-lg flex items-center gap-1.5 ${
+                    activeButton === "optimism"
+                      ? "bg-[#8E8E8E] text-white"
+                      : "bg-[#F5F5F5] text-[#3E3D3D]"
+                  }`}
+                  onClick={() => {
+                    setActiveButton("optimism");
+                    handleUpdateFollowings("optimism", 0);
+                    setChainName("optimism");
+                  }}>
+                  <Image src={oplogo} alt="optimism" width={23} className="" />
+                  Optimism
+                </button>
+                <button
+                  className={`border border-[#CCCCCC] px-4 py-1 rounded-lg text-lg flex items-center gap-1.5 ${
+                    activeButton === "arbitrum"
+                      ? "bg-[#8E8E8E] text-white"
+                      : "bg-[#F5F5F5] text-[#3E3D3D]"
+                  }`}
+                  onClick={() => {
+                    setActiveButton("arbitrum");
+                    handleUpdateFollowings("arbitrum", 0);
+                    setChainName("arbitrum");
+                  }}>
+                  <Image src={arbcir} alt="arbitrum" width={23} className="" />
+                  Arbitrum
+                </button>
+              </div>
+              <hr className="border-t border-gray-300 my-6 mx-10" />
               {isLoading ? (
                 <div className="flex justify-center items-center h-40">
                   <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-shade-200"></div>
@@ -196,7 +245,7 @@ function FollowingModal({
                             }`}
                             onClick={(event) => {
                               event.stopPropagation();
-                              toggleFollowing(index, user);
+                              toggleFollowing(index, user, NetworkofUser);
                             }}>
                             {user.isFollowing ? "Unfollow" : "Follow"}
                           </button>
@@ -219,7 +268,11 @@ function FollowingModal({
                                 size={20}
                                 onClick={(event) => {
                                   event.stopPropagation();
-                                  toggleNotification(index, user);
+                                  toggleNotification(
+                                    index,
+                                    user,
+                                    NetworkofUser
+                                  );
                                 }}
                               />
                             ) : (
@@ -229,7 +282,11 @@ function FollowingModal({
                                 size={20}
                                 onClick={(event) => {
                                   event.stopPropagation();
-                                  toggleNotification(index, user);
+                                  toggleNotification(
+                                    index,
+                                    user,
+                                    NetworkofUser
+                                  );
                                 }}
                               />
                             )}

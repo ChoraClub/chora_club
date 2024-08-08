@@ -114,7 +114,6 @@ function MainProfile() {
     github: "",
   });
   const [isToggled, settoggle] = useState(false);
-
   interface ProgressData {
     total: any;
     uploaded: any;
@@ -128,7 +127,7 @@ function MainProfile() {
 
   // useEffect(() => {
   //   if (chain?.name === "Optimism") {
-  //     setDaoName("optimism");
+  //     set  ("optimism");
   //   } else if (chain?.name === "Arbitrum One") {
   //     setDaoName("arbitrum");
   //   }
@@ -151,7 +150,6 @@ function MainProfile() {
       // console.log("newPath", newPath);
       router.replace(`${newPath}`);
     } else if (!isConnected && !session) {
-      console.log("inside else if !isConnected && !session");
       if (openConnectModal) {
         openConnectModal();
       } else {
@@ -173,7 +171,7 @@ function MainProfile() {
         (
           ((progressData?.total as any) / progressData?.uploaded) as any
         )?.toFixed(2);
-      console.log(percentageDone);
+      // console.log(percentageDone);
     };
 
     const apiKey = process.env.NEXT_PUBLIC_LIGHTHOUSE_KEY
@@ -182,15 +180,15 @@ function MainProfile() {
 
     const output = await lighthouse.upload(selectedFile, apiKey);
 
-    console.log("File Status:", output);
+    // console.log("File Status:", output);
     setModalData((prevUserData) => ({
       ...prevUserData,
       displayImage: output.data.Hash,
     }));
 
-    console.log(
-      "Visit at https://gateway.lighthouse.storage/ipfs/" + output.data.Hash
-    );
+    // console.log(
+    //   "Visit at https://gateway.lighthouse.storage/ipfs/" + output.data.Hash
+    // );
   };
 
   useEffect(() => {
@@ -204,7 +202,7 @@ function MainProfile() {
           : chain?.name === "Arbitrum One"
           ? "0x912CE59144191C1204E64559FE8253a0e49E6548"
           : "";
-      console.log(walletClient);
+      // console.log(walletClient);
       let delegateTx;
       if (address) {
         delegateTx = await publicClient.readContract({
@@ -214,12 +212,12 @@ function MainProfile() {
           args: [address],
           // account: address1,
         });
-        console.log("Delegate tx", delegateTx);
+        // console.log("Delegate tx", delegateTx);
         delegateTxAddr = delegateTx;
       }
 
       if (delegateTxAddr.toLowerCase() === address?.toLowerCase()) {
-        console.log("Delegate comparison: ", delegateTx, address);
+        // console.log("Delegate comparison: ", delegateTx, address);
         setSelfDelegate(true);
       } else {
         setSelfDelegate(false);
@@ -240,8 +238,8 @@ function MainProfile() {
           : chain?.name === "Arbitrum One"
           ? "0x912CE59144191C1204E64559FE8253a0e49E6548"
           : "";
-      console.log("Contract", contractAddress);
-      console.log("Wallet Client", walletClient);
+      // console.log("Contract", contractAddress);
+      // console.log("Wallet Client", walletClient);
       const delegateTx = await walletClient.writeContract({
         address: contractAddress,
         abi: dao_abi.abi,
@@ -249,9 +247,10 @@ function MainProfile() {
         args: [to],
         account: address1,
       });
-      console.log(delegateTx);
+      // console.log(delegateTx);
     } catch (error) {
       console.log("Error:", error);
+      toast.error("Failed to delegate votes. Please try again.");
     }
   };
 
@@ -259,51 +258,68 @@ function MainProfile() {
     copy(addr);
     toast("Address Copied");
   };
-  const handleUpdateFollowings = async () => {
+  const handleUpdateFollowings = async (daoname: string, isChange: number) => {
+    // console.log("daoName", daoname);
+    // setUnfollowDao(daoname);
     setfollowingmodel(true);
     setLoading(true);
-    const myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
+    try {
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
 
-    const raw = JSON.stringify({
-      address: address,
-      // daoName: dao,
-    });
+      const raw = JSON.stringify({
+        address: address,
+        // daoName: dao,
+      });
 
-    const requestOptions: any = {
-      method: "POST",
-      headers: myHeaders,
-      body: raw,
-      redirect: "follow",
-    };
-    const res = await fetch(
-      `/api/delegate-follow/savefollower`,
-      requestOptions
-    );
-
-    const dbResponse = await res.json();
-    setDbResponse(dbResponse);
-
-    for (const item of dbResponse.data) {
-      const matchDao = item.followings.find(
-        (daoItem: any) => daoItem.dao === daoName
+      const requestOptions: any = {
+        method: "POST",
+        headers: myHeaders,
+        body: raw,
+        redirect: "follow",
+      };
+      const res = await fetch(
+        `/api/delegate-follow/savefollower`,
+        requestOptions
       );
-
-      if (matchDao) {
-        const activeFollowings = matchDao.following.filter(
-          (f: Following) => f.isFollowing
-        );
-        setfollowings(activeFollowings.length);
-        setUserFollowings(activeFollowings);
-      } else {
-        setfollowings(0);
-        setUserFollowings([]);
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
       }
+
+      const dbResponse = await res.json();
+      setDbResponse(dbResponse);
+
+      for (const item of dbResponse.data) {
+        const matchDao = item.followings.find(
+          (daoItem: any) => daoItem.dao === daoname
+        );
+
+        if (matchDao) {
+          const activeFollowings = matchDao.following.filter(
+            (f: Following) => f.isFollowing
+          );
+          if (isChange == 1) {
+            setfollowings(activeFollowings.length);
+          }
+          setUserFollowings(activeFollowings);
+        } else {
+          setfollowings(0);
+          setUserFollowings([]);
+        }
+      }
+    } catch (error) {
+      console.error("Error updating followings:", error);
+      toast.error("Failed to update followings. Please try again.");
+    } finally {
+      setLoading(false);
     }
-    // Close the modal
-    setLoading(false);
   };
-  const toggleFollowing = async (index: number, userupdate: any) => {
+  const toggleFollowing = async (
+    index: number,
+    userupdate: any,
+    unfollowDao: any
+  ) => {
+    // alert(unfollowDao);
     setUserFollowings((prevUsers) =>
       prevUsers.map((user, i) =>
         i === index ? { ...user, isFollowing: !user.isFollowing } : user
@@ -311,7 +327,9 @@ function MainProfile() {
     );
 
     if (!userupdate.isFollowing) {
-      setfollowings(followings + 1);
+      if (daoName === unfollowDao) {
+        setfollowings(followings + 1);
+      }
 
       try {
         const response = await fetch("/api/delegate-follow/savefollower", {
@@ -323,7 +341,7 @@ function MainProfile() {
             // Add any necessary data
             delegate_address: userupdate.follower_address,
             follower_address: address,
-            dao: daoName,
+            dao: unfollowDao,
           }),
         });
 
@@ -333,12 +351,14 @@ function MainProfile() {
 
         const data = await response.json();
         settoaster(false);
-        console.log("Follow successful:", data);
+        // console.log("Follow successful:", data);
       } catch (error) {
         console.error("Error following:", error);
       }
     } else {
-      setfollowings(followings - 1);
+      if (daoName === unfollowDao) {
+        setfollowings(followings - 1);
+      }
       setLoading(true);
       settoaster(true);
       try {
@@ -352,7 +372,7 @@ function MainProfile() {
             delegate_address: userupdate.follower_address,
             follower_address: address,
             action: 1,
-            dao: daoName,
+            dao: unfollowDao,
           }),
         });
 
@@ -363,7 +383,7 @@ function MainProfile() {
         const data = await response.json();
         settoaster(false);
         setLoading(false);
-        console.log("unFollow successful:", data);
+        // console.log("unFollow successful:", data);
       } catch (error) {
         setLoading(false);
         console.error("Error following:", error);
@@ -371,7 +391,11 @@ function MainProfile() {
     }
   };
 
-  const toggleNotification = async (index: number, userupdate: any) => {
+  const toggleNotification = async (
+    index: number,
+    userupdate: any,
+    notificationdao: any
+  ) => {
     setUserFollowings((prevUsers) =>
       prevUsers.map((user, i) =>
         i === index ? { ...user, isNotification: !user.isNotification } : user
@@ -390,7 +414,7 @@ function MainProfile() {
           delegate_address: userupdate.follower_address,
           follower_address: address,
           action: 2,
-          dao: daoName,
+          dao: notificationdao,
           updatenotification: !userupdate.isNotification,
         }),
       });
@@ -401,7 +425,7 @@ function MainProfile() {
 
       const data = await response.json();
       settoaster(false);
-      console.log("notification successful:", data);
+      // console.log("notification successful:", data);
     } catch (error) {
       console.error("Error following:", error);
     }
@@ -415,7 +439,7 @@ function MainProfile() {
   };
 
   const updateFollowerState = async () => {
-    console.log("Attempting to call savefollower API");
+    // console.log("Attempting to call savefollower API");
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
     const raw = JSON.stringify({
@@ -440,7 +464,7 @@ function MainProfile() {
       }
 
       const dbResponse = await resp.json();
-      console.log("API Response:", dbResponse);
+      // console.log("API Response:", dbResponse);
 
       if (
         !dbResponse.success ||
@@ -461,8 +485,8 @@ function MainProfile() {
         currentDaoName = "arbitrum";
       }
 
-      console.log("Current DAO:", currentDaoName);
-      console.log("User Address:", address_user);
+      // console.log("Current DAO:", currentDaoName);
+      // console.log("User Address:", address_user);
 
       // Process following details
       const matchDao = userData.followings?.find(
@@ -523,19 +547,21 @@ function MainProfile() {
       }
 
       const data = await response.json();
-      setIsLoading(false);
       settoggle(!isToggled);
-      console.log("status successfully change!", data);
+      // console.log("status successfully change!", data);
     } catch (error) {
       console.error("Error following:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        // console.log("Fetching from DB");
         // Fetch data from your backend API to check if the address exists
-        console.log("Fetching from DB");
+        // console.log("Fetching from DB");
         // const dbResponse = await axios.get(`/api/profile/${address}`);
 
         let dao =
@@ -587,11 +613,11 @@ function MainProfile() {
         }
 
         if (dbResponse.data.length > 0) {
-          console.log("db Response", dbResponse.data[0]);
-          console.log(
-            "dbResponse.data[0]?.networks:",
-            dbResponse.data[0]?.networks
-          );
+          // console.log("db Response", dbResponse.data[0]);
+          // console.log(
+          //   "dbResponse.data[0]?.networks:",
+          //   dbResponse.data[0]?.networks
+          // );
           setUserData({
             displayName: dbResponse.data[0]?.displayName,
             discord: dbResponse.data[0]?.socialHandles?.discord,
@@ -631,12 +657,6 @@ function MainProfile() {
           }
           setIsPageLoading(false);
         } else {
-          // const res = await fetch(
-          //   `https://api.karmahq.xyz/api/dao/find-delegate?dao=${dao}&user=${address}`
-          // );
-          // const details = await res.json();
-          // console.log("details: ", details.data.delegate);
-
           setUserData({
             displayName: karmaDetails.data.delegate.ensName,
             discord: karmaDetails.data.delegate.discordHandle,
@@ -650,6 +670,7 @@ function MainProfile() {
         }
       } catch (error) {
         console.error("Error fetching data:", error);
+        toast.error("Failed to load profile data. Please try again later.");
         setIsPageLoading(false);
       }
     };
@@ -662,7 +683,7 @@ function MainProfile() {
       // Check if the delegate already exists in the database
       if (newDescription) {
         setDescription(newDescription);
-        console.log("New Description", description);
+        // console.log("New Description", description);
       }
       setIsLoading(true);
       const isExisting = await checkDelegateExists(address);
@@ -672,13 +693,13 @@ function MainProfile() {
         await handleUpdate(newDescription);
         setIsLoading(false);
         onClose();
-        console.log("Existing True");
+        // console.log("Existing True");
       } else {
         // If delegate doesn't exist, add a new delegate
         await handleAdd(newDescription);
         setIsLoading(false);
         onClose();
-        console.log("Sorry! Doesn't exist");
+        // console.log("Sorry! Doesn't exist");
       }
 
       toast.success("Saved");
@@ -692,7 +713,7 @@ function MainProfile() {
   const checkDelegateExists = async (address: any) => {
     try {
       // Make a request to your backend API to check if the address exists
-      console.log("Checking");
+      // console.log("Checking");
 
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
@@ -736,7 +757,7 @@ function MainProfile() {
   const handleAdd = async (newDescription?: string) => {
     try {
       // Call the POST API function for adding a new delegate
-      console.log("Adding the delegate..");
+      // console.log("Adding the delegate..");
       const response = await axios.post(
         "/api/profile",
         {
@@ -768,11 +789,11 @@ function MainProfile() {
         }
       );
 
-      console.log("Response Add", response);
+      // console.log("Response Add", response);
 
       if (response.status === 200) {
         // Delegate added successfully
-        console.log("Delegate added successfully:", response.data);
+        // console.log("Delegate added successfully:", response.data);
         setIsLoading(false);
         setUserData({
           displayImage: modalData.displayImage,
@@ -783,12 +804,10 @@ function MainProfile() {
           github: modalData.github,
         });
       } else {
-        // Handle error response
         console.error("Failed to add delegate:", response.statusText);
         setIsLoading(false);
       }
     } catch (error) {
-      // Handle API call error
       console.error("Error calling POST API:", error);
       setIsLoading(false);
     }
@@ -797,16 +816,16 @@ function MainProfile() {
   // Function to handle updating an existing delegate
   const handleUpdate = async (newDescription?: string) => {
     try {
-      // Call the PUT API function for updating an existing delegate
-
       let dao =
         chain?.name === "Optimism"
           ? "optimism"
           : chain?.name === "Arbitrum One"
           ? "arbitrum"
           : "";
-      console.log("Updating");
-      console.log("Inside Updating Description", newDescription);
+      // console.log("Updating");
+      // console.log("Inside Updating Description", newDescription);
+      // console.log("Updating");
+      // console.log("Inside Updating Description", newDescription);
       // const myHeaders = new Headers();
       // myHeaders.append("Content-Type", "application/json");
       // if (address) {
@@ -841,11 +860,11 @@ function MainProfile() {
           },
         }
       );
-      console.log("response", response);
+      // console.log("response", response);
       // Handle response from the PUT API function
       if (response.data.success) {
         // Delegate updated successfully
-        console.log("Delegate updated successfully");
+        // console.log("Delegate updated successfully");
         setIsLoading(false);
         setUserData({
           displayImage: modalData.displayImage,
@@ -856,12 +875,10 @@ function MainProfile() {
           github: modalData.github,
         });
       } else {
-        // Handle error response
         console.error("Failed to update delegate:", response.error);
         setIsLoading(false);
       }
     } catch (error) {
-      // Handle API call error
       console.error("Error calling PUT API:", error);
       setIsLoading(false);
     }
@@ -878,7 +895,8 @@ function MainProfile() {
                 style={{
                   backgroundColor: "#fcfcfc",
                   border: "2px solid #E9E9E9 ",
-                }}>
+                }}
+              >
                 <div className="w-40 h-40 flex items-center justify-content ">
                   <div className="flex justify-center items-center w-40 h-40">
                     <Image
@@ -940,7 +958,8 @@ function MainProfile() {
                           : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                      target="_blank">
+                      target="_blank"
+                    >
                       <FaXTwitter color="#7C7C7C" size={12} />
                     </Link>
                     <Link
@@ -958,7 +977,8 @@ function MainProfile() {
                           : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                      target="_blank">
+                      target="_blank"
+                    >
                       <BiSolidMessageRoundedDetail color="#7C7C7C" size={12} />
                     </Link>
                     <Link
@@ -969,7 +989,8 @@ function MainProfile() {
                           : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                      target="_blank">
+                      target="_blank"
+                    >
                       <FaDiscord color="#7C7C7C" size={12} />
                     </Link>
                     <Link
@@ -980,17 +1001,20 @@ function MainProfile() {
                           : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                      target="_blank">
+                      target="_blank"
+                    >
                       <FaGithub color="#7C7C7C" size={12} />
                     </Link>
                     <Tooltip
                       content="Update your Profile"
                       placement="top"
-                      showArrow>
+                      showArrow
+                    >
                       <span
                         className="border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 cursor-pointer"
                         style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                        onClick={onOpen}>
+                        onClick={onOpen}
+                      >
                         <FaPencil color="#3e3d3d" size={12} />
                       </span>
                     </Tooltip>
@@ -1020,24 +1044,19 @@ function MainProfile() {
                     content="Copy"
                     placement="bottom"
                     closeDelay={1}
-                    showArrow>
+                    showArrow
+                  >
                     <span className="px-2 cursor-pointer" color="#3E3D3D">
                       <IoCopy onClick={() => handleCopy(`${address}`)} />
                     </span>
                   </Tooltip>
                   <div className="flex space-x-2">
-                    {/* <span className="p-2 bg-gray-200 rounded-lg text-black">
-                      {typeof window !== "undefined" &&
-                        `${BASE_URL}/${
-                          chain?.name === "Optimism" ? "optimism" : "arbitrum"
-                        }/${address}?active=info`}
-                      Copy to Share Profile URL on Warpcast
-                    </span> */}
                     <Tooltip
                       content="Copy your profile URL to share on Warpcast or Twitter."
                       placement="bottom"
                       closeDelay={1}
-                      showArrow>
+                      showArrow
+                    >
                       <Button
                         className="bg-gray-200 hover:bg-gray-300"
                         onClick={() => {
@@ -1053,15 +1072,14 @@ function MainProfile() {
                           setTimeout(() => {
                             setIsCopied(false);
                           }, 3000);
-                        }}>
+                        }}
+                      >
                         <IoShareSocialSharp />
                         {isCopied ? "Copied" : "Share profile"}
                       </Button>
                     </Tooltip>
                   </div>
                 </div>
-
-                {/* {isOpentoaster && toast.loading("Saving...")} */}
 
                 {isOpenFollowings && (
                   <FollowingModal
@@ -1071,6 +1089,7 @@ function MainProfile() {
                     setfollowingmodel={setfollowingmodel}
                     isLoading={isLoading}
                     chainName={chain?.name}
+                    handleUpdateFollowings={handleUpdateFollowings}
                   />
                 )}
 
@@ -1079,7 +1098,8 @@ function MainProfile() {
                     {/* pass address of whom you want to delegate the voting power to */}
                     <button
                       className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
-                      onClick={() => handleDelegateVotes(`${address}`)}>
+                      onClick={() => handleDelegateVotes(`${address}`)}
+                    >
                       Become Delegate
                     </button>
 
@@ -1087,46 +1107,34 @@ function MainProfile() {
                       className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
                       onClick={() =>
                         followings
-                          ? handleUpdateFollowings()
+                          ? handleUpdateFollowings(daoName, 1)
                           : toast.error(
                               "You're not following anyone yet. Start exploring delegate profiles now!"
                             )
-                      }>
+                      }
+                    >
                       {followings} Following
                     </button>
-
-                    {/* <div className="">
-                      <select
-                        value={daoName}
-                        onChange={(e) => setDaoName(e.target.value)}
-                        className="outline-none border border-blue-shade-200 text-blue-shade-200 rounded-full py-2 px-3"
-                      >
-                        <option value="optimism" className="text-gray-700">
-                          Optimism
-                        </option>
-                        <option value="arbitrum" className="text-gray-700">
-                          Arbitrum
-                        </option>
-                      </select>
-                    </div> */}
                   </div>
                 ) : (
                   <div className="pt-2 flex gap-5">
                     <button className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]">
-                      {followers} {" "}{followers === 0 || followers === 1
-                          ? "Follower"
-                          : "Followers"}
+                      {followers}{" "}
+                      {followers === 0 || followers === 1
+                        ? "Follower"
+                        : "Followers"}
                     </button>
 
                     <button
                       className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
                       onClick={() =>
                         followings
-                          ? handleUpdateFollowings()
+                          ? handleUpdateFollowings(daoName, 1)
                           : toast.error(
                               "You're not following anyone yet. Start exploring delegate profiles now!"
                             )
-                      }>
+                      }
+                    >
                       {followings} Followings
                     </button>
                   </div>
@@ -1145,7 +1153,8 @@ function MainProfile() {
                   ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
                   : "border-transparent"
               }`}
-              onClick={() => router.push(path + "?active=info")}>
+              onClick={() => router.push(path + "?active=info")}
+            >
               Info
             </button>
             {selfDelegate === true && (
@@ -1155,7 +1164,8 @@ function MainProfile() {
                     ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
                     : "border-transparent"
                 }`}
-                onClick={() => router.push(path + "?active=votes")}>
+                onClick={() => router.push(path + "?active=votes")}
+              >
                 Past Votes
               </button>
             )}
@@ -1166,8 +1176,14 @@ function MainProfile() {
                   : "border-transparent"
               }`}
               onClick={() =>
-                router.push(path + "?active=sessions&session=schedule")
-              }>
+                router.push(
+                  path +
+                    `?active=sessions&session=${
+                      selfDelegate ? "schedule" : "attending"
+                    }`
+                )
+              }
+            >
               Sessions
             </button>
             <button
@@ -1178,7 +1194,8 @@ function MainProfile() {
               }`}
               onClick={() =>
                 router.push(path + "?active=officeHours&hours=schedule")
-              }>
+              }
+            >
               Office Hours
             </button>
 
@@ -1189,7 +1206,8 @@ function MainProfile() {
                     ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
                     : "border-transparent"
                 }`}
-                onClick={() => router.push(path + "?active=instant-meet")}>
+                onClick={() => router.push(path + "?active=instant-meet")}
+              >
                 Instant Meet
               </button>
             )}
@@ -1246,7 +1264,6 @@ function MainProfile() {
             ) : (
               ""
             )}
-            {/* {searchParams.get("active") === "claimNft" ? <ClaimNFTs /> : ""} */}
           </div>
         </div>
       ) : (

@@ -9,7 +9,7 @@ import chain from "@/assets/images/daos/chain.png";
 import ProposalsSkeletonLoader from "../SkeletonLoader/ProposalsSkeletonLoader";
 import ArbLogo from "@/assets/images/daos/arbCir.png";
 import { dao_details } from "@/config/daoDetails";
-import { RiErrorWarningLine } from "react-icons/ri";
+import ErrorDisplay from "../ComponentUtils/ErrorDisplay";
 
 interface Proposal {
   proposalId: string;
@@ -25,7 +25,6 @@ interface Proposal {
   queueStartTime?: number;
   queueEndTime?: number;
 }
-// Create a cache object outside of the component to persist acrnulls re-renders
 const cache: any = {
   optimism: null,
   arbitrum: null,
@@ -42,25 +41,8 @@ function Proposals({ props }: { props: string }) {
   const [currentPage, setCurrentPage] = useState(1);
   const [canceledProposals, setCanceledProposals] = useState<any[]>([]);
   const proposalsPerPage = 7;
-  const isOptimism = (props === "optimism");
+  const isOptimism = props === "optimism";
   const currentCache = isOptimism ? optimismCache : arbitrumCache;
-
-
-  const ErrorDisplay = ({ message, onRetry }: any) => (
-    <div className="flex flex-col items-center justify-center p-8 bg-red-50 rounded-lg shadow-md">
-      <RiErrorWarningLine className="text-red-500 text-5xl mb-4" />
-      <h2 className="text-2xl font-bold text-red-700 mb-2">
-        Oops! Something went wrong
-      </h2>
-      <p className="text-red-600 text-center mb-6">{message}</p>
-      <button
-        onClick={onRetry}
-        className="px-6 py-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors duration-300"
-      >
-        Try Again
-      </button>
-    </div>
-  );
 
   const VoteLoader = () => (
     <div className=" flex justify-center items-center w-32">
@@ -285,24 +267,14 @@ function Proposals({ props }: { props: string }) {
     }
   }, [displayedProposals, fetchVotes, props]);
 
-
   useEffect(() => {
     const proposals = async () => {
       if (currentCache && currentCache.props === props) {
         setDisplayedProposals(currentCache.updatedProposals);
-        // setCurrentPage(pageCache);
         setLoading(false);
       } else {
         await fetchProposals();
       }
-
-      // return () => {
-      //   pageCache = {
-      //     dao: props,
-      //     proposals: displayedProposals,
-      //     currentPage: currentPage,
-      //   };
-      // };
     };
     proposals();
   }, [props]);
@@ -325,11 +297,7 @@ function Proposals({ props }: { props: string }) {
             : "DEFEATED";
         }
       } else {
-        // Fallback to old logic if queue times are not available
         const proposalAge = currentTime - proposal.blockTimestamp;
-        // if (proposalAge <= 3 * 24 * 60 * 60) {
-        //   return "PENDING";
-        // } else
         if (proposalAge <= 17 * 24 * 60 * 60) {
           return "PENDING";
         } else {
@@ -339,7 +307,6 @@ function Proposals({ props }: { props: string }) {
         }
       }
     } else {
-      // Optimism logic
       if (
         canceledProposals.some(
           (item) => item.proposalId === proposal.proposalId
@@ -362,7 +329,7 @@ function Proposals({ props }: { props: string }) {
     if (props === "optimism") {
       let nextPage;
       if (currentCache) {
-        nextPage = (currentCache.updatedProposals.length / proposalsPerPage) + 1;
+        nextPage = currentCache.updatedProposals.length / proposalsPerPage + 1;
       } else {
         nextPage = currentPage + 1;
       }
@@ -393,23 +360,18 @@ function Proposals({ props }: { props: string }) {
   }, [props, allProposals, currentPage, displayedProposals.length]);
 
   const truncateText = (text: string, charLimit: number) => {
-    // Remove all '#' characters from the text
     const cleanedText = text.replace(/#/g, "");
 
-    // Truncate the cleaned text if necessary
     return cleanedText.length <= charLimit
       ? cleanedText
       : cleanedText.slice(0, charLimit) + "...";
   };
 
   const formatDate = (timestamp: number): string => {
-    // Convert the timestamp to milliseconds if it's in seconds
     const milliseconds = timestamp * 1000;
 
-    // Create a date object in the local time zone
     const date = new Date(milliseconds);
 
-    // Format the date components
     const day = date.getDate();
     const month = date.toLocaleString("en-US", { month: "long" });
     const year = date.getFullYear();
@@ -417,14 +379,9 @@ function Proposals({ props }: { props: string }) {
     const minutes = String(date.getMinutes()).padStart(2, "0");
     const seconds = String(date.getSeconds()).padStart(2, "0");
     const ampm = hours >= 12 ? "PM" : "AM";
-
-    // Format hours for 12-hour clock
     const formattedHours = String(hours % 12 || 12).padStart(2, "0");
-
-    // Get the local time zone abbreviation
     const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-    // Construct the formatted date string
     return `${day} ${month}, ${year} ${formattedHours}:${minutes}:${seconds} ${ampm}`;
   };
 
@@ -456,8 +413,9 @@ function Proposals({ props }: { props: string }) {
             <div className="flex basis-1/2">
               <Image
                 src={dao_details[props as keyof typeof dao_details].logo}
-                alt={`${dao_details[props as keyof typeof dao_details].title
-                  } logo`}
+                alt={`${
+                  dao_details[props as keyof typeof dao_details].title
+                } logo`}
                 className="size-10 mx-5 rounded-full"
               />
               <div>
@@ -488,25 +446,17 @@ function Proposals({ props }: { props: string }) {
               </Tooltip>
               {proposal.votesLoaded ? (
                 <div
-                  className={`rounded-full flex items-center justify-center text-xs h-fit py-0.5 border font-medium w-24 ${getProposalStatus(proposal) === "SUCCEEDED"
+                  className={`rounded-full flex items-center justify-center text-xs h-fit py-0.5 border font-medium w-24 ${
+                    getProposalStatus(proposal) === "SUCCEEDED"
                       ? "bg-green-200 border-green-600 text-green-600"
                       : getProposalStatus(proposal) === "DEFEATED" ||
                         getProposalStatus(proposal) === "CANCELLED"
-                        ? "bg-red-200 border-red-500 text-red-500"
-                        : getProposalStatus(proposal) === "QUEUED"
-                          ? "bg-yellow-200 border-yellow-600 text-yellow-600"
-                          : "bg-green-200 border-green-600 text-green-600"
-                    }`}
+                      ? "bg-red-200 border-red-500 text-red-500"
+                      : getProposalStatus(proposal) === "QUEUED"
+                      ? "bg-yellow-200 border-yellow-600 text-yellow-600"
+                      : "bg-yellow-200 border-yellow-600 text-yellow-600"
+                  }`}
                 >
-                  {/* {
-                   canceledProposals.some((item) => item.proposalId === proposal.proposalId)
-                   ? "CANCELLED"
-                   : new Date() > new Date(proposal.blockTimestamp * 1000 + (props==="optimism" ? 7:17) * 24 * 60 * 60 * 1000)
-                     ? proposal.support1Weight! > proposal.support0Weight!
-                       ? "SUCCEEDED"
-                       : "DEFEATED"
-                     : "PENDING"
-                  } */}
                   {getProposalStatus(proposal)}
                 </div>
               ) : (
@@ -515,23 +465,24 @@ function Proposals({ props }: { props: string }) {
 
               {proposal.votesLoaded ? (
                 <div
-                  className={`py-0.5 rounded-md text-sm font-medium flex justify-center items-center w-32 
-                  ${proposal.support1Weight! === 0 &&
-                      proposal.support0Weight! === 0 &&
-                      proposal.support2Weight! === 0
-                      ? "bg-yellow-200 border-yellow-600 text-yellow-600"
-                      : proposal.support1Weight! > proposal.support0Weight!
-                        ? "text-[#639b55] border-[#639b55] bg-[#dbf8d4]"
-                        : "bg-[#fa989a] text-[#e13b15] border-[#e13b15]"
-                    }`}
-                >
-                  {proposal.support1Weight! === 0 &&
+                  className={`py-0.5 rounded-md text-sm font-medium border flex justify-center items-center w-32 
+                  ${
+                    proposal.support1Weight! === 0 &&
                     proposal.support0Weight! === 0 &&
                     proposal.support2Weight! === 0
+                      ? "bg-[#FFEDD5] border-[#F97316] text-[#F97316]"
+                      : proposal.support1Weight! > proposal.support0Weight!
+                      ? "text-[#639b55] border-[#639b55] bg-[#dbf8d4]"
+                      : "bg-[#fa989a] text-[#e13b15] border-[#e13b15]"
+                  }`}
+                >
+                  {proposal.support1Weight! === 0 &&
+                  proposal.support0Weight! === 0 &&
+                  proposal.support2Weight! === 0
                     ? "Yet to start"
                     : proposal.support1Weight! > proposal.support0Weight!
-                      ? `${formatWeight(proposal.support1Weight!)} FOR`
-                      : `${formatWeight(proposal.support0Weight!)} AGAINST`}
+                    ? `${formatWeight(proposal.support1Weight!)} FOR`
+                    : `${formatWeight(proposal.support0Weight!)} AGAINST`}
                 </div>
               ) : (
                 <VoteLoader />
@@ -558,8 +509,9 @@ function Proposals({ props }: { props: string }) {
                     if (props === "arbitrum") {
                       if (daysDifference <= 3) {
                         const daysLeft = Math.ceil(3 - daysDifference);
-                        return `${daysLeft} day${daysLeft !== 1 ? "s" : ""
-                          } to go`;
+                        return `${daysLeft} day${
+                          daysLeft !== 1 ? "s" : ""
+                        } to go`;
                       } else if (daysDifference <= 17) {
                         return "Active";
                       } else {

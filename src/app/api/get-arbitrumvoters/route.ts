@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+export const revalidate = 0;
 
 export const GET = async (req: NextRequest) => {
     const url = new URL(req.url);
