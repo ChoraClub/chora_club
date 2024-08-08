@@ -18,7 +18,6 @@ import user6 from "@/assets/images/user/user6.svg";
 import user7 from "@/assets/images/user/user7.svg";
 import user8 from "@/assets/images/user/user8.svg";
 import user9 from "@/assets/images/user/user9.svg";
-// import { parseISO } from "date-fns";
 import posterImage from "@/assets/images/daos/thumbnail1.png";
 import { getEnsName } from "@/utils/ENSUtils";
 import logo from "@/assets/images/daos/CCLogo.png";
@@ -31,6 +30,7 @@ interface meeting {
   meetingData: any;
   showClaimButton?: boolean;
   session?: string; 
+  gridCols?: string;
 }
 
 type DaoName = "optimism" | "arbitrum";
@@ -43,7 +43,7 @@ const getDaoLogo = (daoName: string): StaticImageData => {
   return daoLogos[normalizedName] || arblogo;
 };
 
-function RecordedSessionsTile({ meetingData , showClaimButton,session}: meeting) {
+function RecordedSessionsTile({ meetingData , showClaimButton,session, gridCols = "2xl:grid-cols-4" }: meeting) {
 
   const [hoveredVideo, setHoveredVideo] = useState<number | null>(null);
   const videoRefs = useRef<any>([]);
@@ -205,7 +205,7 @@ function RecordedSessionsTile({ meetingData , showClaimButton,session}: meeting)
 
   return (
     <>
-      <div className="grid min-[475px]:grid-cols- md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-10 py-8 font-poppins">
+      <div className={`grid min-[475px]:grid-cols- md:grid-cols-2 lg:grid-cols-3 ${gridCols} gap-10 py-8 font-poppins`}>
         {meetingData.map((data: any, index: number) => (
           <div
             key={index}

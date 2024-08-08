@@ -160,23 +160,6 @@ function WatchSession({
     return lines.length;
   };
 
-  // const getLineCount = (text: string) => {
-  //   if (typeof text !== 'string') {
-  //     return 0;
-  //   }
-
-  //   const lines = text.split('\n');
-  //   let lineCount = 0;
-
-  //   for (let line of lines) {
-  //     line = line.trim();
-  //     if (line.length > 0) {
-  //       lineCount++;
-  //     }
-  //   }
-
-  //   return lineCount;
-  // };
   useEffect(() => {
     const fetchEnsName = async () => {
       const name = await getEnsName(data.host_address.toLowerCase());
@@ -522,15 +505,8 @@ function WatchSession({
             <div
               className={`px-6 pt-4 pb-4 rounded-b-3xl bg-white text-[#1E1E1E]`}
             >
-              <>
-                {/* <div
-                className={`${
-                  isExpanded ? "max-h-full" : "max-h-24 line-clamp-3"
-                } transition-[max-height] duration-500 ease-in-out `}
-              >
-                {data.description}
-              </div> */}
-                <div
+              <>                
+              <div
                   ref={contentRef}
                   className={`max-h-full transition-max-height duration-500 ease-in-out overflow-hidden ${
                     isExpanded ? "max-h-full" : "max-h-24 line-clamp-3"
@@ -555,10 +531,19 @@ function WatchSession({
           )
         )}
       </div>
+      <div className="flex justify-between mt-5">
+          <p className="text-lg font-medium text-blue-shade-100">
+            Video Recommendations
+          </p>
+          
+        <Link href={"/sessions?active=recordedSessions"} className="text-[10px] text-blue-shade-100 bg-blue-shade-700 rounded py-1 px-2 border border-blue-shade-100 flex items-center justify-center cursor-pointer">
+          View All
+        </Link>
+        </div>
       {dataLoading ? (
-        <RecordedSessionsSpecificSkeletonLoader />
+        <RecordedSessionsSpecificSkeletonLoader itemCount={3} gridCols="2xl:grid-cols-3"/>
       ) :  (
-        <RecordedSessionsTile meetingData={meetings} />)
+        <RecordedSessionsTile meetingData={meetings} gridCols="2xl:grid-cols-3"/>)
       }
       {modalOpen && (
         <ReportOptionModal
@@ -568,18 +553,6 @@ function WatchSession({
           onClose={handleModalClose}
         />
       )}
-      {/* <Toaster
-        toastOptions={{
-          style: {
-            fontSize: "14px",
-            backgroundColor: "#3E3D3D",
-            color: "#fff",
-            boxShadow: "none",
-            borderRadius: "50px",
-            padding: "3px 5px",
-          },
-        }}
-      /> */}
 
       {shareModal && (
         <ShareMediaModal

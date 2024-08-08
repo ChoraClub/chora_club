@@ -1,9 +1,9 @@
 import React from 'react'
 
-const RecordedSessionsSpecificSkeletonLoader = () => {
+const RecordedSessionsSpecificSkeletonLoader = ({ itemCount = 8 , gridCols = "2xl:grid-cols-4" }) => {
   return (
-    <div className="grid min-[475px]:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-10 py-8 font-poppins">
-  {Array.from({ length: 3 }).map((_, index) => (
+    <div className={`grid min-[475px]:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 ${gridCols} gap-10 py-8 font-poppins`}>
+  {Array.from({ length: itemCount }).map((_, index) => (
     <div key={index} className="rounded-3xl">
       <div className="w-full h-44 rounded-t-3xl bg-gray-200 animate-pulse"></div>
       <div className="py-2">
