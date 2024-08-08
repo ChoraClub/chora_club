@@ -121,7 +121,22 @@ const BottomBar = ({
     }
 
     try {
-      const status = await fetch(`/api/stopRecording/${roomId}`);
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      if (address) {
+        myHeaders.append("x-wallet-address", address);
+      }
+      const requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        body: JSON.stringify({
+          roomId: roomId,
+        }),
+      };
+      const status = await fetch(
+        `/api/stopRecording/${roomId}`,
+        requestOptions
+      );
       console.log("status: ", status);
 
       if (!status.ok) {
@@ -175,7 +190,23 @@ const BottomBar = ({
 
   const startRecording = async () => {
     try {
-      const status = await fetch(`/api/startRecording/${params.roomId}`);
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      if (address) {
+        myHeaders.append("x-wallet-address", address);
+      }
+      const requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        body: JSON.stringify({
+          roomId: params.roomId,
+        }),
+      };
+
+      const status = await fetch(
+        `/api/startRecording/${params.roomId}`,
+        requestOptions
+      );
       if (!status.ok) {
         console.error(`Request failed with status: ${status.status}`);
         toast.error("Failed to start recording");

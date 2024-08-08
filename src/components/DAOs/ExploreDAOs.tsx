@@ -3,12 +3,8 @@
 import React, { useState, useEffect } from "react";
 import Image, { StaticImageData } from "next/image";
 import search from "@/assets/images/daos/search.png";
-import op_logo from "@/assets/images/daos/op.png";
-import arb_logo from "@/assets/images/daos/arbitrum.jpg";
-// import { useRouter } from "next/navigation";
 import { useRouter } from "next-nprogress-bar";
 import { ImCross } from "react-icons/im";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { FaCirclePlus } from "react-icons/fa6";
 import Link from "next/link";
 import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
@@ -16,10 +12,6 @@ import { dao_details } from "@/config/daoDetails";
 import ExploreDaosSkeletonLoader from "../SkeletonLoader/ExploreDaosSkeletonLoader";
 
 function ExploreDAOs() {
-  // const dao_info = [
-  //   { name: "Optimism", value: "193K", img: op_logo },
-  //   { name: "Arbitrum", value: "294k", img: arb_logo },
-  // ];
 
   const dao_info = Object.keys(dao_details).map((key) => {
     const dao = dao_details[key];
@@ -33,13 +25,10 @@ function ExploreDAOs() {
   const [daoInfo, setDaoInfo] = useState(dao_info);
   const [searchQuery, setSearchQuery] = useState("");
   const [status, setStatus] = useState(true);
-
   const router = useRouter();
   const [showNotification, setShowNotification] = useState(true);
   const [isPageLoading, setIsPageLoading] = useState(true);
   const [isHovered, setIsHovered] = useState(false);
-  const [circlePosition, setCirclePosition] = useState({ x: 0, y: 0 });
-  const [IshowCircle, SetCircleShow] = useState(false);
 
   useEffect(() => {
     const storedStatus = sessionStorage.getItem("notificationStatus");
@@ -70,25 +59,6 @@ function ExploreDAOs() {
     router.push(`/${formatted}?active=about`);
   };
 
-  const handleClose = () => {
-    setStatus(false);
-    localStorage.setItem("hasSeenNotification", "true");
-  };
-  // const coursercall=(event)=>{
-  //   const rect = event.currentTarget.getBoundingClientRect();
-  //   const x = event.clientX - rect.left;
-  //   const y = event.clientY - rect.top;
-
-  //   setCirclePosition({ x, y });
-  //   SetCircleShow(true);
-  //   console.log(circlePosition);
-
-  //   setTimeout(() => {
-  //     SetCircleShow(false);
-  //   }, 1000); // Adjust the time as needed
-
-  // }
-
   return (
     <div className="pt-6 pl-14 pr-6 min-h-screen">
       <div className="">
@@ -99,7 +69,6 @@ function ExploreDAOs() {
 
           <div>
             <ConnectWalletWithENS />
-            {/* <ConnectButton /> */}
           </div>
         </div>
 

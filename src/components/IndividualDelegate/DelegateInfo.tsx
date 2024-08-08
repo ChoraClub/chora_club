@@ -87,7 +87,6 @@ function DelegateInfo({ props, desc }: { props: Type; desc: string }) {
             ) {
               sessionHostingCount++;
             }
-            // console.log("op host count: ", sessionHostingCount);
             setSessionHostCount(sessionHostingCount);
             setSessionHostedLoading(false);
           });
@@ -123,7 +122,6 @@ function DelegateInfo({ props, desc }: { props: Type; desc: string }) {
             ) {
               sessionAttendingCount++;
             }
-            // console.log("op attended count: ", sessionAttendingCount);
             setSessionAttendCount(sessionAttendingCount);
             setSessionAttendedLoading(false);
           });
@@ -246,7 +244,6 @@ function DelegateInfo({ props, desc }: { props: Type; desc: string }) {
   const convertMarkdownToHtml = async (markdown: string): Promise<string> => {
     let html = await marked.parse(markdown);
     
-    // Replace <pre> tags with custom styled divs
     html = html.replace(/<pre>([\s\S]*?)<\/pre>/g, (match, content) => {
       return `<div class="${styles.preFormatted}">${content}</div>`;
     });
@@ -289,7 +286,6 @@ function DelegateInfo({ props, desc }: { props: Type; desc: string }) {
             headers: {
               "Content-Type": "application/json",
             },
-            // body: JSON.stringify({ individualDelegate: props.individualDelegate }),
           }
         );
 
@@ -300,8 +296,6 @@ function DelegateInfo({ props, desc }: { props: Type; desc: string }) {
         const data = await res.json();
         const statement = data.statement.payload.delegateStatement;
         console.log("statement", statement);
-        // setOpAgoraDescription(statement);
-        // setConvertedDescription(convertMarkdownToHtml(statement));
         const statementHtml = await convertMarkdownToHtml(statement);
         setOpAgoraDescription(statement);
         setConvertedDescription(statementHtml);

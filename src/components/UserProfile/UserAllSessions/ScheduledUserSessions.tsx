@@ -10,12 +10,9 @@ import { Tooltip } from "@nextui-org/react";
 import SchedulingSuccessModal from "./SchedulingSuccessModal";
 import { RxCross2 } from "react-icons/rx";
 import AddEmailModal from "@/components/ComponentUtils/AddEmailModal";
-
 import Image from "next/image";
-
 import AvailableUserSessions from "./AvailableUserSessions";
 import styles from "./ScheduleUserSessions.module.css";
-// import { Input } from "@nextui-org/react";
 import { TimeInput } from "@nextui-org/react";
 import { Time } from "@internationalized/date";
 import { AbiEncodingLengthMismatchError } from "viem";
@@ -32,7 +29,6 @@ interface dataToStore {
 
 function ScheduledUserSessions({ daoName }: { daoName: string }) {
   const { address } = useAccount();
-  // const address = "0x5e349eca2dc61abcd9dd99ce94d04136151a09ee";
   const [timeSlotSizeMinutes, setTimeSlotSizeMinutes] = useState(30);
   const [selectedDate, setSelectedDate] = useState<any>("");
   const [dateAndRanges, setDateAndRanges] = useState<any>([]);
@@ -40,10 +36,7 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
   const [startMinute, setStartMinute] = useState("");
   const [endHour, setEndHour] = useState("");
   const [endMinute, setEndMinute] = useState("");
-  // const [startTime, setStartTime] = useState("");
-  // const [endTime, setEndTime] = useState("");
   const [allowedDates, setAllowedDates] = useState<any>([]);
-  // const [daoName, setDaoName] = useState("");
   const { chain, chains } = useNetwork();
   const [utcStartTime, setUtcStartTime] = useState("");
   const [utcEndTime, setUtcEndTime] = useState("");
@@ -65,10 +58,6 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
   const [addingEmail, setAddingEmail] = useState<boolean>();
   const [scheduledSuccess, setScheduledSuccess] = useState<boolean>();
   const [sessionCreated, setSessionCreated] = useState(false);
-  // const [numberOfSessions, setNumberOfSessions] = useState(0);
-  // const [generatedTimeSlots, setGeneratedTimeSlots] = useState<
-  //   Array<{ time: string; date: string }>
-  // >([]);
   const [timeSlots, setTimeSlots] = useState<Date[]>([]);
   const [sessions, setSessions] = useState(0);
   const [startTime, setStartTime] = useState({
@@ -81,6 +70,18 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
     minute: "00",
     ampm: "AM",
   });
+
+  const isTimeslotInPast = (date: any, time: any) => {
+    const now = new Date();
+    const slotDateTime = new Date(`${date} ${time}`);
+    return slotDateTime < now;
+  };
+
+  const areAllSlotsPast = () => {
+    if (timeSlots.length === 0) return false;
+    const currentDate = new Date();
+    return timeSlots.every((slot) => slot < currentDate);
+  };
 
   const convertTo12Hour = (time: string) => {
     const [hour, minute] = time.split(":").map(Number);
@@ -149,6 +150,12 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
 
     setTimeSlots(slots);
     setSessions(slots.length);
+
+    if (areAllSlotsPast()) {
+      toast.error(
+        "All generated time slots are in the past. Please select a future time range."
+      );
+    }
   };
   const [EnsName, setDisplayEnsName] = useState<string>();
 
@@ -392,24 +399,6 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
     return result;
   };
 
-  // const handleRemoveDate = (dateToRemove: any, timeRanges: any) => {
-  //   console.log("dateToRemove", dateToRemove);
-  //   console.log("timeRanges", timeRanges);
-  //   const updatedDates = allData.filter(
-  //     (item: any) => item.date !== dateToRemove
-  //   );
-  //   setAllData(updatedDates);
-  //   const updatedDateAndRanges = dateAndRanges.filter(
-  //     (item: any) => item.date !== dateToRemove
-  //   );
-  //   setDateAndRanges(updatedDateAndRanges);
-
-  //   const updatedAllowedDates = allowedDates.filter(
-  //     (date: any) => date !== dateToRemove
-  //   );
-  //   setAllowedDates(updatedAllowedDates);
-  // };
-
   const handleRemoveDate = (
     dateToRemove: string,
     timeRangesToRemove: any[]
@@ -435,14 +424,14 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
     }
   };
 
-  // const handleAddSelectedDate = async () => {
-  //   if (!selectedDate || !startHour || !startMinute || !endHour || !endMinute) {
-  //     toast.error("Please select a date and time ranges before adding.");
-  //     return;
-  //   }
   const handleAddSelectedDate = async () => {
     if (!selectedDate || !startTime || !endTime) {
       toast.error("Please select a date and time ranges before adding.");
+      return;
+    }
+
+    if (areAllSlotsPast()) {
+      toast.error("Cannot add session. All time slots are in the past.");
       return;
     }
 
@@ -462,7 +451,6 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
 
     const newAllData = {
       date: selectedDate,
-      // timeRanges: [[startHour, startMinute, endHour, endMinute]],
       timeRanges: [[formattedStartTime, formattedEndTime]],
     };
 
@@ -503,6 +491,7 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
     setStartTime({ hour: "12", minute: "00", ampm: "AM" });
     setEndTime({ hour: "12", minute: "00", ampm: "AM" });
     setSessions(0);
+    setTimeSlots([]);
   };
 
   useEffect(() => {
@@ -612,20 +601,13 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
     setShowGetMailModal(false);
   };
 
-  // useEffect(() => {
-  //   if (chain && chain?.name === "Optimism") {
-  //     setDaoName("optimism");
-  //   } else if (chain && chain?.name === "Arbitrum One") {
-  //     setDaoName("arbitrum");
-  //   }
-  // }, [chain, chain?.name]);
-
   return (
     <>
       <div className="flex flex-col md:flex-row justify-center gap-8 md:gap-10 1.5lg:gap-20 p-4">
         {/* First box- left side */}
         <div
-          className={`w-full md:w-auto p-8 bg-white rounded-2xl ${styles.boxshadow} basis-1/2`}>
+          className={`w-full md:w-auto p-8 bg-white rounded-2xl ${styles.boxshadow} basis-1/2`}
+        >
           <div className="mb-4">
             <label className="text-gray-700 font-semibold flex items-center">
               Select DAO Name:
@@ -639,7 +621,8 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
                 }
                 showArrow
                 placement="right"
-                delay={1}>
+                delay={1}
+              >
                 <span className="px-2">
                   <FaCircleInfo className="cursor-pointer text-blue-500" />
                 </span>
@@ -664,7 +647,8 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
                 }
                 showArrow
                 placement="right"
-                delay={1}>
+                delay={1}
+              >
                 <span className="px-2">
                   <FaCircleInfo className="cursor-pointer text-blue-500" />
                 </span>
@@ -673,7 +657,8 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
             <select
               value={timeSlotSizeMinutes}
               onChange={(e: any) => setTimeSlotSizeMinutes(e.target.value)}
-              className="border border-gray-300 rounded px-3 py-2 mt-1 w-full cursor-pointer">
+              className="border border-gray-300 rounded px-3 py-2 mt-1 w-full cursor-pointer"
+            >
               {/* <option value={15}>15 minutes</option> */}
               <option value={30}>30 minutes</option>
               <option value={45} disabled>
@@ -693,7 +678,8 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
                 }
                 showArrow
                 placement="right"
-                delay={1}>
+                delay={1}
+              >
                 <span className="px-2">
                   <FaCircleInfo className="cursor-pointer text-blue-500" />
                 </span>
@@ -719,7 +705,8 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
                 }
                 showArrow
                 placement="right"
-                delay={1}>
+                delay={1}
+              >
                 <span className="px-2">
                   <FaCircleInfo className="cursor-pointer text-blue-500" />
                 </span>
@@ -729,48 +716,14 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="text-gray-500 mt-2">Start Time</label>
-
-                {/* <div className="rounded-md flex items-center space-x-2">
-                  <select className="p-2 border rounded cursor-pointer" id="hour" value={startTime.hour} onChange={handleStartTimeChange}>
-                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((hour) => (
-                      <option key={hour} value={hour}>
-                        {hour.toString().padStart(2, "0")}
-                <label className="text-gray-500 mt-1">Start Time</label>
-                <div className="relative">
-                  <select
-                    className="appearance-none border border-gray-300 rounded px-3 py-2 mt-1 w-full bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-300 focus:outline-none focus:border-blue-400 dark:focus:border-blue-400 transition duration-300 ease-in-out cursor-pointer"
-                    value={selectedStartTime}
-                    onChange={handleStartTimeChange}>
-                    {startTimeOptions.map((time) => (
-                      <option
-                        key={time}
-                        value={time}
-                        className={`py-2 px-4 hover:bg-blue-100 dark:hover:bg-gray-700 custom-time-picker-option`}>
-                        {time}
-                      </option>
-                    ))}
-                  </select>
-                  <span>:</span>
-                  <select className="p-2 border rounded cursor-pointer" id="minute" value={startTime.minute} onChange={handleStartTimeChange}>
-                    {[0, 30].map((minute) => (
-                      <option key={minute} value={minute}>
-                        {minute.toString().padStart(2, "0")}
-                      </option>
-                    ))}
-                  </select>
-                  <select className="p-2 border rounded cursor-pointer" id="ampm" value={startTime.ampm} onChange={handleStartTimeChange}>
-                    <option value="AM">AM</option>
-                    <option value="PM">PM</option>
-                  </select>
-                </div> */}
-
                 <div className="rounded-md flex items-center space-x-2">
                   <select
                     value={startTime.hour}
                     className="p-2 border rounded cursor-pointer"
                     onChange={(e) =>
                       handleTimeChange("start", "hour", e.target.value)
-                    }>
+                    }
+                  >
                     {[...Array(12)].map((_, i) => (
                       <option key={i} value={String(i + 1).padStart(2, "0")}>
                         {String(i + 1).padStart(2, "0")}
@@ -783,7 +736,8 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
                     className="p-2 border rounded cursor-pointer"
                     onChange={(e) =>
                       handleTimeChange("start", "minute", e.target.value)
-                    }>
+                    }
+                  >
                     <option value="00">00</option>
                     <option value="30">30</option>
                   </select>
@@ -792,7 +746,8 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
                     className="p-2 border rounded cursor-pointer"
                     onChange={(e) =>
                       handleTimeChange("start", "ampm", e.target.value)
-                    }>
+                    }
+                  >
                     <option value="AM">AM</option>
                     <option value="PM">PM</option>
                   </select>
@@ -800,60 +755,14 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
               </div>
               <div>
                 <label className="text-gray-500 mt-1">End Time</label>
-
-                {/* <div className="rounded-md flex items-center space-x-2">
-                  <select
-                    className="p-2 border rounded cursor-pointer"
-                    id="hour"
-                    value={endTime.hour}
-                    onChange={handleEndTimeChange}
-                  >
-                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((hour) => (
-                      <option key={hour} value={hour}>
-                        {hour.toString().padStart(2, "0")}
-                    className="appearance-none border border-gray-300 rounded px-3 py-2 mt-1 w-full bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-300 focus:outline-none focus:border-blue-400 dark:focus:border-blue-400 transition duration-300 ease-in-out cursor-pointer"
-                    value={selectedEndTime}
-                    onChange={handleEndTimeChange}>
-                    {endTimeOptions.map((time) => (
-                      <option
-                        key={time}
-                        value={time}
-                        className={`py-2 px-4 hover:bg-blue-100 dark:hover:bg-gray-700 custom-time-picker-option`}
-                        style={{ cursor: "pointer" }}>
-                        {time}
-                      </option>
-                    ))}
-                  </select>
-                  <span>:</span>
-                  <select
-                    className="p-2 border rounded cursor-pointer"
-                    id="minute"
-                    value={endTime.minute}
-                    onChange={handleEndTimeChange}
-                  >
-                    {[0, 30].map((minute) => (
-                      <option key={minute} value={minute}>
-                        {minute.toString().padStart(2, "0")}
-                      </option>
-                    ))}
-                  </select>
-                  <select
-                    className="p-2 border rounded cursor-pointer"
-                    id="ampm"
-                    value={endTime.ampm}
-                    onChange={handleEndTimeChange}
-                  >
-                    <option value="AM">AM</option>
-                    <option value="PM">PM</option>
-                  </select>
-                </div> */}
                 <div className="rounded-md flex items-center space-x-2">
                   <select
                     value={endTime.hour}
                     className="p-2 border rounded cursor-pointer"
                     onChange={(e) =>
                       handleTimeChange("end", "hour", e.target.value)
-                    }>
+                    }
+                  >
                     {[...Array(12)].map((_, i) => (
                       <option key={i} value={String(i + 1).padStart(2, "0")}>
                         {String(i + 1).padStart(2, "0")}
@@ -866,7 +775,8 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
                     className="p-2 border rounded cursor-pointer"
                     onChange={(e) =>
                       handleTimeChange("end", "minute", e.target.value)
-                    }>
+                    }
+                  >
                     <option value="00">00</option>
                     <option value="30">30</option>
                   </select>
@@ -875,7 +785,8 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
                     className="p-2 border rounded cursor-pointer"
                     onChange={(e) =>
                       handleTimeChange("end", "ampm", e.target.value)
-                    }>
+                    }
+                  >
                     <option value="AM">AM</option>
                     <option value="PM">PM</option>
                   </select>
@@ -896,7 +807,8 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
                   }
                   showArrow
                   placement="right"
-                  delay={1}>
+                  delay={1}
+                >
                   <span className="px-2">
                     <FaCircleInfo className="cursor-pointer text-blue-500" />
                   </span>
@@ -907,27 +819,6 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
               </div>
             </div>
 
-            {/* <div className="flex flex-col gap-2">
-              {generatedTimeSlots.length > 0 && (
-                <div className="mt-4">
-                  <h3 className="text-lg font-semibold mb-2">
-                    Generated Time Slots:
-                  </h3>
-                  <div className="grid grid-cols-3 gap-2 w-full">
-                    {generatedTimeSlots.map((slot, index) => (
-                      <div
-                        key={index}
-                        className="border border-gray-300 p-1.5 rounded-md flex flex-col items-center text-left basis-1/3 text-sm font-poppins bg-[#f5f5f5]"
-                      >
-                        <p>{slot.time}</p>
-                        <p>{slot.date}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div> */}
-
             <div className="flex flex-col gap-2">
               {timeSlots.length > 0 && (
                 <div className="mt-4">
@@ -935,17 +826,34 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
                     Generated Time Slots:
                   </h3>
                   <div className="grid grid-cols-4 gap-2 w-full">
-                    {timeSlots.map((slot, index) => (
-                      <div
-                        key={index}
-                        className="shadow hover:bg-gray-50 p-1.5 rounded-md flex flex-col items-center text-left basis-1/3 text-sm font-poppins bg-[#f5f5f5]">
-                        {slot.toLocaleTimeString("en-US", {
-                          hour: "numeric",
-                          minute: "2-digit",
-                          hour12: true,
-                        })}
-                      </div>
-                    ))}
+                    {timeSlots.map((slot, index) => {
+                      const slotTime = slot.toLocaleTimeString("en-US", {
+                        hour: "numeric",
+                        minute: "2-digit",
+                        hour12: false,
+                      });
+                      const isPast =
+                        selectedDate ===
+                          new Date().toISOString().split("T")[0] &&
+                        isTimeslotInPast(selectedDate, slotTime);
+                      return (
+                        <div
+                          key={index}
+                          className={`shadow p-1.5 rounded-md flex flex-col items-center text-left basis-1/3 text-sm font-poppins ${
+                            isPast
+                              ? "bg-red-100 text-red-500"
+                              : "bg-[#f5f5f5] hover:bg-gray-50"
+                          }`}
+                        >
+                          {slot.toLocaleTimeString("en-US", {
+                            hour: "numeric",
+                            minute: "2-digit",
+                            hour12: true,
+                          })}
+                          {isPast && <span className="text-xs">(Past)</span>}
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               )}
@@ -954,10 +862,13 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
 
           <button
             onClick={handleAddSelectedDate}
-            disabled={sessions === 0}
+            disabled={areAllSlotsPast()}
             className={`bg-blue-shade-400 hover:bg-blue-shade-500 text-[#0500FF] font-semibold py-2 px-4 rounded-md shadow-md transition duration-300 ease-in-out ${
-              sessions === 0 ? "cursor-not-allowed " : "cursor-pointer"
-            }`}>
+              areAllSlotsPast()
+                ? "opacity-50 cursor-not-allowed"
+                : "cursor-pointer"
+            }`}
+          >
             <span className="flex items-center gap-3">
               <FaPlus className="" />
               Add Session
@@ -972,7 +883,8 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
               {allData.map((item: any, index: any) => (
                 <div
                   key={index}
-                  className="bg-white p-4 rounded-lg shadow-md flex justify-between items-center">
+                  className="bg-white p-4 rounded-lg shadow-md flex justify-between items-center"
+                >
                   <div>
                     <p className="font-semibold text-gray-700">{item.date}</p>
                     <p className="text-gray-600">
@@ -993,7 +905,8 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
                       createSessionLoading
                         ? "opacity-50 cursor-not-allowed"
                         : "hover:bg-red-100"
-                    }`}>
+                    }`}
+                  >
                     Remove
                   </button>
                 </div>
@@ -1008,7 +921,8 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
                 ? "bg-green-400 cursor-not-allowed"
                 : "bg-green-600 hover:bg-green-700"
             } text-white font-bold py-3 px-4 rounded-3xl mt-4 w-[160px] flex justify-center items-center`}
-            disabled={createSessionLoading}>
+            disabled={createSessionLoading}
+          >
             {createSessionLoading ? (
               <Oval
                 visible={true}
@@ -1023,24 +937,12 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
               "Create Session"
             )}
           </button>
-
-          {/* <Toaster
-            toastOptions={{
-              style: {
-                fontSize: "14px",
-                backgroundColor: "#3E3D3D",
-                color: "#fff",
-                boxShadow: "none",
-                borderRadius: "50px",
-                padding: "3px 5px",
-              },
-            }}
-          /> */}
         </div>
 
         {/* Second box- right side */}
         <div
-          className={`w-full md:w-auto p-8 bg-white rounded-2xl ${styles.boxshadow} basis-1/2`}>
+          className={`w-full md:w-auto p-8 bg-white rounded-2xl ${styles.boxshadow} basis-1/2`}
+        >
           <AvailableUserSessions
             daoName={daoName}
             scheduledSuccess={scheduledSuccess}

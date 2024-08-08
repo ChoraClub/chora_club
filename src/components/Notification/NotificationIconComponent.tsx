@@ -49,7 +49,7 @@ function NotificationIconComponent() {
   const handleMouseLeave = () => {
     timeoutRef.current = setTimeout(() => {
       setIsHovering(false);
-    }, 300); // 300ms delay before hiding
+    }, 300);
   };
 
   const fetchNotifications = useCallback(async () => {
@@ -69,8 +69,8 @@ function NotificationIconComponent() {
       const response = await fetch("/api/notifications", requestOptions);
       const result = await response.json();
       console.log("result", result);
-      if (result.success && result.data) {
-        const notificationsData = result.data.map((notification: any) => ({
+      if (result.success && result?.data) {
+        const notificationsData = result?.data?.map((notification: any) => ({
           _id: notification?._id,
           receiver_address: notification.receiver_address,
           content: notification.content,

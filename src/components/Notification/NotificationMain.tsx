@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useRouter } from "next-nprogress-bar";
 import NotificationAll from "./NotificationAll";
@@ -14,22 +14,22 @@ import { useSocket } from "@/app/hooks/useSocket";
 import { PiEnvelopeOpen } from "react-icons/pi";
 import { useSession } from "next-auth/react";
 import { MagnifyingGlass } from "react-loader-spinner";
+import { Session } from "next-auth";
 import toast from "react-hot-toast";
 
-function NotificationMain() {
-  const { data: session, status } = useSession();
-  const loading = status === "loading";
-  const { address } = useAccount();
-  const searchParams = useSearchParams();
-  const router = useRouter();
-  const path = usePathname();
-  const socket = useSocket();
+// Custom hook for notifications
+const useNotifications = ({
+  address,
+  session,
+}: {
+  address: string | undefined;
+  session: Session | null;
+}) => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [socketId, setSocketId] = useState<string | null>(null);
-  const [newNotifications, setNewNotifications] = useState<Notification[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  const fetchNotifications = async () => {
+  const fetchNotifications = useCallback(async () => {
+    if (!session) return;
     setIsLoading(true);
     try {
       const myHeaders = new Headers();
@@ -44,28 +44,58 @@ function NotificationMain() {
       };
       const response = await fetch("/api/notifications", requestOptions);
       const result = await response.json();
-      return result;
+      if (Array.isArray(result.data)) {
+        setNotifications(result.data);
+      } else {
+        console.error("Fetched data is not an array:", result);
+      }
     } catch (error) {
       console.error("Error fetching notifications:", error);
-      return null;
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [address, session]);
+
+  const canFetch = !!address && !!session;
 
   useEffect(() => {
-    const fetchData = async () => {
-      if (session) {
-        const result = await fetchNotifications();
-        if (result && Array.isArray(result.data)) {
-          setNotifications(result.data);
-        } else {
-          console.error("Fetched data is not an array:", result);
-        }
-      }
-    };
-    fetchData();
-  }, [address, session]);
+    if (canFetch) {
+      fetchNotifications();
+    }
+  }, [fetchNotifications, canFetch]);
+
+  return {
+    notifications,
+    setNotifications,
+    isLoading,
+    fetchNotifications,
+    canFetch,
+  };
+};
+
+function NotificationMain() {
+  const { data: session } = useSession();
+  const { address } = useAccount();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const path = usePathname();
+  const socket = useSocket();
+  const {
+    notifications,
+    setNotifications,
+    isLoading,
+    fetchNotifications,
+    canFetch,
+  } = useNotifications({ address, session });
+  const [newNotifications, setNewNotifications] = useState<Notification[]>([]);
+  const [socketId, setSocketId] = useState<string | null>(null);
+  const [buttonText, setButtonText] = useState("Mark all as read");
+  const [markAllReadCalling, setMarkAllReadCalling] = useState<boolean>();
+  const [isPageLoading, setIsPageLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    setIsPageLoading(false);
+  }, [isPageLoading]);
 
   useEffect(() => {
     if (socket) {
@@ -80,53 +110,68 @@ function NotificationMain() {
   }, [socket]);
 
   useEffect(() => {
-    const hostAddress = address;
-    if (socket && address && socketId) {
-      socket.emit("register_host", { hostAddress, socketId });
-
-      socket.on("new_notification", (message: Notification) => {
+    if (socket && session && socketId && address) {
+      const handleNewNotification = (message: Notification) => {
         const notificationData: Notification = {
-          _id: message?._id,
-          receiver_address: message.receiver_address,
-          content: message.content,
+          ...message,
           createdAt: Date.now(),
           read_status: false,
-          notification_name: message.notification_name,
-          notification_type: message.notification_type,
-          notification_title: message.notification_title,
         };
-        setNewNotifications((prevNotifications) => [
-          ...prevNotifications,
-          notificationData,
-        ]);
-      });
-    }
+        setNewNotifications((prev) => [...prev, notificationData]);
+      };
 
-    return () => {
-      if (socket) {
-        socket.off("new_notification");
-      }
-    };
+      socket.on("connect", () => {
+        socket.emit("register_host", {
+          hostAddress: address,
+          socketId: socket.id,
+        });
+      });
+
+      socket.on("new_notification", handleNewNotification);
+
+      return () => {
+        socket.off("new_notification", handleNewNotification);
+      };
+    }
   }, [socket, address, socketId]);
 
-  const combinedNotifications = [...notifications, ...newNotifications].sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  const combinedNotifications = React.useMemo(
+    () =>
+      [...notifications, ...newNotifications].sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      ),
+    [notifications, newNotifications]
   );
 
-  const sessionBookings = combinedNotifications.filter(
-    (item) => item.notification_type === "newBooking"
-  );
-  const recordedSessions = combinedNotifications.filter(
-    (item) => item.notification_type === "recordedSession"
-  );
-  const followers = combinedNotifications.filter(
-    (item) => item.notification_type === "newFollower"
-  );
-  const attestations = combinedNotifications.filter(
-    (item) => item.notification_type === "attestation"
-  );
+  const filteredNotifications = React.useMemo(() => {
+    const type = searchParams.get("active");
+    if (type === "all" || !type) return combinedNotifications;
+    const typeMap = {
+      sessionBookings: "newBooking",
+      recordedSessions: "recordedSession",
+      followers: "newFollower",
+      attestations: "attestation",
+    };
+    return combinedNotifications.filter(
+      (item) => item.notification_type === typeMap[type as keyof typeof typeMap]
+    );
+  }, [combinedNotifications, searchParams]);
 
   const markAllAsRead = async () => {
+    if (!address || !session) return;
+
+    const hasUnreadNotifications = [...notifications, ...newNotifications].some(
+      (notification) => notification.read_status === false
+    );
+
+    if (!hasUnreadNotifications) {
+      toast("No unread notifications");
+      return;
+    }
+
+    setButtonText("Marking...");
+    setMarkAllReadCalling(true);
     try {
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
@@ -145,26 +190,91 @@ function NotificationMain() {
         "/api/notifications/mark-as-read",
         requestOptions
       );
-
       if (response.ok) {
-        setNotifications((prevNotifications) =>
-          prevNotifications.map((notification) => ({
-            ...notification,
-            read_status: true,
-          }))
+        setNotifications((prev) =>
+          prev.map((n) => ({ ...n, read_status: true }))
         );
-        setNewNotifications((prevNewNotifications) =>
-          prevNewNotifications.map((notification) => ({
-            ...notification,
-            read_status: true,
-          }))
+        setNewNotifications((prev) =>
+          prev.map((n) => ({ ...n, read_status: true }))
         );
+        setButtonText("Marked!");
+        setTimeout(() => setButtonText("Mark all as read"), 2000);
+        toast.success("All notifications marked as read");
       } else {
         console.error("Failed to mark all as read");
       }
     } catch (error) {
       console.error("Error marking all as read:", error);
+      toast.error("Error marking all as read");
+    } finally {
+      setMarkAllReadCalling(false);
     }
+  };
+
+  const handleTabClick = (tab: string) => {
+    if (
+      tab === "recordedSessions" ||
+      tab === "followers" ||
+      tab === "attestations"
+    ) {
+      toast("Coming Soon 🚀");
+    } else {
+      router.push(`${path}?active=${tab}`);
+    }
+  };
+
+  const renderContent = () => {
+    if (isPageLoading) {
+      return (
+        <div className="flex justify-center items-center h-64">
+          <p className="text-xl text-gray-500">Loading...</p>
+        </div>
+      );
+    }
+
+    if (!canFetch) {
+      return (
+        <div className="flex justify-center items-center h-64">
+          <p className="text-xl text-gray-500">
+            Please connect your wallet and sign in to view notifications.
+          </p>
+        </div>
+      );
+    }
+
+    if (isLoading) {
+      return (
+        <div className="flex justify-center items-center h-64">
+          <MagnifyingGlass
+            color={"#123abc"}
+            visible={isLoading}
+            height="80"
+            width="80"
+          />
+        </div>
+      );
+    }
+
+    const activeTab = searchParams.get("active") || "all";
+
+    if (filteredNotifications.length === 0) {
+      return (
+        <div className="flex justify-center items-center h-64">
+          <p className="text-xl text-gray-500">No new notifications.</p>
+        </div>
+      );
+    }
+
+    const components = {
+      all: NotificationAll,
+      sessionBookings: SessionBookings,
+      // recordedSessions: RecordedSessions,
+      // followers: Followers,
+      // attestations: Attestation,
+    };
+    const Component =
+      components[activeTab as keyof typeof components] || NotificationAll;
+    return <Component notifications={filteredNotifications} />;
   };
 
   return (
@@ -177,108 +287,42 @@ function NotificationMain() {
       </div>
       <div className="flex bg-[#D9D9D945]">
         <div className="flex gap-12 pl-16">
-          <button
-            className={`py-4 px-2 outline-none ${
-              searchParams.get("active") === "all"
-                ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
-                : "border-transparent"
-            }`}
-            onClick={() => router.push(path + "?active=all")}
-          >
-            All
-          </button>
-          <button
-            className={`py-4 px-2 outline-none ${
-              searchParams.get("active") === "sessionBookings"
-                ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
-                : "border-transparent"
-            }`}
-            onClick={() => router.push(path + "?active=sessionBookings")}
-          >
-            Session Bookings
-          </button>
-          <button
-            className={`py-4 px-2 outline-none ${
-              searchParams.get("active") === "recordedSessions"
-                ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
-                : "border-transparent"
-            }`}
-            // onClick={() => router.push(path + "?active=recordedSessions")}
-            onClick={() => toast("Coming Soon 🚀")}
-          >
-            Recorded Sessions
-          </button>
-          <button
-            className={`py-4 px-2 outline-none ${
-              searchParams.get("active") === "followers"
-                ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
-                : "border-transparent"
-            }`}
-            // onClick={() => router.push(path + "?active=followers")}
-            onClick={() => toast("Coming Soon 🚀")}
-          >
-            Followers
-          </button>
-          <button
-            className={`py-4 px-2 outline-none ${
-              searchParams.get("active") === "attestations"
-                ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
-                : "border-transparent"
-            }`}
-            // onClick={() => router.push(path + "?active=attestations")}
-            onClick={() => toast("Coming Soon 🚀")}
-          >
-            Attestations
-          </button>
+          {[
+            "all",
+            "sessionBookings",
+            "recordedSessions",
+            "followers",
+            "attestations",
+          ].map((tab) => (
+            <button
+              key={tab}
+              className={`py-4 px-2 outline-none ${
+                searchParams.get("active") === tab
+                  ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
+                  : "border-transparent"
+              }`}
+              onClick={() => handleTabClick(tab)}
+            >
+              {tab.charAt(0).toUpperCase() +
+                tab
+                  .slice(1)
+                  .replace(/([A-Z])/g, " $1")
+                  .trim()}
+            </button>
+          ))}
         </div>
         <div className="ml-auto pe-16">
           <button
-            className="my-4 py-2 px-4 border border-blue-shade-100 text-blue-shade-100 rounded-xl flex items-center shadow-md hover:bg-blue-shade-100 hover:text-white transition duration-300 ease-in-out font-bold"
+            className="my-4 py-2 px-4 border w-52 border-blue-shade-100 text-blue-shade-100 rounded-xl flex items-center shadow-md hover:bg-blue-shade-100 hover:text-white transition duration-300 ease-in-out font-bold"
             onClick={markAllAsRead}
+            disabled={markAllReadCalling}
           >
-            <PiEnvelopeOpen className="mr-2" width={10} />
-            Mark all as read
+            <PiEnvelopeOpen className="mr-2" size={20} />
+            {buttonText}
           </button>
         </div>
       </div>
-      <div className="px-16">
-        {isLoading ? (
-          <div className="flex justify-center items-center h-64">
-            <MagnifyingGlass
-              color={"#123abc"}
-              visible={isLoading}
-              height="80"
-              width="80"
-            />
-          </div>
-        ) : (
-          <>
-            {combinedNotifications.length === 0 ? (
-              <div className="flex justify-center items-center h-64">
-                <p className="text-xl text-gray-500">No new notifications</p>
-              </div>
-            ) : (
-              <>
-                {searchParams.get("active") === "all" && (
-                  <NotificationAll notifications={combinedNotifications} />
-                )}
-                {searchParams.get("active") === "sessionBookings" && (
-                  <SessionBookings notifications={sessionBookings} />
-                )}
-                {/* {searchParams.get("active") === "recordedSessions" && (
-                  <RecordedSessions notifications={recordedSessions} />
-                )}
-                {searchParams.get("active") === "followers" && (
-                  <Followers notifications={followers} />
-                )}
-                {searchParams.get("active") === "attestations" && (
-                  <Attestation notifications={attestations} />
-                )} */}
-              </>
-            )}
-          </>
-        )}
-      </div>
+      <div className="px-16">{renderContent()}</div>
     </div>
   );
 }
