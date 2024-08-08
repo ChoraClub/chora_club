@@ -42,12 +42,26 @@ function BookedUserSessions({ daoName }: { daoName: string }) {
 
   const getMeetingData = async () => {
     try {
-      const response = await fetch(`/api/get-meeting/${address}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      if (address) {
+        myHeaders.append("x-wallet-address", address);
+      }
+
+      const raw = JSON.stringify({
+        address: address,
       });
+
+      const requestOptions: any = {
+        method: "POST",
+        headers: myHeaders,
+        // body: raw,
+        redirect: "follow",
+      };
+      const response = await fetch(
+        `/api/get-meeting/${address}`,
+        requestOptions
+      );
       const result = await response.json();
       // console.log("result in get meeting", result);
       let filteredData: any = result.data;
