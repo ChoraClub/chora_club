@@ -501,7 +501,7 @@ function SpecificDelegate({ props }: { props: Type }) {
     let delegate_address: string;
     let follower_address: string;
     let dao: string;
-    dao = daoname;
+    dao = props.daoDelegates;
     let address = await walletClient.getAddresses();
     follower_address = address[0];
     delegate_address = props.individualDelegate;
