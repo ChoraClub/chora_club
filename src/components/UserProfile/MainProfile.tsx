@@ -150,7 +150,6 @@ function MainProfile() {
       // console.log("newPath", newPath);
       router.replace(`${newPath}`);
     } else if (!isConnected && !session) {
-      console.log("inside else if !isConnected && !session");
       if (openConnectModal) {
         openConnectModal();
       } else {
@@ -172,7 +171,7 @@ function MainProfile() {
         (
           ((progressData?.total as any) / progressData?.uploaded) as any
         )?.toFixed(2);
-      console.log(percentageDone);
+      // console.log(percentageDone);
     };
 
     const apiKey = process.env.NEXT_PUBLIC_LIGHTHOUSE_KEY
@@ -181,15 +180,15 @@ function MainProfile() {
 
     const output = await lighthouse.upload(selectedFile, apiKey);
 
-    console.log("File Status:", output);
+    // console.log("File Status:", output);
     setModalData((prevUserData) => ({
       ...prevUserData,
       displayImage: output.data.Hash,
     }));
 
-    console.log(
-      "Visit at https://gateway.lighthouse.storage/ipfs/" + output.data.Hash
-    );
+    // console.log(
+    //   "Visit at https://gateway.lighthouse.storage/ipfs/" + output.data.Hash
+    // );
   };
 
   useEffect(() => {
@@ -203,7 +202,7 @@ function MainProfile() {
           : chain?.name === "Arbitrum One"
           ? "0x912CE59144191C1204E64559FE8253a0e49E6548"
           : "";
-      console.log(walletClient);
+      // console.log(walletClient);
       let delegateTx;
       if (address) {
         delegateTx = await publicClient.readContract({
@@ -213,12 +212,12 @@ function MainProfile() {
           args: [address],
           // account: address1,
         });
-        console.log("Delegate tx", delegateTx);
+        // console.log("Delegate tx", delegateTx);
         delegateTxAddr = delegateTx;
       }
 
       if (delegateTxAddr.toLowerCase() === address?.toLowerCase()) {
-        console.log("Delegate comparison: ", delegateTx, address);
+        // console.log("Delegate comparison: ", delegateTx, address);
         setSelfDelegate(true);
       } else {
         setSelfDelegate(false);
@@ -239,8 +238,8 @@ function MainProfile() {
           : chain?.name === "Arbitrum One"
           ? "0x912CE59144191C1204E64559FE8253a0e49E6548"
           : "";
-      console.log("Contract", contractAddress);
-      console.log("Wallet Client", walletClient);
+      // console.log("Contract", contractAddress);
+      // console.log("Wallet Client", walletClient);
       const delegateTx = await walletClient.writeContract({
         address: contractAddress,
         abi: dao_abi.abi,
@@ -248,7 +247,7 @@ function MainProfile() {
         args: [to],
         account: address1,
       });
-      console.log(delegateTx);
+      // console.log(delegateTx);
     } catch (error) {
       console.log("Error:", error);
     }
@@ -259,7 +258,7 @@ function MainProfile() {
     toast("Address Copied");
   };
   const handleUpdateFollowings = async (daoname: string, isChange: number) => {
-    console.log("daoName", daoname);
+    // console.log("daoName", daoname);
     // setUnfollowDao(daoname);
     setfollowingmodel(true);
     setLoading(true);
@@ -322,7 +321,7 @@ function MainProfile() {
       if (daoName === unfollowDao) {
         setfollowings(followings + 1);
       }
-
+      
       try {
         const response = await fetch("/api/delegate-follow/savefollower", {
           method: "PUT",
@@ -343,7 +342,7 @@ function MainProfile() {
 
         const data = await response.json();
         settoaster(false);
-        console.log("Follow successful:", data);
+        // console.log("Follow successful:", data);
       } catch (error) {
         console.error("Error following:", error);
       }
@@ -375,7 +374,7 @@ function MainProfile() {
         const data = await response.json();
         settoaster(false);
         setLoading(false);
-        console.log("unFollow successful:", data);
+        // console.log("unFollow successful:", data);
       } catch (error) {
         setLoading(false);
         console.error("Error following:", error);
@@ -417,7 +416,7 @@ function MainProfile() {
 
       const data = await response.json();
       settoaster(false);
-      console.log("notification successful:", data);
+      // console.log("notification successful:", data);
     } catch (error) {
       console.error("Error following:", error);
     }
@@ -431,7 +430,7 @@ function MainProfile() {
   };
 
   const updateFollowerState = async () => {
-    console.log("Attempting to call savefollower API");
+    // console.log("Attempting to call savefollower API");
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
     const raw = JSON.stringify({
@@ -456,7 +455,7 @@ function MainProfile() {
       }
 
       const dbResponse = await resp.json();
-      console.log("API Response:", dbResponse);
+      // console.log("API Response:", dbResponse);
 
       if (
         !dbResponse.success ||
@@ -477,8 +476,8 @@ function MainProfile() {
         currentDaoName = "arbitrum";
       }
 
-      console.log("Current DAO:", currentDaoName);
-      console.log("User Address:", address_user);
+      // console.log("Current DAO:", currentDaoName);
+      // console.log("User Address:", address_user);
 
       // Process following details
       const matchDao = userData.followings?.find(
@@ -541,7 +540,7 @@ function MainProfile() {
       const data = await response.json();
       setIsLoading(false);
       settoggle(!isToggled);
-      console.log("status successfully change!", data);
+      // console.log("status successfully change!", data);
     } catch (error) {
       console.error("Error following:", error);
     }
@@ -551,7 +550,7 @@ function MainProfile() {
     const fetchData = async () => {
       try {
         // Fetch data from your backend API to check if the address exists
-        console.log("Fetching from DB");
+        // console.log("Fetching from DB");
         // const dbResponse = await axios.get(`/api/profile/${address}`);
 
         let dao =
@@ -603,11 +602,11 @@ function MainProfile() {
         }
 
         if (dbResponse.data.length > 0) {
-          console.log("db Response", dbResponse.data[0]);
-          console.log(
-            "dbResponse.data[0]?.networks:",
-            dbResponse.data[0]?.networks
-          );
+          // console.log("db Response", dbResponse.data[0]);
+          // console.log(
+          //   "dbResponse.data[0]?.networks:",
+          //   dbResponse.data[0]?.networks
+          // );
           setUserData({
             displayName: dbResponse.data[0]?.displayName,
             discord: dbResponse.data[0]?.socialHandles?.discord,
@@ -678,7 +677,7 @@ function MainProfile() {
       // Check if the delegate already exists in the database
       if (newDescription) {
         setDescription(newDescription);
-        console.log("New Description", description);
+        // console.log("New Description", description);
       }
       setIsLoading(true);
       const isExisting = await checkDelegateExists(address);
@@ -688,13 +687,13 @@ function MainProfile() {
         await handleUpdate(newDescription);
         setIsLoading(false);
         onClose();
-        console.log("Existing True");
+        // console.log("Existing True");
       } else {
         // If delegate doesn't exist, add a new delegate
         await handleAdd(newDescription);
         setIsLoading(false);
         onClose();
-        console.log("Sorry! Doesn't exist");
+        // console.log("Sorry! Doesn't exist");
       }
 
       toast.success("Saved");
@@ -708,7 +707,7 @@ function MainProfile() {
   const checkDelegateExists = async (address: any) => {
     try {
       // Make a request to your backend API to check if the address exists
-      console.log("Checking");
+      // console.log("Checking");
 
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
@@ -752,7 +751,7 @@ function MainProfile() {
   const handleAdd = async (newDescription?: string) => {
     try {
       // Call the POST API function for adding a new delegate
-      console.log("Adding the delegate..");
+      // console.log("Adding the delegate..");
       const response = await axios.post(
         "/api/profile",
         {
@@ -784,11 +783,11 @@ function MainProfile() {
         }
       );
 
-      console.log("Response Add", response);
+      // console.log("Response Add", response);
 
       if (response.status === 200) {
         // Delegate added successfully
-        console.log("Delegate added successfully:", response.data);
+        // console.log("Delegate added successfully:", response.data);
         setIsLoading(false);
         setUserData({
           displayImage: modalData.displayImage,
@@ -821,8 +820,8 @@ function MainProfile() {
           : chain?.name === "Arbitrum One"
           ? "arbitrum"
           : "";
-      console.log("Updating");
-      console.log("Inside Updating Description", newDescription);
+      // console.log("Updating");
+      // console.log("Inside Updating Description", newDescription);
       // const myHeaders = new Headers();
       // myHeaders.append("Content-Type", "application/json");
       // if (address) {
@@ -857,11 +856,11 @@ function MainProfile() {
           },
         }
       );
-      console.log("response", response);
+      // console.log("response", response);
       // Handle response from the PUT API function
       if (response.data.success) {
         // Delegate updated successfully
-        console.log("Delegate updated successfully");
+        // console.log("Delegate updated successfully");
         setIsLoading(false);
         setUserData({
           displayImage: modalData.displayImage,

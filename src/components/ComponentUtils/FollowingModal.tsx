@@ -65,7 +65,7 @@ function FollowingModal({
   const [NetworkofUser, setChainName] = useState("");
   const { chain, chains } = useNetwork();
   const [activeButton, setActiveButton] = useState("");
-
+useEffect(() => {
   if (chain && chain?.name === "Optimism") {
     setChainName("optimism");
     setActiveButton("optimism");
@@ -73,10 +73,12 @@ function FollowingModal({
     setChainName("arbitrum");
     setActiveButton("arbitrum");
   }
-
+},[chain])
+  
   useEffect(() => {
+   
     const fetchEnsNames = async () => {
-      console.log(" user followings", userFollowings);
+      // console.log(" user followings", userFollowings);
       const addresses = userFollowings.map(
         (user: any) => user.follower_address
       );
@@ -92,7 +94,7 @@ function FollowingModal({
       names.forEach(({ address, ensName }) => {
         ensNameMap[address] = ensName;
       });
-      console.log("ens name: ", ensNameMap);
+      // console.log("ens name: ", ensNameMap);
       setEnsNames(ensNameMap);
     };
 
@@ -154,9 +156,9 @@ function FollowingModal({
                       : "bg-[#F5F5F5] text-[#3E3D3D]"
                   }`}
                   onClick={() => {
+                    setActiveButton("optimism");
                     handleUpdateFollowings("optimism", 0);
                     setChainName("optimism");
-                    setActiveButton("optimism");
                   }}>
                   <Image src={oplogo} alt="optimism" width={23} className="" />
                   Optimism
@@ -168,9 +170,9 @@ function FollowingModal({
                       : "bg-[#F5F5F5] text-[#3E3D3D]"
                   }`}
                   onClick={() => {
+                    setActiveButton("arbitrum");
                     handleUpdateFollowings("arbitrum", 0);
                     setChainName("arbitrum");
-                    setActiveButton("arbitrum");
                   }}>
                   <Image src={arbcir} alt="arbitrum" width={23} className="" />
                   Arbitrum
