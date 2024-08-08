@@ -1108,8 +1108,8 @@ function MainProfile() {
                     toggleNotification={toggleNotification}
                     setfollowingmodel={setfollowingmodel}
                     isLoading={isLoading}
-                    chainName={chain?.name}
                     handleUpdateFollowings={handleUpdateFollowings}
+                    daoName={daoName}
                   />
                 )}
 
