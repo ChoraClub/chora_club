@@ -48,32 +48,6 @@ export async function getDisplayNameOrAddr(userAddress: string) {
   }
 }
 
-// export async function formatSlotDateAndTime({
-//   dateInput,
-//   locale = "en-US",
-//   options = {},
-// }: any) {
-//   // Convert the input into a Date object
-//   const date = new Date(dateInput);
-
-//   // Set default options if none are provided
-//   const defaultOptions = {
-//     weekday: "long",
-//     year: "numeric",
-//     month: "long",
-//     day: "numeric",
-//     hour: "numeric",
-//     minute: "numeric",
-//     hour12: true,
-//   };
-
-//   // Merge default options with user-provided options
-//   const formatOptions: any = { ...defaultOptions, ...options };
-
-//   // Format the date using toLocaleString
-//   return date.toLocaleString(locale, formatOptions);
-// }
-
 export async function formatSlotDateAndTime({
   dateInput,
   locale = "en-US",
@@ -107,6 +81,7 @@ export async function formatSlotDateAndTime({
     hour: "numeric",
     minute: "numeric",
     hour12: true,
+    timeZone: "UTC",
   };
 
   // Merge default options with user-provided options

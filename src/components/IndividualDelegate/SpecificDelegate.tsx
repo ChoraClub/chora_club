@@ -409,9 +409,9 @@ function SpecificDelegate({ props }: { props: Type }) {
       console.log("no followers found something went wrong!");
       setFollowers(0);
       setFollowerCountLoading(false);
-    }finally {
-    setFollowerCountLoading(false);
-  }
+    } finally {
+      setFollowerCountLoading(false);
+    }
   };
 
   const updateFollowerState = async () => {
@@ -451,12 +451,7 @@ function SpecificDelegate({ props }: { props: Type }) {
       const followerData = data.data[0];
       let address = await walletClient.getAddresses();
       let address_user = address[0].toLowerCase(); // Convert to lowercase for case-insensitive comparison
-      let currentDaoName = "";
-      if (chain?.name === "Optimism") {
-        currentDaoName = "optimism";
-      } else if (chain?.name === "Arbitrum One") {
-        currentDaoName = "arbitrum";
-      }
+      let currentDaoName = props.daoDelegates;
 
       console.log("Current DAO:", currentDaoName);
       console.log("User Address:", address_user);
@@ -506,7 +501,7 @@ function SpecificDelegate({ props }: { props: Type }) {
     let delegate_address: string;
     let follower_address: string;
     let dao: string;
-    dao = daoname;
+    dao = props.daoDelegates;
     let address = await walletClient.getAddresses();
     follower_address = address[0];
     delegate_address = props.individualDelegate;
@@ -597,56 +592,50 @@ function SpecificDelegate({ props }: { props: Type }) {
     } else if (isFollowing) {
       setUnfollowmodel(true);
     } else {
-      if (walletClient?.chain?.network === props.daoDelegates) {
-        setLoading(true);
-        let delegate_address: string;
-        let follower_address: string;
-        let dao: string;
-        dao = daoname;
-        let address = await walletClient.getAddresses();
-        follower_address = address[0];
-        delegate_address = props.individualDelegate;
-        try {
-          const response = await fetch("/api/delegate-follow/savefollower", {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              // Add any necessary data
-              delegate_address: delegate_address,
-              follower_address: follower_address,
-              dao: dao,
-            }),
-          });
+      setLoading(true);
+      let delegate_address: string;
+      let follower_address: string;
+      let dao: string;
+      // alert(props.daoDelegates);
+      dao = props.daoDelegates;
+      let address = await walletClient.getAddresses();
+      follower_address = address[0];
+      delegate_address = props.individualDelegate;
+      try {
+        const response = await fetch("/api/delegate-follow/savefollower", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            // Add any necessary data
+            delegate_address: delegate_address,
+            follower_address: follower_address,
+            dao: dao,
+          }),
+        });
 
-          if (!response.ok) {
-            throw new Error("Failed to follow");
-          }
-
-          const data = await response.json();
-          setLoading(false);
-          toast.success(
-            "Successfully followed the Delegate! Stay tuned for their updates."
-          );
-          // setFollowers(followers + 1);
-          setFollowers((prev) => prev + 1); 
-          setTimeout(() => isFollowed(true), 1000);
-          setIsFollowing(true);
-          isNotification(true);
-          console.log("Follow successful:", data);
-
-          // Then update the follower count from the server
-          await setFollowerscount();
-        } catch (error) {
-          setLoading(false);
-          console.error("Error following:", error);
+        if (!response.ok) {
+          throw new Error("Failed to follow");
         }
-      } else {
-        toast.error("Switch to appropriate network for follow delegate!");
-        if (openChainModal) {
-          openChainModal();
-        }
+
+        const data = await response.json();
+        setLoading(false);
+        toast.success(
+          "Successfully followed the Delegate! Stay tuned for their updates."
+        );
+        // setFollowers(followers + 1);
+        setFollowers((prev) => prev + 1);
+        setTimeout(() => isFollowed(true), 1000);
+        setIsFollowing(true);
+        isNotification(true);
+        console.log("Follow successful:", data);
+
+        // Then update the follower count from the server
+        await setFollowerscount();
+      } catch (error) {
+        setLoading(false);
+        console.error("Error following:", error);
       }
     }
   };
@@ -1032,8 +1021,7 @@ function SpecificDelegate({ props }: { props: Type }) {
                       </Button>
                     </Tooltip>
                   </div>
-                  <div style={{ zIndex: "21474836462" }}>
-                  </div>
+                  <div style={{ zIndex: "21474836462" }}></div>
                 </div>
 
                 <div className="flex gap-4 py-1">
@@ -1079,6 +1067,10 @@ function SpecificDelegate({ props }: { props: Type }) {
                 <div className="pt-2 flex space-x-4 items-center">
                   <button
                     className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
+                    // onClick={() =>
+                    //   handleDelegateVotes(`${props.individualDelegate}`)
+                    // }
+
                     onClick={handleDelegateModal}
                   >
                     Delegate
