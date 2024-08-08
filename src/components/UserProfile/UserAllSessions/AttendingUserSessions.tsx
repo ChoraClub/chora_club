@@ -49,6 +49,7 @@ function AttendingUserSessions({ daoName }: { daoName: string }) {
 
   const getUserMeetingData = async () => {
     try {
+      setPageLoading(true);
       const response = await fetch(`/api/get-session-data/${address}`, {
         method: "POST",
         headers: {
@@ -62,15 +63,14 @@ function AttendingUserSessions({ daoName }: { daoName: string }) {
       const result = await response.json();
 
       if (result.success) {
-        setPageLoading(true);
         const resultData = await result.attending;
         console.log("resultData in attending", resultData);
         setSessionDetails(resultData);
-        setPageLoading(false);
       }
     } catch (error) {
       console.log("error in catch", error);
       setError("Unable to load sessions. Please try again in a few moments.");
+    } finally{
       setPageLoading(false);
     }
   };

@@ -57,6 +57,7 @@ function UserSessions({
   };
 
   const getUserMeetingData = async () => {
+    setDataLoading(true);
     try {
       const response = await fetch(`/api/get-sessions`, {
         method: "POST",
@@ -73,16 +74,15 @@ function UserSessions({
       if (result.success) {
         const hostedData = await result.hostedMeetings;
         const attendedData = await result.attendedMeetings;
-        setDataLoading(true);
         if (searchParams.get("session") === "hosted") {
           setHostedDetails(hostedData);
         } else if (searchParams.get("session") === "attended") {
           setAttendedDetails(attendedData);
         }
-        setDataLoading(false);
       }
     } catch (error) {
       setError("Unable to load sessions. Please try again in a few moments.");
+    } finally{
       setDataLoading(false);
     }
   };
@@ -91,14 +91,14 @@ function UserSessions({
     getUserMeetingData();
   }, [
     address,
-    sessionDetails,
+    // sessionDetails,
     searchParams.get("session"),
-    dataLoading,
+    // dataLoading,
     chain,
     chain?.name,
     daoName,
-    hostedDetails,
-    attendedDetails,
+    // hostedDetails,
+    // attendedDetails,
   ]);
 
   useEffect(() => {

@@ -41,6 +41,7 @@ function DelegateSessions({ props }: { props: Type }) {
   const [error, setError] = useState<string | null>(null);
 
   const getMeetingData = async () => {
+    setDataLoading(true);
     try {
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
@@ -64,13 +65,11 @@ function DelegateSessions({ props }: { props: Type }) {
         if (Array.isArray(resultData)) {
           let filteredData: any = resultData;
           if (searchParams.get("session") === "upcoming") {
-            setDataLoading(true);
             filteredData = resultData.filter((session: Session) => {
               return session.meeting_status === "Upcoming";
             });
             setSessionDetails(filteredData);
           } else if (searchParams.get("session") === "hosted") {
-            setDataLoading(true);
             filteredData = resultData.filter((session: Session) => {
               return (
                 session.meeting_status === "Recorded" &&
@@ -79,7 +78,6 @@ function DelegateSessions({ props }: { props: Type }) {
             });
             setSessionDetails(filteredData);
           } else if (searchParams.get("session") === "attended") {
-            setDataLoading(true);
             filteredData = resultData.filter((session: Session) => {
               return (
                 session.meeting_status === "Recorded" &&
@@ -89,20 +87,16 @@ function DelegateSessions({ props }: { props: Type }) {
                 )
               );
             });
-            setSessionDetails(filteredData);
           }
-          setDataLoading(false);
-        } else {
-          setDataLoading(false);
+          setSessionDetails(filteredData);
         }
-      } else {
-        setDataLoading(false);
-      }
+      } 
     } catch (error) {
-      setDataLoading(false);
       setError(
         "An unexpected error occurred. Please refresh the page and try again."
       );
+    } finally {
+      setDataLoading(false);
     }
   };
 
@@ -111,7 +105,6 @@ function DelegateSessions({ props }: { props: Type }) {
   }, [
     props.daoDelegates,
     props.individualDelegate,
-    sessionDetails,
     searchParams.get("session"),
   ]);
 

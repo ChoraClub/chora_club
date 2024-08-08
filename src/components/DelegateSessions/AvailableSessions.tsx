@@ -57,6 +57,7 @@ function AvailableSessions() {
   const [showStartTimeSelector, setShowStartTimeSelector] = useState(false);
   const [showEndTimeSelector, setShowEndTimeSelector] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [initialFetchComplete, setInitialFetchComplete] = useState(false);
 
   const handleRetry = () => {
     setError(null);
@@ -149,6 +150,7 @@ function AvailableSessions() {
       }
       setAPIData(resultData);
       setDaoInfo(resultData);
+      setInitialFetchComplete(true);
     } catch (error) {
       console.error("Error fetching data:", error);
       setError("Failed to fetch data. Please try again later.");
@@ -497,7 +499,7 @@ function AvailableSessions() {
       </div>
 
       <div className="pt-8 font-poppins">
-        {isPageLoading ? (
+        {!initialFetchComplete || isPageLoading ? (
           <AvailableSessionsSkeletonLoader />
         ) : daoInfo && daoInfo?.length > 0 ? (
           <div className="overflow-auto font-poppins grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 2xl:grid-cols-2 gap-12 py-5 px-10">
