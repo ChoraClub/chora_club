@@ -19,10 +19,11 @@ import { useRouter } from "next-nprogress-bar";
 import "./WatchSession.module.css";
 import ShareMediaModal from "./ShareMediaModal";
 import { BASE_URL } from "@/config/constants";
-import { Toaster } from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
 import { Tooltip } from "@nextui-org/react";
 import { getEnsName } from "@/utils/ENSUtils";
-
+import RecordedSessionsTile from '../ComponentUtils/RecordedSessionsTile'
+import RecordedSessionsSpecificSkeletonLoader from '../SkeletonLoader/RecordedSessionsSpecificSkeletonLoader'
 interface ProfileInfo {
   _id: string;
   address: string;
@@ -106,7 +107,8 @@ function WatchSession({
   const [ensHostName, setEnsHostName] = useState<any>(null);
   const [shareModal, setShareModal] = useState(false);
   const router = useRouter();
-
+  const [meetings, setMeetings] = useState<Meeting[]>([]);
+  const [dataLoading, setDataLoading] = useState(true);
   const handleShareClose = () => {
     setShareModal(false);
   };
@@ -184,6 +186,37 @@ function WatchSession({
     fetchEnsName();
   }, [data.host_address]);
 
+  function getUniqueRandomItems<T>(arr: T[], num: number): T[] {
+    // Convert array to a Set to ensure uniqueness
+    const uniqueItems = Array.from(new Set(arr));
+    
+    // Shuffle the unique items
+    const shuffled = uniqueItems.sort(() => 0.5 - Math.random());
+    
+    // Return the first 'num' items
+    return shuffled.slice(0, num);
+}
+  useEffect(() => {
+    const fetchMeetings = async () => {
+      try {
+        const response = await fetch('/api/get-recorded-meetings');
+        const meeting = await response.json();
+        console.log(meeting);
+
+        const filteredMeetings = meeting.data.filter((meeting:any)=> meeting.dao_name === data.dao_name);
+        const randomMeetings:Meeting[] = getUniqueRandomItems(filteredMeetings, 3);
+
+        setMeetings(randomMeetings);
+        setDataLoading(false);
+      } catch (error) {
+        setDataLoading(false);
+        console.error('Failed to fetch meetings', error);
+      }
+    };
+
+    fetchMeetings();
+  }, []);
+
   return (
     <div className="">
       <div className="rounded-3xl border border-[#CCCCCC] bg-[#F2F2F2]">
@@ -234,12 +267,20 @@ function WatchSession({
                   >
                     <Link
                       href={
-                        data.dao_name === ("optimism" || "Optimism")
+                        data.uid_host
+                        ? data.dao_name === ("optimism" || "Optimism")
                           ? `https://optimism.easscan.org/offchain/attestation/view/${data.uid_host}`
                           : data.dao_name === ("arbitrum" || "Arbitrum")
                           ? `https://arbitrum.easscan.org/offchain/attestation/view/${data.uid_host}`
                           : ""
+                        : "#"
                       }
+                      onClick={(e) => {
+                        if (!data.uid_host) {
+                          e.preventDefault();
+                          toast.error("Offchain attestation not available");
+                        }
+                      }}
                       target="_blank"
                     >
                       <Image
@@ -264,12 +305,20 @@ function WatchSession({
                   >
                     <Link
                       href={
-                        data.dao_name === ("optimism" || "Optimism")
+                        data.onchain_host_uid 
+                        ? data.dao_name === ("optimism" || "Optimism")
                           ? `https://optimism.easscan.org/attestation/view/${data.onchain_host_uid}`
                           : data.dao_name === ("arbitrum" || "Arbitrum")
                           ? `https://arbitrum.easscan.org/attestation/view/${data.onchain_host_uid}`
                           : ""
+                        : "#"
                       }
+                      onClick={(e) => {
+                        if (!data.onchain_host_uid ) {
+                          e.preventDefault();
+                          toast.error("Onchain attestation not available");
+                        }
+                      }}
                       target="_blank"
                     >
                       <Image
@@ -337,7 +386,6 @@ function WatchSession({
               </div>
             </div>
           </div>
-
           <div>
             <div
               className="flex items-center border border-[#8E8E8E] bg-white w-fit rounded-md px-3 font-medium py-1 gap-2 cursor-pointer"
@@ -347,8 +395,8 @@ function WatchSession({
               <div
                 className={
                   showPopup
-                    ? "rotate-180 duration-200 ease-in-out"
-                    : "duration-200 ease-in-out"
+                  ? "rotate-180 duration-200 ease-in-out"
+                  : "duration-200 ease-in-out"
                 }
               >
                 <IoMdArrowDropdown color="#4F4F4F" />
@@ -507,6 +555,11 @@ function WatchSession({
           )
         )}
       </div>
+      {dataLoading ? (
+        <RecordedSessionsSpecificSkeletonLoader />
+      ) :  (
+        <RecordedSessionsTile meetingData={meetings} />)
+      }
       {modalOpen && (
         <ReportOptionModal
           data={data}

@@ -18,7 +18,6 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
   // localStorage.removeItem("isMeetingRecorded");
   try {
     const storedStatus = localStorage.getItem("meetingData");
-    console.log("storedStatus: ", storedStatus);
     if (storedStatus !== null) {
       localStorage.removeItem("meetingData");
     }
@@ -42,12 +41,9 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
   const [showPopup, setShowPopup] = useState(true);
   const [showHostPopup, setShowHostPopup] = useState(false);
 
-  useEffect(() => {
-    console.log("room id: ", roomId);
-  }, []);
+
 
   useEffect(() => {
-    console.log("roomId: ", roomId);
     async function fetchData() {
       try {
         const requestOptions: any = {
@@ -62,10 +58,8 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
         //   throw new Error("Network response was not ok");
         // }
         const result = await response.json();
-        console.log("result::::", result);
         setData(result.data[0]);
         setCollection(result.collection);
-        console.log(result.data[0].video_uri.video_uri);
         setShowPopup(true);
         setDataLoading(false);
       } catch (error) {
@@ -95,11 +89,9 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
   }, [data]);
 
   const handleUpdate = async () => {
-    console.log("handle update");
     try {
       if (address?.toLowerCase() === data.host_address.toLowerCase()) {
         setLoading(true);
-        console.log("handle update");
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
 
@@ -123,7 +115,6 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
         );
         if (response) {
           const responseData = await response.json();
-          console.log("responseData: ", responseData);
           setLoading(false);
           setShowHostPopup(true);
           // router.push(`/profile/${address}?active=sessions&session=hosted`);
@@ -146,7 +137,7 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
                 style={{ boxShadow: "0px 4px 26.7px 0px rgba(0, 0, 0, 0.10)" }}
               >
                 <div className="flex items-center font-semibold text-sm justify-between">
-                  <span>🙂 Thank you for taking the session on CC</span>
+                  <span>🙂 Thank you for taking the session on Chora Club</span>
                   <button
                     className="ml-4 rounded-full flex items-center"
                     onClick={() => setShowPopup(false)}

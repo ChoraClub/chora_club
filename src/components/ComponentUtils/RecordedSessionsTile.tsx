@@ -22,9 +22,15 @@ import user9 from "@/assets/images/user/user9.svg";
 import posterImage from "@/assets/images/daos/thumbnail1.png";
 import { getEnsName } from "@/utils/ENSUtils";
 import logo from "@/assets/images/daos/CCLogo.png";
+import ClaimButton from "./ClaimButton";
+import EditButton from "./EditButton";
+import { useAccount } from "wagmi"; 
+import Link from "next/link";
 
 interface meeting {
   meetingData: any;
+  showClaimButton?: boolean;
+  session?: string; 
 }
 
 type DaoName = "optimism" | "arbitrum";
@@ -37,13 +43,13 @@ const getDaoLogo = (daoName: string): StaticImageData => {
   return daoLogos[normalizedName] || arblogo;
 };
 
-function RecordedSessionsTile({ meetingData }: meeting) {
-  console.log("meetingData: ", meetingData);
+function RecordedSessionsTile({ meetingData , showClaimButton,session}: meeting) {
 
   const [hoveredVideo, setHoveredVideo] = useState<number | null>(null);
   const videoRefs = useRef<any>([]);
   const [videoDurations, setVideoDurations] = useState<any>({});
   const router = useRouter();
+  const { address } = useAccount();
   const [ensHostNames, setEnsHostNames] = useState<any>({});
   const [ensGuestNames, setEnsGuestNames] = useState<any>({});
   const [loadingHostNames, setLoadingHostNames] = useState<boolean>(true);
@@ -66,7 +72,6 @@ function RecordedSessionsTile({ meetingData }: meeting) {
     user9,
   ];
 
-  // State to store the randomly selected user images
   const [randomUserImages, setRandomUserImages] = useState<{
     [key: string]: StaticImageData;
   }>({});
@@ -112,7 +117,6 @@ function RecordedSessionsTile({ meetingData }: meeting) {
     if (progressBar) {
       const progressDiv = progressBar as HTMLDivElement;
       const percentage = (currentTime / duration) * 100;
-      console.log("percentage: ", percentage);
       progressDiv.style.width = `${percentage}%`;
     }
   };
@@ -135,7 +139,6 @@ function RecordedSessionsTile({ meetingData }: meeting) {
 
       videoElement.addEventListener("timeupdate", handleTimeUpdate);
 
-      // Clean up the event listener when the component unmounts or video changes
       return () => {
         videoElement.removeEventListener("timeupdate", handleTimeUpdate);
       };
@@ -170,7 +173,6 @@ function RecordedSessionsTile({ meetingData }: meeting) {
           ensNamesMap[data.host_address] = ensName;
         }
       }
-      console.log("ensNamesMap", ensNamesMap);
       setEnsHostNames(ensNamesMap);
       setLoadingHostNames(false);
     };
@@ -192,7 +194,6 @@ function RecordedSessionsTile({ meetingData }: meeting) {
           ensNamesMap[data.attendees[0]?.attendee_address] = ensName;
         }
       }
-      console.log("guest ensNamesMap", ensNamesMap);
       setEnsGuestNames(ensNamesMap);
       setLoadingGuestNames(false);
     };
@@ -202,64 +203,20 @@ function RecordedSessionsTile({ meetingData }: meeting) {
     }
   }, [meetingData]);
 
-  // useEffect(() => {
-  //   const fetchEnsNames = async () => {
-  //     setLoadingHostNames(true);
-  //     setLoadingGuestNames(true);
-
-  //     const ensNamesMapHost: any = {};
-  //     const ensNamesMapGuest: any = {};
-
-  //     // Fetch host names
-  //     await Promise.all(
-  //       meetingData.map(async (data: any) => {
-  //         const ensNames = await getEnsName(data.host_address.toLowerCase());
-  //         const ensName = ensNames?.ensName;
-  //         if (ensName) {
-  //           ensNamesMapHost[data.host_address] = ensName;
-  //         }
-  //       })
-  //     );
-
-  //     setLoadingHostNames(false);
-  //     setEnsHostNames(ensNamesMapHost);
-
-  //     // Fetch guest names
-  //     await Promise.all(
-  //       meetingData.map(async (data: any) => {
-  //         const ensNames = await getEnsName(
-  //           data.attendees[0]?.attendee_address.toLowerCase()
-  //         );
-  //         const ensName = ensNames?.ensName;
-  //         if (ensName) {
-  //           ensNamesMapGuest[data.attendees[0]?.attendee_address] = ensName;
-  //         }
-  //       })
-  //     );
-
-  //     setLoadingGuestNames(false);
-  //     setEnsGuestNames(ensNamesMapGuest);
-  //   };
-
-  //   if (meetingData.length > 0) {
-  //     fetchEnsNames();
-  //   }
-  // }, [meetingData]);
   return (
     <>
-      {/* {meetingData && meetingData.length > 0 ? ( */}
       <div className="grid min-[475px]:grid-cols- md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-10 py-8 font-poppins">
         {meetingData.map((data: any, index: number) => (
           <div
             key={index}
             className="border border-[#D9D9D9] rounded-3xl cursor-pointer"
-            onClick={() => router.push(`/watch/${data.meetingId}`)}
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              router.push(`/watch/${data.meetingId}`)}}
             onMouseEnter={() => setHoveredVideo(index)}
             onMouseLeave={() => setHoveredVideo(null)}
           >
-            {/* <div
-                  className={`w-full h-44 rounded-t-3xl bg-black object-cover object-center relative ${styles.container}`}
-                > */}
             <div
               className={`w-full h-44 rounded-t-3xl bg-black object-cover object-center relative `}
             >
@@ -286,7 +243,6 @@ function RecordedSessionsTile({ meetingData }: meeting) {
               ) : (
                 <video
                   poster={`https://gateway.lighthouse.storage/ipfs/${data.thumbnail_image}`}
-                  // poster="https://gateway.lighthouse.storage/ipfs/Qmb1JZZieFSENkoYpVD7HRzi61rQCDfVER3fhnxCvmL1DB"
                   ref={(el: any) => (videoRefs.current[index] = el)}
                   loop
                   muted
@@ -346,12 +302,20 @@ function RecordedSessionsTile({ meetingData }: meeting) {
                     />
                   </div>
                   <div>
-                    Host:{" "}
-                    {loadingHostNames
-                      ? data.host_address.slice(0, 4) +
-                        "..." +
-                        data.host_address.slice(-4)
-                      : ensHostNames[data.host_address]}
+                  <span className="font-medium">Host: </span>
+                    <Link
+                      href={`/${data.dao_name}/${data.host_address}?active=info`}
+                      onClick={(event:any) => {
+                        event.stopPropagation();
+                      }}
+                      className="cursor-pointer hover:text-blue-shade-200 ml-1"
+                    >
+                      {loadingHostNames
+                        ? data.host_address.slice(0, 4) +
+                          "..." +
+                          data.host_address.slice(-4)
+                        : ensHostNames[data.host_address]}
+                    </Link>
                   </div>
                   <div>
                     <Tooltip
@@ -387,12 +351,14 @@ function RecordedSessionsTile({ meetingData }: meeting) {
                       />
                     </div>
                     <div>
-                      Guest:{" "}
+                    <span className="font-medium">Guest: </span>
+                    <span>
                       {loadingGuestNames
                         ? data.attendees[0]?.attendee_address.slice(0, 4) +
                           "..." +
                           data.attendees[0]?.attendee_address.slice(-4)
                         : ensGuestNames[data.attendees[0]?.attendee_address]}
+                      </span>
                     </div>
                     <div>
                       <Tooltip
@@ -416,6 +382,24 @@ function RecordedSessionsTile({ meetingData }: meeting) {
                   ""
                 )}
               </div>
+            </div>
+            <div className="px-4 pb-2 flex justify-center space-x-2">
+          {showClaimButton && (
+              <ClaimButton
+                meetingId={data.meetingId}
+                meetingType={data.session_type === "session" ? 2 : 1}
+                startTime={data.attestations[0]?.startTime}
+                endTime={data.attestations[0]?.endTime}
+                dao={data.dao_name}
+                address={address || ''}
+                onChainId={session === "hosted"
+                  ? data.onchain_host_uid
+                  : data.attendees[0]?.onchain_attendee_uid}
+              />
+            )}
+            {session==="hosted" && (
+              <EditButton sessionData={data}/>
+            )}
             </div>
           </div>
         ))}

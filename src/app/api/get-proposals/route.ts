@@ -1,6 +1,7 @@
 import { Client, cacheExchange, fetchExchange, gql } from 'urql';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
+export const revalidate = 0;
 
 const client = new Client({
     url: 'https://api.studio.thegraph.com/query/68573/v6_proxy/version/latest',
