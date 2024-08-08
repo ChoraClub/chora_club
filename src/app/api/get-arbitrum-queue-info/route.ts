@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Client, cacheExchange, fetchExchange, gql } from 'urql';
+export const revalidate = 0;
 
 const client = new Client({
   url: 'https://api.studio.thegraph.com/query/68573/arbitrum_proposals/v0.0.4',

@@ -454,7 +454,7 @@ function Proposals({ props }: { props: string }) {
                       ? "bg-red-200 border-red-500 text-red-500"
                       : getProposalStatus(proposal) === "QUEUED"
                       ? "bg-yellow-200 border-yellow-600 text-yellow-600"
-                      : "bg-green-200 border-green-600 text-green-600"
+                      : "bg-yellow-200 border-yellow-600 text-yellow-600"
                   }`}
                 >
                   {getProposalStatus(proposal)}
@@ -465,12 +465,12 @@ function Proposals({ props }: { props: string }) {
 
               {proposal.votesLoaded ? (
                 <div
-                  className={`py-0.5 rounded-md text-sm font-medium flex justify-center items-center w-32 
+                  className={`py-0.5 rounded-md text-sm font-medium border flex justify-center items-center w-32 
                   ${
                     proposal.support1Weight! === 0 &&
                     proposal.support0Weight! === 0 &&
                     proposal.support2Weight! === 0
-                      ? "bg-yellow-200 border-yellow-600 text-yellow-600"
+                      ? "bg-[#FFEDD5] border-[#F97316] text-[#F97316]"
                       : proposal.support1Weight! > proposal.support0Weight!
                       ? "text-[#639b55] border-[#639b55] bg-[#dbf8d4]"
                       : "bg-[#fa989a] text-[#e13b15] border-[#e13b15]"

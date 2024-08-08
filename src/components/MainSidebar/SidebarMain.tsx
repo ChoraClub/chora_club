@@ -345,12 +345,14 @@ function Sidebar() {
       <div className="py-6 h-full">
         <div className="flex flex-col h-full justify-between">
           <div className="flex flex-col items-center gap-y-4 pb-5">
+          <Link href={"https://chora.club/"}>
             <Image
               src={logo}
               alt={"image"}
               width={40}
               className="xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 logo bg-black rounded-full p-1"
             ></Image>
+          </Link>
             <Tooltip
               content="DAOs"
               placement="right"
