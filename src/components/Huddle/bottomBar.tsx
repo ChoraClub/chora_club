@@ -124,7 +124,22 @@ const BottomBar = ({
     }
 
     try {
-      const status = await fetch(`/api/stopRecording/${roomId}`);
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      if (address) {
+        myHeaders.append("x-wallet-address", address);
+      }
+      const requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        body: JSON.stringify({
+          roomId: roomId,
+        }),
+      };
+      const status = await fetch(
+        `/api/stopRecording/${roomId}`,
+        requestOptions
+      );
       console.log("status: ", status);
 
       if (!status.ok) {
@@ -178,7 +193,23 @@ const BottomBar = ({
 
   const startRecording = async () => {
     try {
-      const status = await fetch(`/api/startRecording/${params.roomId}`);
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      if (address) {
+        myHeaders.append("x-wallet-address", address);
+      }
+      const requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        body: JSON.stringify({
+          roomId: params.roomId,
+        }),
+      };
+
+      const status = await fetch(
+        `/api/startRecording/${params.roomId}`,
+        requestOptions
+      );
       if (!status.ok) {
         console.error(`Request failed with status: ${status.status}`);
         toast.error("Failed to start recording");
@@ -361,11 +392,13 @@ const BottomBar = ({
           <div className="relative">
             <div
               className="mr-auto flex items-center gap-4 w-44 cursor-pointer"
-              onClick={() => setIsDropdownOpen(!isDropdownOpen)}>
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+            >
               <div className="bg-blue-shade-200 p-2 rounded-lg">
                 <PiLinkSimpleBold
                   className="text-white"
-                  size={24}></PiLinkSimpleBold>
+                  size={24}
+                ></PiLinkSimpleBold>
               </div>
               <span className="text-gray-800">Quick Links</span>
             </div>
@@ -382,7 +415,8 @@ const BottomBar = ({
                     href={block.link}
                     target="_blank"
                     className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
-                    key={index}>
+                    key={index}
+                  >
                     {block.title}
                   </a>
                 ))}
@@ -392,7 +426,8 @@ const BottomBar = ({
         </div>
 
         <div
-          className={clsx("flex space-x-3", role === Role.HOST ? "mr-12" : "")}>
+          className={clsx("flex space-x-3", role === Role.HOST ? "mr-12" : "")}
+        >
           <ButtonWithIcon
             content={isVideoOn ? "Turn off camera" : "Turn on camera"}
             onClick={() => {
@@ -404,7 +439,8 @@ const BottomBar = ({
             }}
             className={clsx(
               isVideoOn ? "bg-gray-500" : "bg-red-400 hover:bg-red-500"
-            )}>
+            )}
+          >
             {isVideoOn ? BasicIcons.on.cam : BasicIcons.off.cam}
           </ButtonWithIcon>
           <ButtonWithIcon
@@ -418,7 +454,8 @@ const BottomBar = ({
             }}
             className={clsx(
               isAudioOn ? "bg-gray-500" : "bg-red-400 hover:bg-red-500"
-            )}>
+            )}
+          >
             {isAudioOn ? BasicIcons.on.mic : BasicIcons.off.mic}
           </ButtonWithIcon>
           <ButtonWithIcon
@@ -448,7 +485,8 @@ const BottomBar = ({
               `bg-blue-shade-100 hover:bg-blue-shade-200 ${
                 (shareStream !== null || isScreenShared) && "bg-blue-shade-100"
               }`
-            )}>
+            )}
+          >
             {BasicIcons.screenShare}
           </ButtonWithIcon>
           <ButtonWithIcon
@@ -464,7 +502,8 @@ const BottomBar = ({
               `bg-blue-shade-100 hover:bg-blue-shade-200 ${
                 metadata?.isHandRaised && "bg-blue-shade-100"
               }`
-            )}>
+            )}
+          >
             {BasicIcons.handRaise}
           </ButtonWithIcon>
           {/* <ButtonWithIcon onClick={leaveRoom}>{BasicIcons.end}</ButtonWithIcon> */}
@@ -476,7 +515,8 @@ const BottomBar = ({
             <Dropdown
               triggerChild={BasicIcons.leave}
               open={showLeaveDropDown}
-              onOpenChange={() => setShowLeaveDropDown((prev) => !prev)}>
+              onOpenChange={() => setShowLeaveDropDown((prev) => !prev)}
+            >
               {role === "host" && (
                 <Strip
                   type="close"
@@ -501,7 +541,8 @@ const BottomBar = ({
           <ButtonWithIcon
             content="Participants"
             onClick={() => setIsParticipantsOpen(!isParticipantsOpen)}
-            className={clsx("bg-gray-600/50 hover:bg-gray-600")}>
+            className={clsx("bg-gray-600/50 hover:bg-gray-600")}
+          >
             <div className="flex items-center justify-center">
               {BasicIcons.people}
               <span className="text-white ps-2">
@@ -512,7 +553,8 @@ const BottomBar = ({
           <ButtonWithIcon
             content="Chat"
             onClick={() => setIsChatOpen(!isChatOpen)}
-            className={clsx("bg-gray-600/50 hover:bg-gray-600")}>
+            className={clsx("bg-gray-600/50 hover:bg-gray-600")}
+          >
             {BasicIcons.chat}
           </ButtonWithIcon>
         </div>

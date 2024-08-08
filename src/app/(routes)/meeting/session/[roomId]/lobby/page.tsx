@@ -277,10 +277,6 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
           myHeaders.append("x-wallet-address", address);
         }
 
-        if (address) {
-          myHeaders.append("x-wallet-address", address);
-        }
-
         const raw = JSON.stringify({
           address: address,
           // daoName: dao,
@@ -292,6 +288,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
           body: raw,
           redirect: "follow",
         };
+        console.log("Req OPTIONS", requestOptions);
         const response = await fetch(`/api/profile/${address}`, requestOptions);
         const result = await response.json();
         const resultData = await result.data;
@@ -338,7 +335,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
       }
     };
     fetchData();
-  }, []);
+  }, [address]);
 
   const formattedAddress = address?.slice(0, 6) + "..." + address?.slice(-4);
 
@@ -369,7 +366,8 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
                   <button
                     onClick={() => setIsOpen((prev) => !prev)}
                     type="button"
-                    className="text-white absolute bottom-0 right-0 z-10">
+                    className="text-white absolute bottom-0 right-0 z-10"
+                  >
                     {BasicIcons.edit}
                   </button>
                   <FeatCommon
@@ -378,7 +376,8 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
                       isOpen
                         ? "absolute top-4 block"
                         : "absolute top-1/2 -translate-y-1/2 hidden "
-                    }>
+                    }
+                  >
                     <div className="relative mt-5">
                       <div className="grid-cols-3 grid h-full w-full place-items-center gap-6  px-6 ">
                         {profileDetails?.image && (
@@ -405,7 +404,8 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
                               isActive={avatarUrl === url}
                               onClick={() => {
                                 setAvatarUrl(url);
-                              }}>
+                              }}
+                            >
                               <Image
                                 src={url}
                                 alt={`avatar-${i}`}
@@ -474,7 +474,8 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
                       : "bg-blue-shade-200 transition-transform transform hover:scale-105 duration-300"
                   }`}
                   onClick={handleStartSpaces}
-                  disabled={isLoading}>
+                  disabled={isLoading}
+                >
                   {isJoining ? "Joining Spaces..." : "Start meeting"}
                   {!isJoining && (
                     <Image
@@ -502,7 +503,8 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
                 <Link
                   // onClick={() => push(`/profile/${address}?active=info`)}
                   href={`/profile/${address}?active=info`}
-                  className="px-6 py-3 bg-white text-blue-shade-200 rounded-full shadow-lg hover:bg-blue-shade-200 hover:text-white transition duration-300 ease-in-out">
+                  className="px-6 py-3 bg-white text-blue-shade-200 rounded-full shadow-lg hover:bg-blue-shade-200 hover:text-white transition duration-300 ease-in-out"
+                >
                   Back to Profile
                 </Link>
               </div>
