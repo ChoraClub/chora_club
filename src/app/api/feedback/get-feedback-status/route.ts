@@ -32,7 +32,8 @@ export async function POST(
     }
 
     // Check if the role field exists in the document
-    const hasResponded = feedbackDoc[roleField]?.hasResponded ?? false;
+    const hasResponded =
+      feedbackDoc.feedbackGiven?.[roleField]?.hasResponded ?? false;
 
     return NextResponse.json(
       { success: true, data: hasResponded },

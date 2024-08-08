@@ -622,10 +622,22 @@ export default function Component({ params }: { params: { roomId: string } }) {
       )}
 
       {role === "guest" && modalOpen && (
-        <AttestationModal isOpen={modalOpen} onClose={handleModalClose} />
+        <AttestationModal
+          isOpen={modalOpen}
+          onClose={handleModalClose}
+          hostAddress={hostAddress}
+          meetingId={params.roomId}
+          role={role}
+        />
       )}
       {role === "host" && hostModalOpen && (
-        <AttestationModal isOpen={hostModalOpen} onClose={handleModalClose} />
+        <AttestationModal
+          isOpen={hostModalOpen}
+          onClose={handleModalClose}
+          hostAddress={hostAddress}
+          meetingId={params.roomId}
+          role={role}
+        />
       )}
     </>
   );

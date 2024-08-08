@@ -56,6 +56,7 @@ function PopupSlider({
       const raw = JSON.stringify({
         address: address,
         role: role,
+        feedbackType: "feedbackGiven",
         data: {
           platformExperience: [
             {
