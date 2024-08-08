@@ -5,6 +5,9 @@ import { NextRequest, NextResponse } from "next/server";
 async function delegateAttestationOffchain(data: any) {
   const myHeaders = new Headers();
   myHeaders.append("Content-Type", "application/json");
+  if(data.recipient){
+    myHeaders.append("x-wallet-address",data.recipient);
+  }
   const baseUrl = BASE_URL;
   const raw = JSON.stringify(data);
   console.log("raw", raw);

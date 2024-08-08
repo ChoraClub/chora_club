@@ -99,12 +99,12 @@ function SpecificDelegate({ props }: { props: Type }) {
 
   const [delegateOpen, setDelegateOpen] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
-  const address = useAccount();
+  // const address = useAccount();
   const [followerCountLoading, setFollowerCountLoading] = useState(true);
   const [notificationLoading, setNotificationLoading] = useState(false);
   const [isFollowStatusLoading, setIsFollowStatusLoading] = useState(true);
 
-  const { isConnected } = useAccount();
+  const { isConnected, address } = useAccount();
 
   const handleDelegateModal = async () => {
     if (!isConnected) {
@@ -361,6 +361,9 @@ function SpecificDelegate({ props }: { props: Type }) {
     const myHeaders = new Headers();
     // setFollowerCountLoading(true);
     myHeaders.append("Content-Type", "application/json");
+    if (address) {
+      myHeaders.append("x-wallet-address", address);
+    }
     const raw = JSON.stringify({
       address: props.individualDelegate,
     });
@@ -419,6 +422,9 @@ function SpecificDelegate({ props }: { props: Type }) {
     setIsFollowStatusLoading(true);
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
+    if (address) {
+      myHeaders.append("x-wallet-address", address);
+    }
     const raw = JSON.stringify({
       address: props.individualDelegate,
     });
@@ -501,19 +507,22 @@ function SpecificDelegate({ props }: { props: Type }) {
     let delegate_address: string;
     let follower_address: string;
     let dao: string;
-    dao = daoname;
+    dao = props.daoDelegates;
     let address = await walletClient.getAddresses();
     follower_address = address[0];
     delegate_address = props.individualDelegate;
 
     if (action == 1) {
       setLoading(true);
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      if (address) {
+        myHeaders.append("x-wallet-address", address);
+      }
       try {
         const response = await fetch("/api/delegate-follow/updatefollower", {
           method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: myHeaders,
           body: JSON.stringify({
             // Add any necessary data
             delegate_address: delegate_address,
@@ -551,12 +560,15 @@ function SpecificDelegate({ props }: { props: Type }) {
         let updatenotification: boolean;
         updatenotification = !notification;
         setNotificationLoading(true);
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        if (address) {
+          myHeaders.append("x-wallet-address", address);
+        }
         try {
           const response = await fetch("/api/delegate-follow/updatefollower", {
             method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
+            headers: myHeaders,
             body: JSON.stringify({
               // Add any necessary data
               delegate_address: delegate_address,
@@ -592,50 +604,54 @@ function SpecificDelegate({ props }: { props: Type }) {
     } else if (isFollowing) {
       setUnfollowmodel(true);
     } else {
-      setLoading(true);
-      let delegate_address: string;
-      let follower_address: string;
-      let dao: string;
-      // alert(props.daoDelegates);
-      dao = props.daoDelegates;
-      let address = await walletClient.getAddresses();
-      follower_address = address[0];
-      delegate_address = props.individualDelegate;
-      try {
-        const response = await fetch("/api/delegate-follow/savefollower", {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            // Add any necessary data
-            delegate_address: delegate_address,
-            follower_address: follower_address,
-            dao: dao,
-          }),
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to follow");
+      if (walletClient?.chain?.network === props.daoDelegates) {
+        setLoading(true);
+        let delegate_address: string;
+        let follower_address: string;
+        let dao: string;
+        dao = daoname;
+        let address = await walletClient.getAddresses();
+        follower_address = address[0];
+        delegate_address = props.individualDelegate;
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        if (address) {
+          myHeaders.append("x-wallet-address", address);
         }
+        try {
+          const response = await fetch("/api/delegate-follow/savefollower", {
+            method: "PUT",
+            headers: myHeaders,
+            body: JSON.stringify({
+              // Add any necessary data
+              delegate_address: delegate_address,
+              follower_address: follower_address,
+              dao: dao,
+            }),
+          });
 
-        const data = await response.json();
-        setLoading(false);
-        toast.success(
-          "Successfully followed the Delegate! Stay tuned for their updates."
-        );
-        // setFollowers(followers + 1);
-        setFollowers((prev) => prev + 1);
-        setTimeout(() => isFollowed(true), 1000);
-        setIsFollowing(true);
-        isNotification(true);
-        console.log("Follow successful:", data);
+          if (!response.ok) {
+            throw new Error("Failed to follow");
+          }
 
-        // Then update the follower count from the server
-        await setFollowerscount();
-      } catch (error) {
-        setLoading(false);
-        console.error("Error following:", error);
+          const data = await response.json();
+          setLoading(false);
+          toast.success(
+            "Successfully followed the Delegate! Stay tuned for their updates."
+          );
+          // setFollowers(followers + 1);
+          setFollowers((prev) => prev + 1);
+          setTimeout(() => isFollowed(true), 1000);
+          setIsFollowing(true);
+          isNotification(true);
+          console.log("Follow successful:", data);
+
+          // Then update the follower count from the server
+          await setFollowerscount();
+        } catch (error) {
+          setLoading(false);
+          console.error("Error following:", error);
+        }
       }
     }
   };

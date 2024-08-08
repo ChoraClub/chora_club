@@ -34,6 +34,9 @@ const useNotifications = ({
     try {
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
+      if (address) {
+        myHeaders.append("x-wallet-address", address);
+      }
 
       const raw = JSON.stringify({ address });
 
@@ -175,6 +178,9 @@ function NotificationMain() {
     try {
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
+      if (address) {
+        myHeaders.append("x-wallet-address", address);
+      }
 
       const raw = JSON.stringify({
         markAll: true,
@@ -287,38 +293,67 @@ function NotificationMain() {
       </div>
       <div className="flex bg-[#D9D9D945]">
         <div className="flex gap-12 pl-16">
-          {[
-            "all",
-            "sessionBookings",
-            "recordedSessions",
-            "followers",
-            "attestations",
-          ].map((tab) => (
-            <button
-              key={tab}
-              className={`py-4 px-2 outline-none ${
-                searchParams.get("active") === tab
-                  ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
-                  : "border-transparent"
-              }`}
-              onClick={() => handleTabClick(tab)}
-            >
-              {tab.charAt(0).toUpperCase() +
-                tab
-                  .slice(1)
-                  .replace(/([A-Z])/g, " $1")
-                  .trim()}
-            </button>
-          ))}
+          <button
+            className={`py-4 px-2 outline-none ${
+              searchParams.get("active") === "all"
+                ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
+                : "border-transparent"
+            }`}
+            onClick={() => router.push(path + "?active=all")}
+          >
+            All
+          </button>
+          <button
+            className={`py-4 px-2 outline-none ${
+              searchParams.get("active") === "sessionBookings"
+                ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
+                : "border-transparent"
+            }`}
+            onClick={() => router.push(path + "?active=sessionBookings")}
+          >
+            Session Bookings
+          </button>
+          <button
+            className={`py-4 px-2 outline-none ${
+              searchParams.get("active") === "recordedSessions"
+                ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
+                : "border-transparent"
+            }`}
+            // onClick={() => router.push(path + "?active=recordedSessions")}
+            onClick={() => toast("Coming Soon 🚀")}
+          >
+            Recorded Sessions
+          </button>
+          <button
+            className={`py-4 px-2 outline-none ${
+              searchParams.get("active") === "followers"
+                ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
+                : "border-transparent"
+            }`}
+            // onClick={() => router.push(path + "?active=followers")}
+            onClick={() => toast("Coming Soon 🚀")}
+          >
+            Followers
+          </button>
+          <button
+            className={`py-4 px-2 outline-none ${
+              searchParams.get("active") === "attestations"
+                ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
+                : "border-transparent"
+            }`}
+            // onClick={() => router.push(path + "?active=attestations")}
+            onClick={() => toast("Coming Soon 🚀")}
+          >
+            Attestations
+          </button>
         </div>
         <div className="ml-auto pe-16">
           <button
-            className="my-4 py-2 px-4 border w-52 border-blue-shade-100 text-blue-shade-100 rounded-xl flex items-center shadow-md hover:bg-blue-shade-100 hover:text-white transition duration-300 ease-in-out font-bold"
+            className="my-4 py-2 px-4 border border-blue-shade-100 text-blue-shade-100 rounded-xl flex items-center shadow-md hover:bg-blue-shade-100 hover:text-white transition duration-300 ease-in-out font-bold"
             onClick={markAllAsRead}
-            disabled={markAllReadCalling}
           >
-            <PiEnvelopeOpen className="mr-2" size={20} />
-            {buttonText}
+            <PiEnvelopeOpen className="mr-2" width={10} />
+            Mark all as read
           </button>
         </div>
       </div>

@@ -63,6 +63,7 @@ import { TbBrandGithubFilled } from "react-icons/tb";
 import { CgAttachment } from "react-icons/cg";
 import UpdateProfileModal from "../ComponentUtils/UpdateProfileModal";
 import { cookies } from "next/headers";
+import { m } from "framer-motion";
 
 function MainProfile() {
   const { isConnected, address } = useAccount();
@@ -86,8 +87,8 @@ function MainProfile() {
   const [selfDelegate, setSelfDelegate] = useState(false);
   const [daoName, setDaoName] = useState("optimism");
   const [isCopied, setIsCopied] = useState(false);
-  const [followings, setfollowings] = useState(0);
-  const [followers, setfollowers] = useState(0);
+  const [followings, setFollowings] = useState(0);
+  const [followers, setFollowers] = useState(0);
   const [isFollowing, setfollwing] = useState(true);
   const [loading, setLoading] = useState(false);
   const [notification, setnotification] = useState(true);
@@ -113,7 +114,7 @@ function MainProfile() {
     discourse: "",
     github: "",
   });
-  const [isToggled, settoggle] = useState(false);
+  const [isToggled, setToggle] = useState(false);
   interface ProgressData {
     total: any;
     uploaded: any;
@@ -266,6 +267,9 @@ function MainProfile() {
     try {
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
+      if (address) {
+        myHeaders.append("x-wallet-address", address);
+      }
 
       const raw = JSON.stringify({
         address: address,
@@ -299,11 +303,11 @@ function MainProfile() {
             (f: Following) => f.isFollowing
           );
           if (isChange == 1) {
-            setfollowings(activeFollowings.length);
+            setFollowings(activeFollowings.length);
           }
           setUserFollowings(activeFollowings);
         } else {
-          setfollowings(0);
+          setFollowings(0);
           setUserFollowings([]);
         }
       }
@@ -327,16 +331,17 @@ function MainProfile() {
     );
 
     if (!userupdate.isFollowing) {
-      if (daoName === unfollowDao) {
-        setfollowings(followings + 1);
+      setFollowings(followings + 1);
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      if (address) {
+        myHeaders.append("x-wallet-address", address);
       }
 
       try {
         const response = await fetch("/api/delegate-follow/savefollower", {
           method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: myHeaders,
           body: JSON.stringify({
             // Add any necessary data
             delegate_address: userupdate.follower_address,
@@ -357,16 +362,19 @@ function MainProfile() {
       }
     } else {
       if (daoName === unfollowDao) {
-        setfollowings(followings - 1);
+        setFollowings(followings - 1);
       }
       setLoading(true);
       settoaster(true);
       try {
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        if (address) {
+          myHeaders.append("x-wallet-address", address);
+        }
         const response = await fetch("/api/delegate-follow/updatefollower", {
           method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: myHeaders,
           body: JSON.stringify({
             // Add any necessary data
             delegate_address: userupdate.follower_address,
@@ -404,11 +412,14 @@ function MainProfile() {
     settoaster(true);
 
     try {
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      if (address) {
+        myHeaders.append("x-wallet-address", address);
+      }
       const response = await fetch("/api/delegate-follow/updatefollower", {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: myHeaders,
         body: JSON.stringify({
           // Add any necessary data
           delegate_address: userupdate.follower_address,
@@ -442,6 +453,9 @@ function MainProfile() {
     // console.log("Attempting to call savefollower API");
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
+    if (address) {
+      myHeaders.append("x-wallet-address", address);
+    }
     const raw = JSON.stringify({
       address: address,
     });
@@ -498,10 +512,10 @@ function MainProfile() {
         const activeFollowings = matchDao.following?.filter(
           (f: any) => f.isFollowing
         );
-        setfollowings(activeFollowings.length);
+        setFollowings(activeFollowings.length);
         setUserFollowings(activeFollowings);
       } else {
-        setfollowings(0);
+        setFollowings(0);
         setUserFollowings([]);
       }
 
@@ -514,7 +528,7 @@ function MainProfile() {
       ).length;
 
       // alert(followerCount);
-      setfollowers(followerCount);
+      setFollowers(followerCount);
     } catch (error) {
       console.error("Error in updateFollowerState:", error);
     }
@@ -547,7 +561,7 @@ function MainProfile() {
       }
 
       const data = await response.json();
-      settoggle(!isToggled);
+      setToggle(!isToggled);
       // console.log("status successfully change!", data);
     } catch (error) {
       console.error("Error following:", error);
@@ -642,7 +656,7 @@ function MainProfile() {
             github: dbResponse.data[0]?.socialHandles?.github,
             displayImage: dbResponse.data[0]?.image,
           });
-          settoggle(dbResponse.data[0]?.isEmailVisible);
+          setToggle(dbResponse.data[0]?.isEmailVisible);
           setDescription(
             dbResponse.data[0]?.networks?.find(
               (network: any) => network.dao_name === dao
@@ -650,8 +664,8 @@ function MainProfile() {
           );
 
           if (!isConnected) {
-            setfollowings(0);
-            setfollowers(0);
+            setFollowings(0);
+            setFollowers(0);
           } else {
             await updateFollowerState();
           }
@@ -757,43 +771,49 @@ function MainProfile() {
   const handleAdd = async (newDescription?: string) => {
     try {
       // Call the POST API function for adding a new delegate
-      // console.log("Adding the delegate..");
-      const response = await axios.post(
-        "/api/profile",
-        {
-          address: address,
-          image: modalData.displayImage,
-          isDelegate: true,
-          displayName: modalData.displayName,
-          emailId: modalData.emailId,
-          isEmailVisible: false,
-          socialHandles: {
-            twitter: modalData.twitter,
-            discord: modalData.discord,
-            github: modalData.github,
-          },
-          networks: [
-            {
-              dao_name: daoName,
-              network: chain?.name,
-              discourse: modalData.discourse,
-              description: newDescription,
-            },
-          ],
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            ...(address && { "x-wallet-address": address }),
-          },
-        }
-      );
+      console.log("Adding the delegate..");
 
-      // console.log("Response Add", response);
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      if (address) {
+        myHeaders.append("x-wallet-address", address);
+      }
+
+      const raw = JSON.stringify({
+        address: address,
+        image: modalData.displayImage,
+        isDelegate: true,
+        displayName: modalData.displayName,
+        emailId: modalData.emailId,
+        isEmailVisible: false,
+        socialHandles: {
+          twitter: modalData.twitter,
+          discord: modalData.discord,
+          github: modalData.github,
+        },
+        networks: [
+          {
+            dao_name: daoName,
+            network: chain?.name,
+            discourse: modalData.discourse,
+            description: newDescription,
+          },
+        ],
+      });
+
+      const requestOptions: any = {
+        method: "POST",
+        headers: myHeaders,
+        body: raw,
+        redirect: "follow",
+      };
+
+      const response = await fetch("/api/profile/", requestOptions);
+      console.log("Response Add", response);
 
       if (response.status === 200) {
         // Delegate added successfully
-        // console.log("Delegate added successfully:", response.data);
+        console.log("Delegate added successfully:", response.status);
         setIsLoading(false);
         setUserData({
           displayImage: modalData.displayImage,

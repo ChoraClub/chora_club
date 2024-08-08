@@ -8,8 +8,9 @@ import {
   RotatingLines,
   ThreeDots,
 } from "react-loader-spinner";
-import styles from './DelegateInfo.module.css'
-import { marked } from 'marked';
+import styles from "./DelegateInfo.module.css";
+import { marked } from "marked";
+import { useAccount } from "wagmi";
 
 interface Type {
   daoDelegates: string;
@@ -35,10 +36,8 @@ function DelegateInfo({ props, desc }: { props: Type; desc: string }) {
   const [activeButton, setActiveButton] = useState("onchain");
   const [loadingOpAgora, setLoadingOpAgora] = useState(false);
   const [loadingKarma, setLoadingKarma] = useState(false);
-  const [convertedDescription, setConvertedDescription] = useState<string>('');
-
-  
-
+  const [convertedDescription, setConvertedDescription] = useState<string>("");
+  const { address } = useAccount();
 
   useEffect(() => {
     if (activeButton === "onchain") {
@@ -100,13 +99,16 @@ function DelegateInfo({ props, desc }: { props: Type; desc: string }) {
 
     const sessionAttended = async () => {
       try {
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        if (address) {
+          myHeaders.append("x-wallet-address", address);
+        }
         const response = await fetch(
           `/api/get-session-data/${props.individualDelegate}`,
           {
             method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
+            headers: myHeaders,
             body: JSON.stringify({
               dao_name: props.daoDelegates,
             }),
@@ -135,11 +137,14 @@ function DelegateInfo({ props, desc }: { props: Type; desc: string }) {
 
     const officeHoursHosted = async () => {
       try {
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        if (address) {
+          myHeaders.append("x-wallet-address", address);
+        }
         const response = await fetch(`/api/get-officehours-address`, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: myHeaders,
           body: JSON.stringify({
             address: props.individualDelegate,
           }),
@@ -169,11 +174,14 @@ function DelegateInfo({ props, desc }: { props: Type; desc: string }) {
 
     const officeHoursAttended = async () => {
       try {
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        if (address) {
+          myHeaders.append("x-wallet-address", address);
+        }
         const response = await fetch(`/api/get-attendee-individual`, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: myHeaders,
           body: JSON.stringify({
             attendee_address: props.individualDelegate,
           }),
@@ -243,72 +251,79 @@ function DelegateInfo({ props, desc }: { props: Type; desc: string }) {
 
   const convertMarkdownToHtml = async (markdown: string): Promise<string> => {
     let html = await marked.parse(markdown);
-    
+
+    // Replace <pre> tags with custom styled divs
     html = html.replace(/<pre>([\s\S]*?)<\/pre>/g, (match, content) => {
       return `<div class="${styles.preFormatted}">${content}</div>`;
     });
-  
+
     return html;
   };
 
   useEffect(() => {
     const fetchData = async () => {
-      if(props.daoDelegates === 'arbitrum') {
-      try {
-        setLoadingKarma(true);
-        setLoading(true);
-        const res = await fetch(
-          `/api/get-arbitrum-delegatelist?user=${props.individualDelegate}`
-        );
-        const details = await res.json();
-        console.log("Details: ", details);
-        console.log("Desc: ", details.delegate.statement.statement);
-        // setKarmaDescription(details.delegate.statement.statement);
-        const statementHtml = await convertMarkdownToHtml(details.delegate.statement.statement);
-        setKarmaDescription(details.delegate.statement.statement);
-        setConvertedDescription(statementHtml);setLoadingKarma(false);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        setLoadingKarma(false);
-        setLoading(false);
-      }
-      setLoading(false);
-    }else{
-      try {
-        setLoading(true);
-        setLoadingOpAgora(true);
-        console.log(props.individualDelegate);
-        const res = await fetch(
-          `/api/get-statement?individualDelegate=${props.individualDelegate}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-
-        if (!res.ok) {
-          throw new Error("Failed to fetch data");
+      if (props.daoDelegates === "arbitrum") {
+        try {
+          setLoadingKarma(true);
+          setLoading(true);
+          const res = await fetch(
+            `/api/get-arbitrum-delegatelist?user=${props.individualDelegate}`
+          );
+          const details = await res.json();
+          console.log("Details: ", details);
+          console.log("Desc: ", details.delegate.statement.statement);
+          // setKarmaDescription(details.delegate.statement.statement);
+          const statementHtml = await convertMarkdownToHtml(
+            details.delegate.statement.statement
+          );
+          setKarmaDescription(details.delegate.statement.statement);
+          setConvertedDescription(statementHtml);
+          setLoadingKarma(false);
+          setLoading(false);
+        } catch (error) {
+          console.error("Error fetching data:", error);
+          setLoadingKarma(false);
+          setLoading(false);
         }
-
-        const data = await res.json();
-        const statement = data.statement.payload.delegateStatement;
-        console.log("statement", statement);
-        const statementHtml = await convertMarkdownToHtml(statement);
-        setOpAgoraDescription(statement);
-        setConvertedDescription(statementHtml);
-        setLoadingOpAgora(false);
         setLoading(false);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        setLoadingOpAgora(false);
+      } else {
+        try {
+          setLoading(true);
+          setLoadingOpAgora(true);
+          console.log(props.individualDelegate);
+          const res = await fetch(
+            `/api/get-statement?individualDelegate=${props.individualDelegate}`,
+            {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              // body: JSON.stringify({ individualDelegate: props.individualDelegate }),
+            }
+          );
+
+          if (!res.ok) {
+            throw new Error("Failed to fetch data");
+          }
+
+          const data = await res.json();
+          const statement = data.statement.payload.delegateStatement;
+          console.log("statement", statement);
+          // setOpAgoraDescription(statement);
+          // setConvertedDescription(convertMarkdownToHtml(statement));
+          const statementHtml = await convertMarkdownToHtml(statement);
+          setOpAgoraDescription(statement);
+          setConvertedDescription(statementHtml);
+          setLoadingOpAgora(false);
+          setLoading(false);
+        } catch (error) {
+          console.error("Error fetching data:", error);
+          setLoadingOpAgora(false);
+          setLoading(false);
+        }
         setLoading(false);
       }
-      setLoading(false);
-    }
-  }
+    };
     fetchData();
   }, [props.individualDelegate, props.daoDelegates]);
 
@@ -375,12 +390,13 @@ function DelegateInfo({ props, desc }: { props: Type; desc: string }) {
       <div
         style={{ boxShadow: "0px 4px 30.9px 0px rgba(0, 0, 0, 0.12)" }}
         className={`rounded-xl my-7 me-32 py-6 px-7 text-sm ${
-          desc && loadingKarma && loadingOpAgora? "" : "min-h-52"
+          desc && loadingKarma && loadingOpAgora ? "" : "min-h-52"
         }`}
       >
         <div className="flex">
-
-        <h1 className={`text-3xl font-semibold mb-3 ${styles.heading}`}>Delegate Statement</h1>
+          <h1 className={`text-3xl font-semibold mb-3 ${styles.heading}`}>
+            Delegate Statement
+          </h1>
         </div>
         {loadingOpAgora || loadingKarma || loading ? (
           <div className="flex pt-6 justify-center">
@@ -394,9 +410,11 @@ function DelegateInfo({ props, desc }: { props: Type; desc: string }) {
           </div>
         ) : desc !== "" && desc !== null ? (
           desc
-        ) :
-        convertedDescription ? (
-          <div dangerouslySetInnerHTML={{ __html: convertedDescription }} className={`${styles.delegateStatement} rounded-xl me-32 py-6 px-7 text-sm`} />
+        ) : convertedDescription ? (
+          <div
+            dangerouslySetInnerHTML={{ __html: convertedDescription }}
+            className={`${styles.delegateStatement} rounded-xl me-32 py-6 px-7 text-sm`}
+          />
         ) : (
           <div className="font-semibold text-base flex justify-center items-center mt-7">
             Delegate has not provided a description

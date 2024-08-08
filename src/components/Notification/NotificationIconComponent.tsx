@@ -56,6 +56,9 @@ function NotificationIconComponent() {
     try {
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
+      if (address) {
+        myHeaders.append("x-wallet-address", address);
+      }
 
       const raw = JSON.stringify({
         address: address,
@@ -191,19 +194,16 @@ function NotificationIconComponent() {
         className=""
         ref={hoverRef}
         onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-      >
+        onMouseLeave={handleMouseLeave}>
         <Badge
           isInvisible={!hasUnreadNotifications}
           content={""}
           color="danger"
           shape="circle"
-          className={hasUnreadNotifications ? styles.pulseBadge : ""}
-        >
+          className={hasUnreadNotifications ? styles.pulseBadge : ""}>
           <div
             className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 bg-white rounded-full flex justify-center items-center w-10 h-10`}
-            onClick={() => router.push(`/notifications?active=all`)}
-          >
+            onClick={() => router.push(`/notifications?active=all`)}>
             <IoMdNotifications className="size-6 text-blue-shade-200" />
           </div>
         </Badge>
@@ -212,8 +212,7 @@ function NotificationIconComponent() {
           <div
             className="absolute left-20 bottom-4 xl:left-24 bg-white rounded-2xl shadow-lg border border-[#C3D3FF] w-96 font-poppins z-50"
             onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
-          >
+            onMouseLeave={handleMouseLeave}>
             <div className="rounded-t-2xl overflow-hidden">
               {combinedNotifications.length > 0 ? (
                 combinedNotifications.slice(0, 3).map((data, index) => (
@@ -223,30 +222,26 @@ function NotificationIconComponent() {
                       className={`flex items-center p-4 justify-between cursor-pointer bg-gray-200 text-black ${
                         data.read_status ? "bg-white text-gray-500" : ""
                       }`}
-                      onClick={() => handleMarkAndRedirection({ data })}
-                    >
+                      onClick={() => handleMarkAndRedirection({ data })}>
                       <div className="flex gap-3">
                         <span
                           className="flex items-center justify-center rounded-full h-10 w-10 min-w-10"
                           style={{
                             backgroundColor: getBackgroundColor(data),
-                          }}
-                        >
+                          }}>
                           {getIcon(data)}
                         </span>
                         <div>
                           <p
                             className={`text-xs font-semibold mb-1 line-clamp-1 text-black ${
                               data.read_status ? "text-gray-500" : ""
-                            }`}
-                          >
+                            }`}>
                             {data.notification_title}
                           </p>
                           <p
                             className={`text-xs line-clamp-2 text-[#414141] ${
                               data.read_status ? "text-gray-500" : ""
-                            }`}
-                          >
+                            }`}>
                             {data.content}
                           </p>
                         </div>
@@ -254,8 +249,7 @@ function NotificationIconComponent() {
                       <div
                         className={`text-xs min-w-12 text-black font-semibold flex items-center justify-center ${
                           data.read_status ? "text-gray-500 font-normal" : ""
-                        }`}
-                      >
+                        }`}>
                         {formatTimestampOrDate(data.createdAt)}
                       </div>
                     </div>
@@ -273,8 +267,7 @@ function NotificationIconComponent() {
             <div className="flex justify-center p-4">
               <button
                 className="text-xs text-blue-shade-100 hover:text-blue-shade-200"
-                onClick={() => router.push(`/notifications?active=all`)}
-              >
+                onClick={() => router.push(`/notifications?active=all`)}>
                 View All Notifications
               </button>
             </div>

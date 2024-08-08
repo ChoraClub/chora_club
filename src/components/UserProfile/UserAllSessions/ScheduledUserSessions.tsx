@@ -18,6 +18,7 @@ import { Time } from "@internationalized/date";
 import { AbiEncodingLengthMismatchError } from "viem";
 import { all } from "axios";
 import { fetchEnsAvatar } from "@/utils/ENSUtils";
+import { headers } from "next/headers";
 
 interface dataToStore {
   userAddress: `0x${string}` | undefined | null;
@@ -163,6 +164,9 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
     try {
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
+      if (address) {
+        myHeaders.append("x-wallet-address", address);
+      }
 
       const raw = JSON.stringify({
         address: address,
@@ -292,9 +296,14 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
     setFinalData(dataToStore);
 
     console.log("dataToStore", dataToStore);
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    if (address) {
+      myHeaders.append("x-wallet-address", address);
+    }
     const requestOptions: any = {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: myHeaders,
       body: JSON.stringify(dataToStore),
       redirect: "follow",
     };
@@ -314,11 +323,14 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
 
         //calling api endpoint for sending mail to user who follow this delegate
         try {
+          const myHeaders = new Headers();
+          myHeaders.append("Content-Type", "application/json");
+          if (address) {
+            myHeaders.append("x-wallet-address", address);
+          }
           const response = await fetch("/api/delegate-follow/send-mails", {
             method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
+            headers: myHeaders,
             body: JSON.stringify({
               // Add any necessary data
               address: address,
@@ -550,6 +562,9 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
             setAddingEmail(true);
             const myHeaders = new Headers();
             myHeaders.append("Content-Type", "application/json");
+            if (address) {
+              myHeaders.append("x-wallet-address", address);
+            }
 
             const raw = JSON.stringify({
               address: address,
