@@ -37,7 +37,7 @@ interface TileProps {
   tileIndex: number;
   data: {
     _id: string;
-    img: StaticImageData;
+    thumbnail_image: string;
     title: string;
     meetingId: string;
     dao_name: string;
@@ -157,8 +157,10 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
       >
         <div className="flex">
           <Image
-            src={data.img || text1}
+            src={`https://gateway.lighthouse.storage/ipfs/${data.thumbnail_image}`}
             alt="image"
+            width={176}
+            height={176}
             className="w-44 h-44 rounded-3xl border border-[#D9D9D9]"
           />
 
