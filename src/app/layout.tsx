@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import localFonts from "next/font/local";
 import "./globals.css";
-import { NextUIProvider } from "@nextui-org/react";
+// import { NextUIProvider } from "@nextui-org/react";
 import SidebarMain from "@/components/MainSidebar/SidebarMain";
 import RootProviders from "./providers/root-providers";
 import HuddleContextProvider from "@/context/HuddleContextProvider";
@@ -11,7 +11,7 @@ import FeedbackTile from "@/components/ComponentUtils/FeedbackTile";
 import Script from "next/script";
 import ProgressBarProvider from "@/components/ProgressBarProvider/ProgressBarProvider";
 import MobileResponsiveMessage from "@/components/MobileResponsiveMessage/MobileResponsiveMessage";
-
+import { GoogleTagManager } from '@next/third-parties/google';
 const poppins = Poppins({
   subsets: ["latin"],
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
@@ -73,7 +73,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <script
+        {/* <script
           dangerouslySetInnerHTML={{
             __html: `
        (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -83,10 +83,10 @@ export default function RootLayout({
           })(window,document,'script','dataLayer','GTM-W5684W77');
           `,
           }}
-        ></script>
+        ></script> */}
       </head>
       <body className={`${quanty.variable} ${poppins.variable}`}>
-        <noscript
+        {/* <noscript
           dangerouslySetInnerHTML={{
             __html: `
           <iframe
@@ -97,7 +97,7 @@ export default function RootLayout({
           ></iframe>
         `,
           }}
-        />
+        /> */}
         <ProgressBarProvider>
           <RootProviders>
             <HuddleContextProvider>
@@ -128,6 +128,7 @@ export default function RootLayout({
           </RootProviders>
         </ProgressBarProvider>
       </body>
+      <GoogleTagManager gtmId="GTM-5KX3QH8T" />
     </html>
   );
 }
