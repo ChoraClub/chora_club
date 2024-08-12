@@ -8,7 +8,7 @@ interface Recordings {
   recordingSize: number;
 }
 
-export async function GET(
+export async function POST(
   request: Request,
   res: NextResponse
 ): Promise<void | Response> {
