@@ -262,7 +262,7 @@ function MainProfile() {
     isChange: number,
     isfollowingchange: number
   ) => {
-    setfollowingmodel(true);
+  
     setLoading(true);
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
@@ -288,7 +288,7 @@ function MainProfile() {
       updateFollowerState(dbResponse);
     } else {
       setDbResponse(dbResponse);
-
+      setfollowingmodel(true);
       for (const item of dbResponse.data) {
         const matchDao = item.followings.find(
           (daoItem: any) => daoItem.dao === daoname

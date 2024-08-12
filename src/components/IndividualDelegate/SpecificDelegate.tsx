@@ -544,6 +544,7 @@ function SpecificDelegate({ props }: { props: Type }) {
           (f: any) => f.isFollowing
         ).length;
         setFollowers(followerCount);
+        setFollowerCountLoading(false);
 
         // Update follow and notification status
         const address = await walletClient.getAddresses();
@@ -563,13 +564,18 @@ function SpecificDelegate({ props }: { props: Type }) {
         setFollowers(0);
         setIsFollowing(false);
         isNotification(false);
+        setFollowerCountLoading(false);
+
       }
     } catch (error) {
       console.error("Error in fetchDelegateData:", error);
       setFollowers(0);
       setIsFollowing(false);
       isNotification(false);
+      setFollowerCountLoading(false);
+
     } finally {
+      setFollowerCountLoading(false);
       setIsFollowStatusLoading(false);
     }
   };
