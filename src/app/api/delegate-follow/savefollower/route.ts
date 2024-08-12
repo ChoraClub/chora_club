@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/config/connectDB";
-import { dao_details } from "@/config/daoDetails";
 
 type follow_activity = {
   action: string;
@@ -42,14 +41,14 @@ export async function POST(
     const collection = db.collection("delegate_follow");
     const { address } = await req.json();
 
-    console.log("Finding documents for address in save follower:", address);
+    // console.log("Finding documents for address in save follower:", address);
     const documents = await collection
       .find({
         address: { $regex: `^${address}$`, $options: "i" },
       })
       .toArray();
 
-    console.log(documents[0]);
+    // console.log(documents[0]);
 
     client.close();
 
@@ -70,22 +69,15 @@ export async function PUT(req: NextRequest) {
   try {
     const { delegate_address, follower_address, dao } = await req.json();
 
-    if (dao === null) {
-      return NextResponse.json(
-        { message: "Dao is not blank" },
-        { status: 404 }
-      );
-    }
+    // console.log("Received follower details:", {
+    //   delegate_address,
+    //   follower_address,
+    //   dao,
+    // });
 
-    console.log("Received follower details:", {
-      delegate_address,
-      follower_address,
-      dao,
-    });
-
-    console.log("Connecting to MongoDB...");
+    // console.log("Connecting to MongoDB...");
     const client = await connectDB();
-    console.log("Connected to MongoDB");
+    // console.log("Connected to MongoDB");
 
     const db = client.db();
 
@@ -95,35 +87,11 @@ export async function PUT(req: NextRequest) {
 
     if (collections.length === 0) {
       await db.createCollection("delegate_follow");
-      console.log("Collection 'delegate_follow' created.");
-    } else {
-      console.log("Collection 'delegate_follow' already exists.");
     }
 
     const collection = db.collection("delegate_follow");
 
-    console.log(`Updating delegate document for ${delegate_address}...`);
-
-    // First, try to update an existing follower entry
-    // const updateResult = await collection.updateOne(
-    //   {
-    //     address: { $regex: `^${delegate_address}$`, $options: "i" },
-    //     "followers.dao_name": dao,
-    //     "followers.follower.address":follower_address,
-    //   },
-    //   {
-    //     $set: {
-    //       "followers.$.isFollowing": true,
-    //       "followers.$.isNotification": true,
-    //     },
-    //     $push: {
-    //       "followers.$.activity": {
-    //         action: "follow",
-    //         timestamp: new Date(),
-    //       } as any,
-    //     },
-    //   }
-    // );
+    // console.log(`Updating delegate document for ${delegate_address}...`);
 
     const updateResult = await collection.updateOne(
       {

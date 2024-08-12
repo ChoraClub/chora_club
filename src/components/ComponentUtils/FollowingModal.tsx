@@ -65,18 +65,17 @@ function FollowingModal({
   const [NetworkofUser, setChainName] = useState("");
   const { chain, chains } = useNetwork();
   const [activeButton, setActiveButton] = useState("");
-useEffect(() => {
-  if (chain && chain?.name === "Optimism") {
-    setChainName("optimism");
-    setActiveButton("optimism");
-  } else if (chain && chain?.name === "Arbitrum One") {
-    setChainName("arbitrum");
-    setActiveButton("arbitrum");
-  }
-},[chain])
-  
   useEffect(() => {
-   
+    if (chain && chain?.name === "Optimism") {
+      setChainName("optimism");
+      setActiveButton("optimism");
+    } else if (chain && chain?.name === "Arbitrum One") {
+      setChainName("arbitrum");
+      setActiveButton("arbitrum");
+    }
+  }, [chain]);
+
+  useEffect(() => {
     const fetchEnsNames = async () => {
       // console.log(" user followings", userFollowings);
       const addresses = userFollowings.map(
@@ -157,7 +156,7 @@ useEffect(() => {
                   }`}
                   onClick={() => {
                     setActiveButton("optimism");
-                    handleUpdateFollowings("optimism", 0);
+                    handleUpdateFollowings("optimism", 0, 0);
                     setChainName("optimism");
                   }}>
                   <Image src={oplogo} alt="optimism" width={23} className="" />
@@ -171,7 +170,7 @@ useEffect(() => {
                   }`}
                   onClick={() => {
                     setActiveButton("arbitrum");
-                    handleUpdateFollowings("arbitrum", 0);
+                    handleUpdateFollowings("arbitrum", 0, 0);
                     setChainName("arbitrum");
                   }}>
                   <Image src={arbcir} alt="arbitrum" width={23} className="" />

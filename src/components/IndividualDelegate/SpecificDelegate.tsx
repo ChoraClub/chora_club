@@ -285,8 +285,9 @@ function SpecificDelegate({ props }: { props: Type }) {
             ? details.data.delegate.githubHandle
             : "",
         });
-        await updateFollowerState();
-        await setFollowerscount();
+        // await updateFollowerState();
+        // await setFollowerscount();
+        await fetchDelegateData();
 
         setIsPageLoading(false);
       } catch (error) {
@@ -356,10 +357,151 @@ function SpecificDelegate({ props }: { props: Type }) {
     toast("Address Copied");
   };
 
-  const setFollowerscount = async () => {
-    setFollowerCountLoading(true);
+  // const setFollowerscount = async () => {
+  //   setFollowerCountLoading(true);
+  //   const myHeaders = new Headers();
+  //   // setFollowerCountLoading(true);
+  //   myHeaders.append("Content-Type", "application/json");
+  //   const raw = JSON.stringify({
+  //     address: props.individualDelegate,
+  //   });
+
+  //   const requestOptions: any = {
+  //     method: "POST",
+  //     headers: myHeaders,
+  //     body: raw,
+  //     redirect: "follow",
+  //   };
+
+  //   try {
+  //     const resp = await fetch(
+  //       `/api/delegate-follow/savefollower`,
+  //       requestOptions
+  //     );
+
+  //     if (!resp.ok) {
+  //       throw new Error("Failed to save follower");
+  //     }
+
+  //     const data = await resp.json();
+  //     console.log("API Response:", data);
+
+  //     if (!data.success || !data.data || data.data.length === 0) {
+  //       console.log("No data returned from API");
+  //       return;
+  //     }
+
+  //     const followerData = data.data[0];
+  //     const daoFollowers = followerData.followers.find(
+  //       (dao: any) =>
+  //         dao.dao_name.toLowerCase() === props.daoDelegates.toLowerCase()
+  //     );
+
+  //     if (daoFollowers) {
+  //       const followerCount = daoFollowers.follower.filter(
+  //         (f: any) => f.isFollowing
+  //       ).length;
+
+  //       console.log(`Follower count for ${daoname}:`, followerCount);
+  //       setFollowers(followerCount);
+  //       // setFollowerCountLoading(false);
+  //     }
+  //   } catch {
+  //     console.log("no followers found something went wrong!");
+  //     setFollowers(0);
+  //     setFollowerCountLoading(false);
+  //   } finally {
+  //     setFollowerCountLoading(false);
+  //   }
+  // };
+
+  // const updateFollowerState = async () => {
+  //   // console.log("Attempting to call savefollower API");
+  //   setIsFollowStatusLoading(true);
+  //   const myHeaders = new Headers();
+  //   myHeaders.append("Content-Type", "application/json");
+  //   const raw = JSON.stringify({
+  //     address: props.individualDelegate,
+  //   });
+
+  //   const requestOptions: any = {
+  //     method: "POST",
+  //     headers: myHeaders,
+  //     body: raw,
+  //     redirect: "follow",
+  //   };
+
+  //   try {
+  //     const resp = await fetch(
+  //       `/api/delegate-follow/savefollower`,
+  //       requestOptions
+  //     );
+
+  //     if (!resp.ok) {
+  //       throw new Error("Failed to save follower");
+  //     }
+
+  //     const data = await resp.json();
+  //     console.log("API Response:", data);
+
+  //     if (!data.success || !data.data || data.data.length === 0) {
+  //       console.log("No data returned from API");
+  //       return;
+  //     }
+
+  //     const followerData = data.data[0];
+  //     let address = await walletClient.getAddresses();
+  //     let address_user = address[0].toLowerCase(); // Convert to lowercase for case-insensitive comparison
+  //     let currentDaoName = props.daoDelegates;
+
+  //     console.log("Current DAO:", currentDaoName);
+  //     console.log("User Address:", address_user);
+
+  //     const daoFollowers = followerData.followers.find(
+  //       (dao: any) =>
+  //         dao.dao_name.toLowerCase() === currentDaoName.toLowerCase()
+  //     );
+
+  //     console.log("DAO Followers:", daoFollowers);
+
+  //     if (daoFollowers) {
+  //       const follow = daoFollowers.follower.find(
+  //         (f: any) => f.address.toLowerCase() === address_user
+  //       );
+
+  //       console.log("User's follow status:", follow);
+
+  //       if (follow) {
+  //         setIsFollowing(follow.isFollowing);
+  //         isNotification(follow.isNotification); // Changed from isNotification(follow.isNotification)
+  //       } else {
+  //         setIsFollowing(false);
+  //         isNotification(false); // Changed from isNotification(false)
+  //       }
+
+  //       // const followerCount = daoFollowers.follower.filter(
+  //       //   (f: any) => f.isFollowing
+  //       // ).length;
+
+  //       // console.log("Follower count:", followerCount);
+
+  //       // setFollowers(followerCount);
+  //     } else {
+  //       setIsFollowing(false);
+  //       isNotification(false); // Changed from isNotification(false)
+  //       setFollowers(0);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error in updateFollowerState:", error);
+  //   } finally {
+  //     setIsFollowStatusLoading(false);
+  //   }
+  // };
+
+  const fetchDelegateData = async () => {
+    setIsFollowStatusLoading(true);
+
     const myHeaders = new Headers();
-    // setFollowerCountLoading(true);
     myHeaders.append("Content-Type", "application/json");
     const raw = JSON.stringify({
       address: props.individualDelegate,
@@ -379,7 +521,7 @@ function SpecificDelegate({ props }: { props: Type }) {
       );
 
       if (!resp.ok) {
-        throw new Error("Failed to save follower");
+        throw new Error("Failed to fetch delegate data");
       }
 
       const data = await resp.json();
@@ -391,107 +533,42 @@ function SpecificDelegate({ props }: { props: Type }) {
       }
 
       const followerData = data.data[0];
+      const currentDaoName = props.daoDelegates.toLowerCase();
       const daoFollowers = followerData.followers.find(
-        (dao: any) =>
-          dao.dao_name.toLowerCase() === props.daoDelegates.toLowerCase()
+        (dao: any) => dao.dao_name.toLowerCase() === currentDaoName
       );
 
       if (daoFollowers) {
+        // Update follower count
         const followerCount = daoFollowers.follower.filter(
           (f: any) => f.isFollowing
         ).length;
-
-        console.log(`Follower count for ${daoname}:`, followerCount);
         setFollowers(followerCount);
-        // setFollowerCountLoading(false);
-      }
-    } catch {
-      console.log("no followers found something went wrong!");
-      setFollowers(0);
-      setFollowerCountLoading(false);
-    } finally {
-      setFollowerCountLoading(false);
-    }
-  };
 
-  const updateFollowerState = async () => {
-    // console.log("Attempting to call savefollower API");
-    setIsFollowStatusLoading(true);
-    const myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-    const raw = JSON.stringify({
-      address: props.individualDelegate,
-    });
-
-    const requestOptions: any = {
-      method: "POST",
-      headers: myHeaders,
-      body: raw,
-      redirect: "follow",
-    };
-
-    try {
-      const resp = await fetch(
-        `/api/delegate-follow/savefollower`,
-        requestOptions
-      );
-
-      if (!resp.ok) {
-        throw new Error("Failed to save follower");
-      }
-
-      const data = await resp.json();
-      console.log("API Response:", data);
-
-      if (!data.success || !data.data || data.data.length === 0) {
-        console.log("No data returned from API");
-        return;
-      }
-
-      const followerData = data.data[0];
-      let address = await walletClient.getAddresses();
-      let address_user = address[0].toLowerCase(); // Convert to lowercase for case-insensitive comparison
-      let currentDaoName = props.daoDelegates;  
-
-      console.log("Current DAO:", currentDaoName);
-      console.log("User Address:", address_user);
-
-      const daoFollowers = followerData.followers.find(
-        (dao: any) =>
-          dao.dao_name.toLowerCase() === currentDaoName.toLowerCase()
-      );
-
-      console.log("DAO Followers:", daoFollowers);
-
-      if (daoFollowers) {
-        const follow = daoFollowers.follower.find(
+        // Update follow and notification status
+        const address = await walletClient.getAddresses();
+        const address_user = address[0].toLowerCase();
+        const userFollow = daoFollowers.follower.find(
           (f: any) => f.address.toLowerCase() === address_user
         );
 
-        console.log("User's follow status:", follow);
-
-        if (follow) {
-          setIsFollowing(follow.isFollowing);
-          isNotification(follow.isNotification); // Changed from isNotification(follow.isNotification)
+        if (userFollow) {
+          setIsFollowing(userFollow.isFollowing);
+          isNotification(userFollow.isNotification);
         } else {
           setIsFollowing(false);
-          isNotification(false); // Changed from isNotification(false)
+          isNotification(false);
         }
-
-        // const followerCount = daoFollowers.follower.filter(
-        //   (f: any) => f.isFollowing
-        // ).length;
-
-        // console.log("Follower count:", followerCount);
-
-        // setFollowers(followerCount);
       } else {
-        setIsFollowing(false);
-        isNotification(false); // Changed from isNotification(false)
         setFollowers(0);
+        setIsFollowing(false);
+        isNotification(false);
       }
     } catch (error) {
-      console.error("Error in updateFollowerState:", error);
+      console.error("Error in fetchDelegateData:", error);
+      setFollowers(0);
+      setIsFollowing(false);
+      isNotification(false);
     } finally {
       setIsFollowStatusLoading(false);
     }
@@ -501,7 +578,7 @@ function SpecificDelegate({ props }: { props: Type }) {
     let delegate_address: string;
     let follower_address: string;
     let dao: string;
-    dao = daoname;
+    dao = props.daoDelegates;
     let address = await walletClient.getAddresses();
     follower_address = address[0];
     delegate_address = props.individualDelegate;
@@ -592,50 +669,55 @@ function SpecificDelegate({ props }: { props: Type }) {
     } else if (isFollowing) {
       setUnfollowmodel(true);
     } else {
-      setLoading(true);
-      let delegate_address: string;
-      let follower_address: string;
-      let dao: string;
-      // alert(props.daoDelegates);
-      dao = props.daoDelegates;
       let address = await walletClient.getAddresses();
-      follower_address = address[0];
-      delegate_address = props.individualDelegate;
-      try {
-        const response = await fetch("/api/delegate-follow/savefollower", {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            // Add any necessary data
-            delegate_address: delegate_address,
-            follower_address: follower_address,
-            dao: dao,
-          }),
-        });
+      if (address === props.individualDelegate) {
+        toast.error("You can't follow your own profile!");
+      } else {
+        setLoading(true);
+        let delegate_address: string;
+        let follower_address: string;
+        let dao: string;
+        // alert(props.daoDelegates);
+        dao = props.daoDelegates;
+        let address = await walletClient.getAddresses();
+        follower_address = address[0];
+        delegate_address = props.individualDelegate;
+        try {
+          const response = await fetch("/api/delegate-follow/savefollower", {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              // Add any necessary data
+              delegate_address: delegate_address,
+              follower_address: follower_address,
+              dao: dao,
+            }),
+          });
 
-        if (!response.ok) {
-          throw new Error("Failed to follow");
+          if (!response.ok) {
+            throw new Error("Failed to follow");
+          }
+
+          const data = await response.json();
+          setLoading(false);
+          toast.success(
+            "Successfully followed the Delegate! Stay tuned for their updates."
+          );
+          // setFollowers(followers + 1);
+          setFollowers((prev) => prev + 1);
+          setTimeout(() => isFollowed(true), 1000);
+          setIsFollowing(true);
+          isNotification(true);
+          console.log("Follow successful:", data);
+
+          // Then update the follower count from the server
+          await fetchDelegateData();
+        } catch (error) {
+          setLoading(false);
+          console.error("Error following:", error);
         }
-
-        const data = await response.json();
-        setLoading(false);
-        toast.success(
-          "Successfully followed the Delegate! Stay tuned for their updates."
-        );
-        // setFollowers(followers + 1);
-        setFollowers((prev) => prev + 1);
-        setTimeout(() => isFollowed(true), 1000);
-        setIsFollowing(true);
-        isNotification(true);
-        console.log("Follow successful:", data);
-
-        // Then update the follower count from the server
-        await setFollowerscount();
-      } catch (error) {
-        setLoading(false);
-        console.error("Error following:", error);
       }
     }
   };
@@ -790,8 +872,9 @@ function SpecificDelegate({ props }: { props: Type }) {
               setIsFollowing(false);
               isNotification(false);
             } else {
-              await updateFollowerState();
-              await setFollowerscount();
+              // await updateFollowerState();
+              // await setFollowerscount();
+              await fetchDelegateData();
             }
             setSocials({
               twitter: item.socialHandles.twitter,

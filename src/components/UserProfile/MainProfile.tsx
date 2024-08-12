@@ -257,9 +257,11 @@ function MainProfile() {
     copy(addr);
     toast("Address Copied");
   };
-  const handleUpdateFollowings = async (daoname: string, isChange: number) => {
-    // console.log("daoName", daoname);
-    // setUnfollowDao(daoname);
+  const handleUpdateFollowings = async (
+    daoname: string,
+    isChange: number,
+    isfollowingchange: number
+  ) => {
     setfollowingmodel(true);
     setLoading(true);
     const myHeaders = new Headers();
@@ -282,24 +284,28 @@ function MainProfile() {
     );
 
     const dbResponse = await res.json();
-    setDbResponse(dbResponse);
+    if (isfollowingchange == 1) {
+      updateFollowerState(dbResponse);
+    } else {
+      setDbResponse(dbResponse);
 
-    for (const item of dbResponse.data) {
-      const matchDao = item.followings.find(
-        (daoItem: any) => daoItem.dao === daoname
-      );
-
-      if (matchDao) {
-        const activeFollowings = matchDao.following.filter(
-          (f: Following) => f.isFollowing
+      for (const item of dbResponse.data) {
+        const matchDao = item.followings.find(
+          (daoItem: any) => daoItem.dao === daoname
         );
-        if (isChange == 1) {
-          setfollowings(activeFollowings.length);
+
+        if (matchDao) {
+          const activeFollowings = matchDao.following.filter(
+            (f: Following) => f.isFollowing
+          );
+          if (isChange == 1) {
+            setfollowings(activeFollowings.length);
+          }
+          setUserFollowings(activeFollowings);
+        } else {
+          setfollowings(0);
+          setUserFollowings([]);
         }
-        setUserFollowings(activeFollowings);
-      } else {
-        setfollowings(0);
-        setUserFollowings([]);
       }
     }
     // Close the modal
@@ -321,7 +327,7 @@ function MainProfile() {
       if (daoName === unfollowDao) {
         setfollowings(followings + 1);
       }
-      
+
       try {
         const response = await fetch("/api/delegate-follow/savefollower", {
           method: "PUT",
@@ -429,86 +435,44 @@ function MainProfile() {
     }));
   };
 
-  const updateFollowerState = async () => {
-    // console.log("Attempting to call savefollower API");
-    const myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-    const raw = JSON.stringify({
-      address: address,
-    });
-
-    const requestOptions: any = {
-      method: "POST",
-      headers: myHeaders,
-      body: raw,
-      redirect: "follow",
-    };
-
-    try {
-      const resp = await fetch(
-        `/api/delegate-follow/savefollower`,
-        requestOptions
-      );
-
-      if (!resp.ok) {
-        throw new Error("Failed to fetch follower/following data");
-      }
-
-      const dbResponse = await resp.json();
-      // console.log("API Response:", dbResponse);
-
-      if (
-        !dbResponse.success ||
-        !dbResponse.data ||
-        dbResponse.data.length === 0
-      ) {
-        console.log("No data returned from API");
-        return;
-      }
-
-      const userData = dbResponse.data[0];
-      let address = await walletClient.getAddresses();
-      let address_user = address[0].toLowerCase();
-      let currentDaoName = "";
-      if (chain?.name === "Optimism") {
-        currentDaoName = "optimism";
-      } else if (chain?.name === "Arbitrum One") {
-        currentDaoName = "arbitrum";
-      }
-
-      // console.log("Current DAO:", currentDaoName);
-      // console.log("User Address:", address_user);
-
-      // Process following details
-      const matchDao = userData.followings?.find(
-        (daoItem: any) =>
-          daoItem.dao.toLowerCase() === currentDaoName.toLowerCase()
-      );
-
-      if (matchDao) {
-        const activeFollowings = matchDao.following?.filter(
-          (f: any) => f.isFollowing
-        );
-        setfollowings(activeFollowings.length);
-        setUserFollowings(activeFollowings);
-      } else {
-        setfollowings(0);
-        setUserFollowings([]);
-      }
-
-      const daoFollowers = userData?.followers?.find(
-        (dao: any) => dao.dao_name === currentDaoName
-      );
-
-      const followerCount = daoFollowers?.follower?.filter(
-        (f: any) => f.isFollowing
-      ).length;
-
-      // alert(followerCount);
-      setfollowers(followerCount);
-    } catch (error) {
-      console.error("Error in updateFollowerState:", error);
+  const updateFollowerState = async (dbResponse: any) => {
+    const userData = dbResponse.data[0];
+    let address = await walletClient.getAddresses();
+    let address_user = address[0].toLowerCase();
+    let currentDaoName = "";
+    if (chain?.name === "Optimism") {
+      currentDaoName = "optimism";
+    } else if (chain?.name === "Arbitrum One") {
+      currentDaoName = "arbitrum";
     }
+
+    // Process following details
+    const matchDao = userData.followings?.find(
+      (daoItem: any) =>
+        daoItem.dao.toLowerCase() === currentDaoName.toLowerCase()
+    );
+
+    if (matchDao) {
+      const activeFollowings = matchDao.following?.filter(
+        (f: any) => f.isFollowing
+      );
+      setfollowings(activeFollowings.length);
+      setUserFollowings(activeFollowings);
+    } else {
+      setfollowings(0);
+      setUserFollowings([]);
+    }
+
+    const daoFollowers = userData?.followers?.find(
+      (dao: any) => dao.dao_name === currentDaoName
+    );
+
+    const followerCount = daoFollowers?.follower?.filter(
+      (f: any) => f.isFollowing
+    ).length;
+
+    // alert(followerCount);
+    setfollowers(followerCount);
   };
 
   const handleToggle = async () => {
@@ -642,7 +606,7 @@ function MainProfile() {
             setfollowings(0);
             setfollowers(0);
           } else {
-            await updateFollowerState();
+            await handleUpdateFollowings(daoName, 0, 1);
           }
           setIsPageLoading(false);
         } else {
@@ -660,7 +624,7 @@ function MainProfile() {
             github: karmaDetails.data.delegate.githubHandle,
             displayImage: karmaDetails.data.delegate.profilePicture,
           });
-          await updateFollowerState();
+          await handleUpdateFollowings(daoName, 0, 1);
           setIsPageLoading(false);
         }
       } catch (error) {
@@ -1103,7 +1067,7 @@ function MainProfile() {
                       className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
                       onClick={() =>
                         followings
-                          ? handleUpdateFollowings(daoName, 1)
+                          ? handleUpdateFollowings(daoName, 1, 0)
                           : toast.error(
                               "You're not following anyone yet. Start exploring delegate profiles now!"
                             )
@@ -1139,7 +1103,7 @@ function MainProfile() {
                       className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
                       onClick={() =>
                         followings
-                          ? handleUpdateFollowings(daoName, 1)
+                          ? handleUpdateFollowings(daoName, 1, 0)
                           : toast.error(
                               "You're not following anyone yet. Start exploring delegate profiles now!"
                             )
