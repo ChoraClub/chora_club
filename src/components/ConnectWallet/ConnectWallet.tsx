@@ -1,8 +1,8 @@
 "use client";
 
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import wallet from "../../assets/images/sidebar/wallet.png";
-import Image from "next/image";
+import { BiSolidWallet } from "react-icons/bi";
+import styles from '@/components/MainSidebar/sidebar.module.css'
 export const ConnectWallet = () => {
   return (
     <ConnectButton.Custom>
@@ -38,13 +38,9 @@ export const ConnectWallet = () => {
               if (!connected) {
                 return (
                   <button onClick={openConnectModal} type="button">
-                    <Image
-                      className="cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14"
-                      src={wallet}
-                      alt="image"
-                      width={40}
-                      // style={{ width: "40px", height: "40px" }}
-                    />
+                    <div className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 rounded-full flex items-center justify-center bg-white w-10 h-10 ${styles.icon3d} ${styles.whiteBg}`}>
+                <BiSolidWallet className={`size-5 text-blue-shade-200 ${styles.iconInner}`}/>
+                </div>
                   </button>
                 );
               }
@@ -58,13 +54,10 @@ export const ConnectWallet = () => {
               return (
                 <div style={{ display: "flex", gap: 12 }}>
                   <button onClick={openAccountModal} type="button">
-                    <Image
-                      className="cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14"
-                      src={wallet}
-                      alt=""
-                      width={40}
-                      // style={{ width: "40px", height: "40px" }}
-                    />
+                    <div className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 rounded-full flex items-center justify-center bg-white w-10 h-10 ${styles.icon3d} ${styles.whiteBg}
+                    `}>
+                <BiSolidWallet className={`size-5 text-blue-shade-200 ${styles.iconInner}`}/>
+                </div>
                   </button>
                 </div>
               );

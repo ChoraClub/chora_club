@@ -29,6 +29,7 @@ const config: Config = {
         "blue-shade-500": "#C6D7FF",
         "blue-shade-600": "#DDE7FF",
         "blue-shade-700": "#F5F5FF",
+        "blue-shade-800": "#0040d4",
         "black-shade-100": "#7C7C7C",
         "black-shade-200": "#DEDEDE",
         "black-shade-300": "#F6F6F6",

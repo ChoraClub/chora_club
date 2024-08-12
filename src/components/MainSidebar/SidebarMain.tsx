@@ -3,13 +3,6 @@
 import Image from "next/image";
 import React, { useEffect, useState, useRef } from "react";
 import logo from "@/assets/images/daos/CCLogo.png";
-// import logo from "@/assets/images/sidebar/favicon.png";
-import rocket from "@/assets/images/sidebar/rocket.png";
-import sessionIcn from "@/assets/images/sidebar/office.png";
-import office from "@/assets/images/sidebar/Office hour (1).png";
-import wallet from "@/assets/images/sidebar/wallet.png";
-import gitbook from "@/assets/images/sidebar/gitbook.png";
-import user from "@/assets/images/sidebar/user.png";
 import styles from "./sidebar.module.css";
 import { usePathname } from "next/navigation";
 import { Badge, Tooltip, VisuallyHidden } from "@nextui-org/react";
@@ -32,6 +25,10 @@ import dummy from "@/assets/images/daos/user2.png";
 import { Poppins } from "next/font/google";
 import { MdImportantDevices } from "react-icons/md";
 import NotificationIconComponent from "../Notification/NotificationIconComponent";
+import { IoIosRocket } from "react-icons/io";
+import { FaBusinessTime, FaUser } from "react-icons/fa6";
+import { SiGitbook, SiGoogleclassroom } from "react-icons/si";
+import { PiUsersThreeFill } from "react-icons/pi";
 
 function Sidebar() {
   const [isTourOpen, setIsTourOpen] = useState(false);
@@ -345,73 +342,83 @@ function Sidebar() {
       <div className="py-6 h-full">
         <div className="flex flex-col h-full justify-between">
           <div className="flex flex-col items-center gap-y-4 pb-5">
-          <Link href={"https://chora.club/"}>
-            <Image
-              src={logo}
-              alt={"image"}
-              width={40}
-              className="xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 logo bg-black rounded-full p-1"
-            ></Image>
-          </Link>
+            <Link href={"https://chora.club/"}>
+              <Image
+                src={logo}
+                alt={"image"}
+                width={40}
+                className="xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 logo bg-black rounded-full p-1"
+              ></Image>
+            </Link>
             <Tooltip
-              content="DAOs"
+              // content="DAOs"
+              content={<div className={`${styles.customTooltip}`}>DAOs</div>}
               placement="right"
               className="rounded-md bg-opacity-90"
               closeDelay={1}
             >
               <Link href={"/"}>
-                <Image
-                  priority
-                  src={rocket}
-                  alt={"image"}
-                  width={40}
-                  className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 dao ${
+                <div
+                  className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 rounded-full flex items-center justify-center border border-white bg-blue-shade-800 w-10 h-10 ${
+                    styles.icon3d
+                  } ${
                     pathname.endsWith(`/`)
                       ? "border-white border-2 rounded-full"
                       : ""
                   }`}
-                ></Image>
+                >
+                  <IoIosRocket
+                    className={`size-5 text-white ${styles.iconInner}`}
+                  />
+                </div>
               </Link>
             </Tooltip>
             <Tooltip
-              content="Office Hours"
+              content={
+                <div className={`${styles.customTooltip}`}>Office Hours</div>
+              }
               placement="right"
               className="rounded-md bg-opacity-90"
               closeDelay={1}
             >
               <Link href={"/office-hours?hours=ongoing"}>
-                <Image
-                  priority
-                  src={office}
-                  alt={"image"}
-                  width={40}
-                  className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 office ${
+                <div
+                  className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 rounded-full flex items-center justify-center border border-white bg-blue-shade-800 w-10 h-10 ${
+                    styles.icon3d
+                  } ${
                     pathname.includes(`/office-hours`)
                       ? "border-white border-2 rounded-full"
                       : ""
                   }`}
-                ></Image>
+                >
+                  <FaBusinessTime
+                    className={`size-5 text-white ${styles.iconInner}`}
+                  />
+                </div>
               </Link>
             </Tooltip>
             <Tooltip
-              content="Sessions"
+              content={
+                <div className={`${styles.customTooltip}`}>Sessions</div>
+              }
               placement="right"
               className="rounded-md bg-opacity-90"
               closeDelay={1}
             >
               <Link href={"/sessions?active=recordedSessions"}>
-                <Image
-                  priority
-                  src={sessionIcn}
-                  alt={"image"}
-                  width={40}
-                  height={40}
-                  className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 session ${
+                <div
+                  className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 rounded-full flex items-center justify-center border border-white bg-blue-shade-800 w-10 h-10 ${
+                    styles.icon3d
+                  } ${
                     pathname.includes(`/sessions`)
                       ? "border-white border-2 rounded-full"
                       : ""
                   }`}
-                ></Image>
+                >
+                  <PiUsersThreeFill
+                    className={`size-5 text-white ${styles.iconInner}`}
+                  />
+                </div>
               </Link>
             </Tooltip>
           </div>
@@ -436,7 +443,11 @@ function Sidebar() {
                       onClick={() => handleBadgeClick(data[0])}
                     >
                       <Tooltip
-                        content={<div className="capitalize">{data[0]}</div>}
+                        content={
+                          <div className={`${styles.customTooltip} capitalize`}>
+                            {data[0]}
+                          </div>
+                        }
                         placement="right"
                         className="rounded-md bg-opacity-90"
                         closeDelay={1}
@@ -449,6 +460,8 @@ function Sidebar() {
                             height={80}
                             alt="image"
                             className={`w-10 h-10 xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 rounded-full cursor-pointer ${
+                              styles.icon3d
+                            } ${
                               pathname.includes(`/${data[0]}`)
                                 ? "border-white border-[2.5px]"
                                 : ""
@@ -468,53 +481,63 @@ function Sidebar() {
           <div className="flex flex-col items-center gap-y-4 pt-5">
             <NotificationIconComponent />
             <Tooltip
-              content={<div className="capitalize">Git Book</div>}
+              content={
+                <div className={`${styles.customTooltip}`}>Git Book</div>
+              }
               placement="right"
               className="rounded-md bg-opacity-90"
               closeDelay={1}
             >
               <Link href={"https://docs.chora.club/"} target="_blank">
-                <Image
-                  src={gitbook}
-                  alt={"image"}
-                  width={40}
-                  className="xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 gitbook"
-                />
+                <div
+                  className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 rounded-full flex items-center justify-center bg-white w-10 h-10 ${styles.icon3d} ${styles.whiteBg}`}
+                >
+                  <SiGitbook
+                    className={`size-5 text-blue-shade-200 ${styles.iconInner}`}
+                  />
+                </div>
               </Link>
             </Tooltip>
 
             {!isConnected && !session ? (
               <Tooltip
-                content={<div className="capitalize">Wallet</div>}
+                content={
+                  <div className={`${styles.customTooltip}`}>Wallet</div>
+                }
                 placement="right"
                 className="rounded-md bg-opacity-90"
                 closeDelay={1}
               >
                 {isPageLoading || sessionLoading ? (
-                  <Image
-                    src={user}
-                    alt={"image"}
-                    width={40}
-                    className="cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 "
-                  />
+                  <div
+                    className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 rounded-full flex items-center justify-center bg-white w-10 h-10 ${styles.icon3d} ${styles.whiteBg}`}
+                  >
+                    <FaUser
+                      className={`size-5 text-blue-shade-200 ${styles.iconInner}`}
+                    />
+                  </div>
                 ) : (
                   <ConnectWallet />
                 )}
               </Tooltip>
             ) : (
               <Tooltip
-                content={<div className="capitalize">Profile</div>}
+                content={
+                  <div className={`${styles.customTooltip}`}>Profile</div>
+                }
                 placement="right"
                 className="rounded-md bg-opacity-90"
                 closeDelay={1}
               >
-                <Image
-                  src={user}
-                  alt={"image"}
-                  width={40}
-                  className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 profile`}
-                  onClick={() => router.push(`/profile/${address}?active=info`)}
-                />
+                <Link href={`/profile/${address}?active=info`}>
+                  <div
+                    className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 rounded-full flex items-center justify-center bg-white w-10 h-10 ${styles.icon3d} ${styles.whiteBg}`}
+                  >
+                    <FaUser
+                      className={`size-5 text-blue-shade-200 ${styles.iconInner}`}
+                    />
+                  </div>
+                </Link>
               </Tooltip>
             )}
           </div>
