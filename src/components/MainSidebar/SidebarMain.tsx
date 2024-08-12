@@ -357,8 +357,8 @@ function Sidebar() {
               className="rounded-md bg-opacity-90"
               closeDelay={1}
             >
-              <Link href={"/"}>
-                <div
+              {/* <Link href={"/"}> */}
+                <Link href={"/"}
                   className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 rounded-full flex items-center justify-center border border-white bg-blue-shade-800 w-10 h-10 ${
                     styles.icon3d
                   } ${
@@ -370,8 +370,8 @@ function Sidebar() {
                   <IoIosRocket
                     className={`size-5 text-white ${styles.iconInner}`}
                   />
-                </div>
-              </Link>
+                </Link>
+              {/* </Link> */}
             </Tooltip>
             <Tooltip
               content={
@@ -381,8 +381,9 @@ function Sidebar() {
               className="rounded-md bg-opacity-90"
               closeDelay={1}
             >
-              <Link href={"/office-hours?hours=ongoing"}>
-                <div
+              {/* <Link href={"/office-hours?hours=ongoing"}> */}
+                <Link
+                  href={"/office-hours?hours=ongoing"}
                   className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 rounded-full flex items-center justify-center border border-white bg-blue-shade-800 w-10 h-10 ${
                     styles.icon3d
                   } ${
@@ -394,8 +395,8 @@ function Sidebar() {
                   <FaBusinessTime
                     className={`size-5 text-white ${styles.iconInner}`}
                   />
-                </div>
-              </Link>
+                </Link>
+              {/* </Link> */}
             </Tooltip>
             <Tooltip
               content={
@@ -405,8 +406,9 @@ function Sidebar() {
               className="rounded-md bg-opacity-90"
               closeDelay={1}
             >
-              <Link href={"/sessions?active=recordedSessions"}>
-                <div
+              {/* <Link href={"/sessions?active=recordedSessions"}> */}
+                <Link
+                href={"/sessions?active=recordedSessions"}
                   className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 rounded-full flex items-center justify-center border border-white bg-blue-shade-800 w-10 h-10 ${
                     styles.icon3d
                   } ${
@@ -418,8 +420,8 @@ function Sidebar() {
                   <PiUsersThreeFill
                     className={`size-5 text-white ${styles.iconInner}`}
                   />
-                </div>
-              </Link>
+                </Link>
+              {/* </Link> */}
             </Tooltip>
           </div>
           <div className="h-full">
@@ -488,15 +490,16 @@ function Sidebar() {
               className="rounded-md bg-opacity-90"
               closeDelay={1}
             >
-              <Link href={"https://docs.chora.club/"} target="_blank">
-                <div
+              {/* <Link href={"https://docs.chora.club/"} target="_blank"> */}
+                <Link
+                href={"https://docs.chora.club/"} target="_blank"
                   className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 rounded-full flex items-center justify-center bg-white w-10 h-10 ${styles.icon3d} ${styles.whiteBg}`}
                 >
                   <SiGitbook
                     className={`size-5 text-blue-shade-200 ${styles.iconInner}`}
                   />
-                </div>
-              </Link>
+                </Link>
+              {/* </Link> */}
             </Tooltip>
 
             {!isConnected && !session ? (
@@ -529,15 +532,16 @@ function Sidebar() {
                 className="rounded-md bg-opacity-90"
                 closeDelay={1}
               >
-                <Link href={`/profile/${address}?active=info`}>
-                  <div
+                {/* <Link href={`/profile/${address}?active=info`}> */}
+                  <Link
                     className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 rounded-full flex items-center justify-center bg-white w-10 h-10 ${styles.icon3d} ${styles.whiteBg}`}
+                    href={`/profile/${address}?active=info`}
                   >
                     <FaUser
                       className={`size-5 text-blue-shade-200 ${styles.iconInner}`}
                     />
-                  </div>
-                </Link>
+                  </Link>
+                {/* </Link> */}
               </Tooltip>
             )}
           </div>

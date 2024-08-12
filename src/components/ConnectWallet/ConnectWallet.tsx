@@ -37,11 +37,11 @@ export const ConnectWallet = () => {
             {(() => {
               if (!connected) {
                 return (
-                  <button onClick={openConnectModal} type="button">
-                    <div className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 rounded-full flex items-center justify-center bg-white w-10 h-10 ${styles.icon3d} ${styles.whiteBg}`}>
+                  // <button onClick={openConnectModal} type="button">
+                    <button onClick={openConnectModal} type="button" className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 rounded-full flex items-center justify-center bg-white w-10 h-10 ${styles.icon3d} ${styles.whiteBg}`}>
                 <BiSolidWallet className={`size-5 text-blue-shade-200 ${styles.iconInner}`}/>
-                </div>
-                  </button>
+                </button>
+                  // </button>
                 );
               }
               if (chain.unsupported) {
@@ -53,12 +53,12 @@ export const ConnectWallet = () => {
               }
               return (
                 <div style={{ display: "flex", gap: 12 }}>
-                  <button onClick={openAccountModal} type="button">
-                    <div className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 rounded-full flex items-center justify-center bg-white w-10 h-10 ${styles.icon3d} ${styles.whiteBg}
-                    `}>
+                  {/* <button onClick={openAccountModal} type="button"> */}
+                    <button className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 rounded-full flex items-center justify-center bg-white w-10 h-10 ${styles.icon3d} ${styles.whiteBg}
+                    `} onClick={openAccountModal} type="button">
                 <BiSolidWallet className={`size-5 text-blue-shade-200 ${styles.iconInner}`}/>
-                </div>
-                  </button>
+                </button>
+                  {/* </button> */}
                 </div>
               );
             })()}
