@@ -16,10 +16,10 @@ function AttestationModal({
 }) {
   // const [modalOpen, setModalOpen] = useState(props);
 
-  const storedStatus = localStorage.getItem("meetingData");
-  if (storedStatus) {
-    localStorage.removeItem("meetingData");
-  }
+  // const storedStatus = localStorage.getItem("meetingData");
+  // if (storedStatus) {
+  //   localStorage.removeItem("meetingData");
+  // }
 
   const toggleModal = () => {
     onClose();

@@ -28,7 +28,7 @@ const PeerList: React.FC<PeerListProps> = ({
         <div className="relative mt-4 flex items-center justify-center text-gray-600 text-xs font-medium gap-1">
           {title}
           {TitleArr.includes(title) && <span>- {count}</span>}
-          <span>{PeerListIcons.info}</span>
+          {/* <span>{PeerListIcons.info}</span> */}
         </div>
         <div className="bg-slate-800 h-[1px] flex-1 translate-y-2" />
       </div>

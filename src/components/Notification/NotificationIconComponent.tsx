@@ -89,13 +89,13 @@ function NotificationIconComponent() {
     }
   }, [address]);
 
-  useEffect(() => {
-    fetchNotifications();
+  // useEffect(() => {
+  //   fetchNotifications();
 
-    const interval = setInterval(fetchNotifications, 3000);
+  //   const interval = setInterval(fetchNotifications, 3000);
 
-    return () => clearInterval(interval);
-  }, [fetchNotifications]);
+  //   return () => clearInterval(interval);
+  // }, [fetchNotifications]);
 
   useEffect(() => {
     if (socket) {

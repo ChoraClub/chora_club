@@ -48,7 +48,7 @@ interface StudioState {
   setActiveBg: (val: string) => void;
   boxPosition: BoxPosition;
   setBoxPosition: (val: BoxPosition) => void;
-  isRecording: boolean;
+  isRecording: boolean | null;
   setIsRecording: (val: boolean) => void;
   isLiveStreaming: boolean;
   setIsLiveStreaming: (val: boolean) => void;
@@ -145,7 +145,7 @@ export const useStudioState = create<StudioState>((set) => ({
   setActiveBg: (val: string) => set({ activeBg: val }),
   boxPosition: { x: 0, y: 0, width: "200", height: "200" },
   setBoxPosition: (val: BoxPosition) => set({ boxPosition: val }),
-  isRecording: false,
+  isRecording: null,
   setIsRecording: (val: boolean) => set({ isRecording: val }),
   isLiveStreaming: false,
   setIsLiveStreaming: (val: boolean) => set({ isLiveStreaming: val }),
