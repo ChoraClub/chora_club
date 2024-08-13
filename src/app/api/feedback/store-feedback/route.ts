@@ -29,6 +29,7 @@ export async function POST(
 
     // Construct the update document
     let updateDocument: any = {};
+    let arrayFilters: any[] = [];
 
     if (feedbackType === "feedbackGiven") {
       updateDocument = {
@@ -45,34 +46,64 @@ export async function POST(
         },
       };
     } else if (feedbackType === "feedbackReceived") {
-      // Construct the update document for feedbackReceived
-      updateDocument = {
-        $set: {
-          "feedbackReceived.$[meeting].ratings": [
-            {
-              $each: [
-                {
-                  address: data.address,
-                  ratings: data.ratings,
-                  timestamp: Date.now(),
-                },
-              ],
-            },
-          ],
-        },
-        $addToSet: {
-          feedbackReceived: {
-            meetingId: data.meetingId,
-            ratings: [
-              {
+      const existingDocument = await collection.findOne({ address });
+
+      if (existingDocument) {
+        // Check if the meetingId exists in feedbackReceived
+        const meetingExists = existingDocument.feedbackReceived?.some(
+          (meeting: any) => meeting.meetingId === data.meetingId
+        );
+
+        if (meetingExists) {
+          // Add the data to the existing meeting's ratings array
+          updateDocument = {
+            $push: {
+              "feedbackReceived.$[meeting].ratings": {
                 guestAddress: data.guestAddress,
                 ratings: data.ratings,
                 timestamp: Date.now(),
               },
+            },
+          };
+          arrayFilters = [{ "meeting.meetingId": data.meetingId }];
+        } else {
+          // Add a new meetingId with ratings array
+          updateDocument = {
+            $addToSet: {
+              feedbackReceived: {
+                meetingId: data.meetingId,
+                ratings: [
+                  {
+                    guestAddress: data.guestAddress,
+                    ratings: data.ratings,
+                    timestamp: Date.now(),
+                  },
+                ],
+              },
+            },
+          };
+        }
+      } else {
+        // Create a new document if the address doesn't exist
+        console.log("Document doesn't exists");
+        updateDocument = {
+          $set: {
+            address,
+            feedbackReceived: [
+              {
+                meetingId: data.meetingId,
+                ratings: [
+                  {
+                    guestAddress: data.guestAddress,
+                    ratings: data.ratings,
+                    timestamp: Date.now(),
+                  },
+                ],
+              },
             ],
           },
-        },
-      };
+        };
+      }
     } else {
       return NextResponse.json(
         { success: false, message: "Invalid feedback type" },
@@ -83,7 +114,7 @@ export async function POST(
     const insertedDocument = await collection.updateOne(
       { address },
       updateDocument,
-      { upsert: true, arrayFilters: [{ "meeting.meetingId": data.meetingId }] }
+      { upsert: true, arrayFilters }
     );
 
     client.close();

@@ -25,6 +25,8 @@ function AttestationModal({
 
   const [rating, setRating] = useState<number | null>(null);
   const [submitted, setSubmitted] = useState(false);
+  const [feedbackStored, setFeedbackStored] = useState(false);
+  const [hoverRating, setHoverRating] = useState<number | null>(null);
   const { address } = useAccount();
 
   useEffect(() => {
@@ -35,7 +37,7 @@ function AttestationModal({
   }, []);
 
   const toggleModal = () => {
-    if (rating !== null) {
+    if (rating !== null && !feedbackStored) {
       storeUserFeedback();
     }
     onClose();
@@ -56,7 +58,7 @@ function AttestationModal({
     // Open Twitter share dialog
     window.open(twitterUrl, "_blank");
 
-    if (rating !== null) {
+    if (rating !== null && !feedbackStored) {
       storeUserFeedback();
     }
   };
@@ -72,7 +74,7 @@ function AttestationModal({
       myHeaders.append("Content-Type", "application/json");
 
       const raw = JSON.stringify({
-        address: address,
+        address: hostAddress,
         role: role,
         feedbackType: "feedbackReceived",
         data: {
@@ -99,10 +101,20 @@ function AttestationModal({
       );
 
       const result = await response.json();
-      console.log(result);
+      if (result.success) {
+        setFeedbackStored(true);
+      }
     } catch (e) {
       console.log("Error: ", e);
     }
+  };
+
+  const handleRatingHover = (value: number) => {
+    setHoverRating(value);
+  };
+
+  const handleRatingMouseOut = () => {
+    setHoverRating(null);
   };
 
   return (
@@ -151,11 +163,14 @@ function AttestationModal({
                           <button
                             key={star}
                             className={`text-2xl ${
-                              rating && rating >= star
+                              (hoverRating && hoverRating >= star) ||
+                              (rating && rating >= star)
                                 ? "text-yellow-500"
                                 : "text-gray-300"
                             }`}
                             onClick={() => handleRatingClick(star)}
+                            onMouseEnter={() => handleRatingHover(star)}
+                            onMouseLeave={handleRatingMouseOut}
                           >
                             ★
                           </button>
@@ -174,7 +189,7 @@ function AttestationModal({
                       target="_blank"
                       className="ps-[2px] underline font-semibold text-xs"
                       onClick={() => {
-                        if (rating !== null) {
+                        if (rating !== null && !feedbackStored) {
                           storeUserFeedback();
                         }
                       }}
