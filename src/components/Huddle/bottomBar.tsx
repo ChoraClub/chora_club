@@ -201,7 +201,7 @@ const BottomBar = ({
 
   const startRecording = async () => {
     try {
-      console.log("recording started")
+      console.log("recording started");
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
       // if (address) {
@@ -533,6 +533,7 @@ const BottomBar = ({
                 displayName: metadata?.displayName || "",
                 avatarUrl: metadata?.avatarUrl || "",
                 isHandRaised: !metadata?.isHandRaised,
+                walletAddress: metadata?.walletAddress || address || "",
               });
             }}
             className={clsx(

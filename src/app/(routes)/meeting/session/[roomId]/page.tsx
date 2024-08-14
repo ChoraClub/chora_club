@@ -174,6 +174,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
     displayName: string;
     avatarUrl: string;
     isHandRaised: boolean;
+    walletAddress: string;
   }>();
 
   const [reaction, setReaction] = useState("");
@@ -337,6 +338,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
         displayName: name,
         avatarUrl: avatarUrl,
         isHandRaised: metadata?.isHandRaised || false,
+        walletAddress: address || "",
       });
 
       if (role === "guest") {

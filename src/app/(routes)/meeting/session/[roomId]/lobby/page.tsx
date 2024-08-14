@@ -48,6 +48,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
     displayName: string;
     avatarUrl: string;
     isHandRaised: boolean;
+    walletAddress: string;
   }>();
 
   const { name, setName, avatarUrl, setAvatarUrl } = useStudioState();

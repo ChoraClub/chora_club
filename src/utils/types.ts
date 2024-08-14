@@ -2,6 +2,7 @@ export interface PeerMetadata {
   displayName: string;
   avatarUrl: string;
   isHandRaised: boolean;
+  walletAddress: string;
 }
 
 // create a type with key of string and value of string
