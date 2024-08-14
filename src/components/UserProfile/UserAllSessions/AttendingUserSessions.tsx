@@ -92,14 +92,16 @@ function AttendingUserSessions({ daoName }: { daoName: string }) {
       {pageLoading ? (
         <SessionTileSkeletonLoader />
       ) : sessionDetails.length > 0 ? (
-        sessionDetails.map((data, index) => (
+        <div className={`grid min-[475px]:grid-cols- md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-10 py-8 font-poppins`}>
+        {sessionDetails.map((data, index) => (
           <EventTile
             key={index}
             tileIndex={index}
             data={data}
             isEvent="Attending"
           />
-        ))
+        ))}
+        </div>
       ) : (
         <div className="flex flex-col justify-center items-center">
           <div className="text-5xl">☹️</div>{" "}

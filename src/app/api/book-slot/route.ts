@@ -10,6 +10,7 @@ import {
   formatSlotDateAndTime,
   getDisplayNameOrAddr,
 } from "@/utils/NotificationUtils";
+import { imageCIDs } from "@/config/staticDataUtils";
 
 type Attendee = {
   attendee_address: string;
@@ -53,6 +54,11 @@ interface MeetingResponseBody {
   error?: string;
 }
 
+function getRandomElementFromArray(arr: any[]) {
+  const randomIndex = Math.floor(Math.random() * arr.length);
+  return arr[randomIndex];
+}
+
 export async function POST(
   req: NextRequest,
   res: NextApiResponse<MeetingResponseBody>
@@ -78,6 +84,8 @@ export async function POST(
     const db = client.db();
     const collection = db.collection("meetings");
 
+    const randomImage = getRandomElementFromArray(imageCIDs);
+
     const result = await collection.insertOne({
       host_address,
       attendees,
@@ -89,7 +97,7 @@ export async function POST(
       dao_name,
       title,
       description,
-      thumbnail_image,
+      thumbnail_image : randomImage,
       session_type,
     });
 

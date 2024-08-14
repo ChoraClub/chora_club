@@ -16,6 +16,7 @@ import { FaUserCheck } from "react-icons/fa6";
 import { GiChaingun } from "react-icons/gi";
 import { formatTimestampOrDate } from "@/utils/NotificationUtils";
 import styles from "./NotificationIconComponent.module.css";
+import style from "@/components/MainSidebar/sidebar.module.css"
 import {
   getBackgroundColor,
   getIcon,
@@ -171,10 +172,10 @@ function NotificationIconComponent() {
           className={hasUnreadNotifications ? styles.pulseBadge : ""}
         >
           <div
-            className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 bg-white rounded-full flex justify-center items-center w-10 h-10`}
+            className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 bg-white rounded-full flex justify-center items-center w-10 h-10 ${style.icon3d} ${style.whiteBg}`}
             onClick={() => router.push(`/notifications?active=all`)}
           >
-            <IoMdNotifications className="size-6 text-blue-shade-200" />
+            <IoMdNotifications className={`size-5 text-blue-shade-200 ${style.iconInner}`} />
           </div>
         </Badge>
 

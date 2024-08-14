@@ -9,9 +9,16 @@ import { Oval } from "react-loader-spinner";
 // import { useRouter } from "next/navigation";
 import { useRouter } from "next-nprogress-bar";
 import Link from "next/link";
+import copy from "copy-to-clipboard";
 import text1 from "@/assets/images/daos/texture1.png";
 import text2 from "@/assets/images/daos/texture2.png";
+import oplogo from "@/assets/images/daos/op.png";
+import arblogo from "@/assets/images/daos/arbitrum.jpg";
 // import { getEnsName } from "../ConnectWallet/ENSResolver";
+import logo from "@/assets/images/daos/CCLogo.png";
+import user1 from "@/assets/images/user/user1.svg";
+import { BsPersonVideo3 } from "react-icons/bs";
+import { fetchEnsAvatar } from "@/utils/ENSUtils";
 import {
   Modal,
   ModalContent,
@@ -21,6 +28,7 @@ import {
   Button,
   useDisclosure,
 } from "@nextui-org/react";
+import { IoCopy } from "react-icons/io5";
 interface RoomDetails {
   message: string;
   data: {
@@ -37,7 +45,7 @@ interface TileProps {
   tileIndex: number;
   data: {
     _id: string;
-    img: StaticImageData;
+    thumbnail_image: string;
     title: string;
     meetingId: string;
     dao_name: string;
@@ -52,6 +60,17 @@ interface TileProps {
   };
   isEvent: string;
 }
+
+type DaoName = "optimism" | "arbitrum";
+const daoLogos: Record<DaoName, StaticImageData> = {
+  optimism: oplogo,
+  arbitrum: arblogo,
+};
+
+const getDaoLogo = (daoName: string): StaticImageData => {
+  const normalizedName = daoName.toLowerCase() as DaoName;
+  return daoLogos[normalizedName] || arblogo;
+};
 
 const createRandomRoom = async () => {
   const res = await fetch(`${process.env.NEXT_PUBLIC_CREATE_ROOM_ENDPOINT}`, {
@@ -74,6 +93,51 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
   const [startLoading, setStartLoading] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [rejectionReason, setRejectionReason] = useState("");
+  const [ensHostName, setEnsHostName] = useState("");
+  const [ensGuestName, setEnsGuestName] = useState("");
+  const [ensHostAvatar, setEnsHostAvatar] = useState("");
+  const [ensGuestAvatar, setEnsGuestAvatar] = useState("");
+  const [loadingEnsData, setLoadingEnsData] = useState(true);
+
+  const handleCopy = (addr: string) => {
+    copy(addr);
+    toast("Address Copied");
+  };
+
+  useEffect(() => {
+    const fetchEnsData = async () => {
+      try {
+        setLoadingEnsData(true);
+
+        // Fetch host ENS data
+        const hostEnsData = await fetchEnsAvatar(
+          data.host_address.toLowerCase()
+        );
+        setEnsHostName(
+          hostEnsData?.ensName || formatWalletAddress(data.host_address)
+        );
+        setEnsHostAvatar(hostEnsData?.avatar || "");
+
+        // Fetch guest ENS data if available
+        if (data.attendees[0]?.attendee_address) {
+          const guestEnsData = await fetchEnsAvatar(
+            data.attendees[0].attendee_address.toLowerCase()
+          );
+          setEnsGuestName(
+            guestEnsData?.ensName ||
+              formatWalletAddress(data.attendees[0].attendee_address)
+          );
+          setEnsGuestAvatar(guestEnsData?.avatar || "");
+        }
+      } catch (error) {
+        console.error("Error fetching ENS data:", error);
+      } finally {
+        setLoadingEnsData(false);
+      }
+    };
+
+    fetchEnsData();
+  }, [data.host_address, data.attendees[0].attendee_address]);
 
   useEffect(() => {
     setIsPageLoading(false);
@@ -150,76 +214,157 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
   };
   return (
     <>
-      <div
-        key={tileIndex}
-        className="flex justify-between p-5 rounded-[2rem]"
-        style={{ boxShadow: "0px 4px 26.7px 0px rgba(0, 0, 0, 0.10)" }}
-      >
-        <div className="flex">
+      <div key={tileIndex} className="border border-[#D9D9D9] rounded-3xl">
+        <div className="w-full h-44 rounded-t-3xl bg-black object-cover object-center relative">
           <Image
-            src={data.img || text1}
+            src={`https://gateway.lighthouse.storage/ipfs/${data.thumbnail_image}`}
             alt="image"
-            className="w-44 h-44 rounded-3xl border border-[#D9D9D9]"
+            width={176}
+            height={176}
+            className="w-full h-44 rounded-t-3xl object-cover"
           />
-
-          <div className="ps-6 pe-8 py-1">
-            <div className="font-semibold text-blue-shade-200 text-lg">
-              {data.title}
-            </div>
-
-            <div className="flex py-2">
-              <div className="capitalize bg-[#1E1E1E] border border-[#1E1E1E] text-white rounded-md text-xs px-5 py-1 font-semibold">
-                {data.dao_name}
-              </div>
-            </div>
-
-            <div className="pt-1 pe-10">
-              <hr />
-            </div>
-
-            <div className="flex gap-x-16 text-sm py-3">
-              {data.session_type === "session" ? (
-                <div className="text-[#3E3D3D]">
-                  <span className="font-semibold">Session - </span>{" "}
-                  <span className="font-semibold">Guest:</span>{" "}
-                  {formatWalletAddress(data.attendees[0].attendee_address)}
-                </div>
-              ) : (
-                <div className="text-[#3E3D3D]">
-                  <span className="font-semibold">Instant Meet</span>{" "}
-                </div>
-              )}
-              <div className="text-[#3E3D3D]">
-                <span className="font-semibold">Host:</span>{" "}
-                {formatWalletAddress(data.host_address)}
-              </div>
-              <div className="text-[#3E3D3D]">
-                <span className="font-semibold">Session Time:</span>{" "}
-                {formatSlotTimeToLocal(data.slot_time)}
-              </div>
-            </div>
-
-            <div className="text-[#1E1E1E] text-sm">{data.description}</div>
+          <div className="absolute top-2 right-2 bg-black rounded-full">
+            <Image src={logo} alt="image" width={24} />
           </div>
         </div>
 
-        <div className={`flex flex-col justify-between text-xs py-2`}>
-          <div
-            className={`rounded-md px-3 py-1 ${
-              data.booking_status === "Approved"
-                ? "border border-lime-600 text-lime-600"
-                : data.booking_status === "Rejected"
-                ? "border border-red-600 text-red-600"
-                : "border border-yellow-500 text-yellow-500"
-            }`}
-          >
-            {data.booking_status}
-            {/* Approve */}
+        <div className="px-4 pt-2">
+          <div className="flex justify-between gap-2">
+            <div
+              className={`font-semibold py-1`}
+              style={{
+                display: "-webkit-box",
+                WebkitBoxOrient: "vertical",
+                WebkitLineClamp: 1,
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+            >
+              {data.title}
+            </div>
+            <div
+              className={`rounded-md px-2 py-0.5 w-fit flex items-center text-xs ${
+                data.booking_status === "Approved"
+                  ? "border border-lime-600 text-lime-600"
+                  : data.booking_status === "Rejected"
+                  ? "border border-red-600 text-red-600"
+                  : "border border-yellow-500 text-yellow-500"
+              }`}
+            >
+              {data.booking_status}
+              {/* Approve */}
+            </div>
+          </div>
+          <div className="text-[#1E1E1E] text-sm mt-0.5">
+            {data.description}
+          </div>
+          <div className="py-1">
+            <hr />
           </div>
 
+          <div className="flex items-center text-sm gap-3 py-1">
+            <Image
+              src={getDaoLogo(data.dao_name)}
+              alt="image"
+              width={24}
+              height={24}
+              className="w-6 h-6"
+            />
+            <div className="bg-[#F5F5F5] py-1 px-3 rounded-md flex items-center w-fit">
+              {formatSlotTimeToLocal(data.slot_time)}
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-2 text-sm pt-1">
+            {data.session_type === "session" ? (
+              <div className="text-[#3E3D3D] flex items-center gap-2">
+                <Image
+                  src={ensGuestAvatar || user1}
+                  alt="image"
+                  width={20}
+                  height={20}
+                  className="h-5 w-5 rounded-full object-cover object-center"
+                />
+                <div className="flex items-center">
+                  <span className="font-semibold">Guest: </span> &nbsp;
+                  {loadingEnsData
+                    ? formatWalletAddress(data.attendees[0].attendee_address)
+                    : ensGuestName}
+                  &nbsp;
+                  <Tooltip
+                    content="Copy"
+                    placement="right"
+                    closeDelay={1}
+                    showArrow
+                  >
+                    <span className="cursor-pointer text-sm">
+                      <IoCopy
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          handleCopy(data.attendees[0].attendee_address);
+                        }}
+                      />
+                    </span>
+                  </Tooltip>
+                </div>
+              </div>
+            ) : (
+              <div className="text-[#3E3D3D]">
+                <span className="font-semibold">Instant Meet</span>{" "}
+              </div>
+            )}
+            <div className="text-[#3E3D3D] flex items-center gap-2">
+              <Image
+                src={ensHostAvatar || user1}
+                alt="image"
+                width={20}
+                height={20}
+                className="h-5 w-5 rounded-full object-cover object-center"
+              />
+              <div className="flex items-center">
+                <span className="font-semibold">Host: </span> &nbsp;
+                {isEvent === "Attending" ? (
+                  <Link
+                    href={`/${data.dao_name}/${data.host_address}?active=info`}
+                  >
+                    <span className="hover:text-blue-shade-100 transition-colors duration-200">
+                      {loadingEnsData
+                        ? formatWalletAddress(data.host_address)
+                        : ensHostName}
+                    </span>
+                  </Link>
+                ) : (
+                  <span>
+                    {loadingEnsData
+                      ? formatWalletAddress(data.host_address)
+                      : ensHostName}
+                  </span>
+                )}
+                &nbsp;
+                <Tooltip
+                  content="Copy"
+                  placement="right"
+                  closeDelay={1}
+                  showArrow
+                >
+                  <span className="cursor-pointer text-sm">
+                    <IoCopy
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        handleCopy(data.host_address);
+                      }}
+                    />
+                  </span>
+                </Tooltip>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className={`flex flex-col justify-between text-xs py-2 px-4 mb-2`}>
           {isEvent === "Book" ? (
             data.booking_status === "Approved" ? (
-              <div className="flex justify-between ">
+              <div className="flex justify-end items-center gap-2 ">
                 {startLoading || isConfirmSlotLoading ? (
                   <div className="flex items-center justify-center">
                     <Oval
@@ -240,7 +385,7 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
                   >
                     <span className="cursor-pointer">
                       <FaCirclePlay
-                        size={35}
+                        size={32}
                         color="#004DFF"
                         onClick={() => {
                           setStartLoading(true);
@@ -259,7 +404,7 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
                   showArrow
                 >
                   <span className="cursor-pointer">
-                    <FaCircleXmark onClick={onOpen} size={35} color="#b91c1c" />
+                    <FaCircleXmark onClick={onOpen} size={32} color="#b91c1c" />
                   </span>
                 </Tooltip>
                 {isOpen && (
@@ -370,7 +515,9 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
                     />
                   </div>
                 ) : (
-                  "Join"
+                  <div className="flex items-center justify-center gap-2 text-sm">
+                    Join <BsPersonVideo3 className="size-4" />
+                  </div>
                 )}
               </div>
             )
