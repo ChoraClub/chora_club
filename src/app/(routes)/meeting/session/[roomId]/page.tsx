@@ -43,6 +43,7 @@ import ParticipantTile from "@/components/Huddle/ParticipantTile";
 import { NestedPeerListIcons } from "@/utils/PeerListIcons";
 import logo from "@/assets/images/daos/CCLogo1.png";
 import Image from "next/image";
+import { headers } from "next/headers";
 import UpdateSessionDetails from "@/components/MeetingPreview/UpdateSessionDetails";
 import PopupSlider from "@/components/FeedbackPopup/PopupSlider";
 import MeetingRecordingModal from "@/components/ComponentUtils/MeetingRecordingModal";
@@ -361,6 +362,12 @@ export default function Component({ params }: { params: { roomId: string } }) {
 
         console.log("All attendees: ", attendees);
 
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        if (address) {
+          myHeaders.append("x-wallet-address", address);
+        }
+
         const raw = JSON.stringify({
           meetingId: params.roomId,
           attendees: attendees,
@@ -369,6 +376,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
         // Make the API request
         const requestOptions = {
           method: "PUT",
+          headers: myHeaders,
           body: raw,
         };
 

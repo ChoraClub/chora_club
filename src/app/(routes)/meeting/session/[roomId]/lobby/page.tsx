@@ -79,6 +79,9 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
     } else {
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
+      if (address) {
+        myHeaders.append("x-wallet-address", address);
+      }
 
       const raw = JSON.stringify({
         roomId: params.roomId,
@@ -122,11 +125,14 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
           address: address, // assuming you have userAddress defined somewhere
         };
         try {
+          const myHeaders = new Headers();
+          myHeaders.append("Content-Type", "application/json");
+          if (address) {
+            myHeaders.append("x-wallet-address", address);
+          }
           const response = await fetch("/api/new-token", {
             method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
+            headers: myHeaders,
             body: JSON.stringify(requestBody),
           });
 
@@ -163,6 +169,9 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
         console.log("inside put api");
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
+        if (address) {
+          myHeaders.append("x-wallet-address", address);
+        }
 
         const raw = JSON.stringify({
           meetingId: params.roomId,
@@ -200,6 +209,9 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
   useEffect(() => {
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
+    if (address) {
+      myHeaders.append("x-wallet-address", address);
+    }
 
     const raw = JSON.stringify({
       roomId: params.roomId,
@@ -264,7 +276,6 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
       try {
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
-
         if (address) {
           myHeaders.append("x-wallet-address", address);
         }
@@ -280,6 +291,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
           body: raw,
           redirect: "follow",
         };
+        console.log("Req OPTIONS", requestOptions);
         const response = await fetch(`/api/profile/${address}`, requestOptions);
         const result = await response.json();
         const resultData = await result.data;
@@ -332,7 +344,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
       }
     };
     fetchData();
-  }, []);
+  }, [address]);
 
   return (
     <>

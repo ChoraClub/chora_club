@@ -102,7 +102,7 @@ function WatchComponentMain({ props }: { props: { id: string } }) {
               />
 
               {/* /Video Recommendation */}
-              {/* <WatchVideoRecommendation /> */}
+              <WatchVideoRecommendation data={data} />
             </div>
 
             {/* Right side */}

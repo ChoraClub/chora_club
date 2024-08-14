@@ -85,11 +85,14 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
             address: address, // assuming you have userAddress defined somewhere
           };
           try {
+            const myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+            if (address) {
+              myHeaders.append("x-wallet-address", address);
+            }
             const response = await fetch("/api/new-token", {
               method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
+              headers: myHeaders,
               body: JSON.stringify(requestBody),
             });
 
@@ -126,6 +129,9 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
           console.log("inside put api");
           const myHeaders = new Headers();
           myHeaders.append("Content-Type", "application/json");
+          if (address) {
+            myHeaders.append("x-wallet-address", address);
+          }
 
           const raw = JSON.stringify({
             meetingId: params.roomId,
@@ -160,6 +166,9 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
   useEffect(() => {
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
+    if (address) {
+      myHeaders.append("x-wallet-address", address);
+    }
 
     const raw = JSON.stringify({
       roomId: params.roomId,
@@ -238,8 +247,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
                 <button
                   onClick={() => setIsOpen((prev) => !prev)}
                   type="button"
-                  className="text-white absolute bottom-0 right-0 z-10"
-                >
+                  className="text-white absolute bottom-0 right-0 z-10">
                   {BasicIcons.edit}
                 </button>
                 <FeatCommon
@@ -248,8 +256,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
                     isOpen
                       ? "absolute top-4 block"
                       : "absolute top-1/2 -translate-y-1/2 hidden "
-                  }
-                >
+                  }>
                   <div className="relative mt-5">
                     <div className="grid-cols-3 grid h-full w-full place-items-center gap-6  px-6 ">
                       {Array.from({ length: 20 }).map((_, i) => {
@@ -261,8 +268,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
                             isActive={avatarUrl === url}
                             onClick={() => {
                               setAvatarUrl(url);
-                            }}
-                          >
+                            }}>
                             <Image
                               src={url}
                               alt={`avatar-${i}`}
@@ -308,8 +314,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
             <div className="flex items-center w-full">
               <button
                 className="flex items-center justify-center bg-blue-shade-100 text-slate-100 rounded-md p-2 mt-2 w-full"
-                onClick={() => handleStartSpaces()}
-              >
+                onClick={() => handleStartSpaces()}>
                 {isJoining ? "Joining Spaces..." : "Start meeting"}
                 {!isJoining && (
                   <Image
@@ -348,8 +353,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
                 <Link
                   // onClick={() => push(`/profile/${address}?active=info`)}
                   href={`/profile/${address}?active=info`}
-                  className="px-6 py-3 bg-white text-blue-shade-200 rounded-full shadow-lg hover:bg-blue-shade-200 hover:text-white transition duration-300 ease-in-out"
-                >
+                  className="px-6 py-3 bg-white text-blue-shade-200 rounded-full shadow-lg hover:bg-blue-shade-200 hover:text-white transition duration-300 ease-in-out">
                   Back to Profile
                 </Link>
               </div>

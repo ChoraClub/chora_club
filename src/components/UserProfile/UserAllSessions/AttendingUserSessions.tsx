@@ -50,11 +50,14 @@ function AttendingUserSessions({ daoName }: { daoName: string }) {
   const getUserMeetingData = async () => {
     try {
       setPageLoading(true);
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      if (address) {
+        myHeaders.append("x-wallet-address", address);
+      }
       const response = await fetch(`/api/get-session-data/${address}`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: myHeaders,
         body: JSON.stringify({
           dao_name: daoName,
         }),
@@ -70,7 +73,7 @@ function AttendingUserSessions({ daoName }: { daoName: string }) {
     } catch (error) {
       console.log("error in catch", error);
       setError("Unable to load sessions. Please try again in a few moments.");
-    } finally{
+    } finally {
       setPageLoading(false);
     }
   };

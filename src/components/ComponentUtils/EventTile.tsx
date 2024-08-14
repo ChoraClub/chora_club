@@ -14,6 +14,7 @@ import text1 from "@/assets/images/daos/texture1.png";
 import text2 from "@/assets/images/daos/texture2.png";
 import oplogo from "@/assets/images/daos/op.png";
 import arblogo from "@/assets/images/daos/arbitrum.jpg";
+
 // import { getEnsName } from "../ConnectWallet/ENSResolver";
 import logo from "@/assets/images/daos/CCLogo.png";
 import user1 from "@/assets/images/user/user1.svg";
@@ -29,6 +30,7 @@ import {
   useDisclosure,
 } from "@nextui-org/react";
 import { IoCopy } from "react-icons/io5";
+import { useAccount } from "wagmi";
 interface RoomDetails {
   message: string;
   data: {
@@ -98,6 +100,7 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
   const [ensHostAvatar, setEnsHostAvatar] = useState("");
   const [ensGuestAvatar, setEnsGuestAvatar] = useState("");
   const [loadingEnsData, setLoadingEnsData] = useState(true);
+  const { address } = useAccount();
 
   const handleCopy = (addr: string) => {
     copy(addr);
@@ -176,6 +179,9 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
       // console.log(meeting_status);
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
+      if (address) {
+        myHeaders.append("x-wallet-address", address);
+      }
 
       const raw = await JSON.stringify({
         id: id,

@@ -5,6 +5,11 @@ import { useRouter } from "next-nprogress-bar";
 import RecordedSessionsTile from "../ComponentUtils/RecordedSessionsTile";
 import RecordedSessionsSkeletonLoader from "../SkeletonLoader/RecordedSessionsSkeletonLoader";
 import ErrorDisplay from "../ComponentUtils/ErrorDisplay";
+import text1 from "@/assets/images/daos/texture1.png";
+import SessionTile from "../ComponentUtils/SessionTiles";
+import { Oval } from "react-loader-spinner";
+import SessionTileSkeletonLoader from "../SkeletonLoader/SessionTileSkeletonLoader";
+import { useAccount } from "wagmi";
 
 type Attendee = {
   attendee_address: string;
@@ -39,12 +44,18 @@ function DelegateSessions({ props }: { props: Type }) {
   const [sessionDetails, setSessionDetails] = useState([]);
   const dao_name = props.daoDelegates;
   const [error, setError] = useState<string | null>(null);
+  const { address } = useAccount();
+
+  // const dao_name = daoName.charAt(0).toUpperCase() + daoName.slice(1);
 
   const getMeetingData = async () => {
     setDataLoading(true);
     try {
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
+      if (address) {
+        myHeaders.append("x-wallet-address", address);
+      }
 
       const raw = JSON.stringify({
         dao_name: dao_name,
@@ -90,7 +101,7 @@ function DelegateSessions({ props }: { props: Type }) {
           }
           setSessionDetails(filteredData);
         }
-      } 
+      }
     } catch (error) {
       setError(
         "An unexpected error occurred. Please refresh the page and try again."

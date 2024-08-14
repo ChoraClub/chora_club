@@ -95,6 +95,9 @@ const BottomBar = ({
 
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
+        if (address) {
+          myHeaders.append("x-wallet-address", address);
+        }
 
         const raw = JSON.stringify({
           meetingId: roomId,
@@ -294,11 +297,14 @@ const BottomBar = ({
       }
 
       try {
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        if (address) {
+          myHeaders.append("x-wallet-address", address);
+        }
         const requestOptions = {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: myHeaders,
           body: JSON.stringify({
             roomId: roomId,
             meetingType: meetingType,
@@ -317,11 +323,14 @@ const BottomBar = ({
       if (isRecording === true) {
         try {
           toast.success("Giving Attestations");
+          const myHeaders = new Headers();
+          myHeaders.append("Content-Type", "application/json");
+          if (address) {
+            myHeaders.append("x-wallet-address", address);
+          }
           const response = await fetch(`/api/get-attest-data`, {
             method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
+            headers: myHeaders,
             body: JSON.stringify({
               roomId: roomId,
             }),
@@ -338,11 +347,14 @@ const BottomBar = ({
       }
 
       try {
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        if (address) {
+          myHeaders.append("x-wallet-address", address);
+        }
         const requestOptions = {
           method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: myHeaders,
           body: JSON.stringify({
             meetingId: roomId,
             meetingType: meetingCategory,
@@ -362,12 +374,15 @@ const BottomBar = ({
     }
 
     if (meetingCategory === "officehours") {
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      if (address) {
+        myHeaders.append("x-wallet-address", address);
+      }
       try {
         const res = await fetch(`/api/update-office-hours/${hostAddress}`, {
           method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: myHeaders,
         });
         const res_data = await res.json();
 

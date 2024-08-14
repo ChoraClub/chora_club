@@ -1,4 +1,4 @@
-// NotificationActions.tsx
+"use client";
 
 import React from "react";
 import { FaClock, FaUserCheck } from "react-icons/fa";
@@ -10,6 +10,7 @@ import {
 import { PiVideoFill } from "react-icons/pi";
 import { GiChaingun } from "react-icons/gi";
 import { BASE_URL } from "@/config/constants";
+import { useAccount } from "wagmi";
 
 export const getBackgroundColor = (data: any) => {
   if (data?.notification_type === "newBooking") {
@@ -61,6 +62,9 @@ export const markAsRead = async (data: any): Promise<void> => {
   try {
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
+    if (data.receiver_address) {
+      myHeaders.append("x-wallet-address", data.receiver_address);
+    }
 
     const raw = JSON.stringify({
       id: data?._id,

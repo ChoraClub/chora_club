@@ -41,8 +41,6 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
   const [showPopup, setShowPopup] = useState(true);
   const [showHostPopup, setShowHostPopup] = useState(false);
 
-
-
   useEffect(() => {
     async function fetchData() {
       try {
@@ -94,6 +92,9 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
         setLoading(true);
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
+        if (address) {
+          myHeaders.append("x-wallet-address", address);
+        }
 
         const raw = JSON.stringify({
           meetingId: roomId,

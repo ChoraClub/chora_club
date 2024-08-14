@@ -40,11 +40,14 @@ function ReportAdditionalDetailsModal({
     video_reports: any
   ) => {
     setIsLoading(true);
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    if (address) {
+      myHeaders.append("x-wallet-address", address);
+    }
     const requestOptions = {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: myHeaders,
       body: JSON.stringify({
         meetingId,
         host_address,
@@ -123,15 +126,13 @@ function ReportAdditionalDetailsModal({
       <div className="fixed inset-0 z-50 flex items-center justify-center font-poppins">
         <div
           className="absolute inset-0 backdrop-blur-md"
-          onClick={toggleModal}
-        ></div>
+          onClick={toggleModal}></div>
         <div className="z-50 bg-white p-6 rounded-3xl shadow-lg w-[28rem]">
           <div className="flex justify-between items-center">
             <div className="text-xl font-bold text-gray-900">Report video</div>
             <button
               className="text-gray-500 hover:text-gray-800"
-              onClick={toggleModal}
-            >
+              onClick={toggleModal}>
               <RxCross2 size={20} />
             </button>
           </div>
@@ -147,16 +148,14 @@ function ReportAdditionalDetailsModal({
             <button
               type="button"
               onClick={toggleModal}
-              className="ps-4 text-gray-700 rounded hover:text-gray-800 font-semibold"
-            >
+              className="ps-4 text-gray-700 rounded hover:text-gray-800 font-semibold">
               Cancel
             </button>
             <button
               type="button"
               onClick={handleReport}
               className="ps-4 text-red-500 hover:text-red-600 font-semibold"
-              disabled={isLoading}
-            >
+              disabled={isLoading}>
               {isLoading ? <>Submitting...</> : <> Report</>}
             </button>
           </div>
