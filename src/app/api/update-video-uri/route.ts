@@ -4,11 +4,6 @@ import { NextRequest, NextResponse } from "next/server";
 import axios from "axios";
 import { imageCIDs } from "@/config/staticDataUtils";
 
-function getRandomElementFromArray(arr: any[]) {
-  const randomIndex = Math.floor(Math.random() * arr.length);
-  return arr[randomIndex];
-}
-
 export async function POST(req: NextRequest, res: NextApiResponse) {
   const { meetingId, video_uri } = await req.json();
 
@@ -25,14 +20,12 @@ export async function POST(req: NextRequest, res: NextApiResponse) {
     );
 
     // Update video_uri in the other collection
-    const randomCID = getRandomElementFromArray(imageCIDs);
     const meetingsCollection = db.collection("meetings");
     const sessionMeeting = await meetingsCollection.findOneAndUpdate(
       { meetingId },
       {
         $set: {
           video_uri,
-          thumbnail_image: randomCID,
           meeting_status: "Recorded",
         },
       }
