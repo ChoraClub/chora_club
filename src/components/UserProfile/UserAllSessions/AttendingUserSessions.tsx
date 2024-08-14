@@ -11,6 +11,7 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { useRouter } from "next-nprogress-bar";
 import { Oval } from "react-loader-spinner";
 import SessionTileSkeletonLoader from "@/components/SkeletonLoader/SessionTileSkeletonLoader";
+import ErrorDisplay from "@/components/ComponentUtils/ErrorDisplay";
 
 type Attendee = {
   attendee_address: string;
@@ -38,9 +39,17 @@ function AttendingUserSessions({ daoName }: { daoName: string }) {
   const { address } = useAccount();
   const [sessionDetails, setSessionDetails] = useState<any[]>([]);
   const [pageLoading, setPageLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleRetry = () => {
+    setError(null);
+    getUserMeetingData();
+    window.location.reload();
+  };
 
   const getUserMeetingData = async () => {
     try {
+      setPageLoading(true);
       const response = await fetch(`/api/get-session-data/${address}`, {
         method: "POST",
         headers: {
@@ -54,20 +63,29 @@ function AttendingUserSessions({ daoName }: { daoName: string }) {
       const result = await response.json();
 
       if (result.success) {
-        setPageLoading(true);
         const resultData = await result.attending;
         console.log("resultData in attending", resultData);
         setSessionDetails(resultData);
-        setPageLoading(false);
       }
     } catch (error) {
       console.log("error in catch", error);
+      setError("Unable to load sessions. Please try again in a few moments.");
+    } finally{
+      setPageLoading(false);
     }
   };
 
   useEffect(() => {
     getUserMeetingData();
   }, [searchParams.get("session")]);
+
+  if (error) {
+    return (
+      <div className="flex justify-center items-center min-h-[400px]">
+        <ErrorDisplay message={error} onRetry={handleRetry} />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

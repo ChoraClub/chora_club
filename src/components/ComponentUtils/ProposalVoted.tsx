@@ -234,7 +234,6 @@ const router = useRouter();
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Your async logic here
         const finalResult = await fetchProposalDescriptions(
           1000,
           0,
@@ -247,27 +246,22 @@ const router = useRouter();
         setIsPageLoading(false);
         setFirst(true);
       } catch (error) {
-        // Handle errors here
         console.error("Error fetching proposal descriptions:", error);
       }
     };
 
-    // Call the async function
     fetchData();
   }, [daoName]);
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Your async logic here
         const counts = await fetchGraphData(daoName, pageData);
         setSupportCounts(counts);
       } catch (error) {
-        // Handle errors here
         console.error("Error fetching proposal descriptions:", error);
       }
     };
 
-    // Call the async function
     fetchData();
   }, [pageData]);
 
@@ -368,7 +362,7 @@ const router = useRouter();
                       proposal.proposalId &&
                       proposal.proposalId.params &&
                       proposal.proposalId.params.length > 2
-                        ? "" // Your custom color for this condition
+                        ? "" 
                         : proposal.support === 1
                         ? "bg-[#0033A8]"
                         : proposal.support === 0
@@ -424,9 +418,11 @@ const router = useRouter();
                 </div>
               ))
             ) : (
-              <div className="pt-4 flex items-center flex-col justify-center">
-                <div className="text-3xl">☹️</div>
-                <div>Oops, no data available</div>
+              <div className="pt-10 flex items-center flex-col justify-center">
+                <div className="text-5xl">☹️</div>
+                <div className="pt-4 font-semibold text-lg">
+                Oops, no data available!
+                </div>
               </div>
             )}
           </div>

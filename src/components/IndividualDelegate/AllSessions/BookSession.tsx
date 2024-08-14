@@ -73,7 +73,6 @@ function BookSession({ props }: { props: Type }) {
   const [addingEmail, setAddingEmail] = useState<boolean>();
 
   useEffect(() => {
-    // Lock scrolling when the modal is open
     if (isOpen) {
       document.body.style.overflow = "hidden";
     } else {
@@ -90,15 +89,8 @@ function BookSession({ props }: { props: Type }) {
       setIsLoading(false);
     }, 2000);
 
-    // if (isConnected) {
-    // setTimeout(() => {
     getAvailability();
     getSlotTimeAvailability();
-    // setIsPageLoading(false);
-    // }, 1000);
-    // }
-    // onOpen();
-    // setIsPageLoading(false);
     return () => {
       clearTimeout(loadingTimeout);
     };
@@ -114,13 +106,11 @@ function BookSession({ props }: { props: Type }) {
       });
 
       const result = await response.json();
-      // console.log("result", result);
       if (result.success) {
         setAPIData(result.data);
         setIsLoading(false);
       }
     } catch (error) {
-      console.log("error in catch", error);
     }
   };
 
@@ -134,13 +124,11 @@ function BookSession({ props }: { props: Type }) {
       });
 
       const result = await response.json();
-      console.log("result in get meeting", result);
       if (result.success) {
         setAPIBookings(result.data);
         const extractedSlotTimes = result.data.map(
           (item: any) => new Date(item.slot_time)
         );
-        console.log("extractedSlotTimes", extractedSlotTimes);
         setSlotTimes(extractedSlotTimes);
         setIsPageLoading(false);
 
@@ -154,7 +142,6 @@ function BookSession({ props }: { props: Type }) {
         setIsLoading(false);
       }
     } catch (error) {
-      console.log("error in catch", error);
       setIsPageLoading(false);
     }
   };
@@ -201,17 +188,13 @@ function BookSession({ props }: { props: Type }) {
   };
 
   useEffect(() => {
-    console.log("userRejected in useEffect", userRejected);
     const hasRejected = JSON.parse(
       sessionStorage.getItem("bookingMailRejected") || "false"
     );
-    console.log("hasRejected in useEffect", hasRejected);
     setUserRejected(hasRejected);
   }, [userRejected, sessionStorage.getItem("bookingMailRejected")]);
 
   useEffect(() => {
-    // checkUser();
-    console.log("continueAPICalling", continueAPICalling);
     if (continueAPICalling) {
       apiCall();
     }
@@ -224,7 +207,6 @@ function BookSession({ props }: { props: Type }) {
 
       const raw = JSON.stringify({
         address: address,
-        // daoName: daoName,
       });
 
       const requestOptions: any = {
@@ -235,16 +217,10 @@ function BookSession({ props }: { props: Type }) {
       };
       const response = await fetch(`/api/profile/${address}`, requestOptions);
       const result = await response.json();
-      console.log("result", result);
       if (Array.isArray(result.data) && result.data.length > 0) {
-        console.log("inside array");
-        // Iterate over each item in the response data array
         for (const item of result.data) {
-          console.log("item::", item);
-          // Check if address and daoName match
           if (item.address === address) {
             if (item.emailId === null || item.emailId === "") {
-              console.log("NO emailId found");
               setHasEmailID(false);
               return false;
             } else if (item.emailId) {
@@ -254,7 +230,6 @@ function BookSession({ props }: { props: Type }) {
                 setMailId(item.emailId);
                 setContinueAPICalling(true);
                 setHasEmailID(true);
-                console.log("emailId:", item.emailId);
                 return true;
               } else {
                 setContinueAPICalling(false);
@@ -265,7 +240,10 @@ function BookSession({ props }: { props: Type }) {
         }
       }
     } catch (error) {
-      console.log("Error", error);
+      toast.error("An error occurred while checking user information");
+      setHasEmailID(false);
+      setContinueAPICalling(false);
+      return false;
     }
   };
 
@@ -277,29 +255,16 @@ function BookSession({ props }: { props: Type }) {
         const userRejectedLocal: any = await sessionStorage.getItem(
           "bookingMailRejected"
         );
-        // setUserRejected(userRejectedLocal);
-        console.log("userRejectedLocal", userRejectedLocal);
-        console.log("checkUserMail in handleApplyWithCheck", checkUserMail);
-        console.log("userRejected in handleApplyWithCheck", userRejected);
         if (!checkUserMail && (!userRejected || !userRejectedLocal)) {
           setShowGetMailModal(true);
         } else {
-          console.log("inside else condition!!!!!");
-          console.log("continueAPICalling", continueAPICalling);
-          console.log("!continueAPICalling", !continueAPICalling);
           if (!continueAPICalling || continueAPICalling === false) {
-            // console.log("inside if(!continueAPICalling)", !continueAPICalling);
             setContinueAPICalling(true);
           } else if (continueAPICalling) {
             apiCall();
           }
         }
-        console.log("inside handleApplyWithCheck");
-        // if (continueAPICalling) {
-        //   handleApplyButtonClick();
-        // }
       } catch (error) {
-        console.log("error:", error);
       }
     } else {
       toast.error("Please enter title or description!");
@@ -314,9 +279,7 @@ function BookSession({ props }: { props: Type }) {
       },
     });
     const result = await res.json();
-    // console.log("result", result);
     const roomId = await result.data;
-    // console.log("roomId", roomId);
     return roomId;
   };
   const apiCall = async () => {
@@ -334,7 +297,6 @@ function BookSession({ props }: { props: Type }) {
       session_type: "session",
       meetingId: roomId,
     };
-    console.log("requestData", requestData);
 
     const requestOptions: any = {
       method: "POST",
@@ -344,11 +306,9 @@ function BookSession({ props }: { props: Type }) {
     };
 
     try {
-      console.log("calling.......");
       setConfirmSave(true);
       const response = await fetch("/api/book-slot", requestOptions);
       const result = await response.json();
-      console.log("result of book-slots", result);
       if (result.success) {
         setIsScheduled(true);
         setConfirmSave(false);
@@ -360,7 +320,6 @@ function BookSession({ props }: { props: Type }) {
       console.error("Error:", error);
     }
 
-    // Reset modal data
     setModalData({
       dao_name: "",
       date: "",
@@ -374,11 +333,8 @@ function BookSession({ props }: { props: Type }) {
   let dateAndRanges: any = [];
   let allowedDates: any = [];
 
-  // Check if API data exists
   if (APIData) {
-    // console.log("APIData", APIData)
     APIData.forEach((item: any) => {
-      // console.log("item", item)
       dateAndRanges.push(...item.dateAndRanges);
       allowedDates.push(...item.allowedDates);
     });
@@ -426,9 +382,7 @@ function BookSession({ props }: { props: Type }) {
   }
 
   function subtractOneMinute(date: any) {
-    // Create a new Date object from the provided date
     let newDate = new Date(date);
-    // Subtract one minute (60000 milliseconds)
     newDate.setTime(newDate.getTime() - 60000);
     return newDate;
   }
@@ -448,12 +402,10 @@ function BookSession({ props }: { props: Type }) {
       formattedUTCTime_startTime: startTime,
       formattedUTCTime_endTime: endTime,
     } of dateAndRanges) {
-      // Check if slotTime is within the time range of startTime and endTime
       if (
         slotTime.getTime() >= startTime.getTime() &&
         slotTime.getTime() <= endTime.getTime()
       ) {
-        // Check if the slot is booked
         const isBooked = bookedSlots.some((bookedSlot: any) => {
           return (
             dateFns.isSameDay(startTime, bookedSlot) &&
@@ -462,7 +414,6 @@ function BookSession({ props }: { props: Type }) {
           );
         });
 
-        // If the slot is not booked, return true
         if (!isBooked) {
           return true;
         }
@@ -473,7 +424,6 @@ function BookSession({ props }: { props: Type }) {
   }
 
   const handleModalClose = () => {
-    console.log("Popup Closed");
     setModalOpen(false);
     router.push(`/profile/${address}?active=sessions&session=attending`);
   };
@@ -504,7 +454,6 @@ function BookSession({ props }: { props: Type }) {
             const raw = JSON.stringify({
               address: address,
               emailId: mailId,
-              // daoName: daoName,
             });
 
             const requestOptions: any = {
@@ -520,24 +469,17 @@ function BookSession({ props }: { props: Type }) {
               setContinueAPICalling(true);
               setAddingEmail(false);
             }
-            console.log("result", result);
-            console.log("Email submitted:", mailId);
-            // Optionally, close the modal
-            // handleGetMailModalClose();
             setShowGetMailModal(false);
           } catch (error) {
-            console.log("Error", error);
             setAddingEmail(false);
           }
         } else {
           toast.error("Enter Valid Email");
           setShowGetMailModal(true);
-          console.log("Error");
         }
       } else {
         toast.error("Enter Valid Email");
         setShowGetMailModal(true);
-        console.log("Error");
       }
     }
   };
@@ -601,7 +543,7 @@ function BookSession({ props }: { props: Type }) {
             <div className="relative">
               <div className="flex flex-col gap-1 text-white bg-[#292929] p-4 py-7">
                 <h2 className="text-lg font-semibold mx-4">
-                  Book your slot for {props.daoDelegates}
+                  Book your slot for {props.daoDelegates.charAt(0).toUpperCase() + props.daoDelegates.slice(1)}
                   <button
                     className="absolute right-7"
                     onClick={() => {

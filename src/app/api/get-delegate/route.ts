@@ -16,6 +16,7 @@ const DELEGATE_QUERY = gql`
   ) {
     newBalance
     toDelegate
+    balanceBlockTimestamp
   }
 }
 `;
@@ -46,10 +47,10 @@ export const GET = async (req: NextRequest) => {
 
       for (const change of delegateChangeds) {
         console.log("change",change)
-        const { toDelegate, blockTimestamp, newBalance } = change;
+        const { toDelegate, balanceBlockTimestamp, newBalance } = change;
         if (!uniqueDelegates.has(toDelegate) || 
-            blockTimestamp > uniqueDelegates.get(toDelegate).blockTimestamp) {
-          uniqueDelegates.set(toDelegate, { blockTimestamp, newBalance });
+        balanceBlockTimestamp > uniqueDelegates.get(toDelegate).blockTimestamp) {
+          uniqueDelegates.set(toDelegate, { balanceBlockTimestamp, newBalance });
         }
          skipCount++;
         if (uniqueDelegates.size >= UNIQUE_DELEGATES_COUNT) {

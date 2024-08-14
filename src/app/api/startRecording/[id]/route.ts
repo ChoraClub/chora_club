@@ -5,7 +5,7 @@ import { Recorder } from "@huddle01/server-sdk/recorder";
 import { AccessToken, Role } from "@huddle01/server-sdk/auth";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(request: Request, res: NextResponse) {
+export async function POST(request: Request, res: NextResponse) {
   //   const roomId = req.url;
   const roomId = request.url.split("startRecording/")[1];
 

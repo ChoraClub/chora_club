@@ -250,6 +250,7 @@ function MainProfile() {
       // console.log(delegateTx);
     } catch (error) {
       console.log("Error:", error);
+      toast.error("Failed to delegate votes. Please try again.");
     }
   };
 
@@ -310,8 +311,7 @@ function MainProfile() {
     }
     // Close the modal
     setLoading(false);
-  };
-  const toggleFollowing = async (
+  };  const toggleFollowing = async (
     index: number,
     userupdate: any,
     unfollowDao: any
@@ -502,17 +502,19 @@ function MainProfile() {
       }
 
       const data = await response.json();
-      setIsLoading(false);
       settoggle(!isToggled);
       // console.log("status successfully change!", data);
     } catch (error) {
       console.error("Error following:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        // console.log("Fetching from DB");
         // Fetch data from your backend API to check if the address exists
         // console.log("Fetching from DB");
         // const dbResponse = await axios.get(`/api/profile/${address}`);
@@ -610,12 +612,6 @@ function MainProfile() {
           }
           setIsPageLoading(false);
         } else {
-          // const res = await fetch(
-          //   `https://api.karmahq.xyz/api/dao/find-delegate?dao=${dao}&user=${address}`
-          // );
-          // const details = await res.json();
-          // console.log("details: ", details.data.delegate);
-
           setUserData({
             displayName: karmaDetails.data.delegate.ensName,
             discord: karmaDetails.data.delegate.discordHandle,
@@ -629,6 +625,7 @@ function MainProfile() {
         }
       } catch (error) {
         console.error("Error fetching data:", error);
+        toast.error("Failed to load profile data. Please try again later.");
         setIsPageLoading(false);
       }
     };
@@ -762,12 +759,10 @@ function MainProfile() {
           github: modalData.github,
         });
       } else {
-        // Handle error response
         console.error("Failed to add delegate:", response.statusText);
         setIsLoading(false);
       }
     } catch (error) {
-      // Handle API call error
       console.error("Error calling POST API:", error);
       setIsLoading(false);
     }
@@ -776,14 +771,14 @@ function MainProfile() {
   // Function to handle updating an existing delegate
   const handleUpdate = async (newDescription?: string) => {
     try {
-      // Call the PUT API function for updating an existing delegate
-
       let dao =
         chain?.name === "Optimism"
           ? "optimism"
           : chain?.name === "Arbitrum One"
           ? "arbitrum"
           : "";
+      // console.log("Updating");
+      // console.log("Inside Updating Description", newDescription);
       // console.log("Updating");
       // console.log("Inside Updating Description", newDescription);
       // const myHeaders = new Headers();
@@ -835,12 +830,10 @@ function MainProfile() {
           github: modalData.github,
         });
       } else {
-        // Handle error response
         console.error("Failed to update delegate:", response.error);
         setIsLoading(false);
       }
     } catch (error) {
-      // Handle API call error
       console.error("Error calling PUT API:", error);
       setIsLoading(false);
     }
@@ -857,7 +850,8 @@ function MainProfile() {
                 style={{
                   backgroundColor: "#fcfcfc",
                   border: "2px solid #E9E9E9 ",
-                }}>
+                }}
+              >
                 <div className="w-40 h-40 flex items-center justify-content ">
                   <div className="flex justify-center items-center w-40 h-40">
                     <Image
@@ -919,7 +913,8 @@ function MainProfile() {
                           : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                      target="_blank">
+                      target="_blank"
+                    >
                       <FaXTwitter color="#7C7C7C" size={12} />
                     </Link>
                     <Link
@@ -937,7 +932,8 @@ function MainProfile() {
                           : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                      target="_blank">
+                      target="_blank"
+                    >
                       <BiSolidMessageRoundedDetail color="#7C7C7C" size={12} />
                     </Link>
                     <Link
@@ -948,7 +944,8 @@ function MainProfile() {
                           : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                      target="_blank">
+                      target="_blank"
+                    >
                       <FaDiscord color="#7C7C7C" size={12} />
                     </Link>
                     <Link
@@ -959,17 +956,20 @@ function MainProfile() {
                           : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                      target="_blank">
+                      target="_blank"
+                    >
                       <FaGithub color="#7C7C7C" size={12} />
                     </Link>
                     <Tooltip
                       content="Update your Profile"
                       placement="top"
-                      showArrow>
+                      showArrow
+                    >
                       <span
                         className="border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 cursor-pointer"
                         style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                        onClick={onOpen}>
+                        onClick={onOpen}
+                      >
                         <FaPencil color="#3e3d3d" size={12} />
                       </span>
                     </Tooltip>
@@ -999,24 +999,19 @@ function MainProfile() {
                     content="Copy"
                     placement="bottom"
                     closeDelay={1}
-                    showArrow>
+                    showArrow
+                  >
                     <span className="px-2 cursor-pointer" color="#3E3D3D">
                       <IoCopy onClick={() => handleCopy(`${address}`)} />
                     </span>
                   </Tooltip>
                   <div className="flex space-x-2">
-                    {/* <span className="p-2 bg-gray-200 rounded-lg text-black">
-                      {typeof window !== "undefined" &&
-                        `${BASE_URL}/${
-                          chain?.name === "Optimism" ? "optimism" : "arbitrum"
-                        }/${address}?active=info`}
-                      Copy to Share Profile URL on Warpcast
-                    </span> */}
                     <Tooltip
                       content="Copy your profile URL to share on Warpcast or Twitter."
                       placement="bottom"
                       closeDelay={1}
-                      showArrow>
+                      showArrow
+                    >
                       <Button
                         className="bg-gray-200 hover:bg-gray-300"
                         onClick={() => {
@@ -1032,15 +1027,14 @@ function MainProfile() {
                           setTimeout(() => {
                             setIsCopied(false);
                           }, 3000);
-                        }}>
+                        }}
+                      >
                         <IoShareSocialSharp />
                         {isCopied ? "Copied" : "Share profile"}
                       </Button>
                     </Tooltip>
                   </div>
                 </div>
-
-                {/* {isOpentoaster && toast.loading("Saving...")} */}
 
                 {isOpenFollowings && (
                   <FollowingModal
@@ -1049,8 +1043,8 @@ function MainProfile() {
                     toggleNotification={toggleNotification}
                     setfollowingmodel={setfollowingmodel}
                     isLoading={isLoading}
-                    chainName={chain?.name}
                     handleUpdateFollowings={handleUpdateFollowings}
+                    daoName={daoName}
                   />
                 )}
 
@@ -1059,7 +1053,8 @@ function MainProfile() {
                     {/* pass address of whom you want to delegate the voting power to */}
                     <button
                       className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
-                      onClick={() => handleDelegateVotes(`${address}`)}>
+                      onClick={() => handleDelegateVotes(`${address}`)}
+                    >
                       Become Delegate
                     </button>
 
@@ -1071,24 +1066,10 @@ function MainProfile() {
                           : toast.error(
                               "You're not following anyone yet. Start exploring delegate profiles now!"
                             )
-                      }>
+                      }
+                    >
                       {followings} Following
                     </button>
-
-                    {/* <div className="">
-                      <select
-                        value={daoName}
-                        onChange={(e) => setDaoName(e.target.value)}
-                        className="outline-none border border-blue-shade-200 text-blue-shade-200 rounded-full py-2 px-3"
-                      >
-                        <option value="optimism" className="text-gray-700">
-                          Optimism
-                        </option>
-                        <option value="arbitrum" className="text-gray-700">
-                          Arbitrum
-                        </option>
-                      </select>
-                    </div> */}
                   </div>
                 ) : (
                   <div className="pt-2 flex gap-5">
@@ -1107,7 +1088,8 @@ function MainProfile() {
                           : toast.error(
                               "You're not following anyone yet. Start exploring delegate profiles now!"
                             )
-                      }>
+                      }
+                    >
                       {followings} Followings
                     </button>
                   </div>
@@ -1126,7 +1108,8 @@ function MainProfile() {
                   ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
                   : "border-transparent"
               }`}
-              onClick={() => router.push(path + "?active=info")}>
+              onClick={() => router.push(path + "?active=info")}
+            >
               Info
             </button>
             {selfDelegate === true && (
@@ -1136,7 +1119,8 @@ function MainProfile() {
                     ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
                     : "border-transparent"
                 }`}
-                onClick={() => router.push(path + "?active=votes")}>
+                onClick={() => router.push(path + "?active=votes")}
+              >
                 Past Votes
               </button>
             )}
@@ -1147,8 +1131,14 @@ function MainProfile() {
                   : "border-transparent"
               }`}
               onClick={() =>
-                router.push(path + "?active=sessions&session=schedule")
-              }>
+                router.push(
+                  path +
+                    `?active=sessions&session=${
+                      selfDelegate ? "schedule" : "attending"
+                    }`
+                )
+              }
+            >
               Sessions
             </button>
             <button
@@ -1159,7 +1149,8 @@ function MainProfile() {
               }`}
               onClick={() =>
                 router.push(path + "?active=officeHours&hours=schedule")
-              }>
+              }
+            >
               Office Hours
             </button>
 
@@ -1170,7 +1161,8 @@ function MainProfile() {
                     ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
                     : "border-transparent"
                 }`}
-                onClick={() => router.push(path + "?active=instant-meet")}>
+                onClick={() => router.push(path + "?active=instant-meet")}
+              >
                 Instant Meet
               </button>
             )}
@@ -1227,7 +1219,6 @@ function MainProfile() {
             ) : (
               ""
             )}
-            {/* {searchParams.get("active") === "claimNft" ? <ClaimNFTs /> : ""} */}
           </div>
         </div>
       ) : (

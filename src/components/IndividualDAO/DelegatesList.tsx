@@ -19,7 +19,7 @@ import { useConnectModal, useChainModal } from "@rainbow-me/rainbowkit";
 import dao_abi from "../../artifacts/Dao.sol/GovernanceToken.json";
 import { useAccount, useNetwork } from "wagmi";
 import WalletAndPublicClient from "@/helpers/signer";
-// import { getEnsNameOfUser } from "../ConnectWallet/ENSResolver";
+import ErrorDisplay from "../ComponentUtils/ErrorDisplay";
 import {
   processAddressOrEnsName,
   resolveENSProfileImage,
@@ -33,9 +33,7 @@ import {
   DELEGATE_CHANGED_QUERY,
   op_client,
 } from "@/config/staticDataUtils";
-import { RiErrorWarningLine } from "react-icons/ri";
 
-// Create a cache object outside of the component to persist across re-renders
 const cache: any = {
   optimism: null,
   arbitrum: null,
@@ -69,7 +67,7 @@ function DelegatesList({ props }: { props: string }) {
   const [selectedDelegate, setSelectedDelegate] = useState<any>(null);
   const [skip, setSkip] = useState(0);
   const [hasMore, setHasMore] = useState(true);
-  const address = useAccount();
+  const {address} = useAccount();
 
   const handleRetry = () => {
     setError(null);
@@ -77,25 +75,8 @@ function DelegatesList({ props }: { props: string }) {
     setDelegateData({ delegates: [] });
     setTempData({ delegates: [] });
     window.location.reload();
-    // Retry fetching data
-    // fetchData(null);
   };
 
-  const ErrorDisplay = ({ message, onRetry }: any) => (
-    <div className="flex flex-col items-center justify-center p-8 bg-red-50 rounded-lg shadow-md">
-      <RiErrorWarningLine className="text-red-500 text-5xl mb-4" />
-      <h2 className="text-2xl font-bold text-red-700 mb-2">
-        Oops! Something went wrong
-      </h2>
-      <p className="text-red-600 text-center mb-6">{message}</p>
-      <button
-        onClick={onRetry}
-        className="px-6 py-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors duration-300"
-      >
-        Try Again
-      </button>
-    </div>
-  );
 
   const handleClose = () => {
     setIsShowing(false);
@@ -157,7 +138,6 @@ function DelegatesList({ props }: { props: string }) {
       setDelegateData((prevData: any) => ({
         delegates: [...prevData.delegates, ...formattedDelegates],
       }));
-      // { delegates : [...formattedDelegates]};
       setTempData((prevData: any) => ({
         delegates: [...prevData.delegates, ...formattedDelegates],
       }));
@@ -176,11 +156,10 @@ function DelegatesList({ props }: { props: string }) {
     }
   };
   useEffect(() => {
-    console.log(cache[props]);
+
     if (cache[props]) {
-      console.log("Using cached data");
+
       // Use cached data if available
-      console.log(cache[props]);
       setDelegateData(cache[props]);
       setCurrentPage(pageCache + 1);
       setTempData(cache[props]);
@@ -188,8 +167,6 @@ function DelegatesList({ props }: { props: string }) {
       setPageLoading(false);
       setDataLoading(false);
     } else {
-      // Fetch data if not in cache
-      console.log("Fetching data");
       setDataLoading(true);
       fetchData(null);
       setDataLoading(false);
@@ -197,7 +174,6 @@ function DelegatesList({ props }: { props: string }) {
   }, [props]);
 
   useEffect(() => {
-    console.log("last", lastCursor);
     if (currentPage > 0 || lastCursor) {
       fetchData(lastCursor || "");
     }
@@ -210,9 +186,7 @@ function DelegatesList({ props }: { props: string }) {
       timeout = setTimeout(() => func(...args), wait);
     };
   };
-  const handleSearchChange = async (query: string) => {
-    // console.log("query: ", query.length);
-
+    const handleSearchChange = async (query: string) => {
     setSearchQuery(query);
     setPageLoading(true);
 
@@ -228,15 +202,12 @@ function DelegatesList({ props }: { props: string }) {
         if (filtered.delegates && filtered.delegates.length > 0) {
           const formattedDelegates = filtered.delegates.map(
             (delegate: any) => ({
-              // console.log("delegate",delegate)
               delegate: delegate.publicAddress,
               adjustedBalance: delegate.delegatedVotes,
-              // newBalance: delegate.newBalance,
-              profilePicture: delegate.profilePicture, // Assuming `avatar` is a property of delegate
-              ensName: delegate.ensName, // Uncomment if ensName is needed and exists
+              profilePicture: delegate.profilePicture, 
+              ensName: delegate.ensName,
             })
           );
-          console.log("formattedDelegates", formattedDelegates);
           setDelegateData({ delegates: formattedDelegates });
           // setPageLoading(false);
         } else {
@@ -294,15 +265,15 @@ function DelegatesList({ props }: { props: string }) {
 
   const WalletOpen = async (to: string) => {
     const adr = await walletClient.getAddresses();
-    console.log(adr);
+
     const address1 = adr[0];
-    console.log(address1);
+ 
 
     let parts = path.split("/");
     let firstStringAfterSlash = parts[1];
 
     let chainAddress;
-    console.log(delegateData.delegates[0].daoName);
+
 
     if (delegateData.delegates[0].daoName === "optimism") {
       chainAddress = "0x4200000000000000000000000000000000000042";
@@ -311,7 +282,7 @@ function DelegatesList({ props }: { props: string }) {
     } else {
       return;
     }
-    console.log(chainAddress);
+ 
 
     if (isConnected) {
       if (walletClient.chain?.network === firstStringAfterSlash) {
@@ -322,7 +293,6 @@ function DelegatesList({ props }: { props: string }) {
           args: [to],
           account: address1,
         });
-        console.log(delegateTx);
       } else {
         toast.error("Please switch to appropriate network to delegate!");
         if (openChainModal) {
@@ -393,13 +363,11 @@ function DelegatesList({ props }: { props: string }) {
 
   const handleDelegateModal = async (delegateObject: any) => {
     setSelectedDelegate(delegateObject);
-    console.log("delegateObject----------", delegateObject);
     if (!isConnected) {
       if (openConnectModal) {
         openConnectModal();
       }
     } else {
-      console.log(delegateObject.delegate);
       setDelegateOpen(true);
       // setLoading(true);
       try {
@@ -414,20 +382,15 @@ function DelegatesList({ props }: { props: string }) {
           });
         }
  
-        console.log("data of individual delegate: ", data.data);
         const delegate = data.data.delegateChangeds[0]?.toDelegate;
-        console.log("individualDelegate", delegate);
         setSame(
           delegate.toLowerCase() === delegateObject.delegate.toLowerCase()
         );
-        // ens
-        // ? setDelegate(ens)
-        // :
-        console.log("delegate N/A: ", delegate);
         setDelegateDetails(delegate);
         setError(null);
       } catch (err: any) {
-        setError(err.message);
+        console.log(err)
+        // setError(err.message);
       } finally {
         // setLoading(false);
       }
@@ -459,10 +422,6 @@ function DelegatesList({ props }: { props: string }) {
       return;
     }
 
-    console.log("address", address);
-    console.log("address1", address1);
-    console.log("to: ", to);
-
     let chainAddress;
     if (chain?.name === "Optimism") {
       chainAddress = "0x4200000000000000000000000000000000000042";
@@ -472,7 +431,6 @@ function DelegatesList({ props }: { props: string }) {
       return;
     }
 
-    console.log("walletClient?.chain?.network", walletClient?.chain?.network);
 
     if (walletClient?.chain === "") {
       toast.error("Please connect your wallet!");
@@ -487,7 +445,7 @@ function DelegatesList({ props }: { props: string }) {
             account: address1,
           });
 
-          console.log(delegateTx);
+
           handleCloseDelegateModal();
         } catch (error) {
           toast.error("Transaction failed");
@@ -523,14 +481,6 @@ function DelegatesList({ props }: { props: string }) {
             sourcing accurate data and it will be available soon.
           </span>{" "}
           &nbsp;
-          {/* <a
-            href="http://karmahq.xyz"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-500 font-medium hover:underline"
-          >
-            Click Here!🚀
-          </a> */}
           <button
             className="flex ml-auto items-center justify-center p-1 text-gray-500 hover:text-red-500 bg-white border border-gray-300 rounded-md"
             onClick={handleClose}
@@ -577,12 +527,10 @@ function DelegatesList({ props }: { props: string }) {
         ) : delegateData.delegates.length > 0 ? (
           <div>
             <div className="grid min-[475px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-10">
-              {console.log("data............", delegateData)}
               {delegateData.delegates.map((delegate: any, index: number) => (
                 <>
                   <div
                     onClick={(event) => {
-                      // handleMouseMove(event,index);
                       router.push(
                         `/${props}/${delegate.delegate}?active=info  `
                       );
@@ -642,9 +590,6 @@ function DelegatesList({ props }: { props: string }) {
                                   : delegate.ensName.length > 15
                                   ? delegate.ensName.slice(0, 15) + "..."
                                   : delegate.ensName}
-                                {/* {delegate.ensName.length > 15
-                                ? delegate.ensName.slice(0, 15) + "..."
-                                : delegate.ensName} */}
                               </span>
                             )}
                           </div>
@@ -691,18 +636,6 @@ function DelegatesList({ props }: { props: string }) {
                       </div>
                     </div>
                     <div style={{ zIndex: "21474836462" }}>
-                      {/* <Toaster
-                        toastOptions={{
-                          style: {
-                            fontSize: "14px",
-                            backgroundColor: "#3E3D3D",
-                            color: "#fff",
-                            boxShadow: "none",
-                            borderRadius: "50px",
-                            padding: "3px 5px",
-                          },
-                        }}
-                      /> */}
                     </div>
                   </div>
                   {delegateOpen && (

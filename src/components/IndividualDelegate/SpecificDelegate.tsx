@@ -334,14 +334,6 @@ function SpecificDelegate({ props }: { props: Type }) {
     checkDelegateStatus();
   }, []);
 
-  // if (isPageLoading) {
-  //   return null;
-  // }
-
-  // if (!isDelegate && !selfDelegate && !isPageLoading) {
-  //   return <div>No such Delegate for this address</div>;
-  // }
-
   const formatNumber = (number: number) => {
     if (number >= 1000000) {
       return (number / 1000000).toFixed(2) + "m";
@@ -356,147 +348,6 @@ function SpecificDelegate({ props }: { props: Type }) {
     copy(addr);
     toast("Address Copied");
   };
-
-  // const setFollowerscount = async () => {
-  //   setFollowerCountLoading(true);
-  //   const myHeaders = new Headers();
-  //   // setFollowerCountLoading(true);
-  //   myHeaders.append("Content-Type", "application/json");
-  //   const raw = JSON.stringify({
-  //     address: props.individualDelegate,
-  //   });
-
-  //   const requestOptions: any = {
-  //     method: "POST",
-  //     headers: myHeaders,
-  //     body: raw,
-  //     redirect: "follow",
-  //   };
-
-  //   try {
-  //     const resp = await fetch(
-  //       `/api/delegate-follow/savefollower`,
-  //       requestOptions
-  //     );
-
-  //     if (!resp.ok) {
-  //       throw new Error("Failed to save follower");
-  //     }
-
-  //     const data = await resp.json();
-  //     console.log("API Response:", data);
-
-  //     if (!data.success || !data.data || data.data.length === 0) {
-  //       console.log("No data returned from API");
-  //       return;
-  //     }
-
-  //     const followerData = data.data[0];
-  //     const daoFollowers = followerData.followers.find(
-  //       (dao: any) =>
-  //         dao.dao_name.toLowerCase() === props.daoDelegates.toLowerCase()
-  //     );
-
-  //     if (daoFollowers) {
-  //       const followerCount = daoFollowers.follower.filter(
-  //         (f: any) => f.isFollowing
-  //       ).length;
-
-  //       console.log(`Follower count for ${daoname}:`, followerCount);
-  //       setFollowers(followerCount);
-  //       // setFollowerCountLoading(false);
-  //     }
-  //   } catch {
-  //     console.log("no followers found something went wrong!");
-  //     setFollowers(0);
-  //     setFollowerCountLoading(false);
-  //   } finally {
-  //     setFollowerCountLoading(false);
-  //   }
-  // };
-
-  // const updateFollowerState = async () => {
-  //   // console.log("Attempting to call savefollower API");
-  //   setIsFollowStatusLoading(true);
-  //   const myHeaders = new Headers();
-  //   myHeaders.append("Content-Type", "application/json");
-  //   const raw = JSON.stringify({
-  //     address: props.individualDelegate,
-  //   });
-
-  //   const requestOptions: any = {
-  //     method: "POST",
-  //     headers: myHeaders,
-  //     body: raw,
-  //     redirect: "follow",
-  //   };
-
-  //   try {
-  //     const resp = await fetch(
-  //       `/api/delegate-follow/savefollower`,
-  //       requestOptions
-  //     );
-
-  //     if (!resp.ok) {
-  //       throw new Error("Failed to save follower");
-  //     }
-
-  //     const data = await resp.json();
-  //     console.log("API Response:", data);
-
-  //     if (!data.success || !data.data || data.data.length === 0) {
-  //       console.log("No data returned from API");
-  //       return;
-  //     }
-
-  //     const followerData = data.data[0];
-  //     let address = await walletClient.getAddresses();
-  //     let address_user = address[0].toLowerCase(); // Convert to lowercase for case-insensitive comparison
-  //     let currentDaoName = props.daoDelegates;
-
-  //     console.log("Current DAO:", currentDaoName);
-  //     console.log("User Address:", address_user);
-
-  //     const daoFollowers = followerData.followers.find(
-  //       (dao: any) =>
-  //         dao.dao_name.toLowerCase() === currentDaoName.toLowerCase()
-  //     );
-
-  //     console.log("DAO Followers:", daoFollowers);
-
-  //     if (daoFollowers) {
-  //       const follow = daoFollowers.follower.find(
-  //         (f: any) => f.address.toLowerCase() === address_user
-  //       );
-
-  //       console.log("User's follow status:", follow);
-
-  //       if (follow) {
-  //         setIsFollowing(follow.isFollowing);
-  //         isNotification(follow.isNotification); // Changed from isNotification(follow.isNotification)
-  //       } else {
-  //         setIsFollowing(false);
-  //         isNotification(false); // Changed from isNotification(false)
-  //       }
-
-  //       // const followerCount = daoFollowers.follower.filter(
-  //       //   (f: any) => f.isFollowing
-  //       // ).length;
-
-  //       // console.log("Follower count:", followerCount);
-
-  //       // setFollowers(followerCount);
-  //     } else {
-  //       setIsFollowing(false);
-  //       isNotification(false); // Changed from isNotification(false)
-  //       setFollowers(0);
-  //     }
-  //   } catch (error) {
-  //     console.error("Error in updateFollowerState:", error);
-  //   } finally {
-  //     setIsFollowStatusLoading(false);
-  //   }
-  // };
 
   const fetchDelegateData = async () => {
     setIsFollowStatusLoading(true);
@@ -922,20 +773,14 @@ function SpecificDelegate({ props }: { props: Type }) {
           {/* {followed && <Confetti recycle={false} numberOfPieces={550} />} */}
           <div className="flex ps-14 py-5 justify-between">
             <div className="flex">
-              {/* <Image
-            src={delegateInfo?.profilePicture || user}
-            alt="user"
-            width={256}
-            height={256}
-            className="w-40 rounded-3xl"
-          /> */}
 
               <div
                 className="relative object-cover rounded-3xl"
                 style={{
                   backgroundColor: "#fcfcfc",
                   border: "2px solid #E9E9E9 ",
-                }}>
+                }}
+              >
                 <div className="w-40 h-40 flex items-center justify-content ">
                   <div className="flex justify-center items-center w-40 h-40">
                     <Image
@@ -997,7 +842,8 @@ function SpecificDelegate({ props }: { props: Type }) {
                           : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                      target="_blank">
+                      target="_blank"
+                    >
                       <FaXTwitter color="#7C7C7C" size={12} />
                     </Link>
                     <Link
@@ -1016,7 +862,8 @@ function SpecificDelegate({ props }: { props: Type }) {
                           : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                      target="_blank">
+                      target="_blank"
+                    >
                       <BiSolidMessageRoundedDetail color="#7C7C7C" size={12} />
                     </Link>
                     <Link
@@ -1031,7 +878,8 @@ function SpecificDelegate({ props }: { props: Type }) {
                           : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                      target="_blank">
+                      target="_blank"
+                    >
                       <FaDiscord color="#7C7C7C" size={12} />
                     </Link>
                     {isEmailVisible && (
@@ -1039,7 +887,8 @@ function SpecificDelegate({ props }: { props: Type }) {
                         href={`mailto:${emailId}`}
                         className="border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1"
                         style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                        target="_blank">
+                        target="_blank"
+                      >
                         <FaEnvelope color="#7C7C7C" size={12} />
                       </Link>
                     )}
@@ -1055,7 +904,8 @@ function SpecificDelegate({ props }: { props: Type }) {
                           : ""
                       }`}
                       style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                      target="_blank">
+                      target="_blank"
+                    >
                       <FaGithub color="#7C7C7C" size={12} />
                     </Link>
                   </div>
@@ -1071,7 +921,8 @@ function SpecificDelegate({ props }: { props: Type }) {
                     content="Copy"
                     placement="right"
                     closeDelay={1}
-                    showArrow>
+                    showArrow
+                  >
                     <span className="px-2 cursor-pointer" color="#3E3D3D">
                       <IoCopy
                         onClick={() => handleCopy(props.individualDelegate)}
@@ -1079,18 +930,12 @@ function SpecificDelegate({ props }: { props: Type }) {
                     </span>
                   </Tooltip>
                   <div className="flex space-x-2">
-                    {/* <span className="p-2 bg-gray-200 rounded-lg text-black">
-                      {typeof window !== "undefined" &&
-                        `${BASE_URL}/${
-                          chain?.name === "Optimism" ? "optimism" : "arbitrum"
-                        }/${address}?active=info`}
-                      Copy to Share Profile URL on Warpcast
-                    </span> */}
                     <Tooltip
                       content="Copy profile URL to share on Warpcast or Twitter."
                       placement="bottom"
                       closeDelay={1}
-                      showArrow>
+                      showArrow
+                    >
                       <Button
                         className="bg-gray-200 hover:bg-gray-300"
                         onClick={() => {
@@ -1102,26 +947,14 @@ function SpecificDelegate({ props }: { props: Type }) {
                           setTimeout(() => {
                             setIsCopied(false);
                           }, 3000);
-                        }}>
+                        }}
+                      >
                         <IoShareSocialSharp />
                         {isCopied ? "Copied" : "Share profile"}
                       </Button>
                     </Tooltip>
                   </div>
-                  <div style={{ zIndex: "21474836462" }}>
-                    {/* <Toaster
-                      toastOptions={{
-                        style: {
-                          fontSize: "14px",
-                          backgroundColor: "#3E3D3D",
-                          color: "#fff",
-                          boxShadow: "none",
-                          borderRadius: "50px",
-                          padding: "3px 5px",
-                        },
-                      }}
-                    /> */}
-                  </div>
+                  <div style={{ zIndex: "21474836462" }}></div>
                 </div>
 
                 <div className="flex gap-4 py-1">
@@ -1171,7 +1004,8 @@ function SpecificDelegate({ props }: { props: Type }) {
                     //   handleDelegateVotes(`${props.individualDelegate}`)
                     // }
 
-                    onClick={handleDelegateModal}>
+                    onClick={handleDelegateModal}
+                  >
                     Delegate
                   </button>
 
@@ -1179,7 +1013,8 @@ function SpecificDelegate({ props }: { props: Type }) {
                     className={`font-bold text-white rounded-full w-[138.5px] h-[44px] py-[10px] flex justify-center items-center ${
                       isFollowing ? "bg-blue-shade-200" : "bg-black"
                     }`}
-                    onClick={handleFollow}>
+                    onClick={handleFollow}
+                  >
                     {isFollowStatusLoading ? (
                       <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div>
                     ) : loading ? (
@@ -1199,7 +1034,8 @@ function SpecificDelegate({ props }: { props: Type }) {
                     }
                     placement="top"
                     closeDelay={1}
-                    showArrow>
+                    showArrow
+                  >
                     <div
                       className={`border  rounded-full flex items-center justify-center size-10  ${
                         isFollowing
@@ -1208,7 +1044,8 @@ function SpecificDelegate({ props }: { props: Type }) {
                       }`}
                       onClick={() =>
                         isFollowing && !notificationLoading && handleConfirm(2)
-                      }>
+                      }
+                    >
                       {notificationLoading ? (
                         <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-blue-shade-100"></div>
                       ) : isFollowing ? (
@@ -1243,12 +1080,14 @@ function SpecificDelegate({ props }: { props: Type }) {
                           <div className="flex justify-center px-8 py-4">
                             <button
                               className="bg-gray-300 text-gray-700 px-8 py-3 font-semibold rounded-full mr-4"
-                              onClick={() => setUnfollowmodel(false)}>
+                              onClick={() => setUnfollowmodel(false)}
+                            >
                               Cancel
                             </button>
                             <button
                               className="bg-red-500 text-white px-8 py-3 font-semibold rounded-full"
-                              onClick={() => handleConfirm(1)}>
+                              onClick={() => handleConfirm(1)}
+                            >
                               {loading ? (
                                 <Oval
                                   visible={true}
@@ -1267,51 +1106,6 @@ function SpecificDelegate({ props }: { props: Type }) {
                       </div>
                     </div>
                   )}
-
-                  {/* <Tooltip
-                    content={
-                      notification
-                        ? "Click to mute delegate activity alerts."
-                        : "Don't miss out! Click to get alerts on delegate activity."
-                    }
-                    placement="top"
-                    closeDelay={1}
-                    showArrow> */}
-                  {/* <button
-                      className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[5px] flex items-center mr-2"
-                      onClick={() => {
-                        if (notification) {
-                          setNotificationmodel(true);
-                        } else {
-                          handleConfirm(2);
-                        }
-                      }}
-                    > */}
-                  {/* <div
-                      className="flex items-center cursor-pointer"
-                      onClick={() => {
-                        if (notification) {
-                          handleConfirm(2);
-                        } else {
-                          handleConfirm(2);
-                        }
-                      }}>
-                      {isFollowing &&
-                        (notification ? (
-                          <BiSolidBellRing
-                            className=""
-                            color="bg-blue-shade-200"
-                            size={24}
-                          />
-                        ) : (
-                          <BiSolidBellOff
-                            className="mr-1"
-                            color="bg-blue-shade-200"
-                            size={24}
-                          />
-                        ))}
-                    </div>
-                  </Tooltip> */}
                 </div>
               </div>
             </div>
@@ -1327,7 +1121,8 @@ function SpecificDelegate({ props }: { props: Type }) {
                   ? " border-blue-shade-200 text-blue-shade-200 font-semibold"
                   : "border-transparent"
               }`}
-              onClick={() => router.push(path + "?active=info")}>
+              onClick={() => router.push(path + "?active=info")}
+            >
               Info
             </button>
             <button
@@ -1336,7 +1131,8 @@ function SpecificDelegate({ props }: { props: Type }) {
                   ? "text-blue-shade-200 font-semibold border-blue-shade-200"
                   : "border-transparent"
               }`}
-              onClick={() => router.push(path + "?active=pastVotes")}>
+              onClick={() => router.push(path + "?active=pastVotes")}
+            >
               Past Votes
             </button>
             <button
@@ -1347,7 +1143,8 @@ function SpecificDelegate({ props }: { props: Type }) {
               }`}
               onClick={() =>
                 router.push(path + "?active=delegatesSession&session=book")
-              }>
+              }
+            >
               Sessions
             </button>
             <button
@@ -1358,7 +1155,8 @@ function SpecificDelegate({ props }: { props: Type }) {
               }`}
               onClick={() =>
                 router.push(path + "?active=officeHours&hours=ongoing")
-              }>
+              }
+            >
               Office Hours
             </button>
           </div>
@@ -1402,7 +1200,6 @@ function SpecificDelegate({ props }: { props: Type }) {
           delegateName={
             delegateInfo?.ensName ||
             displayEnsName || (
-              // displayName ||
               <>
                 {props.individualDelegate.slice(0, 6)}...
                 {props.individualDelegate.slice(-4)}
