@@ -142,7 +142,9 @@ const WatchSocialLinks = ({
               </Link>
             ))
           ) : (
-            <>No socials added by the host.</>
+            <div className="flex items-center justify-center rounded-full border text-sm border-black-shade-200 bg-white py-2 hover:bg-blue-shade-400 text-blue-shade-100">
+              <p className="font-medium">No socials added by the host.</p>
+            </div>
           )}
         </div>
       </div>

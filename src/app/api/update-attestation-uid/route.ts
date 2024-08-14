@@ -31,6 +31,7 @@ export async function PUT(req: NextRequest, res: NextResponse) {
 
     const db = client.db();
     const collection = db.collection("meetings");
+    const usersCollection = db.collection("delegates");
 
     console.log("Fetching session document by meeting ID...");
     let existingDocument: any;
@@ -43,6 +44,13 @@ export async function PUT(req: NextRequest, res: NextResponse) {
         },
         { $set: { onchain_host_uid: uidOnchain } }
       );
+
+      await usersCollection.findOneAndUpdate(
+        { address: address },
+        {
+          $inc: { "meetingRecords.sessionHosted.onchainCounts": 1 },
+        }
+      );
     } else if (meetingType === 2) {
       existingDocument = await collection.findOneAndUpdate(
         {
@@ -50,6 +58,12 @@ export async function PUT(req: NextRequest, res: NextResponse) {
           "attendees.attendee_address": address,
         },
         { $set: { "attendees.$.onchain_attendee_uid": uidOnchain } }
+      );
+      await usersCollection.findOneAndUpdate(
+        { address: address },
+        {
+          $inc: { "meetingRecords.sessionAttended.onchainCounts": 1 },
+        }
       );
     }
 

@@ -28,6 +28,30 @@ import toast, { Toaster } from "react-hot-toast";
 import { useNetwork } from "wagmi";
 import { hash } from "crypto";
 import { marked } from "marked";
+import { createPublicClient, http } from 'viem'
+import { arbitrum } from 'viem/chains'
+import { Tooltip as Tooltips } from "@nextui-org/react";
+import style from "./proposalMain.module.css";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
+import { RiArrowRightUpLine, RiExternalLinkLine } from "react-icons/ri";
+import ProposalMainVotersSkeletonLoader from "../SkeletonLoader/ProposalMainVotersSkeletonLoader";
+import ProposalMainDescriptionSkeletonLoader from "../SkeletonLoader/ProposalMainDescriptionSkeletonLoader";
+import DOMPurify from "dompurify";
+
+// Create a client
+const client = createPublicClient({
+  chain: arbitrum,
+  transport: http()
+})
 
 interface ArbitrumVote {
   voter: {
@@ -61,22 +85,7 @@ interface Proposal {
   queueStartTime?: number;
   queueEndTime?: number;
 }
-import { Tooltip as Tooltips } from "@nextui-org/react";
-import style from "./proposalMain.module.css";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from "recharts";
-import { RiArrowRightUpLine, RiExternalLinkLine } from "react-icons/ri";
-import ProposalMainVotersSkeletonLoader from "../SkeletonLoader/ProposalMainVotersSkeletonLoader";
-import ProposalMainDescriptionSkeletonLoader from "../SkeletonLoader/ProposalMainDescriptionSkeletonLoader";
-import DOMPurify from "dompurify";
+
 
 function ProposalMain({ props }: { props: Props }) {
   const router = useRouter();
@@ -111,6 +120,24 @@ function ProposalMain({ props }: { props: Props }) {
     votingPower?: number;
     network: string;
   }
+       
+const getContractAddress = async (txHash:`0x${string}`) => {  
+  try {
+    const transaction = await client.getTransaction({ hash: txHash })
+
+    const transactionReceipt = await client.getTransactionReceipt({ hash: txHash })
+
+   if (transaction.to) {
+      return transaction.to;
+    } else {
+      return "Not a contract interaction or creation"
+    }
+
+  } catch (error) {
+    console.error('Error:', error)
+    return "Error retrieving transaction information"
+  }
+}
 
   const StoreData = async (voteData: VoteData) => {
     // Make the API call to submit the vote
@@ -161,9 +188,9 @@ function ProposalMain({ props }: { props: Props }) {
 
     let chainAddress;
     if (chain?.name === "Optimism") {
-      chainAddress = "0xcDF27F107725988f2261Ce2256bDfCdE8B382B10"; //token contract address
+      chainAddress = "0xcDF27F107725988f2261Ce2256bDfCdE8B382B10"; 
     } else if (chain?.name === "Arbitrum One") {
-      chainAddress = "0x789fC99093B09aD01C34DC7251D0C89ce743e5a4";
+    chainAddress = await getContractAddress(data.transactionHash);
     } else {
       return;
     }
@@ -228,7 +255,6 @@ function ProposalMain({ props }: { props: Props }) {
       );
 
       if (!response.ok) {
-        // throw new Error("Network response was not ok");
         console.log("Network response was not ok");
       }
 
@@ -254,8 +280,6 @@ function ProposalMain({ props }: { props: Props }) {
   useEffect(() => {
     const formatDesc = async () => {
       if (data?.description) {
-        // const formatted = await formatDescription(data.description);
-        // setFormattedDescription(formatted);
         const { title, content } = await formatDescription(data.description);
         setFormattedTitle(title);
         setFormattedDescription(content);
@@ -315,7 +339,6 @@ function ProposalMain({ props }: { props: Props }) {
         text = `<strong>${match[1]}</strong>`;
       }
 
-      // em tag
       const emPattern = /^\*(.*)\*$/;
       const matchem = text.match(emPattern);
       if (matchem) {
@@ -525,13 +548,10 @@ function ProposalMain({ props }: { props: Props }) {
   }, [support0Weight, support1Weight]);
 
   const formatDate = (timestamp: number): string => {
-    // Convert the timestamp to milliseconds if it's in seconds
     const milliseconds = timestamp * 1000;
 
-    // Create a date object in the local time zone
     const date = new Date(milliseconds);
 
-    // Format the date components
     const day = date.getDate();
     const month = date.toLocaleString("en-US", { month: "long" });
     const year = date.getFullYear();
@@ -540,17 +560,13 @@ function ProposalMain({ props }: { props: Props }) {
     const seconds = String(date.getSeconds()).padStart(2, "0");
     const ampm = hours >= 12 ? "PM" : "AM";
 
-    // Format hours for 12-hour clock
     const formattedHours = String(hours % 12 || 12).padStart(2, "0");
 
-    // Get the local time zone abbreviation
     const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-    // Construct the formatted date string
     return `${day} ${month}, ${year} ${formattedHours}:${minutes}:${seconds} ${ampm}`;
   };
 
-  // New useEffect to handle chart data processing
   const formatWeight = (weight: number | string): string => {
     const numWeight = Number(weight);
 
@@ -571,7 +587,6 @@ function ProposalMain({ props }: { props: Props }) {
 
   useEffect(() => {
     if (voterList && voterList.length > 0) {
-      // Sort voterList by blockTimestamp
       const sortedVoterList = [...voterList].sort(
         (a, b) => parseInt(a.blockTimestamp) - parseInt(b.blockTimestamp)
       );
@@ -601,11 +616,10 @@ function ProposalMain({ props }: { props: Props }) {
         data.forEach((entry: any) => {
           const timestamp = parseInt(entry.blockTimestamp);
           const date = new Date(timestamp * 1000);
-          const day = date.toISOString().split("T")[0]; // YYYY-MM-DD format
-          const weight = parseFloat(entry.weight) / 1e18; // Convert wei to ether
+          const day = date.toISOString().split("T")[0]; 
+          const weight = parseFloat(entry.weight) / 1e18;
 
           if (!aggregatedData[day]) {
-            // Create a new Date object set to midnight UTC for this day
             const utcMidnight = new Date(
               Date.UTC(
                 date.getUTCFullYear(),
@@ -630,7 +644,6 @@ function ProposalMain({ props }: { props: Props }) {
           }
         });
 
-        // Sort the days and calculate cumulative totals
         const sortedDays = Object.keys(aggregatedData).sort();
         let cumulativeFor = 0;
         let cumulativeAgainst = 0;
@@ -675,7 +688,7 @@ function ProposalMain({ props }: { props: Props }) {
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsChartLoading(false);
-    }, 2000); // Simulate 2 seconds loading time
+    }, 2000);
 
     return () => clearTimeout(timer);
   }, []);
@@ -711,7 +724,6 @@ function ProposalMain({ props }: { props: Props }) {
     } else {
       router.push(`/arbitrum/${address}?active=info`);
     }
-    // window.location.href = `/optimism/${address}?active=info`;
   };
   const date = data?.blockTimestamp;
   const formatYAxis = (value: number) => {
@@ -719,10 +731,8 @@ function ProposalMain({ props }: { props: Props }) {
   };
 
   const truncateText = (text: string, charLimit: number) => {
-    // Remove all '#' characters from the text
     const cleanedText = text?.replace(/#/g, "");
 
-    // Truncate the cleaned text if necessary
     return cleanedText?.length <= charLimit
       ? cleanedText
       : cleanedText?.slice(0, charLimit) + "...";
@@ -764,7 +774,6 @@ function ProposalMain({ props }: { props: Props }) {
     return { status: "Closed", votingPeriodEnd };
   };
 
-  // Usage in your component
   const { status, votingPeriodEnd } = getProposalStatus(
     data,
     props,
@@ -772,11 +781,10 @@ function ProposalMain({ props }: { props: Props }) {
   );
   const isActive = status === "Active" && !(props.daoDelegates === "optimism");
   const getVotingPeriodEnd = () => {
-    console.log(data);
     if (!data || !data.blockTimestamp) return null;
 
     const baseTimestamp = new Date(data.blockTimestamp * 1000);
-    const votingPeriod = props.daoDelegates === "arbitrum" ? 17 : 7; // Changed to 3 days for Arbitrum
+    const votingPeriod = props.daoDelegates === "arbitrum" ? 17 : 7; 
     return new Date(
       baseTimestamp.getTime() + votingPeriod * 24 * 60 * 60 * 1000
     );
@@ -811,8 +819,6 @@ function ProposalMain({ props }: { props: Props }) {
           return support1Weight! > support0Weight! ? "SUCCEEDED" : "DEFEATED";
         }
       } else {
-        // Fallback to old logic if queue times are not available
-        console.log(currentDate, votingPeriodEndData);
         return !votingPeriodEndData
           ? "PENDING"
           : currentDate > votingPeriodEndData
@@ -822,7 +828,6 @@ function ProposalMain({ props }: { props: Props }) {
             : "PENDING";
       }
     } else {
-      // Optimism logic
       return currentDate > votingPeriodEndData!
         ? support1Weight! > support0Weight!
           ? "SUCCEEDED"
@@ -850,7 +855,6 @@ function ProposalMain({ props }: { props: Props }) {
 
   const Proposalstatus = (data && support1Weight >= 0) || support1Weight ? proposal_status : null;
 
-  console.log(Proposalstatus, data, support1Weight);
   const CustomXAxisTick = ({
     x,
     y,
@@ -907,7 +911,6 @@ function ProposalMain({ props }: { props: Props }) {
         <IndividualDaoHeader />
       </div>
 
-      {/* buttons */}
       <div className="flex gap-4 mx-24 mb-8 mt-5 font-poppins">
         <div
           className="text-white bg-blue-shade-100 rounded-full py-1.5 px-4 flex justify-center items-center gap-1 cursor-pointer"
@@ -926,19 +929,11 @@ function ProposalMain({ props }: { props: Props }) {
       </div>
 
       <div
-        className={`rounded-[1rem] mx-20 md:mx-24 px-4 md:px-12 py-6 transition-shadow duration-300 ease-in-out shadow-xl bg-gray-50 font-poppins relative ${isExpanded ? "h-fit" : "h-fit"
+        className={`rounded-[1rem] mx-20 md:mx-24 px-4 md:px-12 pb-6 pt-16 transition-shadow duration-300 ease-in-out shadow-xl bg-gray-50 font-poppins relative ${isExpanded ? "h-fit" : "h-fit"
           }`}
-      >
-        <div className="flex items-center justify-between">
-          <div className="flex gap-2 items-center">
-            {loading ? (
-              <div className="h-5 bg-gray-200 animate-pulse w-[50vw] rounded-full"></div>
-            ) : (
-              <p className="text-2xl font-semibold">{formattedTitle}</p>
-            )}
-          </div>
-          <div className="flex flex-wrap items-center max-w-[400px] float-left md:max-w-none md:flex-nowrap md:justify-start md:float-none">
-            <div className="flex items-center gap-1 flex-grow w-max	">
+      >       
+          <div className="w-full flex items-center justify-end gap-2 absolute top-6 right-12">
+            <div className="">
               <Tooltips
                 showArrow
                 content={<div className="font-poppins">OnChain</div>}
@@ -949,34 +944,43 @@ function ProposalMain({ props }: { props: Props }) {
                 <Image
                   src={chainImg}
                   alt=""
-                  className="w-6 h-6 md:w-6 md:h-6 cursor-pointer flex-shrink-0"
+                  className="w-6 h-6 cursor-pointer"
                 />
               </Tooltips>
             </div>
-            <div className="flex items-center gap-1 flex-grow  mx-2">
               {isActive && (
+            <div className="">
                 <button
-                  className="align-middle select-none font-sans font-bold text-center uppercase transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-1 px-2 rounded-full bg-blue-600 text-white shadow-md shadow-blue-600/10 hover:shadow-lg hover:shadow-blue-600/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none flex-shrink-0 w-fit md:w-[100%] md:min-w-[80px] md:max-w-[200px]"
+                  className="w-fit align-middle select-none font-poppins font-medium text-center uppercase transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-2 px-3 rounded-full bg-blue-600 text-white shadow-md shadow-blue-600/10 hover:shadow-lg hover:shadow-blue-600/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none"
                   type="button"
                   onClick={voteOnchain}
                   disabled={hasVoted}
                 >
                   Vote onchain
                 </button>
-              )}
             </div>
-            <div className="flex-shrink-0 mt-2 md:mt-0">
+              )}
+            <div className="flex-shrink-0">
               <div
                 className={`rounded-full flex items-center justify-center text-xs py-1 px-2 font-medium ${status
-                    ? status === "Closed"
-                      ? "bg-[#f4d3f9] border border-[#77367a] text-[#77367a]"
-                      : "bg-[#f4d3f9] border border-[#77367a] text-[#77367a]"
-                    : "bg-gray-200 animate-pulse rounded-full"
+                  ? status === "Closed"
+                    ? "bg-[#f4d3f9] border border-[#77367a] text-[#77367a]"
+                    : "bg-[#f4d3f9] border border-[#77367a] text-[#77367a]"
+                  : "bg-gray-200 animate-pulse rounded-full"
                   }`}
               >
                 {status ? status : <div className="h-4 w-16"></div>}
               </div>
             </div>
+          </div>
+          <div className="w-full mb-4 md:mb-0">
+          <div className="flex gap-2 items-center">
+            {loading ? (
+              <div className="h-5 bg-gray-200 animate-pulse w-[50vw] rounded-full"></div>
+            ) : (
+              <p className="text-xl md:text-2xl font-semibold">{formattedTitle}</p>
+            )}
+          </div>
           </div>
           <VotingPopup
             isOpen={isVotingOpen}
@@ -987,7 +991,6 @@ function ProposalMain({ props }: { props: Props }) {
             address={address || ""}
             dao={props.daoDelegates}
           />
-        </div>
 
         <div className="flex gap-1 my-1 items-center">
           <div className="flex text-xs font-normal items-center">
@@ -997,16 +1000,16 @@ function ProposalMain({ props }: { props: Props }) {
               <div className="animate-pulse bg-gray-200  h-4 w-32 rounded-full"></div>
             )}
           </div>
-          {isLoading? (
+          {isLoading ? (
             <div
-              className={`rounded-full flex items-center justify-center text-xs h-fit py-0.5 border font-medium w-24 bg-gray-200 animate-pulse rounded-full`}
+              className={`rounded-full flex items-center justify-center text-xs h-fit py-0.5 border font-medium w-24 bg-gray-200 animate-pulse`}
             >
-               <div className="h-5 w-20"></div>
+              <div className="h-5 w-20"></div>
             </div>) : (
             <div
               className={`rounded-full flex items-center justify-center text-xs h-fit py-0.5 border font-medium w-24 ${Proposalstatus
-                  ? getStatusColor(Proposalstatus)
-                  : "bg-gray-200 animate-pulse rounded-full"
+                ? getStatusColor(Proposalstatus)
+                : "bg-gray-200 animate-pulse rounded-full"
                 }`}
             >
               {Proposalstatus ? Proposalstatus : <div className="h-5 w-20"></div>}
@@ -1056,8 +1059,8 @@ function ProposalMain({ props }: { props: Props }) {
             ) : (
               <div
                 className={`flex flex-col gap-2 py-3 pl-2 pr-1  xl:pl-3 xl:pr-2 my-3 border-gray-200 ${voterList.length > 5
-                    ? `h-[440px] overflow-y-auto ${style.scrollbar}`
-                    : "h-fit"
+                  ? `h-[440px] overflow-y-auto ${style.scrollbar}`
+                  : "h-fit"
                   }`}
               >
                 {voterList.length === 0 ? (
@@ -1100,14 +1103,12 @@ function ProposalMain({ props }: { props: Props }) {
                         </div>
                         <div className="flex items-center space-x-4">
                           <div
-                            className={`xl:px-4 px-2 py-2 rounded-full xl:text-sm xl:w-36 w-25 flex items-center justify-center xl:font-medium text-xs ${voter.support === 1 || voter.type === "for"
-                                ? "bg-green-100 text-green-800"
-                                : "bg-red-100 text-red-800"
+                            className={`xl:px-4 px-2 py-2 rounded-full xl:text-sm xl:w-36 w-25 flex items-center justify-center xl:font-medium text-xs ${voter.support === 1 ? "bg-green-100 text-green-800" : voter.support === 0 ? "bg-red-100 text-red-800" : "bg-blue-100 text-blue-800"
                               }`}
                           >
                             {formatWeight(voter.weight / 10 ** 18)}
                             &nbsp;
-                            {voter.support === 1 ? "For" : "Against"}
+                            {voter.support === 1 ? "For" : voter.support === 0 ? "Against" : "Abstain"}
                           </div>
                           <Tooltips
                             showArrow

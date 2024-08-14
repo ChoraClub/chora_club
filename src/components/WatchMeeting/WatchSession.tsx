@@ -19,10 +19,11 @@ import { useRouter } from "next-nprogress-bar";
 import "./WatchSession.module.css";
 import ShareMediaModal from "./ShareMediaModal";
 import { BASE_URL } from "@/config/constants";
-import { Toaster } from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
 import { Tooltip } from "@nextui-org/react";
 import { getEnsName } from "@/utils/ENSUtils";
-
+import RecordedSessionsTile from '../ComponentUtils/RecordedSessionsTile'
+import RecordedSessionsSpecificSkeletonLoader from '../SkeletonLoader/RecordedSessionsSpecificSkeletonLoader'
 interface ProfileInfo {
   _id: string;
   address: string;
@@ -106,7 +107,8 @@ function WatchSession({
   const [ensHostName, setEnsHostName] = useState<any>(null);
   const [shareModal, setShareModal] = useState(false);
   const router = useRouter();
-
+  const [meetings, setMeetings] = useState<Meeting[]>([]);
+  const [dataLoading, setDataLoading] = useState(true);
   const handleShareClose = () => {
     setShareModal(false);
   };
@@ -158,23 +160,6 @@ function WatchSession({
     return lines.length;
   };
 
-  // const getLineCount = (text: string) => {
-  //   if (typeof text !== 'string') {
-  //     return 0;
-  //   }
-
-  //   const lines = text.split('\n');
-  //   let lineCount = 0;
-
-  //   for (let line of lines) {
-  //     line = line.trim();
-  //     if (line.length > 0) {
-  //       lineCount++;
-  //     }
-  //   }
-
-  //   return lineCount;
-  // };
   useEffect(() => {
     const fetchEnsName = async () => {
       const name = await getEnsName(data.host_address.toLowerCase());
@@ -183,6 +168,37 @@ function WatchSession({
 
     fetchEnsName();
   }, [data.host_address]);
+
+  function getUniqueRandomItems<T>(arr: T[], num: number): T[] {
+    // Convert array to a Set to ensure uniqueness
+    const uniqueItems = Array.from(new Set(arr));
+    
+    // Shuffle the unique items
+    const shuffled = uniqueItems.sort(() => 0.5 - Math.random());
+    
+    // Return the first 'num' items
+    return shuffled.slice(0, num);
+}
+  useEffect(() => {
+    const fetchMeetings = async () => {
+      try {
+        const response = await fetch('/api/get-recorded-meetings');
+        const meeting = await response.json();
+        console.log(meeting);
+
+        const filteredMeetings = meeting.data.filter((meeting:any)=> meeting.dao_name === data.dao_name);
+        const randomMeetings:Meeting[] = getUniqueRandomItems(filteredMeetings, 3);
+
+        setMeetings(randomMeetings);
+        setDataLoading(false);
+      } catch (error) {
+        setDataLoading(false);
+        console.error('Failed to fetch meetings', error);
+      }
+    };
+
+    fetchMeetings();
+  }, []);
 
   return (
     <div className="">
@@ -234,12 +250,20 @@ function WatchSession({
                   >
                     <Link
                       href={
-                        data.dao_name === ("optimism" || "Optimism")
+                        data.uid_host
+                        ? data.dao_name === ("optimism" || "Optimism")
                           ? `https://optimism.easscan.org/offchain/attestation/view/${data.uid_host}`
                           : data.dao_name === ("arbitrum" || "Arbitrum")
                           ? `https://arbitrum.easscan.org/offchain/attestation/view/${data.uid_host}`
                           : ""
+                        : "#"
                       }
+                      onClick={(e) => {
+                        if (!data.uid_host) {
+                          e.preventDefault();
+                          toast.error("Offchain attestation not available");
+                        }
+                      }}
                       target="_blank"
                     >
                       <Image
@@ -264,12 +288,20 @@ function WatchSession({
                   >
                     <Link
                       href={
-                        data.dao_name === ("optimism" || "Optimism")
+                        data.onchain_host_uid 
+                        ? data.dao_name === ("optimism" || "Optimism")
                           ? `https://optimism.easscan.org/attestation/view/${data.onchain_host_uid}`
                           : data.dao_name === ("arbitrum" || "Arbitrum")
                           ? `https://arbitrum.easscan.org/attestation/view/${data.onchain_host_uid}`
                           : ""
+                        : "#"
                       }
+                      onClick={(e) => {
+                        if (!data.onchain_host_uid ) {
+                          e.preventDefault();
+                          toast.error("Onchain attestation not available");
+                        }
+                      }}
                       target="_blank"
                     >
                       <Image
@@ -337,7 +369,6 @@ function WatchSession({
               </div>
             </div>
           </div>
-
           <div>
             <div
               className="flex items-center border border-[#8E8E8E] bg-white w-fit rounded-md px-3 font-medium py-1 gap-2 cursor-pointer"
@@ -347,8 +378,8 @@ function WatchSession({
               <div
                 className={
                   showPopup
-                    ? "rotate-180 duration-200 ease-in-out"
-                    : "duration-200 ease-in-out"
+                  ? "rotate-180 duration-200 ease-in-out"
+                  : "duration-200 ease-in-out"
                 }
               >
                 <IoMdArrowDropdown color="#4F4F4F" />
@@ -474,15 +505,8 @@ function WatchSession({
             <div
               className={`px-6 pt-4 pb-4 rounded-b-3xl bg-white text-[#1E1E1E]`}
             >
-              <>
-                {/* <div
-                className={`${
-                  isExpanded ? "max-h-full" : "max-h-24 line-clamp-3"
-                } transition-[max-height] duration-500 ease-in-out `}
-              >
-                {data.description}
-              </div> */}
-                <div
+              <>                
+              <div
                   ref={contentRef}
                   className={`max-h-full transition-max-height duration-500 ease-in-out overflow-hidden ${
                     isExpanded ? "max-h-full" : "max-h-24 line-clamp-3"
@@ -507,6 +531,20 @@ function WatchSession({
           )
         )}
       </div>
+      <div className="flex justify-between mt-5">
+          <p className="text-lg font-medium text-blue-shade-100">
+            Video Recommendations
+          </p>
+          
+        <Link href={"/sessions?active=recordedSessions"} className="text-[10px] text-blue-shade-100 bg-blue-shade-700 rounded py-1 px-2 border border-blue-shade-100 flex items-center justify-center cursor-pointer">
+          View All
+        </Link>
+        </div>
+      {dataLoading ? (
+        <RecordedSessionsSpecificSkeletonLoader itemCount={3} gridCols="2xl:grid-cols-3"/>
+      ) :  (
+        <RecordedSessionsTile meetingData={meetings} gridCols="2xl:grid-cols-3"/>)
+      }
       {modalOpen && (
         <ReportOptionModal
           data={data}
@@ -515,18 +553,6 @@ function WatchSession({
           onClose={handleModalClose}
         />
       )}
-      {/* <Toaster
-        toastOptions={{
-          style: {
-            fontSize: "14px",
-            backgroundColor: "#3E3D3D",
-            color: "#fff",
-            boxShadow: "none",
-            borderRadius: "50px",
-            padding: "3px 5px",
-          },
-        }}
-      /> */}
 
       {shareModal && (
         <ShareMediaModal

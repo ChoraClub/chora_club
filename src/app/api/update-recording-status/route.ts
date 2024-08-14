@@ -29,7 +29,8 @@ export async function PUT(req: NextRequest, res: NextResponse) {
           $set: {
             isMeetingRecorded: recordedStatus,
           },
-        }
+        },
+        { returnDocument: "after" }
       );
 
       client.close();
@@ -43,8 +44,47 @@ export async function PUT(req: NextRequest, res: NextResponse) {
             isMeetingRecorded: recordedStatus,
             meeting_status: meetingStatus,
           },
-        }
+        },
+        { returnDocument: "after" }
       );
+
+      if (sessions) {
+        console.log("sessions: ", sessions);
+        const updatedDocument = sessions;
+        const { host_address, attendees } = updatedDocument;
+
+        // Update the delegate collection to increase sessionRecords.hostedRecords.totalMeetings count
+        const delegateCollection = db.collection("delegates");
+        const delegateUpdateResult = await delegateCollection.findOneAndUpdate(
+          { address: host_address },
+          {
+            $inc: { "meetingRecords.sessionHosted.totalHostedMeetings": 1 },
+          },
+          { returnDocument: "after", upsert: true } // Ensures the document is created if it doesn't exist
+        );
+
+        const attendeeUpdates = attendees.map(async (attendee: any) => {
+          const { attendee_address } = attendee;
+          return await delegateCollection.findOneAndUpdate(
+            { address: attendee_address },
+            {
+              $inc: {
+                "meetingRecords.sessionAttended.totalAttendedMeetings": 1,
+              },
+              // $setOnInsert: {
+              //   "meetingRecords.sessionAttended.offchainCount": 0,
+              //   "meetingRecords.sessionAttended.onchainCount": 0,
+              //   "meetingRecords.hostedRecords.offchainCount": 0,
+              //   "meetingRecords.hostedRecords.onchainCount": 0,
+              //   "meetingRecords.hostedRecords.totalMeetings": 0,
+              // },
+            },
+            { returnDocument: "after", upsert: true }
+          );
+        });
+
+        const updatedAttendees = await Promise.all(attendeeUpdates);
+      }
 
       client.close();
 

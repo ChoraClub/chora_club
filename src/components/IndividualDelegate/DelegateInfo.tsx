@@ -87,7 +87,6 @@ function DelegateInfo({ props, desc }: { props: Type; desc: string }) {
             ) {
               sessionHostingCount++;
             }
-            // console.log("op host count: ", sessionHostingCount);
             setSessionHostCount(sessionHostingCount);
             setSessionHostedLoading(false);
           });
@@ -123,7 +122,6 @@ function DelegateInfo({ props, desc }: { props: Type; desc: string }) {
             ) {
               sessionAttendingCount++;
             }
-            // console.log("op attended count: ", sessionAttendingCount);
             setSessionAttendCount(sessionAttendingCount);
             setSessionAttendedLoading(false);
           });
@@ -243,8 +241,14 @@ function DelegateInfo({ props, desc }: { props: Type; desc: string }) {
       ));
   };
 
-  const convertMarkdownToHtml = async(markdown: string):Promise<string> => {
-    return await marked.parse(markdown);
+  const convertMarkdownToHtml = async (markdown: string): Promise<string> => {
+    let html = await marked.parse(markdown);
+    
+    html = html.replace(/<pre>([\s\S]*?)<\/pre>/g, (match, content) => {
+      return `<div class="${styles.preFormatted}">${content}</div>`;
+    });
+  
+    return html;
   };
 
   useEffect(() => {
@@ -282,7 +286,6 @@ function DelegateInfo({ props, desc }: { props: Type; desc: string }) {
             headers: {
               "Content-Type": "application/json",
             },
-            // body: JSON.stringify({ individualDelegate: props.individualDelegate }),
           }
         );
 
@@ -293,8 +296,6 @@ function DelegateInfo({ props, desc }: { props: Type; desc: string }) {
         const data = await res.json();
         const statement = data.statement.payload.delegateStatement;
         console.log("statement", statement);
-        // setOpAgoraDescription(statement);
-        // setConvertedDescription(convertMarkdownToHtml(statement));
         const statementHtml = await convertMarkdownToHtml(statement);
         setOpAgoraDescription(statement);
         setConvertedDescription(statementHtml);
@@ -394,53 +395,10 @@ function DelegateInfo({ props, desc }: { props: Type; desc: string }) {
         ) : desc !== "" && desc !== null ? (
           desc
         ) :
-        // props.daoDelegates === 'optimism' && opAgoraDescription ? ( // Check for opAgoraDescription
-        //   renderParagraphs(opAgoraDescription)
-//           <div
-//       dangerouslySetInnerHTML={{
-//         __html: opAgoraDescription
-//           // // .replace(/### (.*)/g, '<h3>$1</h3><br/>')
-//           // // .replace(/## (.*)/g, '<h2>$1</h2>')
-//           // .replace(/\*\*\*\*(.*)\*\*\*\*/g, '<br/><strong>$1</strong><br/>')
-//           // .replace(/\*\*(.*)\*\*/g, '<br/><strong>$1</strong><br/>')
-//           // .replace(/- (.*)/g, '<li>$1</li>')
-//           // // .replace(/\n/g, '<br />'),
-//           // // .replace(/###\*\*(.*)\*\*/g, '<br/><h3><strong>$1<strong></h3><br/>')
-//           // // .replace(/###\*\*\*\*(.*)\*\*\*\*/g, '<br/><h3><strong><strong>$1</strong></strong></h3><br/>')
-//           // // .replace(/##\*\*\*\*(.*)\*\*\*\*/g, '<br/><h2><strong><strong>$1</strong></strong></h2><br/>')
-//           // // .replace(/##\*\*(.*)\*\*/g, '<br/><h2><strong>$1<strong></h2><br/>')
-//           // .replace(/### (.*)/g, '<br/><h3>$1</h3><br/>')
-//           // .replace(/## (.*)/g, '<br/><h2>$1</h2><br/>')
-//           // .replace(/\*(.*)/g, '<li>$1</li>')
-//           // .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" style="text-decoration: underline;">$1</a>')
-
-
-//           // .replace(/### (.*)/g, '<h3 style="font-size:22px">$1</h3>')
-//           // .replace(/## (.*)/g, '<h2 style="font-size:22px">$1</h2>')
-//           .replace(/### (.*?)\n/g, '<h3 style="font-size:18px;line-height:1;display:block;margin:0;font-weight:500">$1</h3>')
-// .replace(/## (.*?)\n/g, '<h2 style="font-size:18px;line-height:1;display:block;margin:0;font-weight:600">$1</h2>')
-//           .replace(/\*\*\*(.*)\*\*\*/g, '<strong>$1</strong>')
-//           .replace(/\*\*(.*)\*\*/g, '<strong style="font-size:18px">$1</strong>')
-//           .replace(/- (.*)/g, '<li>$1</li>')
-//           .replace(/\* (.*)/g, '<li style="margin-top: 1rem;margin-bottom:-1rem">$1</li>')
-//           .replace(
-//             /\[(.*?)\]\((.*?)\)/g,
-//             '<a href="$2" target="_blank" style="text-decoration: underline;">$1</a>'
-//           )
-//           .replace(/\n/g, '<br/>')
-//           // .replace(/\*\*(.*)\*\*/g, '<strong>$1</strong>')
-//           .replace(/\*([^*]*)\*/g, '<h2>$1</h2>')
-//           .replace(/(\*{3})(.*)\1/g, '<strong>$2</strong>')
-//           .replace(/(?<!<h3.*?>)\n(?!<\/h3>)/g, '<br/>')
-//           .replace(/(?<!<h2.*?>)\n(?!<\/h2>)/g, '<br/>')
-//       }}
-//     />
-        // ) : karmaDescription ? (
-        //   renderParagraphs(karmaDescription)
         convertedDescription ? (
-          <div dangerouslySetInnerHTML={{ __html: convertedDescription }} className={`${styles.delegateStatement} rounded-xl my-7 me-32 py-6 px-7 text-sm`} />
+          <div dangerouslySetInnerHTML={{ __html: convertedDescription }} className={`${styles.delegateStatement} rounded-xl me-32 py-6 px-7 text-sm`} />
         ) : (
-          <div className="font-semibold text-base flex justify-center items-center">
+          <div className="font-semibold text-base flex justify-center items-center mt-7">
             Delegate has not provided a description
           </div>
         )}

@@ -5,44 +5,13 @@ import texture1 from "@/assets/images/daos/texture1.png";
 import oplogo from "@/assets/images/daos/op.png";
 import arblogo from "@/assets/images/daos/arbitrum.jpg";
 import arbcir from "@/assets/images/daos/arbCir.png";
-import user from "@/assets/images/daos/user3.png";
-import { Tooltip } from "@nextui-org/react";
-import { IoCopy } from "react-icons/io5";
 import toast, { Toaster } from "react-hot-toast";
 import copy from "copy-to-clipboard";
-import styles from "./RecordedSessions.module.css";
-import { Oval } from "react-loader-spinner";
-// import { parseISO } from "date-fns";
-// import { useRouter } from "next/navigation";
 import { useRouter } from "next-nprogress-bar";
-import user1 from "@/assets/images/user/user1.svg";
-import user2 from "@/assets/images/user/user2.svg";
-import user3 from "@/assets/images/user/user3.svg";
-import user4 from "@/assets/images/user/user4.svg";
-import user5 from "@/assets/images/user/user5.svg";
-import user6 from "@/assets/images/user/user6.svg";
-import user7 from "@/assets/images/user/user7.svg";
-import user8 from "@/assets/images/user/user8.svg";
-import user9 from "@/assets/images/user/user9.svg";
-
-interface SessionData {
-  session: {
-    attendees: {
-      attendee_address: string;
-    }[];
-    host_address: string;
-  };
-  guestInfo: {
-    image: string | null;
-  };
-  hostInfo: {
-    image: string | null;
-  };
-}
-import Head from "next/head";
-// import { getEnsName, getEnsNameOfUser } from "../ConnectWallet/ENSResolver";
 import RecordedSessionsTile from "../ComponentUtils/RecordedSessionsTile";
 import RecordedSessionsSkeletonLoader from "../SkeletonLoader/RecordedSessionsSkeletonLoader";
+import ErrorDisplay from "../ComponentUtils/ErrorDisplay";
+import { TimeoutError } from "viem";
 
 function RecordedSessions() {
   // const parseISO = dateFns;
@@ -57,131 +26,71 @@ function RecordedSessions() {
   const [videoDurations, setVideoDurations] = useState<any>({});
   const [searchMeetingData, setSearchMeetingData] = useState<any>([]);
   const [activeButton, setActiveButton] = useState("all");
+  const [error, setError] = useState<string | null>(null);
 
-  const handleCopy = (addr: string) => {
-    copy(addr);
-    toast("Address Copied");
+  const handleRetry = () => {
+    setError(null);
+    getRecordedMeetings();
+    window.location.reload();
+  };
+
+  const getRecordedMeetings = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const response = await fetch(`/api/get-recorded-meetings`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const resultData = await response.json();
+
+      if (resultData.success) {
+        setMeetingData(resultData.data);
+        setSearchMeetingData(resultData.data);
+      } else {
+        throw new Error(resultData.message || "Failed to fetch meeting data");
+      }
+    } catch (error) {
+      console.log("error in catch", error);
+      if (error instanceof TypeError && error.message === "Failed to fetch") {
+        setError("Please check your internet connection and try again.");
+      } else if (error instanceof TimeoutError) {
+        setError(
+          "The request is taking longer than expected. Please try again."
+        );
+      } else if (error instanceof SyntaxError) {
+        setError(
+          "We're having trouble processing the data. Please try again later."
+        );
+      } else {
+        setError(
+          "Unable to load recorded meetings. Please try again in a few moments."
+        );
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
-    const getRecordedMeetings = async () => {
-      try {
-        const response = await fetch(`/api/get-recorded-meetings`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-
-        const resultData = await response.json();
-        // console.log("result data: ", resultData);
-
-        if (resultData.success) {
-          console.log("result data: ", resultData.data);
-          setMeetingData(resultData.data);
-          setSearchMeetingData(resultData.data);
-          setIsLoading(false);
-        }
-      } catch (error) {
-        console.log("error in catch", error);
-      }
-    };
     getRecordedMeetings();
   }, []);
-
-  // const formatTimeAgo = (utcTime: string): string => {
-  //   const parsedTime = parseISO(utcTime);
-  //   const currentTime = new Date();
-  //   const differenceInSeconds = Math.abs(
-  //     (parsedTime.getTime() - currentTime.getTime()) / 1000
-  //   );
-
-  //   if (differenceInSeconds < 60) {
-  //     return "Just now";
-  //   } else if (differenceInSeconds < 3600) {
-  //     const minutes = Math.round(differenceInSeconds / 60);
-  //     return `${minutes} minute${minutes === 1 ? "" : "s"} ago`;
-  //   } else if (differenceInSeconds < 86400) {
-  //     const hours = Math.round(differenceInSeconds / 3600);
-  //     return `${hours} hour${hours === 1 ? "" : "s"} ago`;
-  //   } else if (differenceInSeconds < 604800) {
-  //     const days = Math.round(differenceInSeconds / 86400);
-  //     return `${days} day${days === 1 ? "" : "s"} ago`;
-  //   } else if (differenceInSeconds < 31536000) {
-  //     const weeks = Math.round(differenceInSeconds / 604800);
-  //     return `${weeks} week${weeks === 1 ? "" : "s"} ago`;
-  //   } else {
-  //     const years = Math.round(differenceInSeconds / 31536000);
-  //     return `${years} year${years === 1 ? "" : "s"} ago`;
-  //   }
-  // };
-
-  // const handleTimeUpdate = (video: HTMLVideoElement, index: number) => {
-  //   const duration = video.duration;
-  //   const currentTime = video.currentTime;
-  //   const progressBar = document.querySelectorAll(".progress-bar")[index];
-
-  //   if (progressBar) {
-  //     const progressDiv = progressBar as HTMLDivElement;
-  //     const percentage = (currentTime / duration) * 100;
-  //     console.log("percentage: ", percentage);
-  //     progressDiv.style.width = `${percentage}%`;
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   if (hoveredVideo !== null && videoRefs.current[hoveredVideo]) {
-  //     const videoElement = videoRefs.current[hoveredVideo];
-  //     const progressBar = document.getElementById(
-  //       `progressBar-${hoveredVideo}`
-  //     );
-
-  //     const handleTimeUpdate = (e: any) => {
-  //       const { currentTime, duration } = e.target;
-  //       const progressPercentage = (currentTime / duration) * 100;
-
-  //       if (progressBar) {
-  //         progressBar.style.width = `${progressPercentage}%`;
-  //       }
-  //     };
-
-  //     videoElement.addEventListener("timeupdate", handleTimeUpdate);
-
-  //     // Clean up the event listener when the component unmounts or video changes
-  //     return () => {
-  //       videoElement.removeEventListener("timeupdate", handleTimeUpdate);
-  //     };
-  //   }
-  // }, [hoveredVideo]);
-
-  // const handleLoadedMetadata = (index: any, e: any) => {
-  //   const duration = e.target.duration;
-  //   setVideoDurations((prev: any) => ({ ...prev, [index]: duration })); // Store the duration
-  // };
-
-  // const formatVideoDuration = (duration: any) => {
-  //   const hours = Math.floor(duration / 3600);
-  //   const minutes = Math.floor((duration % 3600) / 60);
-  //   const seconds = Math.floor(duration % 60);
-
-  //   const formattedDuration =
-  //     (hours > 0 ? `${hours}:` : "") +
-  //     `${minutes.toString().padStart(2, "0")}:` +
-  //     `${seconds.toString().padStart(2, "0")}`;
-
-  //   return formattedDuration;
-  // };
 
   const handleSearchChange = (query: string) => {
     setSearchQuery(query);
     if (query) {
       const filtered = searchMeetingData.filter((item: any) => {
-        // Convert both query and userAddress to lowercase for case-insensitive matching
         const lowercaseQuery = query.toLowerCase();
         const lowercaseAddress = item.host_address.toLowerCase();
         const lowercaseTitle = item.title.toLowerCase();
 
-        // Check if the lowercase userAddress includes the lowercase query
         return (
           lowercaseAddress.includes(lowercaseQuery) ||
           lowercaseTitle.includes(lowercaseQuery)
@@ -207,6 +116,14 @@ function RecordedSessions() {
       setMeetingData(searchMeetingData);
     }
   };
+
+  if (error) {
+    return (
+      <div className="flex justify-center items-center min-h-[400px]">
+        <ErrorDisplay message={error} onRetry={handleRetry} />
+      </div>
+    );
+  }
 
   return (
     <>
@@ -272,23 +189,13 @@ function RecordedSessions() {
           <div className="flex flex-col justify-center items-center pt-10">
             <div className="text-5xl">☹️</div>{" "}
             <div className="pt-4 font-semibold text-lg">
-              Oops, no such result available!
+              {searchQuery
+                ? `No search results found for "${searchQuery}"`
+                : "Oops, no such result available!"}
             </div>
           </div>
         )}
       </div>
-      {/* <Toaster
-        toastOptions={{
-          style: {
-            fontSize: "14px",
-            backgroundColor: "#3E3D3D",
-            color: "#fff",
-            boxShadow: "none",
-            borderRadius: "50px",
-            padding: "3px 5px",
-          },
-        }}
-      /> */}
     </>
   );
 }

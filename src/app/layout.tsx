@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import localFonts from "next/font/local";
 import "./globals.css";
-import { NextUIProvider } from "@nextui-org/react";
+// import { NextUIProvider } from "@nextui-org/react";
 import SidebarMain from "@/components/MainSidebar/SidebarMain";
 import RootProviders from "./providers/root-providers";
 import HuddleContextProvider from "@/context/HuddleContextProvider";
@@ -11,7 +11,7 @@ import FeedbackTile from "@/components/ComponentUtils/FeedbackTile";
 import Script from "next/script";
 import ProgressBarProvider from "@/components/ProgressBarProvider/ProgressBarProvider";
 import MobileResponsiveMessage from "@/components/MobileResponsiveMessage/MobileResponsiveMessage";
-
+import { GoogleTagManager } from '@next/third-parties/google';
 const poppins = Poppins({
   subsets: ["latin"],
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
@@ -73,7 +73,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <script
+        {/* <script
           dangerouslySetInnerHTML={{
             __html: `
        (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -83,10 +83,20 @@ export default function RootLayout({
           })(window,document,'script','dataLayer','GTM-W5684W77');
           `,
           }}
+        ></script> */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+        !function(){var i="analytics",analytics=window[i]=window[i]||[];if(!analytics.initialize)if(analytics.invoked)window.console&&console.error&&console.error("Segment snippet included twice.");else{analytics.invoked=!0;analytics.methods=["trackSubmit","trackClick","trackLink","trackForm","pageview","identify","reset","group","track","ready","alias","debug","page","screen","once","off","on","addSourceMiddleware","addIntegrationMiddleware","setAnonymousId","addDestinationMiddleware","register"];analytics.factory=function(e){return function(){if(window[i].initialized)return window[i][e].apply(window[i],arguments);var n=Array.prototype.slice.call(arguments);if(["track","screen","alias","group","page","identify"].indexOf(e)>-1){var c=document.querySelector("link[rel='canonical']");n.push({__t:"bpc",c:c&&c.getAttribute("href")||void 0,p:location.pathname,u:location.href,s:location.search,t:document.title,r:document.referrer})}n.unshift(e);analytics.push(n);return analytics}};for(var n=0;n<analytics.methods.length;n++){var key=analytics.methods[n];analytics[key]=analytics.factory(key)}analytics.load=function(key,n){var t=document.createElement("script");t.type="text/javascript";t.async=!0;t.setAttribute("data-global-segment-analytics-key",i);t.src="https://cdn.segment.com/analytics.js/v1/" + key + "/analytics.min.js";var r=document.getElementsByTagName("script")[0];r.parentNode.insertBefore(t,r);analytics._loadOptions=n};analytics._writeKey="YRKGm8yZxOeOoTPDzshMBCC7SQq2FyEi";;analytics.SNIPPET_VERSION="5.2.0";
+  analytics.load("YRKGm8yZxOeOoTPDzshMBCC7SQq2FyEi");
+  analytics.page();
+  }}();`,
+          }}
         ></script>
+        
       </head>
       <body className={`${quanty.variable} ${poppins.variable}`}>
-        <noscript
+        {/* <noscript
           dangerouslySetInnerHTML={{
             __html: `
           <iframe
@@ -97,7 +107,7 @@ export default function RootLayout({
           ></iframe>
         `,
           }}
-        />
+        /> */}
         <ProgressBarProvider>
           <RootProviders>
             <HuddleContextProvider>
@@ -128,6 +138,7 @@ export default function RootLayout({
           </RootProviders>
         </ProgressBarProvider>
       </body>
+      <GoogleTagManager gtmId="GTM-5KX3QH8T" />
     </html>
   );
 }
