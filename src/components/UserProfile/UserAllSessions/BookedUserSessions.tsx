@@ -8,10 +8,8 @@ import { FaCircleCheck, FaCircleXmark, FaCirclePlay } from "react-icons/fa6";
 import { Tooltip } from "@nextui-org/react";
 import EventTile from "../../ComponentUtils/EventTile";
 import { useAccount, useNetwork } from "wagmi";
-import toast, { Toaster } from "react-hot-toast";
-import { Oval } from "react-loader-spinner";
-import SessionTileSkeletonLoader from "@/components/SkeletonLoader/SessionTileSkeletonLoader";
 import ErrorDisplay from "@/components/ComponentUtils/ErrorDisplay";
+import RecordedSessionsSkeletonLoader from "@/components/SkeletonLoader/RecordedSessionsSkeletonLoader";
 
 interface Session {
   booking_status: string;
@@ -89,7 +87,7 @@ function BookedUserSessions({ daoName }: { daoName: string }) {
     <>
       <div className="space-y-6">
         {pageLoading ? (
-          <SessionTileSkeletonLoader />
+          <RecordedSessionsSkeletonLoader />
         ) : sessionDetails.length > 0 ? (
           <div className={`grid min-[475px]:grid-cols- md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-10 py-8 font-poppins`}>
           {sessionDetails.map((data, index) => (
