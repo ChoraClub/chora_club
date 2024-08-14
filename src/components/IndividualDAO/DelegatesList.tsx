@@ -1,7 +1,7 @@
 "use client";
 
 import Image, { StaticImageData } from "next/image";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import search from "@/assets/images/daos/search.png";
 import OPLogo from "@/assets/images/daos/op.png";
 import ARBLogo from "@/assets/images/daos/arbitrum.jpg";
@@ -67,7 +67,8 @@ function DelegatesList({ props }: { props: string }) {
   const { chain, chains } = useNetwork();
   const [delegateInfo, setDelegateInfo] = useState<any>();
   const [selectedDelegate, setSelectedDelegate] = useState<any>(null);
-
+  const [skip, setSkip] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
   const address = useAccount();
 
   const handleRetry = () => {
@@ -100,23 +101,6 @@ function DelegatesList({ props }: { props: string }) {
     setIsShowing(false);
     sessionStorage.setItem("KarmaCreditClosed", JSON.stringify(true));
   };
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       console.log("inside useEffect");
-
-  //       const [avatar] = await Promise.all([
-  //         fetchEnsAvatar("0x5e349eca2dc61abcd9dd99ce94d04136151a09ee"),
-  //       ]);
-
-  //       console.log("avatar...", avatar);
-  //     } catch (error) {
-  //       console.error("Error fetching ENS avatar:", error);
-  //     }
-  //   };
-
-  //   fetchData();
-  // }, []);
 
   useEffect(() => {
     const KarmaCreditClosed = JSON.parse(
@@ -125,101 +109,16 @@ function DelegatesList({ props }: { props: string }) {
     setIsShowing(!KarmaCreditClosed);
   }, []);
 
-  useEffect(() => {
-    const fetchData = async (lastCursor: string | null) => {
-      try {
-        // throw new Error(`fake error :${TimeoutError}`)
-        setDataLoading(true);
-        console.log("its props", props);
-        console.log("currentPage", currentPage);
-        const res = await fetch(
-          props === "arbitrum"
-            ? `/api/get-arbitrum-delegatelist?lastCursor=${lastCursor || ""}`
-            : `/api/get-delegatelist?currentPage=${currentPage}`
-        );
-        console.log("res", res);
-        if (!res.ok) {
-          throw new Error(`HTTP error! status: ${res.status}`);
-        }
-
-        const daoInfo = await res.json();
-
-        let formattedDelegates;
-        if (props === "arbitrum") {
-          formattedDelegates = daoInfo.delegates.nodes.map((delegate: any) => {
-            return {
-              delegate: delegate.account.address,
-              adjustedBalance: delegate.votesCount / 10 ** 18,
-              ensName: delegate.account.ens,
-              profilePicture: delegate.account.picture,
-            };
-          });
-        } else {
-          formattedDelegates = await Promise.all(
-            daoInfo.map(async (delegate: any) => {
-              // const ensName = await getEnsNameOfUser(delegate._id);
-              const avatar = await fetchEnsAvatar(delegate._id);
-              // console.log("avatar", avatar);
-              return {
-                delegate: delegate._id,
-                adjustedBalance: delegate.adjustedBalance,
-                newBalance: delegate.newBalance,
-                profilePicture: avatar?.avatar,
-                ensName: avatar?.ensName,
-              };
-            })
-          );
-        }
-
-        setDelegateData((prevData: any) => ({
-          delegates: [...prevData.delegates, ...formattedDelegates],
-        }));
-
-        setTempData((prevData: any) => ({
-          delegates: [...prevData.delegates, ...formattedDelegates],
-        }));
-
-        setLastCursor(daoInfo.delegates?.pageInfo?.lastCursor);
-        setDataLoading(false);
-      } catch (error: any) {
-        console.error("Error fetching data:", error);
-        if (error.name === "TypeError" && error.message === "Failed to fetch") {
-          setError("Please check your internet connection and try again.");
-        } else if (error.name === "TimeoutError") {
-          setError(
-            "The request is taking longer than expected. Please try again."
-          );
-        } else if (error.name === "SyntaxError") {
-          setError(
-            "We're having trouble processing the data. Please try again later."
-          );
-        } else {
-          setError(
-            "Unable to load delegates. Please try again in a few moments."
-          );
-        }
-      } finally {
-        setPageLoading(false);
-        setDataLoading(false);
-      }
-    };
-
-    fetchData(lastCursor || "");
-  }, [currentPage]);
-
-  // let uniqueDelegates = new Set();
-  // useEffect(() => {
+  
   const fetchData = async (lastCursor: string | null) => {
     try {
       setDataLoading(true);
-      console.log("its props", props);
-      console.log("currentPage", currentPage);
       const res = await fetch(
         props === "arbitrum"
           ? `/api/get-arbitrum-delegatelist?lastCursor=${lastCursor || ""}`
-          : `/api/get-delegatelist?currentPage=${currentPage}`
+          : `/api/get-delegate?skip=${skip}`
       );
-      console.log("res", res);
+
       if (!res.ok) {
         throw new Error(`HTTP error! status: ${res.status}`);
       }
@@ -236,14 +135,17 @@ function DelegatesList({ props }: { props: string }) {
           };
         });
       } else {
+
+        setSkip(daoInfo.nextSkip);
+        setHasMore(daoInfo.hasMore);
         formattedDelegates = await Promise.all(
-          daoInfo.map(async (delegate: any) => {
+          daoInfo.delegates.map(async (delegate: any) => {
             // const ensName = await getEnsNameOfUser(delegate._id);
-            const avatar = await fetchEnsAvatar(delegate._id);
+            const avatar = await fetchEnsAvatar(delegate.toDelegate);
             // console.log("avatar", avatar);
             return {
-              delegate: delegate._id,
-              adjustedBalance: delegate.adjustedBalance,
+              delegate: delegate.toDelegate,
+              adjustedBalance: (delegate.newBalance/10**18),
               newBalance: delegate.newBalance,
               profilePicture: avatar?.avatar,
               ensName: avatar?.ensName,
@@ -261,7 +163,7 @@ function DelegatesList({ props }: { props: string }) {
       }));
 
       setLastCursor(daoInfo.delegates?.pageInfo?.lastCursor);
-      console.log("lastCursor", daoInfo);
+
       setDataLoading(false);
       cache[props] = {
         delegates: [...(cache[props]?.delegates || []), ...formattedDelegates],
@@ -273,19 +175,11 @@ function DelegatesList({ props }: { props: string }) {
       setPageLoading(false);
     }
   };
-
-  // fetchData(lastCursor || "");
-  // }, [currentPage]);
-  // useEffect(() => {
-  //   fetchData(lastCursor || "");
-  // },[currentPage]);
-
   useEffect(() => {
     console.log(cache[props]);
     if (cache[props]) {
       console.log("Using cached data");
       // Use cached data if available
-      console.log("pageCache", pageCache);
       console.log(cache[props]);
       setDelegateData(cache[props]);
       setCurrentPage(pageCache + 1);
@@ -316,75 +210,6 @@ function DelegatesList({ props }: { props: string }) {
       timeout = setTimeout(() => func(...args), wait);
     };
   };
-  // const handleSearchChange = async (query: string) => {
-  //   console.log("query: ", query.length);
-
-  //   setSearchQuery(query);
-  //   setPageLoading(true);
-
-  //   if (query.length > 0) {
-  //     // console.log("Delegate data: ", query, delegateData);
-  //     // console.log(delegateData);
-  //     setIsSearching(true);
-  //     window.removeEventListener("scroll", handleScroll);
-  //     console.log(props)
-  //     console.log("lowercasee", query.toLowerCase())
-  //     const res = await fetch(
-  //       props === "optimism" ? `/api/get-delegatelist?user=${query.toLowerCase()}` : `/api/get-arbitrum-delegatelist?user=${query}`
-  //       // `https://api.karmahq.xyz/api/dao/search-delegate?user=${query}&pageSize=10&offset=0&period=lifetime&order=desc&dao=${props}`
-  //     );
-  //     console.log("res: ", res);
-  //     let filtered: any = await res.json();
-  //     filtered.delegate === null ? filtered = [] : null;
-  //     console.log(filtered);
-
-  //     if (props === "optimism") {
-  //       const formattedDelegates = await Promise.all(
-  //         filtered.map(async (delegate: any) => {
-  //           // const ensName = await getEnsNameOfUser(delegate._id);
-  //           return {
-  //             delegate: delegate._id,
-  //             adjustedBalance: delegate.adjustedBalance,
-  //             newBalance: delegate.newBalance,
-  //             // ensName: ensName,
-  //           };
-  //         })
-  //       );
-  //       console.log("formate", formattedDelegates);
-
-  //       setDelegateData({ delegates: [...formattedDelegates] });
-
-  //       setPageLoading(false);
-  //     } else {
-  //       let formattedDelegates: any;
-  //       filtered.delegate ? formattedDelegates = {
-  //         delegate: filtered.delegate?.account.address,
-  //         adjustedBalance: filtered.delegate?.votesCount / 10 ** 18,
-  //         ensName: filtered.delegate?.account.ens,
-  //       } : formattedDelegates = [];
-  //       console.log("formattedDelegates", formattedDelegates)
-  //       // setDelegateData({ delegates: [formattedDelegates] });
-  //       setDelegateData({ delegates: Array.isArray(formattedDelegates) ? formattedDelegates : [formattedDelegates] });
-
-  //       setPageLoading(false);
-
-  //     }
-
-  //   } else {
-
-  //     setIsSearching(false);
-  //     setDelegateData({ ...delegateData, delegates: tempData.delegates });
-  //     setPageLoading(false);
-  //     window.addEventListener("scroll", handleScroll);
-  //   }
-  // };
-  // // Debounced version of handleSearchChange
-  // const debouncedHandleSearchChange = debounce(handleSearchChange, 300); // Delay of 300ms
-
-  // // Use the debounced function instead of handleSearchChange
-  // const handleSearchChangeWithDebounce = async (query: string) => {
-  //   debouncedHandleSearchChange(query);
-  // };
   const handleSearchChange = async (query: string) => {
     // console.log("query: ", query.length);
 
@@ -392,8 +217,6 @@ function DelegatesList({ props }: { props: string }) {
     setPageLoading(true);
 
     if (query.length > 0) {
-      // console.log("Delegate data: ", query, delegateData);
-      // console.log(delegateData);
       setIsSearching(true);
       window.removeEventListener("scroll", handleScroll);
 
@@ -402,13 +225,6 @@ function DelegatesList({ props }: { props: string }) {
           `https://api.karmahq.xyz/api/dao/search-delegate?user=${query}&pageSize=10&offset=0&period=lifetime&order=desc&dao=${props}`
         );
         const filtered = await res.json().then((delegates) => delegates.data);
-
-        // console.log(
-        //   "Filtered Data: ",
-        //   query,
-        //   filtered.delegates[0].publicAddress
-        // );
-
         if (filtered.delegates && filtered.delegates.length > 0) {
           const formattedDelegates = filtered.delegates.map(
             (delegate: any) => ({
@@ -442,18 +258,17 @@ function DelegatesList({ props }: { props: string }) {
     setPageLoading(false);
   };
 
-  const handleScroll = debounce(() => {
-    const { scrollTop, clientHeight, scrollHeight } = document.documentElement;
-    const threshold = 100;
-    if (
-      !isDataLoading &&
-      scrollTop + clientHeight >= scrollHeight - threshold
-    ) {
-      console.log("fetching more data");
-      setCurrentPage((prev) => prev + 1);
-      pageCache = currentPage + 1;
-    }
-  }, 200); // Adjust the debounce wait time as necessary
+ 
+  const handleScroll = useCallback(
+    debounce(() => {
+      const { scrollTop, clientHeight, scrollHeight } = document.documentElement;
+      const threshold = 100;
+      if (scrollTop + clientHeight >= scrollHeight - threshold && !isDataLoading ) {
+        fetchData(lastCursor || "");
+      }
+    }, 200),
+    [fetchData, isDataLoading, hasMore]
+  );
 
   useEffect(() => {
     window.addEventListener("scroll", handleScroll);
@@ -476,20 +291,6 @@ function DelegatesList({ props }: { props: string }) {
     copy(addr);
     toast("Address Copied");
   };
-  // const handleMouseMove = (event:any,index:any) => {
-  //   const rect = event.currentTarget.getBoundingClientRect();
-  //   const x = event.clientX - rect.left;
-  //   const y = event.clientY - rect.top;
-
-  //   setCirclePosition({ x, y });
-  //   setClickedTileIndex(index);
-  //   console.log(circlePosition);
-
-  //   setTimeout(() => {
-  //     setClickedTileIndex(null);
-  //   }, 1500); // Adjust the time as needed
-
-  // };
 
   const WalletOpen = async (to: string) => {
     const adr = await walletClient.getAddresses();
@@ -612,9 +413,7 @@ function DelegatesList({ props }: { props: string }) {
             delegator: address,
           });
         }
-        // const ens = await getEnsNameOfUser(
-        //   data.delegateChangeds[0]?.toDelegate
-        // );
+ 
         console.log("data of individual delegate: ", data.data);
         const delegate = data.data.delegateChangeds[0]?.toDelegate;
         console.log("individualDelegate", delegate);
