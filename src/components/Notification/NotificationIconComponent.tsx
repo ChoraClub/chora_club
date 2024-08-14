@@ -89,13 +89,13 @@ function NotificationIconComponent() {
     }
   }, [address]);
 
-  useEffect(() => {
-    fetchNotifications();
+  // useEffect(() => {
+  //   fetchNotifications();
 
-    const interval = setInterval(fetchNotifications, 3000);
+  //   const interval = setInterval(fetchNotifications, 3000);
 
-    return () => clearInterval(interval);
-  }, [fetchNotifications]);
+  //   return () => clearInterval(interval);
+  // }, [fetchNotifications]);
 
   useEffect(() => {
     if (socket) {
@@ -121,36 +121,6 @@ function NotificationIconComponent() {
           receiver_address: message.receiver_address,
           content: message.content,
           createdAt: message.createdAt,
-          read_status: false,
-          notification_name: message.notification_name,
-          notification_type: message.notification_type,
-          notification_title: message.notification_title,
-        };
-        setNewNotifications((prevNotifications: any) => [
-          ...prevNotifications,
-          notificationData,
-        ]);
-      });
-    }
-
-    return () => {
-      if (socket) {
-        socket.off("new_notification");
-      }
-    };
-  }, [socket, address, socketId]);
-
-  useEffect(() => {
-    const hostAddress = address;
-    if (socket && address && socketId) {
-      socket.emit("register_host", { hostAddress, socketId });
-
-      socket.on("new_notification", (message: Notification) => {
-        const notificationData: Notification = {
-          _id: message?._id,
-          receiver_address: message.receiver_address,
-          content: message.content,
-          createdAt: Date.now(),
           read_status: false,
           notification_name: message.notification_name,
           notification_type: message.notification_type,

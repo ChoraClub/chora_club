@@ -7,6 +7,7 @@ import { FaArrowRight } from "react-icons/fa6";
 import Confetti from "react-confetti";
 import { BsTwitterX } from "react-icons/bs";
 import { useAccount } from "wagmi";
+import StarRating from "../FeedbackPopup/RatingTypes/StarRating";
 
 function AttestationModal({
   isOpen,
@@ -26,15 +27,13 @@ function AttestationModal({
   const [rating, setRating] = useState<number | null>(null);
   const [submitted, setSubmitted] = useState(false);
   const [feedbackStored, setFeedbackStored] = useState(false);
-  const [hoverRating, setHoverRating] = useState<number | null>(null);
+  const [hoverRating, setHoverRating] = useState<number>(0);
   const { address } = useAccount();
 
-  useEffect(() => {
-    const storedStatus = localStorage.getItem("meetingData");
-    if (storedStatus) {
-      localStorage.removeItem("meetingData");
-    }
-  }, []);
+  // const storedStatus = localStorage.getItem("meetingData");
+  // if (storedStatus) {
+  //   localStorage.removeItem("meetingData");
+  // }
 
   const toggleModal = () => {
     if (rating !== null && !feedbackStored) {
@@ -109,14 +108,6 @@ function AttestationModal({
     }
   };
 
-  const handleRatingHover = (value: number) => {
-    setHoverRating(value);
-  };
-
-  const handleRatingMouseOut = () => {
-    setHoverRating(null);
-  };
-
   return (
     <div>
       {isOpen && (
@@ -159,22 +150,13 @@ function AttestationModal({
                         Rate the Host
                       </h3>
                       <div className="flex justify-center space-x-2 py-2">
-                        {[1, 2, 3, 4, 5].map((star) => (
-                          <button
-                            key={star}
-                            className={`text-2xl ${
-                              (hoverRating && hoverRating >= star) ||
-                              (rating && rating >= star)
-                                ? "text-yellow-500"
-                                : "text-gray-300"
-                            }`}
-                            onClick={() => handleRatingClick(star)}
-                            onMouseEnter={() => handleRatingHover(star)}
-                            onMouseLeave={handleRatingMouseOut}
-                          >
-                            ★
-                          </button>
-                        ))}
+                        <StarRating
+                          ratings={[1, 2, 3, 4, 5]}
+                          hoverRating={hoverRating}
+                          currentRating={rating || 0}
+                          setHoverRating={setHoverRating}
+                          handleResponse={handleRatingClick}
+                        />
                       </div>
                     </div>
                   </div>

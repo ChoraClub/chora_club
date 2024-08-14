@@ -45,6 +45,7 @@ import logo from "@/assets/images/daos/CCLogo1.png";
 import Image from "next/image";
 import UpdateSessionDetails from "@/components/MeetingPreview/UpdateSessionDetails";
 import PopupSlider from "@/components/FeedbackPopup/PopupSlider";
+import MeetingRecordingModal from "@/components/ComponentUtils/MeetingRecordingModal";
 
 export default function Component({ params }: { params: { roomId: string } }) {
   const { isVideoOn, enableVideo, disableVideo, stream } = useLocalVideo();
@@ -72,6 +73,8 @@ export default function Component({ params }: { params: { roomId: string } }) {
     layout,
     isScreenShared,
     avatarUrl,
+    isRecording,
+    setIsRecording,
   } = useStudioState();
   const videoRef = useRef<HTMLVideoElement>(null);
   const { peerIds } = usePeerIds({
@@ -95,12 +98,15 @@ export default function Component({ params }: { params: { roomId: string } }) {
   const [showFeedbackPopups, setShowFeedbackPopups] = useState(false);
   const [meetingRecordingStatus, setMeetingRecordingStatus] =
     useState<boolean>();
+  const [showModal, setShowModal] = useState(true);
+  const { sendData } = useDataMessage();
 
   const { state } = useRoom({
     onLeave: async ({ reason }) => {
       if (reason === "CLOSED") {
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
+        setIsRecording(null);
 
         if (address) {
           myHeaders.append("x-wallet-address", address);
@@ -189,6 +195,10 @@ export default function Component({ params }: { params: { roomId: string } }) {
             setReaction("");
           }, 5000);
         }
+      }
+      if (label === "recordingStatus") {
+        const status = JSON.parse(payload).isRecording;
+        setIsRecording(status);
       }
     },
   });
@@ -373,6 +383,43 @@ export default function Component({ params }: { params: { roomId: string } }) {
     console.log("videoTrack", videoTrack);
   }, [videoTrack]);
 
+  // useEffect(() => {
+  //   const storedStatus = localStorage.getItem("meetingData");
+  //   if (storedStatus) {
+  //     const parsedStatus = JSON.parse(storedStatus);
+  //     console.log("storedStatus: ", parsedStatus);
+  //     setRecordingStatus(parsedStatus.isMeetingRecorded);
+  //     setIsRecording(parsedStatus.isMeetingRecorded);
+  //   }
+  //   console.log("recordingStatus: ", recordingStatus);
+  // }, [recordingStatus]);
+
+  const updateRecordingStatus = (status: boolean) => {
+    setIsRecording(status);
+    sendData({
+      to: "*",
+      payload: JSON.stringify({ isRecording: status }),
+      label: "recordingStatus",
+    });
+  };
+
+  const handleMeetingModalClose = async (result: boolean) => {
+    if (role === "host") {
+      setShowModal(false);
+      updateRecordingStatus(result);
+    }
+  };
+
+  useEffect(() => {
+    if (role === "host" && isRecording !== null) {
+      sendData({
+        to: "*",
+        payload: JSON.stringify({ isRecording }),
+        label: "recordingStatus",
+      });
+    }
+  }, [peerIds]);
+
   return (
     <>
       {isAllowToEnter ? (
@@ -388,21 +435,23 @@ export default function Component({ params }: { params: { roomId: string } }) {
               </div>
             </div>
             <div className="flex items-center justify-center gap-4">
-              <Tooltip
-                showArrow
-                content={
-                  <div className="font-poppins">
-                    This meeting is being recorded
-                  </div>
-                }
-                placement="left"
-                className="rounded-md bg-opacity-90 max-w-96"
-                closeDelay={1}
-              >
-                <span>
-                  <PiRecordFill color="#c42727" size={22} />
-                </span>
-              </Tooltip>
+              {isRecording && (
+                <Tooltip
+                  showArrow
+                  content={
+                    <div className="font-poppins">
+                      This meeting is being recorded
+                    </div>
+                  }
+                  placement="left"
+                  className="rounded-md bg-opacity-90 max-w-96"
+                  closeDelay={1}
+                >
+                  <span>
+                    <PiRecordFill color="#c42727" size={22} />
+                  </span>
+                </Tooltip>
+              )}
 
               <div className="flex space-x-3">
                 <DropdownMenu>
@@ -486,7 +535,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
                           }`
                     )}
                   >
-                    <div className="absolute left-1/2 -translate-x-1/2 mb-2 text-4xl z-10">
+                    <div className="absolute left-4 top-4 text-3xl z-10">
                       {reaction}
                     </div>
                     {metadata?.isHandRaised && (
@@ -618,6 +667,13 @@ export default function Component({ params }: { params: { roomId: string } }) {
           daoName={daoName}
           meetingId={params.roomId}
           onClose={handleFeedbackPopupsClose}
+        />
+      )}
+
+      {role === "host" && isRecording === null && (
+        <MeetingRecordingModal
+          show={showModal}
+          onClose={handleMeetingModalClose}
         />
       )}
 

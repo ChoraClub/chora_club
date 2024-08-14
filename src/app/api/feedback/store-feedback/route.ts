@@ -19,8 +19,8 @@ export async function POST(
     data
   );
 
+  const client = await connectDB();
   try {
-    const client = await connectDB();
     const db = client.db();
     const collection = db.collection("feedbacks");
 
@@ -128,5 +128,7 @@ export async function POST(
       { message: "An error occurred while storing feedback" },
       { status: 500 }
     );
+  } finally {
+    client.close();
   }
 }

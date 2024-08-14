@@ -17,10 +17,7 @@ export async function POST(
     const db = client.db();
     const collection = db.collection("feedbacks");
 
-    // Determine the field to update based on the role
     const roleField = role === "host" ? "asSessionHost" : "asSessionAttendee";
-
-    //Logic
 
     const feedbackDoc = await collection.findOne({ address });
 
@@ -31,7 +28,6 @@ export async function POST(
       );
     }
 
-    // Check if the role field exists in the document
     const hasResponded =
       feedbackDoc.feedbackGiven?.[roleField]?.hasResponded ?? false;
 

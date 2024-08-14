@@ -16,14 +16,14 @@ import SessionHostedModal from "../ComponentUtils/SessionHostedModal";
 
 function UpdateSessionDetails({ roomId }: { roomId: string }) {
   // localStorage.removeItem("isMeetingRecorded");
-  try {
-    const storedStatus = localStorage.getItem("meetingData");
-    if (storedStatus !== null) {
-      localStorage.removeItem("meetingData");
-    }
-  } catch (e) {
-    console.log(e);
-  }
+  // try {
+  //   const storedStatus = localStorage.getItem("meetingData");
+  //   if (storedStatus !== null) {
+  //     localStorage.removeItem("meetingData");
+  //   }
+  // } catch (e) {
+  //   console.log(e);
+  // }
 
   const [sessionDetails, setSessionDetails] = useState({
     title: "",

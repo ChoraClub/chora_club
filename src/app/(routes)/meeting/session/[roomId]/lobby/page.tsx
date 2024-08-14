@@ -33,6 +33,8 @@ import { RxCross2 } from "react-icons/rx";
 import record from "@/assets/images/instant-meet/record.svg";
 import arrow from "@/assets/images/instant-meet/arrow.svg";
 import ConnectWalletWithENS from "@/components/ConnectWallet/ConnectWalletWithENS";
+import { getEnsName } from "@/utils/ENSUtils";
+import { truncateAddress } from "@/utils/text";
 
 type lobbyProps = {};
 
@@ -288,17 +290,23 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
           });
           console.log("filtered profile: ", filtered);
           setProfileDetails(filtered[0]);
-          setIsLoading(false);
           const imageCid = filtered[0]?.image;
           if (imageCid) {
             setAvatarUrl(`https://gateway.lighthouse.storage/ipfs/${imageCid}`);
           }
-          if (filtered[0]?.displayName) {
-            setName(filtered[0].displayName);
-          } else {
-            console.log("formattedAddress ", formattedAddress);
-            setName(formattedAddress);
+
+          if (address) {
+            const getName = await getEnsName(address?.toString());
+            const getEnsNameOfAddress = await getName?.ensName;
+            console.log("formattedAddress ", getEnsNameOfAddress);
+            if (getEnsNameOfAddress) {
+              setName(getEnsNameOfAddress);
+            } else {
+              const formattedAddress = await truncateAddress(address);
+              setName(formattedAddress);
+            }
           }
+          setIsLoading(false);
         }
 
         // if (resultData.length === 0) {
@@ -324,8 +332,6 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
     };
     fetchData();
   }, []);
-
-  const formattedAddress = address?.slice(0, 6) + "..." + address?.slice(-4);
 
   return (
     <>
@@ -446,9 +452,9 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
                           />
                         </div>
                       ) : (
-                        profileDetails?.displayName ||
-                        profileDetails?.ensName ||
-                        formattedAddress
+                        // profileDetails?.ensName ||
+                        // formattedAddress
+                        name
                       )}
                     </div>
                   </div>

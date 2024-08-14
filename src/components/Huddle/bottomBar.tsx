@@ -25,6 +25,11 @@ import { PiLinkSimpleBold } from "react-icons/pi";
 import { opBlock, arbBlock } from "@/config/staticDataUtils";
 import MeetingRecordingModal from "../ComponentUtils/MeetingRecordingModal";
 import ReactionBar from "./ReactionBar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
 
 const BottomBar = ({
   daoName,
@@ -65,7 +70,7 @@ const BottomBar = ({
     setIsScreenShared,
   } = useStudioState();
   const [showModal, setShowModal] = useState(true);
-  const [recordingStatus, setRecordingStatus] = useState<string | null>(null);
+  // const [recordingStatus, setRecordingStatus] = useState<string | null>(null);
   const { startScreenShare, stopScreenShare, shareStream } =
     useLocalScreenShare({
       onProduceStart(data) {
@@ -159,42 +164,49 @@ const BottomBar = ({
   //   }
   // }, []);
 
+  // useEffect(() => {
+  //   const storedStatus = localStorage.getItem("meetingData");
+  //   if (storedStatus) {
+  //     const parsedStatus = JSON.parse(storedStatus);
+  //     console.log("storedStatus: ", parsedStatus);
+  //     setRecordingStatus(parsedStatus.isMeetingRecorded);
+  //   }
+  //   console.log("recordingStatus: ", recordingStatus);
+  // }, []);
+
+  // const handleModalClose = async (result: boolean) => {
+  //   if (role === "host") {
+  //     const meetingData = {
+  //       meetingId: roomId,
+  //       isMeetingRecorded: result.toString(),
+  //     };
+  //     localStorage.setItem("meetingData", JSON.stringify(meetingData));
+  //     setShowModal(false);
+  //     setRecordingStatus(result.toString());
+  //     console.log(
+  //       result ? "Meeting will be recorded." : "Meeting will not be recorded."
+  //     );
+
+  //     if (result) {
+  //       startRecording();
+  //     }
+  //   }
+  // };
+
   useEffect(() => {
-    const storedStatus = localStorage.getItem("meetingData");
-    if (storedStatus) {
-      const parsedStatus = JSON.parse(storedStatus);
-      console.log("storedStatus: ", parsedStatus);
-      setRecordingStatus(parsedStatus.isMeetingRecorded);
+    if (isRecording) {
+      startRecording();
     }
-    console.log("recordingStatus: ", recordingStatus);
   }, []);
-
-  const handleModalClose = async (result: boolean) => {
-    if (role === "host") {
-      const meetingData = {
-        meetingId: roomId,
-        isMeetingRecorded: result.toString(),
-      };
-      localStorage.setItem("meetingData", JSON.stringify(meetingData));
-      setShowModal(false);
-      setRecordingStatus(result.toString());
-      console.log(
-        result ? "Meeting will be recorded." : "Meeting will not be recorded."
-      );
-
-      if (result) {
-        startRecording();
-      }
-    }
-  };
 
   const startRecording = async () => {
     try {
+      console.log("recording started")
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
-      if (address) {
-        myHeaders.append("x-wallet-address", address);
-      }
+      // if (address) {
+      //   myHeaders.append("x-wallet-address", address);
+      // }
       const requestOptions = {
         method: "POST",
         headers: myHeaders,
@@ -253,7 +265,7 @@ const BottomBar = ({
 
     // console.log("host address", host_address);
 
-    if (role === "host" && recordingStatus === "true") {
+    if (role === "host" && isRecording === true) {
       await handleStopRecording(); // Do not proceed with API calls if not the host
     }
 
@@ -302,7 +314,7 @@ const BottomBar = ({
         console.error("Error handling end call:", error);
       }
 
-      if (recordingStatus === "true") {
+      if (isRecording === true) {
         try {
           toast.success("Giving Attestations");
           const response = await fetch(`/api/get-attest-data`, {
@@ -334,8 +346,8 @@ const BottomBar = ({
           body: JSON.stringify({
             meetingId: roomId,
             meetingType: meetingCategory,
-            recordedStatus: recordingStatus,
-            meetingStatus: recordingStatus === "true" ? "Recorded" : "Finished",
+            recordedStatus: isRecording,
+            meetingStatus: isRecording === true ? "Recorded" : "Finished",
           }),
         };
 
@@ -372,8 +384,8 @@ const BottomBar = ({
 
   return (
     <>
-      <footer className="flex items-center justify-between px-4 py-2">
-        <div>
+      <footer className="flex items-center justify-between px-4 py-2 font-poppins">
+        {/* <div>
           <div className="relative">
             <div
               className="mr-auto flex items-center gap-4 w-44 cursor-pointer"
@@ -408,7 +420,47 @@ const BottomBar = ({
               </div>
             )}
           </div>
-        </div>
+        </div> */}
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button className="bg-white hover:bg-white">
+              <div className="flex gap-2 items-center">
+                <div className="bg-blue-shade-200 p-2 rounded-lg">
+                  <PiLinkSimpleBold
+                    className="text-white"
+                    size={24}
+                  ></PiLinkSimpleBold>
+                </div>
+                <div className="text-gray-800 text-base">Quick Links</div>
+              </div>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            className="bg-white items-start"
+            sideOffset={8}
+            align="start"
+          >
+            <div className="">
+              {/* <div className="arrow-up"></div> */}
+              {(daoName === "arbitrum"
+                ? arbBlock
+                : daoName === "optimism"
+                ? opBlock
+                : []
+              ).map((block, index) => (
+                <a
+                  href={block.link}
+                  target="_blank"
+                  className="block px-4 py-2 text-gray-800 hover:bg-gray-200 hover:rounded-md"
+                  key={index}
+                >
+                  {block.title}
+                </a>
+              ))}
+            </div>
+          </DropdownMenuContent>
+        </DropdownMenu>
 
         <div
           className={clsx("flex space-x-3", role === Role.HOST ? "mr-12" : "")}
@@ -544,9 +596,6 @@ const BottomBar = ({
           </ButtonWithIcon>
         </div>
       </footer>
-      {role === "host" && recordingStatus === null && (
-        <MeetingRecordingModal show={showModal} onClose={handleModalClose} />
-      )}
     </>
   );
 };
