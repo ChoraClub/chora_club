@@ -30,10 +30,12 @@ function AttestationModal({
   const [hoverRating, setHoverRating] = useState<number>(0);
   const { address } = useAccount();
 
-  // const storedStatus = localStorage.getItem("meetingData");
-  // if (storedStatus) {
-  //   localStorage.removeItem("meetingData");
-  // }
+  useEffect(() => {
+    const storedStatus = localStorage.getItem("meetingData");
+    if (storedStatus) {
+      localStorage.removeItem("meetingData");
+    }
+  }, []);
 
   const toggleModal = () => {
     if (rating !== null && !feedbackStored) {

@@ -47,6 +47,7 @@ import { headers } from "next/headers";
 import UpdateSessionDetails from "@/components/MeetingPreview/UpdateSessionDetails";
 import PopupSlider from "@/components/FeedbackPopup/PopupSlider";
 import MeetingRecordingModal from "@/components/ComponentUtils/MeetingRecordingModal";
+import toast from "react-hot-toast";
 
 export default function Component({ params }: { params: { roomId: string } }) {
   const { isVideoOn, enableVideo, disableVideo, stream } = useLocalVideo();
@@ -157,7 +158,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
       if (storedStatus) {
         const parsedStatus = JSON.parse(storedStatus);
         console.log("storedStatus: ", parsedStatus);
-        if (parsedStatus.isMeetingRecorded === "true") {
+        if (parsedStatus.isMeetingRecorded === true) {
           router.push(
             `/meeting/session/${params.roomId}/update-session-details`
           );
@@ -202,6 +203,13 @@ export default function Component({ params }: { params: { roomId: string } }) {
         const status = JSON.parse(payload).isRecording;
         setIsRecording(status);
       }
+      if (label === 'requestRecordingStatus' && role === 'host') {
+        sendData({
+          to: [from],
+          payload: JSON.stringify({ isRecording: isRecording }),
+          label: 'recordingStatus',
+        });
+      }
     },
   });
 
@@ -210,12 +218,6 @@ export default function Component({ params }: { params: { roomId: string } }) {
       videoRef.current.srcObject = stream;
     }
   }, [stream]);
-
-  // useEffect(() => {
-  //   if (state === "idle") {
-  //     router.push(`${params.roomId}/lobby`);
-  //   }
-  // }, [state]);
 
   useEffect(() => {
     setCamPrefferedDevice(videoDevice.deviceId);
@@ -416,19 +418,63 @@ export default function Component({ params }: { params: { roomId: string } }) {
   const handleMeetingModalClose = async (result: boolean) => {
     if (role === "host") {
       setShowModal(false);
+      const meetingData = {
+        meetingId: params.roomId,
+        isMeetingRecorded: result,
+      };
+      localStorage.setItem("meetingData", JSON.stringify(meetingData));
+      setShowModal(false);
+      setMeetingRecordingStatus(result);
+
       updateRecordingStatus(result);
+      if (result) {
+        startRecording();
+      }
+    }
+  };
+
+  const startRecording = async () => {
+    try {
+      console.log("recording started");
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      // if (address) {
+      //   myHeaders.append("x-wallet-address", address);
+      // }
+      const requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        body: JSON.stringify({
+          roomId: params.roomId,
+        }),
+      };
+
+      const status = await fetch(
+        `/api/startRecording/${params.roomId}`,
+        requestOptions
+      );
+      if (!status.ok) {
+        console.error(`Request failed with status: ${status.status}`);
+        toast.error("Failed to start recording");
+        return;
+      }
+      setIsRecording(true); // Assuming this should be true after starting recording
+      toast.success("Recording started");
+    } catch (error) {
+      console.error("Error starting recording:", error);
+      toast.error("Error starting recording");
     }
   };
 
   useEffect(() => {
-    if (role === "host" && isRecording !== null) {
+    if (role === "guest") {
       sendData({
         to: "*",
-        payload: JSON.stringify({ isRecording }),
-        label: "recordingStatus",
+        payload: JSON.stringify({ action: "getRecordingStatus" }),
+        label: "requestRecordingStatus",
       });
     }
-  }, [peerIds]);
+  }, []);
 
   return (
     <>
@@ -445,7 +491,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
               </div>
             </div>
             <div className="flex items-center justify-center gap-4">
-              {isRecording && (
+              {(isRecording || meetingRecordingStatus) && (
                 <Tooltip
                   showArrow
                   content={
@@ -621,7 +667,11 @@ export default function Component({ params }: { params: { roomId: string } }) {
         name={metadata?.displayName}
         localPeerId={peerId}
       /> */}
-          <BottomBar daoName={daoName} hostAddress={hostAddress} />
+          <BottomBar
+            daoName={daoName}
+            hostAddress={hostAddress}
+            meetingStatus={meetingRecordingStatus}
+          />
         </div>
       ) : (
         <>
@@ -680,7 +730,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
         />
       )}
 
-      {role === "host" && isRecording === null && (
+      {role === "host" && meetingRecordingStatus === undefined && (
         <MeetingRecordingModal
           show={showModal}
           onClose={handleMeetingModalClose}
