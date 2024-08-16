@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Oval } from "react-loader-spinner";
 import { FaCheck, FaGift } from "react-icons/fa6";
 import { Tooltip } from "@nextui-org/react";
-import styles from "./ClaimButton.module.css";
+import styles from "./Button.module.css";
 import { ethers } from "ethers";
 import { EAS } from "@ethereum-attestation-service/eas-sdk";
 import toast from "react-hot-toast";
+import confetti from 'canvas-confetti';
 
 interface ClaimButtonProps {
   meetingId: string;
@@ -32,6 +33,15 @@ const ClaimButton: React.FC<ClaimButtonProps> = ({
   useEffect(() => {
     setIsClaimed(!!onChainId);
   }, [onChainId]);
+
+  const triggerConfetti = () => {
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { y: 0.6 },
+      zIndex: 9999
+    });
+  };
 
   const handleAttestationOnchain = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -119,6 +129,9 @@ const ClaimButton: React.FC<ClaimButtonProps> = ({
         if (updateData.success) {
           console.log("On-chain attestation Claimed");
           setIsClaimed(true);
+          setTimeout(() => {
+            triggerConfetti();
+          }, 100);
           toast.success("On-chain attestation claimed successfully!");
         }
       }
@@ -131,6 +144,7 @@ const ClaimButton: React.FC<ClaimButtonProps> = ({
   };
 
   return (
+    <>
     <Tooltip
       content={
         isClaiming
@@ -176,6 +190,7 @@ const ClaimButton: React.FC<ClaimButtonProps> = ({
         </span>
       </button>
     </Tooltip>
+    </>
   );
 };
 
