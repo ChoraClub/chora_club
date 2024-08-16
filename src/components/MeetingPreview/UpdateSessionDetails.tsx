@@ -15,15 +15,12 @@ import { IoClose } from "react-icons/io5";
 import SessionHostedModal from "../ComponentUtils/SessionHostedModal";
 
 function UpdateSessionDetails({ roomId }: { roomId: string }) {
-  // localStorage.removeItem("isMeetingRecorded");
-  // try {
-  //   const storedStatus = localStorage.getItem("meetingData");
-  //   if (storedStatus !== null) {
-  //     localStorage.removeItem("meetingData");
-  //   }
-  // } catch (e) {
-  //   console.log(e);
-  // }
+  useEffect(() => {
+    const storedStatus = localStorage.getItem("meetingData");
+    if (storedStatus !== null) {
+      localStorage.removeItem("meetingData");
+    }
+  }, []);
 
   const [sessionDetails, setSessionDetails] = useState({
     title: "",

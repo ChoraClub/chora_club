@@ -34,9 +34,11 @@ import {
 const BottomBar = ({
   daoName,
   hostAddress,
+  meetingStatus,
 }: {
   daoName: string;
   hostAddress: string;
+  meetingStatus: boolean | undefined;
 }) => {
   const { isAudioOn, enableAudio, disableAudio } = useLocalAudio();
   const { isVideoOn, enableVideo, disableVideo } = useLocalVideo();
@@ -196,44 +198,44 @@ const BottomBar = ({
   //   }
   // };
 
-  useEffect(() => {
-    if (isRecording) {
-      startRecording();
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (isRecording) {
+  //     startRecording();
+  //   }
+  // }, []);
 
-  const startRecording = async () => {
-    try {
-      console.log("recording started");
-      const myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
-      if (address) {
-        myHeaders.append("x-wallet-address", address);
-      }
-      const requestOptions = {
-        method: "POST",
-        headers: myHeaders,
-        body: JSON.stringify({
-          roomId: params.roomId,
-        }),
-      };
+  // const startRecording = async () => {
+  //   try {
+  //     console.log("recording started");
+  //     const myHeaders = new Headers();
+  //     myHeaders.append("Content-Type", "application/json");
+  //     // if (address) {
+  //     //   myHeaders.append("x-wallet-address", address);
+  //     // }
+  //     const requestOptions = {
+  //       method: "POST",
+  //       headers: myHeaders,
+  //       body: JSON.stringify({
+  //         roomId: params.roomId,
+  //       }),
+  //     };
 
-      const status = await fetch(
-        `/api/startRecording/${params.roomId}`,
-        requestOptions
-      );
-      if (!status.ok) {
-        console.error(`Request failed with status: ${status.status}`);
-        toast.error("Failed to start recording");
-        return;
-      }
-      setIsRecording(true); // Assuming this should be true after starting recording
-      toast.success("Recording started");
-    } catch (error) {
-      console.error("Error starting recording:", error);
-      toast.error("Error starting recording");
-    }
-  };
+  //     const status = await fetch(
+  //       `/api/startRecording/${params.roomId}`,
+  //       requestOptions
+  //     );
+  //     if (!status.ok) {
+  //       console.error(`Request failed with status: ${status.status}`);
+  //       toast.error("Failed to start recording");
+  //       return;
+  //     }
+  //     setIsRecording(true); // Assuming this should be true after starting recording
+  //     toast.success("Recording started");
+  //   } catch (error) {
+  //     console.error("Error starting recording:", error);
+  //     toast.error("Error starting recording");
+  //   }
+  // };
 
   useEffect(() => {
     const handleBeforeUnload = (event: any) => {
@@ -268,7 +270,7 @@ const BottomBar = ({
 
     // console.log("host address", host_address);
 
-    if (role === "host" && isRecording === true) {
+    if (role === "host" && meetingStatus === true) {
       await handleStopRecording(); // Do not proceed with API calls if not the host
     }
 
@@ -279,6 +281,33 @@ const BottomBar = ({
       setIsLoading(false);
       setShowLeaveDropDown(false);
     } else if (endMeet === "close") {
+      if (role === "host") {
+        try {
+          const myHeaders = new Headers();
+          myHeaders.append("Content-Type", "application/json");
+          if (address) {
+            myHeaders.append("x-wallet-address", address);
+          }
+          const requestOptions = {
+            method: "PUT",
+            headers: myHeaders,
+            body: JSON.stringify({
+              meetingId: roomId,
+              meetingType: meetingCategory,
+              recordedStatus: isRecording,
+              meetingStatus: isRecording === true ? "Recorded" : "Finished",
+            }),
+          };
+
+          const response = await fetch(
+            "/api/update-recording-status",
+            requestOptions
+          );
+          console.log("Response: ", response);
+        } catch (e) {
+          console.log("Error: ", e);
+        }
+      }
       closeRoom();
       setIsLoading(false);
       setShowLeaveDropDown(false);
@@ -321,7 +350,7 @@ const BottomBar = ({
         console.error("Error handling end call:", error);
       }
 
-      if (isRecording === true) {
+      if (meetingStatus === true) {
         try {
           toast.success("Giving Attestations");
           const myHeaders = new Headers();
@@ -346,32 +375,6 @@ const BottomBar = ({
           console.log("Error in attestation: ", e);
           toast.error("Attestation denied");
         }
-      }
-
-      try {
-        const myHeaders = new Headers();
-        myHeaders.append("Content-Type", "application/json");
-        if (address) {
-          myHeaders.append("x-wallet-address", address);
-        }
-        const requestOptions = {
-          method: "PUT",
-          headers: myHeaders,
-          body: JSON.stringify({
-            meetingId: roomId,
-            meetingType: meetingCategory,
-            recordedStatus: isRecording,
-            meetingStatus: isRecording === true ? "Recorded" : "Finished",
-          }),
-        };
-
-        const response = await fetch(
-          "/api/update-recording-status",
-          requestOptions
-        );
-        console.log("Response: ", response);
-      } catch (e) {
-        console.log("Error: ", e);
       }
     }
 
