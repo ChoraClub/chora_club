@@ -6,11 +6,11 @@ import { BASE_URL } from "./config/constants";
 const allowedOrigins = [BASE_URL];
 
 export async function middleware(request: NextRequest) {
-  // console.log("Request Body line number 7 :- ", request);
+  // console.log("Request Body :- ", request);
 
   const origin = request.nextUrl.origin;
 
-  console.log("Origin request come from :-", origin);
+  // console.log("Origin request come from:-", origin);
 
   if (!allowedOrigins.includes(origin)) {
     return new NextResponse(
@@ -24,24 +24,21 @@ export async function middleware(request: NextRequest) {
 
   const walletAddress = request.headers.get("x-wallet-address");
 
-  console.log(
-    "Appened headers wallet address line number:-",
-    walletAddress
-  );
+  // console.log("Append headers wallet address:-", walletAddress);
 
   if (!["POST", "PUT", "DELETE"].includes(request.method)) {
     // For other methods, allow the request to proceed without additional checks
     return NextResponse.next();
   }
 
-  console.log("Upcoming request method line number :-", request.method);
+  console.log("Upcoming request method:-", request.method);
 
   const token = await getToken({
     req: request,
     secret: process.env.NEXTAUTH_SECRET,
   });
 
-  console.log("Token generated using nextauth line number :-", token);
+  // console.log("Token generated using nextauth:-", token);
 
   if (!token) {
     // If there's no token, the user is not authenticated
@@ -49,16 +46,12 @@ export async function middleware(request: NextRequest) {
       status: 401,
       headers: { "Content-Type": "application/json" },
     });
-    
   }
 
   // Extract the user address from the token
   const UserAddress = token.sub;
 
-  console.log(
-    "Exracted user address from token line number :- ",
-    UserAddress
-  );
+  console.log("Exracted user address from token:- ", UserAddress);
 
   console.log("Requested Address:", walletAddress);
 
@@ -101,7 +94,7 @@ export const config = {
     "/api/update-recording-status/:path*",
     "/api/update-session-attendees/:path*",
     "/api/update-video-uri/:path*",
-    "/api/verify-meeting-id/:path*",
+    // "/api/verify-meeting-id/:path*",
     "/api/get-attest-data/:path*",
     "/api/get-availability/:path*",
     "/api/get-host/:path*",
@@ -119,7 +112,7 @@ export const config = {
     "/api/store-availability/:path*",
     "/api/submit-vote/:path*",
     "/api/get-session-data/:path*",
-    "/api/attest-offchain/:path*",
+    // "/api/attest-offchain/:path*",
     "/api/get-attendee-individual/:path*",
     "/api/get-dao-sessions/:path*",
   ],

@@ -4,16 +4,26 @@ import { BASE_URL } from "@/config/constants";
 
 interface Meeting {
   meetingId: string;
-  startTime: number; // Changed to number
-  endTime: number; // Changed to number
+  startTime: number;
+  endTime: number;
+}
+
+interface ParticipantMetadata {
+  displayName: string;
+  avatarUrl: string;
+  isHandRaised: boolean;
+  walletAddress: string;
 }
 
 interface Participant {
-  displayName: string;
-  walletAddress: string;
-  joinedAt: string;
-  exitedAt: string;
-  attestation: string; // Added attestation field
+  peerId: string;
+  joinTime: number;
+  exitTime: number;
+  metadata: ParticipantMetadata;
+}
+
+interface ParticipantWithAttestation extends Participant {
+  attestation: string;
 }
 
 interface MeetingTimePerEOA {
@@ -26,8 +36,13 @@ export async function POST(req: NextRequest, res: NextResponse) {
       roomId,
       meetingType,
       dao_name,
-    }: { roomId: string; meetingType: number; dao_name: string } =
-      await req.json();
+      hostAddress,
+    }: {
+      roomId: string;
+      meetingType: number;
+      dao_name: string;
+      hostAddress: string;
+    } = await req.json();
 
     if (!roomId) {
       return NextResponse.json(
@@ -47,23 +62,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
         { status: 400 }
       );
     }
-
-    const myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-
-    const raw = JSON.stringify({
-      meetingId: roomId,
-    });
-
-    const requestOptions = {
-      method: "POST",
-      headers: myHeaders,
-      body: raw,
-    };
-    const baseUrl = BASE_URL;
-    const hostResponse = await fetch(`${baseUrl}/api/get-host`, requestOptions);
-    const hostData = await hostResponse.json();
-    console.log("Host Data:", hostData);
 
     const myHeadersForMeeting = new Headers();
     myHeadersForMeeting.append(
@@ -97,7 +95,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
       const endTime = new Date(meeting.endTime);
       const durationInMinutes = Math.floor(
         (endTime.valueOf() - startTime.valueOf()) / (1000 * 60)
-      ); // Convert to milliseconds
+      );
       totalMeetingTimeInMinutes += durationInMinutes;
     }
 
@@ -111,7 +109,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
         `https://api.huddle01.com/api/v1/rooms/participant-list?meetingId=${meeting.meetingId}`,
         requestOptionsForMeeting
       );
-
+      console.log("response", response);
       if (!response.ok) {
         throw new Error("Failed to fetch participant list");
       }
@@ -122,9 +120,9 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
       // Calculate meeting time per participant
       participantList.participants.forEach((participant) => {
-        const eoaAddress: string = participant.walletAddress;
-        const joinedAt: Date = new Date(participant.joinedAt);
-        const exitedAt: Date = new Date(participant.exitedAt);
+        const eoaAddress: string = participant?.metadata?.walletAddress;
+        const joinedAt: Date = new Date(participant.joinTime);
+        const exitedAt: Date = new Date(participant.exitTime);
         const durationInMinutes: number = Math.floor(
           (exitedAt.valueOf() - joinedAt.valueOf()) / (1000 * 60)
         );
@@ -148,17 +146,17 @@ export async function POST(req: NextRequest, res: NextResponse) {
     const validParticipants: Participant[] = [];
     for (const participantList of combinedParticipantLists) {
       for (const participant of participantList) {
-        if (participant.displayName !== "No name") {
+        if (participant?.metadata?.displayName !== "No name") {
           validParticipants.push(participant);
         }
       }
     }
 
     // Filter participants based on attendance
-    let participantsWithSufficientAttendance: Participant[] = [];
+    let participantsWithSufficientAttendance: ParticipantWithAttestation[] = [];
     for (const participant of validParticipants) {
       const participantMeetingTime =
-        meetingTimePerEOA[participant.walletAddress] || 0;
+        meetingTimePerEOA[participant?.metadata?.walletAddress] || 0;
       if (participantMeetingTime >= minimumAttendanceTime) {
         participantsWithSufficientAttendance.push({
           ...participant,
@@ -170,29 +168,29 @@ export async function POST(req: NextRequest, res: NextResponse) {
     participantsWithSufficientAttendance =
       participantsWithSufficientAttendance.filter(
         (participant) =>
-          participant.walletAddress &&
-          participant.walletAddress.toLowerCase() !==
-            hostData?.address.toLowerCase()
+          participant?.metadata?.walletAddress &&
+          participant?.metadata?.walletAddress.toLowerCase() !==
+            hostAddress.toLowerCase()
       );
 
     // Add the "attestation" field with value "pending" to each host
-    const hosts: Participant[] = [];
+    const hosts: ParticipantWithAttestation[] = [];
     if (
-      hostData &&
+      hostAddress &&
       combinedParticipantLists
         .flat()
         .some(
           (participant) =>
-            participant.walletAddress &&
-            participant.walletAddress.toLowerCase() ===
-              hostData.address.toLowerCase()
+            participant?.metadata?.walletAddress &&
+            participant?.metadata?.walletAddress.toLowerCase() ===
+              hostAddress.toLowerCase()
         )
     ) {
       combinedParticipantLists.flat().forEach((participant) => {
         if (
-          participant.walletAddress &&
-          participant.walletAddress.toLowerCase() ===
-            hostData.address.toLowerCase()
+          participant?.metadata?.walletAddress &&
+          participant?.metadata?.walletAddress.toLowerCase() ===
+            hostAddress.toLowerCase()
         ) {
           hosts.push({ ...participant, attestation: "pending" });
         }
@@ -223,8 +221,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
     const earliestStartTimeEpoch = Math.floor(earliestStartTime / 1000);
     const latestEndTimeEpoch = Math.floor(latestEndTime / 1000);
 
-    // await updateVideoURI(roomId, video_uri);
-
     // Prepare the data to store
     const dataToStore = {
       roomId,
@@ -237,7 +233,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
       meetingType: meetingTypeName,
       attestation: "pending",
       dao_name: dao_name,
-      // video_uri,
     };
 
     if (existingData) {

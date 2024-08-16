@@ -3,10 +3,11 @@ import { BASE_URL } from "@/config/constants";
 import { NextRequest, NextResponse } from "next/server";
 
 async function delegateAttestationOffchain(data: any) {
+  console.log("data::", data);
   const myHeaders = new Headers();
   myHeaders.append("Content-Type", "application/json");
-  if(data.recipient){
-    myHeaders.append("x-wallet-address",data.recipient);
+  if (data.connectedAddress) {
+    myHeaders.append("x-wallet-address", data.connectedAddress);
   }
   const baseUrl = BASE_URL;
   const raw = JSON.stringify(data);
@@ -19,7 +20,7 @@ async function delegateAttestationOffchain(data: any) {
 
   try {
     const response = await fetch(
-      `${baseUrl}/api/attest-offchain/`,
+      `${BASE_URL}/api/attest-offchain/`,
       requestOptions
     );
     console.log("Response from attestation endpoint:", response);
@@ -31,7 +32,7 @@ async function delegateAttestationOffchain(data: any) {
 }
 
 export async function POST(req: NextRequest, res: NextResponse) {
-  const { roomId } = await req.json();
+  const { roomId, connectedAddress } = await req.json();
 
   console.log("Incoming request with roomId:", roomId);
 
@@ -71,53 +72,54 @@ export async function POST(req: NextRequest, res: NextResponse) {
     if (data.meetingType === "officehours") {
       console.log("Meeting type: officehours");
       // For office hours, delegate attestation to hosts (meetingType 3) and participants (meetingType 4)
-      await delegateAndSetAttestation(
-        data.hosts[0].walletAddress,
-        `${roomId}/${token}`,
-        3,
-        data.startTime,
-        data.endTime,
-        data.dao_name
-      );
+      for (const host of data.hosts) {
+        await delegateAndSetAttestation(
+          host?.metadata?.walletAddress,
+          `${roomId}/${token}`,
+          3,
+          data.startTime,
+          data.endTime,
+          data.dao_name,
+          connectedAddress
+        );
+      }
       for (const participant of data.participants) {
         await delegateAndSetAttestation(
-          participant.walletAddress,
+          participant?.metadata?.walletAddress,
           `${roomId}/${token}`,
           4,
           data.startTime,
           data.endTime,
-          data.dao_name
+          data.dao_name,
+          connectedAddress
         );
       }
     } else if (data.meetingType === "session") {
       console.log("Meeting type: session: ", data);
       // For sessions, delegate attestation to hosts (meetingType 1) and participants (meetingType 2)
-      await delegateAndSetAttestation(
-        data.hosts[0].walletAddress,
-        `${roomId}/${token}`,
-        1,
-        data.startTime,
-        data.endTime,
-        data.dao_name
-      );
+      for (const host of data.hosts) {
+        await delegateAndSetAttestation(
+          host?.metadata?.walletAddress,
+          `${roomId}/${token}`,
+          1,
+          data.startTime,
+          data.endTime,
+          data.dao_name,
+          connectedAddress
+        );
+      }
       for (const participant of data.participants) {
         await delegateAndSetAttestation(
-          participant.walletAddress,
+          participant?.metadata?.walletAddress,
           `${roomId}/${token}`,
           2,
           data.startTime,
           data.endTime,
-          data.dao_name
+          data.dao_name,
+          connectedAddress
         );
       }
     }
-
-    // Update attestation status to "attested"
-    // await collection.updateOne(
-    //   { roomId },
-    //   { $set: { attestation: "attested" } }
-    // );
-    // console.log("Updated attestation status to 'attested'");
 
     return NextResponse.json({ success: true, data }, { status: 200 });
   } catch (error) {
@@ -135,7 +137,8 @@ async function delegateAndSetAttestation(
   meetingType: number,
   startTime: number,
   endTime: number,
-  daoName: string
+  daoName: string,
+  connectedAddress: string
 ) {
   await delegateAttestationOffchain({
     recipient,
@@ -144,5 +147,6 @@ async function delegateAndSetAttestation(
     startTime,
     endTime,
     daoName,
+    connectedAddress,
   });
 }

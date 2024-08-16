@@ -207,9 +207,9 @@ const BottomBar = ({
       console.log("recording started");
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
-      // if (address) {
-      //   myHeaders.append("x-wallet-address", address);
-      // }
+      if (address) {
+        myHeaders.append("x-wallet-address", address);
+      }
       const requestOptions = {
         method: "POST",
         headers: myHeaders,
@@ -309,6 +309,7 @@ const BottomBar = ({
             roomId: roomId,
             meetingType: meetingType,
             dao_name: daoName,
+            hostAddress: hostAddress,
           }),
         };
         // console.log("req optionnnn", requestOptions);
@@ -333,6 +334,7 @@ const BottomBar = ({
             headers: myHeaders,
             body: JSON.stringify({
               roomId: roomId,
+              connectedAddress: address,
             }),
           });
           const response_data = await response.json();
