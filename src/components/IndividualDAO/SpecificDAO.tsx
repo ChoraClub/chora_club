@@ -14,6 +14,7 @@ import { dao_details } from "@/config/daoDetails";
 import Proposals from "./Proposals";
 import IndividualDaoHeader from "../ComponentUtils/IndividualDaoHeader";
 import AboutDao from "./AboutDao";
+import Leaderboard from "./Leaderboard";
 
 const desc = dao_details;
 
@@ -200,6 +201,18 @@ function SpecificDAO({ props }: { props: { daoDelegates: string } }) {
         >
           Office hours
         </button>
+        <button
+          className={`border-b-2 py-4 px-2 ${
+            searchParams.get("active") === "leaderboard"
+              ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
+              : "border-transparent"
+          }`}
+          onClick={() =>
+            router.push(path + "?active=leaderboard")
+          }
+        >
+          Leaderboard
+        </button>
       </div>
 
       <div className="py-6 px-16">
@@ -225,6 +238,11 @@ function SpecificDAO({ props }: { props: { daoDelegates: string } }) {
         )}
         {searchParams.get("active") === "about" ? (
           <AboutDao props={props.daoDelegates} />
+        ) : (
+          ""
+        )}
+        {searchParams.get("active") === "leaderboard" ? (
+          <Leaderboard props={props.daoDelegates} />
         ) : (
           ""
         )}
