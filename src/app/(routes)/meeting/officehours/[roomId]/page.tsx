@@ -254,7 +254,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
         name={metadata?.displayName}
         localPeerId={peerId}
       /> */}
-      <BottomBar daoName={daoName} hostAddress="" />
+      <BottomBar daoName={daoName} hostAddress="" meetingStatus />
     </div>
   );
 }
