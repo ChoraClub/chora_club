@@ -235,6 +235,7 @@ function UserSessions({
               <RecordedSessionsTile
                 meetingData={attendedDetails}
                 showClaimButton={true}
+                session="attended"
               />
             ))}
         </div>
