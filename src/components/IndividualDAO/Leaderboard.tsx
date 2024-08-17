@@ -7,7 +7,10 @@ import toast from "react-hot-toast";
 import { Tooltip } from "@nextui-org/react";
 import { IoCopy } from "react-icons/io5";
 import Link from "next/link";
-import { FaStar } from "react-icons/fa";
+import { FaStar, FaStarHalfAlt } from "react-icons/fa";
+import styles from "./Leaderboard.module.css";
+import LeaderboardSkeleton from "../SkeletonLoader/LeaderboardSkeletonLoader";
+import TopDelegatesSkeleton from "../SkeletonLoader/TopLeaderSkeletonLoader";
 
 interface DelegateData {
   address: string;
@@ -22,6 +25,7 @@ interface DelegateData {
 
 function Leaderboard({ props }: { props: string }) {
   const [delegatesData, setDelegatesData] = useState<DelegateData[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const handleCopy = (addr: string) => {
     copy(addr);
@@ -61,7 +65,7 @@ function Leaderboard({ props }: { props: string }) {
       sessions: 25,
       nfts: 82,
       views: 250,
-      rating: 3,
+      rating: 3.5,
     },
     {
       address: "0x1b686ee8e31c5959d9f5bbd8122a58682788eead",
@@ -82,7 +86,7 @@ function Leaderboard({ props }: { props: string }) {
       sessions: 16,
       nfts: 10,
       views: 130,
-      rating: 3,
+      rating: 4.7,
     },
     {
       address: "0x5b191f5a2b4a867c4ed71858daccc51fc59c69c0",
@@ -129,6 +133,7 @@ function Leaderboard({ props }: { props: string }) {
         })
       );
       setDelegatesData(updatedDelegates);
+      setIsLoading(false);
     };
     fetchEnsData();
   }, []);
@@ -141,8 +146,11 @@ function Leaderboard({ props }: { props: string }) {
   return (
     <>
       <div className="container mx-auto p-4 font-poppins">
-        <div className=" flex flex-col items-center max-w-5xl mx-auto">
-          {delegatesData.map((delegate: DelegateData, index) => (
+        <div className="max-w-5xl flex-grow mx-auto">
+        {isLoading?
+           [...Array(5)].map((_, index) => <LeaderboardSkeleton key={index} />)
+           :
+          delegatesData.map((delegate: DelegateData, index) => (
             <div
               className="bg-white hover:bg-gray-50 rounded-lg p-4 mb-4 w-full transition duration-300 ease-in-out hover:shadow-lg hover:scale-105"
               key={index}
@@ -165,24 +173,24 @@ function Leaderboard({ props }: { props: string }) {
                     alt="image"
                     width={20}
                     height={20}
-                    className="h-10 w-10 rounded-full object-cover object-center"
+                    className={`h-10 w-10 rounded-full object-cover object-center`}
                   />
                   <div className="flex-grow flex items-center gap-1">
                     <Link
                       href={`/${props}/${delegate.address}?active=info`}
-                      className={`font-bold w-fit cursor-pointer hover:text-blue-shade-100 ${delegate.color} bg-opacity-20 px-2 py-1 rounded-full`}
+                      className={`font-bold w-fit cursor-pointer hover:text-gray-500 ${delegate.color} bg-opacity-20 px-2 py-1 rounded-full`}
                     >
                       {delegate.ensName}
                     </Link>
                     <Tooltip
-                            content="Copy"
-                            placement="right"
-                            closeDelay={1}
-                            showArrow
-                          >
-                    <span className="cursor-pointer text-sm">
-                      <IoCopy onClick={() => handleCopy(delegate.address)} />
-                    </span>
+                      content="Copy"
+                      placement="right"
+                      closeDelay={1}
+                      showArrow
+                    >
+                      <span className="cursor-pointer text-sm">
+                        <IoCopy onClick={() => handleCopy(delegate.address)} />
+                      </span>
                     </Tooltip>
                   </div>
                 </div>
@@ -209,22 +217,39 @@ function Leaderboard({ props }: { props: string }) {
                     </div>
                     <div className="text-xs text-gray-600 mt-1">Views</div>
                   </div>
-                  <div className="text-center flex items-center mr-2 ml-6 my-1">
+                  <div className="text-center flex items-center mx-2 my-1 w-32">
                     <div className="text-black font-bold pl-3 pr-1 py-1">
                       <div className="flex">
-                        {[...Array(5)].map((_, index) => (
-                          <FaStar
-                            key={index}
-                            className={`w-5 h-5 ${
-                              index < delegate.rating
-                                ? "text-yellow-400 drop-shadow-lg"
-                                : "text-gray-300"
-                            }`}
-                          />
-                        ))}
+                        {[...Array(5)].map((_, index) => {
+                          const starValue = index + 1;
+                          if (starValue <= delegate.rating) {
+                            return (
+                              <FaStar
+                                key={index}
+                                className="w-5 h-5 text-yellow-400 drop-shadow-lg"
+                              />
+                            );
+                          } else if (starValue - 0.5 <= delegate.rating) {
+                            return (
+                              <FaStarHalfAlt
+                                key={index}
+                                className="w-5 h-5 text-yellow-400 drop-shadow-lg"
+                              />
+                            );
+                          } else {
+                            return (
+                              <FaStar
+                                key={index}
+                                className="w-5 h-5 text-gray-300"
+                              />
+                            );
+                          }
+                        })}
                       </div>
                     </div>
-                    <div className="text-xs text-gray-600 mt-1">({delegate.rating})</div>
+                    <div className="text-xs text-gray-600 mt-1 ml-1">
+                      ({delegate.rating})
+                    </div>
                   </div>
                 </div>
               </div>
