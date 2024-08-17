@@ -23,13 +23,13 @@ import { getEnsName } from "@/utils/ENSUtils";
 import logo from "@/assets/images/daos/CCLogo.png";
 import ClaimButton from "./ClaimButton";
 import EditButton from "./EditButton";
-import { useAccount } from "wagmi"; 
+import { useAccount } from "wagmi";
 import Link from "next/link";
 
 interface meeting {
   meetingData: any;
   showClaimButton?: boolean;
-  session?: string; 
+  session?: string;
   gridCols?: string;
 }
 
@@ -43,8 +43,12 @@ const getDaoLogo = (daoName: string): StaticImageData => {
   return daoLogos[normalizedName] || arblogo;
 };
 
-function RecordedSessionsTile({ meetingData , showClaimButton,session, gridCols = "2xl:grid-cols-4" }: meeting) {
-
+function RecordedSessionsTile({
+  meetingData,
+  showClaimButton,
+  session,
+  gridCols = "2xl:grid-cols-4",
+}: meeting) {
   const [hoveredVideo, setHoveredVideo] = useState<number | null>(null);
   const videoRefs = useRef<any>([]);
   const [videoDurations, setVideoDurations] = useState<any>({});
@@ -59,23 +63,6 @@ function RecordedSessionsTile({ meetingData , showClaimButton,session, gridCols 
     copy(addr);
     toast("Address Copied");
   };
-
-  const userImages = [
-    user1,
-    user2,
-    user3,
-    user4,
-    user5,
-    user6,
-    user7,
-    user8,
-    user9,
-  ];
-
-  const [randomUserImages, setRandomUserImages] = useState<{
-    [key: string]: StaticImageData;
-  }>({});
-  const [usedIndices, setUsedIndices] = useState<Set<number>>(new Set());
 
   const formatTimeAgo = (utcTime: string): string => {
     const parsedTime = new Date(utcTime);
@@ -107,18 +94,6 @@ function RecordedSessionsTile({ meetingData , showClaimButton,session, gridCols 
   const daoLogos = {
     optimism: oplogo,
     arbitrum: arblogo,
-  };
-
-  const handleTimeUpdate = (video: HTMLVideoElement, index: number) => {
-    const duration = video.duration;
-    const currentTime = video.currentTime;
-    const progressBar = document.querySelectorAll(".progress-bar")[index];
-
-    if (progressBar) {
-      const progressDiv = progressBar as HTMLDivElement;
-      const percentage = (currentTime / duration) * 100;
-      progressDiv.style.width = `${percentage}%`;
-    }
   };
 
   useEffect(() => {
@@ -205,7 +180,9 @@ function RecordedSessionsTile({ meetingData , showClaimButton,session, gridCols 
 
   return (
     <>
-      <div className={`grid min-[475px]:grid-cols- md:grid-cols-2 lg:grid-cols-3 ${gridCols} gap-10 py-8 font-poppins`}>
+      <div
+        className={`grid min-[475px]:grid-cols- md:grid-cols-2 lg:grid-cols-3 ${gridCols} gap-10 py-8 font-poppins`}
+      >
         {meetingData.map((data: any, index: number) => (
           <div
             key={index}
@@ -213,7 +190,8 @@ function RecordedSessionsTile({ meetingData , showClaimButton,session, gridCols 
             onClick={(e) => {
               e.stopPropagation();
               e.preventDefault();
-              router.push(`/watch/${data.meetingId}`)}}
+              router.push(`/watch/${data.meetingId}`);
+            }}
             onMouseEnter={() => setHoveredVideo(index)}
             onMouseLeave={() => setHoveredVideo(null)}
           >
@@ -258,107 +236,65 @@ function RecordedSessionsTile({ meetingData , showClaimButton,session, gridCols 
                 <Image src={logo} alt="image" width={24} />
               </div>
             </div>
-            <div className="px-4 py-2">
-              <div
-                className={`font-semibold py-1 ${styles.truncate}`}
-                style={{
-                  display: "-webkit-box",
-                  WebkitBoxOrient: "vertical",
-                  WebkitLineClamp: 1,
-                }}
-              >
-                {data.title}
-              </div>
-              <div className="flex text-sm gap-3 py-1">
-                <div className="bg-[#F5F5F5] flex items-center py-1 px-3 rounded-md gap-2">
-                  <div>
-                    <Image
-                      src={getDaoLogo(data.dao_name)}
-                      alt="image"
-                      width={20}
-                      height={20}
-                      className="rounded-full"
-                    />
-                  </div>
-                  <div className="capitalize">{data.dao_name}</div>
+            <div className="flex flex-col justify-between">
+              <div className="px-4 py-2">
+                <div
+                  className={`font-semibold py-1 ${styles.truncate}`}
+                  style={{
+                    display: "-webkit-box",
+                    WebkitBoxOrient: "vertical",
+                    WebkitLineClamp: 1,
+                  }}
+                >
+                  {data.title}
                 </div>
-                <div className="bg-[#F5F5F5] py-1 px-3 rounded-md">
-                  {formatTimeAgo(data.slot_time)}
-                </div>
-              </div>
-              <div className="">
-                <div className="flex items-center gap-2 py-1 ps-3 text-sm">
-                  <div>
-                    <Image
-                      src={
-                        data.hostInfo?.image
-                          ? `https://gateway.lighthouse.storage/ipfs/${data.hostInfo.image}`
-                          : user1
-                      }
-                      alt="image"
-                      width={20}
-                      height={20}
-                      className="rounded-full"
-                    />
+                <div className="flex text-sm gap-3 py-1">
+                  <div className="bg-[#F5F5F5] flex items-center py-1 px-3 rounded-md gap-2">
+                    <div>
+                      <Image
+                        src={getDaoLogo(data.dao_name)}
+                        alt="image"
+                        width={20}
+                        height={20}
+                        className="rounded-full"
+                      />
+                    </div>
+                    <div className="capitalize">{data.dao_name}</div>
                   </div>
-                  <div>
-                  <span className="font-medium">Host: </span>
-                    <Link
-                      href={`/${data.dao_name}/${data.host_address}?active=info`}
-                      onClick={(event:any) => {
-                        event.stopPropagation();
-                      }}
-                      className="cursor-pointer hover:text-blue-shade-200 ml-1"
-                    >
-                      {loadingHostNames
-                        ? data.host_address.slice(0, 4) +
-                          "..." +
-                          data.host_address.slice(-4)
-                        : ensHostNames[data.host_address]}
-                    </Link>
-                  </div>
-                  <div>
-                    <Tooltip
-                      content="Copy"
-                      placement="right"
-                      closeDelay={1}
-                      showArrow
-                    >
-                      <span className="cursor-pointer text-sm">
-                        <IoCopy
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            handleCopy(data.host_address);
-                          }}
-                        />
-                      </span>
-                    </Tooltip>
+                  <div className="bg-[#F5F5F5] py-1 px-3 rounded-md">
+                    {formatTimeAgo(data.slot_time)}
                   </div>
                 </div>
-                {data.attendees[0]?.attendee_address ? (
+                <div className="">
                   <div className="flex items-center gap-2 py-1 ps-3 text-sm">
-                    <div className="">
+                    <div>
                       <Image
                         src={
-                          data.guestInfo?.image
-                            ? `https://gateway.lighthouse.storage/ipfs/${data.attendees[0]?.guestInfo.image}`
-                            : user2
+                          data.hostInfo?.image
+                            ? `https://gateway.lighthouse.storage/ipfs/${data.hostInfo.image}`
+                            : user1
                         }
                         alt="image"
                         width={20}
                         height={20}
-                        className="h-5 w-5 rounded-full object-cover object-center"
+                        className="rounded-full"
                       />
                     </div>
                     <div>
-                    <span className="font-medium">Guest: </span>
-                    <span>
-                      {loadingGuestNames
-                        ? data.attendees[0]?.attendee_address.slice(0, 4) +
-                          "..." +
-                          data.attendees[0]?.attendee_address.slice(-4)
-                        : ensGuestNames[data.attendees[0]?.attendee_address]}
-                      </span>
+                      <span className="font-medium">Host: </span>
+                      <Link
+                        href={`/${data.dao_name}/${data.host_address}?active=info`}
+                        onClick={(event: any) => {
+                          event.stopPropagation();
+                        }}
+                        className="cursor-pointer hover:text-blue-shade-200 ml-1"
+                      >
+                        {loadingHostNames
+                          ? data.host_address.slice(0, 4) +
+                            "..." +
+                            data.host_address.slice(-4)
+                          : ensHostNames[data.host_address]}
+                      </Link>
                     </div>
                     <div>
                       <Tooltip
@@ -371,35 +307,96 @@ function RecordedSessionsTile({ meetingData , showClaimButton,session, gridCols 
                           <IoCopy
                             onClick={(event) => {
                               event.stopPropagation();
-                              handleCopy(data.attendees[0]?.attendee_address);
+                              handleCopy(data.host_address);
                             }}
                           />
                         </span>
                       </Tooltip>
                     </div>
                   </div>
-                ) : (
-                  ""
-                )}
+                  {data.attendees[0]?.attendee_address ? (
+                    <div className="flex items-center gap-2 py-1 ps-3 text-sm">
+                      <div className="">
+                        <Image
+                          src={
+                            data.guestInfo?.image
+                              ? `https://gateway.lighthouse.storage/ipfs/${data.attendees[0]?.guestInfo.image}`
+                              : user2
+                          }
+                          alt="image"
+                          width={20}
+                          height={20}
+                          className="h-5 w-5 rounded-full object-cover object-center"
+                        />
+                      </div>
+                      <div>
+                        <span className="font-medium">Guest: </span>
+                        <span>
+                          {loadingGuestNames
+                            ? data.attendees[0]?.attendee_address.slice(0, 4) +
+                              "..." +
+                              data.attendees[0]?.attendee_address.slice(-4)
+                            : ensGuestNames[
+                                data.attendees[0]?.attendee_address
+                              ]}
+                        </span>
+                      </div>
+                      <div>
+                        <Tooltip
+                          content="Copy"
+                          placement="right"
+                          closeDelay={1}
+                          showArrow
+                        >
+                          <span className="cursor-pointer text-sm">
+                            <IoCopy
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                handleCopy(data.attendees[0]?.attendee_address);
+                              }}
+                            />
+                          </span>
+                        </Tooltip>
+                      </div>
+                    </div>
+                  ) : (
+                    ""
+                  )}
+                </div>
               </div>
-            </div>
-            <div className="px-4 pb-2 flex justify-center space-x-2">
-          {showClaimButton && (
-              <ClaimButton
-                meetingId={data.meetingId}
-                meetingType={data.session_type === "session" ? 2 : 1}
-                startTime={data.attestations[0]?.startTime}
-                endTime={data.attestations[0]?.endTime}
-                dao={data.dao_name}
-                address={address || ''}
-                onChainId={session === "hosted"
-                  ? data.onchain_host_uid
-                  : data.attendees[0]?.onchain_attendee_uid}
-              />
-            )}
-            {session==="hosted" && (
-              <EditButton sessionData={data}/>
-            )}
+              <div className="px-4 pb-2 flex justify-center space-x-2">
+                {session === "hosted" && data.uid_host && (
+                  <ClaimButton
+                    meetingId={data.meetingId}
+                    meetingType={data.session_type === "session" ? 2 : 1}
+                    startTime={data.attestations[0]?.startTime}
+                    endTime={data.attestations[0]?.endTime}
+                    dao={data.dao_name}
+                    address={address || ""}
+                    onChainId={
+                      session === "hosted" ? data.onchain_host_uid : ""
+                    }
+                  />
+                )}
+                {session === "attended" && data.attendees[0]?.attendee_uid && (
+                  <ClaimButton
+                    meetingId={data.meetingId}
+                    meetingType={data.session_type === "session" ? 2 : 1}
+                    startTime={data.attestations[0]?.startTime}
+                    endTime={data.attestations[0]?.endTime}
+                    dao={data.dao_name}
+                    address={address || ""}
+                    onChainId={
+                      session === "attended"
+                        ? data.attendees[0]?.onchain_attendee_uid
+                        : ""
+                    }
+                  />
+                )}
+                <div className="flex w-full justify-end">
+                  {session === "hosted" && <EditButton sessionData={data} />}
+                </div>
+              </div>
             </div>
           </div>
         ))}

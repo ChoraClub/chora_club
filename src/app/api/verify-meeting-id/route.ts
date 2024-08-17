@@ -37,6 +37,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
         { status: 200 }
       );
     } else {
+      console.log("meeting data:", meeting);
       // Meeting exists
       const statusField =
         meetingType === "session" ? "meeting_status" : "meeting_status";
@@ -52,7 +53,8 @@ export async function POST(req: NextRequest, res: NextResponse) {
         );
       } else if (
         meeting[statusField] === "inactive" ||
-        meeting[statusField] === "Recorded"
+        meeting[statusField] === "Recorded" ||
+        meeting[statusField] === "Finished"
       ) {
         // Meeting has ended
         return NextResponse.json(

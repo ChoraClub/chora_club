@@ -196,6 +196,14 @@ export async function POST(req: NextRequest, res: NextResponse) {
           }
         );
 
+        const usersCollection = db.collection("delegates");
+        await usersCollection.findOneAndUpdate(
+          { address: requestData.recipient },
+          {
+            $inc: { "meetingRecords.sessionHosted.offchainCounts": 1 },
+          }
+        );
+
         client.close();
       } else if (requestData.meetingType === 2) {
         const client = await connectDB();
@@ -214,6 +222,14 @@ export async function POST(req: NextRequest, res: NextResponse) {
             $set: {
               "attendees.$.attendee_uid": response.data.offchainAttestationId,
             },
+          }
+        );
+
+        const usersCollection = db.collection("delegates");
+        await usersCollection.findOneAndUpdate(
+          { address: requestData.recipient },
+          {
+            $inc: { "meetingRecords.sessionAttended.offchainCounts": 1 },
           }
         );
 

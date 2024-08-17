@@ -21,9 +21,9 @@ function EditSessionDetails({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const getDescriptionStatus = (length: number) => {
     if (length < 600) return "Bad";
-    if (length >= 600 && length <= 1000) return "Medium (Short)";
+    if (length >= 600 && length <= 1000) return "Medium";
     if (length > 1000 && length <= 1500) return "Good";
-    if (length > 1500) return "Medium (Long)";
+    if (length > 1500) return "Medium";
   };
 
   const handleTitleChange = (e: any) => {

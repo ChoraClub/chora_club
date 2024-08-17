@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import img from "@/assets/images/daos/attestation.png";
 import Image from "next/image";
 import { RxCross2 } from "react-icons/rx";
@@ -6,22 +6,41 @@ import Link from "next/link";
 import { FaArrowRight } from "react-icons/fa6";
 import Confetti from "react-confetti";
 import { BsTwitterX } from "react-icons/bs";
+import { useAccount } from "wagmi";
+import StarRating from "../FeedbackPopup/RatingTypes/StarRating";
 
 function AttestationModal({
   isOpen,
   onClose,
+  hostAddress,
+  meetingId,
+  role,
 }: {
   isOpen: boolean;
   onClose: () => void;
+  hostAddress: string;
+  meetingId: string;
+  role: string;
 }) {
   // const [modalOpen, setModalOpen] = useState(props);
 
-  const storedStatus = localStorage.getItem("meetingData");
-  if (storedStatus) {
-    localStorage.removeItem("meetingData");
-  }
+  const [rating, setRating] = useState<number | null>(null);
+  const [submitted, setSubmitted] = useState(false);
+  const [feedbackStored, setFeedbackStored] = useState(false);
+  const [hoverRating, setHoverRating] = useState<number>(0);
+  const { address } = useAccount();
+
+  useEffect(() => {
+    const storedStatus = localStorage.getItem("meetingData");
+    if (storedStatus) {
+      localStorage.removeItem("meetingData");
+    }
+  }, []);
 
   const toggleModal = () => {
+    if (rating !== null && !feedbackStored) {
+      storeUserFeedback();
+    }
     onClose();
   };
   // console.log("Attestation modal");
@@ -39,6 +58,56 @@ function AttestationModal({
 
     // Open Twitter share dialog
     window.open(twitterUrl, "_blank");
+
+    if (rating !== null && !feedbackStored) {
+      storeUserFeedback();
+    }
+  };
+
+  const handleRatingClick = (value: number) => {
+    setRating(value);
+    console.log("Rating submitted:", value);
+  };
+
+  const storeUserFeedback = async () => {
+    try {
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+
+      const raw = JSON.stringify({
+        address: hostAddress,
+        role: role,
+        feedbackType: "feedbackReceived",
+        data: {
+          guestAddress: address,
+          meetingId: meetingId,
+          ratings: rating,
+        },
+      });
+
+      if (address) {
+        myHeaders.append("x-wallet-address", address);
+      }
+
+      const requestOptions: any = {
+        method: "POST",
+        headers: myHeaders,
+        body: raw,
+        redirect: "follow",
+      };
+
+      const response = await fetch(
+        "/api/feedback/store-feedback",
+        requestOptions
+      );
+
+      const result = await response.json();
+      if (result.success) {
+        setFeedbackStored(true);
+      }
+    } catch (e) {
+      console.log("Error: ", e);
+    }
   };
 
   return (
@@ -76,15 +145,25 @@ function AttestationModal({
                     Your attestation will be on its way shortly. 📜✨
                   </div>
                 </div>
-                {/* <div className="justify-around space-x-8 py-5">
-                  <button className="border-2 border-blue-shade-200 bg-blue-shade-200 rounded-full text-white px-8 py-3 font-bold text-sm">
-                    On-chain
-                  </button>
-                  <button className="border-2 border-blue-shade-200 rounded-full text-blue-shade-200 px-8 py-3 font-bold text-sm">
-                    Off-chain
-                  </button>
-                </div> */}
-                <div className="flex items-center text-blue-shade-100 mt-6">
+                {role === "guest" && (
+                  <div className="py-2 text-gray-900">
+                    <div>
+                      <h3 className="text-xl font-bold text-center">
+                        Rate the Host
+                      </h3>
+                      <div className="flex justify-center space-x-2 py-2">
+                        <StarRating
+                          ratings={[1, 2, 3, 4, 5]}
+                          hoverRating={hoverRating}
+                          currentRating={rating || 0}
+                          setHoverRating={setHoverRating}
+                          handleResponse={handleRatingClick}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+                <div className="flex items-center text-blue-shade-100 mt-4">
                   <FaArrowRight size={10} className="mt-1 mr-1" />
                   <div className="mr-8">
                     <Link
@@ -93,6 +172,11 @@ function AttestationModal({
                       }
                       target="_blank"
                       className="ps-[2px] underline font-semibold text-xs"
+                      onClick={() => {
+                        if (rating !== null && !feedbackStored) {
+                          storeUserFeedback();
+                        }
+                      }}
                     >
                       Share Your Feedback!
                     </Link>

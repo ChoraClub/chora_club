@@ -16,3 +16,59 @@
   background: #fff;
   border-radius: 5px;
 }
+
+.icon3d {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 10px rgba(0,0,0,0.3);
+}
+
+.icon3d::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 50%);
+  z-index: 1;
+}
+
+.icon3d:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 15px rgba(0,0,0,0.3);
+}
+
+.iconInner {
+  position: relative;
+  z-index: 2;
+}
+
+.icon3d.whiteBg {
+  background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
+}
+
+.icon3d.whiteBg::before {
+  background: linear-gradient(135deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0) 50%);
+}
+
+.icon3d.whiteBg .iconInner {
+  background: linear-gradient(135deg, #0077b6 0%, #005b8e 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+@keyframes expandTooltip {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.customTooltip {
+  transform-origin: center;
+  animation: expandTooltip 0.3s ease-out forwards;
+}
