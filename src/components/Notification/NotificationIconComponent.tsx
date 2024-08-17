@@ -52,11 +52,20 @@ function NotificationIconComponent() {
     if (now - lastFetchTime.current > cacheDuration) {
       setIsAPILoading(true);
       try {
-        const response = await fetch("/api/notifications", {
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        if (address) {
+          myHeaders.append("x-wallet-address", address);
+        }
+
+        const raw = JSON.stringify({ address });
+
+        const requestOptions: RequestInit = {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ address }),
-        });
+          headers: myHeaders,
+          body: raw,
+        };
+        const response = await fetch("/api/notifications", requestOptions);
         const result = await response.json();
         if (result.success && result?.data) {
           const notificationsData = result.data.map((notification: any) => ({
