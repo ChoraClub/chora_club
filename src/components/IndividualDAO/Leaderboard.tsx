@@ -8,9 +8,7 @@ import { Tooltip } from "@nextui-org/react";
 import { IoCopy } from "react-icons/io5";
 import Link from "next/link";
 import { FaStar, FaStarHalfAlt } from "react-icons/fa";
-import styles from "./Leaderboard.module.css";
 import LeaderboardSkeleton from "../SkeletonLoader/LeaderboardSkeletonLoader";
-import TopDelegatesSkeleton from "../SkeletonLoader/TopLeaderSkeletonLoader";
 
 interface DelegateData {
   address: string;
