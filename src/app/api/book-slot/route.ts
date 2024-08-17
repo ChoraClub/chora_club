@@ -144,7 +144,7 @@ export async function POST(
         const hostENSNameOrAddress = await getDisplayNameOrAddr(host_address);
         const notificationToHost = {
           receiver_address: host_address,
-          content: `Great news! 🎉 ${userENSNameOrAddress} has just booked a session with you on ${dao_name}. The session is scheduled on ${localSlotTime} and will focus on ${title}.`,
+          content: `Great news! 🎉 ${userENSNameOrAddress} has just booked a session with you on ${dao_name}. The session is scheduled on ${localSlotTime} UTC and will focus on ${title}.`,
           createdAt: Date.now(),
           read_status: false,
           notification_name: "newBookingForHost",
@@ -154,7 +154,7 @@ export async function POST(
 
         const notificationToGuest = {
           receiver_address: guestAddress,
-          content: `Congratulations! 🎉 Your session on ${dao_name} titled "${title}" has been successfully booked with ${hostENSNameOrAddress}. The session will take place on ${localSlotTime}.`,
+          content: `Congratulations! 🎉 Your session on ${dao_name} titled "${title}" has been successfully booked with ${hostENSNameOrAddress}. The session will take place on ${localSlotTime} UTC.`,
           createdAt: Date.now(),
           read_status: false,
           notification_name: "newBookingForGuest",

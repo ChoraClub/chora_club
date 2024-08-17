@@ -92,7 +92,7 @@ export async function PUT(
       const hostENSNameOrAddress = await getDisplayNameOrAddr(host_address);
       const notificationToGuest = {
         receiver_address: attendeeAddress,
-        content: `The session titled "${title}" on ${dao_name}, scheduled on ${localSlotTime}, has been rejected by the delegate ${hostENSNameOrAddress}.`,
+        content: `The session titled "${title}" on ${dao_name}, scheduled on ${localSlotTime} UTC, has been rejected by the delegate ${hostENSNameOrAddress}.`,
         createdAt: Date.now(),
         read_status: false,
         notification_name: "sessionRejectionForGuest",
