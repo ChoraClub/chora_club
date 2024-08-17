@@ -3,16 +3,17 @@ import type { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 import { BASE_URL } from "./config/constants";
 
-const allowedOrigins = [BASE_URL];
+const allowedOrigins = BASE_URL;
 
 export async function middleware(request: NextRequest) {
   // console.log("Request Body :- ", request);
 
   const origin = request.nextUrl.origin;
 
-  // console.log("Origin request come from:-", origin);
+  // console.log("allowed Origin", allowedOrigins);
+  // console.log("Origin from request", origin);
 
-  if (!allowedOrigins.includes(origin)) {
+  if (!allowedOrigins?.includes(origin)) {
     return new NextResponse(
       JSON.stringify({ error: "Unknown origin request come Forbidden" }),
       {

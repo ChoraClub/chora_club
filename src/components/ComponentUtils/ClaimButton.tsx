@@ -25,7 +25,7 @@ const ClaimButton: React.FC<ClaimButtonProps> = ({
   endTime,
   dao,
   address,
-  onChainId
+  onChainId,
 }) => {
   const [isClaiming, setIsClaiming] = useState(false);
   const [isClaimed, setIsClaimed] = useState(!!onChainId);
@@ -78,16 +78,27 @@ const ClaimButton: React.FC<ClaimButtonProps> = ({
     };
 
     try {
-      const res = await fetch("/api/attest-onchain", {
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      if (address) {
+        myHeaders.append("x-wallet-address", address);
+      }
+
+      // Configure the request options
+      const requestOptions = {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: myHeaders,
         body: JSON.stringify(data),
-      });
+      };
+
+      const res = await fetch("/api/attest-onchain", requestOptions);
 
       // if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
       if (!res.ok) {
         const errorText = await res.text();
-        throw new Error(`HTTP error! status: ${res.status}, message: ${errorText}`);
+        throw new Error(
+          `HTTP error! status: ${res.status}, message: ${errorText}`
+        );
       }
 
       const attestationObject = await res.json();
@@ -135,7 +146,7 @@ const ClaimButton: React.FC<ClaimButtonProps> = ({
           toast.success("On-chain attestation claimed successfully!");
         }
       }
-    } catch (error:any) {
+    } catch (error: any) {
       console.error("Error claim:", error.message);
       toast.error(`Failed to claim on-chain attestation`);
     } finally {
@@ -160,17 +171,11 @@ const ClaimButton: React.FC<ClaimButtonProps> = ({
         className={`${styles.button} ${
           !!onChainId || isClaimed ? styles.claimed : ""
         } w-full `}
-        onClick={
-          handleAttestationOnchain
-        }
+        onClick={handleAttestationOnchain}
         disabled={!!onChainId || isClaiming || isClaimed}
       >
         <span className={styles.buttonText}>
-          {isClaiming
-            ? "Claiming..."
-            : isClaimed
-            ? "Claimed"
-            : "Claim"}
+          {isClaiming ? "Claiming..." : isClaimed ? "Claimed" : "Claim"}
         </span>
         <span className={styles.iconWrapper}>
           {isClaiming ? (
