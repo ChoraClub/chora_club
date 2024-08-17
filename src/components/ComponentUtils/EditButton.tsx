@@ -113,7 +113,7 @@ const EditButton: React.FC<EditButtonProps> = ({ sessionData }) => {
     <>
       <Tooltip content="Edit Details" placement="right" showArrow>
         <span
-          className={`bg-gradient-to-r from-[#8d949e] to-[#555c6629]  rounded-full p-1 cursor-pointer w-10 flex items-center justify-center font-semibold text-sm text-black`}
+          className={`bg-gradient-to-r from-[#8d949e] to-[#555c6629]  rounded-full p-1 py-3 cursor-pointer w-10 flex items-center justify-center font-semibold text-sm text-black`}
         //   style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
           onClick={(e) => {
             e.preventDefault();
