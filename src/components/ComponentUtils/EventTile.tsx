@@ -20,6 +20,7 @@ import logo from "@/assets/images/daos/CCLogo.png";
 import user1 from "@/assets/images/user/user1.svg";
 import { BsPersonVideo3 } from "react-icons/bs";
 import { fetchEnsAvatar } from "@/utils/ENSUtils";
+import styles from "./Button.module.css";
 import {
   Modal,
   ModalContent,
@@ -507,10 +508,10 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
                   setStartLoading(true);
                   router.push(`/meeting/session/${data.meetingId}/lobby`);
                 }}
-                className="text-center bg-blue-shade-100 rounded-full font-bold text-white py-2 text-xs cursor-pointer"
+                className="text-center rounded-full font-bold text-white mt-2 text-xs cursor-pointer"
               >
                 {startLoading ? (
-                  <div className="flex justify-center items-center">
+                  <div className="flex justify-center items-center w-full py-2 rounded-full" style={{background:"linear-gradient(45deg, #004DFF, #00A3FF)"}}>
                     <Oval
                       visible={true}
                       height="20"
@@ -521,8 +522,8 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
                     />
                   </div>
                 ) : (
-                  <div className="flex items-center justify-center gap-2 text-sm">
-                    Join <BsPersonVideo3 className="size-4" />
+                  <div className={`${styles.button} flex items-center justify-center gap-2 text-sm w-full`}>
+                    <span className={styles.buttonText}>Join</span><span className={styles.iconWrapper}><BsPersonVideo3 className={styles.icon}/></span>
                   </div>
                 )}
               </div>

@@ -12,6 +12,7 @@ import { useRouter } from "next-nprogress-bar";
 import { Oval } from "react-loader-spinner";
 import SessionTileSkeletonLoader from "@/components/SkeletonLoader/SessionTileSkeletonLoader";
 import ErrorDisplay from "@/components/ComponentUtils/ErrorDisplay";
+import RecordedSessionsSkeletonLoader from "@/components/SkeletonLoader/RecordedSessionsSkeletonLoader";
 
 type Attendee = {
   attendee_address: string;
@@ -93,7 +94,7 @@ function AttendingUserSessions({ daoName }: { daoName: string }) {
   return (
     <div className="space-y-6">
       {pageLoading ? (
-        <SessionTileSkeletonLoader />
+        <RecordedSessionsSkeletonLoader />
       ) : sessionDetails.length > 0 ? (
         <div className={`grid min-[475px]:grid-cols- md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-10 py-8 font-poppins`}>
         {sessionDetails.map((data, index) => (
