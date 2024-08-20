@@ -58,6 +58,7 @@ function RecordedSessionsTile({
   const [ensGuestNames, setEnsGuestNames] = useState<any>({});
   const [loadingHostNames, setLoadingHostNames] = useState<boolean>(true);
   const [loadingGuestNames, setLoadingGuestNames] = useState<boolean>(true);
+  const [updatedSessionDetails, setUpdatedSessionDetails] = useState<any[]>([]);
 
   const handleCopy = (addr: string) => {
     copy(addr);
@@ -178,6 +179,14 @@ function RecordedSessionsTile({
     }
   }, [meetingData]);
 
+  const updateSessionData = (updatedData: any, index: number) => {
+    setUpdatedSessionDetails((prevDetails) => {
+      const newDetails = [...prevDetails];
+      newDetails[index] = updatedData;
+      return newDetails;
+    });
+  };
+
   return (
     <>
       <div
@@ -220,7 +229,11 @@ function RecordedSessionsTile({
                 </div>
               ) : (
                 <video
-                  poster={`https://gateway.lighthouse.storage/ipfs/${data.thumbnail_image}`}
+                  poster={`https://gateway.lighthouse.storage/ipfs/${
+                    updatedSessionDetails[index]?.thumbnail_image
+                      ? updatedSessionDetails[index].thumbnail_image
+                      : data.thumbnail_image
+                  }`}
                   ref={(el: any) => (videoRefs.current[index] = el)}
                   loop
                   muted
@@ -246,7 +259,7 @@ function RecordedSessionsTile({
                     WebkitLineClamp: 1,
                   }}
                 >
-                  {data.title}
+                  {updatedSessionDetails[index]?.title || data.title}
                 </div>
                 <div className="flex text-sm gap-3 py-1">
                   <div className="bg-[#F5F5F5] flex items-center py-1 px-3 rounded-md gap-2">
@@ -393,9 +406,22 @@ function RecordedSessionsTile({
                     }
                   />
                 )}
-                <div className="flex w-full justify-end">
-                  {session === "hosted" && <EditButton sessionData={data} />}
-                </div>
+                {session === "hosted" && (
+                  <div
+                    className={`flex justify-end ${
+                      data.uid_host ? "" : "w-full"
+                    } `}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                    }}
+                  >
+                    <EditButton
+                      sessionData={data}
+                      updateSessionData={updateSessionData}
+                      index={index}
+                    />
+                  </div>
+                )}
               </div>
             </div>
           </div>
