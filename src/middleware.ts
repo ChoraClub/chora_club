@@ -1,21 +1,36 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
-import { BASE_URL } from "./config/constants";
 
-const allowedOrigins = BASE_URL;
+const normalizeOrigin = (url: string) => url.replace(/\/$/, "");
+
+const allowedOrigins = [
+  normalizeOrigin(process.env.NEXT_PUBLIC_LOCAL_BASE_URL!),
+  normalizeOrigin(process.env.NEXT_PUBLIC_HOSTED_BASE_URL!),
+];
 
 export async function middleware(request: NextRequest) {
   // console.log("Request Body :- ", request);
 
-  const origin = request.nextUrl.origin;
+  // const origin = request.nextUrl.origin;
+  const origin = normalizeOrigin(request.nextUrl.origin);
 
-  // console.log("allowed Origin", allowedOrigins);
-  // console.log("Origin from request", origin);
+  console.log("allowed Origin", allowedOrigins);
+  console.log("Origin from request", origin);
 
-  if (!allowedOrigins?.includes(origin)) {
+  // if (!allowedOrigins?.includes(origin)) {
+  //   return new NextResponse(
+  //     JSON.stringify({ error: "Unknown origin request come Forbidden" }),
+  //     {
+  //       status: 403,
+  //       headers: { "Content-Type": "application/json" },
+  //     }
+  //   );
+  // }
+
+  if (!allowedOrigins.includes(origin)) {
     return new NextResponse(
-      JSON.stringify({ error: "Unknown origin request come Forbidden" }),
+      JSON.stringify({ error: "Unknown origin request. Forbidden" }),
       {
         status: 403,
         headers: { "Content-Type": "application/json" },

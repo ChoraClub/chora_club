@@ -8,6 +8,11 @@ export const BASE_URL =
     ? process.env.NEXT_PUBLIC_LOCAL_BASE_URL
     : process.env.NEXT_PUBLIC_HOSTED_BASE_URL;
 
+export const ALLOWED_ORIGINS = [
+  process.env.NEXT_PUBLIC_LOCAL_BASE_URL,
+  process.env.NEXT_PUBLIC_HOSTED_BASE_URL,
+].filter(Boolean);
+
 export const SCHEMA_ID =
   process.env.NODE_ENV == "development"
     ? "0xbaeab565ea1cf3cd3808b75fef04b811606b2c0d6f57a39c6abb60ee642fdcc0"
