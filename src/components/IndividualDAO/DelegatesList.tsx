@@ -116,18 +116,19 @@ function DelegatesList({ props }: { props: string }) {
           };
         });
       } else {
-
+console.log(daoInfo)
         setSkip(daoInfo.nextSkip);
         setHasMore(daoInfo.hasMore);
         formattedDelegates = await Promise.all(
           daoInfo.delegates.map(async (delegate: any) => {
             // const ensName = await getEnsNameOfUser(delegate._id);
-            const avatar = await fetchEnsAvatar(delegate.toDelegate);
-            // console.log("avatar", avatar);
+            console.log("delegate", delegate.delegate);
+            const avatar = await fetchEnsAvatar(delegate.delegate);
+            console.log("avatar", avatar);
             return {
-              delegate: delegate.toDelegate,
-              adjustedBalance: (delegate.newBalance/10**18),
-              newBalance: delegate.newBalance,
+              delegate: delegate.delegate,
+              adjustedBalance: (delegate.latestBalance/10**18),
+              newBalance: delegate.latestBalance,
               profilePicture: avatar?.avatar,
               ensName: avatar?.ensName,
             };
