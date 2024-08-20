@@ -482,9 +482,7 @@ const BottomBar = ({
           </DropdownMenuContent>
         </DropdownMenu>
 
-        <div
-          className={clsx("flex space-x-3", role === Role.HOST ? "mr-12" : "")}
-        >
+        <div className={clsx("flex space-x-3")}>
           <ButtonWithIcon
             content={isVideoOn ? "Turn off camera" : "Turn on camera"}
             onClick={() => {

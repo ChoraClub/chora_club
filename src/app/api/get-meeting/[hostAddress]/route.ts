@@ -14,6 +14,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
     // Find documents based on user_address
     const documents = await collection
       .find({ host_address: { $regex: new RegExp(`^${host_address}$`, "i") } })
+      .sort({ slot_time: -1 })
       .toArray();
 
     client.close();

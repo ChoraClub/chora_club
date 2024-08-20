@@ -189,12 +189,23 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
                     sessionDetails={sessionDetails}
                     onSessionDetailsChange={handleSessionDetailsChange}
                   />
-                  <div className="flex justify-center">
+                  <div className="flex justify-center gap-3">
                     <Button
                       className="bg-blue-shade-200 rounded-full font-semibold px-10 text-white"
                       onClick={() => setViewMode("preview")}
                     >
                       Next
+                    </Button>
+
+                    <Button
+                      className="bg-blue-shade-200 rounded-full font-semibold px-10 text-white"
+                      onClick={() =>
+                        router.push(
+                          `/profile/${address}?active=sessions&session=hosted`
+                        )
+                      }
+                    >
+                      Back to Profile
                     </Button>
                   </div>
                 </div>
@@ -205,7 +216,7 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
                     collection={collection}
                     sessionDetails={sessionDetails}
                   />
-                  <div className="flex justify-center ">
+                  <div className="flex justify-center gap-3">
                     <Button
                       className="bg-blue-shade-200 text-white font-semibold rounded-full px-10"
                       onClick={() => handleUpdate()}
@@ -221,6 +232,16 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
                       ) : (
                         "Update"
                       )}
+                    </Button>
+                    <Button
+                      className="bg-blue-shade-200 rounded-full font-semibold px-10 text-white"
+                      onClick={() =>
+                        router.push(
+                          `/profile/${address}?active=sessions&session=hosted`
+                        )
+                      }
+                    >
+                      Back to Profile
                     </Button>
                   </div>
                 </div>

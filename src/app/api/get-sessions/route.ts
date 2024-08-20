@@ -21,6 +21,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
           host_address: address,
           meeting_status: "Recorded",
         })
+        .sort({ slot_time: -1 })
         .toArray();
 
       const mergedHostedMeetings = await Promise.all(
@@ -48,6 +49,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
           meeting_status: "Recorded",
           "attendees.attendee_address": address,
         })
+        .sort({ slot_time: -1 })
         .toArray();
 
       const mergedAttendedMeetings = await Promise.all(

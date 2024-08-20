@@ -26,11 +26,14 @@ export async function POST(req: NextRequest, res: NextResponse) {
       query.host_address = { $regex: new RegExp(`^${address}$`, "i") };
     }
 
-    const meetings = await meetingsCollection.find(query).toArray();
+    const meetings = await meetingsCollection
+      .find(query)
+      .sort({ slot_time: -1 })
+      .toArray();
 
     // Extract unique addresses from meetings data
     const uniqueAddresses = new Set<string>();
-    meetings.forEach(meeting => {
+    meetings.forEach((meeting) => {
       uniqueAddresses.add(meeting.host_address);
       meeting.attendees.forEach((attendee: any) => {
         uniqueAddresses.add(attendee.attendee_address);
@@ -44,12 +47,12 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
     // Create a map for quick lookup of delegate data
     const delegatesMap = new Map<string, any>();
-    delegates.forEach(delegate => {
+    delegates.forEach((delegate) => {
       delegatesMap.set(delegate.address, delegate);
     });
 
     // Merge profile data with meeting data
-    const mergedMeetings = meetings.map(meeting => {
+    const mergedMeetings = meetings.map((meeting) => {
       const hostInfo = delegatesMap.get(meeting.host_address) || null;
       const attendees = meeting.attendees.map((attendee: any) => {
         const guestInfo = delegatesMap.get(attendee.attendee_address) || null;

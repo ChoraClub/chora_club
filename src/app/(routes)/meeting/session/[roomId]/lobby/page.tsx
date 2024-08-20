@@ -197,6 +197,34 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
       //   toast("Please wait, Host has not started the session yet.");
       //   console.log("Wait..");
       // }
+
+      if (role === "guest") {
+        // Get the attendee address based on the role
+        const attendeeAddress = role === "guest" ? address : peerId;
+
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        if (address) {
+          myHeaders.append("x-wallet-address", address);
+        }
+
+        const raw = JSON.stringify({
+          meetingId: params.roomId,
+          attendee_address: attendeeAddress,
+        });
+
+        // Make the API request
+        const requestOptions = {
+          method: "PUT",
+          headers: myHeaders,
+          body: raw,
+        };
+
+        fetch("/api/update-session-attendees", requestOptions)
+          .then((response) => response.text())
+          .then((result) => console.log(result))
+          .catch((error) => console.error(error));
+      }
     }
   };
 
@@ -268,8 +296,6 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
     }
     verifyMeetingId();
   }, [params.roomId, isAllowToEnter, notAllowedMessage, meetingStatus]);
-
-  useEffect(() => {}, [daoName]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -544,18 +570,6 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
           )}
         </>
       )}
-      <Toaster
-        toastOptions={{
-          style: {
-            fontSize: "14px",
-            backgroundColor: "#3E3D3D",
-            color: "#fff",
-            boxShadow: "none",
-            borderRadius: "50px",
-            padding: "3px 5px",
-          },
-        }}
-      />
     </>
   );
 };

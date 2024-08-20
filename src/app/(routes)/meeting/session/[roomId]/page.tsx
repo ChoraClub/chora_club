@@ -203,11 +203,11 @@ export default function Component({ params }: { params: { roomId: string } }) {
         const status = JSON.parse(payload).isRecording;
         setIsRecording(status);
       }
-      if (label === 'requestRecordingStatus' && role === 'host') {
+      if (label === "requestRecordingStatus" && role === "host") {
         sendData({
           to: [from],
           payload: JSON.stringify({ isRecording: isRecording }),
-          label: 'recordingStatus',
+          label: "recordingStatus",
         });
       }
     },
@@ -344,49 +344,6 @@ export default function Component({ params }: { params: { roomId: string } }) {
         walletAddress: address || "",
       });
 
-      if (role === "guest") {
-        // Get the attendee address based on the role
-        const attendeeAddress = role === "guest" ? address : peerId;
-        let uniqueAddresses = new Set();
-        let attendees = [];
-
-        if (!uniqueAddresses.has(attendeeAddress)) {
-          // Add the address to the set of unique addresses
-          uniqueAddresses.add(attendeeAddress);
-
-          // Construct the request body
-
-          // Add the attendee dynamically one by one
-          attendees.push({
-            attendee_address: attendeeAddress,
-          });
-        }
-
-        console.log("All attendees: ", attendees);
-
-        const myHeaders = new Headers();
-        myHeaders.append("Content-Type", "application/json");
-        if (address) {
-          myHeaders.append("x-wallet-address", address);
-        }
-
-        const raw = JSON.stringify({
-          meetingId: params.roomId,
-          attendees: attendees,
-        });
-
-        // Make the API request
-        const requestOptions = {
-          method: "PUT",
-          headers: myHeaders,
-          body: raw,
-        };
-
-        fetch("/api/update-session-attendees", requestOptions)
-          .then((response) => response.text())
-          .then((result) => console.log(result))
-          .catch((error) => console.error(error));
-      }
     }
   }, [isAllowToEnter, state]);
 
