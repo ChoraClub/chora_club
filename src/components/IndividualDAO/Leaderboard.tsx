@@ -12,13 +12,14 @@ import LeaderboardSkeleton from "../SkeletonLoader/LeaderboardSkeletonLoader";
 
 interface DelegateData {
   address: string;
-  sessions: number;
-  nfts: number;
-  views: number;
+  sessionCount: number;
+  claimedNFT: number;
+  numberOfViews: number;
+  ratingCount: number;
+  averageRating: number;
   ensName: string;
   ensAvatar: string;
   color: string;
-  rating: number;
 }
 
 function Leaderboard({ props }: { props: string }) {
@@ -43,58 +44,6 @@ function Leaderboard({ props }: { props: string }) {
     }
   };
 
-  const delegates = [
-    {
-      address: "0xBb4c2baB6B2de45F9CC7Ab41087b730Eaa4adE31",
-      sessions: 10,
-      nfts: 5,
-      views: 100,
-      rating: 3,
-    },
-    {
-      address: "0xc622420AD9dE8E595694413F24731Dd877eb84E1",
-      sessions: 15,
-      nfts: 8,
-      views: 150,
-      rating: 1,
-    },
-    {
-      address: "0xa2d590fee197c0b614fe7c3e10303327f38c0dc3",
-      sessions: 25,
-      nfts: 82,
-      views: 250,
-      rating: 3.5,
-    },
-    {
-      address: "0x1b686ee8e31c5959d9f5bbd8122a58682788eead",
-      sessions: 16,
-      nfts: 10,
-      views: 130,
-      rating: 2,
-    },
-    {
-      address: "0x5b191f5a2b4a867c4ed71858daccc51fc59c69c0",
-      sessions: 75,
-      nfts: 18,
-      views: 550,
-      rating: 4,
-    },
-    {
-      address: "0x1b686ee8e31c5959d9f5bbd8122a58682788eead",
-      sessions: 16,
-      nfts: 10,
-      views: 130,
-      rating: 4.7,
-    },
-    {
-      address: "0x5b191f5a2b4a867c4ed71858daccc51fc59c69c0",
-      sessions: 75,
-      nfts: 18,
-      views: 550,
-      rating: 5,
-    },
-  ];
-
   const colors = [
     "bg-red-500",
     "bg-blue-500",
@@ -107,23 +56,52 @@ function Leaderboard({ props }: { props: string }) {
 
   useEffect(() => {
     const fetchEnsData = async () => {
+      const resp = await fetch(`/api/getleaderboard/${props}`);
+      const apiData = await resp.json();
       const updatedDelegates: DelegateData[] = await Promise.all(
-        delegates.map(async (delegate, index) => {
+        apiData.map(async (delegate: any, index: number) => {
           try {
-            const delegateAddress = await fetchEnsAvatar(delegate.address);
+            // const delegateAddress = await fetchEnsAvatar(delegate.address);
+            // return {
+            //   ...delegate,
+            //   ensName:
+            //     delegateAddress?.ensName ||
+            //     formatWalletAddress(delegate.address),
+            //   ensAvatar: delegateAddress?.avatar || "",
+            //   color: colors[index % colors.length],
+            // };
+            const delegateAddress = await fetchEnsAvatar(
+              delegate.delegate_address
+            );
             return {
-              ...delegate,
+              address: delegate.delegate_address,
+              sessionCount: delegate.sessionCount,
+              claimedNFT: delegate.ClaimedNFT,
+              numberOfViews: delegate.NumberofViews,
+              ratingCount: delegate.ratingCount,
+              averageRating: delegate.averageRating,
               ensName:
                 delegateAddress?.ensName ||
-                formatWalletAddress(delegate.address),
+                formatWalletAddress(delegate.delegate_address),
               ensAvatar: delegateAddress?.avatar || "",
               color: colors[index % colors.length],
             };
           } catch (error) {
             console.error("Error fetching ENS data:", error);
+            // return {
+            //   ...delegate,
+            //   ensName: formatWalletAddress(delegate.address),
+            //   ensAvatar: "",
+            //   color: colors[index % colors.length],
+            // };
             return {
-              ...delegate,
-              ensName: formatWalletAddress(delegate.address),
+              address: delegate.delegate_address,
+              sessionCount: delegate.sessionCount,
+              claimedNFT: delegate.ClaimedNFT,
+              numberOfViews: delegate.NumberofViews,
+              ratingCount: delegate.ratingCount,
+              averageRating: delegate.averageRating,
+              ensName: formatWalletAddress(delegate.delegate_address),
               ensAvatar: "",
               color: colors[index % colors.length],
             };
@@ -145,114 +123,117 @@ function Leaderboard({ props }: { props: string }) {
     <>
       <div className="container mx-auto p-4 font-poppins">
         <div className="max-w-5xl flex-grow mx-auto">
-        {isLoading?
-           [...Array(5)].map((_, index) => <LeaderboardSkeleton key={index} />)
-           :
-          delegatesData.map((delegate: DelegateData, index) => (
-            <div
-              className="bg-white hover:bg-gray-50 rounded-lg p-4 mb-4 w-full transition duration-300 ease-in-out hover:shadow-lg hover:scale-105"
-              key={index}
-              style={{
-                boxShadow:
-                  "rgb(204, 219, 232) 3px 3px 12px 0px inset, rgba(255, 255, 255, 0.5) -3px -3px 6px 1px inset",
-              }}
-            >
-              <div className="flex flex-col justify-between sm:flex-row items-center">
-                <div className="flex items-center space-x-3 mb-3 sm:mb-0">
-                  <div
-                    className={`text-gray-500 font-semibold ${
-                      index < 3 ? "text-xl" : "text-sm"
-                    }`}
-                  >
-                    {getRankSymbol(index)}
-                  </div>
-                  <Image
-                    src={delegate.ensAvatar || user1}
-                    alt="image"
-                    width={20}
-                    height={20}
-                    className={`h-10 w-10 rounded-full object-cover object-center`}
-                  />
-                  <div className="flex-grow flex items-center gap-1">
-                    <Link
-                      href={`/${props}/${delegate.address}?active=info`}
-                      className={`font-bold w-fit cursor-pointer hover:text-gray-500 ${delegate.color} bg-opacity-20 px-2 py-1 rounded-full`}
-                    >
-                      {delegate.ensName}
-                    </Link>
-                    <Tooltip
-                      content="Copy"
-                      placement="right"
-                      closeDelay={1}
-                      showArrow
-                    >
-                      <span className="cursor-pointer text-sm">
-                        <IoCopy onClick={() => handleCopy(delegate.address)} />
-                      </span>
-                    </Tooltip>
-                  </div>
-                </div>
-                <div className="flex flex-wrap justify-center sm:justify-end mt-2 sm:mt-0">
-                  <div className="text-center mx-2 my-1">
-                    <div className={` text-black font-bold px-3 py-1`}>
-                      {delegate.nfts}
-                    </div>
-                    <div className="text-xs text-gray-600 mt-1">
-                      NFTs Claimed
-                    </div>
-                  </div>
-                  <div className="text-center mx-2 my-1">
-                    <div
-                      className={`${delegate.color} bg-opacity-20 text-black font-bold px-3 py-1 rounded-full`}
-                    >
-                      {delegate.sessions}
-                    </div>
-                    <div className="text-xs text-gray-600 mt-1">Sessions</div>
-                  </div>
-                  <div className="text-center mx-2 my-1">
-                    <div className={` text-black font-bold px-3 py-1`}>
-                      {delegate.views}
-                    </div>
-                    <div className="text-xs text-gray-600 mt-1">Views</div>
-                  </div>
-                  <div className="text-center flex items-center mx-2 my-1 w-32">
-                    <div className="text-black font-bold pl-3 pr-1 py-1">
-                      <div className="flex">
-                        {[...Array(5)].map((_, index) => {
-                          const starValue = index + 1;
-                          if (starValue <= delegate.rating) {
-                            return (
-                              <FaStar
-                                key={index}
-                                className="w-5 h-5 text-yellow-400 drop-shadow-lg"
-                              />
-                            );
-                          } else if (starValue - 0.5 <= delegate.rating) {
-                            return (
-                              <FaStarHalfAlt
-                                key={index}
-                                className="w-5 h-5 text-yellow-400 drop-shadow-lg"
-                              />
-                            );
-                          } else {
-                            return (
-                              <FaStar
-                                key={index}
-                                className="w-5 h-5 text-gray-300"
-                              />
-                            );
-                          }
-                        })}
+          {isLoading
+            ? [...Array(5)].map((_, index) => (
+                <LeaderboardSkeleton key={index} />
+              ))
+            : delegatesData.map((delegate: DelegateData, index) => (
+                <div
+                  className="bg-white hover:bg-gray-50 rounded-lg p-4 mb-4 w-full transition duration-300 ease-in-out hover:shadow-lg hover:scale-105"
+                  key={index}
+                  style={{
+                    boxShadow:
+                      "rgb(204, 219, 232) 3px 3px 12px 0px inset, rgba(255, 255, 255, 0.5) -3px -3px 6px 1px inset",
+                  }}>
+                  <div className="flex flex-col justify-between sm:flex-row items-center">
+                    <div className="flex items-center space-x-3 mb-3 sm:mb-0">
+                      <div
+                        className={`text-gray-500 font-semibold ${
+                          index < 3 ? "text-xl" : "text-sm"
+                        }`}>
+                        {getRankSymbol(index)}
+                      </div>
+                      <Image
+                        src={delegate.ensAvatar || user1}
+                        alt="image"
+                        width={20}
+                        height={20}
+                        className={`h-10 w-10 rounded-full object-cover object-center`}
+                      />
+                      <div className="flex-grow flex items-center gap-1">
+                        <Link
+                          href={`/${props}/${delegate.address}?active=info`}
+                          className={`font-bold w-fit cursor-pointer hover:text-gray-500 ${delegate.color} bg-opacity-20 px-2 py-1 rounded-full`}>
+                          {delegate.ensName}
+                        </Link>
+                        <Tooltip
+                          content="Copy"
+                          placement="right"
+                          closeDelay={1}
+                          showArrow>
+                          <span className="cursor-pointer text-sm">
+                            <IoCopy
+                              onClick={() => handleCopy(delegate.address)}
+                            />
+                          </span>
+                        </Tooltip>
                       </div>
                     </div>
-                    <div className="text-xs text-gray-600 mt-1 ml-1">
-                      ({delegate.rating})
+                    <div className="flex flex-wrap justify-center sm:justify-end mt-2 sm:mt-0">
+                      <div className="text-center mx-2 my-1">
+                        <div className={` text-black font-bold px-3 py-1`}>
+                          {delegate.claimedNFT}
+                        </div>
+                        <div className="text-xs text-gray-600 mt-1">
+                          NFTs Claimed
+                        </div>
+                      </div>
+                      <div className="text-center mx-2 my-1">
+                        <div
+                          className={`${delegate.color} bg-opacity-20 text-black font-bold px-3 py-1 rounded-full`}>
+                          {delegate.sessionCount}
+                        </div>
+                        <div className="text-xs text-gray-600 mt-1">
+                          Sessions
+                        </div>
+                      </div>
+                      <div className="text-center mx-2 my-1">
+                        <div className={` text-black font-bold px-3 py-1`}>
+                          {delegate.numberOfViews}
+                        </div>
+                        <div className="text-xs text-gray-600 mt-1">Views</div>
+                      </div>
+                      <div className="text-center flex items-center mx-2 my-1 w-32">
+                        <div className="text-black font-bold pl-3 pr-1 py-1">
+                          <div className="flex">
+                            {[...Array(5)].map((_, index) => {
+                              const starValue = index + 1;
+                              if (starValue <= delegate.averageRating) {
+                                return (
+                                  <FaStar
+                                    key={index}
+                                    className="w-5 h-5 text-yellow-400 drop-shadow-lg"
+                                  />
+                                );
+                              } else if (
+                                starValue - 0.5 <=
+                                delegate.averageRating
+                              ) {
+                                return (
+                                  <FaStarHalfAlt
+                                    key={index}
+                                    className="w-5 h-5 text-yellow-400 drop-shadow-lg"
+                                  />
+                                );
+                              } else {
+                                return (
+                                  <FaStar
+                                    key={index}
+                                    className="w-5 h-5 text-gray-300"
+                                  />
+                                );
+                              }
+                            })}
+                          </div>
+                        </div>
+                        <div className="text-xs text-gray-600 mt-1 ml-1">
+                          ({delegate.ratingCount})
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            </div>
-          ))}
+              ))}
         </div>
       </div>
     </>
