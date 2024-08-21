@@ -60,10 +60,10 @@ function ExploreDAOs() {
   };
 
   return (
-    <div className="pt-6 pl-14 pr-6 min-h-screen">
+    <div className="pt-4 sm:pt-6 px-4 sm:px-6 lg:px-14 min-h-screen">
       <div className="">
-        <div className="flex justify-between pe-10">
-          <div className="text-blue-shade-200 font-medium text-4xl font-quanty pb-4">
+        <div className="flex flex-row justify-between items-center mb-6">
+          <div className="text-blue-shade-200 font-medium text-2xl sm:text-3xl md:text-4xl font-quanty">
             Explore DAOs
           </div>
 
@@ -73,27 +73,28 @@ function ExploreDAOs() {
         </div>
 
         <div
-          style={{ background: "rgba(238, 237, 237, 0.36)" }}
-          className="flex border-[0.5px] border-black w-fit rounded-full my-3 font-poppins"
+          // style={{ background: "rgba(238, 237, 237, 0.36)" }}
+          className="flex justify-start items-center border-[0.5px] bg-[#f5f5f5] border-black rounded-full w-fit max-w-sm sm:max-w-full my-3 font-poppins"
         >
           <input
             type="text"
             placeholder="Search DAOs"
-            style={{ background: "rgba(238, 237, 237, 0.36)" }}
-            className="pl-5 rounded-full outline-none"
+            // style={{ background: "rgba(238, 237, 237, 0.36)" }}
+            className="pl-5 pr-2 bg-[#f5f5f5]  rounded-full outline-none"
             value={searchQuery}
             onChange={(e) => handleSearchChange(e.target.value)}
           ></input>
-          <span className="flex items-center bg-black rounded-full px-6 py-3">
-            <Image src={search} alt="search" width={20} height={20} />
+          <span className="flex items-center bg-black rounded-full px-4 sm:px-6 py-2 sm:py-3">
+            <Image src={search} alt="search" width={16} height={16} className="w-4 h-4 sm:w-5 sm:h-5"  />
           </span>
         </div>
+
 
         {isPageLoading ? (
           <ExploreDaosSkeletonLoader />
         ) : (
           <>
-            <div className="grid min-[475px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-10 py-8 font-poppins">
+            <div className="flex flex-wrap justify-center sm:justify-normal gap-4 sm:gap-6 lg:gap-8 py-8 font-poppins">
               {daoInfo.length > 0 ? (
                 daoInfo.map((daos: any, index: any) => (
                   <div
@@ -101,32 +102,30 @@ function ExploreDAOs() {
                     style={{
                       boxShadow: "0px 4px 50.8px 0px rgba(0, 0, 0, 0.11)",
                     }}
-                    className="px-5 py-7 rounded-2xl cursor-pointer"
+                    className="w-[calc(100%-2rem)] max-w-[280px]  sm:w-[calc(50%-1rem)] md:w-[calc(33.333%-1rem)] lg:w-[calc(25%-1rem)] 2xl:w-[calc(20%-1rem)] px-4 py-6 rounded-2xl cursor-pointer flex flex-col items-center justify-center"
                     onClick={() => handleClick(daos.name, daos.img)}
                   >
-                    <div className="flex justify-center">
+                    <div className="flex justify-center mb-4">
                       <Image
                         src={daos.img}
                         alt="Image not found"
-                        width={80}
-                        height={80}
-                        className="rounded-full"
+                        width={60}
+                        height={60}
+                        className="rounded-full w-16 h-16 sm:w-20 sm:h-20"
                       ></Image>
                     </div>
                     <div className="text-center">
-                      <div className="py-3">
-                        <div className="font-semibold capitalize">
+                        <div className="font-semibold capitalize text-sm sm:text-base mb-2">
                           {daos.name}
                         </div>
-                        <div className="text-sm bg-[#F2F2F2] py-2 rounded-md mt-3">
+                        <div className="text-xs sm:text-sm bg-[#F2F2F2] py-2 px-3 rounded-md ">
                           {daos.value} Participants
                         </div>
-                      </div>
                     </div>
                   </div>
                 ))
               ) : (
-                <div className="pl-3 text-xl font-semibold">
+                <div className="w-full text-center text-xl font-semibold">
                   No such Dao available
                 </div>
               )}
@@ -134,28 +133,28 @@ function ExploreDAOs() {
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
                 style={{ boxShadow: "0px 4px 50.8px 0px rgba(0, 0, 0, 0.11)" }}
-                className={`px-5 py-7 rounded-2xl cursor-pointer flex items-center justify-center relative transition-all duration-250 ease-in-out ${
+                className={`w-[calc(100%-2rem)] max-w-[280px] sm:w-[calc(50%-1rem)] md:w-[calc(33.333%-1rem)] lg:w-[calc(25%-1rem)] 2xl:w-[calc(20%-1rem)] px-4 py-6 rounded-2xl cursor-pointer flex items-center justify-center relative transition-all duration-250 ease-in-out h-[188px] sm:h-[212px] md:h-[220px] ${
                   isHovered ? "border-2 border-gray-600" : ""
                 }`}
               >
-                <div className="">
+                <div className="relative w-full h-full flex items-center justify-center">
                   <FaCirclePlus
-                    size={70}
-                    className={
-                      isHovered
+                    size={50}
+                    className={`sm:text-[70px]
+                      ${isHovered
                         ? "blur-md transition-all duration-250 ease-in-out text-slate-300"
                         : "block transition-all duration-250 ease-in-out text-slate-300"
-                    }
+                      }`}
                   />
                 </div>
                 <Link
                   href={`https://app.deform.cc/form/a401a65c-73c0-49cb-8d96-63e36ef36f88`}
                   target="_blank"
-                  className={`absolute inset-0 flex items-center justify-center bottom-0  ${
+                  className={`absolute inset-0 flex items-center justify-center   ${
                     isHovered ? "block" : "hidden"
                   }`}
                 >
-                  <span className="text-xl font-semibold text-slate-800">
+                  <span className="text-lg sm:text-xl font-semibold text-slate-800 px-2 text-center">
                     Add your DAO
                   </span>
                 </Link>
@@ -166,11 +165,11 @@ function ExploreDAOs() {
       </div>
       {showNotification && !isPageLoading && (
         <div
-          className={`flex fixed items-center justify-center bottom-9 rounded-full font-poppins text-sm font-medium left-[34%] w-[32rem] ${
+          className={` fixed bottom-10 left-10 sm:left-[10%] sm:right-[10%] md:left-[20%] md:right-[20%] lg:left-[30%] lg:right-[30%] ${
             status ? "" : "hidden"
           }`}
         >
-          <div className="py-2 bg-blue-shade-100 text-white rounded-xl px-7 relative">
+          <div className="py-2 bg-blue-shade-100 text-white rounded-xl px-4 sm:px-7 relative text-xs sm:text-sm font-poppins font-medium">
             To ensure optimal user experience, please note that our site is
             designed to be responsive on desktop devices.
             <div

@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 // import "@rainbow-me/rainbow-button/styles.css";
 import { fetchEnsAvatar, getEnsName } from "@/utils/ENSUtils";
+import { BiSolidWallet } from "react-icons/bi";
 
 function ConnectWalletWithENS() {
   const [displayAddress, setDisplayAddress] = useState<any>();
@@ -60,24 +61,10 @@ function ConnectWalletWithENS() {
                   <button
                     onClick={openConnectModal}
                     type="button"
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent:"center",
-                      color: "white",
-                      borderRadius: "9999px",
-                      borderColor: "white",
-                      borderStyle: "solid",
-                      paddingLeft: "20px",
-                      paddingRight: "20px",
-                      paddingTop: "16px",
-                      paddingBottom: "16px",
-                      backgroundColor: "#0500FF",
-                      fontWeight: "bold",
-                    }}
-                    className="hover:scale-105 hover:transition-all hover:ease-in-out text-sm"
+                    className="flex items-center justify-center text-white bg-blue-shade-200 hover:bg-blue-shade-100 border border-white rounded-full px-2 py-2 sm:px-5 sm:py-4 text-xs sm:text-sm font-bold transition-transform transform hover:scale-105"
                   >
-                    Connect Wallet
+                    <BiSolidWallet className="block sm:hidden text-lg" />
+                    <span className="hidden sm:block">Connect Wallet</span>
                   </button>
                 );
               }
@@ -87,21 +74,7 @@ function ConnectWalletWithENS() {
                   <button
                     onClick={openChainModal}
                     type="button"
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      color: "white",
-                      borderRadius: "6px",
-                      borderColor: "white",
-                      borderStyle: "solid",
-                      paddingLeft: "10px",
-                      paddingRight: "12px",
-                      paddingTop: "5px",
-                      paddingBottom: "5px",
-                      backgroundColor: "#ff494a",
-                      fontWeight: "bold",
-                    }}
-                    className="hover:scale-105 hover:transition-all hover:ease-in-out"
+                    className="flex items-center text-white bg-red-600 hover:bg-red-700 border border-white rounded-lg px-3 py-2 sm:px-4 sm:py-[5px] font-bold transition-transform transform hover:scale-105 text-xs sm:text-sm"
                   >
                     Wrong network
                   </button>
@@ -112,23 +85,8 @@ function ConnectWalletWithENS() {
                 <div style={{ display: "flex", gap: 12 }}>
                   <button
                     onClick={openChainModal}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      color: "black",
-                      borderRadius: "12px",
-                      borderColor: "white",
-                      borderStyle: "solid",
-                      paddingLeft: "10px",
-                      paddingRight: "8px",
-                      paddingTop: "7px",
-                      paddingBottom: "7px",
-                      backgroundColor: "white",
-                      fontWeight: "bold",
-                      boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
-                    }}
                     type="button"
-                    className="hover:scale-105 hover:transition-all hover:ease-in-out"
+                    className="flex items-center bg-white border border-white rounded-lg sm:pl-[10px] sm:pr-2 py-1.5 pl-2 pr-[6px] sm:py-2 font-bold text-black shadow-sm transition-transform transform hover:scale-105 text-xs sm:text-sm"
                   >
                     {chain.hasIcon && (
                       <div
@@ -182,18 +140,18 @@ function ConnectWalletWithENS() {
                   <button
                     onClick={openAccountModal}
                     type="button"
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      color: "black",
-                      borderRadius: "12px",
-                      borderColor: "white",
-                      borderStyle: "solid",
-                      backgroundColor: "white",
-                      fontWeight: "bold",
-                      boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
-                    }}
-                    className="hover:scale-105 hover:transition-all hover:ease-in-out"
+                    // style={{
+                    //   display: "flex",
+                    //   alignItems: "center",
+                    //   color: "black",
+                    //   borderRadius: "12px",
+                    //   borderColor: "white",
+                    //   borderStyle: "solid",
+                    //   backgroundColor: "white",
+                    //   fontWeight: "bold",
+                    //   boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
+                    // }}
+                    className="flex items-center bg-white border border-white rounded-xl px-3 py-2 sm:px-4 sm:py-2 font-bold text-black shadow-sm transition-transform transform hover:scale-105 text-xs sm:text-sm"
                   >
                     <div
                       style={{
