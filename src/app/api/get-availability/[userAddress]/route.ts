@@ -1,33 +1,34 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/config/connectDB";
 
-export async function GET(request: NextRequest, res: NextResponse) {
-  // console.log("POST req call");
-  const userAddress = request.url.split("get-availability/")[1];
-  // console.log(userAddress);
-  try {
-    // Connect to MongoDB
-    // console.log("Connecting to MongoDB...");
-    const client = await connectDB();
-    // console.log("Connected to MongoDB");
+type Params = {
+  userAddress: string;
+};
 
-    // Access the collection
+export async function GET(request: NextRequest, context: { params: Params }) {
+  const url = new URL(request.url);
+  const daoName = url.searchParams.get("dao_name");
+  console.log("daoName:::", daoName);
+  const userAddress = context.params.userAddress;
+  console.log("userAddress::", userAddress);
+  try {
+    const client = await connectDB();
+
     const db = client.db();
     const collection = db.collection("scheduling");
 
-    // Find documents based on userAddress
     // console.log("Finding documents for user:", userAddress);
     const documents = await collection
       .find({
         userAddress: { $regex: new RegExp(`^${userAddress}$`, "i") },
+        dao_name: daoName,
       })
       .toArray();
-    // console.log("Documents found:", documents);
+    console.log("Documents found:", documents);
 
     client.close();
     // console.log("MongoDB connection closed");
 
-    // Return the found documents
     return NextResponse.json(
       { success: true, data: documents },
       { status: 200 }

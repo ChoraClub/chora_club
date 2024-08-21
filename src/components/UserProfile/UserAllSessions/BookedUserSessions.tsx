@@ -57,7 +57,7 @@ function BookedUserSessions({ daoName }: { daoName: string }) {
         redirect: "follow",
       };
       const response = await fetch(
-        `/api/get-meeting/${address}`,
+        `/api/get-meeting/${address}?dao_name=${daoName}`,
         requestOptions
       );
       const result = await response.json();
