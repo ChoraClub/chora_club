@@ -1,7 +1,7 @@
 "use client";
 
 import Image, { StaticImageData } from "next/image";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import search from "@/assets/images/daos/search.png";
 import OPLogo from "@/assets/images/daos/op.png";
 import ARBLogo from "@/assets/images/daos/arbitrum.jpg";
@@ -65,8 +65,9 @@ function DelegatesList({ props }: { props: string }) {
   const { chain, chains } = useNetwork();
   const [delegateInfo, setDelegateInfo] = useState<any>();
   const [selectedDelegate, setSelectedDelegate] = useState<any>(null);
-
-  const address = useAccount();
+  const [skip, setSkip] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const {address} = useAccount();
 
   const handleRetry = () => {
     setError(null);
@@ -89,96 +90,16 @@ function DelegatesList({ props }: { props: string }) {
     setIsShowing(!KarmaCreditClosed);
   }, []);
 
-  useEffect(() => {
-    const fetchData = async (lastCursor: string | null) => {
-      try {
-        setDataLoading(true);
-        console.log("its props", props);
-        console.log("currentPage", currentPage);
-        const res = await fetch(
-          props === "arbitrum"
-            ? `/api/get-arbitrum-delegatelist?lastCursor=${lastCursor || ""}`
-            : `/api/get-delegatelist?currentPage=${currentPage}`
-        );
-        console.log("res", res);
-        if (!res.ok) {
-          throw new Error(`HTTP error! status: ${res.status}`);
-        }
-
-        const daoInfo = await res.json();
-
-        let formattedDelegates;
-        if (props === "arbitrum") {
-          formattedDelegates = daoInfo.delegates.nodes.map((delegate: any) => {
-            return {
-              delegate: delegate.account.address,
-              adjustedBalance: delegate.votesCount / 10 ** 18,
-              ensName: delegate.account.ens,
-              profilePicture: delegate.account.picture,
-            };
-          });
-        } else {
-          formattedDelegates = await Promise.all(
-            daoInfo.map(async (delegate: any) => {
-              const avatar = await fetchEnsAvatar(delegate._id);
-              return {
-                delegate: delegate._id,
-                adjustedBalance: delegate.adjustedBalance,
-                newBalance: delegate.newBalance,
-                profilePicture: avatar?.avatar,
-                ensName: avatar?.ensName,
-              };
-            })
-          );
-        }
-
-        setDelegateData((prevData: any) => ({
-          delegates: [...prevData.delegates, ...formattedDelegates],
-        }));
-
-        setTempData((prevData: any) => ({
-          delegates: [...prevData.delegates, ...formattedDelegates],
-        }));
-
-        setLastCursor(daoInfo.delegates?.pageInfo?.lastCursor);
-        setDataLoading(false);
-      } catch (error: any) {
-        console.error("Error fetching data:", error);
-        if (error.name === "TypeError" && error.message === "Failed to fetch") {
-          setError("Please check your internet connection and try again.");
-        } else if (error.name === "TimeoutError") {
-          setError(
-            "The request is taking longer than expected. Please try again."
-          );
-        } else if (error.name === "SyntaxError") {
-          setError(
-            "We're having trouble processing the data. Please try again later."
-          );
-        } else {
-          setError(
-            "Unable to load delegates. Please try again in a few moments."
-          );
-        }
-      } finally {
-        setPageLoading(false);
-        setDataLoading(false);
-      }
-    };
-
-    fetchData(lastCursor || "");
-  }, [currentPage]);
-
+  
   const fetchData = async (lastCursor: string | null) => {
     try {
       setDataLoading(true);
-      console.log("its props", props);
-      console.log("currentPage", currentPage);
       const res = await fetch(
         props === "arbitrum"
           ? `/api/get-arbitrum-delegatelist?lastCursor=${lastCursor || ""}`
-          : `/api/get-delegatelist?currentPage=${currentPage}`
+          : `/api/get-delegate?skip=${skip}`
       );
-      console.log("res", res);
+
       if (!res.ok) {
         throw new Error(`HTTP error! status: ${res.status}`);
       }
@@ -195,13 +116,19 @@ function DelegatesList({ props }: { props: string }) {
           };
         });
       } else {
+console.log(daoInfo)
+        setSkip(daoInfo.nextSkip);
+        setHasMore(daoInfo.hasMore);
         formattedDelegates = await Promise.all(
-          daoInfo.map(async (delegate: any) => {
-            const avatar = await fetchEnsAvatar(delegate._id);
+          daoInfo.delegates.map(async (delegate: any) => {
+            // const ensName = await getEnsNameOfUser(delegate._id);
+            console.log("delegate", delegate.delegate);
+            const avatar = await fetchEnsAvatar(delegate.delegate);
+            console.log("avatar", avatar);
             return {
-              delegate: delegate._id,
-              adjustedBalance: delegate.adjustedBalance,
-              newBalance: delegate.newBalance,
+              delegate: delegate.delegate,
+              adjustedBalance: (delegate.latestBalance/10**18),
+              newBalance: delegate.latestBalance,
               profilePicture: avatar?.avatar,
               ensName: avatar?.ensName,
             };
@@ -217,7 +144,7 @@ function DelegatesList({ props }: { props: string }) {
       }));
 
       setLastCursor(daoInfo.delegates?.pageInfo?.lastCursor);
-      console.log("lastCursor", daoInfo);
+
       setDataLoading(false);
       cache[props] = {
         delegates: [...(cache[props]?.delegates || []), ...formattedDelegates],
@@ -229,13 +156,11 @@ function DelegatesList({ props }: { props: string }) {
       setPageLoading(false);
     }
   };
-
   useEffect(() => {
-    console.log(cache[props]);
+
     if (cache[props]) {
-      console.log("Using cached data");
-      console.log("pageCache", pageCache);
-      console.log(cache[props]);
+
+      // Use cached data if available
       setDelegateData(cache[props]);
       setCurrentPage(pageCache + 1);
       setTempData(cache[props]);
@@ -243,7 +168,6 @@ function DelegatesList({ props }: { props: string }) {
       setPageLoading(false);
       setDataLoading(false);
     } else {
-      console.log("Fetching data");
       setDataLoading(true);
       fetchData(null);
       setDataLoading(false);
@@ -251,7 +175,6 @@ function DelegatesList({ props }: { props: string }) {
   }, [props]);
 
   useEffect(() => {
-    console.log("last", lastCursor);
     if (currentPage > 0 || lastCursor) {
       fetchData(lastCursor || "");
     }
@@ -277,7 +200,6 @@ function DelegatesList({ props }: { props: string }) {
           `https://api.karmahq.xyz/api/dao/search-delegate?user=${query}&pageSize=10&offset=0&period=lifetime&order=desc&dao=${props}`
         );
         const filtered = await res.json().then((delegates) => delegates.data);
-
         if (filtered.delegates && filtered.delegates.length > 0) {
           const formattedDelegates = filtered.delegates.map(
             (delegate: any) => ({
@@ -287,7 +209,6 @@ function DelegatesList({ props }: { props: string }) {
               ensName: delegate.ensName,
             })
           );
-          console.log("formattedDelegates", formattedDelegates);
           setDelegateData({ delegates: formattedDelegates });
           // setPageLoading(false);
         } else {
@@ -309,18 +230,17 @@ function DelegatesList({ props }: { props: string }) {
     setPageLoading(false);
   };
 
-  const handleScroll = debounce(() => {
-    const { scrollTop, clientHeight, scrollHeight } = document.documentElement;
-    const threshold = 100;
-    if (
-      !isDataLoading &&
-      scrollTop + clientHeight >= scrollHeight - threshold
-    ) {
-      console.log("fetching more data");
-      setCurrentPage((prev) => prev + 1);
-      pageCache = currentPage + 1;
-    }
-  }, 200); // Adjust the debounce wait time as necessary
+ 
+  const handleScroll = useCallback(
+    debounce(() => {
+      const { scrollTop, clientHeight, scrollHeight } = document.documentElement;
+      const threshold = 100;
+      if (scrollTop + clientHeight >= scrollHeight - threshold && !isDataLoading ) {
+        fetchData(lastCursor || "");
+      }
+    }, 200),
+    [fetchData, isDataLoading, hasMore]
+  );
 
   useEffect(() => {
     window.addEventListener("scroll", handleScroll);
@@ -346,15 +266,15 @@ function DelegatesList({ props }: { props: string }) {
 
   const WalletOpen = async (to: string) => {
     const adr = await walletClient.getAddresses();
-    console.log(adr);
+
     const address1 = adr[0];
-    console.log(address1);
+ 
 
     let parts = path.split("/");
     let firstStringAfterSlash = parts[1];
 
     let chainAddress;
-    console.log(delegateData.delegates[0].daoName);
+
 
     if (delegateData.delegates[0].daoName === "optimism") {
       chainAddress = "0x4200000000000000000000000000000000000042";
@@ -363,7 +283,7 @@ function DelegatesList({ props }: { props: string }) {
     } else {
       return;
     }
-    console.log(chainAddress);
+ 
 
     if (isConnected) {
       if (walletClient.chain?.network === firstStringAfterSlash) {
@@ -374,7 +294,6 @@ function DelegatesList({ props }: { props: string }) {
           args: [to],
           account: address1,
         });
-        console.log(delegateTx);
       } else {
         toast.error("Please switch to appropriate network to delegate!");
         if (openChainModal) {
@@ -445,13 +364,11 @@ function DelegatesList({ props }: { props: string }) {
 
   const handleDelegateModal = async (delegateObject: any) => {
     setSelectedDelegate(delegateObject);
-    console.log("delegateObject----------", delegateObject);
     if (!isConnected) {
       if (openConnectModal) {
         openConnectModal();
       }
     } else {
-      console.log(delegateObject.delegate);
       setDelegateOpen(true);
       // setLoading(true);
       try {
@@ -465,17 +382,16 @@ function DelegatesList({ props }: { props: string }) {
             delegator: address,
           });
         }
-        console.log("data of individual delegate: ", data.data);
+ 
         const delegate = data.data.delegateChangeds[0]?.toDelegate;
-        console.log("individualDelegate", delegate);
         setSame(
           delegate.toLowerCase() === delegateObject.delegate.toLowerCase()
         );
-        console.log("delegate N/A: ", delegate);
         setDelegateDetails(delegate);
         setError(null);
       } catch (err: any) {
-        setError(err.message);
+        console.log(err)
+        // setError(err.message);
       } finally {
         // setLoading(false);
       }
@@ -507,10 +423,6 @@ function DelegatesList({ props }: { props: string }) {
       return;
     }
 
-    console.log("address", address);
-    console.log("address1", address1);
-    console.log("to: ", to);
-
     let chainAddress;
     if (chain?.name === "Optimism") {
       chainAddress = "0x4200000000000000000000000000000000000042";
@@ -520,7 +432,6 @@ function DelegatesList({ props }: { props: string }) {
       return;
     }
 
-    console.log("walletClient?.chain?.network", walletClient?.chain?.network);
 
     if (walletClient?.chain === "") {
       toast.error("Please connect your wallet!");
@@ -535,7 +446,7 @@ function DelegatesList({ props }: { props: string }) {
             account: address1,
           });
 
-          console.log(delegateTx);
+
           handleCloseDelegateModal();
         } catch (error) {
           toast.error("Transaction failed");
@@ -617,7 +528,6 @@ function DelegatesList({ props }: { props: string }) {
         ) : delegateData.delegates.length > 0 ? (
           <div>
             <div className="grid min-[475px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-10">
-              {console.log("data............", delegateData)}
               {delegateData.delegates.map((delegate: any, index: number) => (
                 <>
                   <div

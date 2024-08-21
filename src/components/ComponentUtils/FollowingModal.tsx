@@ -161,7 +161,7 @@ function FollowingModal({
                   }`}
                   onClick={() => {
                     setActiveButton("optimism");
-                    handleUpdateFollowings("optimism", 0);
+                    handleUpdateFollowings("optimism", 0, 0);
                     setChainName("optimism");
                   }}
                 >
@@ -176,7 +176,7 @@ function FollowingModal({
                   }`}
                   onClick={() => {
                     setActiveButton("arbitrum");
-                    handleUpdateFollowings("arbitrum", 0);
+                    handleUpdateFollowings("arbitrum", 0, 0);
                     setChainName("arbitrum");
                   }}
                 >
