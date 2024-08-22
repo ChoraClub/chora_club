@@ -98,9 +98,9 @@ export async function GET(req: NextRequest) {
         $sort: { sessionCount: -1 },
       },
     ];
-    client.close();
-
+    
     const result = await meetingsCollection.aggregate(pipeline).toArray();
+    client.close();
 
     return new Response(JSON.stringify(result), {
       status: 200,
