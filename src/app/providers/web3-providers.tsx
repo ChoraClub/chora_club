@@ -3,12 +3,18 @@
 import "@rainbow-me/rainbowkit/styles.css";
 import { ReactNode } from "react";
 
-import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
+import {
+  getDefaultWallets,
+  RainbowKitProvider,
+  WalletList,
+  connectorsForWallets,
+} from "@rainbow-me/rainbowkit";
 import {
   RainbowKitSiweNextAuthProvider,
   GetSiweMessageOptions,
 } from "@rainbow-me/rainbowkit-siwe-next-auth";
 import { SessionProvider } from "next-auth/react";
+import { rabbyWallet, uniswapWallet } from "@rainbow-me/rainbowkit/wallets";
 
 // import { useTheme } from "next-themes";
 
@@ -21,7 +27,7 @@ interface RainbowKitProviderProps {
   autoConnect?: boolean;
 }
 
-const optimsimSepolia = {
+const optimismSepolia = {
   id: 11155420,
   name: "Optimism Sepolia",
   network: "Optimism Sepolia testnet",
@@ -50,11 +56,25 @@ const { chains, publicClient, webSocketPublicClient } = configureChains(
   [publicProvider()]
 );
 
-const { connectors } = getDefaultWallets({
-  appName: "Test App",
-  projectId: "c52f63cb512b7b43a8724eae05cb5130",
+const projectId = "c52f63cb512b7b43a8724eae05cb5130";
+
+const { wallets } = getDefaultWallets({
+  appName: "Chora Club",
+  projectId: projectId,
   chains,
 });
+
+// const connectors = [...defaultConnectors()];
+const connectors = connectorsForWallets([
+  ...wallets,
+  {
+    groupName: "Others",
+    wallets: [
+      rabbyWallet({ chains, projectId: projectId }),
+      uniswapWallet({ chains, projectId: projectId }),
+    ],
+  },
+]);
 
 const wagmiConfig = createConfig({
   autoConnect: true,

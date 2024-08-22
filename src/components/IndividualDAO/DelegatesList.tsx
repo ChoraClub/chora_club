@@ -27,7 +27,7 @@ import {
   fetchEnsAvatar,
 } from "@/utils/ENSUtils";
 import DelegateListSkeletonLoader from "../SkeletonLoader/DelegateListSkeletonLoader";
-import DelegateTileModal from "../ComponentUtils/delegateTileModal";
+import DelegateTileModal from "../ComponentUtils/DelegateTileModal";
 import {
   arb_client,
   DELEGATE_CHANGED_QUERY,
@@ -69,6 +69,7 @@ function DelegatesList({ props }: { props: string }) {
   const [hasMore, setHasMore] = useState(true);
   const { address } = useAccount();
   const [delegatingToAddr, setDelegatingToAddr] = useState(false);
+  const [confettiVisible, setConfettiVisible] = useState(false);
 
   const handleRetry = () => {
     setError(null);
@@ -444,12 +445,13 @@ function DelegatesList({ props }: { props: string }) {
           });
 
           setDelegatingToAddr(false);
-
-          handleCloseDelegateModal();
+          setConfettiVisible(true);
+          setTimeout(() => setConfettiVisible(false), 5000);
+          // handleCloseDelegateModal();
         } catch (error) {
           setDelegatingToAddr(false);
           toast.error("Transaction failed");
-          handleCloseDelegateModal();
+          // handleCloseDelegateModal();
         }
       } else {
         toast.error("Please switch to appropriate network to delegate!");
@@ -669,6 +671,7 @@ function DelegatesList({ props }: { props: string }) {
                       daoName={props}
                       addressCheck={same}
                       delegatingToAddr={delegatingToAddr}
+                      confettiVisible={confettiVisible}
                     />
                   )}
                 </>
