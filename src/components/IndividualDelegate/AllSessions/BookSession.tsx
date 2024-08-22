@@ -98,30 +98,35 @@ function BookSession({ props }: { props: Type }) {
 
   const getAvailability = async () => {
     try {
-      const response = await fetch(`/api/get-availability/${host_address}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetch(
+        `/api/get-availability/${host_address}?dao_name=${daoName}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       const result = await response.json();
       if (result.success) {
         setAPIData(result.data);
         setIsLoading(false);
       }
-    } catch (error) {
-    }
+    } catch (error) {}
   };
 
   const getSlotTimeAvailability = async () => {
     try {
-      const response = await fetch(`/api/get-meeting/${host_address}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetch(
+        `/api/get-meeting/${host_address}?dao_name=${daoName}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       const result = await response.json();
       if (result.success) {
@@ -267,10 +272,9 @@ function BookSession({ props }: { props: Type }) {
             apiCall();
           }
         }
-      } catch (error) {
-      }
+      } catch (error) {}
     } else {
-      toast.error("Please enter title or description!");
+      toast.error("Please enter title and description!");
     }
   };
 
@@ -527,7 +531,8 @@ function BookSession({ props }: { props: Type }) {
               marginTop: "2rem",
               boxShadow: "0px 4px 50.8px 0px rgba(0, 0, 0, 0.11)",
               width: "fit-content",
-            }}>
+            }}
+          >
             <StyledTimePickerContainer>
               <DayTimeScheduler
                 allowedDates={allowedDates}
@@ -548,18 +553,22 @@ function BookSession({ props }: { props: Type }) {
       {isOpen && (
         <div
           className="font-poppins z-[70] fixed inset-0 flex items-center justify-center backdrop-blur-md"
-          style={{ boxShadow: " 0px 0px 45px -17px rgba(0,0,0,0.75)" }}>
+          style={{ boxShadow: " 0px 0px 45px -17px rgba(0,0,0,0.75)" }}
+        >
           <div className="bg-white rounded-[41px] overflow-hidden shadow-lg w-1/2">
             <div className="relative">
               <div className="flex flex-col gap-1 text-white bg-[#292929] p-4 py-7">
                 <h2 className="text-lg font-semibold mx-4">
-                  Book your slot for {props.daoDelegates.charAt(0).toUpperCase() + props.daoDelegates.slice(1)}
+                  Book your slot for{" "}
+                  {props.daoDelegates.charAt(0).toUpperCase() +
+                    props.daoDelegates.slice(1)}
                   <button
                     className="absolute right-7"
                     onClick={() => {
                       onClose();
                       setIsScheduling(false);
-                    }}>
+                    }}
+                  >
                     <MdCancel size={28} color="white" />
                   </button>
                 </h2>
@@ -598,7 +607,8 @@ function BookSession({ props }: { props: Type }) {
                     <button
                       className="absolute top-2 right-3"
                       onClick={handleGetMailModalClose}
-                      disabled={addingEmail}>
+                      disabled={addingEmail}
+                    >
                       <MdCancel size={25} />
                     </button>
                     <h2 className="text-blue-shade-200 font-semibold text-base">
@@ -619,7 +629,8 @@ function BookSession({ props }: { props: Type }) {
                       <button
                         onClick={handleSubmit}
                         className="bg-black text-white px-8 py-3 rounded-3xl hover:bg-gray-900"
-                        disabled={addingEmail}>
+                        disabled={addingEmail}
+                      >
                         {addingEmail ? (
                           <div className="flex items-center justify-center px-3 py-[0.15rem]">
                             <ThreeDots
@@ -652,7 +663,8 @@ function BookSession({ props }: { props: Type }) {
                 <button
                   className="bg-blue-shade-200 text-white px-8 py-3 font-semibold rounded-full"
                   onClick={checkBeforeApiCall}
-                  disabled={confirmSave}>
+                  disabled={confirmSave}
+                >
                   {confirmSave ? (
                     <div className="flex items-center">
                       <Oval
