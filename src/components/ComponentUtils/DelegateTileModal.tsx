@@ -8,6 +8,7 @@ import Link from "next/link";
 import { BASE_URL } from "@/config/constants";
 import { HiOutlineExternalLink } from "react-icons/hi";
 import { ThreeDots } from "react-loader-spinner";
+import Confetti from "react-confetti";
 
 interface delegate {
   isOpen: boolean;
@@ -19,9 +20,10 @@ interface delegate {
   daoName: String;
   addressCheck: boolean;
   delegatingToAddr: boolean;
+  confettiVisible: boolean;
 }
 
-function DelegateTile({
+function DelegateTileModal({
   isOpen,
   closeModal,
   handleDelegateVotes,
@@ -31,6 +33,7 @@ function DelegateTile({
   daoName,
   addressCheck,
   delegatingToAddr,
+  confettiVisible,
 }: delegate) {
   const [isLoading, setIsLoading] = useState(true);
   const [isHovering, setIsHovering] = useState(false);
@@ -70,6 +73,7 @@ function DelegateTile({
           onClick={closeModal}
         ></div>
         <div className="bg-white p-9 rounded-[34px] flex flex-col  z-50 border-[2px] items-center justify-center ">
+          {confettiVisible && <Confetti />}
           <h1 className="font-semibold text-[26px] mb-2 text-blue-shade-100 text-center">
             Set {delegateName} as your delegate
           </h1>
@@ -124,10 +128,10 @@ function DelegateTile({
             </div>
           </div>
           <button
-            className={`rounded-full py-5 font-semibold font-poppins w-full text-base hover:bg-blue-shade-100 ${
+            className={`rounded-full py-5 font-semibold font-poppins w-full text-base ${
               addressCheck
                 ? "bg-grey-shade-50 text-grey"
-                : "bg-black text-white"
+                : "bg-black text-white hover:bg-blue-shade-100"
             }`}
             onClick={handleDelegateVotes}
             disabled={addressCheck}
@@ -136,16 +140,7 @@ function DelegateTile({
               "You cannot delegate to the same address again"
             ) : delegatingToAddr ? (
               <div className="flex items-center justify-center">
-                <ThreeDots
-                  visible={true}
-                  height="24"
-                  // width="70"
-                  color="#ffffff"
-                  radius="9"
-                  ariaLabel="three-dots-loading"
-                  wrapperStyle={{}}
-                  wrapperClass=""
-                />
+                Delegating your tokens...
               </div>
             ) : (
               "Delegate"
@@ -157,4 +152,4 @@ function DelegateTile({
   );
 }
 
-export default DelegateTile;
+export default DelegateTileModal;

@@ -46,7 +46,7 @@ import {
   op_client,
 } from "@/config/staticDataUtils";
 // import { getEnsNameOfUser } from "../ConnectWallet/ENSResolver";
-import DelegateTileModal from "../ComponentUtils/delegateTileModal";
+import DelegateTileModal from "../ComponentUtils/DelegateTileModal";
 // import { cacheExchange, createClient, fetchExchange, gql } from "urql/core";
 import { set } from "video.js/dist/types/tech/middleware";
 import MainProfileSkeletonLoader from "../SkeletonLoader/MainProfileSkeletonLoader";
@@ -105,6 +105,7 @@ function SpecificDelegate({ props }: { props: Type }) {
   const [isFollowStatusLoading, setIsFollowStatusLoading] = useState(true);
   const [delegatingToAddr, setDelegatingToAddr] = useState(false);
   const { isConnected, address } = useAccount();
+  const [confettiVisible, setConfettiVisible] = useState(false);
 
   const handleDelegateModal = async () => {
     if (!isConnected) {
@@ -635,6 +636,8 @@ function SpecificDelegate({ props }: { props: Type }) {
 
           console.log(delegateTx);
           setDelegatingToAddr(false);
+          setConfettiVisible(true);
+          setTimeout(() => setConfettiVisible(false), 5000);
         } catch (e) {
           toast.error("Transaction failed");
           setDelegatingToAddr(false);
@@ -1230,6 +1233,7 @@ function SpecificDelegate({ props }: { props: Type }) {
           daoName={props.daoDelegates}
           addressCheck={same}
           delegatingToAddr={delegatingToAddr}
+          confettiVisible={confettiVisible}
         />
       )}
     </>
