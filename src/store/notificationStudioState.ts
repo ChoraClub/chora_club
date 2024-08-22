@@ -1,23 +1,14 @@
 import { create } from "zustand";
-
-export interface Notification {
-  id?: string;
-  _id?: string;
-  receiver_address: string;
-  content: string;
-  createdAt: number;
-  read_status: boolean;
-  notification_name: string;
-  notification_title: string;
-  notification_type: string;
-}
+import { Notification } from "@/components/Notification/NotificationTypeUtils";
 
 interface NotificationStudioState {
   notifications: Notification[];
   newNotifications: Notification[];
   combinedNotifications: Notification[];
   addNotification: (notification: Notification) => void;
-  setNotifications: (notifications: Notification[]) => void;
+  setNotifications: (
+    notifications: Notification[] | ((prev: Notification[]) => Notification[])
+  ) => void;
   setNewNotifications: (notifications: Notification[]) => void;
   updateCombinedNotifications: () => void;
   hasAnyUnreadNotification: boolean;
@@ -43,18 +34,50 @@ export const useNotificationStudioState = create<NotificationStudioState>(
           hasAnyUnreadNotification: true,
         };
       }),
-    setNotifications: (notifications) => set({ notifications }),
-    setNewNotifications: (newNotifications) => set({ newNotifications }),
-    updateCombinedNotifications: () =>
+    setNotifications: (
+      notifications: Notification[] | ((prev: Notification[]) => Notification[])
+    ) =>
       set((state) => ({
-        combinedNotifications: [
+        notifications:
+          typeof notifications === "function"
+            ? notifications(state.notifications)
+            : notifications,
+      })),
+    setNewNotifications: (newNotifications) => set({ newNotifications }),
+    // updateCombinedNotifications: () =>
+    //   set((state) => ({
+    //     combinedNotifications: [
+    //       ...state.notifications,
+    //       ...state.newNotifications,
+    //     ].sort(
+    //       (a, b) =>
+    //         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    //     ),
+    //   })),
+    updateCombinedNotifications: () =>
+      set((state) => {
+        const uniqueNotifications = [
           ...state.notifications,
           ...state.newNotifications,
-        ].sort(
-          (a, b) =>
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        ),
-      })),
+        ].reduce<Notification[]>((acc, current) => {
+          const x = acc.find((item) => item._id === current._id);
+          if (!x) {
+            return [...acc, current];
+          } else {
+            // If the notification already exists, update it if necessary
+            return acc.map((item) =>
+              item._id === current._id ? current : item
+            );
+          }
+        }, []);
+
+        return {
+          combinedNotifications: uniqueNotifications.sort(
+            (a, b) =>
+              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          ),
+        };
+      }),
     hasAnyUnreadNotification: false,
     setHasAnyUnreadNotification: (hasUnread) =>
       set({ hasAnyUnreadNotification: hasUnread }),

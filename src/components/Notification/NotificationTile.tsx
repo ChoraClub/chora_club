@@ -17,12 +17,14 @@ import {
   handleRedirection,
   markAsRead,
 } from "./NotificationActions";
+import { useNotificationStudioState } from "@/store/notificationStudioState";
 
 function NotificationTile({ data, index, length }: NotificationTileProps) {
   const router = useRouter();
   const [readStatus, setReadStatus] = useState<boolean>(data.read_status);
   const [tileData, setTileData] = useState(data);
   const [docId, setDocId] = useState(data?._id);
+  const { combinedNotifications } = useNotificationStudioState();
 
   useEffect(() => {
     setTileData(data);
@@ -30,9 +32,16 @@ function NotificationTile({ data, index, length }: NotificationTileProps) {
     setDocId(data?._id);
   }, [data, readStatus, docId]);
 
+  const currentData =
+    combinedNotifications.find((n) => n._id === data._id) || data;
+
   const handleTileRedirection = async () => {
-    await handleRedirection(tileData, router, markAsRead);
+    await handleRedirection(currentData, router, markAsRead);
   };
+
+  // const handleTileRedirection = async () => {
+  //   await handleRedirection(tileData, router, markAsRead);
+  // };
   return (
     <>
       <div

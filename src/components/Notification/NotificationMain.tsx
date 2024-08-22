@@ -30,12 +30,14 @@ function NotificationMain() {
     newNotifications,
     combinedNotifications,
     canFetch,
+    hasAnyUnreadNotification,
     setNotifications,
     setNewNotifications,
     addNotification,
     updateCombinedNotifications,
     markAllAsRead,
     setCanFetch,
+    setHasAnyUnreadNotification,
   } = useNotificationStudioState();
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -128,7 +130,14 @@ function NotificationMain() {
         socket.off("new_notification");
       }
     };
-  }, [socket, address, socketId, addNotification, updateCombinedNotifications]);
+  }, [
+    socket,
+    address,
+    socketId,
+    addNotification,
+    hasAnyUnreadNotification,
+    updateCombinedNotifications,
+  ]);
 
   const filteredNotifications = React.useMemo(() => {
     const type = searchParams.get("active");

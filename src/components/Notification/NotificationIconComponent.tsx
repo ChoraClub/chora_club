@@ -14,6 +14,8 @@ import {
   handleRedirection,
   markAsRead,
 } from "./NotificationActions";
+import { useNotificationStudioState } from "@/store/notificationStudioState";
+import { useSession } from "next-auth/react";
 
 function NotificationIconComponent() {
   const router = useRouter();
@@ -22,23 +24,33 @@ function NotificationIconComponent() {
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const socket = useSocket();
   const { address } = useAccount();
-  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [socketId, setSocketId] = useState<string | null>(null);
-  const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false);
+  const [isAPILoading, setIsAPILoading] = useState<boolean>();
+  const { data: session } = useSession();
+  const {
+    notifications,
+    newNotifications,
+    canFetch,
+    combinedNotifications,
+    addNotification,
+    setNotifications,
+    setHasAnyUnreadNotification,
+    hasAnyUnreadNotification,
+    updateCombinedNotifications,
+    setCanFetch,
+  } = useNotificationStudioState();
+
   const lastFetchTime = useRef<number>(0);
   const cacheDuration = 60000; // 1 minute cache
-  const [isAPILoading, setIsAPILoading] = useState<boolean>();
+
+  useEffect(() => {
+    setCanFetch(!!address && !!session);
+  }, [address, session, setCanFetch]);
 
   useEffect(() => {
     return () => {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
-  }, []);
-
-  const handleMouseEnter = useCallback(() => {
-    if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    setIsHovering(true);
-    fetchNotificationsIfNeeded();
   }, []);
 
   const handleMouseLeave = useCallback(() => {
@@ -85,8 +97,8 @@ function NotificationIconComponent() {
           );
 
           setNotifications(sortedNotifications);
-          // setNotifications(notificationsData);
-          setHasUnreadNotifications(
+          updateCombinedNotifications();
+          setHasAnyUnreadNotification(
             notificationsData.some((n: any) => !n.read_status)
           );
           lastFetchTime.current = now;
@@ -97,7 +109,13 @@ function NotificationIconComponent() {
         setIsAPILoading(false);
       }
     }
-  }, [address]);
+  }, [address, setNotifications, setHasAnyUnreadNotification]);
+
+  const handleMouseEnter = useCallback(() => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    setIsHovering(true);
+    fetchNotificationsIfNeeded();
+  }, [fetchNotificationsIfNeeded]);
 
   useEffect(() => {
     if (socket) {
@@ -116,31 +134,126 @@ function NotificationIconComponent() {
       socket.emit("register_host", { hostAddress: address, socketId });
 
       socket.on("new_notification", (message: Notification) => {
-        setNotifications((prev) => {
-          const sortedNotifications = [...prev, message].sort(
-            (a, b) =>
-              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-          );
-          console.log("Sorted Notifications:", sortedNotifications);
-          return sortedNotifications;
-        });
-
-        // setNotifications((prev) => [message, ...prev]);
-        setHasUnreadNotifications(true);
+        const notificationData: Notification = {
+          _id: message?._id,
+          receiver_address: message.receiver_address,
+          content: message.content,
+          createdAt: Date.now(),
+          read_status: false,
+          notification_name: message.notification_name,
+          notification_type: message.notification_type,
+          notification_title: message.notification_title,
+        };
+        addNotification(notificationData);
+        updateCombinedNotifications();
       });
-
-      return () => {
-        socket.off("new_notification");
-      };
     }
-  }, [socket, address, socketId]);
+
+    return () => {
+      if (socket) {
+        socket.off("new_notification");
+      }
+    };
+  }, [
+    socket,
+    address,
+    socketId,
+    addNotification,
+    hasAnyUnreadNotification,
+    updateCombinedNotifications,
+  ]);
 
   const handleMarkAndRedirection = async ({ data }: { data: Notification }) => {
     await handleRedirection(data, router, markAsRead);
-    setNotifications((prev) =>
-      prev.map((n) => (n._id === data._id ? { ...n, read_status: true } : n))
+    updateCombinedNotifications();
+
+    setNotifications((prev: Notification[]) =>
+      prev.map((n: Notification) =>
+        n._id === data._id ? { ...n, read_status: true } : n
+      )
     );
-    setHasUnreadNotifications(notifications.some((n) => !n.read_status));
+
+    setHasAnyUnreadNotification(
+      combinedNotifications.some((n: Notification) => !n.read_status)
+    );
+  };
+
+  const renderContent = () => {
+    if (isAPILoading) {
+      return (
+        <div className="flex justify-center items-center p-4">
+          <Spinner color="primary" />
+        </div>
+      );
+    }
+
+    if (!canFetch) {
+      return (
+        <div className="flex justify-center items-center p-4">
+          <p className="text-sm text-gray-500">
+            Please connect your wallet and sign in to view notifications.
+          </p>
+        </div>
+      );
+    }
+
+    if (combinedNotifications.length > 0) {
+      return combinedNotifications.slice(0, 3).map((data, index) => (
+        <React.Fragment key={data._id || index}>
+          <div
+            className={`flex items-center p-4 justify-between cursor-pointer ${
+              data.read_status
+                ? "bg-white text-gray-500"
+                : "bg-gray-200 text-black"
+            }`}
+            onClick={() => handleMarkAndRedirection({ data })}
+          >
+            <div className="flex gap-3">
+              <span
+                className="flex items-center justify-center rounded-full h-10 w-10 min-w-10"
+                style={{
+                  backgroundColor: getBackgroundColor(data),
+                }}
+              >
+                {getIcon(data)}
+              </span>
+              <div>
+                <p
+                  className={`text-xs font-semibold mb-1 line-clamp-1 ${
+                    data.read_status ? "text-gray-500" : "text-black"
+                  }`}
+                >
+                  {data.notification_title}
+                </p>
+                <p
+                  className={`text-xs line-clamp-2 ${
+                    data.read_status ? "text-gray-500" : "text-[#414141]"
+                  }`}
+                >
+                  {data.content}
+                </p>
+              </div>
+            </div>
+            <div
+              className={`text-xs min-w-12 font-semibold flex items-center justify-center ${
+                data.read_status ? "text-gray-500 font-normal" : "text-black"
+              }`}
+            >
+              {formatTimestampOrDate(data.createdAt)}
+            </div>
+          </div>
+          {index < 2 && <hr className="border-[#DDDDDD] border-0.5" />}
+        </React.Fragment>
+      ));
+    }
+
+    return (
+      <div className="flex flex-col items-center justify-center p-4">
+        <p className="text-gray-500 text-xs">
+          No new notifications at the moment.
+        </p>
+      </div>
+    );
   };
 
   return (
@@ -150,11 +263,11 @@ function NotificationIconComponent() {
       onMouseLeave={handleMouseLeave}
     >
       <Badge
-        isInvisible={!hasUnreadNotifications}
+        isInvisible={!hasAnyUnreadNotification}
         content={""}
         color="danger"
         shape="circle"
-        className={hasUnreadNotifications ? styles.pulseBadge : ""}
+        className={hasAnyUnreadNotification ? styles.pulseBadge : ""}
       >
         <div
           className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 bg-white rounded-full flex justify-center items-center w-10 h-10 ${style.icon3d} ${style.whiteBg}`}
@@ -172,71 +285,7 @@ function NotificationIconComponent() {
         >
           <div className="h-full flex justify-between flex-col">
             <div className="rounded-t-2xl overflow-hidden">
-              {isAPILoading ? (
-                <div className="flex justify-center items-center p-4">
-                  <Spinner color="primary" />
-                </div>
-              ) : notifications.length > 0 ? (
-                notifications.slice(0, 3).map((data, index) => (
-                  <React.Fragment key={data._id || index}>
-                    <div
-                      className={`flex items-center p-4 justify-between cursor-pointer ${
-                        data.read_status
-                          ? "bg-white text-gray-500"
-                          : "bg-gray-200 text-black"
-                      }`}
-                      onClick={() => handleMarkAndRedirection({ data })}
-                    >
-                      <div className="flex gap-3">
-                        <span
-                          className="flex items-center justify-center rounded-full h-10 w-10 min-w-10"
-                          style={{
-                            backgroundColor: getBackgroundColor(data),
-                          }}
-                        >
-                          {getIcon(data)}
-                        </span>
-                        <div>
-                          <p
-                            className={`text-xs font-semibold mb-1 line-clamp-1 ${
-                              data.read_status ? "text-gray-500" : "text-black"
-                            }`}
-                          >
-                            {data.notification_title}
-                          </p>
-                          <p
-                            className={`text-xs line-clamp-2 ${
-                              data.read_status
-                                ? "text-gray-500"
-                                : "text-[#414141]"
-                            }`}
-                          >
-                            {data.content}
-                          </p>
-                        </div>
-                      </div>
-                      <div
-                        className={`text-xs min-w-12 font-semibold flex items-center justify-center ${
-                          data.read_status
-                            ? "text-gray-500 font-normal"
-                            : "text-black"
-                        }`}
-                      >
-                        {formatTimestampOrDate(data.createdAt)}
-                      </div>
-                    </div>
-                    {index < 2 && (
-                      <hr className="border-[#DDDDDD] border-0.5" />
-                    )}
-                  </React.Fragment>
-                ))
-              ) : (
-                <div className="flex flex-col items-center justify-center p-4">
-                  <p className="text-gray-500 text-xs">
-                    No new notifications at the moment.
-                  </p>
-                </div>
-              )}
+              {renderContent()}
             </div>
             <div className="">
               <hr className="border-[#DDDDDD] border-0.5" />
