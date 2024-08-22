@@ -20,7 +20,7 @@ interface FollowingModal {
   userFollowings: any;
   toggleFollowing: any;
   toggleNotification: any;
-  setfollowingmodel: any;
+  setIsFollowingModalOpen: any;
   isLoading: any;
   handleUpdateFollowings: any;
   daoName: string;
@@ -39,7 +39,7 @@ function FollowingModal({
   userFollowings,
   toggleFollowing,
   toggleNotification,
-  setfollowingmodel,
+  setIsFollowingModalOpen,
   isLoading,
   handleUpdateFollowings,
   daoName,
@@ -130,7 +130,7 @@ function FollowingModal({
         className="font-poppins z-[70] fixed inset-0 flex items-center justify-center backdrop-blur-md"
         onClick={(event) => {
           event.stopPropagation();
-          setfollowingmodel(false);
+          setIsFollowingModalOpen(false);
         }}
       >
         <div
@@ -144,7 +144,7 @@ function FollowingModal({
               <h2 className="text-xl font-semibold ">Followings</h2>
               <div
                 className="size-5 rounded-full bg-[#F23535] flex items-center justify-center cursor-pointer"
-                onClick={() => setfollowingmodel(false)}
+                onClick={() => setIsFollowingModalOpen(false)}
               >
                 <IoClose className=" text-white size-4 " />
               </div>

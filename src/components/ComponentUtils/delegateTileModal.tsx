@@ -7,6 +7,7 @@ import Arrow2 from "@/assets/images/daos/arrow2.png";
 import Link from "next/link";
 import { BASE_URL } from "@/config/constants";
 import { HiOutlineExternalLink } from "react-icons/hi";
+import { ThreeDots } from "react-loader-spinner";
 
 interface delegate {
   isOpen: boolean;
@@ -17,6 +18,7 @@ interface delegate {
   displayImage: any;
   daoName: String;
   addressCheck: boolean;
+  delegatingToAddr: boolean;
 }
 
 function DelegateTile({
@@ -28,6 +30,7 @@ function DelegateTile({
   displayImage,
   daoName,
   addressCheck,
+  delegatingToAddr,
 }: delegate) {
   const [isLoading, setIsLoading] = useState(true);
   const [isHovering, setIsHovering] = useState(false);
@@ -89,7 +92,7 @@ function DelegateTile({
                     className="font-normal text-[12px] flex gap-1 items-center"
                   >
                     {fromDelegate.slice(0, 6) + "..." + fromDelegate.slice(-4)}
-                    <HiOutlineExternalLink size={14}/>
+                    <HiOutlineExternalLink size={14} />
                   </Link>
                 )}
               </div>
@@ -129,9 +132,24 @@ function DelegateTile({
             onClick={handleDelegateVotes}
             disabled={addressCheck}
           >
-            {addressCheck
-              ? "You cannot delegate to the same address again"
-              : "Delegate"}
+            {addressCheck ? (
+              "You cannot delegate to the same address again"
+            ) : delegatingToAddr ? (
+              <div className="flex items-center justify-center">
+                <ThreeDots
+                  visible={true}
+                  height="24"
+                  // width="70"
+                  color="#ffffff"
+                  radius="9"
+                  ariaLabel="three-dots-loading"
+                  wrapperStyle={{}}
+                  wrapperClass=""
+                />
+              </div>
+            ) : (
+              "Delegate"
+            )}
           </button>
         </div>
       </div>

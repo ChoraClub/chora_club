@@ -103,7 +103,7 @@ function SpecificDelegate({ props }: { props: Type }) {
   const [followerCountLoading, setFollowerCountLoading] = useState(true);
   const [notificationLoading, setNotificationLoading] = useState(false);
   const [isFollowStatusLoading, setIsFollowStatusLoading] = useState(true);
-
+  const [delegatingToAddr, setDelegatingToAddr] = useState(false);
   const { isConnected, address } = useAccount();
 
   const handleDelegateModal = async () => {
@@ -146,6 +146,7 @@ function SpecificDelegate({ props }: { props: Type }) {
       setDelegateOpen(true);
     }
   };
+
   const handleCloseDelegateModal = () => {
     setDelegateOpen(false);
   };
@@ -419,7 +420,6 @@ function SpecificDelegate({ props }: { props: Type }) {
         setIsFollowing(false);
         isNotification(false);
         setFollowerCountLoading(false);
-
       }
     } catch (error) {
       console.error("Error in fetchDelegateData:", error);
@@ -427,7 +427,6 @@ function SpecificDelegate({ props }: { props: Type }) {
       setIsFollowing(false);
       isNotification(false);
       setFollowerCountLoading(false);
-
     } finally {
       setFollowerCountLoading(false);
       setIsFollowStatusLoading(false);
@@ -553,6 +552,7 @@ function SpecificDelegate({ props }: { props: Type }) {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",
+              "x-wallet-address": follower_address,
             },
             body: JSON.stringify({
               // Add any necessary data
@@ -624,6 +624,7 @@ function SpecificDelegate({ props }: { props: Type }) {
     } else {
       if (walletClient?.chain?.network === props.daoDelegates) {
         try {
+          setDelegatingToAddr(true);
           const delegateTx = await walletClient.writeContract({
             address: chainAddress,
             abi: dao_abi.abi,
@@ -633,8 +634,10 @@ function SpecificDelegate({ props }: { props: Type }) {
           });
 
           console.log(delegateTx);
+          setDelegatingToAddr(false);
         } catch (e) {
           toast.error("Transaction failed");
+          setDelegatingToAddr(false);
         }
       } else {
         toast.error("Please switch to appropriate network to delegate!");
@@ -782,7 +785,6 @@ function SpecificDelegate({ props }: { props: Type }) {
           {/* {followed && <Confetti recycle={false} numberOfPieces={550} />} */}
           <div className="flex ps-14 py-5 justify-between">
             <div className="flex">
-
               <div
                 className="relative object-cover rounded-3xl"
                 style={{
@@ -1227,6 +1229,7 @@ function SpecificDelegate({ props }: { props: Type }) {
           }
           daoName={props.daoDelegates}
           addressCheck={same}
+          delegatingToAddr={delegatingToAddr}
         />
       )}
     </>

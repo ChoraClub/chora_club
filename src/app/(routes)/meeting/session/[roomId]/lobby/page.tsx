@@ -458,7 +458,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
               {isDisconnected ? <ConnectWalletWithENS /> : null}
               <div className="flex items-center w-full flex-col">
                 <div className="flex flex-col justify-center w-full gap-1 text-[#3E3D3D] font-semibold">
-                  Display name
+                  ENS Name / Address
                   <div className="flex w-full items-center rounded-[10px] border px-3 text-slate-300 outline-none border-white-800 backdrop-blur-[400px] focus-within:border-slate-600 gap-">
                     <div className="mr-2">
                       <Image

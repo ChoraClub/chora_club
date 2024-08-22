@@ -16,9 +16,7 @@ import UserInfo from "./UserInfo";
 import UserVotes from "./UserVotes";
 import UserSessions from "./UserSessions";
 import UserOfficeHours from "./UserOfficeHours";
-import ClaimNFTs from "./ClaimNFTs";
 import { FaPencil } from "react-icons/fa6";
-import { SiFarcaster } from "react-icons/si";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useRouter } from "next-nprogress-bar";
 import toast, { Toaster } from "react-hot-toast";
@@ -26,15 +24,7 @@ import Link from "next/link";
 import OPLogo from "@/assets/images/daos/op.png";
 import ArbLogo from "@/assets/images/daos/arbCir.png";
 import ccLogo from "@/assets/images/daos/CCLogo2.png";
-import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Button,
-  useDisclosure,
-} from "@nextui-org/react";
+import { Button, useDisclosure } from "@nextui-org/react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useAccount } from "wagmi";
 import { useNetwork } from "wagmi";
@@ -49,21 +39,10 @@ import { useConnectModal } from "@rainbow-me/rainbowkit";
 import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
 import MainProfileSkeletonLoader from "../SkeletonLoader/MainProfileSkeletonLoader";
 import { BASE_URL } from "@/config/constants";
-import { fetchData } from "next-auth/client/_utils";
-import user1 from "@/assets/images/daos/user1.png";
-import { FaCalendarDays } from "react-icons/fa6";
 import FollowingModal from "../ComponentUtils/FollowingModal";
 import { IoClose } from "react-icons/io5";
 import "./MainProfile.module.css";
-import { FaUserEdit } from "react-icons/fa";
-import { TbMailFilled } from "react-icons/tb";
-import { SiDiscourse } from "react-icons/si";
-import { BsDiscord } from "react-icons/bs";
-import { TbBrandGithubFilled } from "react-icons/tb";
-import { CgAttachment } from "react-icons/cg";
 import UpdateProfileModal from "../ComponentUtils/UpdateProfileModal";
-import { cookies } from "next/headers";
-import { m } from "framer-motion";
 
 function MainProfile() {
   const { isConnected, address } = useAccount();
@@ -82,20 +61,17 @@ function MainProfile() {
   const [karmaImage, setKarmaImage] = useState<any>();
   const [karmaEns, setKarmaEns] = useState("");
   const [karmaDesc, setKarmaDesc] = useState("");
-  const [votes, setVotes] = useState<any>();
   const [isPageLoading, setIsPageLoading] = useState(true);
   const [selfDelegate, setSelfDelegate] = useState(false);
   const [daoName, setDaoName] = useState("optimism");
   const [isCopied, setIsCopied] = useState(false);
   const [followings, setFollowings] = useState(0);
   const [followers, setFollowers] = useState(0);
-  const [isFollowing, setfollwing] = useState(true);
   const [loading, setLoading] = useState(false);
-  const [notification, setnotification] = useState(true);
-  const [isOpenFollowings, setfollowingmodel] = useState(false);
+  const [isFollowingModalOpen, setIsFollowingModalOpen] = useState(false);
   const [isOpentoaster, settoaster] = useState(false);
   const [userFollowings, setUserFollowings] = useState<Following[]>([]);
-  const [dbResponse, setDbResponse] = useState<any>(null);
+  // const [dbResponse, setDbResponse] = useState<any>(null);
   const [modalData, setModalData] = useState({
     displayImage: "",
     displayName: "",
@@ -126,14 +102,6 @@ function MainProfile() {
     isNotification: boolean;
   }
 
-  // useEffect(() => {
-  //   if (chain?.name === "Optimism") {
-  //     set  ("optimism");
-  //   } else if (chain?.name === "Arbitrum One") {
-  //     setDaoName("arbitrum");
-  //   }
-  //   console.log("daoName", daoName);
-  // }, [chain, daoName]);
   useEffect(() => {
     if (chain && chain?.name === "Optimism") {
       setDaoName("optimism");
@@ -264,10 +232,12 @@ function MainProfile() {
     isChange: number,
     isfollowingchange: number
   ) => {
-  
     setLoading(true);
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
+    if (address) {
+      myHeaders.append("x-wallet-address", address);
+    }
 
     const raw = JSON.stringify({
       address: address,
@@ -286,11 +256,12 @@ function MainProfile() {
     );
 
     const dbResponse = await res.json();
+
     if (isfollowingchange == 1) {
       updateFollowerState(dbResponse);
     } else {
-      setDbResponse(dbResponse);
-      setfollowingmodel(true);
+      // setDbResponse(dbResponse);
+      setIsFollowingModalOpen(true);
       for (const item of dbResponse.data) {
         const matchDao = item.followings.find(
           (daoItem: any) => daoItem.dao === daoname
@@ -312,7 +283,9 @@ function MainProfile() {
     }
     // Close the modal
     setLoading(false);
-  };  const toggleFollowing = async (
+  };
+
+  const toggleFollowing = async (
     index: number,
     userupdate: any,
     unfollowDao: any
@@ -349,7 +322,7 @@ function MainProfile() {
         }
 
         const data = await response.json();
-        settoaster(false);
+        // settoaster(false);
         // console.log("Follow successful:", data);
       } catch (error) {
         console.error("Error following:", error);
@@ -359,7 +332,7 @@ function MainProfile() {
         setFollowings(followings - 1);
       }
       setLoading(true);
-      settoaster(true);
+      // settoaster(true);
       try {
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
@@ -383,7 +356,7 @@ function MainProfile() {
         }
 
         const data = await response.json();
-        settoaster(false);
+        // settoaster(false);
         setLoading(false);
         // console.log("unFollow successful:", data);
       } catch (error) {
@@ -403,7 +376,7 @@ function MainProfile() {
         i === index ? { ...user, isNotification: !user.isNotification } : user
       )
     );
-    settoaster(true);
+    // settoaster(true);
 
     try {
       const myHeaders = new Headers();
@@ -429,7 +402,7 @@ function MainProfile() {
       }
 
       const data = await response.json();
-      settoaster(false);
+      // settoaster(false);
       // console.log("notification successful:", data);
     } catch (error) {
       console.error("Error following:", error);
@@ -444,7 +417,7 @@ function MainProfile() {
   };
 
   const updateFollowerState = async (dbResponse: any) => {
-    const userData = dbResponse.data[0];
+    const userData = dbResponse?.data[0];
     let address = await walletClient.getAddresses();
     let address_user = address[0].toLowerCase();
     let currentDaoName = "";
@@ -455,7 +428,7 @@ function MainProfile() {
     }
 
     // Process following details
-    const matchDao = userData.followings?.find(
+    const matchDao = userData?.followings?.find(
       (daoItem: any) =>
         daoItem.dao.toLowerCase() === currentDaoName.toLowerCase()
     );
@@ -1050,12 +1023,12 @@ function MainProfile() {
                   </div>
                 </div>
 
-                {isOpenFollowings && (
+                {isFollowingModalOpen && (
                   <FollowingModal
                     userFollowings={userFollowings}
                     toggleFollowing={toggleFollowing}
                     toggleNotification={toggleNotification}
-                    setfollowingmodel={setfollowingmodel}
+                    setIsFollowingModalOpen={setIsFollowingModalOpen}
                     isLoading={isLoading}
                     handleUpdateFollowings={handleUpdateFollowings}
                     daoName={daoName}

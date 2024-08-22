@@ -67,7 +67,8 @@ function DelegatesList({ props }: { props: string }) {
   const [selectedDelegate, setSelectedDelegate] = useState<any>(null);
   const [skip, setSkip] = useState(0);
   const [hasMore, setHasMore] = useState(true);
-  const {address} = useAccount();
+  const { address } = useAccount();
+  const [delegatingToAddr, setDelegatingToAddr] = useState(false);
 
   const handleRetry = () => {
     setError(null);
@@ -76,7 +77,6 @@ function DelegatesList({ props }: { props: string }) {
     setTempData({ delegates: [] });
     window.location.reload();
   };
-
 
   const handleClose = () => {
     setIsShowing(false);
@@ -90,7 +90,6 @@ function DelegatesList({ props }: { props: string }) {
     setIsShowing(!KarmaCreditClosed);
   }, []);
 
-  
   const fetchData = async (lastCursor: string | null) => {
     try {
       setDataLoading(true);
@@ -116,7 +115,7 @@ function DelegatesList({ props }: { props: string }) {
           };
         });
       } else {
-console.log(daoInfo)
+        console.log(daoInfo);
         setSkip(daoInfo.nextSkip);
         setHasMore(daoInfo.hasMore);
         formattedDelegates = await Promise.all(
@@ -127,7 +126,7 @@ console.log(daoInfo)
             console.log("avatar", avatar);
             return {
               delegate: delegate.delegate,
-              adjustedBalance: (delegate.latestBalance/10**18),
+              adjustedBalance: delegate.latestBalance / 10 ** 18,
               newBalance: delegate.latestBalance,
               profilePicture: avatar?.avatar,
               ensName: avatar?.ensName,
@@ -157,9 +156,7 @@ console.log(daoInfo)
     }
   };
   useEffect(() => {
-
     if (cache[props]) {
-
       // Use cached data if available
       setDelegateData(cache[props]);
       setCurrentPage(pageCache + 1);
@@ -187,7 +184,7 @@ console.log(daoInfo)
       timeout = setTimeout(() => func(...args), wait);
     };
   };
-    const handleSearchChange = async (query: string) => {
+  const handleSearchChange = async (query: string) => {
     setSearchQuery(query);
     setPageLoading(true);
 
@@ -205,7 +202,7 @@ console.log(daoInfo)
             (delegate: any) => ({
               delegate: delegate.publicAddress,
               adjustedBalance: delegate.delegatedVotes,
-              profilePicture: delegate.profilePicture, 
+              profilePicture: delegate.profilePicture,
               ensName: delegate.ensName,
             })
           );
@@ -230,12 +227,15 @@ console.log(daoInfo)
     setPageLoading(false);
   };
 
- 
   const handleScroll = useCallback(
     debounce(() => {
-      const { scrollTop, clientHeight, scrollHeight } = document.documentElement;
+      const { scrollTop, clientHeight, scrollHeight } =
+        document.documentElement;
       const threshold = 100;
-      if (scrollTop + clientHeight >= scrollHeight - threshold && !isDataLoading ) {
+      if (
+        scrollTop + clientHeight >= scrollHeight - threshold &&
+        !isDataLoading
+      ) {
         fetchData(lastCursor || "");
       }
     }, 200),
@@ -268,13 +268,11 @@ console.log(daoInfo)
     const adr = await walletClient.getAddresses();
 
     const address1 = adr[0];
- 
 
     let parts = path.split("/");
     let firstStringAfterSlash = parts[1];
 
     let chainAddress;
-
 
     if (delegateData.delegates[0].daoName === "optimism") {
       chainAddress = "0x4200000000000000000000000000000000000042";
@@ -283,7 +281,6 @@ console.log(daoInfo)
     } else {
       return;
     }
- 
 
     if (isConnected) {
       if (walletClient.chain?.network === firstStringAfterSlash) {
@@ -382,7 +379,7 @@ console.log(daoInfo)
             delegator: address,
           });
         }
- 
+
         const delegate = data.data.delegateChangeds[0]?.toDelegate;
         setSame(
           delegate.toLowerCase() === delegateObject.delegate.toLowerCase()
@@ -390,7 +387,7 @@ console.log(daoInfo)
         setDelegateDetails(delegate);
         setError(null);
       } catch (err: any) {
-        console.log(err)
+        console.log(err);
         // setError(err.message);
       } finally {
         // setLoading(false);
@@ -432,12 +429,12 @@ console.log(daoInfo)
       return;
     }
 
-
     if (walletClient?.chain === "") {
       toast.error("Please connect your wallet!");
     } else {
       if (walletClient?.chain?.network === props) {
         try {
+          setDelegatingToAddr(true);
           const delegateTx = await walletClient.writeContract({
             address: chainAddress,
             abi: dao_abi.abi,
@@ -446,9 +443,11 @@ console.log(daoInfo)
             account: address1,
           });
 
+          setDelegatingToAddr(false);
 
           handleCloseDelegateModal();
         } catch (error) {
+          setDelegatingToAddr(false);
           toast.error("Transaction failed");
           handleCloseDelegateModal();
         }
@@ -636,8 +635,7 @@ console.log(daoInfo)
                         </button>
                       </div>
                     </div>
-                    <div style={{ zIndex: "21474836462" }}>
-                    </div>
+                    <div style={{ zIndex: "21474836462" }}></div>
                   </div>
                   {delegateOpen && (
                     <DelegateTileModal
@@ -670,6 +668,7 @@ console.log(daoInfo)
                       }
                       daoName={props}
                       addressCheck={same}
+                      delegatingToAddr={delegatingToAddr}
                     />
                   )}
                 </>

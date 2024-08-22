@@ -63,7 +63,7 @@ function ConnectWalletWithENS() {
                     style={{
                       display: "flex",
                       alignItems: "center",
-                      justifyContent:"center",
+                      justifyContent: "center",
                       color: "white",
                       borderRadius: "9999px",
                       borderColor: "white",
@@ -195,18 +195,6 @@ function ConnectWalletWithENS() {
                     }}
                     className="hover:scale-105 hover:transition-all hover:ease-in-out"
                   >
-                    <div
-                      style={{
-                        display: "flex",
-                        paddingRight: "10px",
-                        paddingLeft: "12px",
-                      }}
-                    >
-                      {account.displayBalance
-                        ? ` ${account.displayBalance}`
-                        : ""}
-                    </div>
-
                     <div
                       style={{
                         display: "flex",

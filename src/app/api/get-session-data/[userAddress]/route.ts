@@ -34,6 +34,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
         },
         dao_name: dao_name,
       })
+      .sort({ slot_time: -1 })
       .toArray();
     // console.log("Documents found:", documents);
 
@@ -45,6 +46,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
         slot_time: { $gte: updatedTimeISO },
         meeting_status: { $ne: "Recorded" },
       })
+      .sort({ slot_time: -1 })
       .toArray();
 
     client.close();

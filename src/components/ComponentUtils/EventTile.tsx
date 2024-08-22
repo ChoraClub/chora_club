@@ -219,6 +219,26 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
       console.error(error);
     }
   };
+
+  const handleJoinClick = () => {
+    const currentTime = new Date();
+    const slotTime = new Date(data.slot_time);
+
+    const currentTimestamp = currentTime.getTime();
+    const slotTimestamp = slotTime.getTime();
+
+    const timeDifference = slotTimestamp - currentTimestamp;
+
+    if (timeDifference <= 300000) {
+      setStartLoading(true);
+      router.push(`/meeting/session/${data.meetingId}/lobby`);
+    } else {
+      toast.error(
+        "The meeting can only be started 5 minutes before the slot time."
+      );
+    }
+  };
+
   return (
     <>
       <div key={tileIndex} className="border border-[#D9D9D9] rounded-3xl">
@@ -275,7 +295,7 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
               alt="image"
               width={24}
               height={24}
-              className="w-6 h-6"
+              className="w-6 h-6 rounded-full"
             />
             <div className="bg-[#F5F5F5] py-1 px-3 rounded-md flex items-center w-fit">
               {formatSlotTimeToLocal(data.slot_time)}
@@ -395,10 +415,11 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
                         size={32}
                         color="#004DFF"
                         onClick={() => {
-                          setStartLoading(true);
-                          router.push(
-                            `/meeting/session/${data.meetingId}/lobby`
-                          );
+                          // setStartLoading(true);
+                          // router.push(
+                          //   `/meeting/session/${data.meetingId}/lobby`
+                          // );
+                          handleJoinClick();
                         }}
                       />
                     </span>
@@ -505,13 +526,19 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
             data.booking_status === "Approved" && (
               <div
                 onClick={() => {
-                  setStartLoading(true);
-                  router.push(`/meeting/session/${data.meetingId}/lobby`);
+                  // setStartLoading(true);
+                  // router.push(`/meeting/session/${data.meetingId}/lobby`);
+                  handleJoinClick();
                 }}
                 className="text-center rounded-full font-bold text-white mt-2 text-xs cursor-pointer"
               >
                 {startLoading ? (
-                  <div className="flex justify-center items-center w-full py-2 rounded-full" style={{background:"linear-gradient(45deg, #004DFF, #00A3FF)"}}>
+                  <div
+                    className="flex justify-center items-center w-full py-2 rounded-full"
+                    style={{
+                      background: "linear-gradient(45deg, #004DFF, #00A3FF)",
+                    }}
+                  >
                     <Oval
                       visible={true}
                       height="20"
@@ -522,8 +549,13 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
                     />
                   </div>
                 ) : (
-                  <div className={`${styles.button} flex items-center justify-center gap-2 text-sm w-full`}>
-                    <span className={styles.buttonText}>Join</span><span className={styles.iconWrapper}><BsPersonVideo3 className={styles.icon}/></span>
+                  <div
+                    className={`${styles.button} flex items-center justify-center gap-2 text-sm w-full`}
+                  >
+                    <span className={styles.buttonText}>Join</span>
+                    <span className={styles.iconWrapper}>
+                      <BsPersonVideo3 className={styles.icon} />
+                    </span>
                   </div>
                 )}
               </div>
