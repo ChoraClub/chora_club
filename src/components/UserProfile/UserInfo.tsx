@@ -167,12 +167,15 @@ function UserInfo({
 
     const sessionHosted = async () => {
       try {
-        const response = await fetch(`/api/get-meeting/${address}`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+        const response = await fetch(
+          `/api/get-meeting/${address}?dao_name=${dao_name}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
         const result = await response.json();
         if (result.success) {
           result.data.forEach((item: any) => {

@@ -68,7 +68,7 @@ function DelegateInfo({ props, desc }: { props: Type; desc: string }) {
     const sessionHosted = async () => {
       try {
         const response = await fetch(
-          `/api/get-meeting/${props.individualDelegate}`,
+          `/api/get-meeting/${props.individualDelegate}?dao_name=${props.daoDelegates}`,
           {
             method: "GET",
             headers: {

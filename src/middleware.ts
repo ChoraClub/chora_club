@@ -7,6 +7,7 @@ const normalizeOrigin = (url: string) => url.replace(/\/$/, "");
 const allowedOrigins = [
   normalizeOrigin(process.env.NEXT_PUBLIC_LOCAL_BASE_URL!),
   normalizeOrigin(process.env.NEXT_PUBLIC_HOSTED_BASE_URL!),
+  normalizeOrigin(process.env.NEXT_PUBLIC_MIDDLEWARE_BASE_URL!),
 ];
 
 export async function middleware(request: NextRequest) {

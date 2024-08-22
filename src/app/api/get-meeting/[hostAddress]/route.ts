@@ -1,8 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/config/connectDB";
 
-export async function GET(req: NextRequest, res: NextResponse) {
-  const host_address = req.url.split("get-meeting/")[1];
+type Params = {
+  hostAddress: string;
+};
+
+export async function GET(req: NextRequest, context: { params: Params }) {
+  const url = new URL(req.url);
+  const daoName = url.searchParams.get("dao_name");
+  const host_address = context.params.hostAddress;
+  console.log("host_address:::", host_address);
   try {
     // Connect to MongoDB
     const client = await connectDB();
@@ -13,7 +20,10 @@ export async function GET(req: NextRequest, res: NextResponse) {
 
     // Find documents based on user_address
     const documents = await collection
-      .find({ host_address: { $regex: new RegExp(`^${host_address}$`, "i") } })
+      .find({
+        host_address: { $regex: new RegExp(`^${host_address}$`, "i") },
+        dao_name: daoName,
+      })
       .sort({ slot_time: -1 })
       .toArray();
 
@@ -33,8 +43,9 @@ export async function GET(req: NextRequest, res: NextResponse) {
   }
 }
 
-export async function POST(req: NextRequest, res: NextResponse) {
-  const host_address = req.url.split("get-meeting/")[1];
+export async function POST(req: NextRequest, context: { params: Params }) {
+  const host_address = context.params.hostAddress;
+  console.log("host_address:::", host_address);
   try {
     // Connect to MongoDB
     const client = await connectDB();
