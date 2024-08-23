@@ -2,9 +2,10 @@ import type { NextRequest } from "next/server";
 import { connectDB } from "@/config/connectDB";
 
 export async function GET(req: NextRequest) {
+  let client;
   try {
     const dao_name = req.url.split("getleaderboard/")[1];
-    const client = await connectDB();
+    client = await connectDB();
     const db = client.db();
     const meetingsCollection = db.collection("meetings");
 
@@ -98,9 +99,9 @@ export async function GET(req: NextRequest) {
         $sort: { sessionCount: -1 },
       },
     ];
-    client.close();
 
     const result = await meetingsCollection.aggregate(pipeline).toArray();
+    client.close();
 
     return new Response(JSON.stringify(result), {
       status: 200,
@@ -112,5 +113,9 @@ export async function GET(req: NextRequest) {
       status: 500,
       headers: { "Content-Type": "application/json" },
     });
+  } finally {
+    if (client) {
+      client.close();
+    }
   }
 }

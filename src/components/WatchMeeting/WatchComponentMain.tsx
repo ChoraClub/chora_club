@@ -17,6 +17,8 @@ import WatchFreeCollect from "./WatchFreeCollect";
 import WatchVideoRecommendation from "./WatchVideoRecommendation";
 import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
 import WatchComponentSkeletonLoader from "../SkeletonLoader/WatchComponentSkeletonLoader";
+import { v4 as uuidv4 } from "uuid";
+// import { id } from "ethers";
 
 interface AttestationObject {
   attendee_address: string;
@@ -34,6 +36,33 @@ function WatchComponentMain({ props }: { props: { id: string } }) {
     title: "",
     description: "",
     image: "",
+  };
+  const CountingView = async () => {
+    try {
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      let clientToken = localStorage.getItem("clientToken");
+      if (!clientToken) {
+        clientToken = uuidv4();
+        localStorage.setItem("clientToken", clientToken);
+      }
+      const raw = JSON.stringify({
+        meetingId: props.id,
+        clientToken: clientToken,
+      });
+
+      const requestOptions: any = {
+        method: "PUT",
+        headers: myHeaders,
+        body: raw,
+        redirect: "follow",
+      };
+      const response = await fetch("/api/couting-views", requestOptions);
+      const data = await response.json();
+      console.log("Response from API", data);
+    } catch (error) {
+      console.error("Error in views:", error);
+    }
   };
   useEffect(() => {
     async function fetchData() {
@@ -60,6 +89,7 @@ function WatchComponentMain({ props }: { props: { id: string } }) {
     }
 
     fetchData();
+    // CountingView();
   }, [props.id]);
 
   function utcToLocal(utcDateString: any) {
@@ -107,8 +137,7 @@ function WatchComponentMain({ props }: { props: { id: string } }) {
 
             {/* Right side */}
             <div
-              className={`col-span-1  pb-8 ${styles.customScrollbar} gap-y-6 flex flex-col`}
-            >
+              className={`col-span-1  pb-8 ${styles.customScrollbar} gap-y-6 flex flex-col`}>
               {/* <WatchSessionList /> */}
 
               {/* Free */}

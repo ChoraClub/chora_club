@@ -114,6 +114,27 @@ function WatchSessionVideo({
     player.on("dispose", () => {
       videojs.log("player will dispose");
     });
+
+    var currentTime = player.currentTime();
+    console.log("line 119", currentTime);
+
+    var apiCalled = false;
+
+    player.on("timeupdate", function () {
+      var currentTime = player.currentTime();
+
+      if (currentTime >= 30 && !apiCalled) {
+        // Fire your API here
+        fireAPI();
+        alert('api is fired!');
+        apiCalled = true;
+      }
+    });
+
+    function fireAPI() {
+      // Your API call logic here
+      console.log("API called at 30 seconds");
+    }
   };
   return (
     <div>
