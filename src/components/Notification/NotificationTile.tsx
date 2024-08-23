@@ -1,15 +1,6 @@
 import React, { useEffect, useState } from "react";
-import Image from "next/image";
-import user1 from "../../assets/images/notifications/user1.svg";
 import { NotificationTileProps } from "./NotificationTypeUtils";
-import { BASE_URL } from "@/config/constants";
 import { useRouter } from "next-nprogress-bar";
-import { FaClock } from "react-icons/fa";
-import { IoCheckmarkCircle } from "react-icons/io5";
-import { BsDatabaseFillCheck } from "react-icons/bs";
-import { PiVideoFill } from "react-icons/pi";
-import { FaUserCheck } from "react-icons/fa6";
-import { GiChaingun } from "react-icons/gi";
 import { formatTimestampOrDate } from "@/utils/NotificationUtils";
 import {
   getBackgroundColor,

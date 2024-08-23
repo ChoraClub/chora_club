@@ -279,7 +279,7 @@ function NotificationIconComponent() {
 
       {isHovering && (
         <div
-          className="absolute left-20 bottom-4 xl:left-24 bg-white rounded-2xl shadow-lg border border-[#C3D3FF] w-96 font-poppins z-50 h-80"
+          className="absolute left-20 bottom-4 xl:left-24 bg-white rounded-2xl shadow-lg border border-[#C3D3FF] w-96 font-poppins z-50 h-[19rem]"
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
         >

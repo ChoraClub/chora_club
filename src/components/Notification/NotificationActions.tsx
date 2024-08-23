@@ -106,15 +106,15 @@ export const handleRedirection = async (
   if (data.notification_type === "newBooking") {
     if (data.notification_name === "newBookingForHost") {
       router.push(
-        `${BASE_URL}/profile/${data.receiver_address}?active=sessions&session=book`
+        `/profile/${data.receiver_address}?active=sessions&session=book`
       );
     } else if (data.notification_name === "newBookingForGuest") {
       router.push(
-        `${BASE_URL}/profile/${data.receiver_address}?active=sessions&session=attending`
+        `/profile/${data.receiver_address}?active=sessions&session=attending`
       );
     } else if (data.notification_name === "sessionRejectionForGuest") {
       router.push(
-        `${BASE_URL}/profile/${data.receiver_address}?active=sessions&session=attending`
+        `/profile/${data.receiver_address}?active=sessions&session=attending`
       );
     }
   }

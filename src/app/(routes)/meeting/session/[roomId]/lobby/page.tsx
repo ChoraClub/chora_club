@@ -77,33 +77,33 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
     if (isDisconnected) {
       toast("Connect your wallet to join the meeting!");
     } else {
-      const myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
-      if (address) {
-        myHeaders.append("x-wallet-address", address);
-      }
+      // const myHeaders = new Headers();
+      // myHeaders.append("Content-Type", "application/json");
+      // if (address) {
+      //   myHeaders.append("x-wallet-address", address);
+      // }
 
-      const raw = JSON.stringify({
-        roomId: params.roomId,
-        meetingType: "session",
-      });
+      // const raw = JSON.stringify({
+      //   roomId: params.roomId,
+      //   meetingType: "session",
+      // });
 
-      const requestOptions: any = {
-        method: "POST",
-        headers: myHeaders,
-        body: raw,
-        redirect: "follow",
-      };
-      const response = await fetch("/api/verify-meeting-id", requestOptions);
-      const result = await response.json();
+      // const requestOptions: any = {
+      //   method: "POST",
+      //   headers: myHeaders,
+      //   body: raw,
+      //   redirect: "follow",
+      // };
+      // const response = await fetch("/api/verify-meeting-id", requestOptions);
+      // const result = await response.json();
 
-      if (result.success) {
-        setHostAddress(result.data.host_address);
-        setDaoName(result.data.dao_name);
-      }
-      if (result.message === "Meeting is ongoing") {
-        setMeetingStatus("Ongoing");
-      }
+      // if (result.success) {
+      //   setHostAddress(result.data.host_address);
+      //   setDaoName(result.data.dao_name);
+      // }
+      // if (result.message === "Meeting is ongoing") {
+      //   setMeetingStatus("Ongoing");
+      // }
 
       // if (address === hostAddress || meetingStatus === "Ongoing") {
       // if (address === hostAddress || result.message === "Meeting is ongoing") {
@@ -260,6 +260,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
 
         if (result.success) {
           setHostAddress(result.data.host_address);
+          setDaoName(result.data.dao_name);
         }
 
         if (result.success) {
@@ -268,6 +269,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
             setIsAllowToEnter(false);
             setNotAllowedMessage(result.message);
           } else if (result.message === "Meeting is upcoming") {
+            setMeetingStatus("Upcoming");
             console.log("Meeting is upcoming");
             setIsAllowToEnter(true);
           } else if (result.message === "Meeting has been denied") {
@@ -281,7 +283,6 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
           } else if (result.message === "Meeting is ongoing") {
             setMeetingStatus("Ongoing");
             setIsAllowToEnter(true);
-            // setMeetingStatus("Ongoing");
             console.log("Meeting is ongoing");
           }
         } else {
