@@ -99,7 +99,7 @@ export async function GET(req: NextRequest) {
         $sort: { sessionCount: -1 },
       },
     ];
-
+    
     const result = await meetingsCollection.aggregate(pipeline).toArray();
     client.close();
 
