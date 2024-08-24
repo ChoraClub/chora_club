@@ -1,5 +1,5 @@
 // EditButton.tsx
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import { Tooltip } from "@nextui-org/react";
 import { FaPencil } from "react-icons/fa6";
 import UpdateHostedSessionModal from "./UpdateHostedSessionModal";
@@ -8,9 +8,15 @@ import toast from "react-hot-toast";
 
 interface EditButtonProps {
   sessionData: any;
+  updateSessionData: (updatedData: any, index: number) => void;
+  index: number
 }
 
-const EditButton: React.FC<EditButtonProps> = ({ sessionData }) => {
+const EditButton: React.FC<EditButtonProps> = ({
+  sessionData,
+  updateSessionData,
+  index
+}) => {
   const [editOpen, setEditOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -35,7 +41,7 @@ const EditButton: React.FC<EditButtonProps> = ({ sessionData }) => {
     }));
   };
 
-  const handleSave = async (sessionData: any) => {
+  const handleSave = async () => {
     // Handle save logic here, such as making an API call
     setLoading(true);
     console.log(formData);
@@ -61,26 +67,25 @@ const EditButton: React.FC<EditButtonProps> = ({ sessionData }) => {
         console.log("image output: ", output.data.Hash);
       }
 
-      if (formData.title === "") {
-        formData.title = sessionData.title;
-      }
-      if (formData.description === "") {
-        formData.description = sessionData.description;
-      }
+      const updatedData = {
+        title: formData.title || sessionData.title,
+        description: formData.description || sessionData.description,
+        thumbnail_image: formData.image
+          ? imageCid
+          : sessionData.thumbnail_image,
+      };
 
-      if (formData.image === "") {
-        imageCid = sessionData.thumbnail_image;
-      }
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
+      myHeaders.append("x-wallet-address", sessionData.host_address);
 
       const raw = JSON.stringify({
         meetingId: sessionData.meetingId,
         host_address: sessionData.host_address,
-        title: formData.title,
-        description: formData.description,
-        thumbnail_image: imageCid,
+        ...updatedData,
       });
+
+      console.log("raw: ", raw);
 
       const requestOptions: any = {
         method: "PUT",
@@ -95,6 +100,7 @@ const EditButton: React.FC<EditButtonProps> = ({ sessionData }) => {
       if (response) {
         const responseData = await response.json();
         console.log("responseData: ", responseData);
+        updateSessionData(updatedData, index);
         setLoading(false);
       } else {
         setLoading(false);
@@ -111,18 +117,16 @@ const EditButton: React.FC<EditButtonProps> = ({ sessionData }) => {
 
   return (
     <>
-      <Tooltip content="Edit Details" placement="right" showArrow>
-        <span
-          className={`bg-gradient-to-r from-[#8d949e] to-[#555c6629]  rounded-full p-1 cursor-pointer w-10 flex items-center justify-center font-semibold text-sm text-black`}
-        //   style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
+      <Tooltip content="Edit Details" placement="top" showArrow>
+        <div
+          className={`bg-gradient-to-r from-[#8d949e] to-[#555c6629] rounded-full p-1 py-3 cursor-pointer w-10 flex items-center justify-center font-semibold text-sm text-black`}
+          //   style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
           onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
             handleEditModal();
           }}
         >
           <FaPencil color="black" size={14} />
-        </span>
+        </div>
       </Tooltip>
 
       {editOpen && (

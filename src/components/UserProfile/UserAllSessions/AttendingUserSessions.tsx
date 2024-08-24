@@ -12,6 +12,7 @@ import { useRouter } from "next-nprogress-bar";
 import { Oval } from "react-loader-spinner";
 import SessionTileSkeletonLoader from "@/components/SkeletonLoader/SessionTileSkeletonLoader";
 import ErrorDisplay from "@/components/ComponentUtils/ErrorDisplay";
+import RecordedSessionsSkeletonLoader from "@/components/SkeletonLoader/RecordedSessionsSkeletonLoader";
 
 type Attendee = {
   attendee_address: string;
@@ -50,11 +51,14 @@ function AttendingUserSessions({ daoName }: { daoName: string }) {
   const getUserMeetingData = async () => {
     try {
       setPageLoading(true);
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      if (address) {
+        myHeaders.append("x-wallet-address", address);
+      }
       const response = await fetch(`/api/get-session-data/${address}`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: myHeaders,
         body: JSON.stringify({
           dao_name: daoName,
         }),
@@ -70,7 +74,7 @@ function AttendingUserSessions({ daoName }: { daoName: string }) {
     } catch (error) {
       console.log("error in catch", error);
       setError("Unable to load sessions. Please try again in a few moments.");
-    } finally{
+    } finally {
       setPageLoading(false);
     }
   };
@@ -90,16 +94,18 @@ function AttendingUserSessions({ daoName }: { daoName: string }) {
   return (
     <div className="space-y-6">
       {pageLoading ? (
-        <SessionTileSkeletonLoader />
+        <RecordedSessionsSkeletonLoader />
       ) : sessionDetails.length > 0 ? (
-        sessionDetails.map((data, index) => (
+        <div className={`grid min-[475px]:grid-cols- md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-10 py-8 font-poppins`}>
+        {sessionDetails.map((data, index) => (
           <EventTile
             key={index}
             tileIndex={index}
             data={data}
             isEvent="Attending"
           />
-        ))
+        ))}
+        </div>
       ) : (
         <div className="flex flex-col justify-center items-center">
           <div className="text-5xl">☹️</div>{" "}

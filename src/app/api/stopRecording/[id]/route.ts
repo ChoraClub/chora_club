@@ -32,6 +32,7 @@ export async function POST(
     console.log("recording", recording);
 
     const { msg } = recording;
+    console.log("msg: ", msg);
 
     if (msg === "Stopped") {
       return NextResponse.json({ success: true }, { status: 200 });

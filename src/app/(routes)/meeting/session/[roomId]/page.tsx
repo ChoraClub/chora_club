@@ -43,7 +43,11 @@ import ParticipantTile from "@/components/Huddle/ParticipantTile";
 import { NestedPeerListIcons } from "@/utils/PeerListIcons";
 import logo from "@/assets/images/daos/CCLogo1.png";
 import Image from "next/image";
+import { headers } from "next/headers";
 import UpdateSessionDetails from "@/components/MeetingPreview/UpdateSessionDetails";
+import PopupSlider from "@/components/FeedbackPopup/PopupSlider";
+import MeetingRecordingModal from "@/components/ComponentUtils/MeetingRecordingModal";
+import toast from "react-hot-toast";
 
 export default function Component({ params }: { params: { roomId: string } }) {
   const { isVideoOn, enableVideo, disableVideo, stream } = useLocalVideo();
@@ -71,6 +75,8 @@ export default function Component({ params }: { params: { roomId: string } }) {
     layout,
     isScreenShared,
     avatarUrl,
+    isRecording,
+    setIsRecording,
   } = useStudioState();
   const videoRef = useRef<HTMLVideoElement>(null);
   const { peerIds } = usePeerIds({
@@ -91,23 +97,49 @@ export default function Component({ params }: { params: { roomId: string } }) {
   const [isAllowToEnter, setIsAllowToEnter] = useState<boolean>();
   const [notAllowedMessage, setNotAllowedMessage] = useState<string>();
   const [videoStreamTrack, setVideoStreamTrack] = useState<any>("");
+  const [showFeedbackPopups, setShowFeedbackPopups] = useState(false);
+  const [meetingRecordingStatus, setMeetingRecordingStatus] =
+    useState<boolean>();
+  const [showModal, setShowModal] = useState(true);
+  const { sendData } = useDataMessage();
+
   const { state } = useRoom({
     onLeave: async ({ reason }) => {
       if (reason === "CLOSED") {
-        setModalOpen(true);
-        if (role === "host") {
-          const storedStatus = localStorage.getItem("meetingData");
-          if (storedStatus) {
-            const parsedStatus = JSON.parse(storedStatus);
-            console.log("storedStatus: ", parsedStatus);
-            if (parsedStatus.isMeetingRecorded === "true") {
-              router.push(
-                `/meeting/session/${params.roomId}/update-session-details`
-              );
-            } else {
-              setHostModalOpen(true);
-            }
-          }
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        setIsRecording(null);
+
+        if (address) {
+          myHeaders.append("x-wallet-address", address);
+        }
+
+        const raw = JSON.stringify({
+          address: address,
+          role: role,
+        });
+
+        const requestOptions: any = {
+          method: "POST",
+          headers: myHeaders,
+          body: raw,
+          redirect: "follow",
+        };
+
+        const response = await fetch(
+          "/api/feedback/get-feedback-status",
+          requestOptions
+        );
+
+        const result = await response.json();
+
+        console.log("result: ", result);
+
+        if (result.data) {
+          setShowFeedbackPopups(false);
+          handlePopupRedirection();
+        } else {
+          setShowFeedbackPopups(true);
         }
       } else {
         router.push(`/meeting/session/${params.roomId}/lobby`);
@@ -115,10 +147,36 @@ export default function Component({ params }: { params: { roomId: string } }) {
     },
   });
 
+  const handleFeedbackPopupsClose = () => {
+    setShowFeedbackPopups(false);
+    handlePopupRedirection();
+  };
+
+  const handlePopupRedirection = () => {
+    if (role === "host") {
+      const storedStatus = localStorage.getItem("meetingData");
+      if (storedStatus) {
+        const parsedStatus = JSON.parse(storedStatus);
+        console.log("storedStatus: ", parsedStatus);
+        if (parsedStatus.isMeetingRecorded === true) {
+          router.push(
+            `/meeting/session/${params.roomId}/update-session-details`
+          );
+        } else {
+          console.log("Open modal");
+          setHostModalOpen(true);
+        }
+      }
+    } else if (role === "guest") {
+      setModalOpen(true);
+    }
+  };
+
   const { updateMetadata } = useLocalPeer<{
     displayName: string;
     avatarUrl: string;
     isHandRaised: boolean;
+    walletAddress: string;
   }>();
 
   const [reaction, setReaction] = useState("");
@@ -141,6 +199,17 @@ export default function Component({ params }: { params: { roomId: string } }) {
           }, 5000);
         }
       }
+      if (label === "recordingStatus") {
+        const status = JSON.parse(payload).isRecording;
+        setIsRecording(status);
+      }
+      if (label === "requestRecordingStatus" && role === "host") {
+        sendData({
+          to: [from],
+          payload: JSON.stringify({ isRecording: isRecording }),
+          label: "recordingStatus",
+        });
+      }
     },
   });
 
@@ -149,12 +218,6 @@ export default function Component({ params }: { params: { roomId: string } }) {
       videoRef.current.srcObject = stream;
     }
   }, [stream]);
-
-  // useEffect(() => {
-  //   if (state === "idle") {
-  //     router.push(`${params.roomId}/lobby`);
-  //   }
-  // }, [state]);
 
   useEffect(() => {
     setCamPrefferedDevice(videoDevice.deviceId);
@@ -187,6 +250,15 @@ export default function Component({ params }: { params: { roomId: string } }) {
       changeAudio();
     }
   }, [audioInputDevice]);
+
+  useEffect(() => {
+    const storedStatus = localStorage.getItem("meetingData");
+    if (storedStatus) {
+      const parsedStatus = JSON.parse(storedStatus);
+      console.log("storedStatus: ", parsedStatus);
+      setMeetingRecordingStatus(parsedStatus.isMeetingRecorded);
+    }
+  }, []);
 
   const handleModalClose = () => {
     setModalOpen(false);
@@ -269,44 +341,9 @@ export default function Component({ params }: { params: { roomId: string } }) {
         displayName: name,
         avatarUrl: avatarUrl,
         isHandRaised: metadata?.isHandRaised || false,
+        walletAddress: address || "",
       });
 
-      if (role === "guest") {
-        // Get the attendee address based on the role
-        const attendeeAddress = role === "guest" ? address : peerId;
-        let uniqueAddresses = new Set();
-        let attendees = [];
-
-        if (!uniqueAddresses.has(attendeeAddress)) {
-          // Add the address to the set of unique addresses
-          uniqueAddresses.add(attendeeAddress);
-
-          // Construct the request body
-
-          // Add the attendee dynamically one by one
-          attendees.push({
-            attendee_address: attendeeAddress,
-          });
-        }
-
-        console.log("All attendees: ", attendees);
-
-        const raw = JSON.stringify({
-          meetingId: params.roomId,
-          attendees: attendees,
-        });
-
-        // Make the API request
-        const requestOptions = {
-          method: "PUT",
-          body: raw,
-        };
-
-        fetch("/api/update-session-attendees", requestOptions)
-          .then((response) => response.text())
-          .then((result) => console.log(result))
-          .catch((error) => console.error(error));
-      }
     }
   }, [isAllowToEnter, state]);
 
@@ -314,6 +351,87 @@ export default function Component({ params }: { params: { roomId: string } }) {
     setVideoStreamTrack(videoTrack && new MediaStream([videoTrack]));
     console.log("videoTrack", videoTrack);
   }, [videoTrack]);
+
+  // useEffect(() => {
+  //   const storedStatus = localStorage.getItem("meetingData");
+  //   if (storedStatus) {
+  //     const parsedStatus = JSON.parse(storedStatus);
+  //     console.log("storedStatus: ", parsedStatus);
+  //     setRecordingStatus(parsedStatus.isMeetingRecorded);
+  //     setIsRecording(parsedStatus.isMeetingRecorded);
+  //   }
+  //   console.log("recordingStatus: ", recordingStatus);
+  // }, [recordingStatus]);
+
+  const updateRecordingStatus = (status: boolean) => {
+    setIsRecording(status);
+    sendData({
+      to: "*",
+      payload: JSON.stringify({ isRecording: status }),
+      label: "recordingStatus",
+    });
+  };
+
+  const handleMeetingModalClose = async (result: boolean) => {
+    if (role === "host") {
+      setShowModal(false);
+      const meetingData = {
+        meetingId: params.roomId,
+        isMeetingRecorded: result,
+      };
+      localStorage.setItem("meetingData", JSON.stringify(meetingData));
+      setShowModal(false);
+      setMeetingRecordingStatus(result);
+
+      updateRecordingStatus(result);
+      if (result) {
+        startRecording();
+      }
+    }
+  };
+
+  const startRecording = async () => {
+    try {
+      console.log("recording started");
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      // if (address) {
+      //   myHeaders.append("x-wallet-address", address);
+      // }
+      const requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        body: JSON.stringify({
+          roomId: params.roomId,
+        }),
+      };
+
+      const status = await fetch(
+        `/api/startRecording/${params.roomId}`,
+        requestOptions
+      );
+      if (!status.ok) {
+        console.error(`Request failed with status: ${status.status}`);
+        toast.error("Failed to start recording");
+        return;
+      }
+      setIsRecording(true); // Assuming this should be true after starting recording
+      toast.success("Recording started");
+    } catch (error) {
+      console.error("Error starting recording:", error);
+      toast.error("Error starting recording");
+    }
+  };
+
+  useEffect(() => {
+    if (role === "guest") {
+      sendData({
+        to: "*",
+        payload: JSON.stringify({ action: "getRecordingStatus" }),
+        label: "requestRecordingStatus",
+      });
+    }
+  }, []);
 
   return (
     <>
@@ -330,21 +448,23 @@ export default function Component({ params }: { params: { roomId: string } }) {
               </div>
             </div>
             <div className="flex items-center justify-center gap-4">
-              <Tooltip
-                showArrow
-                content={
-                  <div className="font-poppins">
-                    This meeting is being recorded
-                  </div>
-                }
-                placement="left"
-                className="rounded-md bg-opacity-90 max-w-96"
-                closeDelay={1}
-              >
-                <span>
-                  <PiRecordFill color="#c42727" size={22} />
-                </span>
-              </Tooltip>
+              {(isRecording || meetingRecordingStatus) && (
+                <Tooltip
+                  showArrow
+                  content={
+                    <div className="font-poppins">
+                      This meeting is being recorded
+                    </div>
+                  }
+                  placement="left"
+                  className="rounded-md bg-opacity-90 max-w-96"
+                  closeDelay={1}
+                >
+                  <span>
+                    <PiRecordFill color="#c42727" size={22} />
+                  </span>
+                </Tooltip>
+              )}
 
               <div className="flex space-x-3">
                 <DropdownMenu>
@@ -428,7 +548,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
                           }`
                     )}
                   >
-                    <div className="absolute left-1/2 -translate-x-1/2 mb-2 text-4xl z-10">
+                    <div className="absolute left-4 top-4 text-3xl z-10">
                       {reaction}
                     </div>
                     {metadata?.isHandRaised && (
@@ -504,7 +624,11 @@ export default function Component({ params }: { params: { roomId: string } }) {
         name={metadata?.displayName}
         localPeerId={peerId}
       /> */}
-          <BottomBar daoName={daoName} hostAddress={hostAddress} />
+          <BottomBar
+            daoName={daoName}
+            hostAddress={hostAddress}
+            meetingStatus={meetingRecordingStatus}
+          />
         </div>
       ) : (
         <>
@@ -552,11 +676,41 @@ export default function Component({ params }: { params: { roomId: string } }) {
           )}
         </>
       )}
+
+      {role !== null && address !== undefined && showFeedbackPopups && (
+        <PopupSlider
+          role={role}
+          address={address}
+          daoName={daoName}
+          meetingId={params.roomId}
+          onClose={handleFeedbackPopupsClose}
+        />
+      )}
+
+      {role === "host" && meetingRecordingStatus === undefined && (
+        <MeetingRecordingModal
+          show={showModal}
+          onClose={handleMeetingModalClose}
+        />
+      )}
+
       {role === "guest" && modalOpen && (
-        <AttestationModal isOpen={modalOpen} onClose={handleModalClose} />
+        <AttestationModal
+          isOpen={modalOpen}
+          onClose={handleModalClose}
+          hostAddress={hostAddress}
+          meetingId={params.roomId}
+          role={role}
+        />
       )}
       {role === "host" && hostModalOpen && (
-        <AttestationModal isOpen={hostModalOpen} onClose={handleModalClose} />
+        <AttestationModal
+          isOpen={hostModalOpen}
+          onClose={handleModalClose}
+          hostAddress={hostAddress}
+          meetingId={params.roomId}
+          role={role}
+        />
       )}
     </>
   );

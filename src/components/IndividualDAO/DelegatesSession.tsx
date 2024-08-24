@@ -20,6 +20,9 @@ import {
 import AttestationModal from "../ComponentUtils/AttestationModal";
 import RecordedSessionsSkeletonLoader from "../SkeletonLoader/RecordedSessionsSkeletonLoader";
 import ErrorDisplay from "../ComponentUtils/ErrorDisplay";
+import { useAccount } from "wagmi";
+import { RiErrorWarningLine } from "react-icons/ri";
+import { TimeoutError } from "viem";
 
 interface Session {
   booking_status: string;
@@ -46,18 +49,27 @@ function DelegatesSession({ props }: { props: string }) {
   const [dataLoading, setDataLoading] = useState(true);
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const [error, setError] = useState<string | null>(null);
+  const { address } = useAccount();
 
   const fetchData = async () => {
     try {
       setDataLoading(true);
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      if (address) {
+        myHeaders.append("x-wallet-address", address);
+      }
       const requestOptions: any = {
         method: "POST",
+        headers: myHeaders,
         redirect: "follow",
         body: JSON.stringify({
           dao_name: dao_name,
           address: "",
         }),
       };
+
+      // console.log("propspropsprops", dao_name);
 
       const response = await fetch(`/api/get-dao-sessions`, requestOptions);
       const result = await response.json();
@@ -118,8 +130,15 @@ function DelegatesSession({ props }: { props: string }) {
           dao_name: dao_name,
         });
 
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        if (address) {
+          myHeaders.append("x-wallet-address", address);
+        }
+
         const requestOptions: any = {
           method: "POST",
+          headers: myHeaders,
           body: raw,
           redirect: "follow",
         };

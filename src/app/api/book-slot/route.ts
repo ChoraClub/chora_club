@@ -10,6 +10,7 @@ import {
   formatSlotDateAndTime,
   getDisplayNameOrAddr,
 } from "@/utils/NotificationUtils";
+import { imageCIDs } from "@/config/staticDataUtils";
 
 type Attendee = {
   attendee_address: string;
@@ -53,6 +54,11 @@ interface MeetingResponseBody {
   error?: string;
 }
 
+function getRandomElementFromArray(arr: any[]) {
+  const randomIndex = Math.floor(Math.random() * arr.length);
+  return arr[randomIndex];
+}
+
 export async function POST(
   req: NextRequest,
   res: NextApiResponse<MeetingResponseBody>
@@ -78,6 +84,8 @@ export async function POST(
     const db = client.db();
     const collection = db.collection("meetings");
 
+    const randomImage = getRandomElementFromArray(imageCIDs);
+
     const result = await collection.insertOne({
       host_address,
       attendees,
@@ -89,7 +97,7 @@ export async function POST(
       dao_name,
       title,
       description,
-      thumbnail_image,
+      thumbnail_image : randomImage,
       session_type,
     });
 
@@ -136,7 +144,7 @@ export async function POST(
         const hostENSNameOrAddress = await getDisplayNameOrAddr(host_address);
         const notificationToHost = {
           receiver_address: host_address,
-          content: `Great news! 🎉 ${userENSNameOrAddress} has just booked a session with you on ${dao_name}. The session is scheduled on ${localSlotTime} and will focus on ${title}.`,
+          content: `Great news! 🎉 ${userENSNameOrAddress} has just booked a session with you on ${dao_name}. The session is scheduled on ${localSlotTime} UTC and will focus on ${title}.`,
           createdAt: Date.now(),
           read_status: false,
           notification_name: "newBookingForHost",
@@ -146,7 +154,7 @@ export async function POST(
 
         const notificationToGuest = {
           receiver_address: guestAddress,
-          content: `Congratulations! 🎉 Your session on ${dao_name} titled "${title}" has been successfully booked with ${hostENSNameOrAddress}. The session will take place on ${localSlotTime}.`,
+          content: `Congratulations! 🎉 Your session on ${dao_name} titled "${title}" has been successfully booked with ${hostENSNameOrAddress}. The session will take place on ${localSlotTime} UTC.`,
           createdAt: Date.now(),
           read_status: false,
           notification_name: "newBookingForGuest",

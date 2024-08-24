@@ -25,13 +25,20 @@ import { PiLinkSimpleBold } from "react-icons/pi";
 import { opBlock, arbBlock } from "@/config/staticDataUtils";
 import MeetingRecordingModal from "../ComponentUtils/MeetingRecordingModal";
 import ReactionBar from "./ReactionBar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
 
 const BottomBar = ({
   daoName,
   hostAddress,
+  meetingStatus,
 }: {
   daoName: string;
   hostAddress: string;
+  meetingStatus: boolean | undefined;
 }) => {
   const { isAudioOn, enableAudio, disableAudio } = useLocalAudio();
   const { isVideoOn, enableVideo, disableVideo } = useLocalVideo();
@@ -65,7 +72,7 @@ const BottomBar = ({
     setIsScreenShared,
   } = useStudioState();
   const [showModal, setShowModal] = useState(true);
-  const [recordingStatus, setRecordingStatus] = useState<string | null>(null);
+  // const [recordingStatus, setRecordingStatus] = useState<string | null>(null);
   const { startScreenShare, stopScreenShare, shareStream } =
     useLocalScreenShare({
       onProduceStart(data) {
@@ -90,6 +97,9 @@ const BottomBar = ({
 
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
+        if (address) {
+          myHeaders.append("x-wallet-address", address);
+        }
 
         const raw = JSON.stringify({
           meetingId: roomId,
@@ -104,7 +114,7 @@ const BottomBar = ({
 
         try {
           const response = await fetch("/api/update-video-uri", requestOptions);
-          const result = await response.text();
+          const result = await response.json();
           console.log(result);
         } catch (error) {
           console.error(error);
@@ -159,66 +169,73 @@ const BottomBar = ({
   //   }
   // }, []);
 
-  useEffect(() => {
-    const storedStatus = localStorage.getItem("meetingData");
-    if (storedStatus) {
-      const parsedStatus = JSON.parse(storedStatus);
-      console.log("storedStatus: ", parsedStatus);
-      setRecordingStatus(parsedStatus.isMeetingRecorded);
-    }
-    console.log("recordingStatus: ", recordingStatus);
-  }, []);
+  // useEffect(() => {
+  //   const storedStatus = localStorage.getItem("meetingData");
+  //   if (storedStatus) {
+  //     const parsedStatus = JSON.parse(storedStatus);
+  //     console.log("storedStatus: ", parsedStatus);
+  //     setRecordingStatus(parsedStatus.isMeetingRecorded);
+  //   }
+  //   console.log("recordingStatus: ", recordingStatus);
+  // }, []);
 
-  const handleModalClose = async (result: boolean) => {
-    if (role === "host") {
-      const meetingData = {
-        meetingId: roomId,
-        isMeetingRecorded: result.toString(),
-      };
-      localStorage.setItem("meetingData", JSON.stringify(meetingData));
-      setShowModal(false);
-      setRecordingStatus(result.toString());
-      console.log(
-        result ? "Meeting will be recorded." : "Meeting will not be recorded."
-      );
+  // const handleModalClose = async (result: boolean) => {
+  //   if (role === "host") {
+  //     const meetingData = {
+  //       meetingId: roomId,
+  //       isMeetingRecorded: result.toString(),
+  //     };
+  //     localStorage.setItem("meetingData", JSON.stringify(meetingData));
+  //     setShowModal(false);
+  //     setRecordingStatus(result.toString());
+  //     console.log(
+  //       result ? "Meeting will be recorded." : "Meeting will not be recorded."
+  //     );
 
-      if (result) {
-        startRecording();
-      }
-    }
-  };
+  //     if (result) {
+  //       startRecording();
+  //     }
+  //   }
+  // };
 
-  const startRecording = async () => {
-    try {
-      const myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
-      if (address) {
-        myHeaders.append("x-wallet-address", address);
-      }
-      const requestOptions = {
-        method: "POST",
-        headers: myHeaders,
-        body: JSON.stringify({
-          roomId: params.roomId,
-        }),
-      };
+  // useEffect(() => {
+  //   if (isRecording) {
+  //     startRecording();
+  //   }
+  // }, []);
 
-      const status = await fetch(
-        `/api/startRecording/${params.roomId}`,
-        requestOptions
-      );
-      if (!status.ok) {
-        console.error(`Request failed with status: ${status.status}`);
-        toast.error("Failed to start recording");
-        return;
-      }
-      setIsRecording(true); // Assuming this should be true after starting recording
-      toast.success("Recording started");
-    } catch (error) {
-      console.error("Error starting recording:", error);
-      toast.error("Error starting recording");
-    }
-  };
+  // const startRecording = async () => {
+  //   try {
+  //     console.log("recording started");
+  //     const myHeaders = new Headers();
+  //     myHeaders.append("Content-Type", "application/json");
+  //     // if (address) {
+  //     //   myHeaders.append("x-wallet-address", address);
+  //     // }
+  //     const requestOptions = {
+  //       method: "POST",
+  //       headers: myHeaders,
+  //       body: JSON.stringify({
+  //         roomId: params.roomId,
+  //       }),
+  //     };
+
+  //     const status = await fetch(
+  //       `/api/startRecording/${params.roomId}`,
+  //       requestOptions
+  //     );
+  //     if (!status.ok) {
+  //       console.error(`Request failed with status: ${status.status}`);
+  //       toast.error("Failed to start recording");
+  //       return;
+  //     }
+  //     setIsRecording(true); // Assuming this should be true after starting recording
+  //     toast.success("Recording started");
+  //   } catch (error) {
+  //     console.error("Error starting recording:", error);
+  //     toast.error("Error starting recording");
+  //   }
+  // };
 
   useEffect(() => {
     const handleBeforeUnload = (event: any) => {
@@ -253,7 +270,7 @@ const BottomBar = ({
 
     // console.log("host address", host_address);
 
-    if (role === "host" && recordingStatus === "true") {
+    if (role === "host" && meetingStatus === true) {
       await handleStopRecording(); // Do not proceed with API calls if not the host
     }
 
@@ -264,6 +281,33 @@ const BottomBar = ({
       setIsLoading(false);
       setShowLeaveDropDown(false);
     } else if (endMeet === "close") {
+      if (role === "host") {
+        try {
+          const myHeaders = new Headers();
+          myHeaders.append("Content-Type", "application/json");
+          if (address) {
+            myHeaders.append("x-wallet-address", address);
+          }
+          const requestOptions = {
+            method: "PUT",
+            headers: myHeaders,
+            body: JSON.stringify({
+              meetingId: roomId,
+              meetingType: meetingCategory,
+              recordedStatus: isRecording,
+              meetingStatus: isRecording === true ? "Recorded" : "Finished",
+            }),
+          };
+
+          const response = await fetch(
+            "/api/update-recording-status",
+            requestOptions
+          );
+          console.log("Response: ", response);
+        } catch (e) {
+          console.log("Error: ", e);
+        }
+      }
       closeRoom();
       setIsLoading(false);
       setShowLeaveDropDown(false);
@@ -282,15 +326,19 @@ const BottomBar = ({
       }
 
       try {
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        if (address) {
+          myHeaders.append("x-wallet-address", address);
+        }
         const requestOptions = {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: myHeaders,
           body: JSON.stringify({
             roomId: roomId,
             meetingType: meetingType,
             dao_name: daoName,
+            hostAddress: hostAddress,
           }),
         };
         // console.log("req optionnnn", requestOptions);
@@ -302,16 +350,20 @@ const BottomBar = ({
         console.error("Error handling end call:", error);
       }
 
-      if (recordingStatus === "true") {
+      if (meetingStatus === true) {
         try {
           toast.success("Giving Attestations");
+          const myHeaders = new Headers();
+          myHeaders.append("Content-Type", "application/json");
+          if (address) {
+            myHeaders.append("x-wallet-address", address);
+          }
           const response = await fetch(`/api/get-attest-data`, {
             method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
+            headers: myHeaders,
             body: JSON.stringify({
               roomId: roomId,
+              connectedAddress: address,
             }),
           });
           const response_data = await response.json();
@@ -324,38 +376,18 @@ const BottomBar = ({
           toast.error("Attestation denied");
         }
       }
-
-      try {
-        const requestOptions = {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            meetingId: roomId,
-            meetingType: meetingCategory,
-            recordedStatus: recordingStatus,
-            meetingStatus: recordingStatus === "true" ? "Recorded" : "Finished",
-          }),
-        };
-
-        const response = await fetch(
-          "/api/update-recording-status",
-          requestOptions
-        );
-        console.log("Response: ", response);
-      } catch (e) {
-        console.log("Error: ", e);
-      }
     }
 
     if (meetingCategory === "officehours") {
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      if (address) {
+        myHeaders.append("x-wallet-address", address);
+      }
       try {
         const res = await fetch(`/api/update-office-hours/${hostAddress}`, {
           method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: myHeaders,
         });
         const res_data = await res.json();
 
@@ -372,8 +404,8 @@ const BottomBar = ({
 
   return (
     <>
-      <footer className="flex items-center justify-between px-4 py-2">
-        <div>
+      <footer className="flex items-center justify-between px-4 py-2 font-poppins">
+        {/* <div>
           <div className="relative">
             <div
               className="mr-auto flex items-center gap-4 w-44 cursor-pointer"
@@ -408,11 +440,49 @@ const BottomBar = ({
               </div>
             )}
           </div>
-        </div>
+        </div> */}
 
-        <div
-          className={clsx("flex space-x-3", role === Role.HOST ? "mr-12" : "")}
-        >
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button className="bg-white hover:bg-white">
+              <div className="flex gap-2 items-center">
+                <div className="bg-blue-shade-200 p-2 rounded-lg">
+                  <PiLinkSimpleBold
+                    className="text-white"
+                    size={24}
+                  ></PiLinkSimpleBold>
+                </div>
+                <div className="text-gray-800 text-base">Quick Links</div>
+              </div>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            className="bg-white items-start"
+            sideOffset={8}
+            align="start"
+          >
+            <div className="">
+              {/* <div className="arrow-up"></div> */}
+              {(daoName === "arbitrum"
+                ? arbBlock
+                : daoName === "optimism"
+                ? opBlock
+                : []
+              ).map((block, index) => (
+                <a
+                  href={block.link}
+                  target="_blank"
+                  className="block px-4 py-2 text-gray-800 hover:bg-gray-200 hover:rounded-md"
+                  key={index}
+                >
+                  {block.title}
+                </a>
+              ))}
+            </div>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        <div className={clsx("flex space-x-3")}>
           <ButtonWithIcon
             content={isVideoOn ? "Turn off camera" : "Turn on camera"}
             onClick={() => {
@@ -481,6 +551,7 @@ const BottomBar = ({
                 displayName: metadata?.displayName || "",
                 avatarUrl: metadata?.avatarUrl || "",
                 isHandRaised: !metadata?.isHandRaised,
+                walletAddress: metadata?.walletAddress || address || "",
               });
             }}
             className={clsx(
@@ -544,9 +615,6 @@ const BottomBar = ({
           </ButtonWithIcon>
         </div>
       </footer>
-      {role === "host" && recordingStatus === null && (
-        <MeetingRecordingModal show={showModal} onClose={handleModalClose} />
-      )}
     </>
   );
 };

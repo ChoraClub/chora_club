@@ -17,7 +17,7 @@ interface UserSessionsProps {
 
 type Attendee = {
   attendee_address: string;
-  attendee_uid?: string; 
+  attendee_uid?: string;
 };
 
 interface Session {
@@ -59,11 +59,15 @@ function UserSessions({
   const getUserMeetingData = async () => {
     setDataLoading(true);
     try {
+      // setDataLoading(true);
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      if (address) {
+        myHeaders.append("x-wallet-address", address);
+      }
       const response = await fetch(`/api/get-sessions`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: myHeaders,
         body: JSON.stringify({
           address: address,
           dao_name: daoName,
@@ -82,7 +86,7 @@ function UserSessions({
       }
     } catch (error) {
       setError("Unable to load sessions. Please try again in a few moments.");
-    } finally{
+    } finally {
       setDataLoading(false);
     }
   };
@@ -231,6 +235,7 @@ function UserSessions({
               <RecordedSessionsTile
                 meetingData={attendedDetails}
                 showClaimButton={true}
+                session="attended"
               />
             ))}
         </div>

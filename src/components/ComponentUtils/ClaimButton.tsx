@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Oval } from "react-loader-spinner";
 import { FaCheck, FaGift } from "react-icons/fa6";
 import { Tooltip } from "@nextui-org/react";
-import styles from "./ClaimButton.module.css";
+import styles from "./Button.module.css";
 import { ethers } from "ethers";
 import { EAS } from "@ethereum-attestation-service/eas-sdk";
 import toast from "react-hot-toast";
+import confetti from 'canvas-confetti';
 
 interface ClaimButtonProps {
   meetingId: string;
@@ -24,7 +25,7 @@ const ClaimButton: React.FC<ClaimButtonProps> = ({
   endTime,
   dao,
   address,
-  onChainId
+  onChainId,
 }) => {
   const [isClaiming, setIsClaiming] = useState(false);
   const [isClaimed, setIsClaimed] = useState(!!onChainId);
@@ -32,6 +33,15 @@ const ClaimButton: React.FC<ClaimButtonProps> = ({
   useEffect(() => {
     setIsClaimed(!!onChainId);
   }, [onChainId]);
+
+  const triggerConfetti = () => {
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { y: 0.6 },
+      zIndex: 9999
+    });
+  };
 
   const handleAttestationOnchain = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -68,16 +78,27 @@ const ClaimButton: React.FC<ClaimButtonProps> = ({
     };
 
     try {
-      const res = await fetch("/api/attest-onchain", {
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      if (address) {
+        myHeaders.append("x-wallet-address", address);
+      }
+
+      // Configure the request options
+      const requestOptions = {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: myHeaders,
         body: JSON.stringify(data),
-      });
+      };
+
+      const res = await fetch("/api/attest-onchain", requestOptions);
 
       // if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
       if (!res.ok) {
         const errorText = await res.text();
-        throw new Error(`HTTP error! status: ${res.status}, message: ${errorText}`);
+        throw new Error(
+          `HTTP error! status: ${res.status}, message: ${errorText}`
+        );
       }
 
       const attestationObject = await res.json();
@@ -119,10 +140,13 @@ const ClaimButton: React.FC<ClaimButtonProps> = ({
         if (updateData.success) {
           console.log("On-chain attestation Claimed");
           setIsClaimed(true);
+          setTimeout(() => {
+            triggerConfetti();
+          }, 100);
           toast.success("On-chain attestation claimed successfully!");
         }
       }
-    } catch (error:any) {
+    } catch (error: any) {
       console.error("Error claim:", error.message);
       toast.error(`Failed to claim on-chain attestation`);
     } finally {
@@ -131,6 +155,7 @@ const ClaimButton: React.FC<ClaimButtonProps> = ({
   };
 
   return (
+    <>
     <Tooltip
       content={
         isClaiming
@@ -146,17 +171,11 @@ const ClaimButton: React.FC<ClaimButtonProps> = ({
         className={`${styles.button} ${
           !!onChainId || isClaimed ? styles.claimed : ""
         } w-full `}
-        onClick={
-          handleAttestationOnchain
-        }
+        onClick={handleAttestationOnchain}
         disabled={!!onChainId || isClaiming || isClaimed}
       >
         <span className={styles.buttonText}>
-          {isClaiming
-            ? "Claiming..."
-            : isClaimed
-            ? "Claimed"
-            : "Claim"}
+          {isClaiming ? "Claiming..." : isClaimed ? "Claimed" : "Claim"}
         </span>
         <span className={styles.iconWrapper}>
           {isClaiming ? (
@@ -176,6 +195,7 @@ const ClaimButton: React.FC<ClaimButtonProps> = ({
         </span>
       </button>
     </Tooltip>
+    </>
   );
 };
 

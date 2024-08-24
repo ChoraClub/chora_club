@@ -25,8 +25,11 @@ export async function PUT(req: NextRequest, res: NextResponse) {
     } else if (collectionName === "meetings") {
       const sessions = await collection.findOneAndUpdate(
         { meetingId },
-        { $set: { meeting_status: "Ongoing" } }
+        { $set: { meeting_status: "Ongoing" } },
+        { returnDocument: "after" }
       );
+
+      console.log("sessions::", sessions);
 
       client.close();
 

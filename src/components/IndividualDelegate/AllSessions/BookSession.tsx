@@ -98,30 +98,35 @@ function BookSession({ props }: { props: Type }) {
 
   const getAvailability = async () => {
     try {
-      const response = await fetch(`/api/get-availability/${host_address}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetch(
+        `/api/get-availability/${host_address}?dao_name=${daoName}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       const result = await response.json();
       if (result.success) {
         setAPIData(result.data);
         setIsLoading(false);
       }
-    } catch (error) {
-    }
+    } catch (error) {}
   };
 
   const getSlotTimeAvailability = async () => {
     try {
-      const response = await fetch(`/api/get-meeting/${host_address}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetch(
+        `/api/get-meeting/${host_address}?dao_name=${daoName}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       const result = await response.json();
       if (result.success) {
@@ -204,6 +209,9 @@ function BookSession({ props }: { props: Type }) {
     try {
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
+      if (address) {
+        myHeaders.append("x-wallet-address", address);
+      }
 
       const raw = JSON.stringify({
         address: address,
@@ -264,10 +272,9 @@ function BookSession({ props }: { props: Type }) {
             apiCall();
           }
         }
-      } catch (error) {
-      }
+      } catch (error) {}
     } else {
-      toast.error("Please enter title or description!");
+      toast.error("Please enter title and description!");
     }
   };
 
@@ -298,9 +305,15 @@ function BookSession({ props }: { props: Type }) {
       meetingId: roomId,
     };
 
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    if (address) {
+      myHeaders.append("x-wallet-address", address);
+    }
+
     const requestOptions: any = {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: myHeaders,
       body: JSON.stringify(requestData),
       redirect: "follow",
     };
@@ -450,6 +463,9 @@ function BookSession({ props }: { props: Type }) {
             setAddingEmail(true);
             const myHeaders = new Headers();
             myHeaders.append("Content-Type", "application/json");
+            if (address) {
+              myHeaders.append("x-wallet-address", address);
+            }
 
             const raw = JSON.stringify({
               address: address,
@@ -543,7 +559,9 @@ function BookSession({ props }: { props: Type }) {
             <div className="relative">
               <div className="flex flex-col gap-1 text-white bg-[#292929] p-4 py-7">
                 <h2 className="text-lg font-semibold mx-4">
-                  Book your slot for {props.daoDelegates.charAt(0).toUpperCase() + props.daoDelegates.slice(1)}
+                  Book your slot for{" "}
+                  {props.daoDelegates.charAt(0).toUpperCase() +
+                    props.daoDelegates.slice(1)}
                   <button
                     className="absolute right-7"
                     onClick={() => {

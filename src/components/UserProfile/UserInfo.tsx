@@ -61,7 +61,6 @@ const StyledMDEditorWrapper = styled.div`
   }
 `;
 
-
 const MDEditor = dynamic(
   () => import("@uiw/react-md-editor").then((mod) => mod.default),
   { ssr: false }
@@ -168,12 +167,15 @@ function UserInfo({
 
     const sessionHosted = async () => {
       try {
-        const response = await fetch(`/api/get-meeting/${address}`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+        const response = await fetch(
+          `/api/get-meeting/${address}?dao_name=${dao_name}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
         const result = await response.json();
         if (result.success) {
           result.data.forEach((item: any) => {
@@ -199,11 +201,14 @@ function UserInfo({
 
     const sessionAttended = async () => {
       try {
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        if (address) {
+          myHeaders.append("x-wallet-address", address);
+        }
         const response = await fetch(`/api/get-session-data/${address}`, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: myHeaders,
           body: JSON.stringify({
             dao_name: dao_name,
           }),
@@ -231,11 +236,14 @@ function UserInfo({
 
     const officeHoursHosted = async () => {
       try {
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        if (address) {
+          myHeaders.append("x-wallet-address", address);
+        }
         const response = await fetch(`/api/get-officehours-address`, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: myHeaders,
           body: JSON.stringify({
             address: address,
           }),
@@ -264,11 +272,14 @@ function UserInfo({
 
     const officeHoursAttended = async () => {
       try {
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        if (address) {
+          myHeaders.append("x-wallet-address", address);
+        }
         const response = await fetch(`/api/get-attendee-individual`, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: myHeaders,
           body: JSON.stringify({
             attendee_address: address,
           }),
@@ -338,7 +349,6 @@ function UserInfo({
     );
   }
 
-
   const handleDescChange = (value?: string) => {
     setTempDesc(value || "");
     console.log("Temp Desc", value);
@@ -353,12 +363,12 @@ function UserInfo({
   };
 
   const handleCancelClick = () => {
-    setTempDesc(originalDesc); 
-    setEditing(false); 
+    setTempDesc(originalDesc);
+    setEditing(false);
   };
 
   useEffect(() => {
-    setOriginalDesc(description || karmaDesc); 
+    setOriginalDesc(description || karmaDesc);
     setTempDesc(description || karmaDesc);
   }, [description, karmaDesc]);
 
@@ -425,6 +435,15 @@ function UserInfo({
           className={`flex flex-col justify-between min-h-48 rounded-xl my-7 me-32 p-6
         ${isEditing ? "outline" : ""}`}
         >
+          {/* <ReactQuill
+            readOnly={!isEditing}
+            value={isEditing ? tempDesc :( description || karmaDesc)}
+            onChange={handleDescChange}
+            modules={{
+              toolbar: toolbarOptions,
+            }}
+            placeholder={"Type your description here ..."}
+          /> */}
 
           <StyledMDEditorWrapper>
             <MDEditor

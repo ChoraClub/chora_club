@@ -14,6 +14,7 @@ import clsx from "clsx";
 import { cn } from "@/utils/helper";
 import { NestedPeerListIcons, PeerListIcons } from "@/utils/PeerListIcons";
 import { useStudioState } from "@/store/studioState";
+import { useAccount } from "wagmi";
 
 interface PeerMetaDatProps {
   isRequested?: boolean;
@@ -28,6 +29,7 @@ const PeerMetaData: React.FC<PeerMetaDatProps> = ({
     displayName: string;
     avatarUrl: string;
     isHandRaised: boolean;
+    walletAddress: string;
   }>();
   const { name, avatarUrl } = useStudioState();
 
@@ -44,6 +46,8 @@ const PeerMetaData: React.FC<PeerMetaDatProps> = ({
     stream: micStream,
     isAudioOn,
   } = useLocalAudio();
+
+  const { address } = useAccount();
 
   // const removeRequestedPeers = useStore((state) => state.removeRequestedPeers);
 
@@ -78,6 +82,7 @@ const PeerMetaData: React.FC<PeerMetaDatProps> = ({
               displayName: metadata?.displayName ?? "Guest",
               avatarUrl: metadata?.avatarUrl ?? "/avatars/avatars/0.png",
               isHandRaised: !metadata?.isHandRaised,
+              walletAddress: metadata?.walletAddress || address || "",
             });
             // }
           }}

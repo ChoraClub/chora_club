@@ -8,10 +8,8 @@ import { FaCircleCheck, FaCircleXmark, FaCirclePlay } from "react-icons/fa6";
 import { Tooltip } from "@nextui-org/react";
 import EventTile from "../../ComponentUtils/EventTile";
 import { useAccount, useNetwork } from "wagmi";
-import toast, { Toaster } from "react-hot-toast";
-import { Oval } from "react-loader-spinner";
-import SessionTileSkeletonLoader from "@/components/SkeletonLoader/SessionTileSkeletonLoader";
 import ErrorDisplay from "@/components/ComponentUtils/ErrorDisplay";
+import RecordedSessionsSkeletonLoader from "@/components/SkeletonLoader/RecordedSessionsSkeletonLoader";
 
 interface Session {
   booking_status: string;
@@ -42,12 +40,26 @@ function BookedUserSessions({ daoName }: { daoName: string }) {
 
   const getMeetingData = async () => {
     try {
-      const response = await fetch(`/api/get-meeting/${address}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      if (address) {
+        myHeaders.append("x-wallet-address", address);
+      }
+
+      const raw = JSON.stringify({
+        address: address,
       });
+
+      const requestOptions: any = {
+        method: "POST",
+        headers: myHeaders,
+        // body: raw,
+        redirect: "follow",
+      };
+      const response = await fetch(
+        `/api/get-meeting/${address}?dao_name=${daoName}`,
+        requestOptions
+      );
       const result = await response.json();
       // console.log("result in get meeting", result);
       let filteredData: any = result.data;
@@ -75,7 +87,7 @@ function BookedUserSessions({ daoName }: { daoName: string }) {
 
   useEffect(() => {
     getMeetingData();
-  }, [address, sessionDetails]);
+  }, [address]);
 
   if (error) {
     return (
@@ -89,16 +101,20 @@ function BookedUserSessions({ daoName }: { daoName: string }) {
     <>
       <div className="space-y-6">
         {pageLoading ? (
-          <SessionTileSkeletonLoader />
+          <RecordedSessionsSkeletonLoader />
         ) : sessionDetails.length > 0 ? (
-          sessionDetails.map((data, index) => (
-            <EventTile
-              key={index}
-              tileIndex={index}
-              data={data}
-              isEvent="Book"
-            />
-          ))
+          <div
+            className={`grid min-[475px]:grid-cols- md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-10 py-8 font-poppins`}
+          >
+            {sessionDetails.map((data, index) => (
+              <EventTile
+                key={index}
+                tileIndex={index}
+                data={data}
+                isEvent="Book"
+              />
+            ))}
+          </div>
         ) : (
           <div className="flex flex-col justify-center items-center">
             <div className="text-5xl">☹️</div>{" "}

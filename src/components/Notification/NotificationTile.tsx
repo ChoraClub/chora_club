@@ -1,15 +1,6 @@
 import React, { useEffect, useState } from "react";
-import Image from "next/image";
-import user1 from "../../assets/images/notifications/user1.svg";
 import { NotificationTileProps } from "./NotificationTypeUtils";
-import { BASE_URL } from "@/config/constants";
 import { useRouter } from "next-nprogress-bar";
-import { FaClock } from "react-icons/fa";
-import { IoCheckmarkCircle } from "react-icons/io5";
-import { BsDatabaseFillCheck } from "react-icons/bs";
-import { PiVideoFill } from "react-icons/pi";
-import { FaUserCheck } from "react-icons/fa6";
-import { GiChaingun } from "react-icons/gi";
 import { formatTimestampOrDate } from "@/utils/NotificationUtils";
 import {
   getBackgroundColor,
@@ -17,12 +8,14 @@ import {
   handleRedirection,
   markAsRead,
 } from "./NotificationActions";
+import { useNotificationStudioState } from "@/store/notificationStudioState";
 
 function NotificationTile({ data, index, length }: NotificationTileProps) {
   const router = useRouter();
   const [readStatus, setReadStatus] = useState<boolean>(data.read_status);
   const [tileData, setTileData] = useState(data);
   const [docId, setDocId] = useState(data?._id);
+  const { combinedNotifications } = useNotificationStudioState();
 
   useEffect(() => {
     setTileData(data);
@@ -30,9 +23,16 @@ function NotificationTile({ data, index, length }: NotificationTileProps) {
     setDocId(data?._id);
   }, [data, readStatus, docId]);
 
+  const currentData =
+    combinedNotifications.find((n) => n._id === data._id) || data;
+
   const handleTileRedirection = async () => {
-    await handleRedirection(tileData, router, markAsRead);
+    await handleRedirection(currentData, router, markAsRead);
   };
+
+  // const handleTileRedirection = async () => {
+  //   await handleRedirection(tileData, router, markAsRead);
+  // };
   return (
     <>
       <div

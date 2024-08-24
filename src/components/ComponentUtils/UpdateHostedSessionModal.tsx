@@ -1,4 +1,4 @@
-import React,{ useEffect } from "react";
+import React, { useEffect } from "react";
 import { Oval } from "react-loader-spinner";
 
 interface SessionTileProps {
@@ -37,14 +37,7 @@ function UpdateHostedSessionModal({
   return (
     <>
       <div className="fixed inset-0 flex items-center justify-center z-50  overflow-hidden">
-        <div
-          className="absolute inset-0 backdrop-blur-md"
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            onClose();
-          }}
-        ></div>
+        <div className="absolute inset-0 backdrop-blur-md"></div>
         <div className="p-7 border z-50 rounded-2xl w-[35vw]  bg-white flex flex-col gap-3">
           <div className="text-blue-shade-100 flex justify-center items-center text-3xl font-semibold">
             Edit Session
@@ -85,9 +78,7 @@ function UpdateHostedSessionModal({
             <button
               className="bg-blue-shade-100 rounded-lg py-2 px-4 text-white"
               onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                onSave(sessionData)
+                onSave(sessionData);
               }}
             >
               {loading ? (
@@ -108,8 +99,6 @@ function UpdateHostedSessionModal({
             <button
               className="bg-[#D9D9D945] rounded-lg py-2 px-3"
               onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
                 onClose();
               }}
             >

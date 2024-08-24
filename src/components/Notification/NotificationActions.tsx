@@ -1,4 +1,4 @@
-// NotificationActions.tsx
+"use client";
 
 import React from "react";
 import { FaClock, FaUserCheck } from "react-icons/fa";
@@ -10,6 +10,8 @@ import {
 import { PiVideoFill } from "react-icons/pi";
 import { GiChaingun } from "react-icons/gi";
 import { BASE_URL } from "@/config/constants";
+import { useAccount } from "wagmi";
+import { useNotificationStudioState } from "@/store/notificationStudioState";
 
 export const getBackgroundColor = (data: any) => {
   if (data?.notification_type === "newBooking") {
@@ -58,9 +60,14 @@ export const getIcon = (data: any) => {
 };
 
 export const markAsRead = async (data: any): Promise<void> => {
+  const { setNotifications, updateCombinedNotifications } =
+    useNotificationStudioState.getState();
   try {
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
+    if (data.receiver_address) {
+      myHeaders.append("x-wallet-address", data.receiver_address);
+    }
 
     const raw = JSON.stringify({
       id: data?._id,
@@ -77,7 +84,13 @@ export const markAsRead = async (data: any): Promise<void> => {
       requestOptions
     );
     const result = await response.json();
-    if (!result.success) {
+    if (result.success) {
+      // Update the state in the store
+      setNotifications((prev) =>
+        prev.map((n) => (n._id === data._id ? { ...n, read_status: true } : n))
+      );
+      updateCombinedNotifications();
+    } else {
       console.error("Error marking as read:", result.message);
     }
   } catch (error) {
@@ -93,15 +106,15 @@ export const handleRedirection = async (
   if (data.notification_type === "newBooking") {
     if (data.notification_name === "newBookingForHost") {
       router.push(
-        `${BASE_URL}/profile/${data.receiver_address}?active=sessions&session=book`
+        `/profile/${data.receiver_address}?active=sessions&session=book`
       );
     } else if (data.notification_name === "newBookingForGuest") {
       router.push(
-        `${BASE_URL}/profile/${data.receiver_address}?active=sessions&session=attending`
+        `/profile/${data.receiver_address}?active=sessions&session=attending`
       );
     } else if (data.notification_name === "sessionRejectionForGuest") {
       router.push(
-        `${BASE_URL}/profile/${data.receiver_address}?active=sessions&session=attending`
+        `/profile/${data.receiver_address}?active=sessions&session=attending`
       );
     }
   }

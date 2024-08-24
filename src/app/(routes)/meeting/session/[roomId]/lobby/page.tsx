@@ -33,6 +33,8 @@ import { RxCross2 } from "react-icons/rx";
 import record from "@/assets/images/instant-meet/record.svg";
 import arrow from "@/assets/images/instant-meet/arrow.svg";
 import ConnectWalletWithENS from "@/components/ConnectWallet/ConnectWalletWithENS";
+import { getEnsName } from "@/utils/ENSUtils";
+import { truncateAddress } from "@/utils/text";
 
 type lobbyProps = {};
 
@@ -46,6 +48,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
     displayName: string;
     avatarUrl: string;
     isHandRaised: boolean;
+    walletAddress: string;
   }>();
 
   const { name, setName, avatarUrl, setAvatarUrl } = useStudioState();
@@ -74,30 +77,33 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
     if (isDisconnected) {
       toast("Connect your wallet to join the meeting!");
     } else {
-      const myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
+      // const myHeaders = new Headers();
+      // myHeaders.append("Content-Type", "application/json");
+      // if (address) {
+      //   myHeaders.append("x-wallet-address", address);
+      // }
 
-      const raw = JSON.stringify({
-        roomId: params.roomId,
-        meetingType: "session",
-      });
+      // const raw = JSON.stringify({
+      //   roomId: params.roomId,
+      //   meetingType: "session",
+      // });
 
-      const requestOptions: any = {
-        method: "POST",
-        headers: myHeaders,
-        body: raw,
-        redirect: "follow",
-      };
-      const response = await fetch("/api/verify-meeting-id", requestOptions);
-      const result = await response.json();
+      // const requestOptions: any = {
+      //   method: "POST",
+      //   headers: myHeaders,
+      //   body: raw,
+      //   redirect: "follow",
+      // };
+      // const response = await fetch("/api/verify-meeting-id", requestOptions);
+      // const result = await response.json();
 
-      if (result.success) {
-        setHostAddress(result.data.host_address);
-        setDaoName(result.data.dao_name);
-      }
-      if (result.message === "Meeting is ongoing") {
-        setMeetingStatus("Ongoing");
-      }
+      // if (result.success) {
+      //   setHostAddress(result.data.host_address);
+      //   setDaoName(result.data.dao_name);
+      // }
+      // if (result.message === "Meeting is ongoing") {
+      //   setMeetingStatus("Ongoing");
+      // }
 
       // if (address === hostAddress || meetingStatus === "Ongoing") {
       // if (address === hostAddress || result.message === "Meeting is ongoing") {
@@ -119,11 +125,14 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
           address: address, // assuming you have userAddress defined somewhere
         };
         try {
+          const myHeaders = new Headers();
+          myHeaders.append("Content-Type", "application/json");
+          if (address) {
+            myHeaders.append("x-wallet-address", address);
+          }
           const response = await fetch("/api/new-token", {
             method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
+            headers: myHeaders,
             body: JSON.stringify(requestBody),
           });
 
@@ -160,6 +169,9 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
         console.log("inside put api");
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
+        if (address) {
+          myHeaders.append("x-wallet-address", address);
+        }
 
         const raw = JSON.stringify({
           meetingId: params.roomId,
@@ -185,6 +197,34 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
       //   toast("Please wait, Host has not started the session yet.");
       //   console.log("Wait..");
       // }
+
+      if (role === "guest") {
+        // Get the attendee address based on the role
+        const attendeeAddress = role === "guest" ? address : peerId;
+
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        if (address) {
+          myHeaders.append("x-wallet-address", address);
+        }
+
+        const raw = JSON.stringify({
+          meetingId: params.roomId,
+          attendee_address: attendeeAddress,
+        });
+
+        // Make the API request
+        const requestOptions = {
+          method: "PUT",
+          headers: myHeaders,
+          body: raw,
+        };
+
+        fetch("/api/update-session-attendees", requestOptions)
+          .then((response) => response.text())
+          .then((result) => console.log(result))
+          .catch((error) => console.error(error));
+      }
     }
   };
 
@@ -197,6 +237,9 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
   useEffect(() => {
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
+    if (address) {
+      myHeaders.append("x-wallet-address", address);
+    }
 
     const raw = JSON.stringify({
       roomId: params.roomId,
@@ -217,6 +260,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
 
         if (result.success) {
           setHostAddress(result.data.host_address);
+          setDaoName(result.data.dao_name);
         }
 
         if (result.success) {
@@ -225,6 +269,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
             setIsAllowToEnter(false);
             setNotAllowedMessage(result.message);
           } else if (result.message === "Meeting is upcoming") {
+            setMeetingStatus("Upcoming");
             console.log("Meeting is upcoming");
             setIsAllowToEnter(true);
           } else if (result.message === "Meeting has been denied") {
@@ -238,7 +283,6 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
           } else if (result.message === "Meeting is ongoing") {
             setMeetingStatus("Ongoing");
             setIsAllowToEnter(true);
-            // setMeetingStatus("Ongoing");
             console.log("Meeting is ongoing");
           }
         } else {
@@ -254,14 +298,11 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
     verifyMeetingId();
   }, [params.roomId, isAllowToEnter, notAllowedMessage, meetingStatus]);
 
-  useEffect(() => {}, [daoName]);
-
   useEffect(() => {
     const fetchData = async () => {
       try {
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
-
         if (address) {
           myHeaders.append("x-wallet-address", address);
         }
@@ -277,6 +318,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
           body: raw,
           redirect: "follow",
         };
+        console.log("Req OPTIONS", requestOptions);
         const response = await fetch(`/api/profile/${address}`, requestOptions);
         const result = await response.json();
         const resultData = await result.data;
@@ -288,17 +330,23 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
           });
           console.log("filtered profile: ", filtered);
           setProfileDetails(filtered[0]);
-          setIsLoading(false);
           const imageCid = filtered[0]?.image;
           if (imageCid) {
             setAvatarUrl(`https://gateway.lighthouse.storage/ipfs/${imageCid}`);
           }
-          if (filtered[0]?.displayName) {
-            setName(filtered[0].displayName);
-          } else {
-            console.log("formattedAddress ", formattedAddress);
-            setName(formattedAddress);
+
+          if (address) {
+            const getName = await getEnsName(address?.toString());
+            const getEnsNameOfAddress = await getName?.ensName;
+            console.log("formattedAddress ", getEnsNameOfAddress);
+            if (getEnsNameOfAddress) {
+              setName(getEnsNameOfAddress);
+            } else {
+              const formattedAddress = await truncateAddress(address);
+              setName(formattedAddress);
+            }
           }
+          setIsLoading(false);
         }
 
         // if (resultData.length === 0) {
@@ -323,9 +371,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
       }
     };
     fetchData();
-  }, []);
-
-  const formattedAddress = address?.slice(0, 6) + "..." + address?.slice(-4);
+  }, [address]);
 
   return (
     <>
@@ -413,7 +459,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
               {isDisconnected ? <ConnectWalletWithENS /> : null}
               <div className="flex items-center w-full flex-col">
                 <div className="flex flex-col justify-center w-full gap-1 text-[#3E3D3D] font-semibold">
-                  Display name
+                  ENS Name / Address
                   <div className="flex w-full items-center rounded-[10px] border px-3 text-slate-300 outline-none border-white-800 backdrop-blur-[400px] focus-within:border-slate-600 gap-">
                     <div className="mr-2">
                       <Image
@@ -446,9 +492,9 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
                           />
                         </div>
                       ) : (
-                        profileDetails?.displayName ||
-                        profileDetails?.ensName ||
-                        formattedAddress
+                        // profileDetails?.ensName ||
+                        // formattedAddress
+                        name
                       )}
                     </div>
                   </div>
@@ -525,18 +571,6 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
           )}
         </>
       )}
-      <Toaster
-        toastOptions={{
-          style: {
-            fontSize: "14px",
-            backgroundColor: "#3E3D3D",
-            color: "#fff",
-            boxShadow: "none",
-            borderRadius: "50px",
-            padding: "3px 5px",
-          },
-        }}
-      />
     </>
   );
 };

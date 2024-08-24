@@ -19,6 +19,7 @@ import { getEnsName } from "@/utils/ENSUtils";
 import onChain_link from "@/assets/images/watchmeeting/onChain_link.png";
 import offChain_link from "@/assets/images/watchmeeting/offChain_link.png";
 import ErrorDisplay from "../ComponentUtils/ErrorDisplay";
+import { useAccount, useNetwork } from "wagmi";
 
 interface Type {
   ensName: string;
@@ -47,6 +48,7 @@ function AvailableSessions() {
   const [startTime, setStartTime] = useState<string | null>(null);
   const [endTime, setEndTime] = useState<string | null>(null);
   const [ensNames, setEnsNames] = useState<any>({});
+  const { address } = useAccount();
 
   const [startHour, setStartHour] = useState("");
   const [startMinute, setStartMinute] = useState("");
@@ -86,6 +88,9 @@ function AvailableSessions() {
     try {
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
+      if (address) {
+        myHeaders.append("x-wallet-address", address);
+      }
 
       const currentDate = new Date();
       let newDate = currentDate.toLocaleDateString();

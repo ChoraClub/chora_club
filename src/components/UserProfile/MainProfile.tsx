@@ -16,9 +16,7 @@ import UserInfo from "./UserInfo";
 import UserVotes from "./UserVotes";
 import UserSessions from "./UserSessions";
 import UserOfficeHours from "./UserOfficeHours";
-import ClaimNFTs from "./ClaimNFTs";
 import { FaPencil } from "react-icons/fa6";
-import { SiFarcaster } from "react-icons/si";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useRouter } from "next-nprogress-bar";
 import toast, { Toaster } from "react-hot-toast";
@@ -26,15 +24,7 @@ import Link from "next/link";
 import OPLogo from "@/assets/images/daos/op.png";
 import ArbLogo from "@/assets/images/daos/arbCir.png";
 import ccLogo from "@/assets/images/daos/CCLogo2.png";
-import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Button,
-  useDisclosure,
-} from "@nextui-org/react";
+import { Button, useDisclosure } from "@nextui-org/react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useAccount } from "wagmi";
 import { useNetwork } from "wagmi";
@@ -49,20 +39,10 @@ import { useConnectModal } from "@rainbow-me/rainbowkit";
 import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
 import MainProfileSkeletonLoader from "../SkeletonLoader/MainProfileSkeletonLoader";
 import { BASE_URL } from "@/config/constants";
-import { fetchData } from "next-auth/client/_utils";
-import user1 from "@/assets/images/daos/user1.png";
-import { FaCalendarDays } from "react-icons/fa6";
 import FollowingModal from "../ComponentUtils/FollowingModal";
 import { IoClose } from "react-icons/io5";
 import "./MainProfile.module.css";
-import { FaUserEdit } from "react-icons/fa";
-import { TbMailFilled } from "react-icons/tb";
-import { SiDiscourse } from "react-icons/si";
-import { BsDiscord } from "react-icons/bs";
-import { TbBrandGithubFilled } from "react-icons/tb";
-import { CgAttachment } from "react-icons/cg";
 import UpdateProfileModal from "../ComponentUtils/UpdateProfileModal";
-import { cookies } from "next/headers";
 
 function MainProfile() {
   const { isConnected, address } = useAccount();
@@ -81,20 +61,17 @@ function MainProfile() {
   const [karmaImage, setKarmaImage] = useState<any>();
   const [karmaEns, setKarmaEns] = useState("");
   const [karmaDesc, setKarmaDesc] = useState("");
-  const [votes, setVotes] = useState<any>();
   const [isPageLoading, setIsPageLoading] = useState(true);
   const [selfDelegate, setSelfDelegate] = useState(false);
   const [daoName, setDaoName] = useState("optimism");
   const [isCopied, setIsCopied] = useState(false);
-  const [followings, setfollowings] = useState(0);
-  const [followers, setfollowers] = useState(0);
-  const [isFollowing, setfollwing] = useState(true);
+  const [followings, setFollowings] = useState(0);
+  const [followers, setFollowers] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [notification, setnotification] = useState(true);
-  const [isOpenFollowings, setfollowingmodel] = useState(false);
+  const [isFollowingModalOpen, setIsFollowingModalOpen] = useState(false);
   const [isOpentoaster, settoaster] = useState(false);
   const [userFollowings, setUserFollowings] = useState<Following[]>([]);
-  const [dbResponse, setDbResponse] = useState<any>(null);
+  // const [dbResponse, setDbResponse] = useState<any>(null);
   const [modalData, setModalData] = useState({
     displayImage: "",
     displayName: "",
@@ -113,7 +90,7 @@ function MainProfile() {
     discourse: "",
     github: "",
   });
-  const [isToggled, settoggle] = useState(false);
+  const [isToggled, setToggle] = useState(false);
   interface ProgressData {
     total: any;
     uploaded: any;
@@ -125,14 +102,6 @@ function MainProfile() {
     isNotification: boolean;
   }
 
-  // useEffect(() => {
-  //   if (chain?.name === "Optimism") {
-  //     set  ("optimism");
-  //   } else if (chain?.name === "Arbitrum One") {
-  //     setDaoName("arbitrum");
-  //   }
-  //   console.log("daoName", daoName);
-  // }, [chain, daoName]);
   useEffect(() => {
     if (chain && chain?.name === "Optimism") {
       setDaoName("optimism");
@@ -258,37 +227,41 @@ function MainProfile() {
     copy(addr);
     toast("Address Copied");
   };
-  const handleUpdateFollowings = async (daoname: string, isChange: number) => {
-    // console.log("daoName", daoname);
-    // setUnfollowDao(daoname);
-    setfollowingmodel(true);
+  const handleUpdateFollowings = async (
+    daoname: string,
+    isChange: number,
+    isfollowingchange: number
+  ) => {
     setLoading(true);
-    try {
-      const myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    if (address) {
+      myHeaders.append("x-wallet-address", address);
+    }
 
-      const raw = JSON.stringify({
-        address: address,
-        // daoName: dao,
-      });
+    const raw = JSON.stringify({
+      address: address,
+      // daoName: dao,
+    });
 
-      const requestOptions: any = {
-        method: "POST",
-        headers: myHeaders,
-        body: raw,
-        redirect: "follow",
-      };
-      const res = await fetch(
-        `/api/delegate-follow/savefollower`,
-        requestOptions
-      );
-      if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status}`);
-      }
+    const requestOptions: any = {
+      method: "POST",
+      headers: myHeaders,
+      body: raw,
+      redirect: "follow",
+    };
+    const res = await fetch(
+      `/api/delegate-follow/savefollower`,
+      requestOptions
+    );
 
-      const dbResponse = await res.json();
-      setDbResponse(dbResponse);
+    const dbResponse = await res.json();
 
+    if (isfollowingchange == 1) {
+      updateFollowerState(dbResponse);
+    } else {
+      // setDbResponse(dbResponse);
+      setIsFollowingModalOpen(true);
       for (const item of dbResponse.data) {
         const matchDao = item.followings.find(
           (daoItem: any) => daoItem.dao === daoname
@@ -299,21 +272,19 @@ function MainProfile() {
             (f: Following) => f.isFollowing
           );
           if (isChange == 1) {
-            setfollowings(activeFollowings.length);
+            setFollowings(activeFollowings.length);
           }
           setUserFollowings(activeFollowings);
         } else {
-          setfollowings(0);
+          setFollowings(0);
           setUserFollowings([]);
         }
       }
-    } catch (error) {
-      console.error("Error updating followings:", error);
-      toast.error("Failed to update followings. Please try again.");
-    } finally {
-      setLoading(false);
     }
+    // Close the modal
+    setLoading(false);
   };
+
   const toggleFollowing = async (
     index: number,
     userupdate: any,
@@ -327,16 +298,17 @@ function MainProfile() {
     );
 
     if (!userupdate.isFollowing) {
-      if (daoName === unfollowDao) {
-        setfollowings(followings + 1);
+      setFollowings(followings + 1);
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      if (address) {
+        myHeaders.append("x-wallet-address", address);
       }
 
       try {
         const response = await fetch("/api/delegate-follow/savefollower", {
           method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: myHeaders,
           body: JSON.stringify({
             // Add any necessary data
             delegate_address: userupdate.follower_address,
@@ -350,23 +322,26 @@ function MainProfile() {
         }
 
         const data = await response.json();
-        settoaster(false);
+        // settoaster(false);
         // console.log("Follow successful:", data);
       } catch (error) {
         console.error("Error following:", error);
       }
     } else {
       if (daoName === unfollowDao) {
-        setfollowings(followings - 1);
+        setFollowings(followings - 1);
       }
       setLoading(true);
-      settoaster(true);
+      // settoaster(true);
       try {
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        if (address) {
+          myHeaders.append("x-wallet-address", address);
+        }
         const response = await fetch("/api/delegate-follow/updatefollower", {
           method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: myHeaders,
           body: JSON.stringify({
             // Add any necessary data
             delegate_address: userupdate.follower_address,
@@ -381,7 +356,7 @@ function MainProfile() {
         }
 
         const data = await response.json();
-        settoaster(false);
+        // settoaster(false);
         setLoading(false);
         // console.log("unFollow successful:", data);
       } catch (error) {
@@ -401,14 +376,17 @@ function MainProfile() {
         i === index ? { ...user, isNotification: !user.isNotification } : user
       )
     );
-    settoaster(true);
+    // settoaster(true);
 
     try {
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      if (address) {
+        myHeaders.append("x-wallet-address", address);
+      }
       const response = await fetch("/api/delegate-follow/updatefollower", {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: myHeaders,
         body: JSON.stringify({
           // Add any necessary data
           delegate_address: userupdate.follower_address,
@@ -424,7 +402,7 @@ function MainProfile() {
       }
 
       const data = await response.json();
-      settoaster(false);
+      // settoaster(false);
       // console.log("notification successful:", data);
     } catch (error) {
       console.error("Error following:", error);
@@ -438,86 +416,44 @@ function MainProfile() {
     }));
   };
 
-  const updateFollowerState = async () => {
-    // console.log("Attempting to call savefollower API");
-    const myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-    const raw = JSON.stringify({
-      address: address,
-    });
-
-    const requestOptions: any = {
-      method: "POST",
-      headers: myHeaders,
-      body: raw,
-      redirect: "follow",
-    };
-
-    try {
-      const resp = await fetch(
-        `/api/delegate-follow/savefollower`,
-        requestOptions
-      );
-
-      if (!resp.ok) {
-        throw new Error("Failed to fetch follower/following data");
-      }
-
-      const dbResponse = await resp.json();
-      // console.log("API Response:", dbResponse);
-
-      if (
-        !dbResponse.success ||
-        !dbResponse.data ||
-        dbResponse.data.length === 0
-      ) {
-        console.log("No data returned from API");
-        return;
-      }
-
-      const userData = dbResponse.data[0];
-      let address = await walletClient.getAddresses();
-      let address_user = address[0].toLowerCase();
-      let currentDaoName = "";
-      if (chain?.name === "Optimism") {
-        currentDaoName = "optimism";
-      } else if (chain?.name === "Arbitrum One") {
-        currentDaoName = "arbitrum";
-      }
-
-      // console.log("Current DAO:", currentDaoName);
-      // console.log("User Address:", address_user);
-
-      // Process following details
-      const matchDao = userData.followings?.find(
-        (daoItem: any) =>
-          daoItem.dao.toLowerCase() === currentDaoName.toLowerCase()
-      );
-
-      if (matchDao) {
-        const activeFollowings = matchDao.following?.filter(
-          (f: any) => f.isFollowing
-        );
-        setfollowings(activeFollowings.length);
-        setUserFollowings(activeFollowings);
-      } else {
-        setfollowings(0);
-        setUserFollowings([]);
-      }
-
-      const daoFollowers = userData?.followers?.find(
-        (dao: any) => dao.dao_name === currentDaoName
-      );
-
-      const followerCount = daoFollowers?.follower?.filter(
-        (f: any) => f.isFollowing
-      ).length;
-
-      // alert(followerCount);
-      setfollowers(followerCount);
-    } catch (error) {
-      console.error("Error in updateFollowerState:", error);
+  const updateFollowerState = async (dbResponse: any) => {
+    const userData = dbResponse?.data[0];
+    let address = await walletClient.getAddresses();
+    let address_user = address[0].toLowerCase();
+    let currentDaoName = "";
+    if (chain?.name === "Optimism") {
+      currentDaoName = "optimism";
+    } else if (chain?.name === "Arbitrum One") {
+      currentDaoName = "arbitrum";
     }
+
+    // Process following details
+    const matchDao = userData?.followings?.find(
+      (daoItem: any) =>
+        daoItem.dao.toLowerCase() === currentDaoName.toLowerCase()
+    );
+
+    if (matchDao) {
+      const activeFollowings = matchDao.following?.filter(
+        (f: any) => f.isFollowing
+      );
+      setFollowings(activeFollowings.length);
+      setUserFollowings(activeFollowings);
+    } else {
+      setFollowings(0);
+      setUserFollowings([]);
+    }
+
+    const daoFollowers = userData?.followers?.find(
+      (dao: any) => dao.dao_name === currentDaoName
+    );
+
+    const followerCount = daoFollowers?.follower?.filter(
+      (f: any) => f.isFollowing
+    ).length;
+
+    // alert(followerCount);
+    setFollowers(followerCount);
   };
 
   const handleToggle = async () => {
@@ -547,7 +483,7 @@ function MainProfile() {
       }
 
       const data = await response.json();
-      settoggle(!isToggled);
+      setToggle(!isToggled);
       // console.log("status successfully change!", data);
     } catch (error) {
       console.error("Error following:", error);
@@ -642,7 +578,7 @@ function MainProfile() {
             github: dbResponse.data[0]?.socialHandles?.github,
             displayImage: dbResponse.data[0]?.image,
           });
-          settoggle(dbResponse.data[0]?.isEmailVisible);
+          setToggle(dbResponse.data[0]?.isEmailVisible);
           setDescription(
             dbResponse.data[0]?.networks?.find(
               (network: any) => network.dao_name === dao
@@ -650,10 +586,10 @@ function MainProfile() {
           );
 
           if (!isConnected) {
-            setfollowings(0);
-            setfollowers(0);
+            setFollowings(0);
+            setFollowers(0);
           } else {
-            await updateFollowerState();
+            await handleUpdateFollowings(daoName, 0, 1);
           }
           setIsPageLoading(false);
         } else {
@@ -665,7 +601,7 @@ function MainProfile() {
             github: karmaDetails.data.delegate.githubHandle,
             displayImage: karmaDetails.data.delegate.profilePicture,
           });
-          await updateFollowerState();
+          await handleUpdateFollowings(daoName, 0, 1);
           setIsPageLoading(false);
         }
       } catch (error) {
@@ -757,43 +693,49 @@ function MainProfile() {
   const handleAdd = async (newDescription?: string) => {
     try {
       // Call the POST API function for adding a new delegate
-      // console.log("Adding the delegate..");
-      const response = await axios.post(
-        "/api/profile",
-        {
-          address: address,
-          image: modalData.displayImage,
-          isDelegate: true,
-          displayName: modalData.displayName,
-          emailId: modalData.emailId,
-          isEmailVisible: false,
-          socialHandles: {
-            twitter: modalData.twitter,
-            discord: modalData.discord,
-            github: modalData.github,
-          },
-          networks: [
-            {
-              dao_name: daoName,
-              network: chain?.name,
-              discourse: modalData.discourse,
-              description: newDescription,
-            },
-          ],
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            ...(address && { "x-wallet-address": address }),
-          },
-        }
-      );
+      console.log("Adding the delegate..");
 
-      // console.log("Response Add", response);
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      if (address) {
+        myHeaders.append("x-wallet-address", address);
+      }
+
+      const raw = JSON.stringify({
+        address: address,
+        image: modalData.displayImage,
+        isDelegate: true,
+        displayName: modalData.displayName,
+        emailId: modalData.emailId,
+        isEmailVisible: false,
+        socialHandles: {
+          twitter: modalData.twitter,
+          discord: modalData.discord,
+          github: modalData.github,
+        },
+        networks: [
+          {
+            dao_name: daoName,
+            network: chain?.name,
+            discourse: modalData.discourse,
+            description: newDescription,
+          },
+        ],
+      });
+
+      const requestOptions: any = {
+        method: "POST",
+        headers: myHeaders,
+        body: raw,
+        redirect: "follow",
+      };
+
+      const response = await fetch("/api/profile/", requestOptions);
+      console.log("Response Add", response);
 
       if (response.status === 200) {
         // Delegate added successfully
-        // console.log("Delegate added successfully:", response.data);
+        console.log("Delegate added successfully:", response.status);
         setIsLoading(false);
         setUserData({
           displayImage: modalData.displayImage,
@@ -1081,12 +1023,12 @@ function MainProfile() {
                   </div>
                 </div>
 
-                {isOpenFollowings && (
+                {isFollowingModalOpen && (
                   <FollowingModal
                     userFollowings={userFollowings}
                     toggleFollowing={toggleFollowing}
                     toggleNotification={toggleNotification}
-                    setfollowingmodel={setfollowingmodel}
+                    setIsFollowingModalOpen={setIsFollowingModalOpen}
                     isLoading={isLoading}
                     handleUpdateFollowings={handleUpdateFollowings}
                     daoName={daoName}
@@ -1107,7 +1049,7 @@ function MainProfile() {
                       className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
                       onClick={() =>
                         followings
-                          ? handleUpdateFollowings(daoName, 1)
+                          ? handleUpdateFollowings(daoName, 1, 0)
                           : toast.error(
                               "You're not following anyone yet. Start exploring delegate profiles now!"
                             )
@@ -1129,7 +1071,7 @@ function MainProfile() {
                       className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
                       onClick={() =>
                         followings
-                          ? handleUpdateFollowings(daoName, 1)
+                          ? handleUpdateFollowings(daoName, 1, 0)
                           : toast.error(
                               "You're not following anyone yet. Start exploring delegate profiles now!"
                             )
