@@ -37,33 +37,6 @@ function WatchComponentMain({ props }: { props: { id: string } }) {
     description: "",
     image: "",
   };
-  const CountingView = async () => {
-    try {
-      const myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
-      let clientToken = localStorage.getItem("clientToken");
-      if (!clientToken) {
-        clientToken = uuidv4();
-        localStorage.setItem("clientToken", clientToken);
-      }
-      const raw = JSON.stringify({
-        meetingId: props.id,
-        clientToken: clientToken,
-      });
-
-      const requestOptions: any = {
-        method: "PUT",
-        headers: myHeaders,
-        body: raw,
-        redirect: "follow",
-      };
-      const response = await fetch("/api/couting-views", requestOptions);
-      const data = await response.json();
-      console.log("Response from API", data);
-    } catch (error) {
-      console.error("Error in views:", error);
-    }
-  };
   useEffect(() => {
     async function fetchData() {
       try {
@@ -89,7 +62,6 @@ function WatchComponentMain({ props }: { props: { id: string } }) {
     }
 
     fetchData();
-    // CountingView();
   }, [props.id]);
 
   function utcToLocal(utcDateString: any) {

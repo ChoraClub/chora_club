@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import VideoJs from "../ComponentUtils/VideoJs";
 import videojs from "video.js";
+import { v4 as uuidv4 } from "uuid";
 
 interface ProfileInfo {
   _id: string;
@@ -79,6 +80,8 @@ function WatchSessionVideo({
   sessionDetails: { title: string; description: string; image: string };
 }) {
   const playerRef = React.useRef(null);
+  const [meetingId, setMeetingId] = useState("");
+  setMeetingId(data.meetingId);
 
   const videoJsOptions = {
     autoplay: autoplay,
@@ -115,25 +118,44 @@ function WatchSessionVideo({
       videojs.log("player will dispose");
     });
 
-    var currentTime = player.currentTime();
-    console.log("line 119", currentTime);
-
-    var apiCalled = false;
-
     player.on("timeupdate", function () {
+      var apiCalled = false;
       var currentTime = player.currentTime();
 
       if (currentTime >= 30 && !apiCalled) {
         // Fire your API here
-        fireAPI();
-        alert('api is fired!');
+        console.log("fire api!");
+        CountAsView();
         apiCalled = true;
       }
     });
 
-    function fireAPI() {
-      // Your API call logic here
-      console.log("API called at 30 seconds");
+    async function CountAsView() {
+      try {
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        let clientToken = localStorage.getItem("clientToken");
+        if (!clientToken) {
+          clientToken = uuidv4();
+          localStorage.setItem("clientToken", clientToken);
+        }
+        const raw = JSON.stringify({
+          meetingId: meetingId,
+          clientToken: clientToken,
+        });
+
+        const requestOptions: any = {
+          method: "PUT",
+          headers: myHeaders,
+          body: raw,
+          redirect: "follow",
+        };
+        const response = await fetch("/api/couting-views", requestOptions);
+        const data = await response.json();
+        console.log("Response from API", data);
+      } catch (error) {
+        console.error("Error in views:", error);
+      }
     }
   };
   return (
