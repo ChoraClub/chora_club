@@ -80,8 +80,6 @@ function WatchSessionVideo({
   sessionDetails: { title: string; description: string; image: string };
 }) {
   const playerRef = React.useRef(null);
-  const [meetingId, setMeetingId] = useState("");
-  setMeetingId(data.meetingId);
 
   const videoJsOptions = {
     autoplay: autoplay,
@@ -118,46 +116,71 @@ function WatchSessionVideo({
       videojs.log("player will dispose");
     });
 
-    player.on("timeupdate", function () {
-      var apiCalled = false;
-      var currentTime = player.currentTime();
+    let totalWatchTime = 0;
+    let lastRecordedTime = 0;
+    let hasCalledApi = false;
+    let isPlaying = false;
 
-      if (currentTime >= 30 && !apiCalled) {
-        // Fire your API here
-        console.log("fire api!");
-        CountAsView();
-        apiCalled = true;
-      }
+    player.on("play", function () {
+      isPlaying = true;
+      lastRecordedTime = player.currentTime();
     });
 
-    async function CountAsView() {
-      try {
-        const myHeaders = new Headers();
-        myHeaders.append("Content-Type", "application/json");
-        let clientToken = localStorage.getItem("clientToken");
-        if (!clientToken) {
-          clientToken = uuidv4();
-          localStorage.setItem("clientToken", clientToken);
-        }
-        const raw = JSON.stringify({
-          meetingId: meetingId,
-          clientToken: clientToken,
-        });
+    player.on("pause", function () {
+      isPlaying = false;
+    });
 
-        const requestOptions: any = {
-          method: "PUT",
-          headers: myHeaders,
-          body: raw,
-          redirect: "follow",
-        };
-        const response = await fetch("/api/couting-views", requestOptions);
-        const data = await response.json();
-        console.log("Response from API", data);
-      } catch (error) {
-        console.error("Error in views:", error);
+    player.on("timeupdate", function () {
+      if (isPlaying) {
+        var currentTime = player.currentTime();
+        var timeDiff = currentTime - lastRecordedTime;
+
+        // Handle both forward and backward seeking, and ensure we only count actual playback
+        if (Math.abs(timeDiff) < 1) {
+          totalWatchTime += timeDiff;
+        }
+
+        lastRecordedTime = currentTime;
+
+        if (!hasCalledApi && totalWatchTime >= 15) {
+          hasCalledApi = true;
+          try {
+            CountAsView(data.meetingId);
+            // console.log("API called at total watch time:", totalWatchTime);
+          } catch (error) {
+            console.error("Error calling CountAsView:", error);
+          }
+        }
       }
-    }
+    });
   };
+  async function CountAsView(meetingId: string) {
+    try {
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      let clientToken = localStorage.getItem("clientToken");
+      if (!clientToken) {
+        clientToken = uuidv4();
+        localStorage.setItem("clientToken", clientToken);
+      }
+      const raw = JSON.stringify({
+        meetingId: meetingId,
+        clientToken: clientToken,
+      });
+
+      const requestOptions: any = {
+        method: "PUT",
+        headers: myHeaders,
+        body: raw,
+        redirect: "follow",
+      };
+      const response = await fetch("/api/counting-views", requestOptions);
+      const data = await response.json();
+      // console.log("Response from API", data);
+    } catch (error) {
+      console.error("Error in views:", error);
+    }
+  }
   return (
     <div>
       <div className="rounded-3xl">
