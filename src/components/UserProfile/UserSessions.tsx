@@ -15,25 +15,6 @@ interface UserSessionsProps {
   daoName: string;
 }
 
-type Attendee = {
-  attendee_address: string;
-  attendee_uid?: string;
-};
-
-interface Session {
-  booking_status: string;
-  dao_name: string;
-  description: string;
-  host_address: string;
-  joined_status: string;
-  meetingId: string;
-  meeting_status: "Upcoming" | "Recorded" | "Denied";
-  slot_time: string;
-  title: string;
-  attendees: Attendee[];
-  _id: string;
-}
-
 function UserSessions({
   isDelegate,
   selfDelegate,

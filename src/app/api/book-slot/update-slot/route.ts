@@ -26,9 +26,13 @@ export async function PUT(
       booking_status,
       meetingId,
       rejectionReason,
+      host_address,
       title,
       slot_time,
       dao_name,
+      attendee_address,
+      attendee_joined_status,
+      host_joined_status,
     } = await req.json();
 
     // Validate the ID and booking_status
@@ -60,7 +64,19 @@ export async function PUT(
     console.log("meetingId", meetingId);
     const updateResult = await collection.updateOne(
       { _id: new ObjectId(id) },
-      { $set: { meeting_status, booking_status, meetingId, rejectionReason } }
+      {
+        $set: {
+          meeting_status,
+          booking_status,
+          meetingId,
+          rejectionReason,
+          host_joined_status,
+          "attendees.$[elem].attendee_joined_status": attendee_joined_status,
+        },
+      },
+      {
+        arrayFilters: [{ "elem.attendee_address": attendee_address }],
+      }
     );
 
     console.log("Meeting booking status updated:", updateResult);
@@ -75,7 +91,7 @@ export async function PUT(
       throw new Error("Meeting not found after update");
     }
 
-    const { host_address, attendees } = meeting;
+    const { attendees } = meeting;
 
     // Assuming attendees is an array and you want the address of the first attendee
     const attendeeAddress =

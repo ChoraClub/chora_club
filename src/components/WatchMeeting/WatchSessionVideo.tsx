@@ -1,70 +1,19 @@
 import React from "react";
 import VideoJs from "../ComponentUtils/VideoJs";
 import videojs from "video.js";
+import {
+  DynamicAttendeeInterface,
+  SessionInterface,
+} from "@/types/MeetingTypes";
+import { UserProfileInterface } from "@/types/UserProfileTypes";
 
-interface ProfileInfo {
-  _id: string;
-  address: string;
-  image: string;
-  description: string;
-  daoName: string;
-  isDelegate: boolean;
-  displayName: string;
-  socialHandles: {
-    twitter: string;
-    discord: string;
-    discourse: string;
-    github: string;
-  };
-  emailId: string;
-}
-interface Attendee {
-  attendee_address: string;
-  attendee_uid: string;
-  profileInfo: ProfileInfo;
+interface Attendee extends DynamicAttendeeInterface {
+  profileInfo: UserProfileInterface;
 }
 
-interface HostProfileInfo {
-  _id: string;
-  address: string;
-  image: string;
-  description: string;
-  daoName: string;
-  isDelegate: boolean;
-  displayName: string;
-  socialHandles: {
-    twitter: string;
-    discord: string;
-    discourse: string;
-    github: string;
-  };
-  emailId: string;
-}
-
-interface Meeting {
-  _id: string;
-  slot_time: string;
-  office_hours_slot: string; // Assuming this is a date-time string
-  title: string;
-  description: string;
-  video_uri: string;
-  meetingId: string;
+interface Meeting extends SessionInterface {
   attendees: Attendee[];
-  uid_host: string;
-  dao_name: string;
-  host_address: string;
-  joined_status: string | null;
-  booking_status: string;
-  meeting_status:
-    | "active"
-    | "inactive"
-    | "ongoing"
-    | "Recorded"
-    | "Upcoming"
-    | "Ongoing"; // Assuming meeting status can only be active or inactive
-  session_type: string;
-  hostProfileInfo: HostProfileInfo;
-  thumbnail_image: string;
+  hostProfileInfo: UserProfileInterface;
 }
 
 function WatchSessionVideo({

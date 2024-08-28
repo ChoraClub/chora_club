@@ -1,4 +1,5 @@
 import { connectDB } from "@/config/connectDB";
+import { SessionInterface } from "@/types/MeetingTypes";
 import { NextResponse, NextRequest } from "next/server";
 
 interface OfficeHours {
@@ -13,23 +14,9 @@ interface OfficeHours {
   meetingId: string;
 }
 
-interface Meeting {
-  _id: string;
-  host_address: string;
-  user_address: string;
-  slot_time: Date;
-  meetingId: string;
-  meeting_status: string;
-  joined_status: string | null;
-  booking_status: string;
-  dao_name: string;
-  title: string;
-  description: string;
-}
-
 export async function POST(
   req: NextRequest,
-  res: NextResponse<OfficeHours | Meeting | { error: string }>
+  res: NextResponse<OfficeHours | SessionInterface | { error: string }>
 ) {
   try {
     const { meetingId } = await req.json();
@@ -39,7 +26,7 @@ export async function POST(
     const db = client.db();
 
     const officeHoursCollection = db.collection<OfficeHours>("office_hours");
-    const meetingsCollection = db.collection<Meeting>("meetings");
+    const meetingsCollection = db.collection<SessionInterface>("meetings");
 
     const officeHours = await officeHoursCollection.findOne({ meetingId });
     const meeting = await meetingsCollection.findOne({ meetingId });

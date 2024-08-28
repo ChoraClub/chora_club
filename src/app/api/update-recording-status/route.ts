@@ -4,7 +4,6 @@ import { connectDB } from "@/config/connectDB";
 export async function PUT(req: NextRequest, res: NextResponse) {
   const { meetingId, meetingType, recordedStatus, meetingStatus } =
     await req.json();
-  // const meetingId = req.url.split("update-meeting-status/")[1];
 
   console.log(
     "meetingId, meetingType, recordedStatus: ",

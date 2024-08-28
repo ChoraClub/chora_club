@@ -119,6 +119,7 @@ function NotificationMain() {
           notification_name: message.notification_name,
           notification_type: message.notification_type,
           notification_title: message.notification_title,
+          additionalData: message?.additionalData,
         };
         addNotification(notificationData);
         updateCombinedNotifications();
@@ -299,7 +300,7 @@ function NotificationMain() {
             }`}
             onClick={() => router.push(path + "?active=sessionBookings")}
           >
-            Session Bookings
+            Meetings
           </button>
           <button
             className={`py-4 px-2 outline-none ${

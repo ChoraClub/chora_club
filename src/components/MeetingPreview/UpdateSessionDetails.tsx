@@ -115,7 +115,7 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
           const responseData = await response.json();
           setLoading(false);
           setShowHostPopup(true);
-          // router.push(`/profile/${address}?active=sessions&session=hosted`);
+          router.push(`/profile/${address}?active=sessions&session=hosted`);
         } else {
           setLoading(false);
           // setData(null);

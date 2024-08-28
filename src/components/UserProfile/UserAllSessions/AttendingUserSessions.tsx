@@ -14,25 +14,6 @@ import SessionTileSkeletonLoader from "@/components/SkeletonLoader/SessionTileSk
 import ErrorDisplay from "@/components/ComponentUtils/ErrorDisplay";
 import RecordedSessionsSkeletonLoader from "@/components/SkeletonLoader/RecordedSessionsSkeletonLoader";
 
-type Attendee = {
-  attendee_address: string;
-  attendee_uid?: string; // Making attendee_uid optional
-};
-
-interface Session {
-  booking_status: string;
-  dao_name: string;
-  description: string;
-  host_address: string;
-  joined_status: string;
-  meetingId: string;
-  meeting_status: "Upcoming" | "Recorded" | "Denied" | "";
-  slot_time: string;
-  title: string;
-  attendees: Attendee[];
-  _id: string;
-}
-
 function AttendingUserSessions({ daoName }: { daoName: string }) {
   const router = useRouter();
   const path = usePathname();
@@ -96,15 +77,17 @@ function AttendingUserSessions({ daoName }: { daoName: string }) {
       {pageLoading ? (
         <RecordedSessionsSkeletonLoader />
       ) : sessionDetails.length > 0 ? (
-        <div className={`grid min-[475px]:grid-cols- md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-10 py-8 font-poppins`}>
-        {sessionDetails.map((data, index) => (
-          <EventTile
-            key={index}
-            tileIndex={index}
-            data={data}
-            isEvent="Attending"
-          />
-        ))}
+        <div
+          className={`grid min-[475px]:grid-cols- md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-10 py-8 font-poppins`}
+        >
+          {sessionDetails.map((data, index) => (
+            <EventTile
+              key={index}
+              tileIndex={index}
+              data={data}
+              isEvent="Attending"
+            />
+          ))}
         </div>
       ) : (
         <div className="flex flex-col justify-center items-center">

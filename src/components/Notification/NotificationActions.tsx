@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { FaClock, FaUserCheck } from "react-icons/fa";
+import { FaClock, FaPlay, FaUserCheck } from "react-icons/fa";
 import { IoCheckmarkCircle } from "react-icons/io5";
 import {
   BsDatabaseFillCheck,
@@ -21,6 +21,11 @@ export const getBackgroundColor = (data: any) => {
       return "#D4F1E0";
     } else if (data?.notification_name === "sessionRejectionForGuest") {
       return "#fcc5b8";
+    } else if (
+      data?.notification_name === "sessionStartedByHost" ||
+      data?.notification_name === "sessionStartedByGuest"
+    ) {
+      return "#95b7ed";
     }
   } else if (data?.notification_type === "recordedSession") {
     return "#E5CCFF";
@@ -44,6 +49,11 @@ export const getIcon = (data: any) => {
       return <IoCheckmarkCircle color="#00C259" size={18} />;
     } else if (data?.notification_name === "sessionRejectionForGuest") {
       return <BsFillExclamationCircleFill color="#f7552d" size={18} />;
+    } else if (
+      data?.notification_name === "sessionStartedByHost" ||
+      data?.notification_name === "sessionStartedByGuest"
+    ) {
+      return <FaPlay color="#1061e6" size={18} />;
     }
   } else if (data?.notification_type === "recordedSession") {
     return <PiVideoFill color="#9747FF" size={18} />;
@@ -116,6 +126,10 @@ export const handleRedirection = async (
       router.push(
         `/profile/${data.receiver_address}?active=sessions&session=attending`
       );
+    } else if (data.notification_name === "sessionStartedByHost") {
+      router.push(`/meeting/session/${data.additionalData.meetingId}/lobby`);
+    } else if (data.notification_name === "sessionStartedByGuest") {
+      router.push(`/meeting/session/${data.additionalData.meetingId}/lobby`);
     }
   }
   if (!data.read_status) {
