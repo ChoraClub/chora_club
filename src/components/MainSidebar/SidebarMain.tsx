@@ -342,7 +342,7 @@ function Sidebar() {
       <div className="py-6 h-full">
         <div className="flex flex-col h-full justify-between">
           <div className="flex flex-col items-center gap-y-4 pb-5">
-            <Link href={"https://chora.club/"}>
+            <Link href={"https://chora.club/"} target="_blank">
               <Image
                 src={logo}
                 alt={"image"}

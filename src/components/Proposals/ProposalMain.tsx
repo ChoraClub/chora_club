@@ -20,16 +20,15 @@ import user2 from "@/assets/images/user/user2.svg";
 import user5 from "@/assets/images/user/user5.svg";
 import { useConnectModal, useChainModal } from "@rainbow-me/rainbowkit";
 import VotingPopup from "./VotingPopup";
-import { useAccount } from "wagmi";
 import arb_proposals_abi from "../../artifacts/Dao.sol/arb_proposals_abi.json";
 import op_proposals_abi from "../../artifacts/Dao.sol/op_proposals_abi.json";
 import WalletAndPublicClient from "@/helpers/signer";
 import toast, { Toaster } from "react-hot-toast";
-import { useNetwork } from "wagmi";
+import { useAccount } from "wagmi";
 import { hash } from "crypto";
 import { marked } from "marked";
-import { createPublicClient, http } from 'viem'
-import { arbitrum } from 'viem/chains'
+import { createPublicClient, http } from "viem";
+import { arbitrum } from "viem/chains";
 import { Tooltip as Tooltips } from "@nextui-org/react";
 import style from "./proposalMain.module.css";
 import {
@@ -50,8 +49,8 @@ import DOMPurify from "dompurify";
 // Create a client
 const client = createPublicClient({
   chain: arbitrum,
-  transport: http()
-})
+  transport: http(),
+});
 
 interface ArbitrumVote {
   voter: {
@@ -86,7 +85,6 @@ interface Proposal {
   queueEndTime?: number;
 }
 
-
 function ProposalMain({ props }: { props: Props }) {
   const router = useRouter();
   const [link, setLink] = useState("");
@@ -103,8 +101,8 @@ function ProposalMain({ props }: { props: Props }) {
   const [displayCount, setDisplayCount] = useState(20);
   const [queueStartTime, setQueueStartTime] = useState<number>();
   const [queueEndTime, setQueueEndTime] = useState<number>();
-  const { publicClient, walletClient } = WalletAndPublicClient();
-  const { chain } = useNetwork();
+  const { publicClient, walletClient } = WalletAndPublicClient(props.daoDelegates);
+  const { chain } = useAccount();
   const { openChainModal } = useChainModal();
   const [isVotingOpen, setIsVotingOpen] = useState(false);
   const { address } = useAccount();
@@ -120,24 +118,25 @@ function ProposalMain({ props }: { props: Props }) {
     votingPower?: number;
     network: string;
   }
-       
-const getContractAddress = async (txHash:`0x${string}`) => {  
-  try {
-    const transaction = await client.getTransaction({ hash: txHash })
 
-    const transactionReceipt = await client.getTransactionReceipt({ hash: txHash })
+  const getContractAddress = async (txHash: `0x${string}`) => {
+    try {
+      const transaction = await client.getTransaction({ hash: txHash });
 
-   if (transaction.to) {
-      return transaction.to;
-    } else {
-      return "Not a contract interaction or creation"
+      const transactionReceipt = await client.getTransactionReceipt({
+        hash: txHash,
+      });
+
+      if (transaction.to) {
+        return transaction.to;
+      } else {
+        return "Not a contract interaction or creation";
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      return "Error retrieving transaction information";
     }
-
-  } catch (error) {
-    console.error('Error:', error)
-    return "Error retrieving transaction information"
-  }
-}
+  };
 
   const StoreData = async (voteData: VoteData) => {
     // Make the API call to submit the vote
@@ -193,9 +192,9 @@ const getContractAddress = async (txHash:`0x${string}`) => {
 
     let chainAddress;
     if (chain?.name === "Optimism") {
-      chainAddress = "0xcDF27F107725988f2261Ce2256bDfCdE8B382B10"; 
+      chainAddress = "0xcDF27F107725988f2261Ce2256bDfCdE8B382B10";
     } else if (chain?.name === "Arbitrum One") {
-    chainAddress = await getContractAddress(data.transactionHash);
+      chainAddress = await getContractAddress(data.transactionHash);
     } else {
       return;
     }
@@ -350,8 +349,9 @@ const getContractAddress = async (txHash:`0x${string}`) => {
         text = `<em>${matchem[1]}</em>`;
       }
 
-      return `<a href="${href}" title="${title || ""
-        }" target="_blank" rel="noopener noreferrer" class="text-blue-shade-100">${text}</a>`;
+      return `<a href="${href}" title="${
+        title || ""
+      }" target="_blank" rel="noopener noreferrer" class="text-blue-shade-100">${text}</a>`;
     };
 
     marked.setOptions({
@@ -621,7 +621,7 @@ const getContractAddress = async (txHash:`0x${string}`) => {
         data.forEach((entry: any) => {
           const timestamp = parseInt(entry.blockTimestamp);
           const date = new Date(timestamp * 1000);
-          const day = date.toISOString().split("T")[0]; 
+          const day = date.toISOString().split("T")[0];
           const weight = parseFloat(entry.weight) / 1e18;
 
           if (!aggregatedData[day]) {
@@ -706,9 +706,9 @@ const getContractAddress = async (txHash:`0x${string}`) => {
     isArbitrum
       ? window.open(`https://arbiscan.io/tx/${transactionHash}`, "_blank")
       : window.open(
-        `https://optimistic.etherscan.io/tx/${transactionHash}`,
-        "_blank"
-      );
+          `https://optimistic.etherscan.io/tx/${transactionHash}`,
+          "_blank"
+        );
   };
 
   const shareOnTwitter = () => {
@@ -789,7 +789,7 @@ const getContractAddress = async (txHash:`0x${string}`) => {
     if (!data || !data.blockTimestamp) return null;
 
     const baseTimestamp = new Date(data.blockTimestamp * 1000);
-    const votingPeriod = props.daoDelegates === "arbitrum" ? 17 : 7; 
+    const votingPeriod = props.daoDelegates === "arbitrum" ? 17 : 7;
     return new Date(
       baseTimestamp.getTime() + votingPeriod * 24 * 60 * 60 * 1000
     );
@@ -827,10 +827,10 @@ const getContractAddress = async (txHash:`0x${string}`) => {
         return !votingPeriodEndData
           ? "PENDING"
           : currentDate > votingPeriodEndData
-            ? support1Weight > support0Weight
-              ? "SUCCEEDED"
-              : "DEFEATED"
-            : "PENDING";
+          ? support1Weight > support0Weight
+            ? "SUCCEEDED"
+            : "DEFEATED"
+          : "PENDING";
       }
     } else {
       return currentDate > votingPeriodEndData!
@@ -858,7 +858,8 @@ const getContractAddress = async (txHash:`0x${string}`) => {
 
   const proposal_status = getProposalStatusData();
 
-  const Proposalstatus = (data && support1Weight >= 0) || support1Weight ? proposal_status : null;
+  const Proposalstatus =
+    (data && support1Weight >= 0) || support1Weight ? proposal_status : null;
 
   const CustomXAxisTick = ({
     x,
@@ -890,7 +891,8 @@ const getContractAddress = async (txHash:`0x${string}`) => {
             y={y + 15}
             fill="#718096"
             fontSize={fontSize}
-            textAnchor="start">
+            textAnchor="start"
+          >
             {firstDate}
           </text>
           <text
@@ -898,7 +900,8 @@ const getContractAddress = async (txHash:`0x${string}`) => {
             y={y + 15}
             fill="#718096"
             fontSize={fontSize}
-            textAnchor="end">
+            textAnchor="end"
+          >
             {lastDate}
           </text>
         </g>
@@ -917,79 +920,83 @@ const getContractAddress = async (txHash:`0x${string}`) => {
       <div className="flex gap-4 mx-24 mb-8 mt-5 font-poppins">
         <div
           className="text-white bg-blue-shade-100 rounded-full py-1.5 px-4 flex justify-center items-center gap-1 cursor-pointer"
-          onClick={handleBack}>
+          onClick={handleBack}
+        >
           <IoArrowBack />
           Back
         </div>
         <div
           className="text-white bg-blue-shade-100 rounded-full py-1.5 px-4 flex justify-center items-center gap-1 cursor-pointer"
-          onClick={shareOnTwitter}>
+          onClick={shareOnTwitter}
+        >
           Share
           <IoShareSocialSharp />
         </div>
       </div>
 
       <div
-        className={`rounded-[1rem] mx-20 md:mx-24 px-4 md:px-12 pb-6 pt-16 transition-shadow duration-300 ease-in-out shadow-xl bg-gray-50 font-poppins relative ${isExpanded ? "h-fit" : "h-fit"
-          }`}
-      >       
-          <div className="w-full flex items-center justify-end gap-2 absolute top-6 right-12">
+        className={`rounded-[1rem] mx-20 md:mx-24 px-4 md:px-12 pb-6 pt-16 transition-shadow duration-300 ease-in-out shadow-xl bg-gray-50 font-poppins relative ${
+          isExpanded ? "h-fit" : "h-fit"
+        }`}
+      >
+        <div className="w-full flex items-center justify-end gap-2 absolute top-6 right-12">
+          <div className="">
+            <Tooltips
+              showArrow
+              content={<div className="font-poppins">OnChain</div>}
+              placement="right"
+              className="rounded-md bg-opacity-90"
+              closeDelay={1}
+            >
+              <Image src={chainImg} alt="" className="w-6 h-6 cursor-pointer" />
+            </Tooltips>
+          </div>
+          {isActive && (
             <div className="">
-              <Tooltips
-                showArrow
-                content={<div className="font-poppins">OnChain</div>}
-                placement="right"
-                className="rounded-md bg-opacity-90"
-                closeDelay={1}>
-                <Image
-                  src={chainImg}
-                  alt=""
-                  className="w-6 h-6 cursor-pointer"
-                />
-              </Tooltips>
+              <button
+                className="w-fit align-middle select-none font-poppins font-medium text-center uppercase transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-2 px-3 rounded-full bg-blue-600 text-white shadow-md shadow-blue-600/10 hover:shadow-lg hover:shadow-blue-600/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none"
+                type="button"
+                onClick={voteOnchain}
+                disabled={hasVoted}
+              >
+                Vote onchain
+              </button>
             </div>
-              {isActive && (
-            <div className="">
-                <button
-                  className="w-fit align-middle select-none font-poppins font-medium text-center uppercase transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-2 px-3 rounded-full bg-blue-600 text-white shadow-md shadow-blue-600/10 hover:shadow-lg hover:shadow-blue-600/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none"
-                  type="button"
-                  onClick={voteOnchain}
-                  disabled={hasVoted}>
-                  Vote onchain
-                </button>
-            </div>
-              )}
-            <div className="flex-shrink-0">
-              <div
-                className={`rounded-full flex items-center justify-center text-xs py-1 px-2 font-medium ${status
+          )}
+          <div className="flex-shrink-0">
+            <div
+              className={`rounded-full flex items-center justify-center text-xs py-1 px-2 font-medium ${
+                status
                   ? status === "Closed"
                     ? "bg-[#f4d3f9] border border-[#77367a] text-[#77367a]"
                     : "bg-[#f4d3f9] border border-[#77367a] text-[#77367a]"
                   : "bg-gray-200 animate-pulse rounded-full"
-                  }`}
-              >
-                {status ? status : <div className="h-4 w-16"></div>}
-              </div>
+              }`}
+            >
+              {status ? status : <div className="h-4 w-16"></div>}
             </div>
           </div>
-          <div className="w-full mb-4 md:mb-0">
+        </div>
+        <div className="w-full mb-4 md:mb-0">
           <div className="flex gap-2 items-center">
             {loading ? (
               <div className="h-5 bg-gray-200 animate-pulse w-[50vw] rounded-full"></div>
             ) : (
-              <p className="text-xl md:text-2xl font-semibold">{formattedTitle}</p>
+              <p className="text-xl md:text-2xl font-semibold">
+                {formattedTitle}
+              </p>
             )}
           </div>
-          </div>
-          <VotingPopup
-            isOpen={isVotingOpen}
-            onClose={() => setIsVotingOpen(false)}
-            onSubmit={handleVoteSubmit}
-            proposalId={props.id}
-            proposalTitle={truncateText(data?.description, 50)}
-            address={address || ""}
-            dao={props.daoDelegates}
-          />
+        </div>
+        <VotingPopup
+          isOpen={isVotingOpen}
+          onClose={() => setIsVotingOpen(false)}
+          onSubmit={handleVoteSubmit}
+          proposalId={props.id}
+          proposalTitle={truncateText(data?.description, 50)}
+          address={address || ""}
+          dao={props.daoDelegates}
+        />
 
         <div className="flex gap-1 my-1 items-center">
           <div className="flex text-xs font-normal items-center">
@@ -1004,15 +1011,22 @@ const getContractAddress = async (txHash:`0x${string}`) => {
               className={`rounded-full flex items-center justify-center text-xs h-fit py-0.5 border font-medium w-24 bg-gray-200 animate-pulse`}
             >
               <div className="h-5 w-20"></div>
-            </div>) : (
+            </div>
+          ) : (
             <div
-              className={`rounded-full flex items-center justify-center text-xs h-fit py-0.5 border font-medium w-24 ${Proposalstatus
-                ? getStatusColor(Proposalstatus)
-                : "bg-gray-200 animate-pulse rounded-full"
-                }`}
+              className={`rounded-full flex items-center justify-center text-xs h-fit py-0.5 border font-medium w-24 ${
+                Proposalstatus
+                  ? getStatusColor(Proposalstatus)
+                  : "bg-gray-200 animate-pulse rounded-full"
+              }`}
             >
-              {Proposalstatus ? Proposalstatus : <div className="h-5 w-20"></div>}
-            </div>)}
+              {Proposalstatus ? (
+                Proposalstatus
+              ) : (
+                <div className="h-5 w-20"></div>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="text-sm mt-3">
@@ -1024,8 +1038,9 @@ const getContractAddress = async (txHash:`0x${string}`) => {
             <>
               <div
                 ref={contentRef}
-                className={` transition-max-height duration-500 ease-in-out overflow-hidden ${isExpanded ? "max-h-full" : "max-h-36"
-                  }`}
+                className={` transition-max-height duration-500 ease-in-out overflow-hidden ${
+                  isExpanded ? "max-h-full" : "max-h-36"
+                }`}
               >
                 <div
                   className="description-content"
@@ -1035,7 +1050,8 @@ const getContractAddress = async (txHash:`0x${string}`) => {
               {contentRef.current && contentRef.current.scrollHeight > 144 && (
                 <button
                   className="text-sm text-blue-shade-200 mt-2"
-                  onClick={toggleExpansion}>
+                  onClick={toggleExpansion}
+                >
                   {isExpanded ? "View Less" : "View More"}
                 </button>
               )}
@@ -1056,10 +1072,11 @@ const getContractAddress = async (txHash:`0x${string}`) => {
               </div>
             ) : (
               <div
-                className={`flex flex-col gap-2 py-3 pl-2 pr-1  xl:pl-3 xl:pr-2 my-3 border-gray-200 ${voterList.length > 5
-                  ? `h-[440px] overflow-y-auto ${style.scrollbar}`
-                  : "h-fit"
-                  }`}
+                className={`flex flex-col gap-2 py-3 pl-2 pr-1  xl:pl-3 xl:pr-2 my-3 border-gray-200 ${
+                  voterList.length > 5
+                    ? `h-[440px] overflow-y-auto ${style.scrollbar}`
+                    : "h-fit"
+                }`}
               >
                 {voterList.length === 0 ? (
                   <div className="flex items-center justify-center h-full text-gray-500">
@@ -1072,7 +1089,8 @@ const getContractAddress = async (txHash:`0x${string}`) => {
                     .map((voter: any, index: any) => (
                       <div
                         className="flex items-center py-6 xl:px-6 px-3 bg-white transition-all duration-300 rounded-2xl border-2 border-transparent hover:border-blue-200 transform hover:-translate-y-1 space-x-6"
-                        key={index}>
+                        key={index}
+                      >
                         <div className="flex-grow flex items-center space-x-4">
                           {isArbitrum ? (
                             <Image
@@ -1091,7 +1109,8 @@ const getContractAddress = async (txHash:`0x${string}`) => {
                           <div>
                             <p
                               onClick={() => handleAddressClick(voter.voter)}
-                              className="text-gray-800 xl:text-sm hover:text-blue-600 transition-colors duration-200 cursor-pointer text-xs">
+                              className="text-gray-800 xl:text-sm hover:text-blue-600 transition-colors duration-200 cursor-pointer text-xs"
+                            >
                               {voter.voter.slice(0, 6)}...
                               {voter.voter.slice(-4)}
                             </p>
@@ -1099,12 +1118,21 @@ const getContractAddress = async (txHash:`0x${string}`) => {
                         </div>
                         <div className="flex items-center space-x-4">
                           <div
-                            className={`xl:px-4 px-2 py-2 rounded-full xl:text-sm xl:w-36 w-25 flex items-center justify-center xl:font-medium text-xs ${voter.support === 1 ? "bg-green-100 text-green-800" : voter.support === 0 ? "bg-red-100 text-red-800" : "bg-blue-100 text-blue-800"
-                              }`}
+                            className={`xl:px-4 px-2 py-2 rounded-full xl:text-sm xl:w-36 w-25 flex items-center justify-center xl:font-medium text-xs ${
+                              voter.support === 1
+                                ? "bg-green-100 text-green-800"
+                                : voter.support === 0
+                                ? "bg-red-100 text-red-800"
+                                : "bg-blue-100 text-blue-800"
+                            }`}
                           >
                             {formatWeight(voter.weight / 10 ** 18)}
                             &nbsp;
-                            {voter.support === 1 ? "For" : voter.support === 0 ? "Against" : "Abstain"}
+                            {voter.support === 1
+                              ? "For"
+                              : voter.support === 0
+                              ? "Against"
+                              : "Abstain"}
                           </div>
                           <Tooltips
                             showArrow
@@ -1115,12 +1143,14 @@ const getContractAddress = async (txHash:`0x${string}`) => {
                             }
                             placement="right"
                             className="rounded-md bg-opacity-90"
-                            closeDelay={1}>
+                            closeDelay={1}
+                          >
                             <button
                               onClick={() =>
                                 handleTransactionClick(voter.transactionHash)
                               }
-                              className="text-blue-600 hover:text-blue-800 transition-colors duration-200">
+                              className="text-blue-600 hover:text-blue-800 transition-colors duration-200"
+                            >
                               <RiExternalLinkLine className="w-5 h-5" />
                             </button>
                           </Tooltips>
@@ -1132,7 +1162,8 @@ const getContractAddress = async (txHash:`0x${string}`) => {
                   <div className="flex justify-center items-center mt-6">
                     <button
                       onClick={loadMore}
-                      className="bg-blue-shade-100 text-white py-2 px-4 w-fit rounded-lg font-medium">
+                      className="bg-blue-shade-100 text-white py-2 px-4 w-fit rounded-lg font-medium"
+                    >
                       Load More
                     </button>
                   </div>
@@ -1144,13 +1175,15 @@ const getContractAddress = async (txHash:`0x${string}`) => {
           {isChartLoading ? (
             <div
               className="xl:w-[46.5vw] w-[45%] h-[500px] flex items-center justify-center bg-gray-50 rounded-2xl"
-              style={{ boxShadow: "0px 4px 26.7px 0px rgba(0, 0, 0, 0.10)" }}>
+              style={{ boxShadow: "0px 4px 26.7px 0px rgba(0, 0, 0, 0.10)" }}
+            >
               <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-black-shade-900"></div>
             </div>
           ) : voterList && chartData.length === 0 ? (
             <div
               className="w-[46.5vw] h-[500px] flex items-center justify-center bg-gray-50 rounded-2xl"
-              style={{ boxShadow: "0px 4px 26.7px 0px rgba(0, 0, 0, 0.10)" }}>
+              style={{ boxShadow: "0px 4px 26.7px 0px rgba(0, 0, 0, 0.10)" }}
+            >
               <p className="text-lg font-poppins text-gray-500">
                 📊 Chart Empty: No votes have been recorded on this chart.{" "}
               </p>
@@ -1158,7 +1191,8 @@ const getContractAddress = async (txHash:`0x${string}`) => {
           ) : (
             <div
               ref={chartContainerRef}
-              className="w-[46.5vw] transition-shadow duration-300 ease-in-out shadow-xl h-[500px] rounded-2xl flex text-sm items-center justify-center bg-gray-50 font-poppins">
+              className="w-[46.5vw] transition-shadow duration-300 ease-in-out shadow-xl h-[500px] rounded-2xl flex text-sm items-center justify-center bg-gray-50 font-poppins"
+            >
               <ResponsiveContainer width="100%" height={400}>
                 <LineChart
                   data={chartData}
@@ -1167,7 +1201,8 @@ const getContractAddress = async (txHash:`0x${string}`) => {
                     right: 30,
                     left: 20,
                     bottom: 30,
-                  }}>
+                  }}
+                >
                   <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                   <XAxis
                     dataKey="date"

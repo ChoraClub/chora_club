@@ -3,7 +3,7 @@ import { useConnectModal } from "@rainbow-me/rainbowkit";
 import React, { useState } from "react";
 import { RxCross2 } from "react-icons/rx";
 import { v4 as uuidv4 } from "uuid";
-import { useNetwork, useAccount } from "wagmi";
+import { useAccount } from "wagmi";
 import { Toaster, toast } from "react-hot-toast";
 
 function ReportAdditionalDetailsModal({

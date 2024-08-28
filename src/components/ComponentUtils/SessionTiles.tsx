@@ -3,8 +3,16 @@ import Image, { StaticImageData } from "next/image";
 import { Oval } from "react-loader-spinner";
 import { usePathname } from "next/navigation";
 import { useRouter } from "next-nprogress-bar";
-import { EAS } from "@ethereum-attestation-service/eas-sdk";
-import { useNetwork, useAccount } from "wagmi";
+import {
+  SchemaEncoder,
+  SchemaRegistry,
+  createOffchainURL,
+  EAS,
+  Delegated,
+  ZERO_BYTES32,
+  NO_EXPIRATION,
+} from "@ethereum-attestation-service/eas-sdk";
+import { useAccount } from "wagmi";
 import styles from "./Tile.module.css";
 import { ethers } from "ethers";
 // import { getEnsName } from "../ConnectWallet/ENSResolver";

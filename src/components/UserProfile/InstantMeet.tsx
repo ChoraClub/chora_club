@@ -12,7 +12,6 @@ import { useRouter } from "next-nprogress-bar";
 import React, { useEffect, useState } from "react";
 import { Oval } from "react-loader-spinner";
 import { useAccount } from "wagmi";
-import { useNetwork } from "wagmi";
 import Image from "next/image";
 import { Tooltip } from "@nextui-org/react";
 import connectImg from "@/assets/images/instant-meet/connect.png";
@@ -43,7 +42,7 @@ function InstantMeet({ isDelegate, selfDelegate, daoName }: instantMeetProps) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [confirmSave, setConfirmSave] = useState(false);
   const { address } = useAccount();
-  const { chain, chains } = useNetwork();
+  const { chain } = useAccount();
   const [isScheduling, setIsScheduling] = useState(false);
   // const [daoName, setDaoName] = useState<string>();
   const router = useRouter();
@@ -134,14 +133,6 @@ function InstantMeet({ isDelegate, selfDelegate, daoName }: instantMeetProps) {
       description: "",
     });
   };
-
-  // useEffect(() => {
-  //   if (chain?.name === "Optimism") {
-  //     setDaoName("optimism");
-  //   } else if (chain?.name === "Arbitrum One") {
-  //     setDaoName("arbitrum");
-  //   }
-  // }, [chain]);
 
   const block = [
     {
