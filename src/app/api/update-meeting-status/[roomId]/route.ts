@@ -83,27 +83,24 @@ export async function PUT(req: NextRequest, res: NextResponse) {
 
             const notificationCollection = db.collection("notifications");
 
-            const notificationResults = await notificationCollection.insertMany(
-              [notificationToGuest]
+            const notificationResult = await notificationCollection.insertOne(
+              notificationToGuest
             );
 
-            console.log("notificationResults", notificationResults);
+            console.log("notificationResult", notificationResult);
 
-            if (notificationResults.insertedCount === 2) {
-              const insertedNotifications = await notificationCollection
-                .find({
-                  _id: { $in: Object.values(notificationResults.insertedIds) },
-                })
-                .toArray();
+            if (notificationResult.insertedId) {
+              const insertedNotification = await notificationCollection.findOne(
+                { _id: notificationResult.insertedId }
+              );
 
-              console.log("insertedNotifications", insertedNotifications);
+              console.log("insertedNotification", insertedNotification);
             }
 
             const dataToSendGuest = {
               ...notificationToGuest,
-              _id: notificationResults.insertedIds[1],
+              _id: notificationResult.insertedId,
             };
-
             console.log("dataToSendGuest", dataToSendGuest);
 
             const socket = io(`${SOCKET_BASE_URL}`, {
@@ -158,25 +155,23 @@ export async function PUT(req: NextRequest, res: NextResponse) {
 
             const notificationCollection = db.collection("notifications");
 
-            const notificationResults = await notificationCollection.insertMany(
-              [notificationToHost]
+            const notificationResult = await notificationCollection.insertOne(
+              notificationToHost
             );
 
-            console.log("notificationResults", notificationResults);
+            console.log("notificationResult", notificationResult);
 
-            if (notificationResults.insertedCount === 2) {
-              const insertedNotifications = await notificationCollection
-                .find({
-                  _id: { $in: Object.values(notificationResults.insertedIds) },
-                })
-                .toArray();
+            if (notificationResult.insertedId) {
+              const insertedNotification = await notificationCollection.findOne(
+                { _id: notificationResult.insertedId }
+              );
 
-              console.log("insertedNotifications", insertedNotifications);
+              console.log("insertedNotification", insertedNotification);
             }
 
             const dataToSendHost = {
               ...notificationToHost,
-              _id: notificationResults.insertedIds[0],
+              _id: notificationResult.insertedId,
             };
 
             console.log("dataToSendHost", dataToSendHost);
