@@ -27,7 +27,6 @@ import ccLogo from "@/assets/images/daos/CCLogo2.png";
 import { Button, useDisclosure } from "@nextui-org/react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useAccount } from "wagmi";
-import { useNetwork } from "wagmi";
 import WalletAndPublicClient from "@/helpers/signer";
 import dao_abi from "../../artifacts/Dao.sol/GovernanceToken.json";
 import axios from "axios";
@@ -43,13 +42,17 @@ import FollowingModal from "../ComponentUtils/FollowingModal";
 import { IoClose } from "react-icons/io5";
 import "./MainProfile.module.css";
 import UpdateProfileModal from "../ComponentUtils/UpdateProfileModal";
+import { getChainAddress, getDaoName } from "@/utils/chainUtils";
+interface Following {
+  follower_address: string;
+  isFollowing: boolean;
+  isNotification: boolean;
+}
 
 function MainProfile() {
-  const { isConnected, address } = useAccount();
+  const { isConnected, address, chain } = useAccount();
   const { data: session, status } = useSession();
   const { openConnectModal } = useConnectModal();
-  const { publicClient, walletClient } = WalletAndPublicClient();
-  const { chain, chains } = useNetwork();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const path = usePathname();
@@ -91,23 +94,16 @@ function MainProfile() {
     github: "",
   });
   const [isToggled, setToggle] = useState(false);
-  interface ProgressData {
-    total: any;
-    uploaded: any;
-  }
-
-  interface Following {
-    follower_address: string;
-    isFollowing: boolean;
-    isNotification: boolean;
-  }
+  const { publicClient, walletClient } = WalletAndPublicClient(daoName);
 
   useEffect(() => {
-    if (chain && chain?.name === "Optimism") {
-      setDaoName("optimism");
-    } else if (chain && chain?.name === "Arbitrum One") {
-      setDaoName("arbitrum");
-    }
+    // if (chain && chain.name === "Optimism") {
+    //   setDaoName("optimism");
+    // } else if (chain && chain?.name === "Arbitrum One") {
+    //   setDaoName("arbitrum");
+    // }
+    let daoName = getDaoName(chain?.name);
+    setDaoName(daoName);
   }, [chain, chain?.name]);
 
   useEffect(() => {
@@ -161,16 +157,12 @@ function MainProfile() {
   };
 
   useEffect(() => {
+    console.log("chain name:::: ", chain?.name);
     const checkDelegateStatus = async () => {
       const addr = await walletClient.getAddresses();
       const address1 = addr[0];
       let delegateTxAddr = "";
-      const contractAddress =
-        chain?.name === "Optimism"
-          ? "0x4200000000000000000000000000000000000042"
-          : chain?.name === "Arbitrum One"
-          ? "0x912CE59144191C1204E64559FE8253a0e49E6548"
-          : "";
+      const contractAddress = getChainAddress(chain?.name);
       // console.log(walletClient);
       let delegateTx;
       if (address) {
@@ -201,12 +193,8 @@ function MainProfile() {
       const addr = await walletClient.getAddresses();
       const address1 = addr[0];
 
-      const contractAddress =
-        chain?.name === "Optimism"
-          ? "0x4200000000000000000000000000000000000042"
-          : chain?.name === "Arbitrum One"
-          ? "0x912CE59144191C1204E64559FE8253a0e49E6548"
-          : "";
+      const contractAddress = getChainAddress(chain?.name);
+
       // console.log("Contract", contractAddress);
       // console.log("Wallet Client", walletClient);
       const delegateTx = await walletClient.writeContract({
@@ -420,12 +408,12 @@ function MainProfile() {
     const userData = dbResponse?.data[0];
     let address = await walletClient.getAddresses();
     let address_user = address[0].toLowerCase();
-    let currentDaoName = "";
-    if (chain?.name === "Optimism") {
-      currentDaoName = "optimism";
-    } else if (chain?.name === "Arbitrum One") {
-      currentDaoName = "arbitrum";
-    }
+    let currentDaoName = getDaoName(chain?.name);
+    // if (chain?.name === "Optimism") {
+    //   currentDaoName = "optimism";
+    // } else if (chain?.name === "Arbitrum One") {
+    //   currentDaoName = "arbitrum";
+    // }
 
     // Process following details
     const matchDao = userData?.followings?.find(
@@ -500,12 +488,12 @@ function MainProfile() {
         // console.log("Fetching from DB");
         // const dbResponse = await axios.get(`/api/profile/${address}`);
 
-        let dao =
-          chain?.name === "Optimism"
-            ? "optimism"
-            : chain?.name === "Arbitrum One"
-            ? "arbitrum"
-            : "";
+        let dao = getDaoName(chain?.name);
+        // chain?.name === "Optimism"
+        //   ? "optimism"
+        //   : chain?.name === "Arbitrum One"
+        //   ? "arbitrum"
+        //   : "";
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
         if (address) {
@@ -758,12 +746,6 @@ function MainProfile() {
   // Function to handle updating an existing delegate
   const handleUpdate = async (newDescription?: string) => {
     try {
-      let dao =
-        chain?.name === "Optimism"
-          ? "optimism"
-          : chain?.name === "Arbitrum One"
-          ? "arbitrum"
-          : "";
       // console.log("Updating");
       // console.log("Inside Updating Description", newDescription);
       // console.log("Updating");
@@ -1004,11 +986,9 @@ function MainProfile() {
                         onClick={() => {
                           if (typeof window === "undefined") return;
                           navigator.clipboard.writeText(
-                            `${BASE_URL}/${
-                              chain?.name === "Optimism"
-                                ? "optimism"
-                                : "arbitrum"
-                            }/${address}?active=info`
+                            `${BASE_URL}/${getDaoName(
+                              chain?.name
+                            )}/${address}?active=info`
                           );
                           setIsCopied(true);
                           setTimeout(() => {

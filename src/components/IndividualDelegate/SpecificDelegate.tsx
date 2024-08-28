@@ -33,7 +33,7 @@ import WalletAndPublicClient from "@/helpers/signer";
 import dao_abi from "../../artifacts/Dao.sol/GovernanceToken.json";
 // import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useConnectModal, useChainModal } from "@rainbow-me/rainbowkit";
-import { useAccount, useNetwork } from "wagmi";
+import { useAccount } from "wagmi";
 import OPLogo from "@/assets/images/daos/op.png";
 import ArbLogo from "@/assets/images/daos/arbCir.png";
 import ccLogo from "@/assets/images/daos/CCLogo2.png";
@@ -56,6 +56,7 @@ import { connected } from "process";
 import { IoMdNotifications } from "react-icons/io";
 import { IoMdNotificationsOff } from "react-icons/io";
 import { BASE_URL } from "@/config/constants";
+import { getChainAddress, getDaoName } from "@/utils/chainUtils";
 
 interface Type {
   daoDelegates: string;
@@ -63,8 +64,7 @@ interface Type {
 }
 
 function SpecificDelegate({ props }: { props: Type }) {
-  const { publicClient, walletClient } = WalletAndPublicClient();
-  const { chain, chains } = useNetwork();
+  const { chain } = useAccount();
   console.log(chain?.name);
   const { openChainModal } = useChainModal();
   const [delegateInfo, setDelegateInfo] = useState<any>();
@@ -75,7 +75,6 @@ function SpecificDelegate({ props }: { props: Type }) {
   const searchParams = useSearchParams();
   const [selfDelegate, setSelfDelegate] = useState<boolean>();
   const [isDelegate, setIsDelegate] = useState<boolean>();
-  const addressFromUrl = path.split("/")[2];
   const [isPageLoading, setIsPageLoading] = useState(true);
   console.log("Props", props.daoDelegates);
   const [displayName, setDisplayName] = useState("");
@@ -106,6 +105,9 @@ function SpecificDelegate({ props }: { props: Type }) {
   const [delegatingToAddr, setDelegatingToAddr] = useState(false);
   const { isConnected, address } = useAccount();
   const [confettiVisible, setConfettiVisible] = useState(false);
+  const { publicClient, walletClient } = WalletAndPublicClient(
+    props.daoDelegates
+  );
 
   const handleDelegateModal = async () => {
     if (!isConnected) {
@@ -255,7 +257,7 @@ function SpecificDelegate({ props }: { props: Type }) {
   }, [op_client, props.individualDelegate]);
 
   useEffect(() => {
-    console.log("Network", chain?.network);
+    // console.log("Network", chain?.network);
     const fetchData = async () => {
       console.log("fetching from karma");
       setIsPageLoading(true);
@@ -267,7 +269,7 @@ function SpecificDelegate({ props }: { props: Type }) {
         console.log("Socials: ", details.data.delegate);
         setDelegateInfo(details.data.delegate);
         if (
-          addressFromUrl.toLowerCase() ===
+          props.individualDelegate.toLowerCase() ===
           details.data.delegate.publicAddress.toLowerCase()
         ) {
           setIsDelegate(true);
@@ -299,7 +301,7 @@ function SpecificDelegate({ props }: { props: Type }) {
     };
 
     fetchData();
-  }, [chain]);
+  }, []);
 
   useEffect(() => {
     const checkDelegateStatus = async () => {
@@ -308,23 +310,32 @@ function SpecificDelegate({ props }: { props: Type }) {
       //   const address1 = addr[0];
       let delegateTxAddr = "";
       const contractAddress =
-        chain?.name === "Optimism"
+        props.daoDelegates === "optimism"
           ? "0x4200000000000000000000000000000000000042"
-          : chain?.name === "Arbitrum One"
+          : props.daoDelegates === "arbitrum"
           ? "0x912CE59144191C1204E64559FE8253a0e49E6548"
           : "";
+
       try {
+        console.log("contractAddress: ", contractAddress);
         const delegateTx = await publicClient.readContract({
           address: contractAddress,
           abi: dao_abi.abi,
           functionName: "delegates",
-          args: [addressFromUrl],
+          args: [props.individualDelegate],
           // account: address1,
         });
         console.log("Delegate tx", delegateTx);
         delegateTxAddr = delegateTx;
-        if (delegateTxAddr.toLowerCase() === addressFromUrl?.toLowerCase()) {
-          console.log("Delegate comparison: ", delegateTx, addressFromUrl);
+        if (
+          delegateTxAddr.toLowerCase() ===
+          props.individualDelegate?.toLowerCase()
+        ) {
+          console.log(
+            "Delegate comparison: ",
+            delegateTx,
+            props.individualDelegate
+          );
           setSelfDelegate(true);
         }
         setIsPageLoading(false);
@@ -334,7 +345,7 @@ function SpecificDelegate({ props }: { props: Type }) {
       }
     };
     checkDelegateStatus();
-  }, []);
+  }, [props]);
 
   const formatNumber = (number: number) => {
     if (number >= 1000000) {
@@ -610,9 +621,9 @@ function SpecificDelegate({ props }: { props: Type }) {
     console.log(address1);
 
     let chainAddress;
-    if (chain?.name === "Optimism") {
+    if (props.daoDelegates === "optimism") {
       chainAddress = "0x4200000000000000000000000000000000000042";
-    } else if (chain?.name === "Arbitrum One") {
+    } else if (props.daoDelegates === "arbitrum") {
       chainAddress = "0x912CE59144191C1204E64559FE8253a0e49E6548";
     } else {
       return;
@@ -653,28 +664,7 @@ function SpecificDelegate({ props }: { props: Type }) {
   };
 
   useEffect(() => {
-    if (chain) {
-      if (chain.name === "Optimism") {
-        setDaoName("optimism");
-      } else if (chain.name === "Arbitrum One") {
-        setDaoName("arbitrum");
-      } else {
-        // Optional: handle other chains or set a default
-        setDaoName("");
-      }
-    }
-  }, [chain]);
-
-  useEffect(() => {
     const fetchData = async () => {
-      let currentDaoName = "";
-      if (chain?.name === "Optimism") {
-        currentDaoName = "optimism";
-      } else if (chain?.name === "Arbitrum One") {
-        currentDaoName = "arbitrum";
-      }
-
-      setDaoName(currentDaoName);
       try {
         // Fetch data from your backend API to check if the address exists
 
@@ -726,7 +716,7 @@ function SpecificDelegate({ props }: { props: Type }) {
               setEmailId(item.emailId);
             }
             const matchingNetwork = item.networks?.find(
-              (network: any) => network.dao_name === chain?.name
+              (network: any) => network.dao_name === props.daoDelegates
             );
 
             // If a matching network is found, set the discourse ID
@@ -770,7 +760,7 @@ function SpecificDelegate({ props }: { props: Type }) {
     };
 
     fetchData();
-  }, [chain, props.individualDelegate]);
+  }, [props]);
 
   useEffect(() => {
     const fetchEnsName = async () => {
@@ -778,12 +768,12 @@ function SpecificDelegate({ props }: { props: Type }) {
       setDisplayEnsName(ensName?.ensName);
     };
     fetchEnsName();
-  }, [chain, props.individualDelegate]);
+  }, [props]);
 
   return (
     <>
       {isPageLoading && <MainProfileSkeletonLoader />}
-      {!(isPageLoading || (!isDelegate && !selfDelegate)) ? (
+      {!isPageLoading && (isDelegate || selfDelegate) ? (
         <div className="font-poppins">
           {/* {followed && <Confetti recycle={false} numberOfPieces={550} />} */}
           <div className="flex ps-14 py-5 justify-between">
@@ -1192,8 +1182,7 @@ function SpecificDelegate({ props }: { props: Type }) {
         </div>
       ) : (
         !isPageLoading &&
-        !isDelegate &&
-        !selfDelegate && (
+        !(isDelegate || selfDelegate) && (
           <div className="flex flex-col justify-center items-center w-full h-screen">
             <div className="text-5xl">☹️</div>{" "}
             <div className="pt-4 font-semibold text-lg">

@@ -4,7 +4,7 @@ import BookedUserSessions from "./UserAllSessions/BookedUserSessions";
 import AttendingUserSessions from "./UserAllSessions/AttendingUserSessions";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useRouter } from "next-nprogress-bar";
-import { useNetwork, useAccount } from "wagmi";
+import { useAccount } from "wagmi";
 import RecordedSessionsTile from "../ComponentUtils/RecordedSessionsTile";
 import RecordedSessionsSkeletonLoader from "../SkeletonLoader/RecordedSessionsSkeletonLoader";
 import ErrorDisplay from "../ComponentUtils/ErrorDisplay";
@@ -43,7 +43,7 @@ function UserSessions({
   const router = useRouter();
   const path = usePathname();
   const searchParams = useSearchParams();
-  const { chain, chains } = useNetwork();
+  const { chain } = useAccount();
   const [sessionDetails, setSessionDetails] = useState([]);
   const [dataLoading, setDataLoading] = useState(true);
   const [attendedDetails, setAttendedDetails] = useState([]);

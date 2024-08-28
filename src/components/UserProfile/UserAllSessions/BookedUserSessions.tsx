@@ -7,7 +7,7 @@ import Image from "next/image";
 import { FaCircleCheck, FaCircleXmark, FaCirclePlay } from "react-icons/fa6";
 import { Tooltip } from "@nextui-org/react";
 import EventTile from "../../ComponentUtils/EventTile";
-import { useAccount, useNetwork } from "wagmi";
+import { useAccount } from "wagmi";
 import ErrorDisplay from "@/components/ComponentUtils/ErrorDisplay";
 import RecordedSessionsSkeletonLoader from "@/components/SkeletonLoader/RecordedSessionsSkeletonLoader";
 

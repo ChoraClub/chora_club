@@ -19,7 +19,7 @@ import { getEnsName } from "@/utils/ENSUtils";
 import onChain_link from "@/assets/images/watchmeeting/onChain_link.png";
 import offChain_link from "@/assets/images/watchmeeting/offChain_link.png";
 import ErrorDisplay from "../ComponentUtils/ErrorDisplay";
-import { useAccount, useNetwork } from "wagmi";
+import { useAccount } from "wagmi";
 
 interface Type {
   ensName: string;

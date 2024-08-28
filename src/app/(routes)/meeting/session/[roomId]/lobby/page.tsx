@@ -24,7 +24,7 @@ import {
   usePeerIds,
   useRoom,
 } from "@huddle01/react/hooks";
-import { useAccount, useNetwork } from "wagmi";
+import { useAccount } from "wagmi";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { Role } from "@huddle01/server-sdk/auth";
 import { Oval, TailSpin } from "react-loader-spinner";
@@ -57,7 +57,6 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   const { push } = useRouter();
-  const { chain, chains } = useNetwork();
   const [profileDetails, setProfileDetails] = useState<any>();
 
   // Huddle Hooks

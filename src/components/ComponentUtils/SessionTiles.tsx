@@ -14,7 +14,7 @@ import {
   ZERO_BYTES32,
   NO_EXPIRATION,
 } from "@ethereum-attestation-service/eas-sdk";
-import { useNetwork, useAccount } from "wagmi";
+import { useAccount } from "wagmi";
 import styles from "./Tile.module.css";
 import { ethers } from "ethers";
 // import { getEnsName } from "../ConnectWallet/ENSResolver";

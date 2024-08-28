@@ -6,7 +6,7 @@ import text2 from "@/assets/images/daos/texture2.png";
 import Image from "next/image";
 import { Tooltip } from "@nextui-org/react";
 import EventTile from "../../ComponentUtils/EventTile";
-import { useAccount, useNetwork } from "wagmi";
+import { useAccount } from "wagmi";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useRouter } from "next-nprogress-bar";
 import { Oval } from "react-loader-spinner";

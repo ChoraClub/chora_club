@@ -234,7 +234,7 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
       router.push(`/meeting/session/${data.meetingId}/lobby`);
     } else {
       toast.error(
-        "The meeting can only be started 5 minutes before the slot time."
+        "The meeting can only be started 5 minutes before the meeting time."
       );
     }
   };
