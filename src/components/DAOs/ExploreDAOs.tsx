@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Image, { StaticImageData } from "next/image";
 import search from "@/assets/images/daos/search.png";
 import { useRouter } from "next-nprogress-bar";
@@ -10,6 +10,7 @@ import Link from "next/link";
 import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
 import { dao_details } from "@/config/daoDetails";
 import ExploreDaosSkeletonLoader from "../SkeletonLoader/ExploreDaosSkeletonLoader";
+import { CiSearch } from "react-icons/ci";
 
 function ExploreDAOs() {
 
@@ -29,6 +30,7 @@ function ExploreDAOs() {
   const [showNotification, setShowNotification] = useState(true);
   const [isPageLoading, setIsPageLoading] = useState(true);
   const [isHovered, setIsHovered] = useState(false);
+  const [openSearch, setOpenSearch] = useState(false);
 
   useEffect(() => {
     const storedStatus = sessionStorage.getItem("notificationStatus");
@@ -59,27 +61,59 @@ function ExploreDAOs() {
     router.push(`/${formatted}?active=about`);
   };
 
+  useEffect(() => {
+    const handleClickOutside = (event:any) => {
+      if (openSearch && !event.target.closest('.search-container')) {
+        setOpenSearch(false);
+      }
+    };
+  
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [openSearch]);
+
+
   return (
-    <div className="pt-4 sm:pt-6 px-4 sm:px-6 lg:px-14 min-h-screen">
-      <div className="">
+    <div className="pt-4 sm:pt-6 px-4 md:px-6 lg:px-14 min-h-screen">
+      <div className="relative">
         <div className="flex flex-row justify-between items-center mb-6">
-          <div className="text-blue-shade-200 font-medium text-2xl sm:text-3xl md:text-4xl font-quanty">
+          <div className="text-blue-shade-200 font-medium text-3xl md:text-4xl font-quanty">
             Explore DAOs
           </div>
 
-          <div>
+        <div className="search-container relative">
+          <div className="flex justify-center items-center relative">
+            <div className=" md:hidden flex items-center mr-3 rounded-full p-2 justify-center bg-blue-shade-200 text-white cursor-pointer" onClick={()=>{{setOpenSearch(!openSearch)}}} >
+              <CiSearch className="text-lg"/>
+            
+            </div>
             <ConnectWalletWithENS />
           </div>
+        {openSearch && (
+             <div 
+             className={`md:hidden absolute top-full right-0 w-[90vw] mt-2 px-4 z-10`}
+           >
+                <input
+            type="text"
+            placeholder="Search DAOs"
+            className="w-full pl-5 pr-2 py-2 bg-[#f5f5f5] rounded-lg shadow-lg outline-none "
+            value={searchQuery}
+            onChange={(e) => handleSearchChange(e.target.value)}
+          ></input>
+              </div>
+            )}
+            </div>
         </div>
 
-        <div
-          // style={{ background: "rgba(238, 237, 237, 0.36)" }}
-          className="flex justify-start items-center border-[0.5px] bg-[#f5f5f5] border-black rounded-full w-fit max-w-sm sm:max-w-full my-3 font-poppins"
+
+        {/* <div
+          className="md:flex justify-start items-center border-[0.5px] bg-[#f5f5f5] border-black rounded-full w-fit max-w-sm md:max-w-full hidden my-3 font-poppins"
         >
           <input
             type="text"
             placeholder="Search DAOs"
-            // style={{ background: "rgba(238, 237, 237, 0.36)" }}
             className="pl-5 pr-2 bg-[#f5f5f5]  rounded-full outline-none"
             value={searchQuery}
             onChange={(e) => handleSearchChange(e.target.value)}
@@ -87,14 +121,25 @@ function ExploreDAOs() {
           <span className="flex items-center bg-black rounded-full px-4 sm:px-6 py-2 sm:py-3">
             <Image src={search} alt="search" width={16} height={16} className="w-4 h-4 sm:w-5 sm:h-5"  />
           </span>
-        </div>
+        </div> */}
+         <div className={` hidden md:flex items-center rounded-full shadow-lg bg-gray-100 text-black cursor-pointer w-[365px]`}  >
+              <CiSearch className={`text-base transition-all duration-700 ease-in-out ml-3`}/>
+          <input
+             type="text"
+             placeholder="Search DAOs"
+             className="w-[100%] pl-2 pr-4 py-2 text-sm bg-transparent outline-none"
+             value={searchQuery}
+             onChange={(e) => handleSearchChange(e.target.value)}
+             onClick={(e) => e.stopPropagation()}
+           />
+ </div>
 
 
         {isPageLoading ? (
           <ExploreDaosSkeletonLoader />
         ) : (
           <>
-            <div className="flex flex-wrap justify-center sm:justify-normal gap-4 sm:gap-6 lg:gap-8 py-8 font-poppins">
+            <div className="flex flex-wrap justify-center md:justify-normal gap-4 md:gap-6 lg:gap-8 py-8 font-poppins">
               {daoInfo.length > 0 ? (
                 daoInfo.map((daos: any, index: any) => (
                   <div
@@ -111,14 +156,14 @@ function ExploreDAOs() {
                         alt="Image not found"
                         width={60}
                         height={60}
-                        className="rounded-full w-16 h-16 sm:w-20 sm:h-20"
+                        className="rounded-full w-16 h-16 md:w-20 md:h-20"
                       ></Image>
                     </div>
                     <div className="text-center">
-                        <div className="font-semibold capitalize text-sm sm:text-base mb-2">
+                        <div className="font-semibold capitalize text-sm md:text-base mb-2">
                           {daos.name}
                         </div>
-                        <div className="text-xs sm:text-sm bg-[#F2F2F2] py-2 px-3 rounded-md ">
+                        <div className="text-xs md:text-sm bg-[#F2F2F2] py-2 px-3 rounded-md ">
                           {daos.value} Participants
                         </div>
                     </div>
@@ -133,14 +178,14 @@ function ExploreDAOs() {
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
                 style={{ boxShadow: "0px 4px 50.8px 0px rgba(0, 0, 0, 0.11)" }}
-                className={`w-[calc(100%-2rem)] max-w-[280px] sm:w-[calc(50%-1rem)] md:w-[calc(33.333%-1rem)] lg:w-[calc(25%-1rem)] 2xl:w-[calc(20%-1rem)] px-4 py-6 rounded-2xl cursor-pointer flex items-center justify-center relative transition-all duration-250 ease-in-out h-[188px] sm:h-[212px] md:h-[220px] ${
+                className={`w-[calc(100%-2rem)] max-w-[280px] sm:w-[calc(50%-1rem)] md:w-[calc(33.333%-1rem)] lg:w-[calc(25%-1rem)] 2xl:w-[calc(20%-1rem)] px-4 py-6 rounded-2xl cursor-pointer flex items-center justify-center relative transition-all duration-250 ease-in-out h-[188px] md:h-[220px] ${
                   isHovered ? "border-2 border-gray-600" : ""
                 }`}
               >
                 <div className="relative w-full h-full flex items-center justify-center">
                   <FaCirclePlus
                     size={50}
-                    className={`sm:text-[70px]
+                    className={`md:text-[70px]
                       ${isHovered
                         ? "blur-md transition-all duration-250 ease-in-out text-slate-300"
                         : "block transition-all duration-250 ease-in-out text-slate-300"
@@ -154,7 +199,7 @@ function ExploreDAOs() {
                     isHovered ? "block" : "hidden"
                   }`}
                 >
-                  <span className="text-lg sm:text-xl font-semibold text-slate-800 px-2 text-center">
+                  <span className="text-lg md:text-xl font-semibold text-slate-800 px-2 text-center">
                     Add your DAO
                   </span>
                 </Link>

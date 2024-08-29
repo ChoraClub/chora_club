@@ -61,10 +61,10 @@ function ConnectWalletWithENS() {
                   <button
                     onClick={openConnectModal}
                     type="button"
-                    className="flex items-center justify-center text-white bg-blue-shade-200 hover:bg-blue-shade-100 border border-white rounded-full px-2 py-2 sm:px-5 sm:py-4 text-xs sm:text-sm font-bold transition-transform transform hover:scale-105"
+                    className="flex items-center justify-center text-white bg-blue-shade-200 hover:bg-blue-shade-100 border border-white rounded-full px-2 py-2 md:px-5 md:py-4 text-xs md:text-sm font-bold transition-transform transform hover:scale-105"
                   >
-                    <BiSolidWallet className="block sm:hidden text-lg" />
-                    <span className="hidden sm:block">Connect Wallet</span>
+                    <BiSolidWallet className="block md:hidden text-lg" />
+                    <span className="hidden md:block">Connect Wallet</span>
                   </button>
                 );
               }
@@ -74,7 +74,7 @@ function ConnectWalletWithENS() {
                   <button
                     onClick={openChainModal}
                     type="button"
-                    className="flex items-center text-white bg-red-600 hover:bg-red-700 border border-white rounded-lg px-3 py-2 sm:px-4 sm:py-[5px] font-bold transition-transform transform hover:scale-105 text-xs sm:text-sm"
+                    className="flex items-center text-white bg-red-600 hover:bg-red-700 border border-white rounded-lg px-3 py-2 md:px-4 md:py-[5px] font-bold transition-transform transform hover:scale-105 text-xs md:text-sm"
                   >
                     Wrong network
                   </button>
@@ -86,7 +86,7 @@ function ConnectWalletWithENS() {
                   <button
                     onClick={openChainModal}
                     type="button"
-                    className="flex items-center bg-white border border-white rounded-lg sm:pl-[10px] sm:pr-2 py-1.5 pl-2 pr-[6px] sm:py-2 font-bold text-black shadow-sm transition-transform transform hover:scale-105 text-xs sm:text-sm"
+                    className="flex items-center bg-white border border-white rounded-lg md:pl-[10px] md:pr-2 py-1.5 pl-2 pr-[6px] md:py-2 font-bold text-black shadow-sm transition-transform transform hover:scale-105 text-xs md:text-sm"
                   >
                     {chain.hasIcon && (
                       <div

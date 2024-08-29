@@ -18,8 +18,8 @@ function DelegateSessionsMain() {
   return (
     <>
       <div className="">
-        <div className="flex justify-between pt-6 pl-14 pr-14">
-          <div className="flex font-quanty font-medium text-4xl text-blue-shade-200 pb-4 items-center">
+        <div className="flex flex-row items-center justify-between pt-6 px-4 md:px-6 lg:px-14 mb-4 md:mb-4">
+          <div className="flex font-quanty font-medium text-3xl md:text-4xl text-blue-shade-200 items-center">
             {/* <div>
               <Tooltip
                 showArrow
@@ -43,9 +43,9 @@ function DelegateSessionsMain() {
           </div>
         </div>
 
-        <div className="flex gap-12 bg-[#D9D9D945] pl-16 font-poppins">
+        <div className="flex md:gap-12 bg-[#D9D9D945] md:pl-6 lg:pl-14 font-poppins">
           <button
-            className={`border-b-2 py-4 px-2 ${
+            className={`w-1/2 md:w-auto border-b-2 py-3 md:py-4 px-2 ${
               searchParams.get("active") === "recordedSessions"
                 ? " border-blue-shade-200 text-blue-shade-200 font-semibold"
                 : "border-transparent"
@@ -63,11 +63,11 @@ function DelegateSessionsMain() {
               className="rounded-md bg-opacity-90 max-w-96"
               closeDelay={1}
             >
-              <div>Recorded</div>
+              <div className="text-sm md:text-base whitespace-nowrap">Recorded</div>
             </Tooltip>
           </button>
           <button
-            className={`border-b-2 py-4 px-2 ${
+            className={`w-1/2 md:w-auto border-b-2 py-3 md:py-4 px-2 ${
               searchParams.get("active") === "availableDelegates"
                 ? "text-blue-shade-200 font-semibold border-blue-shade-200"
                 : "border-transparent"
@@ -86,23 +86,26 @@ function DelegateSessionsMain() {
               className="rounded-md bg-opacity-90 max-w-96"
               closeDelay={1}
             >
-              <div> Available Delegates</div>
+              <div className="text-sm md:text-base whitespace-nowrap"> Available Delegates</div>
             </Tooltip>
           </button>
         </div>
 
-        <div className="py-6 pl-14 pr-6">
+        
           {searchParams.get("active") === "recordedSessions" ? (
+            <div className="py-6 sm:px-20 md:px-6 lg:px-14">
             <RecordedSessions />
+            </div>
           ) : (
             ""
           )}
           {searchParams.get("active") === "availableDelegates" ? (
+            <div className="py-6 sm:px-8 md:px-6 lg:px-14 xl:px-14">
             <AvailableSessions />
+            </div>
           ) : (
             ""
           )}
-        </div>
 
         {/* <div className="mt-1">
           <AvailableSessions />

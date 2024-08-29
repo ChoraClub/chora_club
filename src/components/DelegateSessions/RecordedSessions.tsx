@@ -12,6 +12,7 @@ import RecordedSessionsTile from "../ComponentUtils/RecordedSessionsTile";
 import RecordedSessionsSkeletonLoader from "../SkeletonLoader/RecordedSessionsSkeletonLoader";
 import ErrorDisplay from "../ComponentUtils/ErrorDisplay";
 import { TimeoutError } from "viem";
+import { CiSearch } from "react-icons/ci";
 
 function RecordedSessions() {
   // const parseISO = dateFns;
@@ -27,6 +28,7 @@ function RecordedSessions() {
   const [searchMeetingData, setSearchMeetingData] = useState<any>([]);
   const [activeButton, setActiveButton] = useState("all");
   const [error, setError] = useState<string | null>(null);
+  const [openSearch, setOpenSearch] = useState(false);
 
   const handleRetry = () => {
     setError(null);
@@ -125,13 +127,27 @@ function RecordedSessions() {
     );
   }
 
+  useEffect(() => {
+    const handleClickOutside = (event:any) => {
+      if (openSearch && !event.target.closest('.search-container')) {
+        setOpenSearch(false);
+      }
+    };
+  
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [openSearch]);
+
+
   return (
     <>
-      <div className="pe-10">
-        <div className="flex my-4 items-center gap-4 font-poppins">
-          <div
+      <div className="">
+        <div className="flex my-4 justify-end md:justify-start items-center gap-2 sm:gap-3 md:gap-4 font-poppins px-4 sm:px-0">
+          {/* <div
             style={{ background: "rgba(238, 237, 237, 0.36)" }}
-            className="flex border-[0.5px] border-black w-1/3 rounded-full"
+            className="hidden md:flex border-[0.5px] border-black w-1/3 rounded-full"
           >
             <input
               type="text"
@@ -144,10 +160,39 @@ function RecordedSessions() {
             <span className="flex items-center bg-black rounded-full px-5 py-2">
               <Image src={search} alt="search" width={20} />
             </span>
-          </div>
-          <div className="flex space-x-4">
+          </div> */}
+          <div className={` hidden md:flex items-center rounded-full shadow-lg bg-gray-100 text-black cursor-pointer w-[365px]`}  >
+              <CiSearch className={`text-base transition-all duration-700 ease-in-out ml-3`}/>
+          <input
+             type="text"
+             placeholder="Search by title and host address"
+             className="w-[100%] pl-2 pr-4 py-2 text-sm bg-transparent outline-none"
+             value={searchQuery}
+             onChange={(e) => handleSearchChange(e.target.value)}
+             onClick={(e) => e.stopPropagation()}
+           />
+ </div>
+
+          <div className=" md:hidden search-container relative">
+          <div className={` md:hidden flex items-center rounded-full shadow-lg bg-gray-100 text-black cursor-pointer ${openSearch? 'w-full': 'w-7 h-7 justify-center'}`} onClick={()=>{setOpenSearch(!openSearch)}} >
+              <CiSearch className={`text-base transition-all duration-700 ease-in-out ${
+          openSearch ? 'ml-3' : ''
+        }`}/>
+            {openSearch && (
+             <input
+             type="text"
+             placeholder="Search..."
+             className="w-full pl-2 pr-4 py-1 sm:py-1.5 text-sm transition-all duration-700 ease-in-out bg-transparent outline-none"
+             value={searchQuery}
+             onChange={(e) => handleSearchChange(e.target.value)}
+             onClick={(e) => e.stopPropagation()}
+           />
+            )}
+            </div>
+            </div>
+          <div className="flex items-center gap-2 sm:gap-3 md:gap-4">
             <button
-              className={`border border-[#CCCCCC] px-6 py-1 rounded-lg text-lg ${
+              className={` px-3 md:px-5 py-1 sm:py-1.5 rounded-lg text-sm lg:text-base ${
                 activeButton === "all"
                   ? "bg-[#8E8E8E] text-white"
                   : "bg-[#F5F5F5] text-[#3E3D3D]"
@@ -157,26 +202,18 @@ function RecordedSessions() {
               All
             </button>
             <button
-              className={`border border-[#CCCCCC] px-4 py-1  rounded-lg text-lg flex items-center gap-1.5 ${
-                activeButton === "optimism"
-                  ? "bg-[#8E8E8E] text-white"
-                  : "bg-[#F5F5F5] text-[#3E3D3D]"
-              }`}
+              className={`flex items-center justify-center size-[26px] sm:size-[29px] md:size-[29px]`}
               onClick={() => handleFilters("optimism")}
             >
-              <Image src={oplogo} alt="optimism" width={23} className="" />
-              Optimism
+              <Image src={oplogo} alt="optimism" className={`size-full ${activeButton === "optimism" ? "opacity-100" : "opacity-50"}`} />
+              {/* <span className="hidden md:inline ml-1.5">Optimism</span> */}
             </button>
             <button
-              className={`border border-[#CCCCCC] px-4 py-1 rounded-lg text-lg flex items-center gap-1.5 ${
-                activeButton === "arbitrum"
-                  ? "bg-[#8E8E8E] text-white"
-                  : "bg-[#F5F5F5] text-[#3E3D3D]"
-              }`}
+              className={`flex items-center justify-center size-[26px] sm:size-[29px] md:size-[29px]`}
               onClick={() => handleFilters("arbitrum")}
             >
-              <Image src={arbcir} alt="arbitrum" width={23} className="" />
-              Arbitrum
+              <Image src={arbcir} alt="arbitrum" className={`size-full ${activeButton === "arbitrum" ? "opacity-100" : "opacity-50"}`} />
+              {/* <span className="hidden md:inline ml-1.5">Arbitrum</span> */}
             </button>
           </div>
         </div>
