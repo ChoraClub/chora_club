@@ -29,6 +29,7 @@ import { IoIosRocket } from "react-icons/io";
 import { FaBusinessTime, FaUser } from "react-icons/fa6";
 import { SiGitbook, SiGoogleclassroom } from "react-icons/si";
 import { PiUsersThreeFill } from "react-icons/pi";
+import { BiSolidMessageSquareAdd } from "react-icons/bi";
 
 function Sidebar() {
   const [isTourOpen, setIsTourOpen] = useState(false);
@@ -419,6 +420,29 @@ function Sidebar() {
                 }`}
               >
                 <PiUsersThreeFill
+                  className={`size-5 text-white ${styles.iconInner}`}
+                />
+              </Link>
+              {/* </Link> */}
+            </Tooltip>
+            <Tooltip
+              content={<div className={`${styles.customTooltip}`}>Invite</div>}
+              placement="right"
+              className="rounded-md bg-opacity-90"
+              closeDelay={1}
+            >
+              {/* <Link href={"/sessions?active=recordedSessions"}> */}
+              <Link
+                href={"/invite"}
+                className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 rounded-full flex items-center justify-center border border-white bg-blue-shade-800 w-10 h-10 ${
+                  styles.icon3d
+                } ${
+                  pathname.includes(`/invite`)
+                    ? "border-white border-2 rounded-full"
+                    : ""
+                }`}
+              >
+                <BiSolidMessageSquareAdd
                   className={`size-5 text-white ${styles.iconInner}`}
                 />
               </Link>

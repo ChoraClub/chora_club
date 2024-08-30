@@ -10,9 +10,10 @@ import Link from "next/link";
 import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
 import { dao_details } from "@/config/daoDetails";
 import ExploreDaosSkeletonLoader from "../SkeletonLoader/ExploreDaosSkeletonLoader";
+import { useSearchParams } from "next/navigation";
+import { useConnectModal } from "@rainbow-me/rainbowkit";
 
 function ExploreDAOs() {
-
   const dao_info = Object.keys(dao_details).map((key) => {
     const dao = dao_details[key];
     return {
@@ -29,6 +30,8 @@ function ExploreDAOs() {
   const [showNotification, setShowNotification] = useState(true);
   const [isPageLoading, setIsPageLoading] = useState(true);
   const [isHovered, setIsHovered] = useState(false);
+  const searchParams = useSearchParams();
+  const { openConnectModal } = useConnectModal();
 
   useEffect(() => {
     const storedStatus = sessionStorage.getItem("notificationStatus");
@@ -58,6 +61,12 @@ function ExploreDAOs() {
     );
     router.push(`/${formatted}?active=about`);
   };
+
+  useEffect(() => {
+    if (searchParams.get("referrer") && openConnectModal) {
+      openConnectModal();
+    }
+  }, [searchParams]);
 
   return (
     <div className="pt-6 pl-14 pr-6 min-h-screen">

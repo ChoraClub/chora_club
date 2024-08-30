@@ -11,7 +11,7 @@ import FeedbackTile from "@/components/ComponentUtils/FeedbackTile";
 import Script from "next/script";
 import ProgressBarProvider from "@/components/ProgressBarProvider/ProgressBarProvider";
 import MobileResponsiveMessage from "@/components/MobileResponsiveMessage/MobileResponsiveMessage";
-import { GoogleTagManager } from '@next/third-parties/google';
+import { GoogleTagManager } from "@next/third-parties/google";
 const poppins = Poppins({
   subsets: ["latin"],
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
@@ -93,7 +93,6 @@ export default function RootLayout({
   }}();`,
           }}
         ></script>
-        
       </head>
       <body className={`${quanty.variable} ${poppins.variable}`}>
         {/* <noscript
