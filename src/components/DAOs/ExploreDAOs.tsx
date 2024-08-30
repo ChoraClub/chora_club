@@ -11,9 +11,9 @@ import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
 import { dao_details } from "@/config/daoDetails";
 import ExploreDaosSkeletonLoader from "../SkeletonLoader/ExploreDaosSkeletonLoader";
 import { CiSearch } from "react-icons/ci";
+import SidebarMainMobile from "../MainSidebar/SidebarMainMobile";
 
 function ExploreDAOs() {
-
   const dao_info = Object.keys(dao_details).map((key) => {
     const dao = dao_details[key];
     return {
@@ -62,51 +62,32 @@ function ExploreDAOs() {
   };
 
   useEffect(() => {
-    const handleClickOutside = (event:any) => {
-      if (openSearch && !event.target.closest('.search-container')) {
+    const handleClickOutside = (event: any) => {
+      if (openSearch && !event.target.closest(".search-container")) {
         setOpenSearch(false);
       }
     };
-  
-    document.addEventListener('mousedown', handleClickOutside);
+
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [openSearch]);
-
 
   return (
     <div className="pt-4 sm:pt-6 px-4 md:px-6 lg:px-14 min-h-screen">
       <div className="relative">
         <div className="flex flex-row justify-between items-center mb-6">
-          <div className="text-blue-shade-200 font-medium text-3xl md:text-4xl font-quanty">
-            Explore DAOs
-          </div>
-
-        <div className="search-container relative">
-          <div className="flex justify-center items-center relative">
-            <div className=" md:hidden flex items-center mr-3 rounded-full p-2 justify-center bg-blue-shade-200 text-white cursor-pointer" onClick={()=>{{setOpenSearch(!openSearch)}}} >
-              <CiSearch className="text-lg"/>
-            
+          <div className="flex gap-4 items-center">
+            <div className="lg:hidden">
+              <SidebarMainMobile />
             </div>
-            <ConnectWalletWithENS />
-          </div>
-        {openSearch && (
-             <div 
-             className={`md:hidden absolute top-full right-0 w-[90vw] mt-2 px-4 z-10`}
-           >
-                <input
-            type="text"
-            placeholder="Search DAOs"
-            className="w-full pl-5 pr-2 py-2 bg-[#f5f5f5] rounded-lg shadow-lg outline-none "
-            value={searchQuery}
-            onChange={(e) => handleSearchChange(e.target.value)}
-          ></input>
-              </div>
-            )}
+            <div className="text-blue-shade-200 font-medium text-3xl md:text-4xl font-quanty ">
+              Explore DAOs
             </div>
+          </div>
+          <ConnectWalletWithENS />
         </div>
-
 
         {/* <div
           className="md:flex justify-start items-center border-[0.5px] bg-[#f5f5f5] border-black rounded-full w-fit max-w-sm md:max-w-full hidden my-3 font-poppins"
@@ -122,18 +103,21 @@ function ExploreDAOs() {
             <Image src={search} alt="search" width={16} height={16} className="w-4 h-4 sm:w-5 sm:h-5"  />
           </span>
         </div> */}
-         <div className={` hidden md:flex items-center rounded-full shadow-lg bg-gray-100 text-black cursor-pointer w-[365px]`}  >
-              <CiSearch className={`text-base transition-all duration-700 ease-in-out ml-3`}/>
+        <div
+          className={`flex items-center rounded-full shadow-lg bg-gray-100 text-black cursor-pointer w-[365px]`}
+        >
+          <CiSearch
+            className={`text-base transition-all duration-700 ease-in-out ml-3`}
+          />
           <input
-             type="text"
-             placeholder="Search DAOs"
-             className="w-[100%] pl-2 pr-4 py-2 text-sm bg-transparent outline-none"
-             value={searchQuery}
-             onChange={(e) => handleSearchChange(e.target.value)}
-             onClick={(e) => e.stopPropagation()}
-           />
- </div>
-
+            type="text"
+            placeholder="Search DAOs"
+            className="w-[100%] pl-2 pr-4 py-1.5 font-poppins md:py-2 text-sm bg-transparent outline-none"
+            value={searchQuery}
+            onChange={(e) => handleSearchChange(e.target.value)}
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
 
         {isPageLoading ? (
           <ExploreDaosSkeletonLoader />
@@ -160,12 +144,12 @@ function ExploreDAOs() {
                       ></Image>
                     </div>
                     <div className="text-center">
-                        <div className="font-semibold capitalize text-sm md:text-base mb-2">
-                          {daos.name}
-                        </div>
-                        <div className="text-xs md:text-sm bg-[#F2F2F2] py-2 px-3 rounded-md ">
-                          {daos.value} Participants
-                        </div>
+                      <div className="font-semibold capitalize text-sm md:text-base mb-2">
+                        {daos.name}
+                      </div>
+                      <div className="text-xs md:text-sm bg-[#F2F2F2] py-2 px-3 rounded-md ">
+                        {daos.value} Participants
+                      </div>
                     </div>
                   </div>
                 ))
@@ -186,9 +170,10 @@ function ExploreDAOs() {
                   <FaCirclePlus
                     size={50}
                     className={`md:text-[70px]
-                      ${isHovered
-                        ? "blur-md transition-all duration-250 ease-in-out text-slate-300"
-                        : "block transition-all duration-250 ease-in-out text-slate-300"
+                      ${
+                        isHovered
+                          ? "blur-md transition-all duration-250 ease-in-out text-slate-300"
+                          : "block transition-all duration-250 ease-in-out text-slate-300"
                       }`}
                   />
                 </div>

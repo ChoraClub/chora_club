@@ -2,7 +2,8 @@
 
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { BiSolidWallet } from "react-icons/bi";
-import styles from '@/components/MainSidebar/sidebar.module.css'
+import styles from "@/components/MainSidebar/sidebar.module.css";
+import { FiArrowUpRight } from "react-icons/fi";
 export const ConnectWallet = () => {
   return (
     <ConnectButton.Custom>
@@ -37,11 +38,31 @@ export const ConnectWallet = () => {
             {(() => {
               if (!connected) {
                 return (
-                  // <button onClick={openConnectModal} type="button">
-                    <button onClick={openConnectModal} type="button" className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 rounded-full flex items-center justify-center bg-white w-10 h-10 ${styles.icon3d} ${styles.whiteBg}`}>
-                <BiSolidWallet className={`size-5 text-blue-shade-200 ${styles.iconInner}`}/>
-                </button>
-                  // </button>
+                  <>
+                  <button
+                    onClick={openConnectModal}
+                    type="button"
+                    className={`hidden lg:flex cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 rounded-full items-center justify-center bg-white w-10 h-10 ${styles.icon3d} ${styles.whiteBg}`}
+                  >
+                    <BiSolidWallet
+                      className={`size-5 text-blue-shade-200 ${styles.iconInner}`}
+                    />
+                  </button>
+
+                  <div
+                    className="block lg:hidden py-4 pl-6 sm:py-5 hover:bg-blue-shade-100"
+                    onClick={openAccountModal}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <BiSolidWallet className="size-5 mr-4" />
+                        <span>Wallet</span>
+                      </div>
+                      <FiArrowUpRight className="w-5 h-5" />
+                    </div>
+                  </div>
+
+                  </>
                 );
               }
               if (chain.unsupported) {
@@ -52,14 +73,38 @@ export const ConnectWallet = () => {
                 );
               }
               return (
-                <div style={{ display: "flex", gap: 12 }}>
-                  {/* <button onClick={openAccountModal} type="button"> */}
-                    <button className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 rounded-full flex items-center justify-center bg-white w-10 h-10 ${styles.icon3d} ${styles.whiteBg}
-                    `} onClick={openAccountModal} type="button">
-                <BiSolidWallet className={`size-5 text-blue-shade-200 ${styles.iconInner}`}/>
-                </button>
-                  {/* </button> */}
-                </div>
+                <>
+                  <div
+                    className="lg:block hidden"
+                    style={{ display: "flex", gap: 12 }}
+                  >
+                    {/* <button onClick={openAccountModal} type="button"> */}
+                    <button
+                      className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 rounded-full flex items-center justify-center bg-white w-10 h-10 ${styles.icon3d} ${styles.whiteBg}
+                    `}
+                      onClick={openAccountModal}
+                      type="button"
+                    >
+                      <BiSolidWallet
+                        className={`size-5 text-blue-shade-200 ${styles.iconInner}`}
+                      />
+                    </button>
+                    {/* </button> */}
+                  </div>
+
+                  <div
+                    className="block lg:hidden py-4 pl-6 sm:py-5 hover:bg-blue-shade-100"
+                    onClick={openAccountModal}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <BiSolidWallet className="size-5 mr-4" />
+                        <span>Profile</span>
+                      </div>
+                      <FiArrowUpRight className="w-5 h-5" />
+                    </div>
+                  </div>
+                </>
               );
             })()}
           </div>

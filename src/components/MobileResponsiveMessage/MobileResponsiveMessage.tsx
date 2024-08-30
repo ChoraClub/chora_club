@@ -1,8 +1,16 @@
 import React from "react";
+import SidebarMainMobile from "../MainSidebar/SidebarMainMobile";
+import Image from "next/image";
+import cclogo from "@/assets/images/daos/CCLogo.png"
 
 function MobileResponsiveMessage() {
   return (
-    <div className="md:hidden flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
+    <div className="md:hidden min-h-screen bg-gray-100 flex flex-col">    
+    <div className="absolute top-0 left-0 pt-4 sm:pt-6 px-4 flex items-center">
+      <SidebarMainMobile />
+        <div className="ml-5 text-blue-shade-200 font-semibold text-[32px] font-poppins">Chora Club</div>
+    </div>
+    <div className="flex-1 flex items-center justify-center px-4 font-poppins">
         <div className="bg-white rounded-lg shadow-md p-6 text-center max-w-sm w-full">
           <div className="mb-6">
             <svg
@@ -28,6 +36,7 @@ function MobileResponsiveMessage() {
             Please use your desktop computer.
           </p>
         </div>
+      </div>
       </div>
   );
 }

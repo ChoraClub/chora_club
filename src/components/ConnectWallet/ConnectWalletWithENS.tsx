@@ -4,10 +4,76 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 // import "@rainbow-me/rainbow-button/styles.css";
 import { fetchEnsAvatar, getEnsName } from "@/utils/ENSUtils";
 import { BiSolidWallet } from "react-icons/bi";
+import { useAccount } from "wagmi";
+import { usePathname } from "next/navigation";
+import Image from "next/image";
+import user from "@/assets/images/user/user2.svg"
 
 function ConnectWalletWithENS() {
   const [displayAddress, setDisplayAddress] = useState<any>();
+  const [userProfileImage, setUserProfileImage] = useState<string | null>(null);
+  const [ensAvatar, setEnsAvatar] = useState<string | null>(null);
+  const { address } = useAccount();
 
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (address) {
+        try {
+          const myHeaders = new Headers();
+          myHeaders.append("Content-Type", "application/json");
+          myHeaders.append("x-wallet-address", address);
+
+          const raw = JSON.stringify({ address: address });
+
+          const requestOptions: any = {
+            method: "POST",
+            headers: myHeaders,
+            body: raw,
+            redirect: "follow",
+          };
+
+          const res = await fetch(`/api/profile/${address}`, requestOptions);
+          const dbResponse = await res.json();
+          console.log("data",dbResponse)
+
+          if (dbResponse.data.length > 0) {
+            const profileImage = dbResponse.data[0]?.image;
+            setUserProfileImage(profileImage ? `https://gateway.lighthouse.storage/ipfs/${profileImage}` : null);
+          }
+
+          const ensData = await fetchEnsAvatar(address);
+          setEnsAvatar(ensData?.avatar || null);
+        } catch (error) {
+          console.error("Error fetching user profile:", error);
+        }
+      }
+    };
+
+    fetchUserProfile();
+  }, [address]);
+
+  useEffect(() => {
+    if (address) {
+      (async () => {
+        const displayName = await getEnsName(address);
+        setDisplayAddress(displayName?.ensNameOrAddress);
+      })();
+    }
+  }, [address]);
+
+  const getDisplayImage = () => {
+    if (ensAvatar) {
+      return ensAvatar;
+    } else if (userProfileImage) {
+      return userProfileImage;
+    } else {
+      return user;
+    }
+    
+
+  };
+  
   return (
     <ConnectButton.Custom>
       {({
@@ -61,9 +127,9 @@ function ConnectWalletWithENS() {
                   <button
                     onClick={openConnectModal}
                     type="button"
-                    className="flex items-center justify-center text-white bg-blue-shade-200 hover:bg-blue-shade-100 border border-white rounded-full px-2 py-2 md:px-5 md:py-4 text-xs md:text-sm font-bold transition-transform transform hover:scale-105"
+                    className="flex items-center justify-center text-white bg-blue-shade-200 hover:bg-blue-shade-100 border border-white rounded-full p-2 md:px-5 md:py-4 text-xs md:text-sm font-bold transition-transform transform hover:scale-105"
                   >
-                    <BiSolidWallet className="block md:hidden text-lg" />
+                    <BiSolidWallet className="block md:hidden size-5" />
                     <span className="hidden md:block">Connect Wallet</span>
                   </button>
                 );
@@ -82,7 +148,8 @@ function ConnectWalletWithENS() {
               }
 
               return (
-                <div style={{ display: "flex", gap: 12 }}>
+                <>
+                <div style={{ gap: 12 }} className="hidden lg:flex">
                   <button
                     onClick={openChainModal}
                     type="button"
@@ -227,6 +294,45 @@ function ConnectWalletWithENS() {
                     </div>
                   </button>
                 </div>
+
+                <div className="lg:hidden flex items-center">
+                    {/* <button
+                      onClick={openAccountModal}
+                      type="button"
+                      className="flex items-center rounded-full justify-center border-2 border-white font-bold text-black shadow-sm transition-transform transform hover:scale-105 text-xs"
+                    >
+                      {userProfileImage ? (
+                        <Image
+                          src={userProfileImage}
+                          alt="User Profile"
+                          width={30}
+                          height={30}
+                          className="rounded-full mr-2"
+                        />
+                      ) : (
+                        <Image
+                          src={user}
+                          alt="User Profile"
+                          width={30}
+                          height={30}
+                          className="rounded-full mr-2"/>
+                      )}
+                    </button> */}
+                    <button
+                      onClick={openAccountModal}
+                      type="button"
+                      className="flex items-center rounded-full justify-center font-bold text-black shadow-sm transition-transform transform hover:scale-105 text-xs"
+                    >
+                      <Image
+                        src={getDisplayImage()}
+                        alt="User Avatar"
+                        width={30}
+                        height={30}
+                        className="rounded-full"
+                      />
+                    </button>
+                  </div>
+                </>
               );
             })()}
           </div>

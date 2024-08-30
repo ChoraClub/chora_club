@@ -9,6 +9,7 @@ import RecordedSessions from "./RecordedSessions";
 import { FaCircleInfo } from "react-icons/fa6";
 import { Tooltip } from "@nextui-org/react";
 import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
+import SidebarMainMobile from "../MainSidebar/SidebarMainMobile";
 
 function DelegateSessionsMain() {
   const router = useRouter();
@@ -18,29 +19,24 @@ function DelegateSessionsMain() {
   return (
     <>
       <div className="">
-        <div className="flex flex-row items-center justify-between pt-6 px-4 md:px-6 lg:px-14 mb-4 md:mb-4">
+        {/* <div className="flex flex-row items-center justify-between pt-6 px-4 md:px-6 lg:px-14 mb-4 md:mb-4">
           <div className="flex font-quanty font-medium text-3xl md:text-4xl text-blue-shade-200 items-center">
-            {/* <div>
-              <Tooltip
-                showArrow
-                content={
-                  <div className="font-poppins">
-                    Explore available delegates by DAO, date, and time to book
-                    sessions and unlock Web3 opportunities.
-                  </div>
-                }
-                placement="right"
-                className="rounded-md bg-opacity-90 max-w-96"
-                closeDelay={1}
-              >
-                <div> Available Delegates</div>
-              </Tooltip>
-            </div>  */}
-            Sessions
+                        Sessions
           </div>
           <div>
             <ConnectWalletWithENS />
           </div>
+        </div> */}
+        <div className="flex flex-row justify-between items-center mb-6 pt-4 sm:pt-6 px-4 md:px-6 lg:px-14">
+          <div className="flex gap-4 items-center">
+            <div className="lg:hidden">
+              <SidebarMainMobile />
+            </div>
+            <div className="text-blue-shade-200 font-medium text-3xl md:text-4xl font-quanty ">
+              Sessions
+            </div>
+          </div>
+          <ConnectWalletWithENS />
         </div>
 
         <div className="flex md:gap-12 bg-[#D9D9D945] md:pl-6 lg:pl-14 font-poppins">
