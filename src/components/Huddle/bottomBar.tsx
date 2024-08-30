@@ -30,15 +30,18 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import { SessionInterface } from "@/types/MeetingTypes";
 
 const BottomBar = ({
   daoName,
   hostAddress,
   meetingStatus,
+  meetingData,
 }: {
   daoName: string;
   hostAddress: string;
   meetingStatus: boolean | undefined;
+  meetingData?: SessionInterface;
 }) => {
   const { isAudioOn, enableAudio, disableAudio } = useLocalAudio();
   const { isVideoOn, enableVideo, disableVideo } = useLocalVideo();
@@ -364,6 +367,7 @@ const BottomBar = ({
             body: JSON.stringify({
               roomId: roomId,
               connectedAddress: address,
+              meetingData: meetingData,
             }),
           });
           const response_data = await response.json();

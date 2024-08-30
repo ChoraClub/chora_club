@@ -108,7 +108,7 @@ export async function PUT(req: NextRequest, res: NextResponse) {
             });
             socket.on("connect", () => {
               console.log("Connected to WebSocket server from API");
-              socket.emit("session_started", {
+              socket.emit("session_started_by_host", {
                 attendeeAddress,
                 dataToSendGuest,
               });

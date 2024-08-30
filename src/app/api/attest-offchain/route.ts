@@ -16,7 +16,9 @@ import {
   OFFCHAIN_ARB_ATTESTATION_BASE_URL,
   OFFCHAIN_OP_ATTESTATION_BASE_URL,
   SCHEMA_ID,
+  SOCKET_BASE_URL,
 } from "@/config/constants";
+import { io } from "socket.io-client";
 
 interface AttestOffchainRequestBody {
   recipient: string;
@@ -57,8 +59,11 @@ export async function POST(req: NextRequest, res: NextResponse) {
   (BigInt.prototype as any).toJSON = function () {
     return this.toString();
   };
-  const requestData = (await req.json()) as AttestOffchainRequestBody;
+  const requestData = await req.json();
+  // const requestData = (await req.json()) as AttestOffchainRequestBody;
   // Your validation logic here
+
+  console.log("requestData in attest-offchain API", requestData);
 
   try {
     console.log("log2");
@@ -90,12 +95,12 @@ export async function POST(req: NextRequest, res: NextResponse) {
     console.log("Connected");
     // Your initialization code remains the same
     const offchain = await eas.getOffchain();
-    console.log(offchain);
+    // console.log(offchain);
     const schemaEncoder = new SchemaEncoder(
       "bytes32 MeetingId,uint8 MeetingType,uint32 StartTime,uint32 EndTime"
     );
 
-    console.log(schemaEncoder);
+    // console.log(schemaEncoder);
 
     const encodedData = schemaEncoder.encodeData([
       {
@@ -108,16 +113,16 @@ export async function POST(req: NextRequest, res: NextResponse) {
       { name: "EndTime", value: requestData.endTime, type: "uint32" },
     ]);
 
-    console.log(encodedData);
+    // console.log(encodedData);
 
     const expirationTime = BigInt(0);
     const currentTime = BigInt(Math.floor(Date.now() / 1000));
-    console.log(expirationTime);
-    console.log(currentTime);
+    // console.log(expirationTime);
+    // console.log(currentTime);
 
-    console.log("---------");
-    console.log(typeof currentTime);
-    console.log("---------");
+    // console.log("---------");
+    // console.log(typeof currentTime);
+    // console.log("---------");
 
     const offchainAttestation = await offchain.signOffchainAttestation(
       {
@@ -155,17 +160,17 @@ export async function POST(req: NextRequest, res: NextResponse) {
     console.log("base url: ", baseUrl);
 
     let uploadstatus = false;
-    console.log("data: ", data);
+    // console.log("data: ", data);
     try {
       const response = await axios.post(`${baseUrl}/offchain/store`, data);
       if (response.data) {
         uploadstatus = true;
       }
       console.log("response data", response.data);
-      console.log(
-        "requestData.meetingId.split",
-        requestData.meetingId.split("/")[0]
-      );
+      // console.log(
+      //   "requestData.meetingId.split",
+      //   requestData.meetingId.split("/")[0]
+      // );
 
       if (requestData.meetingType === 1) {
         const client = await connectDB();
@@ -266,6 +271,72 @@ export async function POST(req: NextRequest, res: NextResponse) {
     }
 
     // Rest of your code remains the same
+
+    console.log(
+      "inside attest-offchain success: true",
+      offchainAttestation,
+      url,
+      uploadstatus
+    );
+
+    const notificationToSend = {
+      receiver_address: offchainAttestation.message.recipient,
+      content: `Congratulations 🎉 ! You just received an Off-chain attestation for attending "${requestData.meetingData.title}".`,
+      createdAt: Date.now(),
+      read_status: false,
+      notification_name: "offchain",
+      notification_title: "Received Off-chain Attestation",
+      notification_type: "attestation",
+      additionalData: { ...offchainAttestation, requestData },
+    };
+
+    const client = await connectDB();
+    console.log("Connected to MongoDB");
+
+    const db = client.db();
+    const notificationCollection = db.collection("notifications");
+
+    const notificationResult = await notificationCollection.insertOne(
+      notificationToSend
+    );
+
+    console.log("notificationResult", notificationResult);
+
+    if (notificationResult.insertedId) {
+      const insertedNotification = await notificationCollection.findOne({
+        _id: notificationResult.insertedId,
+      });
+
+      console.log("insertedNotification", insertedNotification);
+    }
+
+    const dataToSend = {
+      ...notificationToSend,
+      _id: notificationResult.insertedId,
+    };
+    console.log("dataToSend", dataToSend);
+    const receiver_address = notificationToSend.receiver_address;
+    const socket = io(`${SOCKET_BASE_URL}`, {
+      withCredentials: true,
+    });
+    socket.on("connect", () => {
+      console.log("Connected to WebSocket server from API");
+      socket.emit("received_offchain_attestation", {
+        receiver_address,
+        dataToSend,
+      });
+      console.log("Message sent from API to socket server");
+      socket.disconnect();
+    });
+
+    socket.on("connect_error", (err) => {
+      console.error("WebSocket connection error:", err);
+    });
+
+    socket.on("error", (err) => {
+      console.error("WebSocket error:", err);
+    });
+    await client.close();
 
     return NextResponse.json(
       { success: true, offchainAttestation, url, uploadstatus },

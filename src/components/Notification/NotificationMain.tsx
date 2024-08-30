@@ -330,8 +330,7 @@ function NotificationMain() {
                 ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
                 : "border-transparent"
             }`}
-            // onClick={() => router.push(path + "?active=attestations")}
-            onClick={() => toast("Coming Soon 🚀")}
+            onClick={() => router.push(path + "?active=attestations")}
           >
             Attestations
           </button>

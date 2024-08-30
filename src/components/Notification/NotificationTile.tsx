@@ -9,6 +9,7 @@ import {
   markAsRead,
 } from "./NotificationActions";
 import { useNotificationStudioState } from "@/store/notificationStudioState";
+import { BiLinkExternal } from "react-icons/bi";
 
 function NotificationTile({ data, index, length }: NotificationTileProps) {
   const router = useRouter();
@@ -33,6 +34,24 @@ function NotificationTile({ data, index, length }: NotificationTileProps) {
   // const handleTileRedirection = async () => {
   //   await handleRedirection(tileData, router, markAsRead);
   // };
+
+  const renderTitleContent = () => {
+    if (
+      tileData.notification_type === "attestation" &&
+      tileData.notification_name === "offchain"
+    ) {
+      return (
+        <BiLinkExternal
+          size={18}
+          className="text-black hover:text-blue-600 transition-colors duration-200"
+          onClick={() => console.log(tileData)}
+        />
+      );
+    }
+
+    return <></>;
+  };
+
   return (
     <>
       <div
@@ -55,6 +74,7 @@ function NotificationTile({ data, index, length }: NotificationTileProps) {
               }`}
             >
               {data.notification_title}
+              {renderTitleContent()}
             </h1>
             <p
               className={`font-normal text-sm text-[#414141] ${
