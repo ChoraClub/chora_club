@@ -166,80 +166,6 @@ const BottomBar = ({
     }
   };
 
-  // useEffect(() => {
-  //   if (role === "host") {
-  //     startRecordingAutomatically();
-  //   }
-  // }, []);
-
-  // useEffect(() => {
-  //   const storedStatus = localStorage.getItem("meetingData");
-  //   if (storedStatus) {
-  //     const parsedStatus = JSON.parse(storedStatus);
-  //     console.log("storedStatus: ", parsedStatus);
-  //     setRecordingStatus(parsedStatus.isMeetingRecorded);
-  //   }
-  //   console.log("recordingStatus: ", recordingStatus);
-  // }, []);
-
-  // const handleModalClose = async (result: boolean) => {
-  //   if (role === "host") {
-  //     const meetingData = {
-  //       meetingId: roomId,
-  //       isMeetingRecorded: result.toString(),
-  //     };
-  //     localStorage.setItem("meetingData", JSON.stringify(meetingData));
-  //     setShowModal(false);
-  //     setRecordingStatus(result.toString());
-  //     console.log(
-  //       result ? "Meeting will be recorded." : "Meeting will not be recorded."
-  //     );
-
-  //     if (result) {
-  //       startRecording();
-  //     }
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   if (isRecording) {
-  //     startRecording();
-  //   }
-  // }, []);
-
-  // const startRecording = async () => {
-  //   try {
-  //     console.log("recording started");
-  //     const myHeaders = new Headers();
-  //     myHeaders.append("Content-Type", "application/json");
-  //     // if (address) {
-  //     //   myHeaders.append("x-wallet-address", address);
-  //     // }
-  //     const requestOptions = {
-  //       method: "POST",
-  //       headers: myHeaders,
-  //       body: JSON.stringify({
-  //         roomId: params.roomId,
-  //       }),
-  //     };
-
-  //     const status = await fetch(
-  //       `/api/startRecording/${params.roomId}`,
-  //       requestOptions
-  //     );
-  //     if (!status.ok) {
-  //       console.error(`Request failed with status: ${status.status}`);
-  //       toast.error("Failed to start recording");
-  //       return;
-  //     }
-  //     setIsRecording(true); // Assuming this should be true after starting recording
-  //     toast.success("Recording started");
-  //   } catch (error) {
-  //     console.error("Error starting recording:", error);
-  //     toast.error("Error starting recording");
-  //   }
-  // };
-
   useEffect(() => {
     const handleBeforeUnload = (event: any) => {
       if (role === "host") {
@@ -377,7 +303,7 @@ const BottomBar = ({
           }
         } catch (e) {
           console.log("Error in attestation: ", e);
-          toast.error("Attestation denied");
+          // toast.error("Attestation denied");
         }
       }
     }
@@ -409,43 +335,6 @@ const BottomBar = ({
   return (
     <>
       <footer className="flex items-center justify-between px-4 py-2 font-poppins">
-        {/* <div>
-          <div className="relative">
-            <div
-              className="mr-auto flex items-center gap-4 w-44 cursor-pointer"
-              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            >
-              <div className="bg-blue-shade-200 p-2 rounded-lg">
-                <PiLinkSimpleBold
-                  className="text-white"
-                  size={24}
-                ></PiLinkSimpleBold>
-              </div>
-              <span className="text-gray-800">Quick Links</span>
-            </div>
-            {isDropdownOpen && (
-              <div className="absolute z-10 top-auto bottom-full left-0 mb-2 w-52 bg-white rounded-lg shadow-lg">
-                <div className="arrow-up"></div>
-                {(daoName === "arbitrum"
-                  ? arbBlock
-                  : daoName === "optimism"
-                  ? opBlock
-                  : []
-                ).map((block, index) => (
-                  <a
-                    href={block.link}
-                    target="_blank"
-                    className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
-                    key={index}
-                  >
-                    {block.title}
-                  </a>
-                ))}
-              </div>
-            )}
-          </div>
-        </div> */}
-
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button className="bg-white hover:bg-white">

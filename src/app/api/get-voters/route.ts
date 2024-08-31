@@ -1,19 +1,26 @@
-import { Client, cacheExchange, fetchExchange, gql } from 'urql';
-import type { NextRequest } from 'next/server';
-import { NextResponse } from 'next/server';
-export const revalidate = 0;
+import { Client, fetchExchange, gql } from "urql";
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
+
+export const runtime = "nodejs";
 
 const client = new Client({
-  url: 'https://api.studio.thegraph.com/query/68573/v6_proxy/version/latest',
-  exchanges: [cacheExchange, fetchExchange],
+  url: "https://api.studio.thegraph.com/query/68573/v6_proxy/version/latest",
+  exchanges: [fetchExchange],
 });
 
 const arb_client = new Client({
-  url: 'https://api.studio.thegraph.com/query/68573/arbitrum_proposals/v0.0.4',
-  exchanges: [cacheExchange, fetchExchange],
+  url: "https://api.studio.thegraph.com/query/68573/arbitrum_proposals/v0.0.4",
+  exchanges: [fetchExchange],
 });
+
 const COMBINED_VOTE_QUERY = gql`
-  query CombinedVoteQuery($proposalId: String!, $skip1: Int!, $skip2: Int!, $first: Int!) {
+  query CombinedVoteQuery(
+    $proposalId: String!
+    $skip1: Int!
+    $skip2: Int!
+    $first: Int!
+  ) {
     voteCastWithParams: voteCastWithParams_collection(
       where: { proposalId: $proposalId }
       first: $first
@@ -46,37 +53,82 @@ const COMBINED_VOTE_QUERY = gql`
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
 
-  const proposalId = searchParams.get('proposalId');
-  const skip1 = parseInt(searchParams.get('skip1') || '0', 10);
-  const skip2 = parseInt(searchParams.get('skip2') || '0', 10);
-  const first = parseInt(searchParams.get('first') || '10', 10);
-  const dao = searchParams.get('dao');
+  const proposalId = searchParams.get("proposalId");
+  const skip1 = parseInt(searchParams.get("skip1") || "0", 10);
+  const skip2 = parseInt(searchParams.get("skip2") || "0", 10);
+  const first = parseInt(searchParams.get("first") || "10", 10);
+  const dao = searchParams.get("dao");
 
   if (!proposalId) {
-    return NextResponse.json({ error: 'Missing proposalId parameter' }, { status: 400 });
+    return NextResponse.json(
+      { error: "Missing proposalId parameter" },
+      {
+        status: 400,
+        headers: {
+          "Cache-Control": "no-store, max-age=0",
+        },
+      }
+    );
   }
 
   if (isNaN(skip1) || isNaN(skip2) || isNaN(first)) {
-    return NextResponse.json({ error: 'Invalid skip1, skip2, or first parameter' }, { status: 400 });
+    return NextResponse.json(
+      { error: "Invalid skip1, skip2, or first parameter" },
+      {
+        status: 400,
+        headers: {
+          "Cache-Control": "no-store, max-age=0",
+        },
+      }
+    );
   }
 
   try {
     let result;
-    if(dao==='optimism'){
-     result = await client.query(COMBINED_VOTE_QUERY, { proposalId, skip1, skip2, first }).toPromise();
-    }else{
-      result =await arb_client.query(COMBINED_VOTE_QUERY, { proposalId, skip1, skip2, first }).toPromise();
+    if (dao === "optimism") {
+      result = await client
+        .query(COMBINED_VOTE_QUERY, { proposalId, skip1, skip2, first })
+        .toPromise();
+    } else {
+      result = await arb_client
+        .query(COMBINED_VOTE_QUERY, { proposalId, skip1, skip2, first })
+        .toPromise();
     }
-
 
     if (result.error) {
-      console.error('GraphQL query error:', result.error);
-      return NextResponse.json({ error: 'An error occurred while fetching data' }, { status: 500 });
+      console.error("GraphQL query error:", result.error);
+      return NextResponse.json(
+        { error: "An error occurred while fetching data" },
+        {
+          status: 500,
+          headers: {
+            "Cache-Control": "no-store, max-age=0",
+          },
+        }
+      );
     }
 
-    return NextResponse.json(result.data);
+    return NextResponse.json(
+      {
+        ...result.data,
+        timestamp: new Date().toISOString(),
+      },
+      {
+        headers: {
+          "Cache-Control": "no-store, max-age=0",
+        },
+      }
+    );
   } catch (error) {
-    console.error('Unexpected error:', error);
-    return NextResponse.json({ error: 'An unexpected error occurred' }, { status: 500 });
+    console.error("Unexpected error:", error);
+    return NextResponse.json(
+      { error: "An unexpected error occurred" },
+      {
+        status: 500,
+        headers: {
+          "Cache-Control": "no-store, max-age=0",
+        },
+      }
+    );
   }
 }
