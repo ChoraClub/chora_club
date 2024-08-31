@@ -12,6 +12,7 @@ import { dao_details } from "@/config/daoDetails";
 import ExploreDaosSkeletonLoader from "../SkeletonLoader/ExploreDaosSkeletonLoader";
 import { CiSearch } from "react-icons/ci";
 import SidebarMainMobile from "../MainSidebar/SidebarMainMobile";
+import RewardButton from "../ClaimReward/RewardButton";
 
 function ExploreDAOs() {
   const dao_info = Object.keys(dao_details).map((key) => {
@@ -86,7 +87,11 @@ function ExploreDAOs() {
               Explore DAOs
             </div>
           </div>
-          <ConnectWalletWithENS />
+          <div className="flex gap-2 items-center">
+            <RewardButton />
+            <ConnectWalletWithENS />
+          </div>
+          {/* <ConnectWalletWithENS /> */}
         </div>
 
         {/* <div
