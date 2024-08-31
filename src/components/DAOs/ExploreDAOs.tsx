@@ -10,6 +10,7 @@ import Link from "next/link";
 import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
 import { dao_details } from "@/config/daoDetails";
 import ExploreDaosSkeletonLoader from "../SkeletonLoader/ExploreDaosSkeletonLoader";
+import RewardButton from "../ClaimReward/RewardButton"
 
 function ExploreDAOs() {
 
@@ -67,7 +68,8 @@ function ExploreDAOs() {
             Explore DAOs
           </div>
 
-          <div>
+          <div className="flex gap-2 items-center">
+            <RewardButton/>
             <ConnectWalletWithENS />
           </div>
         </div>
