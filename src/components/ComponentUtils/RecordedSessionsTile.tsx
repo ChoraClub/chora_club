@@ -64,6 +64,31 @@ function RecordedSessionsTile({
     copy(addr);
     toast("Address Copied");
   };
+  function formatViews(views: number): string {
+    // Handle negative numbers or NaN
+    if (isNaN(views) || views < 0) {
+      return "0";
+    }
+
+    // For millions (e.g., 1.25M)
+    if (views >= 1000000) {
+      const millionViews = views / 1000000;
+      return (
+        millionViews.toFixed(millionViews >= 10 ? 0 : 1).replace(/\.0$/, "") +
+        "M"
+      );
+    }
+    // For thousands (e.g., 1.2k, 12k)
+    if (views >= 1000) {
+      const thousandViews = views / 1000;
+      return (
+        thousandViews.toFixed(thousandViews >= 10 ? 0 : 1).replace(/\.0$/, "") +
+        "k"
+      );
+    }
+    // For less than 1000 views, return as is
+    return Math.floor(views).toString();
+  }
 
   const formatTimeAgo = (utcTime: string): string => {
     const parsedTime = new Date(utcTime);
@@ -190,8 +215,7 @@ function RecordedSessionsTile({
   return (
     <>
       <div
-        className={`grid min-[475px]:grid-cols- md:grid-cols-2 lg:grid-cols-3 ${gridCols} gap-10 py-8 font-poppins`}
-      >
+        className={`grid min-[475px]:grid-cols- md:grid-cols-2 lg:grid-cols-3 ${gridCols} gap-10 py-8 font-poppins`}>
         {meetingData.map((data: any, index: number) => (
           <div
             key={index}
@@ -202,11 +226,9 @@ function RecordedSessionsTile({
               router.push(`/watch/${data.meetingId}`);
             }}
             onMouseEnter={() => setHoveredVideo(index)}
-            onMouseLeave={() => setHoveredVideo(null)}
-          >
+            onMouseLeave={() => setHoveredVideo(null)}>
             <div
-              className={`w-full h-44 rounded-t-3xl bg-black object-cover object-center relative `}
-            >
+              className={`w-full h-44 rounded-t-3xl bg-black object-cover object-center relative `}>
               {hoveredVideo === index ? (
                 <div className="relative">
                   <video
@@ -216,14 +238,12 @@ function RecordedSessionsTile({
                     muted
                     onLoadedMetadata={(e) => handleLoadedMetadata(index, e)}
                     src={data.video_uri}
-                    className="w-full h-44 rounded-t-3xl object-cover"
-                  ></video>
+                    className="w-full h-44 rounded-t-3xl object-cover"></video>
                   <div className={styles.videoTimeline}>
                     <div className={styles.progressArea}>
                       <div
                         id={`progressBar-${index}`}
-                        className={styles.progressBar}
-                      ></div>
+                        className={styles.progressBar}></div>
                     </div>
                   </div>
                 </div>
@@ -239,8 +259,7 @@ function RecordedSessionsTile({
                   muted
                   onLoadedMetadata={(e) => handleLoadedMetadata(index, e)}
                   src={data.video_uri}
-                  className="w-full h-44 rounded-t-3xl object-cover"
-                ></video>
+                  className="w-full h-44 rounded-t-3xl object-cover"></video>
               )}
               <div className="absolute right-2 bottom-2 text-white text-xs bg-white px-1 bg-opacity-30 rounded-sm">
                 {formatVideoDuration(videoDurations[index] || 0)}
@@ -257,13 +276,12 @@ function RecordedSessionsTile({
                     display: "-webkit-box",
                     WebkitBoxOrient: "vertical",
                     WebkitLineClamp: 1,
-                  }}
-                >
+                  }}>
                   {updatedSessionDetails[index]?.title || data.title}
                 </div>
                 <div className="flex text-sm gap-3 py-1">
                   <div className="bg-[#F5F5F5] flex items-center py-1 px-3 rounded-md gap-2">
-                    <div>
+                    {/* <div>
                       <Image
                         src={getDaoLogo(data.dao_name)}
                         alt="image"
@@ -271,8 +289,10 @@ function RecordedSessionsTile({
                         height={20}
                         className="rounded-full"
                       />
+                    </div> */}
+                    <div className="capitalize">
+                      {formatViews(data?.views ?? 0)} views
                     </div>
-                    <div className="capitalize">{data.dao_name}</div>
                   </div>
                   <div className="bg-[#F5F5F5] py-1 px-3 rounded-md">
                     {formatTimeAgo(data.slot_time)}
@@ -300,8 +320,7 @@ function RecordedSessionsTile({
                         onClick={(event: any) => {
                           event.stopPropagation();
                         }}
-                        className="cursor-pointer hover:text-blue-shade-200 ml-1"
-                      >
+                        className="cursor-pointer hover:text-blue-shade-200 ml-1">
                         {loadingHostNames
                           ? data.host_address.slice(0, 4) +
                             "..." +
@@ -314,8 +333,7 @@ function RecordedSessionsTile({
                         content="Copy"
                         placement="right"
                         closeDelay={1}
-                        showArrow
-                      >
+                        showArrow>
                         <span className="cursor-pointer text-sm">
                           <IoCopy
                             onClick={(event) => {
@@ -359,8 +377,7 @@ function RecordedSessionsTile({
                           content="Copy"
                           placement="right"
                           closeDelay={1}
-                          showArrow
-                        >
+                          showArrow>
                           <span className="cursor-pointer text-sm">
                             <IoCopy
                               onClick={(event) => {
@@ -413,8 +430,7 @@ function RecordedSessionsTile({
                     } `}
                     onClick={(e) => {
                       e.stopPropagation();
-                    }}
-                  >
+                    }}>
                     <EditButton
                       sessionData={data}
                       updateSessionData={updateSessionData}
