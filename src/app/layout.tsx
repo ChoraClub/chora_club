@@ -94,7 +94,6 @@ export default function RootLayout({
   }}();`,
           }}
         ></script>
-        
       </head>
       <body className={`${quanty.variable} ${poppins.variable}`}>
         {/* <noscript
