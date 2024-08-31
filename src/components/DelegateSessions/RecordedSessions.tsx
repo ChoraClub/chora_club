@@ -30,10 +30,29 @@ function RecordedSessions() {
   const [error, setError] = useState<string | null>(null);
   const [openSearch, setOpenSearch] = useState(false);
 
+  useEffect(() => {
+    getRecordedMeetings();
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        openSearch &&
+        !(event.target as Element).closest(".search-container")
+      ) {
+        setOpenSearch(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [openSearch]);
+
   const handleRetry = () => {
     setError(null);
     getRecordedMeetings();
-    window.location.reload();
   };
 
   const getRecordedMeetings = async () => {
@@ -81,10 +100,6 @@ function RecordedSessions() {
     }
   };
 
-  useEffect(() => {
-    getRecordedMeetings();
-  }, []);
-
   const handleSearchChange = (query: string) => {
     setSearchQuery(query);
     if (query) {
@@ -127,20 +142,6 @@ function RecordedSessions() {
     );
   }
 
-  useEffect(() => {
-    const handleClickOutside = (event:any) => {
-      if (openSearch && !event.target.closest('.search-container')) {
-        setOpenSearch(false);
-      }
-    };
-  
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [openSearch]);
-
-
   return (
     <>
       <div className="">
@@ -161,35 +162,48 @@ function RecordedSessions() {
               <Image src={search} alt="search" width={20} />
             </span>
           </div> */}
-          <div className={` hidden md:flex items-center rounded-full shadow-lg bg-gray-100 text-black cursor-pointer w-[365px]`}  >
-              <CiSearch className={`text-base transition-all duration-700 ease-in-out ml-3`}/>
-          <input
-             type="text"
-             placeholder="Search by title and host address"
-             className="w-[100%] pl-2 pr-4 py-2 text-sm bg-transparent outline-none"
-             value={searchQuery}
-             onChange={(e) => handleSearchChange(e.target.value)}
-             onClick={(e) => e.stopPropagation()}
-           />
- </div>
+          <div
+            className={` hidden md:flex items-center rounded-full shadow-lg bg-gray-100 text-black cursor-pointer w-[365px]`}
+          >
+            <CiSearch
+              className={`text-base transition-all duration-700 ease-in-out ml-3`}
+            />
+            <input
+              type="text"
+              placeholder="Search by title and host address"
+              className="w-[100%] pl-2 pr-4 py-2 text-sm bg-transparent outline-none"
+              value={searchQuery}
+              onChange={(e) => handleSearchChange(e.target.value)}
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
 
           <div className=" md:hidden search-container relative">
-          <div className={` md:hidden flex items-center rounded-full shadow-lg bg-gray-100 text-black cursor-pointer ${openSearch? 'w-full': 'w-7 h-7 justify-center'}`} onClick={()=>{setOpenSearch(!openSearch)}} >
-              <CiSearch className={`text-base transition-all duration-700 ease-in-out ${
-          openSearch ? 'ml-3' : ''
-        }`}/>
-            {openSearch && (
-             <input
-             type="text"
-             placeholder="Search..."
-             className="w-full pl-2 pr-4 py-1 sm:py-1.5 text-sm transition-all duration-700 ease-in-out bg-transparent outline-none"
-             value={searchQuery}
-             onChange={(e) => handleSearchChange(e.target.value)}
-             onClick={(e) => e.stopPropagation()}
-           />
-            )}
+            <div
+              className={` md:hidden flex items-center rounded-full shadow-lg bg-gray-100 text-black cursor-pointer ${
+                openSearch ? "w-full" : "w-7 h-7 justify-center"
+              }`}
+              onClick={() => {
+                setOpenSearch(!openSearch);
+              }}
+            >
+              <CiSearch
+                className={`text-base transition-all duration-700 ease-in-out ${
+                  openSearch ? "ml-3" : ""
+                }`}
+              />
+              {openSearch && (
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  className="w-full pl-2 pr-4 py-1 sm:py-1.5 text-sm transition-all duration-700 ease-in-out bg-transparent outline-none"
+                  value={searchQuery}
+                  onChange={(e) => handleSearchChange(e.target.value)}
+                  onClick={(e) => e.stopPropagation()}
+                />
+              )}
             </div>
-            </div>
+          </div>
           <div className="flex items-center gap-2 sm:gap-3 md:gap-4">
             <button
               className={` px-3 md:px-5 py-1 sm:py-1.5 rounded-lg text-sm lg:text-base ${
@@ -205,14 +219,26 @@ function RecordedSessions() {
               className={`flex items-center justify-center size-[26px] sm:size-[29px] md:size-[29px]`}
               onClick={() => handleFilters("optimism")}
             >
-              <Image src={oplogo} alt="optimism" className={`size-full ${activeButton === "optimism" ? "opacity-100" : "opacity-50"}`} />
+              <Image
+                src={oplogo}
+                alt="optimism"
+                className={`size-full ${
+                  activeButton === "optimism" ? "opacity-100" : "opacity-50"
+                }`}
+              />
               {/* <span className="hidden md:inline ml-1.5">Optimism</span> */}
             </button>
             <button
               className={`flex items-center justify-center size-[26px] sm:size-[29px] md:size-[29px]`}
               onClick={() => handleFilters("arbitrum")}
             >
-              <Image src={arbcir} alt="arbitrum" className={`size-full ${activeButton === "arbitrum" ? "opacity-100" : "opacity-50"}`} />
+              <Image
+                src={arbcir}
+                alt="arbitrum"
+                className={`size-full ${
+                  activeButton === "arbitrum" ? "opacity-100" : "opacity-50"
+                }`}
+              />
               {/* <span className="hidden md:inline ml-1.5">Arbitrum</span> */}
             </button>
           </div>

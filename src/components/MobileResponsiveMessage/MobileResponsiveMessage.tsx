@@ -1,16 +1,18 @@
 import React from "react";
 import SidebarMainMobile from "../MainSidebar/SidebarMainMobile";
 import Image from "next/image";
-import cclogo from "@/assets/images/daos/CCLogo.png"
+import cclogo from "@/assets/images/daos/CCLogo.png";
 
 function MobileResponsiveMessage() {
   return (
-    <div className="md:hidden min-h-screen bg-gray-100 flex flex-col">    
-    <div className="absolute top-0 left-0 pt-4 sm:pt-6 px-4 flex items-center">
-      <SidebarMainMobile />
-        <div className="ml-5 text-blue-shade-200 font-semibold text-[32px] font-poppins">Chora Club</div>
-    </div>
-    <div className="flex-1 flex items-center justify-center px-4 font-poppins">
+    <div className="md:hidden min-h-screen bg-gray-100 flex flex-col">
+      <div className="absolute top-0 left-0 pt-4 sm:pt-6 px-4 flex items-center">
+        <SidebarMainMobile />
+        <div className="ml-5 text-blue-shade-200 font-semibold text-[32px] font-poppins">
+          Chora Club
+        </div>
+      </div>
+      <div className="flex-1 flex items-center justify-center px-4 font-poppins">
         <div className="bg-white rounded-lg shadow-md p-6 text-center max-w-sm w-full">
           <div className="mb-6">
             <svg
@@ -30,14 +32,14 @@ function MobileResponsiveMessage() {
           </div>
           <h2 className="text-2xl font-bold mb-4 text-gray-800">Oops!</h2>
           <p className="text-gray-600 mb-4">
-            The mobile version of this site isn't ready yet.
+            The mobile version of this site isn&apos;t ready yet.
           </p>
           <p className="text-gray-600 font-semibold">
             Please use your desktop computer.
           </p>
         </div>
       </div>
-      </div>
+    </div>
   );
 }
 
