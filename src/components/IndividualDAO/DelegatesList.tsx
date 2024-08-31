@@ -97,9 +97,10 @@ function DelegatesList({ props }: { props: string }) {
     try {
       setDataLoading(true);
       const res = await fetch(
-        props === "arbitrum"
-          ? `/api/get-arbitrum-delegatelist?lastCursor=${lastCursor || ""}`
-          : `/api/get-delegate?skip=${skip}`
+        // props === "arbitrum"
+        //   ? `/api/get-arbitrum-delegatelist?lastCursor=${lastCursor || ""}`
+        //   : 
+        `/api/get-delegate?skip=${skip}&dao=${props}`
       );
 
       if (!res.ok) {
@@ -108,38 +109,36 @@ function DelegatesList({ props }: { props: string }) {
 
       const daoInfo = await res.json();
       let formattedDelegates;
-      if (props === "arbitrum") {
-        formattedDelegates = daoInfo.delegates.nodes.map((delegate: any) => {
+      // if (props === "arbitrum") {
+      //   formattedDelegates = daoInfo.delegates.nodes.map((delegate: any) => {
+      //     return {
+      //       delegate: delegate.account.address,
+      //       adjustedBalance: delegate.votesCount / 10 ** 18,
+      //       ensName: delegate.account.ens,
+      //       profilePicture: delegate.account.picture,
+      //     };
+      //   });
+      // } else {
+      setSkip(daoInfo.nextSkip);
+      setHasMore(daoInfo.hasMore);
+      formattedDelegates = await Promise.all(
+        daoInfo.delegates.map(async (delegate: any) => {
+          // const ensName = await fetchEnsNames(delegate._id);
+          // console.log(ensName); 
+          const avatar = await fetchEnsAvatar(delegate.delegate);
           return {
-            delegate: delegate.account.address,
-            adjustedBalance: delegate.votesCount / 10 ** 18,
-            ensName: delegate.account.ens,
-            profilePicture: delegate.account.picture,
+            delegate: delegate.delegate,
+            adjustedBalance: (delegate.latestBalance / 10 ** 18),
+            newBalance: delegate.latestBalance,
+            profilePicture: avatar?.avatar,
+            ensName: avatar?.ensName,
           };
-        });
-      } else {
-
-        setSkip(daoInfo.nextSkip);
-        setHasMore(daoInfo.hasMore);
-        formattedDelegates = await Promise.all(
-          daoInfo.delegates.map(async (delegate: any) => {
-            // const ensName = await getEnsNameOfUser(delegate._id);
-
-            const avatar = await fetchEnsAvatar(delegate.delegate);
-
-            return {
-              delegate: delegate.delegate,
-              adjustedBalance: delegate.latestBalance / 10 ** 18,
-              newBalance: delegate.latestBalance,
-              profilePicture: avatar?.avatar,
-              ensName: avatar?.ensName,
-            };
-          })
-        );
-      }
+        })
+      );
+      // }
 
       setDelegateData((prevData: any) => ({
-        delegates: [...prevData.delegates, ...formattedDelegates],
+        delegates: [...prevData?.delegates, ...formattedDelegates],
       }));
       setTempData((prevData: any) => ({
         delegates: [...prevData.delegates, ...formattedDelegates],
@@ -188,35 +187,34 @@ function DelegatesList({ props }: { props: string }) {
     };
   };
   const handleSearchChange = async (query: string) => {
-    setSearchQuery(query);
     setPageLoading(true);
-
     if (query.length > 0) {
       setIsSearching(true);
       window.removeEventListener("scroll", handleScroll);
 
       try {
         const res = await fetch(
-          `https://api.karmahq.xyz/api/dao/search-delegate?user=${query}&pageSize=10&offset=0&period=lifetime&order=desc&dao=${props}`
+          `/api/search-delegate?address=${query}&dao=${props}`
         );
-        const filtered = await res.json().then((delegates) => delegates.data);
-        if (filtered.delegates && filtered.delegates.length > 0) {
-          const formattedDelegates = filtered.delegates.map(
-            (delegate: any) => ({
-              delegate: delegate.publicAddress,
-              adjustedBalance: delegate.delegatedVotes,
-              profilePicture: delegate.profilePicture,
-              ensName: delegate.ensName,
-            })
-          );
-          setDelegateData({ delegates: formattedDelegates });
-          // setPageLoading(false);
+        const filtered = await res.json();
+        const data = await fetchEnsAvatar(filtered[0].id);
+        if (filtered) {
+          const formattedDelegates =
+            {
+              delegate: filtered[0].id,
+              adjustedBalance: (filtered[0].latestBalance/10**18),
+              profilePicture: data?.avatar,
+              ensName: data?.ensName,
+            }
+          setDelegateData({ delegates: [formattedDelegates] });
+          setPageLoading(false);
         } else {
           // No results found
           setDelegateData({ delegates: [] });
         }
       } catch (error) {
-        console.error("Error fetching search results:", error);
+        // console.error("Error fetching search results:", error);
+        console.log("No results found");
         setDelegateData({ delegates: [] });
         setPageLoading(false);
       }
@@ -282,7 +280,6 @@ function DelegatesList({ props }: { props: string }) {
     if (
       selectedValue === "Random" ||
       selectedValue === "Most delegators" ||
-      selectedValue === "Karma score" ||
       selectedValue === "Most active"
     ) {
       toast("Coming Soon 🚀");
@@ -427,24 +424,6 @@ function DelegatesList({ props }: { props: string }) {
 
   return (
     <div>
-      {isShowing && (
-        <div
-          className="bg-yellow-200 border border-gray-300 rounded-md shadow-md text-gray-700 flex items-center p-3 w-70 mb-4"
-          style={{ width: "80%" }}
-        >
-          <span>
-            We apologize for the inconvenience; we&apos;re currently working on
-            sourcing accurate data and it will be available soon.
-          </span>{" "}
-          &nbsp;
-          <button
-            className="flex ml-auto items-center justify-center p-1 text-gray-500 hover:text-red-500 bg-white border border-gray-300 rounded-md"
-            onClick={handleClose}
-          >
-            Close
-          </button>
-        </div>
-      )}
       <div className="flex items-center justify-between pe-10">
         <div
           style={{ background: "rgba(238, 237, 237, 0.36)" }}
@@ -456,7 +435,12 @@ function DelegatesList({ props }: { props: string }) {
             style={{ background: "rgba(238, 237, 237, 0.36)" }}
             className="pl-5 pr-3 rounded-full outline-none w-full"
             value={searchQuery}
-            onChange={(e) => handleSearchChange(e.target.value)}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleSearchChange(searchQuery);  // Call the function when Enter is pressed
+              }
+            }}
           ></input>
           <span className="flex items-center bg-black rounded-full px-5 py-2">
             <Image src={search} alt="search" width={20} />
@@ -471,7 +455,6 @@ function DelegatesList({ props }: { props: string }) {
             <option>Most voting power</option>
             <option>Random</option>
             <option>Most delegators</option>
-            <option>Karma score</option>
             <option>Most active</option>
           </select>
         </div>
