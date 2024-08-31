@@ -64,26 +64,6 @@ function RecordedSessionsTile({
     copy(addr);
     toast("Address Copied");
   };
-  // function formatViews(views: any) {
-  //   // For millions (e.g., 1.25M)
-  //   if (views >= 1000000) {
-  //     const millionViews = views / 1000000;
-  //     return (
-  //       millionViews.toFixed(millionViews >= 10 ? 0 : 1).replace(/\.0$/, "") +
-  //       "M"
-  //     );
-  //   }
-  //   // For thousands (e.g., 1.2k, 12k)
-  //   if (views >= 1000) {
-  //     const thousandViews = views / 1000;
-  //     return (
-  //       thousandViews.toFixed(thousandViews >= 10 ? 0 : 1).replace(/\.0$/, "") +
-  //       "k"
-  //     );
-  //   }
-  //   // For less than 1000 views, return as is
-  //   return views.toString();
-  // }
   function formatViews(views: number): string {
     // Handle negative numbers or NaN
     if (isNaN(views) || views < 0) {
