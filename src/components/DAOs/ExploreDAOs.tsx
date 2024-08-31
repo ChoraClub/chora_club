@@ -13,6 +13,8 @@ import ExploreDaosSkeletonLoader from "../SkeletonLoader/ExploreDaosSkeletonLoad
 import { CiSearch } from "react-icons/ci";
 import SidebarMainMobile from "../MainSidebar/SidebarMainMobile";
 import RewardButton from "../ClaimReward/RewardButton";
+import { useSearchParams } from "next/navigation";
+import { useConnectModal } from "@rainbow-me/rainbowkit";
 
 function ExploreDAOs() {
   const dao_info = Object.keys(dao_details).map((key) => {
@@ -32,6 +34,8 @@ function ExploreDAOs() {
   const [isPageLoading, setIsPageLoading] = useState(true);
   const [isHovered, setIsHovered] = useState(false);
   const [openSearch, setOpenSearch] = useState(false);
+  const searchParams = useSearchParams();
+  const { openConnectModal } = useConnectModal();
 
   useEffect(() => {
     const storedStatus = sessionStorage.getItem("notificationStatus");
@@ -68,12 +72,10 @@ function ExploreDAOs() {
         setOpenSearch(false);
       }
     };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [openSearch]);
+    if (searchParams.get("referrer") && openConnectModal) {
+      openConnectModal();
+    }
+  }, [searchParams]);
 
   return (
     <div className="pt-4 sm:pt-6 px-4 md:px-6 lg:px-14 min-h-screen">
