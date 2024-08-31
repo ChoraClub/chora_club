@@ -32,12 +32,7 @@ import {
 } from "@nextui-org/react";
 import { IoCopy } from "react-icons/io5";
 import { useAccount } from "wagmi";
-interface RoomDetails {
-  message: string;
-  data: {
-    roomId: string;
-  };
-}
+import { SessionInterface } from "@/types/MeetingTypes";
 
 type Attendee = {
   attendee_address: string;
@@ -46,21 +41,7 @@ type Attendee = {
 
 interface TileProps {
   tileIndex: number;
-  data: {
-    _id: string;
-    thumbnail_image: string;
-    title: string;
-    meetingId: string;
-    dao_name: string;
-    booking_status: string;
-    meeting_status: string;
-    joined_status: boolean;
-    attendees: Attendee[];
-    host_address: string;
-    slot_time: string;
-    description: string;
-    session_type: string;
-  };
+  data: SessionInterface;
   isEvent: string;
 }
 
@@ -160,24 +141,24 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
     return date.toLocaleString();
   };
 
-  const confirmSlot = async (id: any, status: any) => {
-    // console.log("confirm_Slot clicked");
-    // console.log("id:", id);
-    // console.log("status:", status);
+  const confirmSlot = async (data: SessionInterface, status: any) => {
+    console.log("data:::", data);
+    const id = data._id;
+    const host_address = data.host_address;
+    const attendee_address = data.attendees[0].attendee_address;
     setStartLoading(true);
     try {
       setIsConfirmSlotLoading(true);
       let roomId = null;
       let meeting_status = null;
-      // if (status === "Approved") {
-      //   roomId = await createRandomRoom();
-      //   meeting_status = "Upcoming";
-      // }
+      let host_joined_status;
+      let attendee_joined_status;
       if (status === "Rejected") {
         meeting_status = "Denied";
+        host_joined_status = "Not Joined";
+        attendee_joined_status = "Not Joined";
       }
 
-      // console.log(meeting_status);
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
       if (address) {
@@ -193,6 +174,10 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
         title: data.title,
         slot_time: data.slot_time,
         dao_name: data.dao_name,
+        attendee_joined_status: attendee_joined_status,
+        host_joined_status: host_joined_status,
+        host_address,
+        attendee_address,
       });
 
       const requestOptions = await {
@@ -211,6 +196,7 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
         setTimeout(() => {
           setIsPageLoading(false);
           setIsConfirmSlotLoading(false);
+          // onClose;
         }, 4000);
         console.log("status updated");
       }
@@ -234,7 +220,7 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
       router.push(`/meeting/session/${data.meetingId}/lobby`);
     } else {
       toast.error(
-        "The meeting can only be started 5 minutes before the slot time."
+        "The meeting can only be started 5 minutes before the meeting time."
       );
     }
   };
@@ -415,11 +401,11 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
                         size={32}
                         color="#004DFF"
                         onClick={() => {
-                          // setStartLoading(true);
-                          // router.push(
-                          //   `/meeting/session/${data.meetingId}/lobby`
-                          // );
-                          handleJoinClick();
+                          setStartLoading(true);
+                          router.push(
+                            `/meeting/session/${data.meetingId}/lobby`
+                          );
+                          // handleJoinClick();
                         }}
                       />
                     </span>
@@ -470,7 +456,7 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
                           </button>
                           <button
                             className="bg-red-500 text-white px-8 py-3 font-semibold rounded-full"
-                            onClick={() => confirmSlot(data._id, "Rejected")}
+                            onClick={() => confirmSlot(data, "Rejected")}
                           >
                             {startLoading ? (
                               <Oval
@@ -513,7 +499,7 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
                   >
                     <span className="cursor-pointer">
                       <FaCircleCheck
-                        onClick={() => confirmSlot(data._id, "Approved")}
+                        onClick={() => confirmSlot(data, "Approved")}
                         size={28}
                         color="#4d7c0f"
                       />
@@ -526,9 +512,9 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
             data.booking_status === "Approved" && (
               <div
                 onClick={() => {
-                  // setStartLoading(true);
-                  // router.push(`/meeting/session/${data.meetingId}/lobby`);
-                  handleJoinClick();
+                  setStartLoading(true);
+                  router.push(`/meeting/session/${data.meetingId}/lobby`);
+                  // handleJoinClick();
                 }}
                 className="text-center rounded-full font-bold text-white mt-2 text-xs cursor-pointer"
               >

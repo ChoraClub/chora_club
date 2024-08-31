@@ -79,7 +79,11 @@ export async function POST(req: NextRequest, res: NextResponse) {
       } else {
         // Meeting status is unrecognized
         return NextResponse.json(
-          { success: false, message: "Meeting status is invalid" },
+          {
+            success: false,
+            message: "Meeting status is invalid",
+            data: meeting,
+          },
           { status: 400 }
         );
       }

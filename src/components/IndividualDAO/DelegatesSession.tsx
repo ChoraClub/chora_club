@@ -23,20 +23,7 @@ import ErrorDisplay from "../ComponentUtils/ErrorDisplay";
 import { useAccount } from "wagmi";
 import { RiErrorWarningLine } from "react-icons/ri";
 import { TimeoutError } from "viem";
-
-interface Session {
-  booking_status: string;
-  dao_name: string;
-  description: string;
-  host_address: string;
-  joined_status: string;
-  meetingId: string;
-  meeting_status: "Upcoming" | "Recorded" | "Denied";
-  slot_time: string;
-  title: string;
-  user_address: string;
-  _id: string;
-}
+import { SessionInterface } from "@/types/MeetingTypes";
 
 function DelegatesSession({ props }: { props: string }) {
   const [searchQuery, setSearchQuery] = useState("");
@@ -76,7 +63,7 @@ function DelegatesSession({ props }: { props: string }) {
       const resultData = await result.data;
       console.log("resultData", resultData);
       if (Array.isArray(resultData)) {
-        const filtered: any = resultData.filter((session: Session) => {
+        const filtered: any = resultData.filter((session: SessionInterface) => {
           if (searchParams.get("session") === "upcoming") {
             return session.meeting_status === "Upcoming";
           } else if (searchParams.get("session") === "recorded") {
@@ -150,14 +137,16 @@ function DelegatesSession({ props }: { props: string }) {
         const resultData = await result.data;
 
         if (result.success) {
-          const filtered: any = resultData.filter((session: Session) => {
-            if (searchParams.get("session") === "upcoming") {
-              return session.meeting_status === "Upcoming";
-            } else if (searchParams.get("session") === "recorded") {
-              return session.meeting_status === "Recorded";
+          const filtered: any = resultData.filter(
+            (session: SessionInterface) => {
+              if (searchParams.get("session") === "upcoming") {
+                return session.meeting_status === "Upcoming";
+              } else if (searchParams.get("session") === "recorded") {
+                return session.meeting_status === "Recorded";
+              }
+              return false;
             }
-            return false;
-          });
+          );
           console.log("filtered: ", filtered);
           setSessionDetails(filtered);
           setError(null);

@@ -11,72 +11,28 @@ import {
   getDisplayNameOrAddr,
 } from "@/utils/NotificationUtils";
 import { imageCIDs } from "@/config/staticDataUtils";
-
-type Attendee = {
-  attendee_address: string;
-  attendee_uid?: string; // Making attendee_uid optional
-};
-
-// Define the request body type
-interface MeetingRequestBody {
-  host_address: string;
-  attendees: Attendee[];
-  slot_time: string;
-  meetingId: string;
-  meeting_status: string;
-  joined_status: boolean;
-  booking_status: string;
-  dao_name: string;
-  title: string;
-  description: string;
-  thumbnail_image: string;
-  session_type: string;
-}
-
-// Define the response body type
-interface MeetingResponseBody {
-  success: boolean;
-  data?: {
-    id: string;
-    host_address: string;
-    attendees: Attendee[];
-    slot_time: string;
-    meetingId: string;
-    meeting_status: string;
-    joined_status: boolean;
-    booking_status: string;
-    dao_name: string;
-    title: string;
-    description: string;
-    thumbnail_image: string;
-    session_type: string;
-  } | null;
-  error?: string;
-}
+import { SessionInterface } from "@/types/MeetingTypes";
 
 function getRandomElementFromArray(arr: any[]) {
   const randomIndex = Math.floor(Math.random() * arr.length);
   return arr[randomIndex];
 }
 
-export async function POST(
-  req: NextRequest,
-  res: NextApiResponse<MeetingResponseBody>
-) {
+export async function POST(req: NextRequest) {
   const {
     host_address,
     attendees,
     slot_time,
     meetingId,
     meeting_status,
-    joined_status,
+    host_joined_status,
     booking_status,
     dao_name,
     title,
     description,
     thumbnail_image,
     session_type,
-  }: MeetingRequestBody = await req.json();
+  }: SessionInterface = await req.json();
 
   try {
     const client = await connectDB();
@@ -92,12 +48,12 @@ export async function POST(
       slot_time,
       meetingId,
       meeting_status,
-      joined_status,
+      host_joined_status,
       booking_status,
       dao_name,
       title,
       description,
-      thumbnail_image : randomImage,
+      thumbnail_image: randomImage,
       session_type,
     });
 
@@ -111,36 +67,13 @@ export async function POST(
         .find({ address: host_address })
         .toArray();
 
-      // const slotDate = new Date(slot_time);
-      // const options: any = {
-      //   weekday: "long",
-      //   year: "numeric",
-      //   month: "long",
-      //   day: "numeric",
-      //   hour: "numeric",
-      //   minute: "numeric",
-      //   hour12: true,
-      // };
-      // const localSlotTime = slotDate.toLocaleString("en-US", options);
-
-      // const localSlotTime = await formatSlotDateAndTime(slot_time);
       const localSlotTime = await formatSlotDateAndTime({
         dateInput: slot_time,
       });
 
       if (session_type === "session") {
         const guestAddress = attendees[0].attendee_address;
-        // const ensNameOrUserAddress = await getEnsName(guestAddress);
-        // let userENSNameOrAddress = ensNameOrUserAddress?.ensNameOrAddress;
-        // if (userENSNameOrAddress === undefined) {
-        //   userENSNameOrAddress = truncateAddress(guestAddress);
-        // }
         const userENSNameOrAddress = await getDisplayNameOrAddr(guestAddress);
-        // const ensNameOrHostAddress = await getEnsName(host_address);
-        // let hostENSNameOrAddress = ensNameOrHostAddress?.ensNameOrAddress;
-        // if (hostENSNameOrAddress === undefined) {
-        //   hostENSNameOrAddress = truncateAddress(userAddress);
-        // }
         const hostENSNameOrAddress = await getDisplayNameOrAddr(host_address);
         const notificationToHost = {
           receiver_address: host_address,

@@ -17,7 +17,7 @@ import styles from "@/components/IndividualDelegate/DelegateVotes.module.css";
 import { FaArrowUp } from "react-icons/fa6";
 import { useConnectModal, useChainModal } from "@rainbow-me/rainbowkit";
 import dao_abi from "../../artifacts/Dao.sol/GovernanceToken.json";
-import { useAccount, useNetwork } from "wagmi";
+import { useAccount } from "wagmi";
 import WalletAndPublicClient from "@/helpers/signer";
 import ErrorDisplay from "../ComponentUtils/ErrorDisplay";
 import {
@@ -33,7 +33,8 @@ import {
   DELEGATE_CHANGED_QUERY,
   op_client,
 } from "@/config/staticDataUtils";
-
+import { getChainAddress } from "@/utils/chainUtils";
+import { arbitrum, optimism } from "viem/chains";
 const cache: any = {
   optimism: null,
   arbitrum: null,
@@ -42,7 +43,8 @@ let pageCache: any = null;
 function DelegatesList({ props }: { props: string }) {
   const [delegateData, setDelegateData] = useState<any>({ delegates: [] });
   const { openChainModal } = useChainModal();
-  const { publicClient, walletClient } = WalletAndPublicClient();
+  const network = useAccount().chain;
+  const { publicClient, walletClient } = WalletAndPublicClient(network);
   const { openConnectModal } = useConnectModal();
   const { isConnected } = useAccount();
   const [tempData, setTempData] = useState<any>({ delegates: [] });
@@ -62,7 +64,7 @@ function DelegatesList({ props }: { props: string }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [same, setSame] = useState(false);
-  const { chain, chains } = useNetwork();
+  const { chain } = useAccount();
   const [delegateInfo, setDelegateInfo] = useState<any>();
   const [selectedDelegate, setSelectedDelegate] = useState<any>(null);
   const [skip, setSkip] = useState(0);
@@ -116,15 +118,15 @@ function DelegatesList({ props }: { props: string }) {
           };
         });
       } else {
-        console.log(daoInfo);
+
         setSkip(daoInfo.nextSkip);
         setHasMore(daoInfo.hasMore);
         formattedDelegates = await Promise.all(
           daoInfo.delegates.map(async (delegate: any) => {
             // const ensName = await getEnsNameOfUser(delegate._id);
-            console.log("delegate", delegate.delegate);
+
             const avatar = await fetchEnsAvatar(delegate.delegate);
-            console.log("avatar", avatar);
+
             return {
               delegate: delegate.delegate,
               adjustedBalance: delegate.latestBalance / 10 ** 18,
@@ -265,46 +267,6 @@ function DelegatesList({ props }: { props: string }) {
     toast("Address Copied");
   };
 
-  const WalletOpen = async (to: string) => {
-    const adr = await walletClient.getAddresses();
-
-    const address1 = adr[0];
-
-    let parts = path.split("/");
-    let firstStringAfterSlash = parts[1];
-
-    let chainAddress;
-
-    if (delegateData.delegates[0].daoName === "optimism") {
-      chainAddress = "0x4200000000000000000000000000000000000042";
-    } else if (delegateData.delegates[0].daoName === "arbitrum") {
-      chainAddress = "0x912CE59144191C1204E64559FE8253a0e49E6548";
-    } else {
-      return;
-    }
-
-    if (isConnected) {
-      if (walletClient.chain?.network === firstStringAfterSlash) {
-        const delegateTx = await walletClient.writeContract({
-          address: chainAddress,
-          abi: dao_abi.abi,
-          functionName: "delegate",
-          args: [to],
-          account: address1,
-        });
-      } else {
-        toast.error("Please switch to appropriate network to delegate!");
-        if (openChainModal) {
-          openChainModal();
-        }
-      }
-    } else {
-      if (openConnectModal) {
-        openConnectModal();
-      }
-    }
-  };
-
   const formatNumber = (number: number) => {
     if (number >= 1000000) {
       return (number / 1000000).toFixed(2) + "m";
@@ -421,23 +383,16 @@ function DelegatesList({ props }: { props: string }) {
       return;
     }
 
-    let chainAddress;
-    if (chain?.name === "Optimism") {
-      chainAddress = "0x4200000000000000000000000000000000000042";
-    } else if (chain?.name === "Arbitrum One") {
-      chainAddress = "0x912CE59144191C1204E64559FE8253a0e49E6548";
-    } else {
-      return;
-    }
-
+    const chainAddress = getChainAddress(chain?.name);
     if (walletClient?.chain === "") {
       toast.error("Please connect your wallet!");
     } else {
-      if (walletClient?.chain?.network === props) {
+      if (walletClient?.chain === props) {
         try {
           setDelegatingToAddr(true);
           const delegateTx = await walletClient.writeContract({
             address: chainAddress,
+            chain: props === 'arbitrum' ? arbitrum : optimism,
             abi: dao_abi.abi,
             functionName: "delegate",
             args: [to],
@@ -455,7 +410,6 @@ function DelegatesList({ props }: { props: string }) {
         }
       } else {
         toast.error("Please switch to appropriate network to delegate!");
-
         if (openChainModal) {
           openChainModal();
         }
@@ -551,8 +505,8 @@ function DelegatesList({ props }: { props: string }) {
                               ? props == "optimism"
                                 ? OPLogo
                                 : props == "arbitrum"
-                                ? ARBLogo
-                                : ""
+                                  ? ARBLogo
+                                  : ""
                               : delegate.profilePicture
                           }
                           alt="Image not found"
@@ -587,11 +541,11 @@ function DelegatesList({ props }: { props: string }) {
                             ) : (
                               <span>
                                 {delegate.ensName ===
-                                "[693c70956042e4295f0c73589e9ac0850b5b7d276a02639b83331ec323549b88].sismo.eth"
+                                  "[693c70956042e4295f0c73589e9ac0850b5b7d276a02639b83331ec323549b88].sismo.eth"
                                   ? "lindajxie.eth"
                                   : delegate.ensName.length > 15
-                                  ? delegate.ensName.slice(0, 15) + "..."
-                                  : delegate.ensName}
+                                    ? delegate.ensName.slice(0, 15) + "..."
+                                    : delegate.ensName}
                               </span>
                             )}
                           </div>
@@ -650,22 +604,22 @@ function DelegatesList({ props }: { props: string }) {
                       delegateName={
                         !selectedDelegate?.ensName
                           ? selectedDelegate.delegate?.slice(0, 6) +
-                            "..." +
-                            selectedDelegate.delegate?.slice(-4)
+                          "..." +
+                          selectedDelegate.delegate?.slice(-4)
                           : selectedDelegate.ensName ===
                             "[693c70956042e4295f0c73589e9ac0850b5b7d276a02639b83331ec323549b88].sismo.eth"
-                          ? "lindajxie.eth"
-                          : selectedDelegate.ensName?.length > 15
-                          ? selectedDelegate.ensName?.slice(0, 15) + "..."
-                          : selectedDelegate.ensName
+                            ? "lindajxie.eth"
+                            : selectedDelegate.ensName?.length > 15
+                              ? selectedDelegate.ensName?.slice(0, 15) + "..."
+                              : selectedDelegate.ensName
                       }
                       displayImage={
                         selectedDelegate?.profilePicture == null
                           ? props == "optimism"
                             ? OPLogo
                             : props == "arbitrum"
-                            ? ARBLogo
-                            : ""
+                              ? ARBLogo
+                              : ""
                           : selectedDelegate.profilePicture
                       }
                       daoName={props}

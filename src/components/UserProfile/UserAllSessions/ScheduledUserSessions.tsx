@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, ReactEventHandler } from "react";
 import { DateTime } from "luxon";
-import { useAccount, useNetwork } from "wagmi";
+import { useAccount } from "wagmi";
 import toast, { Toaster } from "react-hot-toast";
 import { Oval } from "react-loader-spinner";
 import { FaChevronDown, FaCircleInfo, FaPlus } from "react-icons/fa6";
@@ -38,7 +38,7 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
   const [endHour, setEndHour] = useState("");
   const [endMinute, setEndMinute] = useState("");
   const [allowedDates, setAllowedDates] = useState<any>([]);
-  const { chain, chains } = useNetwork();
+  const { chain } = useAccount();
   const [utcStartTime, setUtcStartTime] = useState("");
   const [utcEndTime, setUtcEndTime] = useState("");
   const [allData, setAllData] = useState<any>([]);

@@ -13,7 +13,7 @@ import { fetchEnsAvatar } from "@/utils/ENSUtils";
 import style from "./FollowingModal.module.css";
 import oplogo from "@/assets/images/daos/op.png";
 import arbcir from "@/assets/images/daos/arbCir.png";
-import { useNetwork } from "wagmi";
+import { useAccount } from "wagmi";
 import { useRouter } from "next-nprogress-bar";
 
 interface FollowingModal {
@@ -47,7 +47,7 @@ function FollowingModal({
   const [ensNames, setEnsNames] = useState<any>({});
   const [ensAvatars, setEnsAvatars] = useState<any>({});
   const [chainName, setChainName] = useState("");
-  const { chain, chains } = useNetwork();
+  const { chain } = useAccount();
   const [activeButton, setActiveButton] = useState("");
   const router = useRouter();
 

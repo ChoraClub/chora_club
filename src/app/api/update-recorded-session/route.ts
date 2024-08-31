@@ -4,7 +4,6 @@ import { connectDB } from "@/config/connectDB";
 export async function PUT(req: NextRequest, res: NextResponse) {
   const { meetingId, host_address, title, description, thumbnail_image } =
     await req.json();
-  // const meetingId = req.url.split("update-meeting-status/")[1];
   console.log(
     "data of put api: ",
     meetingId,
@@ -32,7 +31,7 @@ export async function PUT(req: NextRequest, res: NextResponse) {
     );
 
     client.close();
-
+    console.log("Sessions Updated successfully!!!");
     return NextResponse.json(sessions, { status: 200 });
   } catch (error) {
     console.error("Error fetching sessions:", error);

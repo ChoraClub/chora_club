@@ -10,21 +10,6 @@ import { ethers } from "ethers";
 import { stringToBytes, bytesToHex } from "viem";
 import { BASE_URL } from "@/config/constants";
 
-interface MeetingRequestBody {
-  host_address: string;
-  user_address: string;
-  slot_time: string;
-  meetingId: string;
-  meeting_status: boolean;
-  joined_status: boolean;
-  booking_status: boolean;
-  dao_name: string;
-  title: string;
-  description: string;
-  uid_host: string;
-  uid_user: string;
-}
-
 interface AttestOnchainRequestBody {
   recipient: string;
   meetingId: string;

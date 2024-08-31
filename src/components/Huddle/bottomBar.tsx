@@ -20,7 +20,7 @@ import Dropdown from "../ui/Dropdown";
 import Strip from "./sidebars/participantsSidebar/Peers/PeerRole/Strip";
 import { useEffect, useState } from "react";
 import { useParams, usePathname } from "next/navigation";
-import { useAccount, useNetwork } from "wagmi";
+import { useAccount } from "wagmi";
 import { PiLinkSimpleBold } from "react-icons/pi";
 import { opBlock, arbBlock } from "@/config/staticDataUtils";
 import MeetingRecordingModal from "../ComponentUtils/MeetingRecordingModal";
@@ -30,15 +30,18 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import { SessionInterface } from "@/types/MeetingTypes";
 
 const BottomBar = ({
   daoName,
   hostAddress,
   meetingStatus,
+  meetingData,
 }: {
   daoName: string;
   hostAddress: string;
   meetingStatus: boolean | undefined;
+  meetingData?: SessionInterface;
 }) => {
   const { isAudioOn, enableAudio, disableAudio } = useLocalAudio();
   const { isVideoOn, enableVideo, disableVideo } = useLocalVideo();
@@ -49,7 +52,7 @@ const BottomBar = ({
   const meetingCategory = usePathname().split("/")[2];
   const roomId = params.roomId as string | undefined;
   const [s3URL, setS3URL] = useState<string>("");
-  const { chain } = useNetwork();
+  const { chain } = useAccount();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { address } = useAccount();
   const {
@@ -364,6 +367,7 @@ const BottomBar = ({
             body: JSON.stringify({
               roomId: roomId,
               connectedAddress: address,
+              meetingData: meetingData,
             }),
           });
           const response_data = await response.json();

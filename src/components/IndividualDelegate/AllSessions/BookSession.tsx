@@ -298,11 +298,14 @@ function BookSession({ props }: { props: Type }) {
       title: modalData.title,
       description: modalData.description,
       host_address: host_address,
-      attendees: [{ attendee_address: address }],
+      attendees: [
+        { attendee_address: address, attendee_joined_status: "Pending" },
+      ],
       meeting_status: "Upcoming",
       booking_status: "Approved",
       session_type: "session",
       meetingId: roomId,
+      host_joined_status: "Pending",
     };
 
     const myHeaders = new Headers();

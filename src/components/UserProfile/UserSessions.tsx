@@ -4,7 +4,7 @@ import BookedUserSessions from "./UserAllSessions/BookedUserSessions";
 import AttendingUserSessions from "./UserAllSessions/AttendingUserSessions";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useRouter } from "next-nprogress-bar";
-import { useNetwork, useAccount } from "wagmi";
+import { useAccount } from "wagmi";
 import RecordedSessionsTile from "../ComponentUtils/RecordedSessionsTile";
 import RecordedSessionsSkeletonLoader from "../SkeletonLoader/RecordedSessionsSkeletonLoader";
 import ErrorDisplay from "../ComponentUtils/ErrorDisplay";
@@ -13,25 +13,6 @@ interface UserSessionsProps {
   isDelegate: boolean | undefined;
   selfDelegate: boolean;
   daoName: string;
-}
-
-type Attendee = {
-  attendee_address: string;
-  attendee_uid?: string;
-};
-
-interface Session {
-  booking_status: string;
-  dao_name: string;
-  description: string;
-  host_address: string;
-  joined_status: string;
-  meetingId: string;
-  meeting_status: "Upcoming" | "Recorded" | "Denied";
-  slot_time: string;
-  title: string;
-  attendees: Attendee[];
-  _id: string;
 }
 
 function UserSessions({
@@ -43,7 +24,7 @@ function UserSessions({
   const router = useRouter();
   const path = usePathname();
   const searchParams = useSearchParams();
-  const { chain, chains } = useNetwork();
+  const { chain } = useAccount();
   const [sessionDetails, setSessionDetails] = useState([]);
   const [dataLoading, setDataLoading] = useState(true);
   const [attendedDetails, setAttendedDetails] = useState([]);

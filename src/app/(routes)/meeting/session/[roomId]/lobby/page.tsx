@@ -24,7 +24,7 @@ import {
   usePeerIds,
   useRoom,
 } from "@huddle01/react/hooks";
-import { useAccount, useNetwork } from "wagmi";
+import { useAccount } from "wagmi";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { Role } from "@huddle01/server-sdk/auth";
 import { Oval, TailSpin } from "react-loader-spinner";
@@ -57,7 +57,6 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   const { push } = useRouter();
-  const { chain, chains } = useNetwork();
   const [profileDetails, setProfileDetails] = useState<any>();
 
   // Huddle Hooks
@@ -65,8 +64,13 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
   const [isAllowToEnter, setIsAllowToEnter] = useState<boolean>();
   const [notAllowedMessage, setNotAllowedMessage] = useState<string>();
   const [hostAddress, setHostAddress] = useState();
-  const [daoName, setDaoName] = useState();
   const [meetingStatus, setMeetingStatus] = useState<any>();
+  const [daoName, setDaoName] = useState();
+  const [sessionType, setSessionType] = useState();
+  const [attendeeAddress, setAttendeeAddress] = useState<any>();
+  const [hostJoinedStatus, setHostJoinedStatus] = useState<any>();
+  const [attendeeJoinedStatus, setAttendeeJoinedStatus] = useState<any>();
+  const [meetingData, setMeetingData] = useState<any>();
 
   useEffect(() => {
     console.log("meetingStatus", meetingStatus);
@@ -165,7 +169,11 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
       }
 
       console.log("Role.HOST", Role.HOST);
-      if (Role.HOST) {
+      const updateMeetingStatus = async (
+        params: any,
+        additionalData: any,
+        address: string | undefined
+      ) => {
         console.log("inside put api");
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
@@ -176,13 +184,15 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
         const raw = JSON.stringify({
           meetingId: params.roomId,
           meetingType: "session",
+          additionalData: additionalData,
         });
-        const requestOptions: any = {
+        const requestOptions: RequestInit = {
           method: "PUT",
           headers: myHeaders,
           body: raw,
           redirect: "follow",
         };
+
         const response = await fetch(
           `/api/update-meeting-status/${params.roomId}`,
           requestOptions
@@ -190,6 +200,33 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
         const responseData = await response.json();
         console.log("responseData: ", responseData);
         // setMeetingStatus("Ongoing");
+      };
+
+      if (Role.HOST) {
+        const commonData = {
+          callerAddress: address,
+          daoName: daoName,
+          sessionType: sessionType,
+          hostAddress: hostAddress,
+          attendeeAddress: attendeeAddress,
+          hostJoinedStatus: hostJoinedStatus,
+          attendeeJoinedStatus: attendeeJoinedStatus,
+          meetingData: meetingData,
+        };
+
+        if (sessionType === "instant-meet") {
+          await updateMeetingStatus(params, commonData, address);
+        } else if (sessionType === "session") {
+          if (address === attendeeAddress) {
+            if (attendeeJoinedStatus === "Pending") {
+              await updateMeetingStatus(params, commonData, address);
+            }
+          } else if (address === hostAddress) {
+            if (hostJoinedStatus === "Pending") {
+              await updateMeetingStatus(params, commonData, address);
+            }
+          }
+        }
       }
 
       setIsJoining(false);
@@ -200,7 +237,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
 
       if (role === "guest") {
         // Get the attendee address based on the role
-        const attendeeAddress = role === "guest" ? address : peerId;
+        const attendee_address = role === "guest" ? address : peerId;
 
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
@@ -210,7 +247,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
 
         const raw = JSON.stringify({
           meetingId: params.roomId,
-          attendee_address: attendeeAddress,
+          attendee_address: attendee_address,
         });
 
         // Make the API request
@@ -259,8 +296,20 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
         const result = await response.json();
 
         if (result.success) {
+          setMeetingData(result.data);
           setHostAddress(result.data.host_address);
           setDaoName(result.data.dao_name);
+          setSessionType(result.data.session_type);
+          setHostJoinedStatus(result.data.host_joined_status);
+          if (result.data.session_type === "session") {
+            setAttendeeAddress(result.data.attendees[0].attendee_address);
+            setAttendeeJoinedStatus(
+              result.data.attendees[0].attendee_joined_status
+            );
+          } else {
+            setAttendeeAddress(null);
+            setAttendeeJoinedStatus(null);
+          }
         }
 
         if (result.success) {

@@ -7,23 +7,10 @@ import Image from "next/image";
 import { FaCircleCheck, FaCircleXmark, FaCirclePlay } from "react-icons/fa6";
 import { Tooltip } from "@nextui-org/react";
 import EventTile from "../../ComponentUtils/EventTile";
-import { useAccount, useNetwork } from "wagmi";
+import { useAccount } from "wagmi";
 import ErrorDisplay from "@/components/ComponentUtils/ErrorDisplay";
 import RecordedSessionsSkeletonLoader from "@/components/SkeletonLoader/RecordedSessionsSkeletonLoader";
-
-interface Session {
-  booking_status: string;
-  dao_name: string;
-  description: string;
-  host_address: string;
-  joined_status: string;
-  meetingId: string;
-  meeting_status: "Upcoming" | "Recorded" | "Denied" | "";
-  slot_time: string;
-  title: string;
-  user_address: string;
-  _id: string;
-}
+import { SessionInterface } from "@/types/MeetingTypes";
 
 function BookedUserSessions({ daoName }: { daoName: string }) {
   const { address } = useAccount();
@@ -68,7 +55,7 @@ function BookedUserSessions({ daoName }: { daoName: string }) {
         const currentSlot = new Date(currentTime.getTime() - 60 * 60 * 1000);
 
         filteredData = result.data.filter(
-          (session: Session) =>
+          (session: SessionInterface) =>
             session.dao_name === daoName &&
             session.meeting_status !== "Recorded"
         );

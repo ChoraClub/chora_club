@@ -12,7 +12,6 @@ import { useRouter } from "next-nprogress-bar";
 import React, { useEffect, useState } from "react";
 import { Oval } from "react-loader-spinner";
 import { useAccount } from "wagmi";
-import { useNetwork } from "wagmi";
 import Image from "next/image";
 import { Tooltip } from "@nextui-org/react";
 import connectImg from "@/assets/images/instant-meet/connect.png";
@@ -43,7 +42,7 @@ function InstantMeet({ isDelegate, selfDelegate, daoName }: instantMeetProps) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [confirmSave, setConfirmSave] = useState(false);
   const { address } = useAccount();
-  const { chain, chains } = useNetwork();
+  const { chain } = useAccount();
   const [isScheduling, setIsScheduling] = useState(false);
   // const [daoName, setDaoName] = useState<string>();
   const router = useRouter();
@@ -117,7 +116,7 @@ function InstantMeet({ isDelegate, selfDelegate, daoName }: instantMeetProps) {
       // console.log("calling.......");
       const response = await fetch("/api/book-slot", requestOptions);
       const result = await response.json();
-      console.log("result of book-slots", result);
+      console.log("result:", result);
       if (result.success) {
         // setIsScheduled(true);
         setConfirmSave(false);
@@ -134,14 +133,6 @@ function InstantMeet({ isDelegate, selfDelegate, daoName }: instantMeetProps) {
       description: "",
     });
   };
-
-  // useEffect(() => {
-  //   if (chain?.name === "Optimism") {
-  //     setDaoName("optimism");
-  //   } else if (chain?.name === "Arbitrum One") {
-  //     setDaoName("arbitrum");
-  //   }
-  // }, [chain]);
 
   const block = [
     {
@@ -229,7 +220,8 @@ function InstantMeet({ isDelegate, selfDelegate, daoName }: instantMeetProps) {
                             },
                           },
                         },
-                      }}>
+                      }}
+                    >
                       <div>
                         <div className="group border rounded-3xl bg-[#E5E5EA] flex items-center justify-center p-8 hover:bg-blue-shade-100 hover:shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
                           <Image
@@ -267,7 +259,8 @@ function InstantMeet({ isDelegate, selfDelegate, daoName }: instantMeetProps) {
               <div className="text-center transition-transform transform hover:scale-105 duration-300">
                 <button
                   className="bg-blue-shade-200 py-3 px-6 rounded-full text-white font-semibold"
-                  onClick={onOpen}>
+                  onClick={onOpen}
+                >
                   Start an instant meet
                 </button>
               </div>
@@ -282,7 +275,8 @@ function InstantMeet({ isDelegate, selfDelegate, daoName }: instantMeetProps) {
           onClose();
           // setIsScheduling(false);
         }}
-        className="font-poppins">
+        className="font-poppins"
+      >
         <ModalContent>
           <>
             <ModalHeader className="flex flex-col gap-1">
@@ -321,13 +315,15 @@ function InstantMeet({ isDelegate, selfDelegate, daoName }: instantMeetProps) {
                 onClick={() => {
                   onClose();
                   // setIsScheduling(false);
-                }}>
+                }}
+              >
                 Close
               </Button>
               <Button
                 color="primary"
                 onClick={startInstantMeet}
-                isDisabled={confirmSave}>
+                isDisabled={confirmSave}
+              >
                 {confirmSave ? (
                   <div className="flex items-center justify-center">
                     <Oval

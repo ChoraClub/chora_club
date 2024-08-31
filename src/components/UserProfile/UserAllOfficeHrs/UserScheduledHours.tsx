@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useAccount, useNetwork } from "wagmi";
+import { useAccount } from "wagmi";
 import toast, { Toaster } from "react-hot-toast";
 
 const UserScheduledHours = ({ daoName }: { daoName: string }) => {
@@ -9,7 +9,6 @@ const UserScheduledHours = ({ daoName }: { daoName: string }) => {
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const { address } = useAccount();
-  const { chain } = useNetwork();
 
   const [selectedTime, setSelectedTime] = useState<string>("");
 
@@ -155,7 +154,8 @@ const UserScheduledHours = ({ daoName }: { daoName: string }) => {
             <select
               value={selectedTime || "Time"}
               onChange={handleTimeChange}
-              className="shadow appearance-none border rounded w-1/5 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ml-1">
+              className="shadow appearance-none border rounded w-1/5 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ml-1"
+            >
               <option disabled>Time</option>
               {timeOptions.map((time) => (
                 <option key={time} value={time}>
@@ -170,24 +170,28 @@ const UserScheduledHours = ({ daoName }: { daoName: string }) => {
         <button
           type="submit"
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline flex items-center"
-          disabled={isSubmitting}>
+          disabled={isSubmitting}
+        >
           {isSubmitting ? (
             <svg
               className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
-              viewBox="0 0 24 24">
+              viewBox="0 0 24 24"
+            >
               <circle
                 className="opacity-25"
                 cx="12"
                 cy="12"
                 r="10"
                 stroke="currentColor"
-                strokeWidth="4"></circle>
+                strokeWidth="4"
+              ></circle>
               <path
                 className="opacity-75"
                 fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 4.418 3.582 8 8 8v-4c-2.22 0-4.239-.905-5.708-2.369l1.416-1.416zm16.294-7.58A7.962 7.962 0 0120 12h4c0-4.418-3.582-8-8-8v4c2.219 0 4.238.904 5.707 2.369l-1.413 1.414z"></path>
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 4.418 3.582 8 8 8v-4c-2.22 0-4.239-.905-5.708-2.369l1.416-1.416zm16.294-7.58A7.962 7.962 0 0120 12h4c0-4.418-3.582-8-8-8v4c2.219 0 4.238.904 5.707 2.369l-1.413 1.414z"
+              ></path>
             </svg>
           ) : (
             "Submit"

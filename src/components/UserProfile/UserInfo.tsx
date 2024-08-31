@@ -2,13 +2,13 @@ import { useRouter } from "next-nprogress-bar";
 import React, { ChangeEvent, useState, useEffect } from "react";
 import { Oval, RotatingLines } from "react-loader-spinner";
 import { useAccount } from "wagmi";
-import { useNetwork } from "wagmi";
 // import 'react-quill/dist/quill.snow.css';
 // import './quillCustomStyles.css';
 
 import dynamic from "next/dynamic";
 import styled from "styled-components";
 import rehypeSanitize from "rehype-sanitize";
+import { getDaoName } from "@/utils/chainUtils";
 
 const StyledMDEditorWrapper = styled.div`
   .w-md-editor {
@@ -89,7 +89,7 @@ function UserInfo({
 }: userInfoProps) {
   const { address } = useAccount();
   // const address = "0x5e349eca2dc61abcd9dd99ce94d04136151a09ee";
-  const { chain, chains } = useNetwork();
+  const { chain } = useAccount();
   // const [description, setDescription] = useState(
   //   "Type your description here..."
   // );
@@ -153,11 +153,7 @@ function UserInfo({
     setOfficeHoursHostedLoading(true);
     setOfficeHoursAttendedLoading(true);
 
-    if (chain?.name === "Optimism") {
-      dao_name = "optimism";
-    } else if (chain?.name === "Arbitrum One") {
-      dao_name = "arbitrum";
-    }
+    const dao_name = getDaoName(chain?.name);
 
     const host_uid_key =
       buttonType === "onchain" ? "onchain_host_uid" : "uid_host";

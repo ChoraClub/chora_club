@@ -119,6 +119,7 @@ function NotificationMain() {
           notification_name: message.notification_name,
           notification_type: message.notification_type,
           notification_title: message.notification_title,
+          additionalData: message?.additionalData,
         };
         addNotification(notificationData);
         updateCombinedNotifications();
@@ -299,7 +300,7 @@ function NotificationMain() {
             }`}
             onClick={() => router.push(path + "?active=sessionBookings")}
           >
-            Session Bookings
+            Meetings
           </button>
           <button
             className={`py-4 px-2 outline-none ${
@@ -329,8 +330,7 @@ function NotificationMain() {
                 ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
                 : "border-transparent"
             }`}
-            // onClick={() => router.push(path + "?active=attestations")}
-            onClick={() => toast("Coming Soon 🚀")}
+            onClick={() => router.push(path + "?active=attestations")}
           >
             Attestations
           </button>

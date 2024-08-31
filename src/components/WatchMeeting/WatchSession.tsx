@@ -22,71 +22,19 @@ import { BASE_URL } from "@/config/constants";
 import toast, { Toaster } from "react-hot-toast";
 import { Tooltip } from "@nextui-org/react";
 import { getEnsName } from "@/utils/ENSUtils";
+import {
+  DynamicAttendeeInterface,
+  SessionInterface,
+} from "@/types/MeetingTypes";
+import { UserProfileInterface } from "@/types/UserProfileTypes";
 
-interface ProfileInfo {
-  _id: string;
-  address: string;
-  image: string;
-  description: string;
-  daoName: string;
-  isDelegate: boolean;
-  displayName: string;
-  socialHandles: {
-    twitter: string;
-    discord: string;
-    discourse: string;
-    github: string;
-  };
-  emailId: string;
-}
-interface Attendee {
-  attendee_address: string;
-  attendee_uid: string;
-  profileInfo: ProfileInfo;
-  onchain_attendee_uid?: string;
+interface Attendee extends DynamicAttendeeInterface {
+  profileInfo: UserProfileInterface;
 }
 
-interface HostProfileInfo {
-  _id: string;
-  address: string;
-  image: string;
-  description: string;
-  daoName: string;
-  isDelegate: boolean;
-  displayName: string;
-  socialHandles: {
-    twitter: string;
-    discord: string;
-    discourse: string;
-    github: string;
-  };
-  emailId: string;
-}
-
-interface Meeting {
-  _id: string;
-  slot_time: string;
-  office_hours_slot: string; // Assuming this is a date-time string
-  title: string;
-  description: string;
-  video_uri: string;
-  meetingId: string;
+interface Meeting extends SessionInterface {
   attendees: Attendee[];
-  uid_host: string;
-  dao_name: string;
-  host_address: string;
-  joined_status: string | null;
-  booking_status: string;
-  meeting_status:
-    | "active"
-    | "inactive"
-    | "ongoing"
-    | "Recorded"
-    | "Upcoming"
-    | "Ongoing"; // Assuming meeting status can only be active or inactive
-  session_type: string;
-  hostProfileInfo: HostProfileInfo;
-  onchain_host_uid?: string;
+  hostProfileInfo: UserProfileInterface;
 }
 
 function WatchSession({
@@ -218,12 +166,12 @@ function WatchSession({
                     <Link
                       href={
                         data.uid_host
-                        ? data.dao_name === ("optimism" || "Optimism")
-                          ? `https://optimism.easscan.org/offchain/attestation/view/${data.uid_host}`
-                          : data.dao_name === ("arbitrum" || "Arbitrum")
-                          ? `https://arbitrum.easscan.org/offchain/attestation/view/${data.uid_host}`
-                          : ""
-                        : "#"
+                          ? data.dao_name === ("optimism" || "Optimism")
+                            ? `https://optimism.easscan.org/offchain/attestation/view/${data.uid_host}`
+                            : data.dao_name === ("arbitrum" || "Arbitrum")
+                            ? `https://arbitrum.easscan.org/offchain/attestation/view/${data.uid_host}`
+                            : ""
+                          : "#"
                       }
                       onClick={(e) => {
                         if (!data.uid_host) {
@@ -255,16 +203,16 @@ function WatchSession({
                   >
                     <Link
                       href={
-                        data.onchain_host_uid 
-                        ? data.dao_name === ("optimism" || "Optimism")
-                          ? `https://optimism.easscan.org/attestation/view/${data.onchain_host_uid}`
-                          : data.dao_name === ("arbitrum" || "Arbitrum")
-                          ? `https://arbitrum.easscan.org/attestation/view/${data.onchain_host_uid}`
-                          : ""
-                        : "#"
+                        data.onchain_host_uid
+                          ? data.dao_name === ("optimism" || "Optimism")
+                            ? `https://optimism.easscan.org/attestation/view/${data.onchain_host_uid}`
+                            : data.dao_name === ("arbitrum" || "Arbitrum")
+                            ? `https://arbitrum.easscan.org/attestation/view/${data.onchain_host_uid}`
+                            : ""
+                          : "#"
                       }
                       onClick={(e) => {
-                        if (!data.onchain_host_uid ) {
+                        if (!data.onchain_host_uid) {
                           e.preventDefault();
                           toast.error("Onchain attestation not available");
                         }
@@ -345,8 +293,8 @@ function WatchSession({
               <div
                 className={
                   showPopup
-                  ? "rotate-180 duration-200 ease-in-out"
-                  : "duration-200 ease-in-out"
+                    ? "rotate-180 duration-200 ease-in-out"
+                    : "duration-200 ease-in-out"
                 }
               >
                 <IoMdArrowDropdown color="#4F4F4F" />
@@ -472,8 +420,8 @@ function WatchSession({
             <div
               className={`px-6 pt-4 pb-4 rounded-b-3xl bg-white text-[#1E1E1E]`}
             >
-              <>                
-              <div
+              <>
+                <div
                   ref={contentRef}
                   className={`max-h-full transition-max-height duration-500 ease-in-out overflow-hidden ${
                     isExpanded ? "max-h-full" : "max-h-24 line-clamp-3"

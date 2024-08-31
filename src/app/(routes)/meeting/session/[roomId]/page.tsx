@@ -101,6 +101,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
   const [meetingRecordingStatus, setMeetingRecordingStatus] =
     useState<boolean>();
   const [showModal, setShowModal] = useState(true);
+  const [meetingData, setMeetingData] = useState<any>();
   const { sendData } = useDataMessage();
 
   const { state } = useRoom({
@@ -293,6 +294,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
         const result = await response.json();
 
         if (result.success) {
+          setMeetingData(result.data);
           setHostAddress(result.data.host_address);
           setDaoName(result.data.dao_name);
         }
@@ -343,7 +345,6 @@ export default function Component({ params }: { params: { roomId: string } }) {
         isHandRaised: metadata?.isHandRaised || false,
         walletAddress: address || "",
       });
-
     }
   }, [isAllowToEnter, state]);
 
@@ -628,6 +629,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
             daoName={daoName}
             hostAddress={hostAddress}
             meetingStatus={meetingRecordingStatus}
+            meetingData={meetingData}
           />
         </div>
       ) : (
