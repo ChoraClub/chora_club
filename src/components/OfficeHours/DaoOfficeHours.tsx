@@ -16,6 +16,8 @@ import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
 import { RxCross2 } from "react-icons/rx";
 import SessionTileSkeletonLoader from "../SkeletonLoader/SessionTileSkeletonLoader";
 import {useAccount} from "wagmi";
+import SidebarMainMobile from "../MainSidebar/SidebarMainMobile";
+import MobileResponsiveMessage from "../MobileResponsiveMessage/MobileResponsiveMessage";
 interface Type {
   img: StaticImageData;
   title: string;
@@ -144,10 +146,18 @@ function DaoOfficeHours() {
   };
 
   return (
-    <div className="pt-6 pl-14 pr-6">
-      <div className="flex justify-between pe-10">
-        <div className="font-quanty font-medium text-4xl text-blue-shade-200 pb-4">
-          <Tooltip
+    <>
+    {/* For Mobile Screen */}
+<MobileResponsiveMessage/>
+
+{/* For Desktop Screen  */}
+    <div className="pt-4 sm:pt-6 px-4 md:px-6 lg:px-14">
+      <div className="flex flex-row justify-between items-center mb-6">
+          <div className="flex gap-4 items-center">
+            <div className="lg:hidden">
+              <SidebarMainMobile />
+            </div>
+            <Tooltip
             showArrow
             content={
               <div className="font-poppins">
@@ -159,13 +169,13 @@ function DaoOfficeHours() {
             placement="right"
             className="rounded-md bg-opacity-90 max-w-96"
             closeDelay={1}>
-            <div>Office Hours</div>
-          </Tooltip>
-        </div>
-        <div>
+            <div className="text-blue-shade-200 font-medium text-3xl md:text-4xl font-quanty ">
+              Office Hours
+            </div>
+            </Tooltip>
+          </div>
           <ConnectWalletWithENS />
         </div>
-      </div>
 
       {showComingSoon && (
         <div className="flex items-center w-fit bg-yellow-100 border border-yellow-400 rounded-full px-3 py-1 font-poppins">
@@ -264,6 +274,7 @@ function DaoOfficeHours() {
         </div>
       </div>
     </div>
+    </>
   );
 }
 

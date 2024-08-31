@@ -25,6 +25,7 @@ import ClaimButton from "./ClaimButton";
 import EditButton from "./EditButton";
 import { useAccount } from "wagmi";
 import Link from "next/link";
+import { LuDot } from "react-icons/lu";
 
 interface meeting {
   meetingData: any;
@@ -215,11 +216,12 @@ function RecordedSessionsTile({
   return (
     <>
       <div
-        className={`grid min-[475px]:grid-cols- md:grid-cols-2 lg:grid-cols-3 ${gridCols} gap-10 py-8 font-poppins`}>
+        className={`grid min-[475px]:grid-cols- md:grid-cols-2 lg:grid-cols-3 ${gridCols} sm:gap-10 py-8 font-poppins`}
+      >
         {meetingData.map((data: any, index: number) => (
           <div
             key={index}
-            className="border border-[#D9D9D9] rounded-3xl cursor-pointer"
+            className="border border-[#D9D9D9] sm:rounded-3xl cursor-pointer"
             onClick={(e) => {
               e.stopPropagation();
               e.preventDefault();
@@ -228,7 +230,8 @@ function RecordedSessionsTile({
             onMouseEnter={() => setHoveredVideo(index)}
             onMouseLeave={() => setHoveredVideo(null)}>
             <div
-              className={`w-full h-44 rounded-t-3xl bg-black object-cover object-center relative `}>
+              className={`w-full h-44 sm:rounded-t-3xl bg-black object-cover object-center relative `}
+            >
               {hoveredVideo === index ? (
                 <div className="relative">
                   <video
@@ -269,9 +272,9 @@ function RecordedSessionsTile({
               </div>
             </div>
             <div className="flex flex-col justify-between">
-              <div className="px-4 py-2">
+              <div className="px-4 pb-2 sm:py-2">
                 <div
-                  className={`font-semibold py-1 ${styles.truncate}`}
+                  className={`text-sm sm:text-base font-semibold py-1 ${styles.truncate}`}
                   style={{
                     display: "-webkit-box",
                     WebkitBoxOrient: "vertical",
@@ -279,27 +282,31 @@ function RecordedSessionsTile({
                   }}>
                   {updatedSessionDetails[index]?.title || data.title}
                 </div>
-                <div className="flex text-sm gap-3 py-1">
-                  <div className="bg-[#F5F5F5] flex items-center py-1 px-3 rounded-md gap-2">
-                    {/* <div>
+                <div className="flex items-center text-sm gap-0.5 sm:gap-1 py-1">
+                  <div className=" flex items-center ">
+                    <div>
                       <Image
                         src={getDaoLogo(data.dao_name)}
                         alt="image"
                         width={20}
                         height={20}
-                        className="rounded-full"
+                        className="rounded-full size-4 sm:size-6"
                       />
-                    </div> */}
+                    </div> 
                     <div className="capitalize">
                       {formatViews(data?.views ?? 0)} views
                     </div>
+                    {/* <div className="capitalize hidden sm:flex">{data.dao_name}</div> */}
                   </div>
-                  <div className="bg-[#F5F5F5] py-1 px-3 rounded-md">
+                  <LuDot/>
+                  {/* <div className="text-xs sm:text-sm">300 Views</div> */}
+                  <LuDot/>
+                  <div className=" text-xs sm:text-sm">
                     {formatTimeAgo(data.slot_time)}
                   </div>
                 </div>
                 <div className="">
-                  <div className="flex items-center gap-2 py-1 ps-3 text-sm">
+                  <div className="flex items-center gap-2 py-1  text-xs sm:text-sm">
                     <div>
                       <Image
                         src={
@@ -310,7 +317,7 @@ function RecordedSessionsTile({
                         alt="image"
                         width={20}
                         height={20}
-                        className="rounded-full"
+                        className="rounded-full size-4 sm:size-5"
                       />
                     </div>
                     <div>
@@ -333,8 +340,9 @@ function RecordedSessionsTile({
                         content="Copy"
                         placement="right"
                         closeDelay={1}
-                        showArrow>
-                        <span className="cursor-pointer text-sm">
+                        showArrow
+                      >
+                        <span className="cursor-pointer text-xs sm:text-sm">
                           <IoCopy
                             onClick={(event) => {
                               event.stopPropagation();
@@ -346,7 +354,7 @@ function RecordedSessionsTile({
                     </div>
                   </div>
                   {data.attendees[0]?.attendee_address ? (
-                    <div className="flex items-center gap-2 py-1 ps-3 text-sm">
+                    <div className="hidden sm:flex items-center gap-2 py-1 text-sm">
                       <div className="">
                         <Image
                           src={
@@ -360,7 +368,7 @@ function RecordedSessionsTile({
                           className="h-5 w-5 rounded-full object-cover object-center"
                         />
                       </div>
-                      <div>
+                      <div className="">
                         <span className="font-medium">Guest: </span>
                         <span>
                           {loadingGuestNames
@@ -372,7 +380,7 @@ function RecordedSessionsTile({
                               ]}
                         </span>
                       </div>
-                      <div>
+                      <div className="">
                         <Tooltip
                           content="Copy"
                           placement="right"

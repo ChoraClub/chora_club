@@ -113,7 +113,7 @@ export const config = {
     "/api/update-video-uri/:path*",
     // "/api/verify-meeting-id/:path*",
     "/api/get-attest-data/:path*",
-    "/api/get-availability/:path*",
+    // "/api/get-availability/:path*",
     "/api/get-host/:path*",
     "/api/get-meeting/:path*",
     "/api/get-officehours-address/:path*",
