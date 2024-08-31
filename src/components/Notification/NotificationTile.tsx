@@ -10,6 +10,7 @@ import {
 } from "./NotificationActions";
 import { useNotificationStudioState } from "@/store/notificationStudioState";
 import { BiLinkExternal } from "react-icons/bi";
+import Link from "next/link";
 
 function NotificationTile({ data, index, length }: NotificationTileProps) {
   const router = useRouter();
@@ -35,17 +36,37 @@ function NotificationTile({ data, index, length }: NotificationTileProps) {
   //   await handleRedirection(tileData, router, markAsRead);
   // };
 
+  const handleExternalLinkClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (tileData.additionalData?.offchainAttestationLink) {
+      window.open(tileData.additionalData.offchainAttestationLink, "_blank");
+    }
+  };
+
   const renderTitleContent = () => {
+    const offchainLink = tileData.additionalData?.offchainAttestationLink;
     if (
       tileData.notification_type === "attestation" &&
-      tileData.notification_name === "offchain"
+      tileData.notification_name === "offchain" &&
+      offchainLink
     ) {
       return (
-        <BiLinkExternal
-          size={18}
-          className="text-black hover:text-blue-600 transition-colors duration-200"
-          onClick={() => console.log(tileData)}
-        />
+        <>
+          <Link
+            href={offchainLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
+          >
+            <BiLinkExternal
+              size={18}
+              className="text-black hover:text-blue-600 transition-colors duration-200"
+              title="Open link in new tab"
+            />
+          </Link>
+        </>
       );
     }
 

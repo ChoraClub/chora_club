@@ -279,6 +279,23 @@ export async function POST(req: NextRequest, res: NextResponse) {
       uploadstatus
     );
 
+    let offchainAttestationLink = "";
+    if (requestData.daoName === "optimism") {
+      offchainAttestationLink = `https://optimism.easscan.org/offchain/attestation/view/${offchainAttestation.uid}`;
+    } else if (requestData.daoName === "arbitrum") {
+      offchainAttestationLink = `https://arbitrum.easscan.org/offchain/attestation/view/${offchainAttestation.uid}`;
+    }
+
+    let notification_user_role = "";
+    if (requestData.meetingType === 1) {
+      notification_user_role = "session_hosted";
+    } else if (requestData.meetingType === 2) {
+      notification_user_role = "session_attended";
+    } else if (requestData.meetingType === 3) {
+      notification_user_role = "officehour_hosted";
+    } else if (requestData.meetingType === 4) {
+      notification_user_role = "officehour_attended";
+    }
     const notificationToSend = {
       receiver_address: offchainAttestation.message.recipient,
       content: `Congratulations 🎉 ! You just received an Off-chain attestation for attending "${requestData.meetingData.title}".`,
@@ -287,7 +304,12 @@ export async function POST(req: NextRequest, res: NextResponse) {
       notification_name: "offchain",
       notification_title: "Received Off-chain Attestation",
       notification_type: "attestation",
-      additionalData: { ...offchainAttestation, requestData },
+      additionalData: {
+        ...offchainAttestation,
+        requestData,
+        notification_user_role,
+        offchainAttestationLink,
+      },
     };
 
     const client = await connectDB();

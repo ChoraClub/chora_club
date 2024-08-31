@@ -6,7 +6,7 @@ export const dao_details: Record<string, any> = {
   arbitrum,
 };
 
-// You can add a function to add more DAOs dynamically
+// function to add more DAOs dynamically
 export const addDao = (daoName: string, daoDetails: any) => {
   dao_details[daoName] = daoDetails;
 };
