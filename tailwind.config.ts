@@ -15,6 +15,8 @@ const config: Config = {
         "1.5xl": "1350px",
         "1.7xl": "1450px",
         "1.5lg": "1200px",
+        "1.3lg" : "1100px",
+        "xs" : "470px"
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",

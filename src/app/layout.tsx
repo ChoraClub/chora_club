@@ -12,6 +12,7 @@ import Script from "next/script";
 import ProgressBarProvider from "@/components/ProgressBarProvider/ProgressBarProvider";
 import MobileResponsiveMessage from "@/components/MobileResponsiveMessage/MobileResponsiveMessage";
 import { GoogleTagManager } from "@next/third-parties/google";
+import SidebarMainMobile from "@/components/MainSidebar/SidebarMainMobile";
 const poppins = Poppins({
   subsets: ["latin"],
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
@@ -111,6 +112,19 @@ export default function RootLayout({
           <Suspense>
             <RootProviders>
               <HuddleContextProvider>
+                <div className="flex">
+                  <div className="hidden lg:block fixed w-[6%] bg-blue-shade-100 h-screen z-10">
+                    <SidebarMain />
+                  </div>
+                  {/* <div className="lg:hidden fixed z-10">
+                  <SidebarMainMobile/>
+                </div> */}
+                  <div className="w-[100%] lg:w-[94%] ml-auto">
+                    <FeedbackTile />
+                    <div>{children}</div>
+                  </div>
+                </div>
+                {/* <div className="lg:block hidden">
                 <div className="flex">
                   <div className="fixed w-[6%] bg-blue-shade-100 h-screen z-10">
                     <SidebarMain />

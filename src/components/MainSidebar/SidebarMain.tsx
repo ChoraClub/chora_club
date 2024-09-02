@@ -29,6 +29,7 @@ import { IoIosRocket } from "react-icons/io";
 import { FaBusinessTime, FaUser } from "react-icons/fa6";
 import { SiGitbook, SiGoogleclassroom } from "react-icons/si";
 import { PiUsersThreeFill } from "react-icons/pi";
+import {useSidebar} from "../../app/hooks/useSidebar"
 import { BiSolidMessageSquareAdd } from "react-icons/bi";
 
 function Sidebar() {
@@ -37,6 +38,19 @@ function Sidebar() {
   const [hasSeenTour, setHasSeenTour] = useState(true);
   const [notificationCount, setNotificationCount] = useState(1);
   const [isHovering, setIsHovering] = useState(false);
+  const {
+    storedDao,
+    handleMouseOver,
+    handleMouseOut,
+    handleBadgeClick,
+    badgeVisiblity,
+    isPageLoading,
+    session,
+    status,
+    address,
+    isConnected,
+  } = useSidebar();
+
 
   const tourSteps = [
     {
@@ -227,78 +241,12 @@ function Sidebar() {
   };
 
   const router = useRouter();
-  const [storedDao, setStoredDao] = useState<string[]>([]);
   const pathname = usePathname();
-  const [badgeVisiblity, setBadgeVisibility] = useState<boolean[]>(
-    new Array(storedDao.length).fill(true)
-  );
-  const [isPageLoading, setIsPageLoading] = useState<boolean>(true);
-  const { address, isConnected } = useAccount();
-  const { data: session, status } = useSession();
   const sessionLoading = status === "loading";
-  // const hoverRef = useRef<HTMLDivElement>(null);
-  // const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  // useEffect(() => {
-  //   return () => {
-  //     if (timeoutRef.current) clearTimeout(timeoutRef.current);
-  //   };
-  // }, []);
-
-  // const handleMouseEnter = () => {
-  //   if (timeoutRef.current) clearTimeout(timeoutRef.current);
-  //   setIsHovering(true);
-  // };
-
-  // const handleMouseLeave = () => {
-  //   timeoutRef.current = setTimeout(() => {
-  //     setIsHovering(false);
-  //   }, 300); // 300ms delay before hiding
-  // };
-
   useEffect(() => {
     // console.log(session, sessionLoading, isConnected);
   }, [session, sessionLoading, isConnected, isPageLoading]);
-
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      const localJsonData = JSON.parse(
-        localStorage.getItem("visitedDao") || "{}"
-      );
-
-      const localStorageArr: string[] = Object.values(localJsonData);
-      // console.log("Values: ", localStorageArr);
-
-      setStoredDao(localStorageArr);
-    }, 100);
-    setIsPageLoading(false);
-    return () => clearInterval(intervalId);
-  }, []);
-
-  const handleBadgeClick = (name: string) => {
-    const localData = JSON.parse(localStorage.getItem("visitedDao") || "{}");
-
-    delete localData[name];
-    localStorage.setItem("visitedDao", JSON.stringify(localData));
-
-    setStoredDao((prevState) => prevState.filter((item) => item[0] !== name));
-    setBadgeVisibility(new Array(storedDao.length).fill(false));
-
-    router.push(`/`);
-  };
-
-  const handleMouseOver = (index: number) => {
-    const updatedVisibility = [...badgeVisiblity];
-    updatedVisibility[index] = true;
-    setBadgeVisibility(updatedVisibility);
-  };
-
-  const handleMouseOut = (index: number) => {
-    const updatedVisibility = [...badgeVisiblity];
-    updatedVisibility[index] = false;
-    setBadgeVisibility(updatedVisibility);
-  };
-
+  
   const closeTour = () => {
     setIsTourOpen(false);
     setHasSeenTour(true);
@@ -361,7 +309,7 @@ function Sidebar() {
               {/* <Link href={"/"}> */}
               <Link
                 href={"/"}
-                className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 rounded-full flex items-center justify-center border border-white bg-blue-shade-800 w-10 h-10 ${
+                className={`dao cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 rounded-full flex items-center justify-center border border-white bg-blue-shade-800 w-10 h-10 ${
                   styles.icon3d
                 } ${
                   pathname.endsWith(`/`)
@@ -386,7 +334,7 @@ function Sidebar() {
               {/* <Link href={"/office-hours?hours=ongoing"}> */}
               <Link
                 href={"/office-hours?hours=ongoing"}
-                className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 rounded-full flex items-center justify-center border border-white bg-blue-shade-800 w-10 h-10 ${
+                className={`office cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 rounded-full flex items-center justify-center border border-white bg-blue-shade-800 w-10 h-10 ${
                   styles.icon3d
                 } ${
                   pathname.includes(`/office-hours`)
@@ -411,7 +359,7 @@ function Sidebar() {
               {/* <Link href={"/sessions?active=recordedSessions"}> */}
               <Link
                 href={"/sessions?active=recordedSessions"}
-                className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 rounded-full flex items-center justify-center border border-white bg-blue-shade-800 w-10 h-10 ${
+                className={`session cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 rounded-full flex items-center justify-center border border-white bg-blue-shade-800 w-10 h-10 ${
                   styles.icon3d
                 } ${
                   pathname.includes(`/sessions`)
@@ -519,7 +467,7 @@ function Sidebar() {
               <Link
                 href={"https://docs.chora.club/"}
                 target="_blank"
-                className={`cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 rounded-full flex items-center justify-center bg-white w-10 h-10 ${styles.icon3d} ${styles.whiteBg}`}
+                className={`gitbook cursor-pointer xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 rounded-full flex items-center justify-center bg-white w-10 h-10 ${styles.icon3d} ${styles.whiteBg}`}
               >
                 <SiGitbook
                   className={`size-5 text-blue-shade-200 ${styles.iconInner}`}

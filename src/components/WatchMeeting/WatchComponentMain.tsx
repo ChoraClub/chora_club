@@ -17,6 +17,8 @@ import WatchFreeCollect from "./WatchFreeCollect";
 import WatchVideoRecommendation from "./WatchVideoRecommendation";
 import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
 import WatchComponentSkeletonLoader from "../SkeletonLoader/WatchComponentSkeletonLoader";
+import { v4 as uuidv4 } from "uuid";
+// import { id } from "ethers";
 
 interface AttestationObject {
   attendee_address: string;
@@ -88,7 +90,7 @@ function WatchComponentMain({ props }: { props: { id: string } }) {
 
           <div className="grid grid-cols-3 gap-y-4 gap-x-4 1.7xl:gap-x-6 pt-6 relative 1.7xl:pr-14 pr-4 lg:pr-5 xl-pr-10">
             {/* Left side */}
-            <div className="sticky top-10 z-10 col-span-2 space-y-5 font-poppins pb-10 ">
+            <div className="col-span-2 space-y-5 font-poppins pb-10 ">
               <WatchSessionVideo
                 data={data}
                 collection={collection}
@@ -107,8 +109,7 @@ function WatchComponentMain({ props }: { props: { id: string } }) {
 
             {/* Right side */}
             <div
-              className={`col-span-1  pb-8 ${styles.customScrollbar} gap-y-6 flex flex-col`}
-            >
+              className={`col-span-1  pb-8 ${styles.customScrollbar} gap-y-6 flex flex-col`}>
               {/* <WatchSessionList /> */}
 
               {/* Free */}

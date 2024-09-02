@@ -41,33 +41,26 @@ const optimismSepolia = defineChain({
   network: "",
 });
 
-const WalletAndPublicClient = (chainName: any) => {
+const WalletAndPublicClient = (chain: any) => {
   let publicClient: any;
   let walletClient: any;
-
-  console.log("chainName:", chainName);
-  // let chainName: any;
-  // console.log("the chain", chain?.name);
-  // if (chain?.name === "OP Mainnet") {
-  //   chainName = optimism;
-  // } else if (chain?.name === "Arbitrum One") {
-  //   chainName = arbitrum;
-  // } else if (chain?.name === "Optimism Sepolia") {
-  //   chainName = optimismSepolia;
-  // } else {
-  //   chainName = "";
-  // }
-
+  let chainName: any;
+  if (chain?.name === "OP Mainnet") {
+    chainName = "optimism";
+  } else if (chain?.name === "Arbitrum One") {
+    chainName = "arbitrum";
+  } else {
+    chainName = "";
+  }
   if (typeof window !== "undefined" && window.ethereum) {
     // Instantiate public client and wallet client
     publicClient = createPublicClient({
       chain: chainName,
       transport: custom(window.ethereum),
     });
-
     walletClient = createWalletClient({
       chain: chainName,
-      transport: custom(window.ethereum),
+      transport: custom(window.ethereum!),
     });
 
     // Now you can use publicClient and walletClient as needed

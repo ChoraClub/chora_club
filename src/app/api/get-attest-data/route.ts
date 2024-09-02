@@ -11,7 +11,6 @@ async function delegateAttestationOffchain(data: any) {
   }
   const baseUrl = BASE_URL;
   const raw = JSON.stringify(data);
-  console.log("raw", raw);
   const requestOptions = {
     method: "POST",
     headers: myHeaders,
@@ -23,8 +22,11 @@ async function delegateAttestationOffchain(data: any) {
       `${BASE_URL}/api/attest-offchain/`,
       requestOptions
     );
-    console.log("Response from attestation endpoint:", response);
-    return response.json();
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const result = await response.json();
+    return result;
   } catch (error) {
     console.error("Error fetching from attestation endpoint:", error);
     throw error;
@@ -32,9 +34,7 @@ async function delegateAttestationOffchain(data: any) {
 }
 
 export async function POST(req: NextRequest, res: NextResponse) {
-  const { roomId, connectedAddress } = await req.json();
-
-  console.log("Incoming request with roomId:", roomId);
+  const { roomId, connectedAddress, meetingData } = await req.json();
 
   try {
     // Connect to MongoDB
@@ -80,7 +80,8 @@ export async function POST(req: NextRequest, res: NextResponse) {
           data.startTime,
           data.endTime,
           data.dao_name,
-          connectedAddress
+          connectedAddress,
+          meetingData
         );
       }
       for (const participant of data.participants) {
@@ -91,13 +92,18 @@ export async function POST(req: NextRequest, res: NextResponse) {
           data.startTime,
           data.endTime,
           data.dao_name,
-          connectedAddress
+          connectedAddress,
+          meetingData
         );
       }
     } else if (data.meetingType === "session") {
       console.log("Meeting type: session: ", data);
       // For sessions, delegate attestation to hosts (meetingType 1) and participants (meetingType 2)
       for (const host of data.hosts) {
+        // console.log(
+        //   "Giving Attestation to HOST:::",
+        //   host?.metadata?.walletAddress
+        // );
         await delegateAndSetAttestation(
           host?.metadata?.walletAddress,
           `${roomId}/${token}`,
@@ -105,10 +111,15 @@ export async function POST(req: NextRequest, res: NextResponse) {
           data.startTime,
           data.endTime,
           data.dao_name,
-          connectedAddress
+          connectedAddress,
+          meetingData
         );
       }
       for (const participant of data.participants) {
+        // console.log(
+        //   "Giving Attestation to ATTENDEE:::",
+        //   participant?.metadata?.walletAddress
+        // );
         await delegateAndSetAttestation(
           participant?.metadata?.walletAddress,
           `${roomId}/${token}`,
@@ -116,7 +127,8 @@ export async function POST(req: NextRequest, res: NextResponse) {
           data.startTime,
           data.endTime,
           data.dao_name,
-          connectedAddress
+          connectedAddress,
+          meetingData
         );
       }
     }
@@ -138,7 +150,8 @@ async function delegateAndSetAttestation(
   startTime: number,
   endTime: number,
   daoName: string,
-  connectedAddress: string
+  connectedAddress: string,
+  meetingData: any
 ) {
   await delegateAttestationOffchain({
     recipient,
@@ -148,5 +161,6 @@ async function delegateAndSetAttestation(
     endTime,
     daoName,
     connectedAddress,
+    meetingData,
   });
 }
