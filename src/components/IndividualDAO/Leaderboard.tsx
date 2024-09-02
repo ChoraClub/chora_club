@@ -254,9 +254,8 @@ function Leaderboard({ props }: { props: string }) {
                     {[
                       {
                         label: "NFTs Claimed",
-                        tooltip:
-                          "Number of NFTs collected from hosted sessions.",
-                        content: "Coming Soon",
+                        tooltip: "Coming Soon..",
+                        // content: ""
                         align: "left",
                       },
                       {
@@ -282,9 +281,9 @@ function Leaderboard({ props }: { props: string }) {
                         key={index}
                         className={`relative mx-2 w-[110px] text-gray-600 flex flex-col justify-center ${
                           item.align === "left"
-                            ? "text-left justify-self-start ml-3"
+                            ? "text-left justify-self-start ml-3 bg-yellow-200"
                             : item.align === "right"
-                            ? "text-right items-end"
+                            ? "items-end"
                             : "text-center"
                         }`}
                         onMouseEnter={() =>
@@ -293,15 +292,15 @@ function Leaderboard({ props }: { props: string }) {
                         onMouseLeave={() => setHoveredTitle("")}>
                         <span>{item.label}</span>
                         {hoveredTitle === item.label.toLowerCase() && (
-                          <div className="absolute top-[-60px] left-1/2 transform -translate-x-1/2 bg-gray-700 text-white text-xs rounded p-2 w-64">
+                          <div className="absolute top-[-50px] left-1/2 transform -translate-x-1/2 bg-gray-700 text-white text-xs rounded p-2 w-64">
                             {item.tooltip}
                           </div>
                         )}
-                        {item.content && (
+                        {/* {item.content && (
                           <div className="mt-1 text-xs text-center bg-yellow-200 text-yellow-800 rounded-md p-1">
                             {item.content}
                           </div>
-                        )}
+                        )} */}
                       </div>
                     ))}
                   </div>
@@ -309,120 +308,129 @@ function Leaderboard({ props }: { props: string }) {
               </div>
 
               {/* Delegate Rows */}
-              {displayedDelegates.map((delegate: DelegateData, index) => (
-                <div
-                  className="bg-white hover:bg-gray-50 rounded-lg mb-4 w-full transition duration-300 ease-in-out hover:shadow-lg hover:scale-[1.02]"
-                  key={index}
-                  style={{
-                    boxShadow:
-                      "rgb(204, 219, 232) 3px 3px 12px 0px inset, rgba(255, 255, 255, 0.5) -3px -3px 6px 1px inset",
-                  }}>
-                  <div className="flex flex-col sm:flex-row justify-between items-center">
-                    <div className="flex items-center space-x-5 mb-3 sm:mb-0">
-                      <div
-                        className={`text-[#3E3D3D] font-semibold ml-5 flex justify-center items-center size-[67px] ${
-                          getRankSymbol(delegate, allDelegatesData) === "#1" ||
-                          getRankSymbol(delegate, allDelegatesData) === "#2" ||
-                          getRankSymbol(delegate, allDelegatesData) === "#3"
-                            ? ""
-                            : "text-2xl"
-                        }`}>
-                        {getRankSymbol(delegate, allDelegatesData)}
-                      </div>
-                      <div className="h-[105px] border-[0.1px] border-[#D5D4DF]"></div>
-                      <Image
-                        src={delegate.ensAvatar || user1}
-                        alt="image"
-                        width={20}
-                        height={20}
-                        className="h-11 w-11 rounded-full object-cover object-center"
-                      />
-                      <div className="min-w-[180px] flex justify-start">
+              {displayedDelegates.length > 0 ? (
+                displayedDelegates.map((delegate: DelegateData, index) => (
+                  <div
+                    className="bg-white hover:bg-gray-50 rounded-lg mb-4 w-full transition duration-300 ease-in-out hover:shadow-lg hover:scale-[1.02]"
+                    key={index}
+                    style={{
+                      boxShadow:
+                        "rgb(204, 219, 232) 3px 3px 12px 0px inset, rgba(255, 255, 255, 0.5) -3px -3px 6px 1px inset",
+                    }}>
+                    <div className="flex flex-col sm:flex-row justify-between items-center">
+                      <div className="flex items-center space-x-5 mb-3 sm:mb-0">
                         <div
-                          className={`flex-grow flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-full ${delegate.color} bg-opacity-20`}>
-                          <Link
-                            href={`/${props}/${delegate.address}?active=info`}
-                            className="font-semibold cursor-pointer hover:underline">
-                            {delegate.ensName}
-                          </Link>
-                          <Tooltip
-                            content="Copy"
-                            placement="right"
-                            closeDelay={1}
-                            showArrow>
-                            <span className="cursor-pointer text-xs">
-                              <IoCopy
-                                onClick={() => handleCopy(delegate.address)}
-                              />
-                            </span>
-                          </Tooltip>
+                          className={`text-[#3E3D3D] font-semibold ml-5 flex justify-center items-center size-[67px] ${
+                            getRankSymbol(delegate, allDelegatesData) ===
+                              "#1" ||
+                            getRankSymbol(delegate, allDelegatesData) ===
+                              "#2" ||
+                            getRankSymbol(delegate, allDelegatesData) === "#3"
+                              ? ""
+                              : "text-2xl"
+                          }`}>
+                          {getRankSymbol(delegate, allDelegatesData)}
                         </div>
-                      </div>
-                    </div>
-                    <div className="flex flex-wrap justify-between w-[660px] mt-2 sm:mt-0">
-                      <div className="text-center my-1 w-[100px]">
-                        <div
-                          className={`${delegate.textColor} font-bold text-lg`}>
-                          -
-                        </div>
-                      </div>
-                      <div className="text-center mx-3 my-1 w-[110px]">
-                        <div
-                          className={`${delegate.textColor} font-bold text-lg`}>
-                          {formatViews(delegate.sessionCount)}
-                        </div>
-                      </div>
-                      <div className="text-center mx-3 my-1 w-[110px]">
-                        <div
-                          className={`${delegate.textColor} font-bold text-lg`}>
-                          {formatViews(delegate.TotalViews)}
-                        </div>
-                      </div>
-                      <div className="text-center mx-3 my-1 w-[110px] flex items-center gap-2">
-                        <div className="flex gap-1">
-                          {[...Array(5)].map((_, starIndex) => {
-                            const starValue = starIndex + 1;
-                            if (starValue <= delegate.averageRating) {
-                              return (
-                                <FaStar
-                                  key={starIndex}
-                                  className="w-5 h-5 text-yellow-400 drop-shadow-lg"
+                        <div className="h-[105px] border-[0.1px] border-[#D5D4DF]"></div>
+                        <Image
+                          src={delegate.ensAvatar || user1}
+                          alt="image"
+                          width={20}
+                          height={20}
+                          className="h-11 w-11 rounded-full object-cover object-center"
+                        />
+                        <div className="min-w-[180px] flex justify-start">
+                          <div
+                            className={`flex-grow flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-full ${delegate.color} bg-opacity-20`}>
+                            <Link
+                              href={`/${props}/${delegate.address}?active=info`}
+                              className="font-semibold cursor-pointer hover:underline">
+                              {delegate.ensName}
+                            </Link>
+                            <Tooltip
+                              content="Copy"
+                              placement="right"
+                              closeDelay={1}
+                              showArrow>
+                              <span className="cursor-pointer text-xs">
+                                <IoCopy
+                                  onClick={() => handleCopy(delegate.address)}
                                 />
-                              );
-                            } else if (
-                              starValue - 0.5 <=
-                              delegate.averageRating
-                            ) {
-                              return (
-                                <FaStarHalfAlt
-                                  key={starIndex}
-                                  className="w-5 h-5 text-yellow-400 drop-shadow-lg"
-                                />
-                              );
-                            } else {
-                              return (
-                                <FaRegStar
-                                  key={starIndex}
-                                  className="w-5 h-5 text-gray-300 font-semibold"
-                                />
-                              );
-                            }
-                          })}
-                        </div>
-                        <div className="text-xs text-gray-300 font-semibold">
-                          ({formatViews(delegate.ratingCount)})
+                              </span>
+                            </Tooltip>
+                          </div>
                         </div>
                       </div>
-                      <div className="text-center mx-3 my-1 w-[110px]">
-                        <div
-                          className={`${delegate.textColor} font-bold text-lg`}>
-                          {delegate.Score}
+                      <div className="flex flex-wrap justify-between w-[660px] mt-2 sm:mt-0">
+                        <div className="text-center my-1 w-[100px]">
+                          <div
+                            className={`${delegate.textColor} font-bold text-lg`}>
+                            -
+                          </div>
+                        </div>
+                        <div className="text-center mx-3 my-1 w-[110px]">
+                          <div
+                            className={`${delegate.textColor} font-bold text-lg`}>
+                            {formatViews(delegate.sessionCount)}
+                          </div>
+                        </div>
+                        <div className="text-center mx-3 my-1 w-[110px]">
+                          <div
+                            className={`${delegate.textColor} font-bold text-lg`}>
+                            {formatViews(delegate.TotalViews)}
+                          </div>
+                        </div>
+                        <div className="text-center mx-3 my-1 w-[110px] flex items-center gap-2">
+                          <div className="flex gap-1">
+                            {[...Array(5)].map((_, starIndex) => {
+                              const starValue = starIndex + 1;
+                              if (starValue <= delegate.averageRating) {
+                                return (
+                                  <FaStar
+                                    key={starIndex}
+                                    className="w-5 h-5 text-yellow-400 drop-shadow-lg"
+                                  />
+                                );
+                              } else if (
+                                starValue - 0.5 <=
+                                delegate.averageRating
+                              ) {
+                                return (
+                                  <FaStarHalfAlt
+                                    key={starIndex}
+                                    className="w-5 h-5 text-yellow-400 drop-shadow-lg"
+                                  />
+                                );
+                              } else {
+                                return (
+                                  <FaRegStar
+                                    key={starIndex}
+                                    className="w-5 h-5 text-gray-300 font-semibold"
+                                  />
+                                );
+                              }
+                            })}
+                          </div>
+                          <div className="text-xs text-gray-300 font-semibold">
+                            ({formatViews(delegate.ratingCount)})
+                          </div>
+                        </div>
+                        <div className="text-center mx-3 my-1 w-[110px]">
+                          <div
+                            className={`${delegate.textColor} font-bold text-lg`}>
+                            {delegate.Score}
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
+                ))
+              ) : (
+                <div className="text-center py-10 text-gray-500 text-lg">
+                  No data found at the moment !
                 </div>
-              ))}
+              )}
+
               <div className="flex justify-center mt-4 space-x-2">
                 <button
                   onClick={() => handlePageChange(currentPage - 1)}
