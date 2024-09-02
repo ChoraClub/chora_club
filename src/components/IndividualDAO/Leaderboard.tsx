@@ -255,7 +255,7 @@ function Leaderboard({ props }: { props: string }) {
                       {
                         label: "NFTs Claimed",
                         tooltip: "Number of NFTs collected from hosted sessions.",
-                        content: "coming soon" ,
+                        content: "Coming Soon" ,
                         align: "left",
                       },
                       {
@@ -280,8 +280,8 @@ function Leaderboard({ props }: { props: string }) {
                       <>
                       <div
                         key={index}
-                        className={`relative mx-2 w-[110px] text-gray-600 flex flex-col justify-center ${item.align === "left"
-                          ? "text-left justify-self-start ml-3 top-[-11px]"
+                        className={`relative mx-2 my-4 w-[110px] text-gray-600 flex flex-col justify-center ${item.align === "left"
+                          ? "text-left justify-self-start ml-3 top-[12px]"
                           : item.align === "right"
                             ? "items-end"
                             : "text-center"
@@ -290,12 +290,12 @@ function Leaderboard({ props }: { props: string }) {
                           setHoveredTitle(item.label.toLowerCase())
                         }
                         onMouseLeave={() => setHoveredTitle("")}>
+                        <span>{item.label}</span>
                           {item.content && (
-                          <div className="text-xs text-center bg-yellow-200 text-yellow-800 rounded-md p-1 ">
+                          <div className="text-xs text-center bg-yellow-200 text-yellow-800 rounded-md mt-1 p-1 ">
                             {item.content}
                           </div>
                         )}
-                        <span>{item.label}</span>
                         {hoveredTitle === item.label.toLowerCase() && (
                           <div className="absolute top-[-50px] left-1/2 transform -translate-x-1/2 bg-gray-700 text-white text-xs rounded p-2 w-64">
                             {item.tooltip}
