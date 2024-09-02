@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import VideoJs from "../ComponentUtils/VideoJs";
 import videojs from "video.js";
+import { v4 as uuidv4 } from "uuid";
 import {
   DynamicAttendeeInterface,
   SessionInterface,
@@ -63,7 +64,72 @@ function WatchSessionVideo({
     player.on("dispose", () => {
       videojs.log("player will dispose");
     });
+
+    let totalWatchTime = 0;
+    let lastRecordedTime = 0;
+    let hasCalledApi = false;
+    let isPlaying = false;
+
+    player.on("play", function () {
+      isPlaying = true;
+      lastRecordedTime = player.currentTime();
+    });
+
+    player.on("pause", function () {
+      isPlaying = false;
+    });
+
+    player.on("timeupdate", function () {
+      if (isPlaying) {
+        var currentTime = player.currentTime();
+        var timeDiff = currentTime - lastRecordedTime;
+
+        // Handle both forward and backward seeking, and ensure we only count actual playback
+        if (Math.abs(timeDiff) < 1) {
+          totalWatchTime += timeDiff;
+        }
+
+        lastRecordedTime = currentTime;
+
+        if (!hasCalledApi && totalWatchTime >= 15) {
+          hasCalledApi = true;
+          try {
+            CountAsView(data.meetingId);
+            // console.log("API called at total watch time:", totalWatchTime);
+          } catch (error) {
+            console.error("Error calling CountAsView:", error);
+          }
+        }
+      }
+    });
   };
+  async function CountAsView(meetingId: string) {
+    try {
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      let clientToken = localStorage.getItem("clientToken");
+      if (!clientToken) {
+        clientToken = uuidv4();
+        localStorage.setItem("clientToken", clientToken);
+      }
+      const raw = JSON.stringify({
+        meetingId: meetingId,
+        clientToken: clientToken,
+      });
+
+      const requestOptions: any = {
+        method: "PUT",
+        headers: myHeaders,
+        body: raw,
+        redirect: "follow",
+      };
+      const response = await fetch("/api/counting-views", requestOptions);
+      const data = await response.json();
+      // console.log("Response from API", data);
+    } catch (error) {
+      console.error("Error in views:", error);
+    }
+  }
   return (
     <div>
       <div className="rounded-3xl">

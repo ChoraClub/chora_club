@@ -48,6 +48,9 @@ interface Following {
   isFollowing: boolean;
   isNotification: boolean;
 }
+import { cookies } from "next/headers";
+import { m } from "framer-motion";
+import MobileResponsiveMessage from "../MobileResponsiveMessage/MobileResponsiveMessage";
 
 function MainProfile() {
   const { isConnected, address, chain } = useAccount();
@@ -810,6 +813,11 @@ function MainProfile() {
 
   return (
     <>
+    {/* For Mobile Screen */}
+    <MobileResponsiveMessage/>
+
+    {/* For Desktop Screen  */}
+      <div className="hidden md:block">
       {!isPageLoading ? (
         <div className="font-poppins">
           <div className="flex ps-14 py-5 pe-10 justify-between">
@@ -1193,6 +1201,7 @@ function MainProfile() {
           <MainProfileSkeletonLoader />
         </>
       )}
+      </div>
     </>
   );
 }

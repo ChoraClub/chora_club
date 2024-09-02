@@ -25,7 +25,7 @@ export const getBackgroundColor = (data: any) => {
       data?.notification_name === "sessionStartedByHost" ||
       data?.notification_name === "sessionStartedByGuest"
     ) {
-      return "#95b7ed";
+      return "#b9cef0";
     }
   } else if (data?.notification_type === "recordedSession") {
     return "#E5CCFF";
@@ -130,6 +130,18 @@ export const handleRedirection = async (
       router.push(`/meeting/session/${data.additionalData.meetingId}/lobby`);
     } else if (data.notification_name === "sessionStartedByGuest") {
       router.push(`/meeting/session/${data.additionalData.meetingId}/lobby`);
+    }
+  } else if (data.notification_type === "attestation") {
+    if (data.additionalData.notification_user_role === "session_hosted") {
+      router.push(
+        `/profile/${data.receiver_address}?active=sessions&session=hosted`
+      );
+    } else if (
+      data.additionalData.notification_user_role === "session_attended"
+    ) {
+      router.push(
+        `/profile/${data.receiver_address}?active=sessions&session=attended`
+      );
     }
   }
   if (!data.read_status) {

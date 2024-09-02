@@ -21,23 +21,27 @@
   position: relative;
   overflow: hidden;
   transition: all 0.3s ease;
-  box-shadow: 0 6px 10px rgba(0,0,0,0.3);
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3);
 }
 
 .icon3d::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 50%);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.3) 0%,
+    rgba(255, 255, 255, 0) 50%
+  );
   z-index: 1;
 }
 
 .icon3d:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 15px rgba(0,0,0,0.3);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
 }
 
 .iconInner {
@@ -50,7 +54,11 @@
 }
 
 .icon3d.whiteBg::before {
-  background: linear-gradient(135deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0) 50%);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.5) 0%,
+    rgba(255, 255, 255, 0) 50%
+  );
 }
 
 .icon3d.whiteBg .iconInner {
@@ -69,6 +77,7 @@
 }
 
 .customTooltip {
+  font-family: var(--font-poppins);
   transform-origin: center;
   animation: expandTooltip 0.3s ease-out forwards;
 }

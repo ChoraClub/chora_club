@@ -34,7 +34,7 @@ function FeedbackTile() {
   return (
     <>
       {isShowing && !isPageLoading && !dataShowing && (
-        <div className="bg-yellow-200 flex justify-center items-center py-2 font-poppins">
+        <div className="bg-yellow-200 hidden lg:flex justify-center items-center py-2 font-poppins">
           <span className="">
             Enjoying Chora Club? Share your feedback on{" "}
             <Link
