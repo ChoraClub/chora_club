@@ -5,8 +5,9 @@ import { SiweMessage } from "siwe";
 import { BASE_URL } from "@/config/constants";
 import jwt from "jsonwebtoken";
 
-async function AccountCreate(user: any, token: any) {
+async function AccountCreate(user: any, token: any, referrer: string | null) {
   try {
+    // const referrer = sessionStorage.getItem("referrer");
     const res = await fetch(`${BASE_URL}/api/auth/accountcreate`, {
       method: "POST",
       headers: {
@@ -18,6 +19,7 @@ async function AccountCreate(user: any, token: any) {
         address: user,
         isEmailVisible: false,
         createdAt: new Date(),
+        referrer: referrer,
       }),
     });
 
@@ -55,6 +57,10 @@ export const authOptions: NextAuthOptions = {
             JSON.parse(credentials?.message || "{}")
           );
 
+          const referrerMatch = siwe.statement?.match(/\(Referrer: (.*?)\)$/);
+          const referrer = referrerMatch ? referrerMatch[1] : null;
+          // console.log("referrer: ", referrer);
+
           const nextAuthUrl = new URL(BASE_URL as string);
           // console.log("credentials", credentials);
           // console.log("req", req);
@@ -72,6 +78,7 @@ export const authOptions: NextAuthOptions = {
           if (result.success) {
             return {
               id: siwe.address,
+              referrer: referrer,
             };
           }
           return null;
@@ -87,7 +94,7 @@ export const authOptions: NextAuthOptions = {
   },
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
-    async jwt({ token, account }) {
+    async jwt({ token, account, user }) {
       if (account) {
         // Create a new JWT access token
         const accessToken = jwt.sign(
@@ -101,8 +108,10 @@ export const authOptions: NextAuthOptions = {
 
         // Add the access token to the token object
         // console.log("Access token", accessToken);
-        AccountCreate(token.sub, accessToken);
+
+        AccountCreate(token.sub, accessToken, (user as any).referrer);
         token.accessToken = accessToken;
+        token.referrer = (user as any).referrer;
       }
       return token;
     },

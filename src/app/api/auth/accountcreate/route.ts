@@ -11,6 +11,7 @@ interface DelegateRequestBody {
   address: string;
   isEmailVisible: boolean;
   createdAt: Date;
+  referrer: string;
 }
 
 export async function POST(req: NextRequest, res: NextApiResponse) {
@@ -38,8 +39,12 @@ export async function POST(req: NextRequest, res: NextApiResponse) {
       return NextResponse.json({ error: "Invalid token" }, { status: 401 });
     }
 
-    const { address, isEmailVisible, createdAt }: DelegateRequestBody =
-      await req.json();
+    const {
+      address,
+      isEmailVisible,
+      createdAt,
+      referrer,
+    }: DelegateRequestBody = await req.json();
 
     client = await connectDB();
     const db = client.db();
@@ -69,6 +74,7 @@ export async function POST(req: NextRequest, res: NextApiResponse) {
       emailId: null,
       socialHandles: null,
       networks: null,
+      referrer: referrer,
     };
 
     const result = await collection.insertOne(newDocument);
