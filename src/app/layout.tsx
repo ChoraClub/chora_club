@@ -126,16 +126,6 @@ export default function RootLayout({
                 </div>
                 {/* <div className="lg:block hidden">
                 <div className="flex">
-                  <div className="fixed w-[6%] bg-blue-shade-100 h-screen z-10">
-                    <SidebarMain />
-                  </div>
-                  <div className="w-[94%] ml-auto">
-                    <FeedbackTile />
-                    <div>{children}</div>
-                  </div>
-                </div>
-                {/* <div className="lg:block hidden">
-                <div className="flex">
                 <div className="fixed w-[6%] bg-blue-shade-100 h-screen ">
                 <SidebarMain />
                 </div>
