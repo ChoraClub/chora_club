@@ -14,6 +14,7 @@ import LeaderboardSkeleton from "../SkeletonLoader/LeaderboardSkeletonLoader";
 import first from "@/assets/images/Leaderboard/first.svg";
 import second from "@/assets/images/Leaderboard/second.svg";
 import third from "@/assets/images/Leaderboard/third.svg";
+import { useAccount } from "wagmi";
 
 interface DelegateData {
   address: string;
@@ -43,7 +44,7 @@ function Leaderboard({ props }: { props: string }) {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const ITEMS_PER_PAGE = 10;
-
+  const address = useAccount();
   const handleCopy = (addr: string) => {
     copy(addr);
     toast("Address Copied");
@@ -228,9 +229,8 @@ function Leaderboard({ props }: { props: string }) {
               </select>
               <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
                 <div
-                  className={`transform transition-transform duration-300 ${
-                    isDropdownOpen ? "rotate-180" : ""
-                  }`}>
+                  className={`transform transition-transform duration-300 ${isDropdownOpen ? "rotate-180" : ""
+                    }`}>
                   <FaChevronDown className="h-4 w-4 text-black" />
                 </div>
               </div>
@@ -254,8 +254,8 @@ function Leaderboard({ props }: { props: string }) {
                     {[
                       {
                         label: "NFTs Claimed",
-                        tooltip: "Coming Soon..",
-                        // content: ""
+                        tooltip: "Number of NFTs collected from hosted sessions.",
+                        content: "coming soon" ,
                         align: "left",
                       },
                       {
@@ -277,31 +277,33 @@ function Leaderboard({ props }: { props: string }) {
                         align: "right",
                       },
                     ].map((item, index) => (
+                      <>
                       <div
                         key={index}
-                        className={`relative mx-2 w-[110px] text-gray-600 flex flex-col justify-center ${
-                          item.align === "left"
-                            ? "text-left justify-self-start ml-3 bg-yellow-200"
-                            : item.align === "right"
+                        className={`relative mx-2 w-[110px] text-gray-600 flex flex-col justify-center ${item.align === "left"
+                          ? "text-left justify-self-start ml-3 top-[-11px]"
+                          : item.align === "right"
                             ? "items-end"
                             : "text-center"
-                        }`}
+                          }`}
                         onMouseEnter={() =>
                           setHoveredTitle(item.label.toLowerCase())
                         }
                         onMouseLeave={() => setHoveredTitle("")}>
+                          {item.content && (
+                          <div className="text-xs text-center bg-yellow-200 text-yellow-800 rounded-md p-1 ">
+                            {item.content}
+                          </div>
+                        )}
                         <span>{item.label}</span>
                         {hoveredTitle === item.label.toLowerCase() && (
                           <div className="absolute top-[-50px] left-1/2 transform -translate-x-1/2 bg-gray-700 text-white text-xs rounded p-2 w-64">
                             {item.tooltip}
                           </div>
                         )}
-                        {/* {item.content && (
-                          <div className="mt-1 text-xs text-center bg-yellow-200 text-yellow-800 rounded-md p-1">
-                            {item.content}
-                          </div>
-                        )} */}
+                        
                       </div>
+                      </>
                     ))}
                   </div>
                 </div>
@@ -320,15 +322,14 @@ function Leaderboard({ props }: { props: string }) {
                     <div className="flex flex-col sm:flex-row justify-between items-center">
                       <div className="flex items-center space-x-5 mb-3 sm:mb-0">
                         <div
-                          className={`text-[#3E3D3D] font-semibold ml-5 flex justify-center items-center size-[67px] ${
+                          className={`text-[#3E3D3D] font-semibold ml-5 flex justify-center items-center size-[67px] ${getRankSymbol(delegate, allDelegatesData) ===
+                            "#1" ||
                             getRankSymbol(delegate, allDelegatesData) ===
-                              "#1" ||
-                            getRankSymbol(delegate, allDelegatesData) ===
-                              "#2" ||
+                            "#2" ||
                             getRankSymbol(delegate, allDelegatesData) === "#3"
-                              ? ""
-                              : "text-2xl"
-                          }`}>
+                            ? ""
+                            : "text-2xl"
+                            }`}>
                           {getRankSymbol(delegate, allDelegatesData)}
                         </div>
                         <div className="h-[105px] border-[0.1px] border-[#D5D4DF]"></div>
@@ -352,8 +353,10 @@ function Leaderboard({ props }: { props: string }) {
                               placement="right"
                               closeDelay={1}
                               showArrow>
-                              <span className="cursor-pointer text-xs">
-                                <IoCopy
+                              <span
+                                className={`cursor-pointer text-xs `}
+                              >                                
+                              <IoCopy
                                   onClick={() => handleCopy(delegate.address)}
                                 />
                               </span>
@@ -432,21 +435,26 @@ function Leaderboard({ props }: { props: string }) {
               )}
 
               <div className="flex justify-center mt-4 space-x-2">
-                <button
-                  onClick={() => handlePageChange(currentPage - 1)}
-                  disabled={currentPage === 1}
-                  className="px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-300">
-                  Previous
-                </button>
-                <span className="px-4 py-2">
-                  Page {currentPage} of {totalPages}
-                </span>
-                <button
-                  onClick={() => handlePageChange(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                  className="px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-300">
-                  Next
-                </button>
+                {currentPage <= totalPages && (
+                  <>
+                    <button
+                      onClick={() => handlePageChange(currentPage - 1)}
+                      disabled={currentPage === 1}
+                      className="px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-300">
+                      Previous
+                    </button>
+                    <span className="px-4 py-2">
+                      Page {currentPage} of {totalPages}
+                    </span>
+                    <button
+                      onClick={() => handlePageChange(currentPage + 1)}
+                      disabled={currentPage === totalPages}
+                      className="px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-300">
+                      Next
+                    </button>
+                  </>
+                )}
+
               </div>
             </div>
           )}
