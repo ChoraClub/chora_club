@@ -72,6 +72,13 @@ function ExploreDAOs() {
         setOpenSearch(false);
       }
     };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [openSearch]);
+
+  useEffect(() => {
     if (searchParams.get("referrer") && openConnectModal) {
       openConnectModal();
     }
@@ -82,9 +89,9 @@ function ExploreDAOs() {
       <div className="relative">
         <div className="flex flex-row justify-between items-center mb-6">
           <div className="flex gap-4 items-center">
-            <div className="lg:hidden">
+            {/* <div className="lg:hidden">
               <SidebarMainMobile />
-            </div>
+            </div> */}
             <div className="text-blue-shade-200 font-medium text-3xl md:text-4xl font-quanty ">
               Explore DAOs
             </div>

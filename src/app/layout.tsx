@@ -11,7 +11,7 @@ import FeedbackTile from "@/components/ComponentUtils/FeedbackTile";
 import Script from "next/script";
 import ProgressBarProvider from "@/components/ProgressBarProvider/ProgressBarProvider";
 import MobileResponsiveMessage from "@/components/MobileResponsiveMessage/MobileResponsiveMessage";
-import { GoogleTagManager } from '@next/third-parties/google';
+import { GoogleTagManager } from "@next/third-parties/google";
 import SidebarMainMobile from "@/components/MainSidebar/SidebarMainMobile";
 const poppins = Poppins({
   subsets: ["latin"],
@@ -115,9 +115,9 @@ export default function RootLayout({
                 <div className="hidden lg:block fixed w-[6%] bg-blue-shade-100 h-screen z-10">
                   <SidebarMain />
                 </div>
-                {/* <div className="lg:hidden fixed z-10">
-                  <SidebarMainMobile/>
-                </div> */}
+                <div className="lg:hidden fixed z-10">
+                  <SidebarMainMobile />
+                </div>
                 <div className="w-[100%] lg:w-[94%] ml-auto">
                   <FeedbackTile />
                   <div>{children}</div>
