@@ -27,6 +27,7 @@ interface AttestOffchainRequestBody {
   startTime: number;
   endTime: number;
   daoName: string;
+  meetingData?: any;
 }
 
 interface MyError {
@@ -59,8 +60,8 @@ export async function POST(req: NextRequest, res: NextResponse) {
   (BigInt.prototype as any).toJSON = function () {
     return this.toString();
   };
-  const requestData = await req.json();
-  // const requestData = (await req.json()) as AttestOffchainRequestBody;
+  // const requestData = await req.json();
+  const requestData = (await req.json()) as AttestOffchainRequestBody;
   // Your validation logic here
 
   console.log("requestData in attest-offchain API", requestData);
@@ -298,7 +299,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
     }
     const notificationToSend = {
       receiver_address: offchainAttestation.message.recipient,
-      content: `Congratulations 🎉 ! You just received an Off-chain attestation for attending "${requestData.meetingData.title}".`,
+      content: `Congratulations 🎉 ! You just received an Off-chain attestation for attending "${requestData?.meetingData?.title}".`,
       createdAt: Date.now(),
       read_status: false,
       notification_name: "offchain",

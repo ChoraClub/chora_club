@@ -206,6 +206,9 @@ export async function POST(req: NextRequest, res: NextResponse) {
       latestEndTime = Math.max(latestEndTime, meeting.endTime);
     });
 
+    console.log("Earliest Start Time:", earliestStartTime);
+    console.log("Latest End Time:", latestEndTime);
+
     console.log("Earliest Start Time:", new Date(earliestStartTime));
     console.log("Latest End Time:", new Date(latestEndTime));
 

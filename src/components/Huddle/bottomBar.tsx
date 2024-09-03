@@ -183,21 +183,6 @@ const BottomBar = ({
 
   const handleEndCall = async (endMeet: string) => {
     setIsLoading(true);
-    // Check if the user is the host
-
-    // const response = await fetch(`/api/get-host`, {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    //   body: JSON.stringify({
-    //     meetingId: roomId,
-    //   }),
-    // });
-    // const response_data = await response.json();
-    // const host_address = await response_data.address;
-
-    // console.log("host address", host_address);
 
     if (role === "host" && meetingStatus === true) {
       await handleStopRecording(); // Do not proceed with API calls if not the host
