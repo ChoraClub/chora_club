@@ -7,7 +7,7 @@ import { IoIosRocket, IoMdNotifications } from "react-icons/io";
 import { SiGitbook } from "react-icons/si";
 import { PiUsersThreeFill } from "react-icons/pi";
 import { FaBusinessTime, FaUser } from "react-icons/fa6";
-import { BiSolidWallet } from "react-icons/bi";
+import { BiSolidMessageSquareAdd, BiSolidWallet } from "react-icons/bi";
 import { FiArrowUpRight } from "react-icons/fi";
 import {useSidebar} from "../../app/hooks/useSidebar"
 import { Badge, Tooltip, VisuallyHidden } from "@nextui-org/react";
@@ -63,12 +63,17 @@ const SidebarMainMobile = () => {
 
   return (
     <div className="relative">
+      <div className="absolute top-0 left-0 flex items-center w-full border-b-1 p-1 bg-white">
+
       <div
-        className="bg-blue-shade-200 text-white text-lg font-bold p-1.5 rounded-full cursor-pointer"
+        className="bg-blue-shade-200 text-white text-lg font-bold p-1.5 rounded-full cursor-pointer my-4 mx-4"
         onClick={toggleSidebar}
-      >
+        >
         <IoMenu className="size-6"/>
       </div>
+      <div className="border border-l-0 h-16"></div>
+      <Link className="ml-4 text-black font-semibold text-[32px] font-poppins flex items-center" href={"https://chora.club/"}>Chora <span className="text-blue-shade-200">Club</span></Link>
+        </div>
 
       <div
         ref={sidebarRef}
@@ -88,7 +93,7 @@ const SidebarMainMobile = () => {
           >
             <HiArrowSmLeft className="size-6" />
           </button>
-        <div className="ml-5 text-white font-semibold text-[32px] font-poppins">Chora Club</div>
+        <Link className="ml-5 text-black font-semibold text-[32px] font-poppins" href={"https://chora.club/"}>Chora <span className="text-white">Club</span></Link>
         </div>
       
           <nav className="mt-20 mr-6">
@@ -98,7 +103,7 @@ const SidebarMainMobile = () => {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
                       <IoIosRocket className="size-5 mr-4" />
-                      <span>DAOs</span>
+                      <span>Explore DAOs</span>
                     </div>
                     <FiArrowUpRight className="w-5 h-5" />
                   </div>
@@ -129,6 +134,21 @@ const SidebarMainMobile = () => {
                     <div className="flex items-center">
                       <PiUsersThreeFill className="size-5 mr-4" />
                       <span>Sessions</span>
+                    </div>
+                    <FiArrowUpRight className="w-5 h-5" />
+                  </div>
+                </Link>
+                <div className="h-[0.1px] w-full bg-white"></div>
+              </li>
+              <li>
+                <Link
+                  href={"/invite"}
+                  className="block py-4 pl-6 sm:py-5 hover:bg-blue-shade-100"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <BiSolidMessageSquareAdd className="size-5 mr-4" />
+                      <span>Invite</span>
                     </div>
                     <FiArrowUpRight className="w-5 h-5" />
                   </div>
@@ -211,7 +231,10 @@ const SidebarMainMobile = () => {
             </ul>
           </nav>
           {storedDao.length>0 && (
-          <div className=" flex w-[90%] items-center gap-4 absolute bottom-4 mx-[5%] rounded-xl bg-blue-shade-300 p-4">
+            <>
+          <div className=" flex flex-col w-[90%] gap-2 absolute bottom-4 mx-[5%] ">
+          <h1 className="text-white font-semibold text-lg">Recently Viewed DAOs</h1>
+          <div className="flex items-center gap-4 rounded-xl bg-blue-shade-300 p-4">
           {storedDao ? (
                 storedDao.map((data, index) => (
                   <div
@@ -263,6 +286,8 @@ const SidebarMainMobile = () => {
                 <></>
               )}
           </div>
+          </div>
+          </>
           )}
         </div>
       </div>

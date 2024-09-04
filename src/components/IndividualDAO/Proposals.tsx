@@ -407,33 +407,35 @@ function Proposals({ props }: { props: string }) {
         {displayedProposals.map((proposal: Proposal, index: number) => (
           <div
             key={index}
-            className="flex p-4 text-lg mb-2 gap-5 bg-gray-100 hover:bg-gray-50 rounded-3xl transition-shadow duration-300 ease-in-out shadow-lg cursor-pointer items-center"
+            className="flex flex-col md:flex-row p-4 text-lg mb-2 gap-5 bg-gray-100 hover:bg-gray-50 rounded-3xl transition-shadow duration-300 ease-in-out shadow-lg cursor-pointer items-center"
             onClick={() => handleClick(proposal)}
           >
-            <div className="flex basis-1/2">
+            <div className="flex items-center md:w-[60%]">
               <Image
                 src={dao_details[props as keyof typeof dao_details].logo}
                 alt={`${
                   dao_details[props as keyof typeof dao_details].title
                 } logo`}
-                className="size-10 mx-5 rounded-full"
+                className="size-10 mx-5 rounded-full flex-shrink-0"
               />
               <div>
                 <p className="text-base font-medium">
-                  {truncateText(proposal.description || "", 50)}
+                  {truncateText(proposal.description || "", 65)}
                 </p>
                 <div className="flex gap-1">
                   {/* <Image src={user} alt="" className="size-4" /> */}
                   <p className="flex text-xs font-normal items-center">
                     <span className="text-[#004DFF]"> Created at </span>&nbsp;
                     {formatDate(proposal.blockTimestamp)}
+                    <span><LuDot/></span>
+                    <span className="font-bold text-sm text-blue-shade-200">OnChain</span>
                   </p>
                 </div>
               </div>
             </div>
 
-            <div className="flex justify-around items-center basis-1/2">
-              <Tooltip
+            <div className="flex flex-wrap justify-between items-center md:w-[40%] mt-4 md:mt-0 gap-2">
+              {/* <Tooltip
                 showArrow
                 content={<div className="font-poppins">OnChain</div>}
                 placement="bottom"
@@ -443,7 +445,7 @@ function Proposals({ props }: { props: string }) {
                 <div>
                   <Image src={chain} alt="" className="size-8" />
                 </div>
-              </Tooltip>
+              </Tooltip> */}
               {proposal.votesLoaded ? (
                 <div
                   className={`rounded-full flex items-center justify-center text-xs h-fit py-0.5 border font-medium w-24 ${

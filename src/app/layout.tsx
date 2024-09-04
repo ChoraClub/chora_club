@@ -115,10 +115,10 @@ export default function RootLayout({
                 <div className="hidden lg:block fixed w-[6%] bg-blue-shade-100 h-screen z-10">
                   <SidebarMain />
                 </div>
-                <div className="lg:hidden fixed z-10">
+                <div className="lg:hidden fixed z-10 w-full bg-white border border-b-0">
                   <SidebarMainMobile />
                 </div>
-                <div className="w-[100%] lg:w-[94%] ml-auto">
+                <div className="w-[100%] lg:w-[94%] ml-auto mt-[78px] sm:mt-[64px] lg:mt-0">
                   <FeedbackTile />
                   <div>{children}</div>
                 </div>

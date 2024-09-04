@@ -50,6 +50,15 @@ function FollowingModal({
   const { chain } = useAccount();
   const [activeButton, setActiveButton] = useState("");
   const router = useRouter();
+  const [isButtonLoading, setIsButtonLoading] = useState(false); 
+
+  const handleChainChange = async (chain: string) => {
+    setActiveButton(chain);
+    setIsButtonLoading(true); // Start loading
+    await handleUpdateFollowings(chain, 0, 0);
+    setIsButtonLoading(false); // Stop loading
+    setChainName(chain);
+  };
 
   const handleCopy = (addr: string) => {
     copy(addr);
@@ -68,11 +77,9 @@ function FollowingModal({
 
   useEffect(() => {
     if (chain && chain?.name === "Optimism") {
-      setChainName("optimism");
-      setActiveButton("optimism");
+      handleChainChange("optimism");
     } else if (chain && chain?.name === "Arbitrum One") {
-      setChainName("arbitrum");
-      setActiveButton("arbitrum");
+      handleChainChange("arbitrum");
     }
   }, [chain]);
 
@@ -154,34 +161,40 @@ function FollowingModal({
             >
               <div className="flex ml-10 mt-5 gap-5 ">
                 <button
-                  className={`border border-[#CCCCCC] px-4 py-1 rounded-lg text-lg flex items-center gap-1.5 ${
+                  className={`border border-[#CCCCCC] px-4 py-1 rounded-lg text-lg flex w-[141px] items-center justify-center gap-1.5 ${
                     activeButton === "optimism"
                       ? "bg-[#8E8E8E] text-white"
                       : "bg-[#F5F5F5] text-[#3E3D3D]"
                   }`}
-                  onClick={() => {
-                    setActiveButton("optimism");
-                    handleUpdateFollowings("optimism", 0, 0);
-                    setChainName("optimism");
-                  }}
+                  onClick={() => handleChainChange("optimism")}
+                  disabled={isButtonLoading} 
                 >
-                  <Image src={oplogo} alt="optimism" width={23} className="" />
-                  Optimism
+                  {isButtonLoading && activeButton === "optimism" ? (
+                    <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></div> // Skeleton Loader
+                  ) : (
+                    <>
+                      <Image src={oplogo} alt="optimism" width={23} />
+                      Optimism
+                    </>
+                  )}
                 </button>
                 <button
-                  className={`border border-[#CCCCCC] px-4 py-1 rounded-lg text-lg flex items-center gap-1.5 ${
+                  className={`border border-[#CCCCCC] px-4 py-1 w-[141px] rounded-lg text-lg flex items-center justify-center gap-1.5 ${
                     activeButton === "arbitrum"
                       ? "bg-[#8E8E8E] text-white"
                       : "bg-[#F5F5F5] text-[#3E3D3D]"
                   }`}
-                  onClick={() => {
-                    setActiveButton("arbitrum");
-                    handleUpdateFollowings("arbitrum", 0, 0);
-                    setChainName("arbitrum");
-                  }}
+                  onClick={() => handleChainChange("arbitrum")}
+                  disabled={isButtonLoading} 
                 >
-                  <Image src={arbcir} alt="arbitrum" width={23} className="" />
-                  Arbitrum
+                  {isButtonLoading && activeButton === "arbitrum" ? (
+                    <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></div> // Skeleton Loader
+                  ) : (
+                    <>
+                      <Image src={arbcir} alt="arbitrum" width={23} />
+                      Arbitrum
+                    </>
+                  )}
                 </button>
               </div>
               <hr className="border-t border-gray-300 my-6 mx-10" />

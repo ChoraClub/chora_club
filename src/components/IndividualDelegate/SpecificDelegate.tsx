@@ -58,6 +58,8 @@ import { IoMdNotificationsOff } from "react-icons/io";
 import { BASE_URL } from "@/config/constants";
 import { getChainAddress, getDaoName } from "@/utils/chainUtils";
 import { optimism, arbitrum } from "viem/chains";
+import RewardButton from "../ClaimReward/RewardButton";
+import MobileResponsiveMessage from "../MobileResponsiveMessage/MobileResponsiveMessage";
 
 interface Type {
   daoDelegates: string;
@@ -752,6 +754,11 @@ function SpecificDelegate({ props }: { props: Type }) {
 
   return (
     <>
+    {/* For Mobile Screen */}
+    <MobileResponsiveMessage/>
+
+    {/* For Desktop Screen  */}
+    <div className="hidden md:block">
       {isPageLoading && <MainProfileSkeletonLoader />}
       {!isPageLoading && (isDelegate || selfDelegate) ? (
         <div className="font-poppins">
@@ -1088,7 +1095,10 @@ function SpecificDelegate({ props }: { props: Type }) {
               </div>
             </div>
             <div className="pr-[2.2rem]">
+            <div className="flex gap-1 xs:gap-2 items-center">
+              <RewardButton />
               <ConnectWalletWithENS />
+            </div>
             </div>
           </div>
 
@@ -1194,6 +1204,7 @@ function SpecificDelegate({ props }: { props: Type }) {
           confettiVisible={confettiVisible}
         />
       )}
+    </div>
     </>
   );
 }
