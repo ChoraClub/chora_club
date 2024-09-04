@@ -853,7 +853,7 @@ function ProposalMain({ props }: { props: Props }) {
       case "CANCELLED":
         return "bg-red-200 border-red-500 text-red-500";
       default:
-        return "bg-green-200 border-green-600 text-green-600";
+        return "bg-yellow-200 border-yellow-600 text-yellow-600";
     }
   };
 

@@ -76,8 +76,9 @@ function Proposals({ props }: { props: string }) {
   };
   useEffect(() => {
     const fetchCanacelledProposals = async () => {
-      const response = await fetch(`/api/get-canceledproposal`);
+      const response = await fetch(`/api/get-canceledproposal?dao=${props}`);
       const result = await response.json();
+      console.log("result", result);
       setCanceledProposals(result);
     };
     fetchCanacelledProposals();
@@ -418,17 +419,28 @@ function Proposals({ props }: { props: string }) {
                 } logo`}
                 className="size-10 mx-5 rounded-full flex-shrink-0"
               />
+
               <div>
                 <p className="text-base font-medium">
-                  {truncateText(proposal.description || "", 65)}
+                  {proposal.proposalId ===
+                  "109425185690543736048728494223916696230797128756558452562790432121529327921478"
+                    ? `[Cancelled] ${truncateText(
+                        proposal.description || "",
+                        65
+                      )}`
+                    : truncateText(proposal.description || "", 65)}
                 </p>
                 <div className="flex gap-1">
                   {/* <Image src={user} alt="" className="size-4" /> */}
                   <p className="flex text-xs font-normal items-center">
                     <span className="text-[#004DFF]"> Created at </span>&nbsp;
                     {formatDate(proposal.blockTimestamp)}
-                    <span><LuDot/></span>
-                    <span className="font-bold text-sm text-blue-shade-200">OnChain</span>
+                    <span>
+                      <LuDot />
+                    </span>
+                    <span className="font-bold text-sm text-blue-shade-200">
+                      OnChain
+                    </span>
                   </p>
                 </div>
               </div>
@@ -468,19 +480,31 @@ function Proposals({ props }: { props: string }) {
               {proposal.votesLoaded ? (
                 <div
                   className={`py-0.5 rounded-md text-sm font-medium border flex justify-center items-center w-32 
-                  ${
-                    proposal.support1Weight! === 0 &&
-                    proposal.support0Weight! === 0 &&
-                    proposal.support2Weight! === 0
-                      ? "bg-[#FFEDD5] border-[#F97316] text-[#F97316]"
-                      : proposal.support1Weight! > proposal.support0Weight!
-                      ? "text-[#639b55] border-[#639b55] bg-[#dbf8d4]"
-                      : "bg-[#fa989a] text-[#e13b15] border-[#e13b15]"
-                  }`}
+               ${
+                 canceledProposals?.some(
+                   (item) => item.proposalId === proposal.proposalId
+                 )
+                   ? proposal.support1Weight! > proposal.support0Weight!
+                     ? "text-[#639b55] border-[#639b55] bg-[#dbf8d4]" // Styles for proposals with more 'FOR' votes
+                     : "bg-[#fa989a] text-[#e13b15] border-[#e13b15]"
+                   : proposal.support1Weight! === 0 &&
+                     proposal.support0Weight! === 0 &&
+                     proposal.support2Weight! === 0
+                   ? "bg-[#FFEDD5] border-[#F97316] text-[#F97316]" // Styles for proposals that haven't started
+                   : proposal.support1Weight! > proposal.support0Weight!
+                   ? "text-[#639b55] border-[#639b55] bg-[#dbf8d4]" // Styles for proposals with more 'FOR' votes
+                   : "bg-[#fa989a] text-[#e13b15] border-[#e13b15]" // Styles for proposals with more 'AGAINST' votes
+               }`}
                 >
-                  {proposal.support1Weight! === 0 &&
-                  proposal.support0Weight! === 0 &&
-                  proposal.support2Weight! === 0
+                  {canceledProposals?.some(
+                    (item) => item.proposalId === proposal.proposalId
+                  )
+                    ? proposal.support1Weight! > proposal.support0Weight!
+                      ? `${formatWeight(proposal.support1Weight!)} FOR`
+                      : `${formatWeight(proposal.support0Weight!)} AGAINST`
+                    : proposal.support1Weight! === 0 &&
+                      proposal.support0Weight! === 0 &&
+                      proposal.support2Weight! === 0
                     ? "Yet to start"
                     : proposal.support1Weight! > proposal.support0Weight!
                     ? `${formatWeight(proposal.support1Weight!)} FOR`
@@ -490,7 +514,7 @@ function Proposals({ props }: { props: string }) {
                 <VoteLoader />
               )}
               <div className="flex items-center justify-center w-[15%]">
-                <div className="rounded-full bg-[#f4d3f9] border border-[#77367a] flex items-center justify-center text-[#77367a] text-xs h-fit py-0.5 font-medium px-2 ">
+                <div className="rounded-full bg-[#f4d3f9] border border-[#77367a] flex text-[#77367a] text-xs h-fit py-0.5 font-medium px-2 ">
                   {(() => {
                     if (
                       canceledProposals.some(

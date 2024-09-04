@@ -82,21 +82,25 @@ export async function fetchEnsAvatar(address: string) {
       return;
     }
 
-    // Fetch various ENS details
-    const resolvedAddress = await resolver.getAddress();
-    const avatar = await resolver.getAvatar();
-    const contentHash = await resolver.getContentHash();
-    const email = await resolver.getText("email");
-    const url = await resolver.getText("url");
-    const description = await resolver.getText("description");
-    const notice = await resolver.getText("notice");
-    const keywords = await resolver.getText("keywords");
-    const discord = await resolver.getText("com.discord");
-    const github = await resolver.getText("com.github");
-    const reddit = await resolver.getText("com.reddit");
-    const twitter = await resolver.getText("com.twitter");
-    const supportsWildcard = await resolver.supportsWildcard();
+    // // Fetch various ENS details
+    // const resolvedAddress = await resolver.getAddress();
+    // const avatar = await resolver.getAvatar();
+    // const contentHash = await resolver.getContentHash();
+    // const email = await resolver.getText("email");
+    // const url = await resolver.getText("url");
+    // const description = await resolver.getText("description");
+    // const notice = await resolver.getText("notice");
+    // const keywords = await resolver.getText("keywords");
+    // const discord = await resolver.getText("com.discord");
+    // const github = await resolver.getText("com.github");
+    // const reddit = await resolver.getText("com.reddit");
+    // const twitter = await resolver.getText("com.twitter");
+    // const supportsWildcard = await resolver.supportsWildcard();
     // console.log("ensName", ensName);
+      // Fetch ENS details in parallel
+      const [avatar] = await Promise.all([
+        resolver.getAvatar(),
+      ]);
     return { avatar, ensName, ensNameOrAddress };
   } catch (error) {
     console.error(`Error fetching ENS details for address ${address}:`, error);
