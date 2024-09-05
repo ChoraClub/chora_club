@@ -87,6 +87,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
     console.log("meetingsData...", meetingsData);
     const meetings: Meeting[] = meetingsData.meetings;
 
+    console.log("meetings:::", meetings);
     // Calculate total meeting time
     let totalMeetingTimeInMinutes = 0;
 
@@ -109,7 +110,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
         `https://api.huddle01.com/api/v1/rooms/participant-list?meetingId=${meeting.meetingId}`,
         requestOptionsForMeeting
       );
-      console.log("response", response);
+      console.log("response for meetingID:::", response);
       if (!response.ok) {
         throw new Error("Failed to fetch participant list");
       }
@@ -205,6 +206,9 @@ export async function POST(req: NextRequest, res: NextResponse) {
       earliestStartTime = Math.min(earliestStartTime, meeting.startTime);
       latestEndTime = Math.max(latestEndTime, meeting.endTime);
     });
+
+    console.log("Earliest Start Time:", earliestStartTime);
+    console.log("Latest End Time:", latestEndTime);
 
     console.log("Earliest Start Time:", new Date(earliestStartTime));
     console.log("Latest End Time:", new Date(latestEndTime));

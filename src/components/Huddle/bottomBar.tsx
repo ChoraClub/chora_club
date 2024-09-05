@@ -146,20 +146,25 @@ const BottomBar = ({
           roomId: roomId,
         }),
       };
-      const status = await fetch(
+      const response = await fetch(
         `/api/stopRecording/${roomId}`,
         requestOptions
       );
-      console.log("status: ", status);
+      const data = await response.json();
+      console.log("response: ", response);
 
-      if (!status.ok) {
-        console.error(`Request failed with status: ${status.status}`);
+      if (!response.ok) {
+        console.error(`Request failed with status: ${response.status}`);
         toast.error("Failed to stop recording");
         return;
       }
 
-      setIsRecording(false);
-      toast.success("Recording stopped");
+      if (data.success === true) {
+        setIsRecording(false);
+        toast.success("Recording stopped");
+        const success = true;
+        return success;
+      }
     } catch (error) {
       console.error("Error during stop recording:", error);
       toast.error("Error during stop recording");
@@ -183,24 +188,10 @@ const BottomBar = ({
 
   const handleEndCall = async (endMeet: string) => {
     setIsLoading(true);
-    // Check if the user is the host
 
-    // const response = await fetch(`/api/get-host`, {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    //   body: JSON.stringify({
-    //     meetingId: roomId,
-    //   }),
-    // });
-    // const response_data = await response.json();
-    // const host_address = await response_data.address;
-
-    // console.log("host address", host_address);
-
+    let stopRecordingResult;
     if (role === "host" && meetingStatus === true) {
-      await handleStopRecording(); // Do not proceed with API calls if not the host
+      stopRecordingResult = await handleStopRecording();
     }
 
     console.log("s3URL in handleEndCall", s3URL);
@@ -270,11 +261,12 @@ const BottomBar = ({
             hostAddress: hostAddress,
           }),
         };
-        // console.log("req optionnnn", requestOptions);
 
-        const response2 = await fetch("/api/end-call", requestOptions);
-        const result = await response2.text();
-        console.log("result in end call::", result);
+        if (stopRecordingResult === true) {
+          const response2 = await fetch("/api/end-call", requestOptions);
+          const result = await response2.text();
+          console.log("result in end call::", result);
+        }
       } catch (error) {
         console.error("Error handling end call:", error);
       }
