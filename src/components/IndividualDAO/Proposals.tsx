@@ -76,8 +76,9 @@ function Proposals({ props }: { props: string }) {
   };
   useEffect(() => {
     const fetchCanacelledProposals = async () => {
-      const response = await fetch(`/api/get-canceledproposal`);
+      const response = await fetch(`/api/get-canceledproposal?dao=${props}`);
       const result = await response.json();
+      console.log("result", result);
       setCanceledProposals(result);
     };
     fetchCanacelledProposals();
@@ -413,14 +414,18 @@ function Proposals({ props }: { props: string }) {
             <div className="flex basis-1/2">
               <Image
                 src={dao_details[props as keyof typeof dao_details].logo}
-                alt={`${
-                  dao_details[props as keyof typeof dao_details].title
-                } logo`}
+                alt={`${dao_details[props as keyof typeof dao_details].title
+                  } logo`}
                 className="size-10 mx-5 rounded-full"
               />
               <div>
                 <p className="text-base font-medium">
-                  {truncateText(proposal.description || "", 50)}
+                  {
+                    proposal.proposalId === "109425185690543736048728494223916696230797128756558452562790432121529327921478"
+                      ? `[Cancelled] ${truncateText(proposal.description || "", 50)}`
+                      : truncateText(proposal.description || "", 50)
+                  }
+
                 </p>
                 <div className="flex gap-1">
                   {/* <Image src={user} alt="" className="size-4" /> */}
@@ -446,16 +451,15 @@ function Proposals({ props }: { props: string }) {
               </Tooltip>
               {proposal.votesLoaded ? (
                 <div
-                  className={`rounded-full flex items-center justify-center text-xs h-fit py-0.5 border font-medium w-24 ${
-                    getProposalStatus(proposal) === "SUCCEEDED"
-                      ? "bg-green-200 border-green-600 text-green-600"
-                      : getProposalStatus(proposal) === "DEFEATED" ||
-                        getProposalStatus(proposal) === "CANCELLED"
+                  className={`rounded-full flex items-center justify-center text-xs h-fit py-0.5 border font-medium w-24 ${getProposalStatus(proposal) === "SUCCEEDED"
+                    ? "bg-green-200 border-green-600 text-green-600"
+                    : getProposalStatus(proposal) === "DEFEATED" ||
+                      getProposalStatus(proposal) === "CANCELLED"
                       ? "bg-red-200 border-red-500 text-red-500"
                       : getProposalStatus(proposal) === "QUEUED"
-                      ? "bg-yellow-200 border-yellow-600 text-yellow-600"
-                      : "bg-yellow-200 border-yellow-600 text-yellow-600"
-                  }`}
+                        ? "bg-yellow-200 border-yellow-600 text-yellow-600"
+                        : "bg-yellow-200 border-yellow-600 text-yellow-600"
+                    }`}
                 >
                   {getProposalStatus(proposal)}
                 </div>
@@ -466,23 +470,32 @@ function Proposals({ props }: { props: string }) {
               {proposal.votesLoaded ? (
                 <div
                   className={`py-0.5 rounded-md text-sm font-medium border flex justify-center items-center w-32 
-                  ${
-                    proposal.support1Weight! === 0 &&
-                    proposal.support0Weight! === 0 &&
-                    proposal.support2Weight! === 0
-                      ? "bg-[#FFEDD5] border-[#F97316] text-[#F97316]"
-                      : proposal.support1Weight! > proposal.support0Weight!
-                      ? "text-[#639b55] border-[#639b55] bg-[#dbf8d4]"
-                      : "bg-[#fa989a] text-[#e13b15] border-[#e13b15]"
-                  }`}
+               ${canceledProposals?.some((item) => item.proposalId === proposal.proposalId)
+                      ? proposal.support1Weight! > proposal.support0Weight!
+                        ? "text-[#639b55] border-[#639b55] bg-[#dbf8d4]" // Styles for proposals with more 'FOR' votes
+                        : "bg-[#fa989a] text-[#e13b15] border-[#e13b15]"
+                      : proposal.support1Weight! === 0 &&
+                        proposal.support0Weight! === 0 &&
+                        proposal.support2Weight! === 0
+                        ? "bg-[#FFEDD5] border-[#F97316] text-[#F97316]" // Styles for proposals that haven't started
+                        : proposal.support1Weight! > proposal.support0Weight!
+                          ? "text-[#639b55] border-[#639b55] bg-[#dbf8d4]" // Styles for proposals with more 'FOR' votes
+                          : "bg-[#fa989a] text-[#e13b15] border-[#e13b15]" // Styles for proposals with more 'AGAINST' votes
+                    }`}
                 >
-                  {proposal.support1Weight! === 0 &&
-                  proposal.support0Weight! === 0 &&
-                  proposal.support2Weight! === 0
-                    ? "Yet to start"
-                    : proposal.support1Weight! > proposal.support0Weight!
-                    ? `${formatWeight(proposal.support1Weight!)} FOR`
-                    : `${formatWeight(proposal.support0Weight!)} AGAINST`}
+                  {
+                    canceledProposals?.some((item) => item.proposalId === proposal.proposalId)
+                      ? proposal.support1Weight! > proposal.support0Weight!
+                        ? `${formatWeight(proposal.support1Weight!)} FOR`
+                        : `${formatWeight(proposal.support0Weight!)} AGAINST`
+                      : proposal.support1Weight! === 0 &&
+                        proposal.support0Weight! === 0 &&
+                        proposal.support2Weight! === 0
+                        ? "Yet to start"
+                        : proposal.support1Weight! > proposal.support0Weight!
+                          ? `${formatWeight(proposal.support1Weight!)} FOR`
+                          : `${formatWeight(proposal.support0Weight!)} AGAINST`
+                  }
                 </div>
               ) : (
                 <VoteLoader />
@@ -509,9 +522,8 @@ function Proposals({ props }: { props: string }) {
                     if (props === "arbitrum") {
                       if (daysDifference <= 3) {
                         const daysLeft = Math.ceil(3 - daysDifference);
-                        return `${daysLeft} day${
-                          daysLeft !== 1 ? "s" : ""
-                        } to go`;
+                        return `${daysLeft} day${daysLeft !== 1 ? "s" : ""
+                          } to go`;
                       } else if (daysDifference <= 17) {
                         return "Active";
                       } else {

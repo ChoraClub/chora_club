@@ -59,7 +59,11 @@ export const GET = async (req: NextRequest) => {
       }
       newSkip  += skipCount;
     }
+// Define the wrong address you want to remove
+const wrongAddress = "0x00000000000000000000000000000000000a4b86";
 
+// Filter out the wrong address from the uniqueDelegates map
+uniqueDelegates.delete(wrongAddress);
     const result = Array.from(uniqueDelegates, ([delegate, data]) => ({
         delegate,
       ...data
