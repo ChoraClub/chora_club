@@ -74,8 +74,7 @@ const BottomBar = ({
     isScreenShared,
     setIsScreenShared,
   } = useStudioState();
-  const [showModal, setShowModal] = useState(true);
-  // const [recordingStatus, setRecordingStatus] = useState<string | null>(null);
+  const [roomClosed, setRoomClosed] = useState<Boolean>();
   const { startScreenShare, stopScreenShare, shareStream } =
     useLocalScreenShare({
       onProduceStart(data) {
@@ -126,6 +125,21 @@ const BottomBar = ({
     },
   });
 
+  useEffect(() => {
+    const handleBeforeUnload = (event: any) => {
+      if (role === "host") {
+        event.preventDefault();
+        event.returnValue = "Changes you made may not be saved.";
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [role]);
+
   const handleStopRecording = async () => {
     console.log("stop recording");
     if (!roomId) {
@@ -171,107 +185,53 @@ const BottomBar = ({
     }
   };
 
-  useEffect(() => {
-    const handleBeforeUnload = (event: any) => {
-      if (role === "host") {
-        event.preventDefault();
-        event.returnValue = "Changes you made may not be saved.";
+  const { state } = useRoom({
+    onLeave: async ({ reason }) => {
+      if (reason === "LEFT") {
+        console.log("inside reason left");
       }
-    };
-
-    window.addEventListener("beforeunload", handleBeforeUnload);
-
-    return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-    };
-  }, [role]);
-
-  const handleEndCall = async (endMeet: string) => {
-    setIsLoading(true);
-
-    let stopRecordingResult;
-    if (role === "host" && meetingStatus === true) {
-      stopRecordingResult = await handleStopRecording();
-    }
-
-    console.log("s3URL in handleEndCall", s3URL);
-    toast("Meeting Ended");
-    if (endMeet === "leave") {
-      leaveRoom();
-      setIsLoading(false);
-      setShowLeaveDropDown(false);
-    } else if (endMeet === "close") {
-      if (role === "host") {
-        try {
-          const myHeaders = new Headers();
-          myHeaders.append("Content-Type", "application/json");
-          if (address) {
-            myHeaders.append("x-wallet-address", address);
-          }
-          const requestOptions = {
-            method: "PUT",
-            headers: myHeaders,
-            body: JSON.stringify({
-              meetingId: roomId,
-              meetingType: meetingCategory,
-              recordedStatus: isRecording,
-              meetingStatus: isRecording === true ? "Recorded" : "Finished",
-            }),
-          };
-
-          const response = await fetch(
-            "/api/update-recording-status",
-            requestOptions
-          );
-          console.log("Response: ", response);
-        } catch (e) {
-          console.log("Error: ", e);
-        }
+      if (reason === "CLOSED") {
+        console.log("inside reason closed");
+        console.log("room:::", room);
+        console.log("state:::", state);
+        setRoomClosed(true);
       }
-      closeRoom();
-      setIsLoading(false);
-      setShowLeaveDropDown(false);
+    },
+  });
+
+  const handleCloseMeeting = async () => {
+    // if (role === "host") {
+    let meetingType;
+    if (meetingCategory === "officehours") {
+      meetingType = 2;
+    } else if (meetingCategory === "session") {
+      meetingType = 1;
     } else {
-      return;
+      meetingType = 0;
     }
 
-    if (role === "host") {
-      let meetingType;
-      if (meetingCategory === "officehours") {
-        meetingType = 2;
-      } else if (meetingCategory === "session") {
-        meetingType = 1;
-      } else {
-        meetingType = 0;
+    try {
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      if (address) {
+        myHeaders.append("x-wallet-address", address);
       }
+      const requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        body: JSON.stringify({
+          roomId: roomId,
+          meetingType: meetingType,
+          dao_name: daoName,
+          hostAddress: hostAddress,
+        }),
+      };
 
-      try {
-        const myHeaders = new Headers();
-        myHeaders.append("Content-Type", "application/json");
-        if (address) {
-          myHeaders.append("x-wallet-address", address);
-        }
-        const requestOptions = {
-          method: "POST",
-          headers: myHeaders,
-          body: JSON.stringify({
-            roomId: roomId,
-            meetingType: meetingType,
-            dao_name: daoName,
-            hostAddress: hostAddress,
-          }),
-        };
+      const response = await fetch("/api/end-call", requestOptions);
+      const result = await response.json();
+      console.log("result in end call::", result);
 
-        if (stopRecordingResult === true) {
-          const response2 = await fetch("/api/end-call", requestOptions);
-          const result = await response2.text();
-          console.log("result in end call::", result);
-        }
-      } catch (error) {
-        console.error("Error handling end call:", error);
-      }
-
-      if (meetingStatus === true) {
+      if (meetingStatus === true && result.success) {
         try {
           toast.success("Giving Attestations");
           const myHeaders = new Headers();
@@ -295,11 +255,129 @@ const BottomBar = ({
           }
         } catch (e) {
           console.log("Error in attestation: ", e);
-          // toast.error("Attestation denied");
+          toast.error("Attestation denied");
         }
       }
+    } catch (error) {
+      console.error("Error handling end call:", error);
+    }
+    // }
+  };
+
+  const handleEndCall = async (endMeet: string) => {
+    setIsLoading(true);
+
+    if (role === "host" && meetingStatus === true) {
+      await handleStopRecording();
     }
 
+    console.log("s3URL in handleEndCall", s3URL);
+    toast("Meeting Ended");
+    if (endMeet === "leave") {
+      leaveRoom();
+      setIsLoading(false);
+      setShowLeaveDropDown(false);
+    } else if (endMeet === "close") {
+      if (role === "host") {
+        try {
+          const myHeaders = new Headers();
+          myHeaders.append("Content-Type", "application/json");
+          if (address) {
+            myHeaders.append("x-wallet-address", address);
+          }
+          const requestOptions = {
+            method: "PUT",
+            headers: myHeaders,
+            body: JSON.stringify({
+              meetingId: roomId,
+              meetingType: meetingCategory,
+              recordedStatus: meetingStatus,
+              meetingStatus: meetingStatus === true ? "Recorded" : "Finished",
+            }),
+          };
+
+          const response = await fetch(
+            "/api/update-recording-status",
+            requestOptions
+          );
+          console.log("Response: ", response);
+        } catch (e) {
+          console.log("Error: ", e);
+        }
+      }
+      closeRoom();
+      setIsLoading(false);
+      setShowLeaveDropDown(false);
+    } else {
+      return;
+    }
+
+    // if (role === "host") {
+    //   let meetingType;
+    //   if (meetingCategory === "officehours") {
+    //     meetingType = 2;
+    //   } else if (meetingCategory === "session") {
+    //     meetingType = 1;
+    //   } else {
+    //     meetingType = 0;
+    //   }
+
+    //   try {
+    //     const myHeaders = new Headers();
+    //     myHeaders.append("Content-Type", "application/json");
+    //     if (address) {
+    //       myHeaders.append("x-wallet-address", address);
+    //     }
+    //     const requestOptions = {
+    //       method: "POST",
+    //       headers: myHeaders,
+    //       body: JSON.stringify({
+    //         roomId: roomId,
+    //         meetingType: meetingType,
+    //         dao_name: daoName,
+    //         hostAddress: hostAddress,
+    //       }),
+    //     };
+
+    //     const response = await fetch("/api/end-call", requestOptions);
+    //     const result = await response.json();
+    //     console.log("result in end call::", result);
+
+    //     if (meetingStatus === true && result.success) {
+    //       try {
+    //         toast.success("Giving Attestations");
+    //         const myHeaders = new Headers();
+    //         myHeaders.append("Content-Type", "application/json");
+    //         if (address) {
+    //           myHeaders.append("x-wallet-address", address);
+    //         }
+    //         const response = await fetch(`/api/get-attest-data`, {
+    //           method: "POST",
+    //           headers: myHeaders,
+    //           body: JSON.stringify({
+    //             roomId: roomId,
+    //             connectedAddress: address,
+    //             meetingData: meetingData,
+    //           }),
+    //         });
+    //         const response_data = await response.json();
+    //         console.log("Updated", response_data);
+    //         if (response_data.success) {
+    //           toast.success("Attestation successful");
+    //         }
+    //       } catch (e) {
+    //         console.log("Error in attestation: ", e);
+    //         toast.error("Attestation denied");
+    //       }
+    //     }
+    //   } catch (error) {
+    //     console.error("Error handling end call:", error);
+    //   }
+    // }
+
+    if (role === "host") {
+      await handleCloseMeeting();
+    }
     if (meetingCategory === "officehours") {
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
