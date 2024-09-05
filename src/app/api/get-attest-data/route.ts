@@ -52,64 +52,39 @@ export async function POST(req: NextRequest, res: NextResponse) {
     }
 
     const attestationPromises: any = [];
+    const processedAddresses = new Set<string>();
+
+    function addAttestation(address: string, meetingTypeCode: number) {
+      if (!processedAddresses.has(address)) {
+        processedAddresses.add(address);
+        attestationPromises.push(
+          delegateAndSetAttestation(
+            address,
+            `${roomId}/${token}`,
+            meetingTypeCode,
+            data?.startTime,
+            data?.endTime,
+            data?.dao_name,
+            connectedAddress,
+            meetingData
+          )
+        );
+      }
+    }
 
     if (data.meetingType === "officehours") {
       data.hosts.forEach((host: any) => {
-        attestationPromises.push(
-          delegateAndSetAttestation(
-            host?.metadata?.walletAddress,
-            `${roomId}/${token}`,
-            3,
-            data.startTime,
-            data.endTime,
-            data.dao_name,
-            connectedAddress,
-            meetingData
-          )
-        );
+        addAttestation(host?.metadata?.walletAddress, 3);
       });
       data.participants.forEach((participant: any) => {
-        attestationPromises.push(
-          delegateAndSetAttestation(
-            participant?.metadata?.walletAddress,
-            `${roomId}/${token}`,
-            4,
-            data.startTime,
-            data.endTime,
-            data.dao_name,
-            connectedAddress,
-            meetingData
-          )
-        );
+        addAttestation(participant?.metadata?.walletAddress, 4);
       });
     } else if (data.meetingType === "session") {
       data.hosts.forEach((host: any) => {
-        attestationPromises.push(
-          delegateAndSetAttestation(
-            host?.metadata?.walletAddress,
-            `${roomId}/${token}`,
-            1,
-            data.startTime,
-            data.endTime,
-            data.dao_name,
-            connectedAddress,
-            meetingData
-          )
-        );
+        addAttestation(host?.metadata?.walletAddress, 1);
       });
       data.participants.forEach((participant: any) => {
-        attestationPromises.push(
-          delegateAndSetAttestation(
-            participant?.metadata?.walletAddress,
-            `${roomId}/${token}`,
-            2,
-            data.startTime,
-            data.endTime,
-            data.dao_name,
-            connectedAddress,
-            meetingData
-          )
-        );
+        addAttestation(participant?.metadata?.walletAddress, 2);
       });
     }
 
