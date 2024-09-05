@@ -79,7 +79,7 @@ function SpecificDelegate({ props }: { props: Type }) {
   const [displayImage, setDisplayImage] = useState("");
   const [description, setDescription] = useState("");
   // const provider = new ethers.BrowserProvider(window?.ethereum);
-  const [displayEnsName, setDisplayEnsName] = useState<string>();
+  const [displayEnsName, setDisplayEnsName] = useState<any>();
   const [delegate, setDelegate] = useState("");
   const [same, setSame] = useState(false);
   const [loading, setLoading] = useState(false);

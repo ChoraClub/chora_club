@@ -67,7 +67,7 @@ export async function fetchEnsAvatar(address: any) {
     const ensName =await  ens(config, {
       address,
       chainId: mainnet.id
-    }).toString();
+    });
     const avatar = await getEnsAvatar(config, {
       name: normalize(ensName?.toString() || ""),
       chainId: mainnet.id
@@ -84,8 +84,8 @@ export async function getEnsName(address: any) {
     const ensName =await  ens(config, {
       address,
       chainId: mainnet.id
-    }).toString();    
-    // console.log("ensName: ", ensName);
+    });    
+    console.log("ensName: ", ensName);
     const displayName = address?.slice(0, 4) + "..." + address?.slice(-4);
 
     const ensNameOrAddress = ensName ? ensName : displayName;
