@@ -35,6 +35,7 @@ import {
 } from "@/config/staticDataUtils";
 import { getChainAddress } from "@/utils/chainUtils";
 import { arbitrum, optimism } from "viem/chains";
+import { CiSearch } from "react-icons/ci";
 const cache: any = {
   optimism: null,
   arbitrum: null,
@@ -425,7 +426,7 @@ function DelegatesList({ props }: { props: string }) {
   return (
     <div>
       <div className="flex items-center justify-between pe-10">
-        <div
+        {/* <div
           style={{ background: "rgba(238, 237, 237, 0.36)" }}
           className="flex border-[0.5px] border-black w-1/3 rounded-full my-3 font-poppins"
         >
@@ -445,6 +446,26 @@ function DelegatesList({ props }: { props: string }) {
           <span className="flex items-center bg-black rounded-full px-5 py-2">
             <Image src={search} alt="search" width={20} />
           </span>
+        </div> */}
+
+        <div
+          className={`flex items-center rounded-full shadow-lg bg-gray-100 text-black cursor-pointer w-[300px] xs:w-[365px] my-3 font-poppins`}
+        >
+          <CiSearch
+            className={`text-base transition-all duration-700 ease-in-out ml-3`}
+          />
+          <input
+            type="text"
+            placeholder="Search by Address"
+            className="w-[100%] pl-2 pr-4 py-1.5 font-poppins md:py-2 text-sm bg-transparent outline-none"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleSearchChange(searchQuery);  // Call the function when Enter is pressed
+              }
+            }}
+          />
         </div>
         <div>
           <select

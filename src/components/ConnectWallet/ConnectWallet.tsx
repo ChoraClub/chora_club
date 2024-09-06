@@ -50,8 +50,8 @@ export const ConnectWallet = () => {
                   </button>
 
                   <div
-                    className="block lg:hidden py-4 pl-6 sm:py-5 hover:bg-blue-shade-100"
-                    onClick={openAccountModal}
+                    className="block lg:hidden py-4 pl-6 sm:py-5 hover:bg-blue-shade-100 cursor-pointer"
+                    onClick={openConnectModal}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center">
@@ -93,7 +93,7 @@ export const ConnectWallet = () => {
                   </div>
 
                   <div
-                    className="block lg:hidden py-4 pl-6 sm:py-5 hover:bg-blue-shade-100"
+                    className="block lg:hidden py-4 pl-6 sm:py-5 hover:bg-blue-shade-100 cursor-pointer"
                     onClick={openAccountModal}
                   >
                     <div className="flex items-center justify-between">

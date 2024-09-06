@@ -116,28 +116,14 @@ export default function RootLayout({
                   <div className="hidden lg:block fixed w-[6%] bg-blue-shade-100 h-screen z-10">
                     <SidebarMain />
                   </div>
-                  {/* <div className="lg:hidden fixed z-10">
-                  <SidebarMainMobile/>
-                </div> */}
-                  <div className="w-[100%] lg:w-[94%] ml-auto">
+                  <div className="lg:hidden fixed z-10 w-full bg-white border border-b-0">
+                    <SidebarMainMobile />
+                  </div>
+                  <div className="w-[100%] lg:w-[94%] ml-auto mt-[78px] sm:mt-[64px] lg:mt-0">
                     <FeedbackTile />
                     <div>{children}</div>
                   </div>
                 </div>
-                {/* <div className="lg:block hidden">
-                <div className="flex">
-                <div className="fixed w-[6%] bg-blue-shade-100 h-screen ">
-                <SidebarMain />
-                </div>
-                <div className="w-full md:w-[94%] ml-auto">
-                <FeedbackTile />
-                <div>{children}</div>
-                </div>
-                </div>
-                </div>
-                <div className="lg:hidden w-full h-screen flex items-center justify-center">
-                <MobileResponsiveMessage />
-                </div> */}
               </HuddleContextProvider>
             </RootProviders>
           </Suspense>

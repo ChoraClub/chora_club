@@ -18,6 +18,8 @@ import { Session } from "next-auth";
 import toast from "react-hot-toast";
 import { useNotificationStudioState } from "@/store/notificationStudioState";
 import MobileResponsiveMessage from "../MobileResponsiveMessage/MobileResponsiveMessage";
+import Heading from "../ComponentUtils/Heading";
+import NotificationSkeletonLoader from '../SkeletonLoader/NotificationSkeletonLoader';
 
 function NotificationMain() {
   const { data: session } = useSession();
@@ -221,11 +223,7 @@ function NotificationMain() {
 
   const renderContent = () => {
     if (isPageLoading) {
-      return (
-        <div className="flex justify-center items-center h-64">
-          <p className="text-xl text-gray-500">Loading...</p>
-        </div>
-      );
+      return <NotificationSkeletonLoader />;
     }
 
     if (!canFetch) {
@@ -280,12 +278,9 @@ function NotificationMain() {
 
 {/* For Desktop Screen  */}
     <div className="hidden md:block font-poppins mb-12">
-      <div className="flex items-center justify-between 1.7xl:pe-10 lg:pe-3 pe-2">
-        <div className="font-semibold text-4xl text-blue-shade-100 pb-8 pt-9 px-16">
-          Notifications
+        <div className="pt-2 xs:pt-4 sm:pt-6 px-4 md:px-6 lg:px-14">
+          <Heading/>
         </div>
-        <ConnectWalletWithENS />
-      </div>
       <div className="flex bg-[#D9D9D945]">
         <div className="flex gap-12 pl-16">
           <button

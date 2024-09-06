@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
 import { usePathname, useRouter } from "next/navigation";
 import { dao_details } from "@/config/daoDetails";
+import RewardButton from "../ClaimReward/RewardButton";
 
 function IndividualDaoHeader() {
   const path = usePathname();
@@ -103,9 +104,10 @@ function IndividualDaoHeader() {
         </div>
       </div>
 
-      <div>
-        <ConnectWalletWithENS />
-      </div>
+      <div className="flex gap-1 xs:gap-2 items-center">
+              <RewardButton />
+              <ConnectWalletWithENS />
+            </div>
     </div>
   );
 }

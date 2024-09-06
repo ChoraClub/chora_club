@@ -15,6 +15,7 @@ import SidebarMainMobile from "../MainSidebar/SidebarMainMobile";
 import RewardButton from "../ClaimReward/RewardButton";
 import { useSearchParams } from "next/navigation";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
+import Heading from "../ComponentUtils/Heading";
 
 function ExploreDAOs() {
   const dao_info = Object.keys(dao_details).map((key) => {
@@ -85,40 +86,12 @@ function ExploreDAOs() {
   }, [searchParams]);
 
   return (
-    <div className="pt-4 sm:pt-6 px-4 md:px-6 lg:px-14 min-h-screen">
+    <div className="pt-2 xs:pt-4 sm:pt-6 px-4 md:px-6 lg:px-14 min-h-screen">
       <div className="relative">
-        <div className="flex flex-row justify-between items-center mb-6">
-          <div className="flex gap-4 items-center">
-            {/* <div className="lg:hidden">
-              <SidebarMainMobile />
-            </div> */}
-            <div className="text-blue-shade-200 font-medium text-3xl md:text-4xl font-quanty ">
-              Explore DAOs
-            </div>
-          </div>
-          <div className="flex gap-2 items-center">
-            <RewardButton />
-            <ConnectWalletWithENS />
-          </div>
-          {/* <ConnectWalletWithENS /> */}
-        </div>
-
-        {/* <div
-          className="md:flex justify-start items-center border-[0.5px] bg-[#f5f5f5] border-black rounded-full w-fit max-w-sm md:max-w-full hidden my-3 font-poppins"
-        >
-          <input
-            type="text"
-            placeholder="Search DAOs"
-            className="pl-5 pr-2 bg-[#f5f5f5]  rounded-full outline-none"
-            value={searchQuery}
-            onChange={(e) => handleSearchChange(e.target.value)}
-          ></input>
-          <span className="flex items-center bg-black rounded-full px-4 sm:px-6 py-2 sm:py-3">
-            <Image src={search} alt="search" width={16} height={16} className="w-4 h-4 sm:w-5 sm:h-5"  />
-          </span>
-        </div> */}
+        <Heading/>
+        
         <div
-          className={`flex items-center rounded-full shadow-lg bg-gray-100 text-black cursor-pointer w-[365px]`}
+          className={`flex items-center rounded-full shadow-lg bg-gray-100 text-black cursor-pointer w-[300px] xs:w-[365px]`}
         >
           <CiSearch
             className={`text-base transition-all duration-700 ease-in-out ml-3`}
@@ -145,10 +118,10 @@ function ExploreDAOs() {
                     style={{
                       boxShadow: "0px 4px 50.8px 0px rgba(0, 0, 0, 0.11)",
                     }}
-                    className="w-[calc(100%-2rem)] max-w-[280px]  sm:w-[calc(50%-1rem)] md:w-[calc(33.333%-1rem)] lg:w-[calc(25%-1rem)] 2xl:w-[calc(20%-1rem)] px-4 py-6 rounded-2xl cursor-pointer flex flex-col items-center justify-center"
+                    className="w-[calc(100%-2rem)] max-w-[280px]  sm:w-[calc(50%-1rem)] md:w-[calc(33.333%-1rem)] lg:w-[calc(25%-1rem)] 2xl:w-[calc(20%-1rem)] px-4 py-6 rounded-2xl cursor-pointer flex flex-col items-center justify-center transition-transform duration-300 ease-in-out hover:shadow-2xl hover:scale-105"
                     onClick={() => handleClick(daos.name, daos.img)}
                   >
-                    <div className="flex justify-center mb-4">
+                    <div className="flex justify-center mb-4 transition-transform duration-300 ease-in-out hover:scale-110">
                       <Image
                         src={daos.img}
                         alt="Image not found"
@@ -207,7 +180,7 @@ function ExploreDAOs() {
           </>
         )}
       </div>
-      {showNotification && !isPageLoading && (
+      {/* {showNotification && !isPageLoading && (
         <div
           className={` fixed bottom-10 left-10 sm:left-[10%] sm:right-[10%] md:left-[20%] md:right-[20%] lg:left-[30%] lg:right-[30%] ${
             status ? "" : "hidden"
@@ -224,7 +197,7 @@ function ExploreDAOs() {
             </div>
           </div>
         </div>
-      )}
+      )} */}
     </div>
   );
 }
