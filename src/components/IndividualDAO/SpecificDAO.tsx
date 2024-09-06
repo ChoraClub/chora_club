@@ -15,6 +15,7 @@ import Proposals from "./Proposals";
 import IndividualDaoHeader from "../ComponentUtils/IndividualDaoHeader";
 import AboutDao from "./AboutDao";
 import Leaderboard from "./Leaderboard";
+import MobileResponsiveMessage from "../MobileResponsiveMessage/MobileResponsiveMessage";
 
 const desc = dao_details;
 
@@ -69,7 +70,12 @@ function SpecificDAO({ props }: { props: { daoDelegates: string } }) {
   // };
 
   return (
-    <div className="font-poppins py-6" id="secondSection">
+    <>
+    {/* For Mobile Screen */}
+    <MobileResponsiveMessage/>
+
+    {/* For Desktop Screen  */}
+    <div className="hidden md:block font-poppins py-6" id="secondSection">
       <div className="pr-8 pb-5 pl-16">
         {/* <div className="flex items-center justify-between pe-10">
           <div
@@ -248,6 +254,7 @@ function SpecificDAO({ props }: { props: { daoDelegates: string } }) {
         )}
       </div>
     </div>
+    </>
   );
 }
 

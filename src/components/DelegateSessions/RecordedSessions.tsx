@@ -178,9 +178,9 @@ function RecordedSessions() {
             />
           </div>
 
-          <div className=" md:hidden search-container relative">
+          <div className=" md:hidden search-container relative flex justify-end">
             <div
-              className={` md:hidden flex items-center rounded-full shadow-lg bg-gray-100 text-black cursor-pointer ${
+              className={` md:hidden transition-all duration-500 flex items-center rounded-full shadow-lg bg-gray-100 text-black cursor-pointer ${
                 openSearch ? "w-full" : "w-7 h-7 justify-center"
               }`}
               onClick={() => {

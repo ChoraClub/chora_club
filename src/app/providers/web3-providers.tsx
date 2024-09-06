@@ -1,7 +1,7 @@
 "use client";
 
 import "@rainbow-me/rainbowkit/styles.css";
-import { ReactNode } from "react";
+import { ReactNode, useCallback, useEffect, useState } from "react";
 
 import {
   getDefaultConfig,
@@ -27,6 +27,7 @@ import {
 import { createConfig, WagmiProvider } from "wagmi";
 import { optimism, arbitrum } from "wagmi/chains";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useSearchParams } from "next/navigation";
 // import { publicProvider } from "wagmi/providers/public";
 
 interface RainbowKitProviderProps {
@@ -86,11 +87,24 @@ const wagmiConfig = getDefaultConfig({
 
 const queryClient = new QueryClient();
 
-const getSiweMessageOptions: GetSiweMessageOptions = () => ({
-  statement: "Sign in to The App",
-});
-
 export default function Web3Provider(props: RainbowKitProviderProps) {
+  const [referrer, setReferrer] = useState<string | null>(null);
+  const searchParameter = useSearchParams();
+
+  useEffect(() => {
+    // const storedReferrer = sessionStorage.getItem("referrer");
+    const referrerAddress = searchParameter.get("referrer");
+    setReferrer(referrerAddress);
+  }, [searchParameter]);
+
+  const getSiweMessageOptions: GetSiweMessageOptions = useCallback(() => {
+    return {
+      statement: `Sign in to The App${
+        referrer ? ` (Referrer: ${referrer})` : ""
+      }`,
+    };
+  }, [referrer]);
+
   return (
     <WagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>

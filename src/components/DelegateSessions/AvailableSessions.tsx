@@ -353,7 +353,7 @@ function AvailableSessions() {
 
   return (
     <div className="xs:mx-4 ">
-      <div className="flex flex-col lg:flex-row lg:gap-3 bg-[#D9D9D945] px-2 py-4 xs:p-4 mt-4 rounded-2xl font-poppins">
+      <div className="flex flex-col lg:flex-row lg:gap-3 bg-[#D9D9D945] px-2 py-4 xs:p-4 mt-4 mx-2 rounded-2xl font-poppins">
         {/* <div
           style={{ background: "rgba(238, 237, 237, 0.36)" }}
           className="flex border-[0.5px] border-black w-fit rounded-full  "
@@ -377,7 +377,7 @@ function AvailableSessions() {
         </div> */}
         <div className="flex gap-3 items-center">
           <div
-            className={`flex items-center rounded-full shadow-lg bg-white text-black cursor-pointer w-[365px] lg:w-[150px] 1.5lg:w-[200px] 2xl:w-[365px]`}
+            className={`flex items-center rounded-full shadow-lg bg-white text-black cursor-pointer w-[300px] xs:w-[365px] lg:w-[150px] 1.5lg:w-[200px] 2xl:w-[365px]`}
           >
             <CiSearch
               className={`text-base transition-all duration-700 ease-in-out ml-3`}

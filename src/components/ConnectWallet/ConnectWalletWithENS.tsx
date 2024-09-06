@@ -149,11 +149,11 @@ function ConnectWalletWithENS() {
 
               return (
                 <>
-                <div style={{ gap: 12 }} className="hidden lg:flex">
+                <div style={{ gap: 8 }} className="hidden lg:flex ml-2">
                   <button
                     onClick={openChainModal}
                     type="button"
-                    className="flex items-center bg-white border border-white rounded-lg md:pl-[10px] md:pr-2 py-1.5 pl-2 pr-[6px] md:py-2 font-bold text-black shadow-sm transition-transform transform hover:scale-105 text-xs md:text-sm"
+                    className="flex items-center font-bold text-black transition-transform transform hover:scale-105 text-xs md:text-sm"
                   >
                     {chain.hasIcon && (
                       <div
@@ -218,7 +218,7 @@ function ConnectWalletWithENS() {
                     //   fontWeight: "bold",
                     //   boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
                     // }}
-                    className="flex items-center bg-white border border-white rounded-xl px-3 py-2 sm:px-4 sm:py-2 font-bold text-black shadow-sm transition-transform transform hover:scale-105 text-xs sm:text-sm"
+                    className="flex items-center font-bold text-black transition-transform transform hover:scale-105 text-xs sm:text-sm"
                   >
                     <div
                       style={{
@@ -309,7 +309,7 @@ function ConnectWalletWithENS() {
                     <button
                       onClick={openAccountModal}
                       type="button"
-                      className="flex items-center rounded-full justify-center font-bold text-black shadow-sm transition-transform transform hover:scale-105 text-xs"
+                      className="flex items-center size-[30px] rounded-full justify-center border-2 border-black font-bold text-black shadow-sm transition-transform transform hover:scale-105 text-xs"
                     >
                       <Image
                         src={getDisplayImage()}
