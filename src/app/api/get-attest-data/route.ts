@@ -80,9 +80,11 @@ export async function POST(req: NextRequest, res: NextResponse) {
         addAttestation(participant?.metadata?.walletAddress, 4);
       });
     } else if (data.meetingType === "session") {
-      data.hosts.forEach((host: any) => {
-        addAttestation(host?.metadata?.walletAddress, 1);
-      });
+      if (data.participants.length > 0) {
+        data.hosts.forEach((host: any) => {
+          addAttestation(host?.metadata?.walletAddress, 1);
+        });
+      }
       data.participants.forEach((participant: any) => {
         addAttestation(participant?.metadata?.walletAddress, 2);
       });
