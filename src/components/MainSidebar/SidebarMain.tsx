@@ -31,6 +31,7 @@ import { SiGitbook, SiGoogleclassroom } from "react-icons/si";
 import { PiUsersThreeFill } from "react-icons/pi";
 import {useSidebar} from "../../app/hooks/useSidebar"
 import { BiSolidMessageSquareAdd } from "react-icons/bi";
+// import { useMediaQuery } from 'next/media-query';
 
 function Sidebar() {
   const [isTourOpen, setIsTourOpen] = useState(false);
@@ -50,6 +51,19 @@ function Sidebar() {
     address,
     isConnected,
   } = useSidebar();
+  const [isLgScreen, setIsLgScreen] = useState(false);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(min-width: 1024px)');
+    setIsLgScreen(mediaQuery.matches);
+    const handleMediaQueryChange = () => {
+      setIsLgScreen(mediaQuery.matches);
+    };
+    mediaQuery.addEventListener('change', handleMediaQueryChange);
+    return () => {
+      mediaQuery.removeEventListener('change', handleMediaQueryChange);
+    };
+  }, []);
 
 
   const tourSteps = [
@@ -263,7 +277,7 @@ function Sidebar() {
 
   return (
     <>
-      {!hasSeenTour && (
+      {isLgScreen && !hasSeenTour && (
         <Joyride
           steps={tourSteps}
           run={isTourOpen}

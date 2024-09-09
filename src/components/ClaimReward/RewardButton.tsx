@@ -1,6 +1,8 @@
 "use client";
 import React, { useCallback, useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { AppProgressBar } from 'next-nprogress-bar';
 
 function RewardButton() {
   const [showTooltip, setShowTooltip] = useState(false);
@@ -11,10 +13,19 @@ function RewardButton() {
   const usdBalance = (balance * ethPrice).toFixed(2);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const router = useRouter();
+  const [isNavigating, setIsNavigating] = useState(false);
 
   const handleClick = useCallback(() => {
+    setIsNavigating(true);
     router.push("/claim-rewards");
   }, [router]);
+
+  useEffect(() => {
+    if (isNavigating) {
+      // Reset the state when navigation is complete
+      return () => setIsNavigating(false);
+    }
+  }, [isNavigating]);
 
   useEffect(() => {
     return () => {
@@ -41,7 +52,7 @@ function RewardButton() {
           onClick={handleClick}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
-          className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-4 py-2 rounded-full hover:from-blue-600 hover:to-purple-700 transition-all duration-300 shadow-md hover:shadow-lg flex items-center space-x-2 cursor-pointer"
+          className="bg-gradient-to-r from-blue-500 to-purple-600 text-xs sm:text-base text-white px-3 py-1.5 md:px-4 md:py-2 rounded-full hover:from-blue-600 hover:to-purple-700 transition-all duration-300 shadow-md hover:shadow-lg flex items-center space-x-2 cursor-pointer"
         >
           {balance < 0 ? (
             <>
@@ -59,7 +70,7 @@ function RewardButton() {
           <div
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
-            className="absolute z-10 w-72 p-4 mt-2 bg-white rounded-lg shadow-xl border border-gray-200 transition-all duration-300 ease-in-out transform opacity-100 scale-100"
+            className="absolute z-10 w-72 p-4 mt-2 right-0 bg-white rounded-lg shadow-xl border border-gray-200 transition-all duration-300 ease-in-out transform opacity-100 scale-100"
           >
             <div className="text-sm">
               <h3 className="font-semibold text-lg mb-2 text-gray-800">
@@ -79,8 +90,8 @@ function RewardButton() {
                     Earn rewards by:
                   </p>
                   <ul className="list-disc list-inside text-blue-500">
-                    <li>Sharing Sessions</li>
-                    <li>Referring Creators</li>
+                    <li><Link href="/sessions?active=recordedSessions">Sharing Sessions</Link></li>
+                    <li><Link href="/invite">Referring Creators</Link></li>
                   </ul>
                 </div>
               )}
@@ -88,6 +99,7 @@ function RewardButton() {
           </div>
         )}
       </div>
+      {isNavigating && <AppProgressBar />}
     </>
   );
 }

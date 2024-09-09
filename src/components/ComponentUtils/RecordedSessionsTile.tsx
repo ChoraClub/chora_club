@@ -293,13 +293,13 @@ function RecordedSessionsTile({
                         className="rounded-full size-4 sm:size-6"
                       />
                     </div> 
-                    <div className="capitalize">
-                      {formatViews(data?.views ?? 0)} views
-                    </div>
+                    {/* <div className="capitalize">
+                      
+                    </div> */}
                     {/* <div className="capitalize hidden sm:flex">{data.dao_name}</div> */}
                   </div>
                   <LuDot/>
-                  {/* <div className="text-xs sm:text-sm">300 Views</div> */}
+                  <div className="text-xs sm:text-sm capitalize">{formatViews(data?.views ?? 0)} views</div>
                   <LuDot/>
                   <div className=" text-xs sm:text-sm">
                     {formatTimeAgo(data.slot_time)}
