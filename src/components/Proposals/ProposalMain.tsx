@@ -103,7 +103,7 @@ function ProposalMain({ props }: { props: Props }) {
   const [queueStartTime, setQueueStartTime] = useState<number>();
   const [queueEndTime, setQueueEndTime] = useState<number>();
   const network = useAccount().chain;
-  const { publicClient, walletClient } = WalletAndPublicClient(network);
+  const { publicClient, walletClient } = WalletAndPublicClient();
   const { chain } = useAccount();
   const { openChainModal } = useChainModal();
   const [isVotingOpen, setIsVotingOpen] = useState(false);
