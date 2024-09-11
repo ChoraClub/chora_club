@@ -99,7 +99,7 @@ function MainProfile() {
     github: "",
   });
   const [isToggled, setToggle] = useState(false);
-  const { publicClient, walletClient } = WalletAndPublicClient(daoName);
+  const { publicClient, walletClient } = WalletAndPublicClient();
 
   useEffect(() => {
     // if (chain && chain.name === "Optimism") {
@@ -197,11 +197,14 @@ function MainProfile() {
     try {
       const addr = await walletClient.getAddresses();
       const address1 = addr[0];
+      console.log("addrrr", address1);
 
       const contractAddress = getChainAddress(chain?.name);
 
+      console.log("contractAddress: ", contractAddress);
+
       // console.log("Contract", contractAddress);
-      // console.log("Wallet Client", walletClient);
+      console.log("Wallet Client", walletClient);
       const delegateTx = await walletClient.writeContract({
         address: contractAddress,
         abi: dao_abi.abi,
@@ -209,10 +212,11 @@ function MainProfile() {
         args: [to],
         account: address1,
       });
-      // console.log(delegateTx);
+
+      console.log(delegateTx);
     } catch (error) {
       console.log("Error:", error);
-      toast.error("Failed to delegate votes. Please try again.");
+      toast.error("Failed to become delegate. Please try again.");
     }
   };
 
@@ -226,7 +230,7 @@ function MainProfile() {
     isfollowingchange: number
   ) => {
     setLoading(true);
-    setIsModalLoading(true); 
+    setIsModalLoading(true);
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
     if (address) {
@@ -277,7 +281,7 @@ function MainProfile() {
     }
     // Close the modal
     setLoading(false);
-    setIsModalLoading(false); 
+    setIsModalLoading(false);
   };
 
   const toggleFollowing = async (
@@ -817,399 +821,407 @@ function MainProfile() {
 
   return (
     <>
-    {/* For Mobile Screen */}
-    <MobileResponsiveMessage/>
+      {/* For Mobile Screen */}
+      <MobileResponsiveMessage />
 
-    {/* For Desktop Screen  */}
+      {/* For Desktop Screen  */}
       <div className="hidden md:block">
-      {!isPageLoading ? (
-        <div className="font-poppins">
-          <div className="flex ps-14 py-5 pe-10 justify-between items-start">
-            <div className="flex  items-center justify-center">
-              <div
-                className="relative object-cover rounded-3xl"
-                style={{
-                  backgroundColor: "#fcfcfc",
-                  border: "2px solid #E9E9E9 ",
-                }}
-              >
-                <div className="w-40 h-40 flex items-center justify-content ">
-                  <div className="flex justify-center items-center w-40 h-40">
+        {!isPageLoading ? (
+          <div className="font-poppins">
+            <div className="flex ps-14 py-5 pe-10 justify-between items-start">
+              <div className="flex  items-center justify-center">
+                <div
+                  className="relative object-cover rounded-3xl"
+                  style={{
+                    backgroundColor: "#fcfcfc",
+                    border: "2px solid #E9E9E9 ",
+                  }}
+                >
+                  <div className="w-40 h-40 flex items-center justify-content ">
+                    <div className="flex justify-center items-center w-40 h-40">
+                      <Image
+                        src={
+                          (userData.displayImage
+                            ? `https://gateway.lighthouse.storage/ipfs/${userData.displayImage}`
+                            : karmaImage) ||
+                          (daoName === "optimism"
+                            ? OPLogo
+                            : daoName === "arbitrum"
+                            ? ArbLogo
+                            : ccLogo)
+                        }
+                        alt="user"
+                        width={256}
+                        height={256}
+                        className={
+                          userData.displayImage
+                            ? "w-40 h-40 rounded-3xl"
+                            : "w-20 h-20 rounded-3xl"
+                        }
+                      />
+                    </div>
+
                     <Image
-                      src={
-                        (userData.displayImage
-                          ? `https://gateway.lighthouse.storage/ipfs/${userData.displayImage}`
-                          : karmaImage) ||
-                        (daoName === "optimism"
-                          ? OPLogo
-                          : daoName === "arbitrum"
-                          ? ArbLogo
-                          : ccLogo)
-                      }
-                      alt="user"
-                      width={256}
-                      height={256}
-                      className={
-                        userData.displayImage
-                          ? "w-40 h-40 rounded-3xl"
-                          : "w-20 h-20 rounded-3xl"
-                      }
+                      src={ccLogo}
+                      alt="ChoraClub Logo"
+                      className="absolute top-0 right-0 bg-white rounded-full"
+                      style={{
+                        width: "30px",
+                        height: "30px",
+                        marginTop: "10px",
+                        marginRight: "10px",
+                      }}
                     />
                   </div>
-
-                  <Image
-                    src={ccLogo}
-                    alt="ChoraClub Logo"
-                    className="absolute top-0 right-0 bg-white rounded-full"
-                    style={{
-                      width: "30px",
-                      height: "30px",
-                      marginTop: "10px",
-                      marginRight: "10px",
-                    }}
-                  />
                 </div>
-              </div>
 
-              <div className="px-4">
-                <div className=" flex items-center py-1">
-                  <div className="font-bold text-lg pr-4">
-                    {karmaEns ? (
-                      karmaEns
-                    ) : userData.displayName ? (
-                      userData.displayName
-                    ) : (
-                      <>
-                        {`${address}`.substring(0, 6)} ...{" "}
-                        {`${address}`.substring(`${address}`.length - 4)}
-                      </>
-                    )}
-                  </div>
-                  <div className="flex gap-3">
-                    <Link
-                      href={`https://twitter.com/${userData.twitter}`}
-                      className={`border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 ${
-                        userData.twitter == "" || userData.twitter == undefined
-                          ? "hidden"
-                          : ""
-                      }`}
-                      style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                      target="_blank"
-                    >
-                      <FaXTwitter color="#7C7C7C" size={12} />
-                    </Link>
-                    <Link
-                      href={
-                        daoName === "optimism"
-                          ? `https://gov.optimism.io/u/${userData.discourse}`
-                          : daoName == "arbitrum"
-                          ? `https://forum.arbitrum.foundation/u/${userData.discourse}`
-                          : ""
-                      }
-                      className={`border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1  ${
-                        userData.discourse == "" ||
-                        userData.discourse == undefined
-                          ? "hidden"
-                          : ""
-                      }`}
-                      style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                      target="_blank"
-                    >
-                      <BiSolidMessageRoundedDetail color="#7C7C7C" size={12} />
-                    </Link>
-                    <Link
-                      href={`https://discord.com/${userData.discord}`}
-                      className={`border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 ${
-                        userData.discord == "" || userData.discord == undefined
-                          ? "hidden"
-                          : ""
-                      }`}
-                      style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                      target="_blank"
-                    >
-                      <FaDiscord color="#7C7C7C" size={12} />
-                    </Link>
-                    <Link
-                      href={`https://github.com/${userData.github}`}
-                      className={`border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 ${
-                        userData.github == "" || userData.github == undefined
-                          ? "hidden"
-                          : ""
-                      }`}
-                      style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                      target="_blank"
-                    >
-                      <FaGithub color="#7C7C7C" size={12} />
-                    </Link>
-                    <Tooltip
-                      content="Update your Profile"
-                      placement="top"
-                      showArrow
-                    >
-                      <span
-                        className="border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 cursor-pointer"
+                <div className="px-4">
+                  <div className=" flex items-center py-1">
+                    <div className="font-bold text-lg pr-4">
+                      {karmaEns ? (
+                        karmaEns
+                      ) : userData.displayName ? (
+                        userData.displayName
+                      ) : (
+                        <>
+                          {`${address}`.substring(0, 6)} ...{" "}
+                          {`${address}`.substring(`${address}`.length - 4)}
+                        </>
+                      )}
+                    </div>
+                    <div className="flex gap-3">
+                      <Link
+                        href={`https://twitter.com/${userData.twitter}`}
+                        className={`border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 ${
+                          userData.twitter == "" ||
+                          userData.twitter == undefined
+                            ? "hidden"
+                            : ""
+                        }`}
                         style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                        onClick={onOpen}
+                        target="_blank"
                       >
-                        <FaPencil color="#3e3d3d" size={12} />
-                      </span>
-                    </Tooltip>
-                    <UpdateProfileModal
-                      isOpen={isOpen}
-                      onClose={onClose}
-                      modalData={modalData}
-                      handleInputChange={handleInputChange}
-                      uploadImage={uploadImage}
-                      fileInputRef={fileInputRef}
-                      isLoading={isLoading}
-                      // displayImage={userData.displayImage}
-                      handleSave={handleSave}
-                      handleToggle={handleToggle}
-                      isToggled={isToggled}
-                    />
+                        <FaXTwitter color="#7C7C7C" size={12} />
+                      </Link>
+                      <Link
+                        href={
+                          daoName === "optimism"
+                            ? `https://gov.optimism.io/u/${userData.discourse}`
+                            : daoName == "arbitrum"
+                            ? `https://forum.arbitrum.foundation/u/${userData.discourse}`
+                            : ""
+                        }
+                        className={`border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1  ${
+                          userData.discourse == "" ||
+                          userData.discourse == undefined
+                            ? "hidden"
+                            : ""
+                        }`}
+                        style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
+                        target="_blank"
+                      >
+                        <BiSolidMessageRoundedDetail
+                          color="#7C7C7C"
+                          size={12}
+                        />
+                      </Link>
+                      <Link
+                        href={`https://discord.com/${userData.discord}`}
+                        className={`border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 ${
+                          userData.discord == "" ||
+                          userData.discord == undefined
+                            ? "hidden"
+                            : ""
+                        }`}
+                        style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
+                        target="_blank"
+                      >
+                        <FaDiscord color="#7C7C7C" size={12} />
+                      </Link>
+                      <Link
+                        href={`https://github.com/${userData.github}`}
+                        className={`border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 ${
+                          userData.github == "" || userData.github == undefined
+                            ? "hidden"
+                            : ""
+                        }`}
+                        style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
+                        target="_blank"
+                      >
+                        <FaGithub color="#7C7C7C" size={12} />
+                      </Link>
+                      <Tooltip
+                        content="Update your Profile"
+                        placement="top"
+                        showArrow
+                      >
+                        <span
+                          className="border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 cursor-pointer"
+                          style={{
+                            backgroundColor: "rgba(217, 217, 217, 0.42)",
+                          }}
+                          onClick={onOpen}
+                        >
+                          <FaPencil color="#3e3d3d" size={12} />
+                        </span>
+                      </Tooltip>
+                      <UpdateProfileModal
+                        isOpen={isOpen}
+                        onClose={onClose}
+                        modalData={modalData}
+                        handleInputChange={handleInputChange}
+                        uploadImage={uploadImage}
+                        fileInputRef={fileInputRef}
+                        isLoading={isLoading}
+                        // displayImage={userData.displayImage}
+                        handleSave={handleSave}
+                        handleToggle={handleToggle}
+                        isToggled={isToggled}
+                      />
+                    </div>
                   </div>
-                </div>
 
-                <div className="flex items-center py-1">
-                  <div>
-                    {`${address}`.substring(0, 6)} ...{" "}
-                    {`${address}`.substring(`${address}`.length - 4)}
-                  </div>
+                  <div className="flex items-center py-1">
+                    <div>
+                      {`${address}`.substring(0, 6)} ...{" "}
+                      {`${address}`.substring(`${address}`.length - 4)}
+                    </div>
 
-                  <Tooltip
-                    content="Copy"
-                    placement="bottom"
-                    closeDelay={1}
-                    showArrow
-                  >
-                    <span className="px-2 cursor-pointer" color="#3E3D3D">
-                      <IoCopy onClick={() => handleCopy(`${address}`)} />
-                    </span>
-                  </Tooltip>
-                  <div className="flex space-x-2">
                     <Tooltip
-                      content="Copy your profile URL to share on Warpcast or Twitter."
+                      content="Copy"
                       placement="bottom"
                       closeDelay={1}
                       showArrow
                     >
-                      <Button
-                        className="bg-gray-200 hover:bg-gray-300"
-                        onClick={() => {
-                          if (typeof window === "undefined") return;
-                          navigator.clipboard.writeText(
-                            `${BASE_URL}/${getDaoName(
-                              chain?.name
-                            )}/${address}?active=info`
-                          );
-                          setIsCopied(true);
-                          setTimeout(() => {
-                            setIsCopied(false);
-                          }, 3000);
-                        }}
-                      >
-                        <IoShareSocialSharp />
-                        {isCopied ? "Copied" : "Share profile"}
-                      </Button>
+                      <span className="px-2 cursor-pointer" color="#3E3D3D">
+                        <IoCopy onClick={() => handleCopy(`${address}`)} />
+                      </span>
                     </Tooltip>
+                    <div className="flex space-x-2">
+                      <Tooltip
+                        content="Copy your profile URL to share on Warpcast or Twitter."
+                        placement="bottom"
+                        closeDelay={1}
+                        showArrow
+                      >
+                        <Button
+                          className="bg-gray-200 hover:bg-gray-300"
+                          onClick={() => {
+                            if (typeof window === "undefined") return;
+                            navigator.clipboard.writeText(
+                              `${BASE_URL}/${getDaoName(
+                                chain?.name
+                              )}/${address}?active=info`
+                            );
+                            setIsCopied(true);
+                            setTimeout(() => {
+                              setIsCopied(false);
+                            }, 3000);
+                          }}
+                        >
+                          <IoShareSocialSharp />
+                          {isCopied ? "Copied" : "Share profile"}
+                        </Button>
+                      </Tooltip>
+                    </div>
                   </div>
+
+                  {isFollowingModalOpen && (
+                    <FollowingModal
+                      userFollowings={userFollowings}
+                      toggleFollowing={toggleFollowing}
+                      toggleNotification={toggleNotification}
+                      setIsFollowingModalOpen={setIsFollowingModalOpen}
+                      isLoading={isLoading}
+                      handleUpdateFollowings={handleUpdateFollowings}
+                      daoName={daoName}
+                    />
+                  )}
+
+                  {selfDelegate === false ? (
+                    <div className="pt-2 flex gap-5">
+                      {/* pass address of whom you want to delegate the voting power to */}
+                      <button
+                        className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
+                        onClick={() => handleDelegateVotes(`${address}`)}
+                      >
+                        Become Delegate
+                      </button>
+
+                      <button
+                        className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px] w-[154px] flex items-center justify-center"
+                        onClick={() =>
+                          followings
+                            ? handleUpdateFollowings(daoName, 1, 0)
+                            : toast.error(
+                                "You're not following anyone yet. Start exploring delegate profiles now!"
+                              )
+                        }
+                      >
+                        {isModalLoading ? (
+                          <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></div>
+                        ) : (
+                          `${followings} Following`
+                        )}
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="pt-2 flex gap-5">
+                      <button className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]">
+                        {followers}{" "}
+                        {followers === 0 || followers === 1
+                          ? "Follower"
+                          : "Followers"}
+                      </button>
+
+                      <button
+                        className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
+                        onClick={() =>
+                          followings
+                            ? handleUpdateFollowings(daoName, 1, 0)
+                            : toast.error(
+                                "You're not following anyone yet. Start exploring delegate profiles now!"
+                              )
+                        }
+                      >
+                        {followings} Followings
+                      </button>
+                    </div>
+                  )}
                 </div>
-
-                {isFollowingModalOpen && (
-                  <FollowingModal
-                    userFollowings={userFollowings}
-                    toggleFollowing={toggleFollowing}
-                    toggleNotification={toggleNotification}
-                    setIsFollowingModalOpen={setIsFollowingModalOpen}
-                    isLoading={isLoading}
-                    handleUpdateFollowings={handleUpdateFollowings}
-                    daoName={daoName}
-                  />
-                )}
-
-                {selfDelegate === false ? (
-                  <div className="pt-2 flex gap-5">
-                    {/* pass address of whom you want to delegate the voting power to */}
-                    <button
-                      className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
-                      onClick={() => handleDelegateVotes(`${address}`)}
-                    >
-                      Become Delegate
-                    </button>
-
-                    <button
-                      className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px] w-[154px] flex items-center justify-center"
-                      onClick={() =>
-                        followings
-                          ? handleUpdateFollowings(daoName, 1, 0)
-                          : toast.error(
-                              "You're not following anyone yet. Start exploring delegate profiles now!"
-                            )
-                      }
-                    >
-                      {isModalLoading ? (
-                        <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></div>
-                      ) : (
-                        `${followings} Following`
-                      )}
-                    </button>
-                  </div>
-                ) : (
-                  <div className="pt-2 flex gap-5">
-                    <button className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]">
-                      {followers}{" "}
-                      {followers === 0 || followers === 1
-                        ? "Follower"
-                        : "Followers"}
-                    </button>
-
-                    <button
-                      className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
-                      onClick={() =>
-                        followings
-                          ? handleUpdateFollowings(daoName, 1, 0)
-                          : toast.error(
-                              "You're not following anyone yet. Start exploring delegate profiles now!"
-                            )
-                      }
-                    >
-                      {followings} Followings
-                    </button>
-                  </div>
-                )}
+              </div>
+              <div className="flex gap-1 xs:gap-2 items-center">
+                <RewardButton />
+                <ConnectWalletWithENS />
               </div>
             </div>
-            <div className="flex gap-1 xs:gap-2 items-center">
-              <RewardButton />
-              <ConnectWalletWithENS />
+
+            <div className="flex gap-12 bg-[#D9D9D945] pl-16">
+              <button
+                className={`border-b-2 py-4 px-2 outline-none ${
+                  searchParams.get("active") === "info"
+                    ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
+                    : "border-transparent"
+                }`}
+                onClick={() => router.push(path + "?active=info")}
+              >
+                Info
+              </button>
+              {selfDelegate === true && (
+                <button
+                  className={`border-b-2 py-4 px-2 outline-none ${
+                    searchParams.get("active") === "votes"
+                      ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
+                      : "border-transparent"
+                  }`}
+                  onClick={() => router.push(path + "?active=votes")}
+                >
+                  Past Votes
+                </button>
+              )}
+              <button
+                className={`border-b-2 py-4 px-2 outline-none ${
+                  searchParams.get("active") === "sessions"
+                    ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
+                    : "border-transparent"
+                }`}
+                onClick={() =>
+                  router.push(
+                    path +
+                      `?active=sessions&session=${
+                        selfDelegate ? "schedule" : "attending"
+                      }`
+                  )
+                }
+              >
+                Sessions
+              </button>
+              <button
+                className={`border-b-2 py-4 px-2 outline-none ${
+                  searchParams.get("active") === "officeHours"
+                    ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
+                    : "border-transparent"
+                }`}
+                onClick={() =>
+                  router.push(path + "?active=officeHours&hours=schedule")
+                }
+              >
+                Office Hours
+              </button>
+
+              {selfDelegate === true && (
+                <button
+                  className={`border-b-2 py-4 px-2 outline-none ${
+                    searchParams.get("active") === "instant-meet"
+                      ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
+                      : "border-transparent"
+                  }`}
+                  onClick={() => router.push(path + "?active=instant-meet")}
+                >
+                  Instant Meet
+                </button>
+              )}
+            </div>
+
+            <div className="py-6 ps-16">
+              {searchParams.get("active") === "info" ? (
+                <UserInfo
+                  karmaDesc={karmaDesc}
+                  description={description}
+                  isDelegate={isDelegate}
+                  isSelfDelegate={selfDelegate}
+                  // descAvailable={descAvailable}
+                  onSaveButtonClick={(newDescription?: string) =>
+                    handleSave(newDescription)
+                  }
+                  isLoading={isLoading}
+                  daoName={daoName}
+                />
+              ) : (
+                ""
+              )}
+              {selfDelegate === true &&
+              searchParams.get("active") === "votes" ? (
+                <UserVotes daoName={daoName} />
+              ) : (
+                ""
+              )}
+              {searchParams.get("active") === "sessions" ? (
+                <UserSessions
+                  isDelegate={isDelegate}
+                  selfDelegate={selfDelegate}
+                  daoName={daoName}
+                />
+              ) : (
+                ""
+              )}
+              {searchParams.get("active") === "officeHours" ? (
+                <UserOfficeHours
+                  isDelegate={isDelegate}
+                  selfDelegate={selfDelegate}
+                  daoName={daoName}
+                />
+              ) : (
+                ""
+              )}
+
+              {selfDelegate === true &&
+              searchParams.get("active") === "instant-meet" ? (
+                <InstantMeet
+                  isDelegate={isDelegate}
+                  selfDelegate={selfDelegate}
+                  daoName={daoName}
+                />
+              ) : (
+                ""
+              )}
             </div>
           </div>
-
-          <div className="flex gap-12 bg-[#D9D9D945] pl-16">
-            <button
-              className={`border-b-2 py-4 px-2 outline-none ${
-                searchParams.get("active") === "info"
-                  ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
-                  : "border-transparent"
-              }`}
-              onClick={() => router.push(path + "?active=info")}
-            >
-              Info
-            </button>
-            {selfDelegate === true && (
-              <button
-                className={`border-b-2 py-4 px-2 outline-none ${
-                  searchParams.get("active") === "votes"
-                    ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
-                    : "border-transparent"
-                }`}
-                onClick={() => router.push(path + "?active=votes")}
-              >
-                Past Votes
-              </button>
-            )}
-            <button
-              className={`border-b-2 py-4 px-2 outline-none ${
-                searchParams.get("active") === "sessions"
-                  ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
-                  : "border-transparent"
-              }`}
-              onClick={() =>
-                router.push(
-                  path +
-                    `?active=sessions&session=${
-                      selfDelegate ? "schedule" : "attending"
-                    }`
-                )
-              }
-            >
-              Sessions
-            </button>
-            <button
-              className={`border-b-2 py-4 px-2 outline-none ${
-                searchParams.get("active") === "officeHours"
-                  ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
-                  : "border-transparent"
-              }`}
-              onClick={() =>
-                router.push(path + "?active=officeHours&hours=schedule")
-              }
-            >
-              Office Hours
-            </button>
-
-            {selfDelegate === true && (
-              <button
-                className={`border-b-2 py-4 px-2 outline-none ${
-                  searchParams.get("active") === "instant-meet"
-                    ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
-                    : "border-transparent"
-                }`}
-                onClick={() => router.push(path + "?active=instant-meet")}
-              >
-                Instant Meet
-              </button>
-            )}
-          </div>
-
-          <div className="py-6 ps-16">
-            {searchParams.get("active") === "info" ? (
-              <UserInfo
-                karmaDesc={karmaDesc}
-                description={description}
-                isDelegate={isDelegate}
-                isSelfDelegate={selfDelegate}
-                // descAvailable={descAvailable}
-                onSaveButtonClick={(newDescription?: string) =>
-                  handleSave(newDescription)
-                }
-                isLoading={isLoading}
-                daoName={daoName}
-              />
-            ) : (
-              ""
-            )}
-            {selfDelegate === true && searchParams.get("active") === "votes" ? (
-              <UserVotes daoName={daoName} />
-            ) : (
-              ""
-            )}
-            {searchParams.get("active") === "sessions" ? (
-              <UserSessions
-                isDelegate={isDelegate}
-                selfDelegate={selfDelegate}
-                daoName={daoName}
-              />
-            ) : (
-              ""
-            )}
-            {searchParams.get("active") === "officeHours" ? (
-              <UserOfficeHours
-                isDelegate={isDelegate}
-                selfDelegate={selfDelegate}
-                daoName={daoName}
-              />
-            ) : (
-              ""
-            )}
-
-            {selfDelegate === true &&
-            searchParams.get("active") === "instant-meet" ? (
-              <InstantMeet
-                isDelegate={isDelegate}
-                selfDelegate={selfDelegate}
-                daoName={daoName}
-              />
-            ) : (
-              ""
-            )}
-          </div>
-        </div>
-      ) : (
-        <>
-          <MainProfileSkeletonLoader />
-        </>
-      )}
+        ) : (
+          <>
+            <MainProfileSkeletonLoader />
+          </>
+        )}
       </div>
     </>
   );
