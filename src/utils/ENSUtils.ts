@@ -97,10 +97,8 @@ export async function fetchEnsAvatar(address: string) {
     // const twitter = await resolver.getText("com.twitter");
     // const supportsWildcard = await resolver.supportsWildcard();
     // console.log("ensName", ensName);
-      // Fetch ENS details in parallel
-      const [avatar] = await Promise.all([
-        resolver.getAvatar(),
-      ]);
+    // Fetch ENS details in parallel
+    const [avatar] = await Promise.all([resolver.getAvatar()]);
     return { avatar, ensName, ensNameOrAddress };
   } catch (error) {
     console.error(`Error fetching ENS details for address ${address}:`, error);
@@ -115,7 +113,7 @@ export async function getEnsName(address: string) {
     const displayName = address?.slice(0, 4) + "..." + address?.slice(-4);
 
     const ensNameOrAddress = ensName ? ensName : displayName;
-    console.log("ensNameOrAddress: ", ensNameOrAddress);
+    // console.log("ensNameOrAddress: ", ensNameOrAddress);
 
     return { ensNameOrAddress, ensName };
   } catch (e) {
