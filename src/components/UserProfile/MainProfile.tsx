@@ -1118,7 +1118,7 @@ function MainProfile() {
                     </button>
 
                     <button
-                      className="bg-blue-shade-200 font-bold text-white rounded-full px-6 py-[10px] xs:py-2 text-sm xs:text-xs sm:text-sm lg:px-8 lg:py-[10px] w-full xs:w-[126px] lg:w-[142px] flex items-center justify-center"
+                      className="bg-blue-shade-200 font-bold text-white rounded-full px-6 py-[10px] xs:py-2 text-sm xs:text-xs sm:text-sm lg:px-8 lg:py-[10px] w-full xs:w-[135px] lg:w-[150px] flex items-center justify-center"
                       onClick={() =>
                         followings
                           ? handleUpdateFollowings(daoName, 1, 0)

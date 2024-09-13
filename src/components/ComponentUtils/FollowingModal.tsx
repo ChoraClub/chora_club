@@ -141,27 +141,27 @@ function FollowingModal({
         }}
       >
         <div
-          className="bg-white rounded-[41px] overflow-hidden shadow-lg w-[42%]"
+          className="bg-white rounded-[41px] overflow-hidden shadow-lg w-full max-w-3xl mx-2 xs:mx-4 sm:mx-8 2md:mx-auto"
           onClick={(event) => {
             event.stopPropagation();
           }}
         >
           <div className="relative">
-            <div className="flex text-white bg-[#292929] px-10 items-center justify-between py-7">
-              <h2 className="text-xl font-semibold ">Followings</h2>
+            <div className="flex text-white bg-[#292929] px-4 sm:px-10 items-center justify-between py-7">
+              <h2 className="text-lg sm:text-xl font-semibold ">Followings</h2>
               <div
-                className="size-5 rounded-full bg-[#F23535] flex items-center justify-center cursor-pointer"
+                className="p-1 sm:p-1.5 rounded-full bg-[#F23535] flex items-center justify-center cursor-pointer"
                 onClick={() => setIsFollowingModalOpen(false)}
               >
-                <IoClose className=" text-white size-4 " />
+                <IoClose className=" text-white w-4 h-4 sm:w-5 sm:h-5 " />
               </div>
             </div>
             <div
               className={` max-h-[60vh] overflow-y-auto ${style.customscrollbar}`}
             >
-              <div className="flex ml-10 mt-5 gap-5 ">
+              <div className="flex ml-7 xm:ml-10 mt-5 gap-3 xm:gap-5 ">
                 <button
-                  className={`border border-[#CCCCCC] px-4 py-1 rounded-lg text-lg flex w-[141px] items-center justify-center gap-1.5 ${
+                  className={`border border-[#CCCCCC] px-2 xm:px-4 py-1 rounded-lg text-base xm:text-lg flex w-[125px] xm:w-[141px] items-center justify-center gap-1.5 ${
                     activeButton === "optimism"
                       ? "bg-[#8E8E8E] text-white"
                       : "bg-[#F5F5F5] text-[#3E3D3D]"
@@ -179,7 +179,7 @@ function FollowingModal({
                   )}
                 </button>
                 <button
-                  className={`border border-[#CCCCCC] px-4 py-1 w-[141px] rounded-lg text-lg flex items-center justify-center gap-1.5 ${
+                  className={`border border-[#CCCCCC] px-2 xm:px-4 py-1 w-[125px] xm:w-[141px] rounded-lg text-base xm:text-lg flex items-center justify-center gap-1.5 ${
                     activeButton === "arbitrum"
                       ? "bg-[#8E8E8E] text-white"
                       : "bg-[#F5F5F5] text-[#3E3D3D]"
@@ -197,7 +197,7 @@ function FollowingModal({
                   )}
                 </button>
               </div>
-              <hr className="border-t border-gray-300 my-6 mx-10" />
+              <hr className="border-t border-gray-300 mt-4 sm:my-6 mx-7 xm:mx-10" />
               {isLoading ? (
                 <div className="flex justify-center items-center h-40">
                   <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-shade-200"></div>
@@ -207,20 +207,20 @@ function FollowingModal({
                   <>
                     <div
                       key={index}
-                      className="flex justify-between items-center py-6 px-10"
+                      className="flex justify-between items-center px-2 py-5 xs:p-5 xm:py-6 xm:px-10"
                     >
                       <div className="flex items-center">
                         <Image
                           src={ensAvatars[user.follower_address] || user1} //add ens avatar
                           alt={user.follower_address}
-                          className=" rounded-full mr-4"
+                          className=" rounded-full mr-2 xs:mr-4 size-8 xm:size-10"
                           width={40}
                           height={40}
                         />
                         <div className="gap-1 flex flex-col">
-                          <div className="flex gap-2 items-center">
+                          <div className="flex gap-0.5 xs:gap-2 items-center">
                             <div
-                              className="font-semibold text-base hover:text-blue-shade-100 cursor-pointer"
+                              className="font-semibold text-sm xs:text-base hover:text-blue-shade-100 cursor-pointer"
                               onClick={() =>
                                 handleRedirect(user.follower_address)
                               }
@@ -233,7 +233,7 @@ function FollowingModal({
                                   user.follower_address.slice(-4)}
                             </div>
                             <IoCopy
-                              className="size-4 hover:text-blue-shade-100 cursor-pointer"
+                              className="size-3 xs:size-4 hover:text-blue-shade-100 cursor-pointer"
                               onClick={(event) => {
                                 event.stopPropagation();
                                 handleCopy(`${user.follower_address}`);
@@ -242,13 +242,13 @@ function FollowingModal({
                           </div>
                           <div className="flex gap-1 items-center">
                             <FaCalendarDays className="size-3" />
-                            <p className="text-sm ">
+                            <p className="text-xs xs:text-sm ">
                               {formatDate(user.timestamp)}
                             </p>
                           </div>
                         </div>
                       </div>
-                      <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-1 xm:gap-4">
                         <Tooltip
                           content={
                             user.isFollowing
@@ -260,7 +260,7 @@ function FollowingModal({
                           showArrow
                         >
                           <button
-                            className={`font-semibold rounded-full justify-center py-[10px] flex items-center w-[127.68px]  ${
+                            className={`font-semibold rounded-full justify-center text-xs xs:text-sm xm:text-base py-1 xs:py-2 xm:py-[10px] flex items-center w-[80px] xs:w-[90px] xm:w-[127.68px]  ${
                               user.isFollowing
                                 ? "bg-white text-blue-shade-100 border border-blue-shade-100 hover:bg-blue-shade-400"
                                 : "bg-blue-shade-200 text-white"
@@ -284,10 +284,10 @@ function FollowingModal({
                           closeDelay={1}
                           showArrow
                         >
-                          <div className="text-sm border-blue-shade-100 text-blue-shade-100 border rounded-full size-11 flex items-center justify-center cursor-pointer hover:bg-blue-shade-400">
+                          <div className="text-xs xm:text-sm border-blue-shade-100 text-blue-shade-100 border rounded-full size-8 xs:size-10 xm:size-11 flex items-center justify-center cursor-pointer hover:bg-blue-shade-400">
                             {user.isNotification ? (
                               <BiSolidBellRing
-                                className=""
+                                className="size-3 xs:size-4 xm:size-5"
                                 color="bg-blue-shade-200"
                                 size={20}
                                 onClick={(event) => {
@@ -297,7 +297,7 @@ function FollowingModal({
                               />
                             ) : (
                               <BiSolidBellOff
-                                className=""
+                                className="size-4 xm:size-5"
                                 color="bg-blue-shade-200"
                                 size={20}
                                 onClick={(event) => {
