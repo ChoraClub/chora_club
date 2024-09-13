@@ -618,10 +618,10 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
 
   return (
     <>
-      <div className="flex flex-col md:flex-row justify-center gap-8 md:gap-10 1.5lg:gap-20 p-4">
+      <div className="flex flex-col md:flex-row justify-center gap-8 md:gap-10 1.5lg:gap-20 sm:p-4">
         {/* First box- left side */}
         <div
-          className={`w-full md:w-auto p-8 bg-white rounded-2xl ${styles.boxshadow} basis-1/2`}
+          className={`w-full md:w-auto p-6 xs:p-8 bg-white rounded-2xl ${styles.boxshadow} basis-1/2`}
         >
           <div className="mb-4">
             <label className="text-gray-700 font-semibold flex items-center">
@@ -677,7 +677,8 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
               {/* <option value={15}>15 minutes</option> */}
               <option value={30}>30 minutes</option>
               <option value={45} disabled>
-                45 minutes (Under development - It will be live soon)
+                {/* 45 minutes (Under development - It will be live soon) */}
+                45 minutes (Under development)
               </option>
             </select>
           </div>
@@ -728,7 +729,7 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
               </Tooltip>
             </label>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 xm:grid-cols-2 md:grid-cols-1 xl:grid-cols-2 gap-4">
               <div>
                 <label className="text-gray-500 mt-2">Start Time</label>
                 <div className="rounded-md flex items-center space-x-2">
@@ -840,7 +841,7 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
                   <h3 className="text-lg font-semibold mb-2">
                     Generated Time Slots:
                   </h3>
-                  <div className="grid grid-cols-4 gap-2 w-full">
+                  <div className="grid grid-cols-3 xs:grid-cols-4 md:grid-cols-3 lg:grid-cols-4  gap-2 w-full">
                     {timeSlots.map((slot, index) => {
                       const slotTime = slot.toLocaleTimeString("en-US", {
                         hour: "numeric",
@@ -956,7 +957,7 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
 
         {/* Second box- right side */}
         <div
-          className={`w-full md:w-auto p-8 bg-white rounded-2xl ${styles.boxshadow} basis-1/2`}
+          className={`w-full md:w-auto p-6 xs:p-8 bg-white rounded-2xl ${styles.boxshadow} basis-1/2`}
         >
           <AvailableUserSessions
             daoName={daoName}

@@ -14,7 +14,7 @@ import { SessionInterface } from "@/types/MeetingTypes";
 
 function BookedUserSessions({ daoName }: { daoName: string }) {
   const { address } = useAccount();
-  // const address = "0x5e349eca2dc61abcd9dd99ce94d04136151a09ee";
+  // const address = "0xB351a70dD6E5282A8c84edCbCd5A955469b9b032";
   const [sessionDetails, setSessionDetails] = useState([]);
   const [pageLoading, setPageLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -91,7 +91,7 @@ function BookedUserSessions({ daoName }: { daoName: string }) {
           <RecordedSessionsSkeletonLoader />
         ) : sessionDetails.length > 0 ? (
           <div
-            className={`grid min-[475px]:grid-cols- md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-10 py-8 font-poppins`}
+            className={`grid min-[475px]:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-10 py-8 font-poppins`}
           >
             {sessionDetails.map((data, index) => (
               <EventTile

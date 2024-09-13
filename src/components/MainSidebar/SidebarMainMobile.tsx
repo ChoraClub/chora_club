@@ -79,7 +79,7 @@ const SidebarMainMobile = () => {
         ref={sidebarRef}
         className={`fixed inset-y-0 left-0 w-full font-poppins sm:w-72 bg-blue-shade-200 text-white transform z-10 ${
           isOpen ? "translate-x-0" : "-translate-x-full"
-        } transition-transform duration-300 ease-in-out`}
+        } transition-transform duration-500 ease-in-out`}
         onClick={handleSidebarClick}
       >
         <div className="">

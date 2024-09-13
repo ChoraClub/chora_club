@@ -9,6 +9,7 @@ import dynamic from "next/dynamic";
 import styled from "styled-components";
 import rehypeSanitize from "rehype-sanitize";
 import { getDaoName } from "@/utils/chainUtils";
+import { ICommand, commands } from '@uiw/react-md-editor';
 
 const StyledMDEditorWrapper = styled.div`
   .w-md-editor {
@@ -28,10 +29,22 @@ const StyledMDEditorWrapper = styled.div`
   }
 
   .w-md-editor-toolbar {
-    height: 40px !important;
+    height: auto !important;
     border-radius: 20px 20px 0 0 !important;
     background-color: white !important;
-  }
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    padding: 5px;
+}
+
+.w-md-editor-toolbar li.active,
+.w-md-editor-toolbar li:hover {
+  background-color: #e6e6e6;
+}
+
+.w-md-editor-toolbar li > button {
+  padding: 4px;
+}
 
   .w-md-editor-toolbar svg {
     width: 18px !important;
@@ -59,6 +72,40 @@ const StyledMDEditorWrapper = styled.div`
     list-style-type: decimal !important;
     padding-left: 20px !important;
   }
+
+  @media (max-width: 768px) {
+  
+
+  .w-md-editor-show-live {
+    flex-direction: column;
+  }
+
+  .w-md-editor-show-live .w-md-editor-input,
+  .w-md-editor-show-live .w-md-editor-preview {
+    width: 50% !important;
+    flex: 1 1 auto !important;
+  }
+
+  .w-md-editor-show-live .w-md-editor-input {
+    border-bottom: 1px solid #ddd;
+  }
+}
+   @media (max-width: 1070px) {
+   .w-md-editor-toolbar {
+    padding: 2px;
+  }
+
+  .w-md-editor-toolbar li > button {
+    padding: 2px;
+  }
+
+  .w-md-editor-toolbar svg {
+    width: 14px !important;
+    height: 14px !important;
+    margin: 0 2px 1px 2px !important;
+  }
+   }
+
 `;
 
 const MDEditor = dynamic(
@@ -112,6 +159,18 @@ function UserInfo({
   const [activeButton, setActiveButton] = useState("onchain");
 
   const [originalDesc, setOriginalDesc] = useState(description || karmaDesc);
+  const [isMobile, setIsMobile] = useState(false);
+
+useEffect(() => {
+  const checkMobile = () => {
+    setIsMobile(window.innerWidth <= 900);
+  };
+
+  checkMobile();
+  window.addEventListener('resize', checkMobile);
+
+  return () => window.removeEventListener('resize', checkMobile);
+}, []);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -119,27 +178,52 @@ function UserInfo({
     }
   }, []);
 
-  const toolbarOptions = [
-    ["bold", "italic", "underline", "strike"],
-    ["blockquote", "code-block"],
+  const getCustomCommands = (isMobile: boolean): ICommand[] => {
+    const mobileCommands = [
+      commands.bold,
+      commands.italic,
+      commands.link,
+      commands.image,
+      commands.unorderedListCommand,
+      commands.orderedListCommand,
+    ];
 
-    [{ header: 1 }, { header: 2 }],
-    [{ list: "ordered" }, { list: "bullet" }],
-    [{ script: "sub" }, { script: "super" }],
-    [{ indent: "-1" }, { indent: "+1" }],
-    [{ direction: "rtl" }],
+    const desktopCommands = [
+      commands.bold,
+      commands.italic,
+      commands.strikethrough,
+      commands.link,
+      commands.image,
+      commands.quote,
+      commands.unorderedListCommand,
+      commands.orderedListCommand,
+      commands.checkedListCommand,
+    ];
 
-    [{ size: ["small", false, "large", "huge"] }],
-    [{ header: [1, 2, 3, 4, 5, 6, false] }],
+    return isMobile ? mobileCommands : desktopCommands;
+  };
 
-    [{ color: [] }, { background: [] }],
-    [{ font: [] }],
-    [{ align: [] }],
+  // const toolbarOptions = [
+  //   ["bold", "italic", "underline", "strike"],
+  //   ["blockquote", "code-block"],
 
-    ["clean"],
+  //   [{ header: 1 }, { header: 2 }],
+  //   [{ list: "ordered" }, { list: "bullet" }],
+  //   [{ script: "sub" }, { script: "super" }],
+  //   [{ indent: "-1" }, { indent: "+1" }],
+  //   [{ direction: "rtl" }],
 
-    ["link", "image", "video"],
-  ];
+  //   [{ size: ["small", false, "large", "huge"] }],
+  //   [{ header: [1, 2, 3, 4, 5, 6, false] }],
+
+  //   [{ color: [] }, { background: [] }],
+  //   [{ font: [] }],
+  //   [{ align: [] }],
+
+  //   ["clean"],
+
+  //   ["link", "image", "video"],
+  // ];
 
   const fetchAttestation = async (buttonType: string) => {
     let sessionHostingCount = 0;
@@ -370,7 +454,7 @@ function UserInfo({
 
   return (
     <div className="pt-4">
-      <div className="flex w-fit gap-16 border-1 border-[#7C7C7C] px-6 rounded-xl text-sm mb-6">
+      <div className="flex w-fit gap-16 border-1 border-[#7C7C7C] px-6 rounded-xl text-sm mb-6 mx-4 xs:mx-0 sm:mx-4 md:mx-16 lg:mx-0">
         <button
           className={`py-2 ${
             activeButton === "onchain"
@@ -392,7 +476,7 @@ function UserInfo({
           Offchain
         </button>
       </div>
-      <div className="grid grid-cols-4 pe-32 gap-10">
+      <div className="grid xs:grid-cols-2 lg:grid-cols-4 gap-2 md:gap-5 mx-4 xs:mx-0 sm:mx-4 md:mx-16 lg:mx-0">
         {blocks.length > 0 ? (
           blocks.map((key, index) => (
             <div
@@ -428,7 +512,7 @@ function UserInfo({
       {isSelfDelegate ? (
         <div
           style={{ boxShadow: "0px 4px 30.9px 0px rgba(0, 0, 0, 0.12)" }}
-          className={`flex flex-col justify-between min-h-48 rounded-xl my-7 me-32 p-6
+          className={`flex flex-col justify-between min-h-48 rounded-xl my-7 mx-4 xs:mx-0 sm:mx-4 md:mx-16 lg:mx-0 p-6
         ${isEditing ? "outline" : ""}`}
         >
           {/* <ReactQuill
@@ -441,12 +525,14 @@ function UserInfo({
             placeholder={"Type your description here ..."}
           /> */}
 
-          <StyledMDEditorWrapper>
+          <StyledMDEditorWrapper className="w-full">
             <MDEditor
               value={isEditing ? tempDesc : description || karmaDesc}
               onChange={handleDescChange}
-              preview={isEditing ? "live" : "preview"}
-              height={300}
+              // preview={isEditing ? "live" : "preview"}
+              // height={300}
+              preview={isMobile ? (isEditing ? "edit" : "preview") : "live"}
+              height={isMobile ? 400 : 300}
               hideToolbar={!isEditing}
               visibleDragbar={false}
               previewOptions={{
@@ -454,7 +540,9 @@ function UserInfo({
               }}
               textareaProps={{
                 placeholder: "Type your description here...",
+                // style: {maxHeight: "50vh", overflowY: "auto" }
               }}
+              // commands={getCustomCommands(isMobile)}
             />
           </StyledMDEditorWrapper>
 

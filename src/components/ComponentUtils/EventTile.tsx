@@ -83,6 +83,7 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
   const [ensGuestAvatar, setEnsGuestAvatar] = useState("");
   const [loadingEnsData, setLoadingEnsData] = useState(true);
   const { address } = useAccount();
+  // const address = "0xB351a70dD6E5282A8c84edCbCd5A955469b9b032";
 
   const handleCopy = (addr: string) => {
     copy(addr);
@@ -227,14 +228,14 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
 
   return (
     <>
-      <div key={tileIndex} className="border border-[#D9D9D9] rounded-3xl">
+      <div key={tileIndex} className="border border-[#D9D9D9] sm:rounded-3xl">
         <div className="w-full h-44 rounded-t-3xl bg-black object-cover object-center relative">
           <Image
             src={`https://gateway.lighthouse.storage/ipfs/${data.thumbnail_image}`}
             alt="image"
             width={176}
             height={176}
-            className="w-full h-44 rounded-t-3xl object-cover"
+            className="w-full h-44 sm:rounded-t-3xl object-cover"
           />
           <div className="absolute top-2 right-2 bg-black rounded-full">
             <Image src={logo} alt="image" width={24} />
@@ -244,7 +245,7 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
         <div className="px-4 pt-2">
           <div className="flex justify-between gap-2">
             <div
-              className={`font-semibold py-1`}
+              className={`text-sm sm:text-base font-semibold py-1`}
               style={{
                 display: "-webkit-box",
                 WebkitBoxOrient: "vertical",
@@ -281,25 +282,25 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
               alt="image"
               width={24}
               height={24}
-              className="w-6 h-6 rounded-full"
+              className="size-4 sm:size-6 rounded-full"
             />
-            <div className="bg-[#F5F5F5] py-1 px-3 rounded-md flex items-center w-fit">
+            <div className="bg-[#F5F5F5] text-sm sm:text-base py-0.5 sm:py-1 px-3 rounded-md flex items-center w-fit">
               {formatSlotTimeToLocal(data.slot_time)}
             </div>
           </div>
 
           <div className="flex flex-col gap-2 text-sm pt-1">
             {data.session_type === "session" ? (
-              <div className="text-[#3E3D3D] flex items-center gap-2">
+              <div className="text-[#3E3D3D] text-xs sm:text-sm flex items-center gap-2">
                 <Image
                   src={ensGuestAvatar || user1}
                   alt="image"
                   width={20}
                   height={20}
-                  className="h-5 w-5 rounded-full object-cover object-center"
+                  className="size-4 sm:size-5 rounded-full object-cover object-center"
                 />
                 <div className="flex items-center">
-                  <span className="font-semibold">Guest: </span> &nbsp;
+                  <span className="font-medium">Guest: </span> &nbsp;
                   {loadingEnsData
                     ? formatWalletAddress(data.attendees[0].attendee_address)
                     : ensGuestName}
@@ -310,7 +311,7 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
                     closeDelay={1}
                     showArrow
                   >
-                    <span className="cursor-pointer text-sm">
+                    <span className="cursor-pointer text-xs sm:text-sm">
                       <IoCopy
                         onClick={(event) => {
                           event.stopPropagation();
@@ -326,16 +327,16 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
                 <span className="font-semibold">Instant Meet</span>{" "}
               </div>
             )}
-            <div className="text-[#3E3D3D] flex items-center gap-2">
+            <div className="text-[#3E3D3D] text-xs sm:text-sm flex items-center gap-2">
               <Image
                 src={ensHostAvatar || user1}
                 alt="image"
                 width={20}
                 height={20}
-                className="h-5 w-5 rounded-full object-cover object-center"
+                className="size-4 sm:size-5 rounded-full object-cover object-center"
               />
               <div className="flex items-center">
-                <span className="font-semibold">Host: </span> &nbsp;
+                <span className="font-medium">Host: </span> &nbsp;
                 {isEvent === "Attending" ? (
                   <Link
                     href={`/${data.dao_name}/${data.host_address}?active=info`}
@@ -360,7 +361,7 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
                   closeDelay={1}
                   showArrow
                 >
-                  <span className="cursor-pointer text-sm">
+                  <span className="cursor-pointer text-xs sm:text-sm">
                     <IoCopy
                       onClick={(event) => {
                         event.stopPropagation();
@@ -374,7 +375,7 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
           </div>
         </div>
 
-        <div className={`flex flex-col justify-between text-xs py-2 px-4 mb-2`}>
+        <div className={`flex flex-col justify-between text-xs sm:py-2 px-4 mb-2`}>
           {isEvent === "Book" ? (
             data.booking_status === "Approved" ? (
               <div className="flex justify-end items-center gap-2 ">

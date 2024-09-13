@@ -12,18 +12,26 @@ const titles : TitlesMap = {
     "/office-hours": "Office Hours",
     "/sessions": "Sessions",
     "/notifications":"Notifications",
+    "/profile":"Profile",
     // Add more URL mappings here as needed
   };
 
 function Heading(){
     const pathname = usePathname();
-    const title = titles[pathname] || "Chora Club";
+    let title = "Chora Club"; 
+    
+    Object.keys(titles).forEach((key) => {
+      if (pathname === key || pathname.startsWith(key)) {
+          title = titles[key];
+      }
+  });
+
     return(
         <>
         <div className="flex flex-row justify-between items-center mb-6">
       <div className="flex gap-4 items-center">
         <div className="text-blue-shade-200 font-medium text-2xl xs:text-3xl md:text-4xl font-quanty">
-          {title}
+        {title}
         </div>
       </div>
       <div className="flex gap-1 xs:gap-2 items-center">

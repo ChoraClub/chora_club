@@ -1,3 +1,19 @@
-/* section[role="dialog"] {
-    margin-top: 2.5rem !important;
-  } */
+/* Hide scrollbar color in WebKit browsers */
+.hideScrollbarColor::-webkit-scrollbar {
+  width: 0;
+  height: 0; /* For horizontal scrolling */
+  background: transparent; /* Optional: makes the scrollbar track transparent */
+}
+
+.hideScrollbarColor::-webkit-scrollbar-thumb {
+  background: transparent; /* Makes the scrollbar thumb transparent */
+}
+
+/* Additional scrollbar styles for Firefox */
+.scrollContainter {
+  scrollbar-width: none; /* Hide scrollbar for Firefox */
+}
+
+.scrollContainter::-webkit-scrollbar {
+  display: none; /* Hide scrollbar for other browsers */
+}
