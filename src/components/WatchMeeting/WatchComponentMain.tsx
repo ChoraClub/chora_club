@@ -18,6 +18,8 @@ import WatchVideoRecommendation from "./WatchVideoRecommendation";
 import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
 import WatchComponentSkeletonLoader from "../SkeletonLoader/WatchComponentSkeletonLoader";
 import { v4 as uuidv4 } from "uuid";
+import MobileResponsiveMessage from "../MobileResponsiveMessage/MobileResponsiveMessage";
+import RewardButton from "../ClaimReward/RewardButton";
 // import { id } from "ethers";
 
 interface AttestationObject {
@@ -78,6 +80,12 @@ function WatchComponentMain({ props }: { props: { id: string } }) {
 
   return (
     <>
+    {/* For Mobile Screen */}
+    <MobileResponsiveMessage/>
+
+    {/* For Desktop Screen  */}
+    {console.log(data,"data")}
+    <div className="hidden md:block">
       {data ? (
         <div className=" 1.7xl:ps-14 lg:ps-5 ps-4 xl:ps-10">
           <div className="flex justify-between items-center pt-6 pb-3 1.7xl:pe-10 lg:pe-3 pe-2">
@@ -85,7 +93,10 @@ function WatchComponentMain({ props }: { props: { id: string } }) {
               <span className="text-black">Chora</span>{" "}
               <span className="text-blue-shade-200">Club</span>
             </div>
-            <ConnectWalletWithENS />
+            <div className="flex gap-1 xs:gap-2 items-center">
+              <RewardButton />
+              <ConnectWalletWithENS />
+            </div>
           </div>
 
           <div className="grid grid-cols-3 gap-y-4 gap-x-4 1.7xl:gap-x-6 pt-6 relative 1.7xl:pr-14 pr-4 lg:pr-5 xl-pr-10">
@@ -130,6 +141,7 @@ function WatchComponentMain({ props }: { props: { id: string } }) {
       ) : (
         <WatchComponentSkeletonLoader />
       )}
+      </div>
     </>
   );
 }

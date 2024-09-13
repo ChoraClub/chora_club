@@ -35,6 +35,7 @@ import {
 } from "@/config/staticDataUtils";
 import { getChainAddress } from "@/utils/chainUtils";
 import { arbitrum, optimism } from "viem/chains";
+import { CiSearch } from "react-icons/ci";
 const cache: any = {
   optimism: null,
   arbitrum: null,
@@ -44,7 +45,7 @@ function DelegatesList({ props }: { props: string }) {
   const [delegateData, setDelegateData] = useState<any>({ delegates: [] });
   const { openChainModal } = useChainModal();
   const network = useAccount().chain;
-  const { publicClient, walletClient } = WalletAndPublicClient(network);
+  const { publicClient, walletClient } = WalletAndPublicClient();
   const { openConnectModal } = useConnectModal();
   const { isConnected } = useAccount();
   const [tempData, setTempData] = useState<any>({ delegates: [] });
@@ -99,7 +100,7 @@ function DelegatesList({ props }: { props: string }) {
       const res = await fetch(
         // props === "arbitrum"
         //   ? `/api/get-arbitrum-delegatelist?lastCursor=${lastCursor || ""}`
-        //   : 
+        //   :
         `/api/get-delegate?skip=${skip}&dao=${props}`
       );
 
@@ -124,11 +125,11 @@ function DelegatesList({ props }: { props: string }) {
       formattedDelegates = await Promise.all(
         daoInfo.delegates.map(async (delegate: any) => {
           // const ensName = await fetchEnsNames(delegate._id);
-          // console.log(ensName); 
+          // console.log(ensName);
           const avatar = await fetchEnsAvatar(delegate.delegate);
           return {
             delegate: delegate.delegate,
-            adjustedBalance: (delegate.latestBalance / 10 ** 18),
+            adjustedBalance: delegate.latestBalance / 10 ** 18,
             newBalance: delegate.latestBalance,
             profilePicture: avatar?.avatar,
             ensName: avatar?.ensName,
@@ -199,13 +200,12 @@ function DelegatesList({ props }: { props: string }) {
         const filtered = await res.json();
         const data = await fetchEnsAvatar(filtered[0].id);
         if (filtered) {
-          const formattedDelegates =
-            {
-              delegate: filtered[0].id,
-              adjustedBalance: (filtered[0].latestBalance/10**18),
-              profilePicture: data?.avatar,
-              ensName: data?.ensName,
-            }
+          const formattedDelegates = {
+            delegate: filtered[0].id,
+            adjustedBalance: filtered[0].latestBalance / 10 ** 18,
+            profilePicture: data?.avatar,
+            ensName: data?.ensName,
+          };
           setDelegateData({ delegates: [formattedDelegates] });
           setPageLoading(false);
         } else {
@@ -381,15 +381,25 @@ function DelegatesList({ props }: { props: string }) {
     }
 
     const chainAddress = getChainAddress(chain?.name);
+    console.log("walletClient?.chain:: ", walletClient?.chain);
     if (walletClient?.chain === "") {
       toast.error("Please connect your wallet!");
     } else {
-      if (walletClient?.chain === props) {
+      let network;
+      if (props === "optimism") {
+        network = "OP Mainnet";
+      } else if (props === "arbitrum") {
+        network = "Arbitrum One";
+      }
+
+      console.log("network: ", network);
+
+      if (walletClient?.chain.name === network) {
         try {
           setDelegatingToAddr(true);
           const delegateTx = await walletClient.writeContract({
             address: chainAddress,
-            chain: props === 'arbitrum' ? arbitrum : optimism,
+            chain: props === "arbitrum" ? arbitrum : optimism,
             abi: dao_abi.abi,
             functionName: "delegate",
             args: [to],
@@ -425,7 +435,7 @@ function DelegatesList({ props }: { props: string }) {
   return (
     <div>
       <div className="flex items-center justify-between pe-10">
-        <div
+        {/* <div
           style={{ background: "rgba(238, 237, 237, 0.36)" }}
           className="flex border-[0.5px] border-black w-1/3 rounded-full my-3 font-poppins"
         >
@@ -445,6 +455,26 @@ function DelegatesList({ props }: { props: string }) {
           <span className="flex items-center bg-black rounded-full px-5 py-2">
             <Image src={search} alt="search" width={20} />
           </span>
+        </div> */}
+
+        <div
+          className={`flex items-center rounded-full shadow-lg bg-gray-100 text-black cursor-pointer w-[300px] xs:w-[365px] my-3 font-poppins`}
+        >
+          <CiSearch
+            className={`text-base transition-all duration-700 ease-in-out ml-3`}
+          />
+          <input
+            type="text"
+            placeholder="Search by Address"
+            className="w-[100%] pl-2 pr-4 py-1.5 font-poppins md:py-2 text-sm bg-transparent outline-none"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleSearchChange(searchQuery); // Call the function when Enter is pressed
+              }
+            }}
+          />
         </div>
         <div>
           <select
@@ -488,8 +518,8 @@ function DelegatesList({ props }: { props: string }) {
                               ? props == "optimism"
                                 ? OPLogo
                                 : props == "arbitrum"
-                                  ? ARBLogo
-                                  : ""
+                                ? ARBLogo
+                                : ""
                               : delegate.profilePicture
                           }
                           alt="Image not found"
@@ -524,11 +554,11 @@ function DelegatesList({ props }: { props: string }) {
                             ) : (
                               <span>
                                 {delegate.ensName ===
-                                  "[693c70956042e4295f0c73589e9ac0850b5b7d276a02639b83331ec323549b88].sismo.eth"
+                                "[693c70956042e4295f0c73589e9ac0850b5b7d276a02639b83331ec323549b88].sismo.eth"
                                   ? "lindajxie.eth"
                                   : delegate.ensName.length > 15
-                                    ? delegate.ensName.slice(0, 15) + "..."
-                                    : delegate.ensName}
+                                  ? delegate.ensName.slice(0, 15) + "..."
+                                  : delegate.ensName}
                               </span>
                             )}
                           </div>
@@ -587,22 +617,22 @@ function DelegatesList({ props }: { props: string }) {
                       delegateName={
                         !selectedDelegate?.ensName
                           ? selectedDelegate.delegate?.slice(0, 6) +
-                          "..." +
-                          selectedDelegate.delegate?.slice(-4)
+                            "..." +
+                            selectedDelegate.delegate?.slice(-4)
                           : selectedDelegate.ensName ===
                             "[693c70956042e4295f0c73589e9ac0850b5b7d276a02639b83331ec323549b88].sismo.eth"
-                            ? "lindajxie.eth"
-                            : selectedDelegate.ensName?.length > 15
-                              ? selectedDelegate.ensName?.slice(0, 15) + "..."
-                              : selectedDelegate.ensName
+                          ? "lindajxie.eth"
+                          : selectedDelegate.ensName?.length > 15
+                          ? selectedDelegate.ensName?.slice(0, 15) + "..."
+                          : selectedDelegate.ensName
                       }
                       displayImage={
                         selectedDelegate?.profilePicture == null
                           ? props == "optimism"
                             ? OPLogo
                             : props == "arbitrum"
-                              ? ARBLogo
-                              : ""
+                            ? ARBLogo
+                            : ""
                           : selectedDelegate.profilePicture
                       }
                       daoName={props}

@@ -5,13 +5,13 @@ import cclogo from "@/assets/images/daos/CCLogo.png";
 
 function MobileResponsiveMessage() {
   return (
-    <div className="md:hidden min-h-screen bg-gray-100 flex flex-col">
-      <div className="absolute top-0 left-0 pt-4 sm:pt-6 px-4 flex items-center">
+    <div className="md:hidden overflow-hidden bg-gray-100 flex flex-col" style={{ height: 'calc(100vh - 77px)' }}>
+      {/* <div className="absolute top-0 left-0 pt-4 sm:pt-6 px-4 flex items-center">
         <SidebarMainMobile />
         <div className="ml-5 text-blue-shade-200 font-semibold text-[32px] font-poppins">
           Chora Club
         </div>
-      </div>
+      </div> */}
       <div className="flex-1 flex items-center justify-center px-4 font-poppins">
         <div className="bg-white rounded-lg shadow-md p-6 text-center max-w-sm w-full">
           <div className="mb-6">

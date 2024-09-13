@@ -51,6 +51,7 @@ interface Following {
 import { cookies } from "next/headers";
 import { m } from "framer-motion";
 import MobileResponsiveMessage from "../MobileResponsiveMessage/MobileResponsiveMessage";
+import RewardButton from "../ClaimReward/RewardButton";
 
 function MainProfile() {
   const { isConnected, address, chain } = useAccount();
@@ -77,6 +78,7 @@ function MainProfile() {
   const [isFollowingModalOpen, setIsFollowingModalOpen] = useState(false);
   const [isOpentoaster, settoaster] = useState(false);
   const [userFollowings, setUserFollowings] = useState<Following[]>([]);
+  const [isModalLoading, setIsModalLoading] = useState(false);
   // const [dbResponse, setDbResponse] = useState<any>(null);
   const [modalData, setModalData] = useState({
     displayImage: "",
@@ -97,7 +99,7 @@ function MainProfile() {
     github: "",
   });
   const [isToggled, setToggle] = useState(false);
-  const { publicClient, walletClient } = WalletAndPublicClient(daoName);
+  const { publicClient, walletClient } = WalletAndPublicClient();
 
   useEffect(() => {
     // if (chain && chain.name === "Optimism") {
@@ -193,11 +195,14 @@ function MainProfile() {
     try {
       const addr = await walletClient.getAddresses();
       const address1 = addr[0];
+      console.log("addrrr", address1);
 
       const contractAddress = getChainAddress(chain?.name);
 
+      console.log("contractAddress: ", contractAddress);
+
       // console.log("Contract", contractAddress);
-      // console.log("Wallet Client", walletClient);
+      console.log("Wallet Client", walletClient);
       const delegateTx = await walletClient.writeContract({
         address: contractAddress,
         abi: dao_abi.abi,
@@ -205,10 +210,11 @@ function MainProfile() {
         args: [to],
         account: address1,
       });
-      // console.log(delegateTx);
+
+      console.log(delegateTx);
     } catch (error) {
       console.log("Error:", error);
-      toast.error("Failed to delegate votes. Please try again.");
+      toast.error("Failed to become delegate. Please try again.");
     }
   };
 
@@ -222,6 +228,7 @@ function MainProfile() {
     isfollowingchange: number
   ) => {
     setLoading(true);
+    setIsModalLoading(true);
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
     if (address) {
@@ -272,6 +279,7 @@ function MainProfile() {
     }
     // Close the modal
     setLoading(false);
+    setIsModalLoading(false);
   };
 
   const toggleFollowing = async (
@@ -818,7 +826,7 @@ function MainProfile() {
       <div className="hidden md:block">
         {!isPageLoading ? (
           <div className="font-poppins">
-            <div className="flex ps-14 py-5 pe-10 justify-between">
+            <div className="flex ps-14 py-5 pe-10 justify-between items-start">
               <div className="flex  items-center justify-center">
                 <div
                   className="relative object-cover rounded-3xl"
@@ -1039,7 +1047,7 @@ function MainProfile() {
                       </button>
 
                       <button
-                        className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
+                        className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px] w-[154px] flex items-center justify-center"
                         onClick={() =>
                           followings
                             ? handleUpdateFollowings(daoName, 1, 0)
@@ -1048,7 +1056,11 @@ function MainProfile() {
                               )
                         }
                       >
-                        {followings} Following
+                        {isModalLoading ? (
+                          <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></div>
+                        ) : (
+                          `${followings} Following`
+                        )}
                       </button>
                     </div>
                   ) : (
@@ -1076,7 +1088,8 @@ function MainProfile() {
                   )}
                 </div>
               </div>
-              <div>
+              <div className="flex gap-1 xs:gap-2 items-center">
+                <RewardButton />
                 <ConnectWalletWithENS />
               </div>
             </div>

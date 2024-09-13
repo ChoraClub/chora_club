@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import RecordedSessionsTile from "../ComponentUtils/RecordedSessionsTile";
 import oplogo from "@/assets/images/daos/op.png";
 import arblogo from "@/assets/images/daos/arbCir.png";
@@ -7,6 +7,8 @@ import Image from "next/image";
 import { HiGift } from "react-icons/hi";
 import Link from "next/link";
 import { RxCross2 } from "react-icons/rx";
+import RewardButton from "./RewardButton";
+import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
 
 interface Reward {
   platform: string;
@@ -20,8 +22,91 @@ interface NFT {
   thumbnail: string;
 }
 
+interface CustomDropdownProps {
+  options: string[];
+  onChange?: (option: string) => void;
+}
+
+function CustomDropdown({ options, onChange }: CustomDropdownProps) {
+  const [selectedOption, setSelectedOption] = useState(options[0]);
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
+
+  const handleSelect = (option: string) => {
+    setSelectedOption(option);
+    setIsOpen(false);
+    if (onChange) {
+      onChange(option);
+    }
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event:MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  return (
+    <div className="relative" ref={dropdownRef}>
+      <div
+        className="rounded-full py-2 px-4 outline-none cursor-pointer bg-white shadow-md flex justify-between items-center transition-all duration-300 hover:bg-gray-100 focus:ring-2 focus:ring-blue-500"
+        onClick={() => setIsOpen(!isOpen)}
+        tabIndex={0} // Makes the div focusable for better accessibility
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            setIsOpen(!isOpen);
+          }
+    }}
+      >
+        {selectedOption}
+        <svg
+          className={`ml-2 w-4 h-4 transition-transform duration-200 ${
+            isOpen ? "transform rotate-180" : ""
+          }`}
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </div>
+      {isOpen && (
+        <div className="absolute mt-1 w-full rounded-lg bg-white shadow-lg z-10 max-h-60 overflow-y-auto">
+          {options.map((option, index) => (
+            <div
+              key={index}
+              className={`py-2 px-4 cursor-pointer transition-all duration-200 ${
+                selectedOption === option
+                  ? "bg-blue-100 text-blue-700 font-semibold"
+                  : "hover:bg-gray-100"
+              }`}
+              onClick={() => handleSelect(option)}onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  handleSelect(option);
+                }
+              }}
+              tabIndex={0} // Makes each option focusable
+              role="option" // Helps screen readers understand that these are options
+
+            >
+              {option}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function RewardsMain() {
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [showComingSoon, setShowComingSoon] = useState(true);
   const totalRewards = { amount: "0.0 ETH", value: "$0.0" };
   const claimableRewards: Reward[] = [
@@ -37,14 +122,23 @@ function RewardsMain() {
     (reward) => parseFloat(reward.amount) > 0
   );
 
+  const handleSelectChange = (selectedOption:string) => {
+    console.log(`Selected chain: ${selectedOption}`);
+    // Add your logic here to handle the change
+  };
+
   return (
+    <>
+    <div className="w-full flex justify-end pt-2 xs:pt-4 sm:pt-6 px-4 md:px-6 lg:px-14">
+    <div className="flex gap-1 xs:gap-2 items-center">
+        <RewardButton />
+        <ConnectWalletWithENS />
+      </div>
+    </div>
     <div className="max-w-6xl mx-auto p-6 space-y-8 font-poppins">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="bg-gray-50 hover:bg-gray-100 transition duration-300 shadow-md rounded-lg p-6">
           <h2 className="text-xl font-semibold mb-4 flex items-center">
-            {/* <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
-            </svg> */}
             <span className="mr-1">🎁</span>
             Total Rewards
             {showComingSoon && (
@@ -104,7 +198,6 @@ function RewardsMain() {
                     </div>
                     <button className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-4 py-2 rounded-full hover:from-blue-600 hover:to-purple-700 transition-all duration-300 shadow-md hover:shadow-lg flex items-center space-x-2 group">
                       <span>Claim</span>
-                      {/* <ArrowRight size={16} className="transform group-hover:translate-x-1 transition-transform duration-300" /> */}
                       <HiGift
                         size={16}
                         className="transform group-hover:translate-x-1 transition-transform duration-300"
@@ -148,13 +241,10 @@ function RewardsMain() {
       <div className="bg-gray-50 hover:bg-gray-100 transition duration-300 rounded-lg shadow-md p-6">
         <div className="flex justify-between">
           <h2 className="text-xl font-semibold mb-4">Minted NFTs</h2>
-          <select
-            className="rounded-full py-2 px-4 outline-none cursor-pointer bg-white shadow-md"
-            // onChange={handleSelectChange}
-          >
-            <option>Optimism</option>
-            <option>Arbitrum</option>
-          </select>
+          <CustomDropdown
+            options={["Optimism", "Arbitrum"]}
+            onChange={handleSelectChange}
+          />
         </div>
         {mintedNFTs.length > 0 ? (
           <></>
@@ -177,6 +267,7 @@ function RewardsMain() {
         )}
       </div>
     </div>
+    </>
   );
 }
 

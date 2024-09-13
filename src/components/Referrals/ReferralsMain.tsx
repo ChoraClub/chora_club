@@ -8,6 +8,8 @@ import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
 import { TailSpin } from "react-loader-spinner";
 import Image from "next/image";
 import logo from "@/assets/images/daos/CCLogo2.png";
+import MobileResponsiveMessage from "../MobileResponsiveMessage/MobileResponsiveMessage";
+import RewardButton from "../ClaimReward/RewardButton";
 
 function ReferralsMain() {
   const { address, isConnected } = useAccount();
@@ -20,7 +22,18 @@ function ReferralsMain() {
   }, [isConnected, session]);
 
   return (
-    <div className="font-poppins">
+    <>
+    {/* For Mobile Screen */}
+    <MobileResponsiveMessage/>
+
+    {/* For Desktop Screen  */}
+    <div className="hidden md:block font-poppins">
+    <div className="w-full flex justify-end pt-2 xs:pt-4 sm:pt-6 px-4 md:px-6 lg:px-14">
+    <div className="flex gap-1 xs:gap-2 items-center">
+        <RewardButton />
+        <ConnectWalletWithENS />
+      </div>
+    </div>
       {!pageLoading ? (
         isConnected && session !== null ? (
           <>
@@ -59,6 +72,7 @@ function ReferralsMain() {
         </div>
       )}
     </div>
+    </>
   );
 }
 

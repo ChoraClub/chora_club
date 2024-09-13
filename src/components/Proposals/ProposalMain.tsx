@@ -45,6 +45,7 @@ import { RiArrowRightUpLine, RiExternalLinkLine } from "react-icons/ri";
 import ProposalMainVotersSkeletonLoader from "../SkeletonLoader/ProposalMainVotersSkeletonLoader";
 import ProposalMainDescriptionSkeletonLoader from "../SkeletonLoader/ProposalMainDescriptionSkeletonLoader";
 import DOMPurify from "dompurify";
+import MobileResponsiveMessage from "../MobileResponsiveMessage/MobileResponsiveMessage";
 
 // Create a client
 const client = createPublicClient({
@@ -102,7 +103,7 @@ function ProposalMain({ props }: { props: Props }) {
   const [queueStartTime, setQueueStartTime] = useState<number>();
   const [queueEndTime, setQueueEndTime] = useState<number>();
   const network = useAccount().chain;
-  const { publicClient, walletClient } = WalletAndPublicClient(network);
+  const { publicClient, walletClient } = WalletAndPublicClient();
   const { chain } = useAccount();
   const { openChainModal } = useChainModal();
   const [isVotingOpen, setIsVotingOpen] = useState(false);
@@ -913,11 +914,15 @@ function ProposalMain({ props }: { props: Props }) {
 
   return (
     <>
-      <div className="pr-16 pb-5 pl-24 pt-6 font-poppins">
+      {/* For Mobile Screen */}
+      <MobileResponsiveMessage/>
+
+      {/* For Desktop Screen  */}
+      <div className="hidden md:block pr-16 pb-5 pl-24 pt-6 font-poppins">
         <IndividualDaoHeader />
       </div>
 
-      <div className="flex gap-4 mx-24 mb-8 mt-5 font-poppins">
+      <div className="hidden md:flex gap-4 mx-24 mb-8 mt-5 font-poppins">
         <div
           className="text-white bg-blue-shade-100 rounded-full py-1.5 px-4 flex justify-center items-center gap-1 cursor-pointer"
           onClick={handleBack}

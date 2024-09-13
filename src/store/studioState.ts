@@ -62,6 +62,8 @@ interface StudioState {
   setLayout: (val: 1 | 2) => void;
   isScreenShared: boolean;
   setIsScreenShared: (val: boolean) => void;
+  isRoomClosed: boolean;
+  setIsRoomClosed: (val: boolean) => void;
 }
 
 export const useStudioState = create<StudioState>((set) => ({
@@ -159,4 +161,6 @@ export const useStudioState = create<StudioState>((set) => ({
   setLayout: (val: 1 | 2) => set({ layout: val }),
   isScreenShared: false,
   setIsScreenShared: (val: boolean) => set({ isScreenShared: val }),
+  isRoomClosed: false,
+  setIsRoomClosed: (val: boolean) => set({ isRoomClosed: val }),
 }));

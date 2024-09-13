@@ -306,7 +306,7 @@ const WatchFreeCollect = ({
   };
 
   return (
-    <div className="font-poppins overflow-hidden bg-gradient-to-br from-purple-400 via-pink-500 to-red-500 p-1 rounded-3xl transition-all duration-300 hover:shadow-lg">
+    <div className="font-poppins overflow-hidden bg-gradient-to-br p-1 rounded-3xl transition-all duration-300 hover:shadow-lg">
       <div className="bg-white rounded-3xl overflow-hidden">
         <div className="flex justify-between items-center w-full bg-blue-600 py-4 px-6">
           <div className="flex items-center space-x-2 animate-fade-in">

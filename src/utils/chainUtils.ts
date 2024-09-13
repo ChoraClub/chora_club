@@ -4,7 +4,7 @@ export const getChainAddress = (chainName?: string): string | undefined => {
   } else if (chainName === "Arbitrum One") {
     return "0x912CE59144191C1204E64559FE8253a0e49E6548";
   }
-  return undefined;
+  return "";
 };
 
 export const getDaoName = (chainName?: string): string => {

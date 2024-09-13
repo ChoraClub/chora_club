@@ -22,6 +22,7 @@ import { BASE_URL } from "@/config/constants";
 import toast, { Toaster } from "react-hot-toast";
 import { Tooltip } from "@nextui-org/react";
 import { getEnsName } from "@/utils/ENSUtils";
+import { IoMdEye } from "react-icons/io";
 import {
   DynamicAttendeeInterface,
   SessionInterface,
@@ -34,6 +35,7 @@ interface Attendee extends DynamicAttendeeInterface {
 
 interface Meeting extends SessionInterface {
   attendees: Attendee[];
+  views:any;
   hostProfileInfo: UserProfileInterface;
 }
 
@@ -114,6 +116,32 @@ function WatchSession({
 
     fetchEnsName();
   }, [data.host_address]);
+
+  function formatViews(views: number): string {
+    // Handle negative numbers or NaN
+    if (isNaN(views) || views < 0) {
+      return "0";
+    }
+
+    // For millions (e.g., 1.25M)
+    if (views >= 1000000) {
+      const millionViews = views / 1000000;
+      return (
+        millionViews.toFixed(millionViews >= 10 ? 0 : 1).replace(/\.0$/, "") +
+        "M"
+      );
+    }
+    // For thousands (e.g., 1.2k, 12k)
+    if (views >= 1000) {
+      const thousandViews = views / 1000;
+      return (
+        thousandViews.toFixed(thousandViews >= 10 ? 0 : 1).replace(/\.0$/, "") +
+        "k"
+      );
+    }
+    // For less than 1000 views, return as is
+    return Math.floor(views).toString();
+  }
 
   return (
     <div className="">
@@ -258,6 +286,12 @@ function WatchSession({
             </div>
 
             <div className="flex gap-6">
+            <div className="flex items-center gap-1">
+            <IoMdEye size={20} />
+                <div className="text-[#1E1E1E]">
+                {formatViews(data?.views ?? 0)} views
+                </div>
+              </div>
               <div className="flex items-center gap-1">
                 <Image src={time} alt="image" width={20} priority />
                 <div className="text-[#1E1E1E]">
