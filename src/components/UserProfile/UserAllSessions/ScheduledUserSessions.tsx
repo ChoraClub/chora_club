@@ -158,7 +158,7 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
       );
     }
   };
-  const [EnsName, setDisplayEnsName] = useState<string>();
+  const [displayEnsName, setDisplayEnsName] = useState<any>();
 
   const checkUser = async () => {
     try {
@@ -335,7 +335,7 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
               // Add any necessary data
               address: address,
               daoName: daoName,
-              ensName: EnsName,
+              ensName: displayEnsName,
             }),
           });
 

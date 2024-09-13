@@ -104,7 +104,7 @@ function MainProfile() {
     github: "",
   });
   const [isToggled, setToggle] = useState(false);
-  const { publicClient, walletClient } = WalletAndPublicClient(daoName);
+  const { publicClient, walletClient } = WalletAndPublicClient();
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedTab, setSelectedTab] = useState("Info");
@@ -270,11 +270,14 @@ function MainProfile() {
     try {
       const addr = await walletClient.getAddresses();
       const address1 = addr[0];
+      console.log("addrrr", address1);
 
       const contractAddress = getChainAddress(chain?.name);
 
+      console.log("contractAddress: ", contractAddress);
+
       // console.log("Contract", contractAddress);
-      // console.log("Wallet Client", walletClient);
+      console.log("Wallet Client", walletClient);
       const delegateTx = await walletClient.writeContract({
         address: contractAddress,
         abi: dao_abi.abi,
@@ -282,10 +285,11 @@ function MainProfile() {
         args: [to],
         account: address1,
       });
-      // console.log(delegateTx);
+
+      console.log(delegateTx);
     } catch (error) {
       console.log("Error:", error);
-      toast.error("Failed to delegate votes. Please try again.");
+      toast.error("Failed to become delegate. Please try again.");
     }
   };
 
@@ -299,7 +303,7 @@ function MainProfile() {
     isfollowingchange: number
   ) => {
     setLoading(true);
-    setIsModalLoading(true); 
+    setIsModalLoading(true);
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
     if (address) {
@@ -350,7 +354,7 @@ function MainProfile() {
     }
     // Close the modal
     setLoading(false);
-    setIsModalLoading(false); 
+    setIsModalLoading(false);
   };
 
   const toggleFollowing = async (
@@ -933,19 +937,19 @@ function MainProfile() {
                     />
                   {/* </div> */}
 
-                  <Image
-                    src={ccLogo}
-                    alt="ChoraClub Logo"
-                    className="absolute top-0 right-0 bg-white rounded-full"
-                    style={{
-                      width: "30px",
-                      height: "30px",
-                      marginTop: "10px",
-                      marginRight: "10px",
-                    }}
-                  />
+                    <Image
+                      src={ccLogo}
+                      alt="ChoraClub Logo"
+                      className="absolute top-0 right-0 bg-white rounded-full"
+                      style={{
+                        width: "30px",
+                        height: "30px",
+                        marginTop: "10px",
+                        marginRight: "10px",
+                      }}
+                    />
+                  </div>
                 </div>
-              </div>
 
               <div className="px-4 mt-4 xs:mt-0 md:mt-2 lg:mt-4 w-full xs:w-auto">
                 <div className=" flex items-center py-1">
@@ -1046,11 +1050,11 @@ function MainProfile() {
                   </div>
                 </div>
 
-                <div className="flex items-center py-1">
-                  <div>
-                    {`${address}`.substring(0, 6)} ...{" "}
-                    {`${address}`.substring(`${address}`.length - 4)}
-                  </div>
+                  <div className="flex items-center py-1">
+                    <div>
+                      {`${address}`.substring(0, 6)} ...{" "}
+                      {`${address}`.substring(`${address}`.length - 4)}
+                    </div>
 
                   <Tooltip
                     content="Copy"
@@ -1091,17 +1095,17 @@ function MainProfile() {
                   </div>
                 </div>
 
-                {isFollowingModalOpen && (
-                  <FollowingModal
-                    userFollowings={userFollowings}
-                    toggleFollowing={toggleFollowing}
-                    toggleNotification={toggleNotification}
-                    setIsFollowingModalOpen={setIsFollowingModalOpen}
-                    isLoading={isLoading}
-                    handleUpdateFollowings={handleUpdateFollowings}
-                    daoName={daoName}
-                  />
-                )}
+                  {isFollowingModalOpen && (
+                    <FollowingModal
+                      userFollowings={userFollowings}
+                      toggleFollowing={toggleFollowing}
+                      toggleNotification={toggleNotification}
+                      setIsFollowingModalOpen={setIsFollowingModalOpen}
+                      isLoading={isLoading}
+                      handleUpdateFollowings={handleUpdateFollowings}
+                      daoName={daoName}
+                    />
+                  )}
 
                 {selfDelegate === false ? (
                   <div className="pt-2 flex flex-col xs:flex-row gap-2 sm:gap-5 w-full">

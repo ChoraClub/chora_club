@@ -22,7 +22,7 @@ import {
 import { usePathname } from "next/navigation";
 import { useRouter } from "next-nprogress-bar";
 import { useEffect, useRef, useState } from "react";
-import BottomBar from "@/components/Huddle/bottomBar";
+import BottomBar from "@/components/Huddle/Bottombar/bottomBar";
 import { Button } from "@/components/ui/button";
 import { PeerMetadata } from "@/utils/types";
 import ChatBar from "@/components/Huddle/sidebars/ChatBar/chatbar";
@@ -48,6 +48,7 @@ import UpdateSessionDetails from "@/components/MeetingPreview/UpdateSessionDetai
 import PopupSlider from "@/components/FeedbackPopup/PopupSlider";
 import MeetingRecordingModal from "@/components/ComponentUtils/MeetingRecordingModal";
 import toast from "react-hot-toast";
+import { handleCloseMeeting } from "@/components/Huddle/HuddleUtils";
 
 export default function Component({ params }: { params: { roomId: string } }) {
   const { isVideoOn, enableVideo, disableVideo, stream } = useLocalVideo();
@@ -103,6 +104,17 @@ export default function Component({ params }: { params: { roomId: string } }) {
   const [showModal, setShowModal] = useState(true);
   const [meetingData, setMeetingData] = useState<any>();
   const { sendData } = useDataMessage();
+  const meetingCategory = usePathname().split("/")[2];
+
+  let meetingType;
+
+  if (meetingCategory === "officehours") {
+    meetingType = 2;
+  } else if (meetingCategory === "session") {
+    meetingType = 1;
+  } else {
+    meetingType = 0;
+  }
 
   const { state } = useRoom({
     onLeave: async ({ reason }) => {
@@ -141,6 +153,20 @@ export default function Component({ params }: { params: { roomId: string } }) {
           handlePopupRedirection();
         } else {
           setShowFeedbackPopups(true);
+        }
+
+        if (role === "host") {
+          setTimeout(async () => {
+            await handleCloseMeeting(
+              address,
+              meetingCategory,
+              params.roomId,
+              daoName,
+              hostAddress,
+              meetingRecordingStatus,
+              meetingData
+            );
+          }, 10000);
         }
       } else {
         router.push(`/meeting/session/${params.roomId}/lobby`);
@@ -630,6 +656,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
             hostAddress={hostAddress}
             meetingStatus={meetingRecordingStatus}
             meetingData={meetingData}
+            meetingCategory={meetingCategory}
           />
         </div>
       ) : (

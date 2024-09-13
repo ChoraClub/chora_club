@@ -8,16 +8,8 @@ import { Tooltip } from "@nextui-org/react";
 import { IoCopy } from "react-icons/io5";
 import copy from "copy-to-clipboard";
 import toast, { Toaster } from "react-hot-toast";
-import image from "@/assets/images/daos/thumbnail1.png";
 import user1 from "@/assets/images/user/user1.svg";
 import user2 from "@/assets/images/user/user2.svg";
-import user3 from "@/assets/images/user/user3.svg";
-import user4 from "@/assets/images/user/user4.svg";
-import user5 from "@/assets/images/user/user5.svg";
-import user6 from "@/assets/images/user/user6.svg";
-import user7 from "@/assets/images/user/user7.svg";
-import user8 from "@/assets/images/user/user8.svg";
-import user9 from "@/assets/images/user/user9.svg";
 import posterImage from "@/assets/images/daos/thumbnail1.png";
 import { getEnsName } from "@/utils/ENSUtils";
 import logo from "@/assets/images/daos/CCLogo.png";
@@ -26,6 +18,8 @@ import EditButton from "./EditButton";
 import { useAccount } from "wagmi";
 import Link from "next/link";
 import { LuDot } from "react-icons/lu";
+import { BiLinkExternal } from "react-icons/bi";
+import buttonStyles from "./Button.module.css";
 
 interface meeting {
   meetingData: any;
@@ -229,7 +223,8 @@ function RecordedSessionsTile({
               router.push(`/watch/${data.meetingId}`);
             }}
             onMouseEnter={() => setHoveredVideo(index)}
-            onMouseLeave={() => setHoveredVideo(null)}>
+            onMouseLeave={() => setHoveredVideo(null)}
+          >
             <div
               className={`w-full h-44 sm:rounded-t-3xl bg-black object-cover object-center relative `}
             >
@@ -242,12 +237,14 @@ function RecordedSessionsTile({
                     muted
                     onLoadedMetadata={(e) => handleLoadedMetadata(index, e)}
                     src={data.video_uri}
-                    className="w-full h-44 rounded-t-3xl object-cover"></video>
+                    className="w-full h-44 rounded-t-3xl object-cover"
+                  ></video>
                   <div className={styles.videoTimeline}>
                     <div className={styles.progressArea}>
                       <div
                         id={`progressBar-${index}`}
-                        className={styles.progressBar}></div>
+                        className={styles.progressBar}
+                      ></div>
                     </div>
                   </div>
                 </div>
@@ -263,7 +260,8 @@ function RecordedSessionsTile({
                   muted
                   onLoadedMetadata={(e) => handleLoadedMetadata(index, e)}
                   src={data.video_uri}
-                  className="w-full h-44 rounded-t-3xl object-cover"></video>
+                  className="w-full h-44 rounded-t-3xl object-cover"
+                ></video>
               )}
               <div className="absolute right-2 bottom-2 text-white text-xs bg-white px-1 bg-opacity-30 rounded-sm">
                 {formatVideoDuration(videoDurations[index] || 0)}
@@ -280,7 +278,8 @@ function RecordedSessionsTile({
                     display: "-webkit-box",
                     WebkitBoxOrient: "vertical",
                     WebkitLineClamp: 1,
-                  }}>
+                  }}
+                >
                   {updatedSessionDetails[index]?.title || data.title}
                 </div>
                 <div className="flex items-center text-sm gap-0.5 sm:gap-1 py-1">
@@ -293,15 +292,17 @@ function RecordedSessionsTile({
                         height={20}
                         className="rounded-full size-4 sm:size-6"
                       />
-                    </div> 
+                    </div>
                     {/* <div className="capitalize">
                       
                     </div> */}
                     {/* <div className="capitalize hidden sm:flex">{data.dao_name}</div> */}
                   </div>
-                  <LuDot/>
-                  <div className="text-xs sm:text-sm capitalize">{formatViews(data?.views ?? 0)} views</div>
-                  <LuDot/>
+                  <LuDot />
+                  <div className="text-xs sm:text-sm capitalize">
+                    {formatViews(data?.views ?? 0)} views
+                  </div>
+                  <LuDot />
                   <div className=" text-xs sm:text-sm">
                     {formatTimeAgo(data.slot_time)}
                   </div>
@@ -328,7 +329,8 @@ function RecordedSessionsTile({
                         onClick={(event: any) => {
                           event.stopPropagation();
                         }}
-                        className="cursor-pointer hover:text-blue-shade-200 ml-1">
+                        className="cursor-pointer hover:text-blue-shade-200 ml-1"
+                      >
                         {loadingHostNames
                           ? data.host_address.slice(0, 4) +
                             "..." +
@@ -386,7 +388,8 @@ function RecordedSessionsTile({
                           content="Copy"
                           placement="right"
                           closeDelay={1}
-                          showArrow>
+                          showArrow
+                        >
                           <span className="cursor-pointer text-sm">
                             <IoCopy
                               onClick={(event) => {
@@ -405,33 +408,106 @@ function RecordedSessionsTile({
               </div>
               <div className="px-4 pb-2 flex justify-center space-x-2">
                 {session === "hosted" && data.uid_host && (
-                  <ClaimButton
-                    meetingId={data.meetingId}
-                    meetingType={data.session_type === "session" ? 2 : 1}
-                    startTime={data.attestations[0]?.startTime}
-                    endTime={data.attestations[0]?.endTime}
-                    dao={data.dao_name}
-                    address={address || ""}
-                    onChainId={
-                      session === "hosted" ? data.onchain_host_uid : ""
-                    }
-                  />
+                  <div className="flex gap-2 w-full">
+                    <Link
+                      href={
+                        data.uid_host
+                          ? data.dao_name === ("optimism" || "Optimism")
+                            ? `https://optimism.easscan.org/offchain/attestation/view/${data.uid_host}`
+                            : data.dao_name === ("arbitrum" || "Arbitrum")
+                            ? `https://arbitrum.easscan.org/offchain/attestation/view/${data.uid_host}`
+                            : ""
+                          : "#"
+                      }
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                      }}
+                      className={`${buttonStyles.button} w-full gap-1`}
+                    >
+                      Offchain{" "}
+                      <BiLinkExternal
+                        size={20}
+                        className="text-white hover:text-blue-600 transition-colors duration-200"
+                        title="Open link in new tab"
+                      />
+                    </Link>
+                    <ClaimButton
+                      meetingId={data.meetingId}
+                      meetingType={data.session_type === "session" ? 2 : 1}
+                      startTime={data.attestations[0]?.startTime}
+                      endTime={data.attestations[0]?.endTime}
+                      dao={data.dao_name}
+                      address={address || ""}
+                      onChainId={
+                        session === "hosted" ? data.onchain_host_uid : ""
+                      }
+                    />
+                  </div>
                 )}
-                {session === "attended" && data.attendees[0]?.attendee_uid && (
-                  <ClaimButton
-                    meetingId={data.meetingId}
-                    meetingType={data.session_type === "session" ? 2 : 1}
-                    startTime={data.attestations[0]?.startTime}
-                    endTime={data.attestations[0]?.endTime}
-                    dao={data.dao_name}
-                    address={address || ""}
-                    onChainId={
-                      session === "attended"
-                        ? data.attendees[0]?.onchain_attendee_uid
-                        : ""
-                    }
-                  />
-                )}
+                {session === "attended" &&
+                  data.attendees.some(
+                    (attendee: any) =>
+                      attendee.attendee_address === address &&
+                      attendee.attendee_uid
+                  ) && (
+                    <div className="flex gap-2 w-full">
+                      {(() => {
+                        const matchingAttendee = data.attendees.find(
+                          (attendee: any) =>
+                            attendee.attendee_address === address
+                        );
+                        const attendeeUid = matchingAttendee?.attendee_uid;
+
+                        let href = "#";
+                        if (attendeeUid) {
+                          if (data.dao_name.toLowerCase() === "optimism") {
+                            href = `https://optimism.easscan.org/offchain/attestation/view/${attendeeUid}`;
+                          } else if (
+                            data.dao_name.toLowerCase() === "arbitrum"
+                          ) {
+                            href = `https://arbitrum.easscan.org/offchain/attestation/view/${attendeeUid}`;
+                          }
+                        }
+
+                        return (
+                          <Link
+                            href={href}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                            }}
+                            className={`${buttonStyles.button} w-full gap-1`}
+                          >
+                            Offchain{" "}
+                            <BiLinkExternal
+                              size={20}
+                              className="text-white hover:text-blue-600 transition-colors duration-200"
+                              title="Open link in new tab"
+                            />
+                          </Link>
+                        );
+                      })()}
+                      <ClaimButton
+                        meetingId={data.meetingId}
+                        meetingType={data.session_type === "session" ? 2 : 1}
+                        startTime={data.attestations[0]?.startTime}
+                        endTime={data.attestations[0]?.endTime}
+                        dao={data.dao_name}
+                        address={address || ""}
+                        onChainId={
+                          session === "attended"
+                            ? data.attendees.find(
+                                (attendee: any) =>
+                                  attendee.attendee_address === address
+                              )?.onchain_attendee_uid
+                            : ""
+                        }
+                      />
+                    </div>
+                  )}
                 {session === "hosted" && (
                   <div
                     className={`flex justify-end ${
@@ -439,7 +515,8 @@ function RecordedSessionsTile({
                     } `}
                     onClick={(e) => {
                       e.stopPropagation();
-                    }}>
+                    }}
+                  >
                     <EditButton
                       sessionData={data}
                       updateSessionData={updateSessionData}

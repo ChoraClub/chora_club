@@ -11,37 +11,41 @@ import {
 import { Button } from "@/components/ui/button";
 import { BasicIcons } from "@/utils/BasicIcons";
 import { useStudioState } from "@/store/studioState";
-import ButtonWithIcon from "../ui/buttonWithIcon";
+import ButtonWithIcon from "../../ui/buttonWithIcon";
 import { Role } from "@huddle01/server-sdk/auth";
 import { PeerMetadata } from "@/utils/types";
 import clsx from "clsx";
 import toast from "react-hot-toast";
-import Dropdown from "../ui/Dropdown";
-import Strip from "./sidebars/participantsSidebar/Peers/PeerRole/Strip";
+import Dropdown from "../../ui/Dropdown";
+import Strip from "../sidebars/participantsSidebar/Peers/PeerRole/Strip";
 import { useEffect, useState } from "react";
 import { useParams, usePathname } from "next/navigation";
 import { useAccount } from "wagmi";
 import { PiLinkSimpleBold } from "react-icons/pi";
 import { opBlock, arbBlock } from "@/config/staticDataUtils";
-import MeetingRecordingModal from "../ComponentUtils/MeetingRecordingModal";
-import ReactionBar from "./ReactionBar";
+import MeetingRecordingModal from "../../ComponentUtils/MeetingRecordingModal";
+import ReactionBar from "../ReactionBar";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
+} from "../../ui/dropdown-menu";
 import { SessionInterface } from "@/types/MeetingTypes";
+import QuickLinks from "./QuickLinks";
+import { handleCloseMeeting, handleStopRecording } from "../HuddleUtils";
 
 const BottomBar = ({
   daoName,
   hostAddress,
   meetingStatus,
   meetingData,
+  meetingCategory,
 }: {
   daoName: string;
   hostAddress: string;
   meetingStatus: boolean | undefined;
   meetingData?: SessionInterface;
+  meetingCategory: string;
 }) => {
   const { isAudioOn, enableAudio, disableAudio } = useLocalAudio();
   const { isVideoOn, enableVideo, disableVideo } = useLocalVideo();
@@ -49,7 +53,7 @@ const BottomBar = ({
   const { leaveRoom, closeRoom, room } = useRoom();
   const [isLoading, setIsLoading] = useState(false);
   const params = useParams();
-  const meetingCategory = usePathname().split("/")[2];
+
   const roomId = params.roomId as string | undefined;
   const [s3URL, setS3URL] = useState<string>("");
   const { chain } = useAccount();
@@ -74,8 +78,6 @@ const BottomBar = ({
     isScreenShared,
     setIsScreenShared,
   } = useStudioState();
-  const [showModal, setShowModal] = useState(true);
-  // const [recordingStatus, setRecordingStatus] = useState<string | null>(null);
   const { startScreenShare, stopScreenShare, shareStream } =
     useLocalScreenShare({
       onProduceStart(data) {
@@ -126,51 +128,6 @@ const BottomBar = ({
     },
   });
 
-  const handleStopRecording = async () => {
-    console.log("stop recording");
-    if (!roomId) {
-      console.error("roomId is undefined");
-      return;
-    }
-
-    try {
-      const myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
-      if (address) {
-        myHeaders.append("x-wallet-address", address);
-      }
-      const requestOptions = {
-        method: "POST",
-        headers: myHeaders,
-        body: JSON.stringify({
-          roomId: roomId,
-        }),
-      };
-      const response = await fetch(
-        `/api/stopRecording/${roomId}`,
-        requestOptions
-      );
-      const data = await response.json();
-      console.log("response: ", response);
-
-      if (!response.ok) {
-        console.error(`Request failed with status: ${response.status}`);
-        toast.error("Failed to stop recording");
-        return;
-      }
-
-      if (data.success === true) {
-        setIsRecording(false);
-        toast.success("Recording stopped");
-        const success = true;
-        return success;
-      }
-    } catch (error) {
-      console.error("Error during stop recording:", error);
-      toast.error("Error during stop recording");
-    }
-  };
-
   useEffect(() => {
     const handleBeforeUnload = (event: any) => {
       if (role === "host") {
@@ -189,9 +146,8 @@ const BottomBar = ({
   const handleEndCall = async (endMeet: string) => {
     setIsLoading(true);
 
-    let stopRecordingResult;
     if (role === "host" && meetingStatus === true) {
-      stopRecordingResult = await handleStopRecording();
+      await handleStopRecording(roomId, address);
     }
 
     console.log("s3URL in handleEndCall", s3URL);
@@ -214,8 +170,8 @@ const BottomBar = ({
             body: JSON.stringify({
               meetingId: roomId,
               meetingType: meetingCategory,
-              recordedStatus: isRecording,
-              meetingStatus: isRecording === true ? "Recorded" : "Finished",
+              recordedStatus: meetingStatus,
+              meetingStatus: meetingStatus === true ? "Recorded" : "Finished",
             }),
           };
 
@@ -233,71 +189,6 @@ const BottomBar = ({
       setShowLeaveDropDown(false);
     } else {
       return;
-    }
-
-    if (role === "host") {
-      let meetingType;
-      if (meetingCategory === "officehours") {
-        meetingType = 2;
-      } else if (meetingCategory === "session") {
-        meetingType = 1;
-      } else {
-        meetingType = 0;
-      }
-
-      try {
-        const myHeaders = new Headers();
-        myHeaders.append("Content-Type", "application/json");
-        if (address) {
-          myHeaders.append("x-wallet-address", address);
-        }
-        const requestOptions = {
-          method: "POST",
-          headers: myHeaders,
-          body: JSON.stringify({
-            roomId: roomId,
-            meetingType: meetingType,
-            dao_name: daoName,
-            hostAddress: hostAddress,
-          }),
-        };
-
-        if (stopRecordingResult === true) {
-          const response2 = await fetch("/api/end-call", requestOptions);
-          const result = await response2.text();
-          console.log("result in end call::", result);
-        }
-      } catch (error) {
-        console.error("Error handling end call:", error);
-      }
-
-      if (meetingStatus === true) {
-        try {
-          toast.success("Giving Attestations");
-          const myHeaders = new Headers();
-          myHeaders.append("Content-Type", "application/json");
-          if (address) {
-            myHeaders.append("x-wallet-address", address);
-          }
-          const response = await fetch(`/api/get-attest-data`, {
-            method: "POST",
-            headers: myHeaders,
-            body: JSON.stringify({
-              roomId: roomId,
-              connectedAddress: address,
-              meetingData: meetingData,
-            }),
-          });
-          const response_data = await response.json();
-          console.log("Updated", response_data);
-          if (response_data.success) {
-            toast.success("Attestation successful");
-          }
-        } catch (e) {
-          console.log("Error in attestation: ", e);
-          // toast.error("Attestation denied");
-        }
-      }
     }
 
     if (meetingCategory === "officehours") {
@@ -327,45 +218,7 @@ const BottomBar = ({
   return (
     <>
       <footer className="flex items-center justify-between px-4 py-2 font-poppins">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button className="bg-white hover:bg-white">
-              <div className="flex gap-2 items-center">
-                <div className="bg-blue-shade-200 p-2 rounded-lg">
-                  <PiLinkSimpleBold
-                    className="text-white"
-                    size={24}
-                  ></PiLinkSimpleBold>
-                </div>
-                <div className="text-gray-800 text-base">Quick Links</div>
-              </div>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            className="bg-white items-start"
-            sideOffset={8}
-            align="start"
-          >
-            <div className="">
-              {/* <div className="arrow-up"></div> */}
-              {(daoName === "arbitrum"
-                ? arbBlock
-                : daoName === "optimism"
-                ? opBlock
-                : []
-              ).map((block, index) => (
-                <a
-                  href={block.link}
-                  target="_blank"
-                  className="block px-4 py-2 text-gray-800 hover:bg-gray-200 hover:rounded-md"
-                  key={index}
-                >
-                  {block.title}
-                </a>
-              ))}
-            </div>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <QuickLinks daoName={daoName} />
 
         <div className={clsx("flex space-x-3")}>
           <ButtonWithIcon
