@@ -76,7 +76,7 @@ function FollowingModal({
   };
 
   useEffect(() => {
-    if (chain && chain?.name === "Optimism") {
+    if (chain && chain?.name === "OP Mainnet") {
       handleChainChange("optimism");
     } else if (chain && chain?.name === "Arbitrum One") {
       handleChainChange("arbitrum");

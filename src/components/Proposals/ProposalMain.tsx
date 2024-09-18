@@ -191,7 +191,7 @@ function ProposalMain({ props }: { props: Props }) {
       return;
     }
     let chainAddress;
-    if (chain?.name === "Optimism") {
+    if (chain?.name === "OP Mainnet") {
       chainAddress = "0xcDF27F107725988f2261Ce2256bDfCdE8B382B10";
     } else if (chain?.name === "Arbitrum One") {
       chainAddress = await getContractAddress(data.transactionHash);
