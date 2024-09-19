@@ -157,8 +157,9 @@ function ProposalMain({ props }: { props: Props }) {
       throw new Error("Failed to submit vote");
     }
   };
+  console.log(network)
   const voteOnchain = async () => {
-    if (walletClient?.chain !== props.daoDelegates) {
+    if (walletClient?.chain !== network) {
       toast.error("Please switch to appropriate network to delegate!");
       if (openChainModal) {
         openChainModal();

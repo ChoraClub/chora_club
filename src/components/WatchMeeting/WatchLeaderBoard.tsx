@@ -14,13 +14,100 @@ import Image from "next/image";
 import styles from "./WatchSession.module.css";
 import { IoClose } from "react-icons/io5";
 import { RxCross2 } from "react-icons/rx";
-
-const WatchLeaderBoard = () => {
+import { Holder } from "@/types/LeaderBoardTypes";
+const WatchLeaderBoard = ({leaderBoardData}:{leaderBoardData:Holder}) => {
   const [showPopup, setShowPopup] = useState(false);
   const [isBodyOverflowHidden, setIsBodyOverflowHidden] = useState(false);
   const [showComingSoon, setShowComingSoon] = useState(true);
+  interface LeaderBoardEntry {
+    smallEmoji: string;
+    text: string;
+    img: string;
+    name?: string;
+    color: string;
+    bgColor: string;
+    balance?: number;
+  }
+  
+  const [leaderBoard, setLeaderBoard] = useState<LeaderBoardEntry[]>([]);
+  useEffect(() => {
+    if (leaderBoardData && (leaderBoardData.TopTen?.length > 0 || leaderBoardData.firstCollector || leaderBoardData.latestCollector)) {
+      console.log(leaderBoardData); 
+      
+      const processedLeaderBoard = [
+        ...(Array.isArray(leaderBoardData?.TopTen) 
+          ? leaderBoardData.TopTen.map((holder: any, index: any) => ({
+              smallEmoji: [emoji1, emoji2, emoji3, emoji4, emoji5][index % 5],
+              text: `Top #${index + 1}`,
+              img: [user1, user2, user3, user4, user5][index % 5],
+              name: holder.user ? holder.user.slice(0, 6) + '...' + holder.user.slice(-4) : '',
+              color: ['#4773F0', '#A573E5', '#1FA1FF', '#FF8A00', '#FF8A00'][index % 5],
+              bgColor: ['#EAECFF', '#F2E8FF', '#EAF1FF', '#FFF4EA', '#FFF4EA'][index % 5],
+              balance: holder.balance
+            }))
+          : []),
+        ...(leaderBoardData?.firstCollector 
+          ? [{
+              smallEmoji: emoji4,
+              text: 'First Collector',
+              img: user4,
+              name: leaderBoardData.firstCollector.user 
+                ? leaderBoardData.firstCollector.user.slice(0, 6) + '...' + leaderBoardData.firstCollector.user.slice(-4) 
+                : '',
+              color: '#FF8A00',
+              bgColor: '#FFF4EA',
+              balance: leaderBoardData.firstCollector.balance
+            }] 
+          : []),
+        ...(leaderBoardData?.latestCollector 
+          ? [{
+              smallEmoji: emoji5,
+              text: 'Latest Collector',
+              img: user5,
+              name: leaderBoardData.latestCollector.user 
+                ? leaderBoardData.latestCollector.user.slice(0, 6) + '...' + leaderBoardData.latestCollector.user.slice(-4) 
+                : '',
+              color: '#FF8A00',
+              bgColor: '#FFF4EA',
+              balance: leaderBoardData.latestCollector.balance
+            }] 
+          : [])
+      ];
+    
+      console.log(processedLeaderBoard);
+      setLeaderBoard(processedLeaderBoard);
+    }
+  }, [leaderBoardData]); // Trigger whenever leaderBoardData updates
+  
+  
 
-  const leaderBoard = [
+    // const firstCollector = allHolders.reduce((min, p) => p.timestamp < min.timestamp ? p : min, allHolders[0] || {});
+    // const latestCollector = allHolders.reduce((max, p) => p.timestamp > max.timestamp ? p : max);
+
+   
+  //     {
+  //       smallEmoji: '/emoji4.svg',
+  //       text: 'First Collector',
+  //       img: '/user4.svg',
+  //       // name: firstCollector.user.slice(0, 6) + '...' + firstCollector.user.slice(-4),
+  //       color: '#FF8A00',
+  //       bgColor: '#FFF4EA',
+  //       // balance: firstCollector.balance
+  //     },
+  //     {
+  //       smallEmoji: '/emoji5.svg',
+  //       text: 'Latest Collector',
+  //       img: '/user5.svg',
+  //       // name: latestCollector.user.slice(0, 6) + '...' + latestCollector.user.slice(-4),
+  //       color: '#FF8A00',
+  //       bgColor: '#FFF4EA',
+  //       // balance: latestCollector.balance
+  //     }
+  //   ];
+
+  //   setLeaderBoard(processedLeaderBoard);
+  // };
+  const leaderBoard2 = [
     {
       smallEmoji: emoji1,
       text: "Top #1",
@@ -193,7 +280,7 @@ const WatchLeaderBoard = () => {
                   color: data.color,
                 }}
               >
-                3x
+                {data.balance}x  
               </div>
             </div>
           ))}
@@ -251,7 +338,7 @@ const WatchLeaderBoard = () => {
                         color: data.color,
                       }}
                     >
-                      3x
+                      {data.balance}x
                     </div>
                   </div>
                 </div>

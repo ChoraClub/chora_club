@@ -10,6 +10,11 @@ export const op_client = createClient({
   exchanges: [cacheExchange, fetchExchange],
 });
 
+export const nft_client = createClient({
+  url: "https://api.studio.thegraph.com/query/71916/choraxzora/version/latest",
+  exchanges: [cacheExchange, fetchExchange],
+});
+
 export const DELEGATE_CHANGED_QUERY = gql`
   query MyQuery($delegator: String!) {
     delegateChangeds(

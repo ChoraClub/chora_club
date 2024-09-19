@@ -285,13 +285,13 @@ function RecordedSessionsTile({
                 <div className="flex items-center text-sm gap-0.5 sm:gap-1 py-1">
                   <div className=" flex items-center ">
                     <div>
-                      <Image
-                        src={getDaoLogo(data.dao_name)}
+                      {/* <Image
+                        src={getDaoLogo(data?.dao_name)}
                         alt="image"
                         width={20}
                         height={20}
                         className="rounded-full size-4 sm:size-6"
-                      />
+                      /> */}
                     </div>
                     {/* <div className="capitalize">
                       
@@ -332,10 +332,10 @@ function RecordedSessionsTile({
                         className="cursor-pointer hover:text-blue-shade-200 ml-1"
                       >
                         {loadingHostNames
-                          ? data.host_address.slice(0, 4) +
+                          ? data?.host_address?.slice(0, 4) +
                             "..." +
-                            data.host_address.slice(-4)
-                          : ensHostNames[data.host_address]}
+                            data?.host_address?.slice(-4)
+                          : ensHostNames[data?.host_address]}
                       </Link>
                     </div>
                     <div>
@@ -356,7 +356,7 @@ function RecordedSessionsTile({
                       </Tooltip>
                     </div>
                   </div>
-                  {data.attendees[0]?.attendee_address ? (
+                  {/* {data?.attendees[0]?.attendee_address ? (
                     <div className="hidden sm:flex items-center gap-2 py-1 text-sm">
                       <div className="">
                         <Image
@@ -403,7 +403,7 @@ function RecordedSessionsTile({
                     </div>
                   ) : (
                     ""
-                  )}
+                  )} */}
                 </div>
               </div>
               <div className="px-4 pb-2 flex justify-center space-x-2">

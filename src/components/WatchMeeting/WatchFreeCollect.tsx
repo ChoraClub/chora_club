@@ -7,8 +7,9 @@ import { RiArrowDropDownLine } from "react-icons/ri";
 import { IoArrowUpOutline } from "react-icons/io5";
 import styles from "./WatchSession.module.css";
 import { RxCross2 } from "react-icons/rx";
+import { Holder } from "@/types/LeaderBoardTypes";
 
-const WatchFreeCollect = () => {
+const WatchFreeCollect = ({leaderBoardData}:{leaderBoardData:Holder}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [showComingSoon, setShowComingSoon] = useState(true);
   const [number, setNumber]=useState(1);
@@ -66,7 +67,7 @@ const WatchFreeCollect = () => {
         </div>
         <div className="px-2 py-1 border border-blue-shade-100 bg-blue-shade-600 w-fit rounded-md">
           <p className="text-blue-shade-100 font-medium text-sm">
-            14320 Collected
+            {leaderBoardData?.maxSupply} Collected
           </p>
         </div>
       </div>

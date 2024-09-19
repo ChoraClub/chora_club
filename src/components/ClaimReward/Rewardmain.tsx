@@ -9,7 +9,9 @@ import Link from "next/link";
 import { RxCross2 } from "react-icons/rx";
 import RewardButton from "./RewardButton";
 import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
-
+import { gql } from 'urql';
+import { useAccount } from "wagmi";
+import { nft_client } from "@/config/staticDataUtils";
 interface Reward {
   platform: string;
   amount: string;
@@ -26,6 +28,31 @@ interface CustomDropdownProps {
   options: string[];
   onChange?: (option: string) => void;
 }
+const REWARD_QUERY = gql`
+query MyQuery($address: String!) {
+  rewardsPerUsers(where: {address: $address}) {
+    address
+    amount
+    id
+    withdrawn
+  }
+}`
+
+const MINTED_NFTS =gql`
+query MyQuery($address: String!) {
+  token1155Holders(where: {user: $address}) {
+    balance
+    user
+    tokenAndContract {
+      metadata {
+        image
+        name
+        animationUrl
+      }
+      address
+    }
+  }
+}`;
 
 function CustomDropdown({ options, onChange }: CustomDropdownProps) {
   const [selectedOption, setSelectedOption] = useState(options[0]);
@@ -108,15 +135,20 @@ function CustomDropdown({ options, onChange }: CustomDropdownProps) {
 
 function RewardsMain() {
   const [showComingSoon, setShowComingSoon] = useState(true);
-  const totalRewards = { amount: "0.0 ETH", value: "$0.0" };
-  const claimableRewards: Reward[] = [
-    { platform: "Optimism", amount: "0.0 ETH", value: "$0.0", logo: oplogo },
-    { platform: "Arbitrum", amount: "0.0 ETH", value: "$0.0", logo: arblogo },
-  ];
-  const mintedNFTs: NFT[] = [
+  const [totalRewards, setTotalRewards] = useState<any>({ amount: "0.0 ETH", value: "$0.0" });
+  // const totalRewards = { amount: "0.0 ETH", value: "$0.0" };
+  const {address} = useAccount();
+  console.log(address)
+  const [claimableRewards,setClaimableRewards] = useState<Reward[]>([]);
+  // let claimableRewards: Reward[] = [
+  //   { platform: "Optimism", amount: "0.0 ETH", value: "$0.0", logo: oplogo },
+  //   { platform: "Arbitrum", amount: "0.0 ETH", value: "$0.0", logo: arblogo },
+  // ];
+const [mintedNFTs, setMintedNFTs] = useState<any[]>([]);
+  // const mintedNFTs: NFT[] = [
     // { id: 1, thumbnail: "path/to/thumbnail1.jpg" },
     // { id: 2, thumbnail: "path/to/thumbnail2.jpg" },
-  ];
+  // ];
 
   const nonZeroRewards = claimableRewards.filter(
     (reward) => parseFloat(reward.amount) > 0
@@ -127,6 +159,39 @@ function RewardsMain() {
     // Add your logic here to handle the change
   };
 
+  const fetchReward = async () => {
+    const data = await nft_client.query(REWARD_QUERY, {address: "0x3013bb4e03a7b81106d69c10710eae148c8410e1"}).toPromise();
+    const total = data?.data.rewardsPerUsers?.map((reward: any) => ({
+      amount : reward.amount/10**18,
+      value : `$${parseFloat(reward.amount).toFixed(2)}`
+    })) || [];
+    setTotalRewards(total[0]);
+    console.log("total reward",total);
+    const Rewards= data?.data.rewardsPerUsers?.map((reward: any) => ({
+      platform: reward.id,  // Use the ID or some other property for platform
+      amount: ((reward.amount-reward.withdrawn)/10**18),
+      value: `$${parseFloat(reward.amount).toFixed(2)}`,
+      logo: reward.id.includes("op") ? oplogo : arblogo,  // Example condition to set logo
+    })) || [];
+    setClaimableRewards(Rewards);
+    console.log(claimableRewards);
+  };
+  useEffect(() => {
+    fetchReward();
+    fetchNFTs();
+  }, []);
+
+
+  const fetchNFTs = async () => {
+    const result = await nft_client.query(MINTED_NFTS, {address: "0x3013bb4e03a7b81106d69c10710eae148c8410e1"}).toPromise();
+    const nfts = result?.data.token1155Holders?.map((nft: any) => ({
+      id: nft.tokenAndContract.metadata.name,
+      thumbnail: nft.tokenAndContract.metadata.image,
+      balance : nft.balance
+    })) || [];
+    console.log("minted nfts",nfts);
+    setMintedNFTs(nfts);
+  };
   return (
     <>
     <div className="w-full flex justify-end pt-2 xs:pt-4 sm:pt-6 px-4 md:px-6 lg:px-14">
@@ -169,8 +234,8 @@ function RewardsMain() {
                 d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
               />
             </svg>
-            <span className="text-2xl font-bold">{totalRewards.amount}</span>
-            <span className="text-gray-500">({totalRewards.value})</span>
+            <span className="text-2xl font-bold">{totalRewards.amount} ETH</span>
+            <span className="text-gray-500">({totalRewards.value.slice(0,3)})</span>
           </div>
         </div>
 
@@ -187,11 +252,11 @@ function RewardsMain() {
                     <div className="w-8 h-8 flex items-center justify-center">
                       <Image src={reward.logo} alt="logo" />
                     </div>
-                    <span>{reward.platform}</span>
+                    <span>{reward.platform.slice(0,6)}...{reward.platform.slice(-4)}</span>
                   </div>
                   <div className="flex items-center space-x-4">
                     <div>
-                      <div className="font-semibold">{reward.amount}</div>
+                      <div className="font-semibold">{reward.amount} ETH</div>
                       <div className="text-sm text-gray-500">
                         {reward.value}
                       </div>
@@ -247,17 +312,18 @@ function RewardsMain() {
           />
         </div>
         {mintedNFTs.length > 0 ? (
-          <></>
+          <>
+             <RecordedSessionsTile
+              meetingData={mintedNFTs.map(nft => ({
+                meetingId: nft.id,
+                thumbnail_image: nft.thumbnail,
+                title: `NFT ${nft.id}`,
+                // Add other required properties for RecordedSessionsTile
+              }))}
+              gridCols="grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+            /></>
         ) : (
-          //   <RecordedSessionsTile
-          //     meetingData={mintedNFTs.map(nft => ({
-          //       meetingId: nft.id,
-          //       thumbnail_image: nft.thumbnail,
-          //       title: `NFT ${nft.id}`,
-          //       // Add other required properties for RecordedSessionsTile
-          //     }))}
-          //     gridCols="grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-          //   />
+         
           <div className="text-center py-8 text-gray-500">
             {/* <svg className="w-16 h-16 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
