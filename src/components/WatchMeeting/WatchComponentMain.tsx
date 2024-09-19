@@ -224,7 +224,7 @@ function WatchComponentMain({ props }: { props: { id: string } }) {
         console.log("result::::", result);
         setData(result.data[0]);
         setCollection(result.collection);
-        console.log(result.data[0].video_uri.video_uri);
+        console.log(result.data[0].video_uri);
       } catch (error) {
         console.error(error);
       }
@@ -266,47 +266,48 @@ function WatchComponentMain({ props }: { props: { id: string } }) {
               </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-y-4 gap-x-4 1.7xl:gap-x-6 pt-6 relative 1.7xl:pr-14 pr-4 lg:pr-5 xl-pr-10">
-              {/* Left side */}
-              <div className="col-span-2 space-y-5 font-poppins pb-10 ">
-                <WatchSessionVideo
-                  data={data}
-                  collection={collection}
-                  autoplay={true}
-                  sessionDetails={sessionDetails}
-                />
-                <WatchSession
-                  data={data}
-                  collection={collection}
-                  sessionDetails={sessionDetails}
-                />
+          <div className="grid grid-cols-3 gap-y-4 gap-x-4 1.7xl:gap-x-6 pt-6 relative 1.7xl:pr-14 pr-4 lg:pr-5 xl-pr-10">
+            {/* Left side */}
+            <div className="col-span-2 space-y-5 font-poppins pb-10 ">
+              <WatchSessionVideo
+                data={data}
+                collection={collection}
+                autoplay={true}
+                sessionDetails={sessionDetails}
+              />
+              <WatchSession
+                data={data}
+                collection={collection}
+                sessionDetails={sessionDetails}
+              />
 
-                {/* /Video Recommendation */}
-                <WatchVideoRecommendation data={data} />
-              </div>
+              {/* /Video Recommendation */}
+              <WatchVideoRecommendation data={data} />
+            </div>
 
-              {/* Right side */}
-              <div
-                className={`col-span-1  pb-8 ${styles.customScrollbar} gap-y-6 flex flex-col`}>
-                {/* <WatchSessionList /> */}
+            {/* Right side */}
+            <div
+              className={`col-span-1  pb-8 ${styles.customScrollbar} gap-y-6 flex flex-col`}
+            >
+              {/* <WatchSessionList /> */}
 
-                {/* Free */}
-                <WatchFreeCollect leaderBoardData={leaderBoardData} />
+              {/* Free */}
+              <WatchFreeCollect leaderBoardData={leaderBoardData} data={data} collection={collection} />
 
-                {/* Leader BOARD */}
-                <WatchLeaderBoard leaderBoardData={leaderBoardData} />
+              {/* Leader BOARD */}
+              <WatchLeaderBoard leaderBoardData={leaderBoardData} data={data} collection={collection} />
 
-                {/* COLLECTIBLE INFO */}
-                <WatchCollectibleInfo leaderBoardData={leaderBoardData} />
+              {/* COLLECTIBLE INFO */}
+              <WatchCollectibleInfo leaderBoardData={leaderBoardData} data={data} collection={collection} />
 
-                {/* SOCIAL LINKS */}
-                <WatchSocialLinks data={data} collection={collection} />
-              </div>
+              {/* SOCIAL LINKS */}
+              <WatchSocialLinks data={data} collection={collection} />
             </div>
           </div>
-        ) : (
-          <WatchComponentSkeletonLoader />
-        )}
+        </div>
+      ) : (
+        <WatchComponentSkeletonLoader />
+      )}
       </div>
     </>
   );

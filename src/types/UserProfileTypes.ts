@@ -71,5 +71,7 @@ export interface UserProfileInterface {
   followers?: FollowerData[];
   isEmailVisible: boolean;
   meetingRecords: MeetingRecords;
+  createdAt?: string;
+  referrer?: string;
   [key: string]: any; // Allows for additional dynamic fields if necessary
 }

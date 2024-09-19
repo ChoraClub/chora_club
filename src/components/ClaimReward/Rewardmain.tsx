@@ -2,7 +2,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import RecordedSessionsTile from "../ComponentUtils/RecordedSessionsTile";
 import oplogo from "@/assets/images/daos/op.png";
-import arblogo from "@/assets/images/daos/arbCir.png";
+import arblogo from "@/assets/images/daos/arb.png";
 import Image from "next/image";
 import { HiGift } from "react-icons/hi";
 import Link from "next/link";
@@ -68,8 +68,11 @@ function CustomDropdown({ options, onChange }: CustomDropdownProps) {
   };
 
   useEffect(() => {
-    const handleClickOutside = (event:MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false);
       }
     };
@@ -90,7 +93,7 @@ function CustomDropdown({ options, onChange }: CustomDropdownProps) {
           if (e.key === "Enter" || e.key === " ") {
             setIsOpen(!isOpen);
           }
-    }}
+        }}
       >
         {selectedOption}
         <svg
@@ -102,7 +105,12 @@ function CustomDropdown({ options, onChange }: CustomDropdownProps) {
           viewBox="0 0 24 24"
           xmlns="http://www.w3.org/2000/svg"
         >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M19 9l-7 7-7-7"
+          />
         </svg>
       </div>
       {isOpen && (
@@ -115,14 +123,14 @@ function CustomDropdown({ options, onChange }: CustomDropdownProps) {
                   ? "bg-blue-100 text-blue-700 font-semibold"
                   : "hover:bg-gray-100"
               }`}
-              onClick={() => handleSelect(option)}onKeyDown={(e) => {
+              onClick={() => handleSelect(option)}
+              onKeyDown={(e) => {
                 if (e.key === "Enter" || e.key === " ") {
                   handleSelect(option);
                 }
               }}
               tabIndex={0} // Makes each option focusable
               role="option" // Helps screen readers understand that these are options
-
             >
               {option}
             </div>
@@ -135,7 +143,7 @@ function CustomDropdown({ options, onChange }: CustomDropdownProps) {
 
 function RewardsMain() {
   const [showComingSoon, setShowComingSoon] = useState(true);
-  const [totalRewards, setTotalRewards] = useState<any>({ amount: "0.0 ETH", value: "$0.0" });
+  const [totalRewards, setTotalRewards] = useState<any>({ amount: "0.0", value: "$0.0" });
   // const totalRewards = { amount: "0.0 ETH", value: "$0.0" };
   const {address} = useAccount();
   console.log(address)
@@ -154,13 +162,18 @@ const [mintedNFTs, setMintedNFTs] = useState<any[]>([]);
     (reward) => parseFloat(reward.amount) > 0
   );
 
-  const handleSelectChange = (selectedOption:string) => {
+  const handleSelectChange = (selectedOption: string) => {
     console.log(`Selected chain: ${selectedOption}`);
     // Add your logic here to handle the change
   };
 
   const fetchReward = async () => {
-    const data = await nft_client.query(REWARD_QUERY, {address: "0x3013bb4e03a7b81106d69c10710eae148c8410e1"}).toPromise();
+    const data = await nft_client.query(REWARD_QUERY, {address: address}).toPromise();
+    console.log("here data is ",data);
+    if(data.data.rewardsPerUsers.length < 1) {
+      setTotalRewards({ amount: "0.0 ", value: "$0.0" });
+      return;
+    }
     const total = data?.data.rewardsPerUsers?.map((reward: any) => ({
       amount : reward.amount/10**18,
       value : `$${parseFloat(reward.amount).toFixed(2)}`
@@ -183,7 +196,7 @@ const [mintedNFTs, setMintedNFTs] = useState<any[]>([]);
 
 
   const fetchNFTs = async () => {
-    const result = await nft_client.query(MINTED_NFTS, {address: "0x3013bb4e03a7b81106d69c10710eae148c8410e1"}).toPromise();
+    const result = await nft_client.query(MINTED_NFTS, {address: address}).toPromise();
     const nfts = result?.data.token1155Holders?.map((nft: any) => ({
       id: nft.tokenAndContract.metadata.name,
       thumbnail: nft.tokenAndContract.metadata.image,
@@ -234,8 +247,8 @@ const [mintedNFTs, setMintedNFTs] = useState<any[]>([]);
                 d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
               />
             </svg>
-            <span className="text-2xl font-bold">{totalRewards.amount} ETH</span>
-            <span className="text-gray-500">({totalRewards.value.slice(0,3)})</span>
+            <span className="text-2xl font-bold">{totalRewards?.amount} ETH</span>
+            <span className="text-gray-500">({totalRewards?.value.slice(0,4)})</span>
           </div>
         </div>
 
@@ -269,71 +282,69 @@ const [mintedNFTs, setMintedNFTs] = useState<any[]>([]);
                       />
                     </button>
                   </div>
-                </div>
-              ))}
-            </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                <svg
+                  className="w-16 h-16 mx-auto mb-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                <p>No rewards available to claim at the moment.</p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="mt-4">
+          <Link
+            href="#"
+            className="text-blue-600 hover:text-blue-800 transition-colors duration-300"
+          >
+            Learn more about Referral Rewards
+          </Link>
+        </div>
+
+        <div className="bg-gray-50 hover:bg-gray-100 transition duration-300 rounded-lg shadow-md p-6">
+          <div className="flex justify-between">
+            <h2 className="text-xl font-semibold mb-4">Minted NFTs</h2>
+            <CustomDropdown
+              options={["Optimism", "Arbitrum"]}
+              onChange={handleSelectChange}
+            />
+          </div>
+          {mintedNFTs.length > 0 ? (
+            <></>
           ) : (
+            //   <RecordedSessionsTile
+            //     meetingData={mintedNFTs.map(nft => ({
+            //       meetingId: nft.id,
+            //       thumbnail_image: nft.thumbnail,
+            //       title: `NFT ${nft.id}`,
+            //       // Add other required properties for RecordedSessionsTile
+            //     }))}
+            //     gridCols="grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+            //   />
             <div className="text-center py-8 text-gray-500">
-              <svg
-                className="w-16 h-16 mx-auto mb-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-              <p>No rewards available to claim at the moment.</p>
+              {/* <svg className="w-16 h-16 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg> */}
+              <p>No NFTs minted yet. Start creating your collection!</p>
             </div>
           )}
         </div>
       </div>
-
-      <div className="mt-4">
-        <Link
-          href="#"
-          className="text-blue-600 hover:text-blue-800 transition-colors duration-300"
-        >
-          Learn more about Referral Rewards
-        </Link>
-      </div>
-
-      <div className="bg-gray-50 hover:bg-gray-100 transition duration-300 rounded-lg shadow-md p-6">
-        <div className="flex justify-between">
-          <h2 className="text-xl font-semibold mb-4">Minted NFTs</h2>
-          <CustomDropdown
-            options={["Optimism", "Arbitrum"]}
-            onChange={handleSelectChange}
-          />
-        </div>
-        {mintedNFTs.length > 0 ? (
-          <>
-             {/* <RecordedSessionsTile
-              meetingData={mintedNFTs.map(nft => ({
-                meetingId: nft.id,
-                thumbnail_image: nft.thumbnail,
-                title: `NFT ${nft.id}`,
-                // Add other required properties for RecordedSessionsTile
-              }))}
-              gridCols="grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-            /> */}
-            </>
-        ) : (
-         
-          <div className="text-center py-8 text-gray-500">
-            {/* <svg className="w-16 h-16 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg> */}
-            <p>No NFTs minted yet. Start creating your collection!</p>
-          </div>
-        )}
-      </div>
-    </div>
     </>
   );
 }

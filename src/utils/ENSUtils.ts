@@ -89,7 +89,7 @@ export async function getEnsName(address: any) {
     const displayName = address?.slice(0, 4) + "..." + address?.slice(-4);
 
     const ensNameOrAddress = ensName ? ensName : displayName;
-    console.log("ensNameOrAddress: ", ensNameOrAddress);
+    // console.log("ensNameOrAddress: ", ensNameOrAddress);
 
     return { ensNameOrAddress, ensName };
   } catch (e) {

@@ -27,6 +27,7 @@ import style from "./SessionTiles.module.css";
 import copy from "copy-to-clipboard";
 import UpdateHostedSessionModal from "./UpdateHostedSessionModal";
 import { SessionInterface } from "@/types/MeetingTypes";
+import { LIGHTHOUSE_BASE_API_KEY } from "@/config/constants";
 
 type Attendee = {
   attendee_address: string;
@@ -326,9 +327,7 @@ SessionTileProps) {
       console.log(percentageDone);
     };
 
-    const apiKey = process.env.NEXT_PUBLIC_LIGHTHOUSE_KEY
-      ? process.env.NEXT_PUBLIC_LIGHTHOUSE_KEY
-      : "";
+    const apiKey = LIGHTHOUSE_BASE_API_KEY ? LIGHTHOUSE_BASE_API_KEY : "";
     try {
       let imageCid = "";
       if (formData.image) {

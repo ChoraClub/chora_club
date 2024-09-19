@@ -15,7 +15,29 @@ import styles from "./WatchSession.module.css";
 import { IoClose } from "react-icons/io5";
 import { RxCross2 } from "react-icons/rx";
 import { Holder } from "@/types/LeaderBoardTypes";
-const WatchLeaderBoard = ({leaderBoardData}:{leaderBoardData:Holder}) => {
+// const WatchLeaderBoard = ({leaderBoardData}:{leaderBoardData:Holder}) => {
+import { UserProfileInterface } from "@/types/UserProfileTypes";
+import {
+  DynamicAttendeeInterface,
+  SessionInterface,
+} from "@/types/MeetingTypes";
+interface Attendee extends DynamicAttendeeInterface {
+  profileInfo: UserProfileInterface;
+}
+
+interface Meeting extends SessionInterface {
+  attendees: Attendee[];
+  hostProfileInfo: UserProfileInterface;
+}
+const WatchLeaderBoard = ({
+  leaderBoardData,
+  data,
+  collection,
+}: {
+  leaderBoardData:Holder,
+  data: Meeting;
+  collection: string;
+}) => {
   const [showPopup, setShowPopup] = useState(false);
   const [isBodyOverflowHidden, setIsBodyOverflowHidden] = useState(false);
   const [showComingSoon, setShowComingSoon] = useState(true);
