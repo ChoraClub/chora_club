@@ -22,7 +22,7 @@ import { useRouter } from "next-nprogress-bar";
 import toast, { Toaster } from "react-hot-toast";
 import Link from "next/link";
 import OPLogo from "@/assets/images/daos/op.png";
-import ArbLogo from "@/assets/images/daos/arbCir.png";
+import ArbLogo from "@/assets/images/daos/arb.png";
 import ccLogo from "@/assets/images/daos/CCLogo2.png";
 import { Button, useDisclosure } from "@nextui-org/react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";

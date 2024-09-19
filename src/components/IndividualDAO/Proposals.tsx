@@ -7,7 +7,7 @@ import opLogo from "@/assets/images/daos/op.png";
 import user from "@/assets/images/daos/user1.png";
 import chain from "@/assets/images/daos/chain.png";
 import ProposalsSkeletonLoader from "../SkeletonLoader/ProposalsSkeletonLoader";
-import ArbLogo from "@/assets/images/daos/arbCir.png";
+import ArbLogo from "@/assets/images/daos/arb.png";
 import { dao_details } from "@/config/daoDetails";
 import ErrorDisplay from "../ComponentUtils/ErrorDisplay";
 

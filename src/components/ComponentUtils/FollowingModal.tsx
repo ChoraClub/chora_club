@@ -12,7 +12,7 @@ import { useEffect, useState } from "react";
 import { fetchEnsAvatar } from "@/utils/ENSUtils";
 import style from "./FollowingModal.module.css";
 import oplogo from "@/assets/images/daos/op.png";
-import arbcir from "@/assets/images/daos/arbCir.png";
+import arbcir from "@/assets/images/daos/arb.png";
 import { useAccount } from "wagmi";
 import { useRouter } from "next-nprogress-bar";
 
@@ -50,7 +50,7 @@ function FollowingModal({
   const { chain } = useAccount();
   const [activeButton, setActiveButton] = useState("");
   const router = useRouter();
-  const [isButtonLoading, setIsButtonLoading] = useState(false); 
+  const [isButtonLoading, setIsButtonLoading] = useState(false);
 
   const handleChainChange = async (chain: string) => {
     setActiveButton(chain);
@@ -167,7 +167,7 @@ function FollowingModal({
                       : "bg-[#F5F5F5] text-[#3E3D3D]"
                   }`}
                   onClick={() => handleChainChange("optimism")}
-                  disabled={isButtonLoading} 
+                  disabled={isButtonLoading}
                 >
                   {isButtonLoading && activeButton === "optimism" ? (
                     <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></div> // Skeleton Loader
@@ -185,7 +185,7 @@ function FollowingModal({
                       : "bg-[#F5F5F5] text-[#3E3D3D]"
                   }`}
                   onClick={() => handleChainChange("arbitrum")}
-                  disabled={isButtonLoading} 
+                  disabled={isButtonLoading}
                 >
                   {isButtonLoading && activeButton === "arbitrum" ? (
                     <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></div> // Skeleton Loader
