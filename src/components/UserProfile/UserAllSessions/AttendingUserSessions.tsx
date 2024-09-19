@@ -78,7 +78,7 @@ function AttendingUserSessions({ daoName }: { daoName: string }) {
         <RecordedSessionsSkeletonLoader />
       ) : sessionDetails.length > 0 ? (
         <div
-          className={`grid min-[475px]:grid-cols- md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-10 py-8 font-poppins`}
+          className={`grid min-[475px]:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-10 py-8 font-poppins`}
         >
           {sessionDetails.map((data, index) => (
             <EventTile

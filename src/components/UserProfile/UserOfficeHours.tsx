@@ -160,7 +160,7 @@ function UserOfficeHours({
           </button>
         </div>
       )}
-      <div className="pt-3 pr-32">
+      <div className="pt-3">
         <div className="flex w-fit gap-14 border-1 border-[#7C7C7C] px-6 rounded-xl text-sm">
           {selfDelegate === true && (
             <button

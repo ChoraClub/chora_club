@@ -19,6 +19,7 @@ import UserOfficeHours from "./UserOfficeHours";
 import { FaPencil } from "react-icons/fa6";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useRouter } from "next-nprogress-bar";
+// import { useRouter } from 'next/navigation';
 import toast, { Toaster } from "react-hot-toast";
 import Link from "next/link";
 import OPLogo from "@/assets/images/daos/op.png";
@@ -40,7 +41,7 @@ import MainProfileSkeletonLoader from "../SkeletonLoader/MainProfileSkeletonLoad
 import { BASE_URL, LIGHTHOUSE_BASE_API_KEY } from "@/config/constants";
 import FollowingModal from "../ComponentUtils/FollowingModal";
 import { IoClose } from "react-icons/io5";
-import "./MainProfile.module.css";
+import style from "./MainProfile.module.css";
 import UpdateProfileModal from "../ComponentUtils/UpdateProfileModal";
 import { getChainAddress, getDaoName } from "@/utils/chainUtils";
 interface Following {
@@ -52,9 +53,13 @@ import { cookies } from "next/headers";
 import { m } from "framer-motion";
 import MobileResponsiveMessage from "../MobileResponsiveMessage/MobileResponsiveMessage";
 import RewardButton from "../ClaimReward/RewardButton";
+import Heading from "../ComponentUtils/Heading";
+import { ChevronDownIcon } from "lucide-react";
 
 function MainProfile() {
   const { isConnected, address, chain } = useAccount();
+  // const { isConnected, chain } = useAccount();
+  // const address = "0xc622420AD9dE8E595694413F24731Dd877eb84E1";
   const { data: session, status } = useSession();
   const { openConnectModal } = useConnectModal();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -100,6 +105,78 @@ function MainProfile() {
   });
   const [isToggled, setToggle] = useState(false);
   const { publicClient, walletClient } = WalletAndPublicClient();
+
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [selectedTab, setSelectedTab] = useState("Info");
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
+
+  const tabs = [
+    { name: "Info", value: "info" },
+    ...(selfDelegate ? [{ name: "Past Votes", value: "votes" }] : []),
+    // { name: "Past Votes", value: "votes" },
+    { name: "Sessions", value: "sessions" },
+    { name: "Office Hours", value: "officeHours" },
+    ...(selfDelegate ? [{ name: "Instant Meet", value: "instant-meet" }] : []),
+    // { name: "Instant Meet", value: "instant-meet" }
+  ];
+
+  const handleTabChange = (tabValue: string) => {
+    console.log(tabValue);
+    const selected = tabs.find((tab) => tab.value === tabValue);
+    console.log(selected);
+    if (selected) {
+      setSelectedTab(selected.name);
+      setIsDropdownOpen(false);
+      if (tabValue === "sessions") {
+        router.push(
+          path +
+            `?active=${tabValue}&session=${
+              selfDelegate ? "schedule" : "attending"
+            }`
+        );
+      } else if (tabValue === "officeHours") {
+        router.push(path + `?active=${tabValue}&hours=schedule`);
+      } else {
+        router.push(path + `?active=${tabValue}`);
+      }
+    }
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const handleMouseEnter = () => {
+    setIsDropdownOpen(true);
+  };
+
+  const handleMouseLeave = () => {
+    setTimeout(() => {
+      if (!dropdownRef.current?.matches(":hover")) {
+        setIsDropdownOpen(false);
+      }
+    }, 100);
+  };
+
+  useEffect(() => {
+    const activeTab = searchParams.get("active");
+    if (activeTab) {
+      const tab = tabs.find((t) => t.value === activeTab);
+      setSelectedTab(tab?.name || "Info");
+    }
+  }, [searchParams, tabs]);
 
   useEffect(() => {
     // if (chain && chain.name === "Optimism") {
@@ -498,11 +575,6 @@ function MainProfile() {
         // const dbResponse = await axios.get(`/api/profile/${address}`);
 
         let dao = getDaoName(chain?.name);
-        // chain?.name === "Optimism"
-        //   ? "optimism"
-        //   : chain?.name === "Arbitrum One"
-        //   ? "arbitrum"
-        //   : "";
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
         if (address) {
@@ -603,7 +675,7 @@ function MainProfile() {
         }
       } catch (error) {
         console.error("Error fetching data:", error);
-        toast.error("Failed to load profile data. Please try again later.");
+        // toast.error("Failed to load profile data. Please try again later.");
         setIsPageLoading(false);
       }
     };
@@ -820,283 +892,324 @@ function MainProfile() {
   return (
     <>
       {/* For Mobile Screen */}
-      <MobileResponsiveMessage />
+      {/* <MobileResponsiveMessage/> */}
 
       {/* For Desktop Screen  */}
-      <div className="hidden md:block">
-        {!isPageLoading ? (
-          <div className="font-poppins">
-            <div className="flex ps-14 py-5 pe-10 justify-between items-start">
-              <div className="flex  items-center justify-center">
-                <div
-                  className="relative object-cover rounded-3xl"
-                  style={{
-                    backgroundColor: "#fcfcfc",
-                    border: "2px solid #E9E9E9 ",
-                  }}
-                >
-                  <div className="w-40 h-40 flex items-center justify-content ">
-                    <div className="flex justify-center items-center w-40 h-40">
-                      <Image
-                        src={
-                          (userData.displayImage
-                            ? `https://gateway.lighthouse.storage/ipfs/${userData.displayImage}`
-                            : karmaImage) ||
-                          (daoName === "optimism"
-                            ? OPLogo
-                            : daoName === "arbitrum"
-                            ? ArbLogo
-                            : ccLogo)
-                        }
-                        alt="user"
-                        width={256}
-                        height={256}
-                        className={
-                          userData.displayImage
-                            ? "w-40 h-40 rounded-3xl"
-                            : "w-20 h-20 rounded-3xl"
-                        }
-                      />
-                    </div>
+      {/* <div className="hidden md:block"> */}
+      <div className="lg:hidden pt-2 xs:pt-4 sm:pt-6 px-4 md:px-6 lg:px-14">
+        <Heading />
+      </div>
+      {!isPageLoading ? (
+        <div className="font-poppins">
+          <div className="flex flex-col md:flex-row pb-5 lg:py-5 px-4 md:px-6 lg:px-14 justify-between items-start">
+            <div className="flex flex-col xs:flex-row xs:items-start xs:justify-start items-center lg:items-start justify-center lg:justify-start w-full lg:w-auto">
+              <div
+                className={`${
+                  userData.displayImage ? "h-full" : "h-[80vw] xs:h-auto"
+                } relative object-cover rounded-3xl w-full xs:w-auto`}
+                style={{
+                  backgroundColor: "#fcfcfc",
+                  border: "2px solid #E9E9E9 ",
+                }}
+              >
+                <div className="w-full h-full xs:w-28 xs:h-28 sm:w-36 sm:h-36 lg:w-40 lg:h-40 flex items-center justify-center ">
+                  {/* <div className="flex justify-center items-center w-40 h-40"> */}
+                  <Image
+                    src={
+                      (userData.displayImage
+                        ? `https://gateway.lighthouse.storage/ipfs/${userData.displayImage}`
+                        : karmaImage) ||
+                      (daoName === "optimism"
+                        ? OPLogo
+                        : daoName === "arbitrum"
+                        ? ArbLogo
+                        : ccLogo)
+                    }
+                    alt="user"
+                    width={256}
+                    height={256}
+                    className={
+                      userData.displayImage
+                        ? "w-full xs:w-28 xs:h-28 sm:w-36 sm:h-36 lg:w-40 lg:h-40 rounded-3xl"
+                        : "w-14 h-14 sm:w-20 sm:h-20 lg:w-20 lg:h-20 rounded-3xl"
+                    }
+                  />
+                  {/* </div> */}
 
-                    <Image
-                      src={ccLogo}
-                      alt="ChoraClub Logo"
-                      className="absolute top-0 right-0 bg-white rounded-full"
-                      style={{
-                        width: "30px",
-                        height: "30px",
-                        marginTop: "10px",
-                        marginRight: "10px",
-                      }}
+                  <Image
+                    src={ccLogo}
+                    alt="ChoraClub Logo"
+                    className="absolute top-0 right-0 bg-white rounded-full"
+                    style={{
+                      width: "30px",
+                      height: "30px",
+                      marginTop: "10px",
+                      marginRight: "10px",
+                    }}
+                  />
+                </div>
+              </div>
+
+              <div className="px-4 mt-4 xs:mt-0 md:mt-2 lg:mt-4 w-full xs:w-auto">
+                <div className=" flex items-center py-1">
+                  <div className="font-bold text-[22px] xs:text-xl sm:text-xl lg:text-[22px] pr-4">
+                    {karmaEns ? (
+                      karmaEns
+                    ) : userData.displayName ? (
+                      userData.displayName
+                    ) : (
+                      <>
+                        {`${address}`.substring(0, 6)} ...{" "}
+                        {`${address}`.substring(`${address}`.length - 4)}
+                      </>
+                    )}
+                  </div>
+                  <div className="flex gap-2 sm:gap-3">
+                    <Link
+                      href={`https://twitter.com/${userData.twitter}`}
+                      className={`border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 ${
+                        userData.twitter == "" || userData.twitter == undefined
+                          ? "hidden"
+                          : ""
+                      }`}
+                      style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
+                      target="_blank"
+                    >
+                      <FaXTwitter color="#7C7C7C" size={12} />
+                    </Link>
+                    <Link
+                      href={
+                        daoName === "optimism"
+                          ? `https://gov.optimism.io/u/${userData.discourse}`
+                          : daoName == "arbitrum"
+                          ? `https://forum.arbitrum.foundation/u/${userData.discourse}`
+                          : ""
+                      }
+                      className={`border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1  ${
+                        userData.discourse == "" ||
+                        userData.discourse == undefined
+                          ? "hidden"
+                          : ""
+                      }`}
+                      style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
+                      target="_blank"
+                    >
+                      <BiSolidMessageRoundedDetail color="#7C7C7C" size={12} />
+                    </Link>
+                    <Link
+                      href={`https://discord.com/${userData.discord}`}
+                      className={`border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 ${
+                        userData.discord == "" || userData.discord == undefined
+                          ? "hidden"
+                          : ""
+                      }`}
+                      style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
+                      target="_blank"
+                    >
+                      <FaDiscord color="#7C7C7C" size={12} />
+                    </Link>
+                    <Link
+                      href={`https://github.com/${userData.github}`}
+                      className={`border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 ${
+                        userData.github == "" || userData.github == undefined
+                          ? "hidden"
+                          : ""
+                      }`}
+                      style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
+                      target="_blank"
+                    >
+                      <FaGithub color="#7C7C7C" size={12} />
+                    </Link>
+                    <Tooltip
+                      content="Update your Profile"
+                      placement="top"
+                      showArrow
+                    >
+                      <span
+                        className="border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 cursor-pointer"
+                        style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
+                        onClick={onOpen}
+                      >
+                        <FaPencil color="#3e3d3d" size={12} />
+                      </span>
+                    </Tooltip>
+                    <UpdateProfileModal
+                      isOpen={isOpen}
+                      onClose={onClose}
+                      modalData={modalData}
+                      handleInputChange={handleInputChange}
+                      uploadImage={uploadImage}
+                      fileInputRef={fileInputRef}
+                      isLoading={isLoading}
+                      // displayImage={userData.displayImage}
+                      handleSave={handleSave}
+                      handleToggle={handleToggle}
+                      isToggled={isToggled}
                     />
                   </div>
                 </div>
 
-                <div className="px-4">
-                  <div className=" flex items-center py-1">
-                    <div className="font-bold text-lg pr-4">
-                      {karmaEns ? (
-                        karmaEns
-                      ) : userData.displayName ? (
-                        userData.displayName
-                      ) : (
-                        <>
-                          {`${address}`.substring(0, 6)} ...{" "}
-                          {`${address}`.substring(`${address}`.length - 4)}
-                        </>
-                      )}
-                    </div>
-                    <div className="flex gap-3">
-                      <Link
-                        href={`https://twitter.com/${userData.twitter}`}
-                        className={`border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 ${
-                          userData.twitter == "" ||
-                          userData.twitter == undefined
-                            ? "hidden"
-                            : ""
-                        }`}
-                        style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                        target="_blank"
-                      >
-                        <FaXTwitter color="#7C7C7C" size={12} />
-                      </Link>
-                      <Link
-                        href={
-                          daoName === "optimism"
-                            ? `https://gov.optimism.io/u/${userData.discourse}`
-                            : daoName == "arbitrum"
-                            ? `https://forum.arbitrum.foundation/u/${userData.discourse}`
-                            : ""
-                        }
-                        className={`border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1  ${
-                          userData.discourse == "" ||
-                          userData.discourse == undefined
-                            ? "hidden"
-                            : ""
-                        }`}
-                        style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                        target="_blank"
-                      >
-                        <BiSolidMessageRoundedDetail
-                          color="#7C7C7C"
-                          size={12}
-                        />
-                      </Link>
-                      <Link
-                        href={`https://discord.com/${userData.discord}`}
-                        className={`border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 ${
-                          userData.discord == "" ||
-                          userData.discord == undefined
-                            ? "hidden"
-                            : ""
-                        }`}
-                        style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                        target="_blank"
-                      >
-                        <FaDiscord color="#7C7C7C" size={12} />
-                      </Link>
-                      <Link
-                        href={`https://github.com/${userData.github}`}
-                        className={`border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 ${
-                          userData.github == "" || userData.github == undefined
-                            ? "hidden"
-                            : ""
-                        }`}
-                        style={{ backgroundColor: "rgba(217, 217, 217, 0.42)" }}
-                        target="_blank"
-                      >
-                        <FaGithub color="#7C7C7C" size={12} />
-                      </Link>
-                      <Tooltip
-                        content="Update your Profile"
-                        placement="top"
-                        showArrow
-                      >
-                        <span
-                          className="border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 cursor-pointer"
-                          style={{
-                            backgroundColor: "rgba(217, 217, 217, 0.42)",
-                          }}
-                          onClick={onOpen}
-                        >
-                          <FaPencil color="#3e3d3d" size={12} />
-                        </span>
-                      </Tooltip>
-                      <UpdateProfileModal
-                        isOpen={isOpen}
-                        onClose={onClose}
-                        modalData={modalData}
-                        handleInputChange={handleInputChange}
-                        uploadImage={uploadImage}
-                        fileInputRef={fileInputRef}
-                        isLoading={isLoading}
-                        // displayImage={userData.displayImage}
-                        handleSave={handleSave}
-                        handleToggle={handleToggle}
-                        isToggled={isToggled}
-                      />
-                    </div>
+                <div className="flex items-center py-1">
+                  <div>
+                    {`${address}`.substring(0, 6)} ...{" "}
+                    {`${address}`.substring(`${address}`.length - 4)}
                   </div>
 
-                  <div className="flex items-center py-1">
-                    <div>
-                      {`${address}`.substring(0, 6)} ...{" "}
-                      {`${address}`.substring(`${address}`.length - 4)}
-                    </div>
-
+                  <Tooltip
+                    content="Copy"
+                    placement="bottom"
+                    closeDelay={1}
+                    showArrow
+                  >
+                    <span className="px-2 cursor-pointer" color="#3E3D3D">
+                      <IoCopy onClick={() => handleCopy(`${address}`)} />
+                    </span>
+                  </Tooltip>
+                  <div className="flex space-x-2">
                     <Tooltip
-                      content="Copy"
+                      content="Copy your profile URL to share on Warpcast or Twitter."
                       placement="bottom"
                       closeDelay={1}
                       showArrow
                     >
-                      <span className="px-2 cursor-pointer" color="#3E3D3D">
-                        <IoCopy onClick={() => handleCopy(`${address}`)} />
-                      </span>
+                      <Button
+                        className="bg-gray-200 hover:bg-gray-300 text-xs sm:text-sm "
+                        onClick={() => {
+                          if (typeof window === "undefined") return;
+                          navigator.clipboard.writeText(
+                            `${BASE_URL}/${getDaoName(
+                              chain?.name
+                            )}/${address}?active=info`
+                          );
+                          setIsCopied(true);
+                          setTimeout(() => {
+                            setIsCopied(false);
+                          }, 3000);
+                        }}
+                      >
+                        <IoShareSocialSharp />
+                        {isCopied ? "Copied" : "Share profile"}
+                      </Button>
                     </Tooltip>
-                    <div className="flex space-x-2">
-                      <Tooltip
-                        content="Copy your profile URL to share on Warpcast or Twitter."
-                        placement="bottom"
-                        closeDelay={1}
-                        showArrow
-                      >
-                        <Button
-                          className="bg-gray-200 hover:bg-gray-300"
-                          onClick={() => {
-                            if (typeof window === "undefined") return;
-                            navigator.clipboard.writeText(
-                              `${BASE_URL}/${getDaoName(
-                                chain?.name
-                              )}/${address}?active=info`
-                            );
-                            setIsCopied(true);
-                            setTimeout(() => {
-                              setIsCopied(false);
-                            }, 3000);
-                          }}
-                        >
-                          <IoShareSocialSharp />
-                          {isCopied ? "Copied" : "Share profile"}
-                        </Button>
-                      </Tooltip>
-                    </div>
                   </div>
-
-                  {isFollowingModalOpen && (
-                    <FollowingModal
-                      userFollowings={userFollowings}
-                      toggleFollowing={toggleFollowing}
-                      toggleNotification={toggleNotification}
-                      setIsFollowingModalOpen={setIsFollowingModalOpen}
-                      isLoading={isLoading}
-                      handleUpdateFollowings={handleUpdateFollowings}
-                      daoName={daoName}
-                    />
-                  )}
-
-                  {selfDelegate === false ? (
-                    <div className="pt-2 flex gap-5">
-                      {/* pass address of whom you want to delegate the voting power to */}
-                      <button
-                        className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
-                        onClick={() => handleDelegateVotes(`${address}`)}
-                      >
-                        Become Delegate
-                      </button>
-
-                      <button
-                        className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px] w-[154px] flex items-center justify-center"
-                        onClick={() =>
-                          followings
-                            ? handleUpdateFollowings(daoName, 1, 0)
-                            : toast.error(
-                                "You're not following anyone yet. Start exploring delegate profiles now!"
-                              )
-                        }
-                      >
-                        {isModalLoading ? (
-                          <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></div>
-                        ) : (
-                          `${followings} Following`
-                        )}
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="pt-2 flex gap-5">
-                      <button className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]">
-                        {followers}{" "}
-                        {followers === 0 || followers === 1
-                          ? "Follower"
-                          : "Followers"}
-                      </button>
-
-                      <button
-                        className="bg-blue-shade-200 font-bold text-white rounded-full px-8 py-[10px]"
-                        onClick={() =>
-                          followings
-                            ? handleUpdateFollowings(daoName, 1, 0)
-                            : toast.error(
-                                "You're not following anyone yet. Start exploring delegate profiles now!"
-                              )
-                        }
-                      >
-                        {followings} Followings
-                      </button>
-                    </div>
-                  )}
                 </div>
+
+                {isFollowingModalOpen && (
+                  <FollowingModal
+                    userFollowings={userFollowings}
+                    toggleFollowing={toggleFollowing}
+                    toggleNotification={toggleNotification}
+                    setIsFollowingModalOpen={setIsFollowingModalOpen}
+                    isLoading={isLoading}
+                    handleUpdateFollowings={handleUpdateFollowings}
+                    daoName={daoName}
+                  />
+                )}
+
+                {selfDelegate === false ? (
+                  <div className="pt-2 flex flex-col xs:flex-row gap-2 sm:gap-5 w-full">
+                    {/* pass address of whom you want to delegate the voting power to */}
+                    <button
+                      className="bg-blue-shade-200 font-bold text-white rounded-full py-[10px] px-6 xs:py-2 xs:px-4 sm:px-6 xs:text-xs sm:text-sm text-sm lg:px-8 lg:py-[10px] w-full xs:w-auto"
+                      onClick={() => handleDelegateVotes(`${address}`)}
+                    >
+                      Become Delegate
+                    </button>
+
+                    <button
+                      className="bg-blue-shade-200 font-bold text-white rounded-full px-6 py-[10px] xs:py-2 text-sm xs:text-xs sm:text-sm lg:px-8 lg:py-[10px] w-full xs:w-[135px] lg:w-[150px] flex items-center justify-center"
+                      onClick={() =>
+                        followings
+                          ? handleUpdateFollowings(daoName, 1, 0)
+                          : toast.error(
+                              "You're not following anyone yet. Start exploring delegate profiles now!"
+                            )
+                      }
+                    >
+                      {isModalLoading ? (
+                        <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></div>
+                      ) : (
+                        `${followings} Following`
+                      )}
+                    </button>
+                  </div>
+                ) : (
+                  <div className="pt-2 flex flex-col xs:flex-row gap-2 sm:gap-5 w-full">
+                    <button className="bg-blue-shade-200 font-bold text-white rounded-full py-[10px] px-6 xs:py-2 text-sm xs:text-xs sm:text-sm lg:px-8 lg:py-[10px]  w-full xs:w-auto">
+                      {followers}{" "}
+                      {followers === 0 || followers === 1
+                        ? "Follower"
+                        : "Followers"}
+                    </button>
+
+                    <button
+                      className="bg-blue-shade-200 font-bold text-white rounded-full px-6 py-2 text-sm xs:text-xs sm:text-sm lg:px-8 lg:py-[10px]  w-full xs:w-auto"
+                      onClick={() =>
+                        followings
+                          ? handleUpdateFollowings(daoName, 1, 0)
+                          : toast.error(
+                              "You're not following anyone yet. Start exploring delegate profiles now!"
+                            )
+                      }
+                    >
+                      {followings} Followings
+                    </button>
+                  </div>
+                )}
               </div>
-              <div className="flex gap-1 xs:gap-2 items-center">
-                <RewardButton />
-                <ConnectWalletWithENS />
+            </div>
+            <div className="hidden lg:flex gap-1 xs:gap-2 items-center">
+              <RewardButton />
+              <ConnectWalletWithENS />
+            </div>
+          </div>
+
+          <div className=" ">
+            <div
+              className="md:hidden mt-4 px-8 xs:px-4 sm:px-8 py-2 sm:py-[10px] bg-[#D9D9D945]"
+              ref={dropdownRef}
+              onMouseLeave={handleMouseLeave}
+            >
+              <div
+                className="w-full flex justify-between items-center text-left font-normal rounded-full capitalize text-lg text-blue-shade-100 bg-white px-4 py-2 cursor-pointer"
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                onMouseEnter={handleMouseEnter}
+              >
+                <span>{selectedTab}</span>
+                <ChevronDownIcon
+                  className={`w-4 h-4 transition-transform duration-700 ${
+                    isDropdownOpen ? "rotate-180" : ""
+                  }`}
+                />
+              </div>
+              <div
+                className={`w-[calc(100vw-2rem)] mt-1 overflow-hidden transition-all duration-700 ease-in-out ${
+                  isDropdownOpen
+                    ? "max-h-[500px] opacity-100"
+                    : "max-h-0 opacity-0"
+                }`}
+              >
+                <div className="p-2 border border-white-shade-100 rounded-xl bg-white shadow-md">
+                  {tabs.map((tab, index) => (
+                    <React.Fragment key={tab.value}>
+                      <div
+                        onClick={() => handleTabChange(tab.value)}
+                        className="px-3 py-2 rounded-lg transition duration-300 ease-in-out hover:bg-gray-100 capitalize text-base cursor-pointer"
+                      >
+                        {tab.name}
+                      </div>
+                      {index !== tabs.length - 1 && <hr className="my-1" />}
+                    </React.Fragment>
+                  ))}
+                </div>
               </div>
             </div>
 
-            <div className="flex gap-12 bg-[#D9D9D945] pl-16">
+            <div
+              className={`bg-[#D9D9D945] hidden md:flex overflow-x-auto whitespace-nowrap gap-6 xs:gap-8 sm:gap-12 pl-6 xs:pl-8 sm:pl-16 ${style.hideScrollbarColor} ${style.scrollContainter}`}
+            >
               <button
-                className={`border-b-2 py-4 px-2 outline-none ${
+                className={`border-b-2 py-3 xs:py-4 px-2 outline-none flex-shrink-0 ${
                   searchParams.get("active") === "info"
                     ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
                     : "border-transparent"
@@ -1107,7 +1220,7 @@ function MainProfile() {
               </button>
               {selfDelegate === true && (
                 <button
-                  className={`border-b-2 py-4 px-2 outline-none ${
+                  className={`border-b-2 py-3 xs:py-4 px-2 outline-none flex-shrink-0 ${
                     searchParams.get("active") === "votes"
                       ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
                       : "border-transparent"
@@ -1118,7 +1231,7 @@ function MainProfile() {
                 </button>
               )}
               <button
-                className={`border-b-2 py-4 px-2 outline-none ${
+                className={`border-b-2 py-3 xs:py-4 px-2 outline-none flex-shrink-0 ${
                   searchParams.get("active") === "sessions"
                     ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
                     : "border-transparent"
@@ -1135,7 +1248,7 @@ function MainProfile() {
                 Sessions
               </button>
               <button
-                className={`border-b-2 py-4 px-2 outline-none ${
+                className={`border-b-2 py-3 xs:py-4 px-2 outline-none flex-shrink-0 ${
                   searchParams.get("active") === "officeHours"
                     ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
                     : "border-transparent"
@@ -1149,7 +1262,7 @@ function MainProfile() {
 
               {selfDelegate === true && (
                 <button
-                  className={`border-b-2 py-4 px-2 outline-none ${
+                  className={`border-b-2 py-3 xs:py-4 px-2 outline-none flex-shrink-0 ${
                     searchParams.get("active") === "instant-meet"
                       ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
                       : "border-transparent"
@@ -1161,66 +1274,77 @@ function MainProfile() {
               )}
             </div>
 
-            <div className="py-6 ps-16">
+            <div>
               {searchParams.get("active") === "info" ? (
-                <UserInfo
-                  karmaDesc={karmaDesc}
-                  description={description}
-                  isDelegate={isDelegate}
-                  isSelfDelegate={selfDelegate}
-                  // descAvailable={descAvailable}
-                  onSaveButtonClick={(newDescription?: string) =>
-                    handleSave(newDescription)
-                  }
-                  isLoading={isLoading}
-                  daoName={daoName}
-                />
+                <div className="pt-2 xs:pt-4 sm:pt-6 px-4 md:px-6 lg:px-14">
+                  <UserInfo
+                    karmaDesc={karmaDesc}
+                    description={description}
+                    isDelegate={isDelegate}
+                    isSelfDelegate={selfDelegate}
+                    // descAvailable={descAvailable}
+                    onSaveButtonClick={(newDescription?: string) =>
+                      handleSave(newDescription)
+                    }
+                    isLoading={isLoading}
+                    daoName={daoName}
+                  />
+                </div>
               ) : (
                 ""
               )}
               {selfDelegate === true &&
               searchParams.get("active") === "votes" ? (
-                <UserVotes daoName={daoName} />
+                <div className="pt-2 xs:pt-4 sm:pt-6 px-4 md:px-6 lg:px-14">
+                  <UserVotes daoName={daoName} />
+                </div>
               ) : (
                 ""
               )}
               {searchParams.get("active") === "sessions" ? (
+                // <div className="pt-2 xs:pt-4 sm:pt-6 px-4 md:px-6 lg:px-14">
                 <UserSessions
                   isDelegate={isDelegate}
                   selfDelegate={selfDelegate}
                   daoName={daoName}
                 />
               ) : (
+                // </div>
                 ""
               )}
               {searchParams.get("active") === "officeHours" ? (
-                <UserOfficeHours
-                  isDelegate={isDelegate}
-                  selfDelegate={selfDelegate}
-                  daoName={daoName}
-                />
+                <div className="pt-2 xs:pt-4 sm:pt-6 px-4 md:px-6 lg:px-14">
+                  <UserOfficeHours
+                    isDelegate={isDelegate}
+                    selfDelegate={selfDelegate}
+                    daoName={daoName}
+                  />
+                </div>
               ) : (
                 ""
               )}
 
               {selfDelegate === true &&
               searchParams.get("active") === "instant-meet" ? (
-                <InstantMeet
-                  isDelegate={isDelegate}
-                  selfDelegate={selfDelegate}
-                  daoName={daoName}
-                />
+                <div className="pt-2 xs:pt-4 sm:pt-6 px-4 md:px-6 lg:px-14">
+                  <InstantMeet
+                    isDelegate={isDelegate}
+                    selfDelegate={selfDelegate}
+                    daoName={daoName}
+                  />
+                </div>
               ) : (
                 ""
               )}
             </div>
           </div>
-        ) : (
-          <>
-            <MainProfileSkeletonLoader />
-          </>
-        )}
-      </div>
+        </div>
+      ) : (
+        <>
+          <MainProfileSkeletonLoader />
+        </>
+      )}
+      {/* </div> */}
     </>
   );
 }

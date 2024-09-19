@@ -290,7 +290,7 @@ function TimeSlotTable({
                     </p>
                     <p>{convertUTCToLocalTime(dateRange.date, timeRange)}</p>
                   </div>
-                  <div className="flex space-x-2">
+                  <div className="flex xs:space-x-2">
                     <button
                       className="p-2 text-blue-600 hover:text-blue-800"
                       onClick={handleButtonClick}

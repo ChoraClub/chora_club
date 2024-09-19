@@ -330,17 +330,18 @@ function Proposals({ props }: { props: string }) {
     if (props === "optimism") {
       let nextPage;
       if (currentCache) {
-        nextPage = currentCache.updatedProposals.length / proposalsPerPage + 1;
+        nextPage = Math.ceil(currentCache.updatedProposals.length / proposalsPerPage) + 1;
       } else {
         nextPage = currentPage + 1;
       }
       const startIndex = (nextPage - 1) * proposalsPerPage;
       const endIndex = startIndex + proposalsPerPage;
       const newProposals = cache[props].slice(startIndex, endIndex);
-      setDisplayedProposals((prevProposals) => [
-        ...prevProposals,
-        ...newProposals,
-      ]);
+      
+      // Use a Set to ensure uniqueness based on proposalId
+      const uniqueProposals = new Set([...displayedProposals, ...newProposals].map(p => JSON.stringify(p)));
+      setDisplayedProposals(Array.from(uniqueProposals).map(p => JSON.parse(p)));
+      
       setCurrentPage(nextPage);
     } else {
       // For Arbitrum
@@ -349,16 +350,16 @@ function Proposals({ props }: { props: string }) {
         currentLength,
         currentLength + proposalsPerPage
       );
-      setDisplayedProposals((prevProposals) => [
-        ...prevProposals,
-        ...moreProposals,
-      ]);
+      
+      // Use a Set to ensure uniqueness based on proposalId
+      const uniqueProposals = new Set([...displayedProposals, ...moreProposals].map(p => JSON.stringify(p)));
+      setDisplayedProposals(Array.from(uniqueProposals).map(p => JSON.parse(p)));
 
       if (currentLength + proposalsPerPage >= cache[props].length) {
         fetchProposals();
       }
     }
-  }, [props, allProposals, currentPage, displayedProposals.length]);
+  }, [props, allProposals, currentPage, displayedProposals, currentCache, cache, proposalsPerPage, fetchProposals]);
 
   const truncateText = (text: string, charLimit: number) => {
     const cleanedText = text.replace(/#/g, "");

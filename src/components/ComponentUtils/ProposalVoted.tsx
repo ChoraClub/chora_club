@@ -11,6 +11,9 @@ import { Tooltip as NextUITooltip } from "@nextui-org/react";
 import ProposalVotedLeftSkeletonLoader from "../SkeletonLoader/ProposalVotedLeftSkeletonLoader";
 import ProposalVotedRightSkeletonLoader from "../SkeletonLoader/ProposalVotedRightSkeletonLoader";
 import { useRouter } from "next/navigation";
+import { RiExternalLinkLine } from "react-icons/ri";
+import Link from "next/link";
+
 Chart.register(ArcElement, Tooltip, Legend);
 
 interface Type {
@@ -303,12 +306,27 @@ const router = useRouter();
     return description.replace(/#/g, '').trim();
   };
 
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const checkIfMobile = () => {
+      if (typeof window !== 'undefined') {
+        setIsMobile(window.matchMedia('(max-width: 640px)').matches)
+      }
+    }
+
+    checkIfMobile()
+    window.addEventListener('resize', checkIfMobile)
+
+    return () => window.removeEventListener('resize', checkIfMobile)
+  }, [])
+
   return (
     <>
-      <div className="grid grid-cols-5 pe-5 gap-4 pb-6">
+      <div className="grid grid-cols-2 1.5lg:grid-cols-5 1.5lg:gap-4 pb-6">
         <div
           style={{ boxShadow: "0px 4px 15.1px 0px rgba(0, 0, 0, 0.17)" }}
-          className="col-span-2 space-y-4 p-10 rounded-xl"
+          className="col-span-2 space-y-4 p-10 rounded-xl mb-4 1.5lg:mb-0"
         >
           {isPageLoading ? (
             <ProposalVotedLeftSkeletonLoader />
@@ -335,16 +353,16 @@ const router = useRouter();
             Voted Proposals
           </div>
 
-          <div className={`h-[23rem] overflow-y-auto ${styles.scrollbar}`}>
+          <div className={`h-fit xm:h-[23rem] overflow-y-auto ${styles.scrollbar}`}>
             {isPageLoading ? (
               <ProposalVotedRightSkeletonLoader />
             ) : first && !isPageLoading && pageData.length > 0 ? (
               dataToShow.map((proposal: any, index: number) => (
                 <div
                   key={index}
-                  className={`flex justify-between border border-[#7C7C7C] text-sm px-3 py-2 rounded-lg items-center my-3 `}
+                  className={`flex flex-col xm:flex-row justify-between border border-[#7C7C7C] text-sm px-3 py-2 rounded-lg items-end xm:items-center my-3 `}
                 >
-                  <div className="w-3/4 break-words">
+                  <div className="w-full xm:w-3/5 break-words">
                     <div className={`${openDesc[index] ? "" : styles.desc}`}>
                       {filterDescription(proposal.proposal.description)}
                     </div>
@@ -357,8 +375,9 @@ const router = useRouter();
                       view
                     </span>
                   </div>
+                  <div className="flex items-center ">
                   <div
-                    className={`text-white rounded-full px-3 py-[2px] w-[70px] me-1 text-center flex justify-center align-center ${
+                    className={`text-white rounded-full xm:px-3 py-[2px]  text-xs xs:text-base w-[60px] xs:w-[70px] me-1 text-center flex justify-center align-center ${
                       proposal.proposalId &&
                       proposal.proposalId.params &&
                       proposal.proposalId.params.length > 2
@@ -384,7 +403,7 @@ const router = useRouter();
                       proposal.proposalId.params &&
                       proposal.proposalId.params.length > 2 ? (
                         <Image
-                          className="flex justify-center items-center"
+                          className="flex justify-center items-center size-6 xs:size-8"
                           src={VotedOnOptions}
                           alt="Voted on options"
                         />
@@ -399,22 +418,25 @@ const router = useRouter();
                   </div>
                   <NextUITooltip content="Votes">
                     { proposal.proposalId && (
-                      <div className="text-white rounded-full px-3 py-[2px] bg-[#FF0000]">
+                      <div className="text-white  text-xs xs:text-base rounded-full px-3 py-[2px] bg-[#FF0000]">
                         {formatNumber(proposal.proposalId.weight / 1e18)}
                       </div>
                     )}
                   </NextUITooltip>
                   { proposal.proposalId && (
-                    <div className="px-3 py-[2px] text-xl">
-                      <a
+                    <div className="px-3 py-[2px] text-base xs:text-xl">
+                      <Link
                         href={daoName==="optimism"?`https://optimistic.etherscan.io/tx/${proposal.proposalId.transactionHash}`:`https://arbiscan.io/tx/${proposal.proposalId.transactionHash}`}
                         target="_blank"
-                        className="cursor-pointer"
+                        className="cursor-pointer text-blue-600 hover:text-blue-800 transition-colors duration-200"
                       >
-                        ↗
-                      </a>
+                        {/* ↗ */}
+                        <RiExternalLinkLine/>
+                      </Link>
                     </div>
                   )}
+                  </div>
+
                 </div>
               ))
             ) : (
@@ -442,6 +464,8 @@ const router = useRouter();
                 page={currentPage}
                 onChange={setCurrentPage}
                 showControls
+                siblings={isMobile ? 0 : 1}
+                boundaries={isMobile ? 0 : 1}
               />
             </div>
           )}

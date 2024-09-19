@@ -181,16 +181,16 @@ function InstantMeet({ isDelegate, selfDelegate, daoName }: instantMeetProps) {
 
   return (
     <div>
-      <div className="pb-28 pr-12">
+      <div className="pb-28">
         <div className="">
-          <div className="grid grid-cols-7 rounded-3xl border-solid border-2 border-[#F9F9F9]-900">
-            <div className="col-span-4 border-solid border-r-2 border-[#F9F9F9]-900">
-              <div className="p-14">
-                <div className="text-[#3E3D3D] text-3xl font-semibold font-poppins text-center">
+          <div className="grid gris-cols-4 2md:grid-cols-7 rounded-3xl border-solid border-2 border-[#F9F9F9]-900">
+            <div className="col-span-4 border-solid border-b-2 2md:border-b-0 2md:border-r-2 border-[#F9F9F9]-900">
+              <div className="p-6 xs:p-10 xm:p-14">
+                <div className="text-[#3E3D3D] text-2xl xs:text-3xl font-semibold font-poppins text-center">
                   Start an Instant Meeting
                 </div>
 
-                <div className="grid grid-cols-3 grid-rows-2 text-sm gap-11 font-semibold pt-8 text-[#3E3D3D] text-center">
+                <div className="grid grid-cols-2 xm:grid-cols-3 xm:grid-rows-2 text-xs xs:text-sm gap-6 xs:gap-11 font-semibold pt-8 text-[#3E3D3D] text-center">
                   {block.map((data, index) => (
                     <Tooltip
                       key={index}
@@ -252,7 +252,7 @@ function InstantMeet({ isDelegate, selfDelegate, daoName }: instantMeetProps) {
                 </div>
               </div>
             </div>
-            <div className="col-span-3 flex flex-col p-3 items-center justify-center -mt-[25%]">
+            <div className="col-span-3 flex flex-col p-10 md:p-16 2md:p-3 items-center justify-center -mt-[25%]">
               <div className="h-auto w-auto bg-cover mb-[-20%]">
                 <Image alt="img7" src={heroImg} quality={100} priority />
               </div>

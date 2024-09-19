@@ -49,6 +49,7 @@ function RecordedSessionsTile({
   const [videoDurations, setVideoDurations] = useState<any>({});
   const router = useRouter();
   const { address } = useAccount();
+  // const address = "0xc622420AD9dE8E595694413F24731Dd877eb84E1";
   const [ensHostNames, setEnsHostNames] = useState<any>({});
   const [ensGuestNames, setEnsGuestNames] = useState<any>({});
   const [loadingHostNames, setLoadingHostNames] = useState<boolean>(true);
@@ -210,7 +211,7 @@ function RecordedSessionsTile({
   return (
     <>
       <div
-        className={`grid min-[475px]:grid-cols- md:grid-cols-2 lg:grid-cols-3 ${gridCols} sm:gap-10 py-8 font-poppins`}
+        className={`grid min-[475px]:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 ${gridCols} sm:gap-10 py-8 font-poppins`}
       >
         {meetingData.map((data: any, index: number) => (
           <div
