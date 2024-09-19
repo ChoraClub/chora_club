@@ -313,7 +313,7 @@ const [mintedNFTs, setMintedNFTs] = useState<any[]>([]);
         </div>
         {mintedNFTs.length > 0 ? (
           <>
-             <RecordedSessionsTile
+             {/* <RecordedSessionsTile
               meetingData={mintedNFTs.map(nft => ({
                 meetingId: nft.id,
                 thumbnail_image: nft.thumbnail,
@@ -321,7 +321,8 @@ const [mintedNFTs, setMintedNFTs] = useState<any[]>([]);
                 // Add other required properties for RecordedSessionsTile
               }))}
               gridCols="grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-            /></>
+            /> */}
+            </>
         ) : (
          
           <div className="text-center py-8 text-gray-500">
