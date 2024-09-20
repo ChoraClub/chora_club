@@ -23,7 +23,7 @@ import { useRouter } from "next-nprogress-bar";
 import toast, { Toaster } from "react-hot-toast";
 import Link from "next/link";
 import OPLogo from "@/assets/images/daos/op.png";
-import ArbLogo from "@/assets/images/daos/arbCir.png";
+import ArbLogo from "@/assets/images/daos/arb.png";
 import ccLogo from "@/assets/images/daos/CCLogo2.png";
 import { Button, useDisclosure } from "@nextui-org/react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
@@ -38,7 +38,7 @@ import { useSession } from "next-auth/react";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
 import MainProfileSkeletonLoader from "../SkeletonLoader/MainProfileSkeletonLoader";
-import { BASE_URL } from "@/config/constants";
+import { BASE_URL, LIGHTHOUSE_BASE_API_KEY } from "@/config/constants";
 import FollowingModal from "../ComponentUtils/FollowingModal";
 import { IoClose } from "react-icons/io5";
 import style from "./MainProfile.module.css";
@@ -221,9 +221,7 @@ function MainProfile() {
       // console.log(percentageDone);
     };
 
-    const apiKey = process.env.NEXT_PUBLIC_LIGHTHOUSE_KEY
-      ? process.env.NEXT_PUBLIC_LIGHTHOUSE_KEY
-      : "";
+    const apiKey = LIGHTHOUSE_BASE_API_KEY ? LIGHTHOUSE_BASE_API_KEY : "";
 
     const output = await lighthouse.upload(selectedFile, apiKey);
 

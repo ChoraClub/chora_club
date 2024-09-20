@@ -1,7 +1,26 @@
 import React, { useState } from "react";
 import { RxCross2 } from "react-icons/rx";
+import { UserProfileInterface } from "@/types/UserProfileTypes";
+import {
+  DynamicAttendeeInterface,
+  SessionInterface,
+} from "@/types/MeetingTypes";
+interface Attendee extends DynamicAttendeeInterface {
+  profileInfo: UserProfileInterface;
+}
 
-const WatchCollectibleInfo = () => {
+interface Meeting extends SessionInterface {
+  attendees: Attendee[];
+  hostProfileInfo: UserProfileInterface;
+}
+
+const WatchCollectibleInfo = ({
+  data,
+  collection,
+}: {
+  data: Meeting;
+  collection: string;
+}) => {
   const [showComingSoon, setShowComingSoon] = useState(true);
   return (
     <div className="rounded-3xl border border-black-shade-200 font-poppins ">

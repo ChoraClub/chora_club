@@ -5,17 +5,18 @@ import { FaPencil } from "react-icons/fa6";
 import UpdateHostedSessionModal from "./UpdateHostedSessionModal";
 import lighthouse from "@lighthouse-web3/sdk";
 import toast from "react-hot-toast";
+import { LIGHTHOUSE_BASE_API_KEY } from "@/config/constants";
 
 interface EditButtonProps {
   sessionData: any;
   updateSessionData: (updatedData: any, index: number) => void;
-  index: number
+  index: number;
 }
 
 const EditButton: React.FC<EditButtonProps> = ({
   sessionData,
   updateSessionData,
-  index
+  index,
 }) => {
   const [editOpen, setEditOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -56,9 +57,7 @@ const EditButton: React.FC<EditButtonProps> = ({
       console.log(percentageDone);
     };
 
-    const apiKey = process.env.NEXT_PUBLIC_LIGHTHOUSE_KEY
-      ? process.env.NEXT_PUBLIC_LIGHTHOUSE_KEY
-      : "";
+    const apiKey = LIGHTHOUSE_BASE_API_KEY ? LIGHTHOUSE_BASE_API_KEY : "";
     try {
       let imageCid = "";
       if (formData.image) {

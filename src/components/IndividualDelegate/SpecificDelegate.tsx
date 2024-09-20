@@ -35,7 +35,7 @@ import dao_abi from "../../artifacts/Dao.sol/GovernanceToken.json";
 import { useConnectModal, useChainModal } from "@rainbow-me/rainbowkit";
 import { useAccount } from "wagmi";
 import OPLogo from "@/assets/images/daos/op.png";
-import ArbLogo from "@/assets/images/daos/arbCir.png";
+import ArbLogo from "@/assets/images/daos/arb.png";
 import ccLogo from "@/assets/images/daos/CCLogo2.png";
 import { Oval } from "react-loader-spinner";
 import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";

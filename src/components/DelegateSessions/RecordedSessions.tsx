@@ -4,7 +4,7 @@ import search from "@/assets/images/daos/search.png";
 import texture1 from "@/assets/images/daos/texture1.png";
 import oplogo from "@/assets/images/daos/op.png";
 import arblogo from "@/assets/images/daos/arbitrum.jpg";
-import arbcir from "@/assets/images/daos/arbCir.png";
+import arbcir from "@/assets/images/daos/arb.png";
 import toast, { Toaster } from "react-hot-toast";
 import copy from "copy-to-clipboard";
 import { useRouter } from "next-nprogress-bar";

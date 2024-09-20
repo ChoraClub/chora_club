@@ -12,7 +12,7 @@ import { Tooltip } from "@nextui-org/react";
 import clockIcn from "@/assets/images/daos/icon_clock.png";
 import ccLogo from "@/assets/images/daos/CCLogo2.png";
 import OPLogo from "@/assets/images/daos/op.png";
-import ArbLogo from "@/assets/images/daos/arbCir.png";
+import ArbLogo from "@/assets/images/daos/arb.png";
 import "@/components/DelegateSessions/DelegateSessionsMain.module.css";
 import AvailableSessionsSkeletonLoader from "../SkeletonLoader/AvailableSessionsSkeletonLoader";
 import { getEnsName } from "@/utils/ENSUtils";

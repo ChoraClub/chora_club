@@ -6,6 +6,7 @@ import { imageCIDs } from "@/config/staticDataUtils";
 import lighthouse from "@lighthouse-web3/sdk";
 import Image from "next/image";
 import { CgAttachment } from "react-icons/cg";
+import { LIGHTHOUSE_BASE_API_KEY } from "@/config/constants";
 
 function EditSessionDetails({
   data,
@@ -45,9 +46,7 @@ function EditSessionDetails({
   };
 
   const handleChange = async (selectedImage: any) => {
-    const apiKey = process.env.NEXT_PUBLIC_LIGHTHOUSE_KEY
-      ? process.env.NEXT_PUBLIC_LIGHTHOUSE_KEY
-      : "";
+    const apiKey = LIGHTHOUSE_BASE_API_KEY ? LIGHTHOUSE_BASE_API_KEY : "";
 
     if (selectedImage) {
       const output = await lighthouse.upload(selectedImage, apiKey);

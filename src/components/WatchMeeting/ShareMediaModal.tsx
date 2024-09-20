@@ -11,6 +11,7 @@ import toast, { Toaster } from "react-hot-toast";
 import { FaFacebook } from "react-icons/fa";
 import { FaXTwitter, FaWhatsapp } from "react-icons/fa6";
 import { RiTwitterXLine } from "react-icons/ri";
+import { useAccount } from "wagmi";
 
 function ShareMediaModal({
   isOpen,
@@ -27,12 +28,13 @@ function ShareMediaModal({
 
   const [link, setLink] = useState("");
   const [copySuccess, setCopySuccess] = useState(false);
+  const { address } = useAccount();
 
   console.log("data::", data);
 
   useEffect(() => {
-    setLink(window.location.href);
-  }, []);
+    setLink(`${window.location.href}${address ? `?referrer=${address}` : ""}`);
+  }, [address]);
 
   useEffect(() => {
     // Lock scrolling when the modal is open

@@ -57,7 +57,7 @@ function WatchComponentMain({ props }: { props: { id: string } }) {
         console.log("result::::", result);
         setData(result.data[0]);
         setCollection(result.collection);
-        console.log(result.data[0].video_uri.video_uri);
+        console.log(result.data[0].video_uri);
       } catch (error) {
         console.error(error);
       }
@@ -120,17 +120,18 @@ function WatchComponentMain({ props }: { props: { id: string } }) {
 
             {/* Right side */}
             <div
-              className={`col-span-1  pb-8 ${styles.customScrollbar} gap-y-6 flex flex-col`}>
+              className={`col-span-1  pb-8 ${styles.customScrollbar} gap-y-6 flex flex-col`}
+            >
               {/* <WatchSessionList /> */}
 
               {/* Free */}
-              <WatchFreeCollect />
+              <WatchFreeCollect data={data} collection={collection} />
 
               {/* Leader BOARD */}
-              <WatchLeaderBoard />
+              <WatchLeaderBoard data={data} collection={collection} />
 
               {/* COLLECTIBLE INFO */}
-              <WatchCollectibleInfo />
+              <WatchCollectibleInfo data={data} collection={collection} />
 
               {/* SOCIAL LINKS */}
               <WatchSocialLinks data={data} collection={collection} />

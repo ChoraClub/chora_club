@@ -88,8 +88,8 @@ function ExploreDAOs() {
   return (
     <div className="pt-2 xs:pt-4 sm:pt-6 px-4 md:px-6 lg:px-14 min-h-screen">
       <div className="relative">
-        <Heading/>
-        
+        <Heading />
+
         <div
           className={`flex items-center rounded-full shadow-lg bg-gray-100 text-black cursor-pointer w-[300px] xs:w-[365px]`}
         >
@@ -128,6 +128,8 @@ function ExploreDAOs() {
                         width={60}
                         height={60}
                         className="rounded-full w-16 h-16 md:w-20 md:h-20"
+                        quality={100}
+                        loading={`lazy`}
                       ></Image>
                     </div>
                     <div className="text-center">

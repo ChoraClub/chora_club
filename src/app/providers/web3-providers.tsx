@@ -25,7 +25,7 @@ import {
 // import { useTheme } from "next-themes";
 
 import { createConfig, WagmiProvider } from "wagmi";
-import { optimism, arbitrum } from "wagmi/chains";
+import { optimism, arbitrum, arbitrumSepolia } from "wagmi/chains";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
 // import { publicProvider } from "wagmi/providers/public";
@@ -69,7 +69,7 @@ const projectId = "c52f63cb512b7b43a8724eae05cb5130";
 const wagmiConfig = getDefaultConfig({
   appName: "Chora Club",
   projectId: projectId,
-  chains: [optimism, arbitrum],
+  chains: [optimism, arbitrum, arbitrumSepolia],
   ssr: true, // If your dApp uses server side rendering (SSR)
   wallets: [
     {
