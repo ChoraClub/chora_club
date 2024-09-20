@@ -13,7 +13,6 @@ interface NFTProps {
 }
 
 function NFTTile({ nft }: NFTProps) {
-  console.log(nft);
   return (
     <div className="border border-[#D9D9D9] sm:rounded-3xl">
       <div className="w-full h-44 sm:rounded-t-3xl bg-black object-cover object-center relative">

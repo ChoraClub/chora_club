@@ -54,7 +54,6 @@ const WatchLeaderBoard = ({
   const [leaderBoard, setLeaderBoard] = useState<LeaderBoardEntry[]>([]);
   useEffect(() => {
     if (leaderBoardData && (leaderBoardData.TopTen?.length > 0 || leaderBoardData.firstCollector || leaderBoardData.latestCollector)) {
-      console.log(leaderBoardData); 
       
       const processedLeaderBoard = [
         ...(Array.isArray(leaderBoardData?.TopTen) 
@@ -96,7 +95,6 @@ const WatchLeaderBoard = ({
           : [])
       ];
     
-      console.log(processedLeaderBoard);
       setLeaderBoard(processedLeaderBoard);
     }
   }, [leaderBoardData]); // Trigger whenever leaderBoardData updates

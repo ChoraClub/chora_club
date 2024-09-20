@@ -163,31 +163,35 @@ function RewardsMain() {
   );
 
   const handleSelectChange = (selectedOption: string) => {
-    console.log(`Selected chain: ${selectedOption}`);
+    // console.log(`Selected chain: ${selectedOption}`);
     // Add your logic here to handle the change
   };
 
   const fetchReward = async () => {
-    const data = await nft_client.query(REWARD_QUERY, { address: address }).toPromise();
-    console.log("here data is ", data);
+    const data = await nft_client.query(REWARD_QUERY, { address: '0x3013bb4e03a7b81106d69c10710eae148c8410e1' }).toPromise();
+    const response = await fetch(
+      "https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd"
+    );
+    const coingeckoData = await response.json();
+    // console.log("here data is ", data, coingeckoData.ethereum.usd);
     if (data.data.rewardsPerUsers.length < 1) {
       setTotalRewards({ amount: "0.0 ", value: "$0.0" });
       return;
     }
     const total = data?.data.rewardsPerUsers?.map((reward: any) => ({
-      amount: reward.amount / 10 ** 18,
-      value: `$${parseFloat(reward.amount).toFixed(2)}`
+      amount: (reward.amount / 10 ** 18).toFixed(5),
+      value: `$${((reward.amount*coingeckoData.ethereum.usd)/10**18).toFixed(2)}`
     })) || [];
     setTotalRewards(total[0]);
-    console.log("total reward", total);
+    // console.log("total reward", total)
     const Rewards = data?.data.rewardsPerUsers?.map((reward: any) => ({
       platform: reward.id,  // Use the ID or some other property for platform
-      amount: ((reward.amount - reward.withdrawn) / 10 ** 18),
-      value: `$${parseFloat(reward.amount).toFixed(2)}`,
+      amount: ((reward.amount - reward.withdrawn) / 10 ** 18).toFixed(5),
+      value: `$${((reward.amount*coingeckoData.ethereum.usd)/10**18).toFixed(2)}`,
       logo: reward.id.includes("op") ? oplogo : arblogo,  // Example condition to set logo
     })) || [];
     setClaimableRewards(Rewards);
-    console.log(claimableRewards);
+    // console.log(claimableRewards);
   };
   useEffect(() => {
     if(address){
@@ -205,7 +209,7 @@ function RewardsMain() {
       balance: nft.balance,
       contract: nft.tokenAndContract.address
     })) || [];
-    console.log("minted nfts", nfts);
+    // console.log("minted nfts", nfts);
     setMintedNFTs(nfts);
   };
   return (
@@ -268,7 +272,7 @@ function RewardsMain() {
                 />
               </svg>
               <span className="text-2xl font-bold">{totalRewards?.amount} ETH</span>
-              <span className="text-gray-500">({totalRewards?.value.slice(0, 4)})</span>
+              <span className="text-gray-500">({totalRewards?.value})</span>
             </div>
           </div>
 

@@ -80,7 +80,7 @@ function WatchComponentMain({ props }: { props: { id: string } }) {
         address: data?.deployedContractAddress,
       }).toPromise();
 
-      console.log(result);
+      // console.log(result);
 
       // Check if result data is valid and tokens exist
       const selectedToken = result?.data?.zoraCreateTokens?.find(
@@ -221,10 +221,10 @@ function WatchComponentMain({ props }: { props: { id: string } }) {
           throw new Error("Network response was not ok");
         }
         const result = await response.json();
-        console.log("result::::", result);
+        // console.log("result::::", result);
         setData(result.data[0]);
         setCollection(result.collection);
-        console.log(result.data[0].video_uri);
+        // console.log(result.data[0].video_uri);
       } catch (error) {
         console.error(error);
       }
@@ -251,7 +251,6 @@ function WatchComponentMain({ props }: { props: { id: string } }) {
       <MobileResponsiveMessage />
 
       {/* For Desktop Screen  */}
-      {console.log(data, "data")}
       <div className="hidden md:block">
         {data ? (
           <div className=" 1.7xl:ps-14 lg:ps-5 ps-4 xl:ps-10">
