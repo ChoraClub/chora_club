@@ -14,6 +14,37 @@ import { imageCIDs } from "@/config/staticDataUtils";
 import { SessionInterface } from "@/types/MeetingTypes";
 import { uploadFile } from "@/actions/uploadFile";
 
+import lighthouse from "@lighthouse-web3/sdk";
+import { NFT_LIGHTHOUSE_BASE_API_KEY } from "@/config/constants";
+import { Buffer } from "buffer";
+
+// const uploadFile = async (arrayBuffer: ArrayBuffer) => {
+//   // console.log("arrayBuffer", arrayBuffer);
+//   try {
+//     const apiKey = NFT_LIGHTHOUSE_BASE_API_KEY || "";
+//     if (!apiKey) {
+//       throw new Error("Lighthouse API key is not set");
+//     }
+
+//     const file = Buffer.from(arrayBuffer);
+
+//     console.log("file:::", file);
+//     const files = new File([file], "image.png", { type: "image/png" });
+
+//     const uploadResponse = await lighthouse.uploadBuffer(file, apiKey);
+
+//     if (!uploadResponse || !uploadResponse.data) {
+//       throw new Error("Upload failed: Invalid response from Lighthouse");
+//     }
+
+//     // console.log("Upload successful:", uploadResponse.data);
+//     return uploadResponse.data;
+//   } catch (error: any) {
+//     console.error("Error uploading to Lighthouse:", error.message);
+//     throw error;
+//   }
+// };
+
 function getRandomElementFromArray(arr: any[]) {
   const randomIndex = Math.floor(Math.random() * arr.length);
   return arr[randomIndex];
@@ -46,11 +77,10 @@ export async function POST(req: NextRequest) {
       `${BASE_URL}/api/images/og/nft?daoName=${dao_name}&meetingId=${meetingId}`,
       requestOptions
     );
-    const arrayBuffer = await imageResponse.arrayBuffer();
+    
 
     try {
-      // Upload the ArrayBuffer to Lighthouse
-      const result = await uploadFile(arrayBuffer);
+      const result = await uploadFile(imageResponse);
       console.log("Upload result:", result);
       console.log("Hash:", result.Hash);
       nft_image = `ipfs://` + result.Hash;
