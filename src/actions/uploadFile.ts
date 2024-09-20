@@ -1,8 +1,10 @@
+"use client";
 import lighthouse from "@lighthouse-web3/sdk";
 import { NFT_LIGHTHOUSE_BASE_API_KEY } from "@/config/constants";
 import { Buffer } from "buffer";
 
-export const uploadFile = async (arrayBuffer: ArrayBuffer) => {
+export const uploadFile = async (imageResponse: any) => {
+  const arrayBuffer = await imageResponse.arrayBuffer();
   // console.log("arrayBuffer", arrayBuffer);
   try {
     const apiKey = NFT_LIGHTHOUSE_BASE_API_KEY || "";
