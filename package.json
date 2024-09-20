@@ -76,6 +76,7 @@
     "reactour": "^1.19.4",
     "recharts": "^2.12.7",
     "rehype-sanitize": "^6.0.0",
+    "sharp": "^0.33.5",
     "siwe": "^2.3.2",
     "socket.io-client": "^4.7.5",
     "tailwindcss-scrollbar": "^0.1.0",

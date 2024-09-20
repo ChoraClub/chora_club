@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ImageResponse } from "next/og";
 import React from "react";
+import sharp from "sharp";
 
 export const revalidate = false;
 
@@ -11,7 +12,7 @@ const size = {
   height: 800,
 };
 
-export async function POST(req: NextRequest) {
+export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
 
   const daoName = searchParams.get("daoName");
@@ -42,7 +43,7 @@ export async function POST(req: NextRequest) {
     nftLogo = arbLogo;
   }
 
-  return new ImageResponse(
+  const imageResponse = new ImageResponse(
     (
       <div
         style={{
@@ -95,8 +96,8 @@ export async function POST(req: NextRequest) {
             marginBottom: "auto",
           }}
         >
-          Congratulations! 🎉 You've watched this session and claimed this NFT,
-          marking your knowledge and growth in Web3.
+          Congratulations! 🎉 You&apos;ve watched this session and claimed this
+          NFT, marking your knowledge and growth in Web3.
         </div>
         <div
           style={{
@@ -115,4 +116,6 @@ export async function POST(req: NextRequest) {
       ...size,
     }
   );
+  // console.log("imageResponse::", imageResponse);
+  return imageResponse;
 }

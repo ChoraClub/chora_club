@@ -35,6 +35,7 @@ export interface SessionInterface {
   onchain_host_uid: string;
   thumbnail_image?: string;
   deployedContractAddress?: string;
+  nft_image?: string;
 }
 
 export interface DynamicSessionInterface extends SessionInterface {

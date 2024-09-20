@@ -3,7 +3,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { NextResponse, NextRequest } from "next/server";
 import { sendMail, compileBookedSessionTemplate } from "@/libs/mail";
 import { io } from "socket.io-client";
-import { SOCKET_BASE_URL } from "@/config/constants";
+import { BASE_URL, SOCKET_BASE_URL } from "@/config/constants";
 import { getEnsName } from "@/utils/ENSUtils";
 import { truncateAddress } from "@/utils/text";
 import {
@@ -12,6 +12,7 @@ import {
 } from "@/utils/NotificationUtils";
 import { imageCIDs } from "@/config/staticDataUtils";
 import { SessionInterface } from "@/types/MeetingTypes";
+import { uploadFile } from "@/actions/uploadFile";
 
 function getRandomElementFromArray(arr: any[]) {
   const randomIndex = Math.floor(Math.random() * arr.length);
@@ -33,6 +34,32 @@ export async function POST(req: NextRequest) {
     thumbnail_image,
     session_type,
   }: SessionInterface = await req.json();
+  let nft_image;
+  try {
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    const requestOptions = {
+      method: "GET",
+      headers: myHeaders,
+    };
+    const imageResponse = await fetch(
+      `${BASE_URL}/api/images/og/nft?daoName=${dao_name}&meetingId=${meetingId}`,
+      requestOptions
+    );
+    const arrayBuffer = await imageResponse.arrayBuffer();
+
+    try {
+      // Upload the ArrayBuffer to Lighthouse
+      const result = await uploadFile(arrayBuffer);
+      console.log("Upload result:", result);
+      console.log("Hash:", result.Hash);
+      nft_image = `ipfs://` + result.Hash;
+    } catch (error) {
+      console.error("Error in uploading file:", error);
+    }
+  } catch (error) {
+    console.log("Error in generating OG image:::", error);
+  }
 
   try {
     const client = await connectDB();
@@ -55,6 +82,7 @@ export async function POST(req: NextRequest) {
       description,
       thumbnail_image: randomImage,
       session_type,
+      nft_image,
     });
 
     if (result.insertedId) {

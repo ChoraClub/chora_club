@@ -76,6 +76,7 @@ const WatchFreeCollect = ({
     string | null
   >(null);
   const [contractUri, setContractUri] = useState<string | null>(null);
+  const [tokenMetadataURI, setTokenMetadataUri] = useState<string | null>(null);
   const [jsonUri, setJsonUri] = useState("");
   const [mintFee, setMintFee] = useState("0 ETH");
   const [ethToUsdConversionRate, setEthToUsdConversionRate] = useState(0);
@@ -242,7 +243,31 @@ const WatchFreeCollect = ({
       const jsonData = {
         name: data.title,
         description: data.description,
-        imageCid: data.thumbnail_image,
+        imageCid: data?.nft_image,
+      };
+
+      const tokenMetadata = {
+        name: data.title,
+        description: data.description,
+        image: data?.nft_image,
+        attributes: [
+          {
+            trait_type: "Host",
+            value: data.host_address,
+          },
+          {
+            trait_type: "Meeting Id",
+            value: data.meetingId,
+          },
+          // {
+          //   trait_type: "Start Time",
+          //   value: "1719468207",
+          // },
+          // {
+          //   trait_type: "End Time",
+          //   value: "1719469044",
+          // },
+        ],
       };
       const jsonBlob = new Blob([JSON.stringify(jsonData)], {
         type: "application/json",
@@ -252,9 +277,27 @@ const WatchFreeCollect = ({
       });
       const jsonUploadResponse = await lighthouse.upload([jsonFile], API_KEY);
       const jsonCid = jsonUploadResponse.data.Hash;
+
       setJsonUri(jsonCid);
       setContractUri(`ipfs://${jsonCid}`);
       console.log("Form submitted with JSON URI:", jsonCid);
+
+      const tokenMetadataJsonBlob = new Blob([JSON.stringify(tokenMetadata)], {
+        type: "application/json",
+      });
+      const tokenMetadataJsonFile = new File(
+        [tokenMetadataJsonBlob],
+        "metadata.json",
+        {
+          type: "application/json",
+        }
+      );
+      const tokenMetadataJsonUploadResponse = await lighthouse.upload(
+        [tokenMetadataJsonFile],
+        API_KEY
+      );
+      const tokenMetadataJsonCid = tokenMetadataJsonUploadResponse.data.Hash;
+      setTokenMetadataUri(`ipfs://${tokenMetadataJsonCid}`);
     } catch (error) {
       console.error("Error uploading to Lighthouse:", error);
       alert("Error uploading data. Please try again.");
@@ -283,8 +326,7 @@ const WatchFreeCollect = ({
       const { parameters } = await creatorClient.create1155({
         contract: { name: data.title, uri: contractUri || "" },
         token: {
-          tokenMetadataURI:
-            "ipfs://bafkreibp5oimmwewsutwlkk4yriqxhcldzuj4hrwchq5fo4shamkw7gpue",
+          tokenMetadataURI: tokenMetadataURI || "",
         },
         account: address!,
       });
