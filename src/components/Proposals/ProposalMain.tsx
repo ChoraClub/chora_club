@@ -158,7 +158,16 @@ function ProposalMain({ props }: { props: Props }) {
     }
   };
   const voteOnchain = async () => {
-    if (walletClient?.chain !== props.daoDelegates) {
+    let chain;
+    if (walletClient?.chain.name === "OP Mainnet") {
+      chain = "optimism";
+    } else if (walletClient?.chain.name === "Arbitrum One") {
+      chain = "arbitrum";
+    } else {
+      chain = "";
+    }
+
+    if (chain !== props.daoDelegates) {
       toast.error("Please switch to appropriate network to delegate!");
       if (openChainModal) {
         openChainModal();
@@ -191,18 +200,22 @@ function ProposalMain({ props }: { props: Props }) {
       return;
     }
     let chainAddress;
-    if (chain?.name === "Optimism") {
+    let currentChain;
+    if (chain?.name === "OP Mainnet") {
       chainAddress = "0xcDF27F107725988f2261Ce2256bDfCdE8B382B10";
+      currentChain = "optimism";
     } else if (chain?.name === "Arbitrum One") {
       chainAddress = await getContractAddress(data.transactionHash);
+      currentChain = "arbitrum";
     } else {
+      currentChain = "";
       return;
     }
 
-    if (walletClient?.chain === "") {
+    if (currentChain === "") {
       toast.error("Please connect your wallet!");
     } else if (comment) {
-      if (walletClient?.chain === props.daoDelegates) {
+      if (currentChain === props.daoDelegates) {
         try {
           const delegateTx = await walletClient.writeContract({
             address: chainAddress,
@@ -221,7 +234,7 @@ function ProposalMain({ props }: { props: Props }) {
         }
       }
     } else if (!comment) {
-      if (walletClient?.chain === props.daoDelegates) {
+      if (currentChain === props.daoDelegates) {
         try {
           const delegateTx = await walletClient.writeContract({
             address: chainAddress,
@@ -351,8 +364,9 @@ function ProposalMain({ props }: { props: Props }) {
         text = `<em>${matchem[1]}</em>`;
       }
 
-      return `<a href="${href}" title="${title || ""
-        }" target="_blank" rel="noopener noreferrer" class="text-blue-shade-100">${text}</a>`;
+      return `<a href="${href}" title="${
+        title || ""
+      }" target="_blank" rel="noopener noreferrer" class="text-blue-shade-100">${text}</a>`;
     };
 
     marked.setOptions({
@@ -707,9 +721,9 @@ function ProposalMain({ props }: { props: Props }) {
     isArbitrum
       ? window.open(`https://arbiscan.io/tx/${transactionHash}`, "_blank")
       : window.open(
-        `https://optimistic.etherscan.io/tx/${transactionHash}`,
-        "_blank"
-      );
+          `https://optimistic.etherscan.io/tx/${transactionHash}`,
+          "_blank"
+        );
   };
 
   const shareOnTwitter = () => {
@@ -828,10 +842,10 @@ function ProposalMain({ props }: { props: Props }) {
         return !votingPeriodEndData
           ? "PENDING"
           : currentDate > votingPeriodEndData
-            ? support1Weight > support0Weight
-              ? "SUCCEEDED"
-              : "DEFEATED"
-            : "PENDING";
+          ? support1Weight > support0Weight
+            ? "SUCCEEDED"
+            : "DEFEATED"
+          : "PENDING";
       }
     } else {
       return currentDate > votingPeriodEndData!
@@ -915,7 +929,7 @@ function ProposalMain({ props }: { props: Props }) {
   return (
     <>
       {/* For Mobile Screen */}
-      <MobileResponsiveMessage/>
+      <MobileResponsiveMessage />
 
       {/* For Desktop Screen  */}
       <div className="hidden md:block pr-16 pb-5 pl-24 pt-6 font-poppins">
@@ -940,8 +954,9 @@ function ProposalMain({ props }: { props: Props }) {
       </div>
 
       <div
-        className={`rounded-[1rem] mx-20 md:mx-24 px-4 md:px-12 pb-6 pt-16 transition-shadow duration-300 ease-in-out shadow-xl bg-gray-50 font-poppins relative ${isExpanded ? "h-fit" : "h-fit"
-          }`}
+        className={`rounded-[1rem] mx-20 md:mx-24 px-4 md:px-12 pb-6 pt-16 transition-shadow duration-300 ease-in-out shadow-xl bg-gray-50 font-poppins relative ${
+          isExpanded ? "h-fit" : "h-fit"
+        }`}
       >
         <div className="w-full flex items-center justify-end gap-2 absolute top-6 right-12">
           <div className="">
@@ -969,12 +984,13 @@ function ProposalMain({ props }: { props: Props }) {
           )}
           <div className="flex-shrink-0">
             <div
-              className={`rounded-full flex items-center justify-center text-xs py-1 px-2 font-medium ${status
+              className={`rounded-full flex items-center justify-center text-xs py-1 px-2 font-medium ${
+                status
                   ? status === "Closed"
                     ? "bg-[#f4d3f9] border border-[#77367a] text-[#77367a]"
                     : "bg-[#f4d3f9] border border-[#77367a] text-[#77367a]"
                   : "bg-gray-200 animate-pulse rounded-full"
-                }`}
+              }`}
             >
               {status ? status : <div className="h-4 w-16"></div>}
             </div>
@@ -1017,10 +1033,11 @@ function ProposalMain({ props }: { props: Props }) {
             </div>
           ) : (
             <div
-              className={`rounded-full flex items-center justify-center text-xs h-fit py-0.5 border font-medium w-24 ${Proposalstatus
+              className={`rounded-full flex items-center justify-center text-xs h-fit py-0.5 border font-medium w-24 ${
+                Proposalstatus
                   ? getStatusColor(Proposalstatus)
                   : "bg-gray-200 animate-pulse rounded-full"
-                }`}
+              }`}
             >
               {Proposalstatus ? (
                 Proposalstatus
@@ -1040,8 +1057,9 @@ function ProposalMain({ props }: { props: Props }) {
             <>
               <div
                 ref={contentRef}
-                className={` transition-max-height duration-500 ease-in-out overflow-hidden ${isExpanded ? "max-h-full" : "max-h-36"
-                  }`}
+                className={` transition-max-height duration-500 ease-in-out overflow-hidden ${
+                  isExpanded ? "max-h-full" : "max-h-36"
+                }`}
               >
                 <div
                   className="description-content"
@@ -1073,10 +1091,11 @@ function ProposalMain({ props }: { props: Props }) {
               </div>
             ) : (
               <div
-                className={`flex flex-col gap-2 py-3 pl-2 pr-1  xl:pl-3 xl:pr-2 my-3 border-gray-200 ${voterList.length > 5
+                className={`flex flex-col gap-2 py-3 pl-2 pr-1  xl:pl-3 xl:pr-2 my-3 border-gray-200 ${
+                  voterList.length > 5
                     ? `h-[440px] overflow-y-auto ${style.scrollbar}`
                     : "h-fit"
-                  }`}
+                }`}
               >
                 {voterList.length === 0 ? (
                   <div className="flex items-center justify-center h-full text-gray-500">
@@ -1118,20 +1137,21 @@ function ProposalMain({ props }: { props: Props }) {
                         </div>
                         <div className="flex items-center space-x-4">
                           <div
-                            className={`xl:px-4 px-2 py-2 rounded-full xl:text-sm xl:w-36 w-25 flex items-center justify-center xl:font-medium text-xs ${voter.support === 1
+                            className={`xl:px-4 px-2 py-2 rounded-full xl:text-sm xl:w-36 w-25 flex items-center justify-center xl:font-medium text-xs ${
+                              voter.support === 1
                                 ? "bg-green-100 text-green-800"
                                 : voter.support === 0
-                                  ? "bg-red-100 text-red-800"
-                                  : "bg-blue-100 text-blue-800"
-                              }`}
+                                ? "bg-red-100 text-red-800"
+                                : "bg-blue-100 text-blue-800"
+                            }`}
                           >
                             {formatWeight(voter.weight / 10 ** 18)}
                             &nbsp;
                             {voter.support === 1
                               ? "For"
                               : voter.support === 0
-                                ? "Against"
-                                : "Abstain"}
+                              ? "Against"
+                              : "Abstain"}
                           </div>
                           <Tooltips
                             showArrow

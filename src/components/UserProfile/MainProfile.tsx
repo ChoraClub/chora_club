@@ -54,7 +54,7 @@ import { m } from "framer-motion";
 import MobileResponsiveMessage from "../MobileResponsiveMessage/MobileResponsiveMessage";
 import RewardButton from "../ClaimReward/RewardButton";
 import Heading from "../ComponentUtils/Heading";
-import { ChevronDownIcon } from 'lucide-react';
+import { ChevronDownIcon } from "lucide-react";
 
 function MainProfile() {
   const { isConnected, address, chain } = useAccount();
@@ -116,20 +116,24 @@ function MainProfile() {
     // { name: "Past Votes", value: "votes" },
     { name: "Sessions", value: "sessions" },
     { name: "Office Hours", value: "officeHours" },
-    ...(selfDelegate ? [{ name: "Instant Meet", value: "instant-meet" }] : [])
+    ...(selfDelegate ? [{ name: "Instant Meet", value: "instant-meet" }] : []),
     // { name: "Instant Meet", value: "instant-meet" }
   ];
 
-
   const handleTabChange = (tabValue: string) => {
-    console.log(tabValue)
-    const selected = tabs.find(tab => tab.value === tabValue);
-    console.log(selected)
+    console.log(tabValue);
+    const selected = tabs.find((tab) => tab.value === tabValue);
+    console.log(selected);
     if (selected) {
       setSelectedTab(selected.name);
       setIsDropdownOpen(false);
       if (tabValue === "sessions") {
-        router.push(path + `?active=${tabValue}&session=${selfDelegate ? "schedule" : "attending"}`);
+        router.push(
+          path +
+            `?active=${tabValue}&session=${
+              selfDelegate ? "schedule" : "attending"
+            }`
+        );
       } else if (tabValue === "officeHours") {
         router.push(path + `?active=${tabValue}&hours=schedule`);
       } else {
@@ -139,40 +143,40 @@ function MainProfile() {
   };
 
   useEffect(() => {
-    const handleClickOutside = (event:MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setIsDropdownOpen(false);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
   const handleMouseEnter = () => {
-    setIsDropdownOpen(true)
-  }
+    setIsDropdownOpen(true);
+  };
 
   const handleMouseLeave = () => {
     setTimeout(() => {
-      if (!dropdownRef.current?.matches(':hover')) {
-        setIsDropdownOpen(false)
+      if (!dropdownRef.current?.matches(":hover")) {
+        setIsDropdownOpen(false);
       }
-    }, 100)
-  }
- 
-  
+    }, 100);
+  };
 
   useEffect(() => {
     const activeTab = searchParams.get("active");
     if (activeTab) {
-      const tab = tabs.find(t => t.value === activeTab);
+      const tab = tabs.find((t) => t.value === activeTab);
       setSelectedTab(tab?.name || "Info");
     }
   }, [searchParams, tabs]);
-  
 
   useEffect(() => {
     // if (chain && chain.name === "Optimism") {
@@ -573,11 +577,6 @@ function MainProfile() {
         // const dbResponse = await axios.get(`/api/profile/${address}`);
 
         let dao = getDaoName(chain?.name);
-        // chain?.name === "Optimism"
-        //   ? "optimism"
-        //   : chain?.name === "Arbitrum One"
-        //   ? "arbitrum"
-        //   : "";
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
         if (address) {
@@ -678,7 +677,7 @@ function MainProfile() {
         }
       } catch (error) {
         console.error("Error fetching data:", error);
-        toast.error("Failed to load profile data. Please try again later.");
+        // toast.error("Failed to load profile data. Please try again later.");
         setIsPageLoading(false);
       }
     };
@@ -894,20 +893,22 @@ function MainProfile() {
 
   return (
     <>
-    {/* For Mobile Screen */}
-    {/* <MobileResponsiveMessage/> */}
+      {/* For Mobile Screen */}
+      {/* <MobileResponsiveMessage/> */}
 
-    {/* For Desktop Screen  */}
-     {/* <div className="hidden md:block"> */}
-     <div className="lg:hidden pt-2 xs:pt-4 sm:pt-6 px-4 md:px-6 lg:px-14">
-      <Heading/>
-     </div>
+      {/* For Desktop Screen  */}
+      {/* <div className="hidden md:block"> */}
+      <div className="lg:hidden pt-2 xs:pt-4 sm:pt-6 px-4 md:px-6 lg:px-14">
+        <Heading />
+      </div>
       {!isPageLoading ? (
         <div className="font-poppins">
           <div className="flex flex-col md:flex-row pb-5 lg:py-5 px-4 md:px-6 lg:px-14 justify-between items-start">
             <div className="flex flex-col xs:flex-row xs:items-start xs:justify-start items-center lg:items-start justify-center lg:justify-start w-full lg:w-auto">
               <div
-                className={`${userData.displayImage ? 'h-full':'h-[80vw] xs:h-auto'} relative object-cover rounded-3xl w-full xs:w-auto`}
+                className={`${
+                  userData.displayImage ? "h-full" : "h-[80vw] xs:h-auto"
+                } relative object-cover rounded-3xl w-full xs:w-auto`}
                 style={{
                   backgroundColor: "#fcfcfc",
                   border: "2px solid #E9E9E9 ",
@@ -915,41 +916,41 @@ function MainProfile() {
               >
                 <div className="w-full h-full xs:w-28 xs:h-28 sm:w-36 sm:h-36 lg:w-40 lg:h-40 flex items-center justify-center ">
                   {/* <div className="flex justify-center items-center w-40 h-40"> */}
-                    <Image
-                      src={
-                        (userData.displayImage
-                          ? `https://gateway.lighthouse.storage/ipfs/${userData.displayImage}`
-                          : karmaImage) ||
-                        (daoName === "optimism"
-                          ? OPLogo
-                          : daoName === "arbitrum"
-                          ? ArbLogo
-                          : ccLogo)
-                      }
-                      alt="user"
-                      width={256}
-                      height={256}
-                      className={
-                        userData.displayImage
-                          ? "w-full xs:w-28 xs:h-28 sm:w-36 sm:h-36 lg:w-40 lg:h-40 rounded-3xl"
-                          : "w-14 h-14 sm:w-20 sm:h-20 lg:w-20 lg:h-20 rounded-3xl"
-                      }
-                    />
+                  <Image
+                    src={
+                      (userData.displayImage
+                        ? `https://gateway.lighthouse.storage/ipfs/${userData.displayImage}`
+                        : karmaImage) ||
+                      (daoName === "optimism"
+                        ? OPLogo
+                        : daoName === "arbitrum"
+                        ? ArbLogo
+                        : ccLogo)
+                    }
+                    alt="user"
+                    width={256}
+                    height={256}
+                    className={
+                      userData.displayImage
+                        ? "w-full xs:w-28 xs:h-28 sm:w-36 sm:h-36 lg:w-40 lg:h-40 rounded-3xl"
+                        : "w-14 h-14 sm:w-20 sm:h-20 lg:w-20 lg:h-20 rounded-3xl"
+                    }
+                  />
                   {/* </div> */}
 
-                    <Image
-                      src={ccLogo}
-                      alt="ChoraClub Logo"
-                      className="absolute top-0 right-0 bg-white rounded-full"
-                      style={{
-                        width: "30px",
-                        height: "30px",
-                        marginTop: "10px",
-                        marginRight: "10px",
-                      }}
-                    />
-                  </div>
+                  <Image
+                    src={ccLogo}
+                    alt="ChoraClub Logo"
+                    className="absolute top-0 right-0 bg-white rounded-full"
+                    style={{
+                      width: "30px",
+                      height: "30px",
+                      marginTop: "10px",
+                      marginRight: "10px",
+                    }}
+                  />
                 </div>
+              </div>
 
               <div className="px-4 mt-4 xs:mt-0 md:mt-2 lg:mt-4 w-full xs:w-auto">
                 <div className=" flex items-center py-1">
@@ -1050,11 +1051,11 @@ function MainProfile() {
                   </div>
                 </div>
 
-                  <div className="flex items-center py-1">
-                    <div>
-                      {`${address}`.substring(0, 6)} ...{" "}
-                      {`${address}`.substring(`${address}`.length - 4)}
-                    </div>
+                <div className="flex items-center py-1">
+                  <div>
+                    {`${address}`.substring(0, 6)} ...{" "}
+                    {`${address}`.substring(`${address}`.length - 4)}
+                  </div>
 
                   <Tooltip
                     content="Copy"
@@ -1095,17 +1096,17 @@ function MainProfile() {
                   </div>
                 </div>
 
-                  {isFollowingModalOpen && (
-                    <FollowingModal
-                      userFollowings={userFollowings}
-                      toggleFollowing={toggleFollowing}
-                      toggleNotification={toggleNotification}
-                      setIsFollowingModalOpen={setIsFollowingModalOpen}
-                      isLoading={isLoading}
-                      handleUpdateFollowings={handleUpdateFollowings}
-                      daoName={daoName}
-                    />
-                  )}
+                {isFollowingModalOpen && (
+                  <FollowingModal
+                    userFollowings={userFollowings}
+                    toggleFollowing={toggleFollowing}
+                    toggleNotification={toggleNotification}
+                    setIsFollowingModalOpen={setIsFollowingModalOpen}
+                    isLoading={isLoading}
+                    handleUpdateFollowings={handleUpdateFollowings}
+                    daoName={daoName}
+                  />
+                )}
 
                 {selfDelegate === false ? (
                   <div className="pt-2 flex flex-col xs:flex-row gap-2 sm:gap-5 w-full">
@@ -1166,173 +1167,178 @@ function MainProfile() {
           </div>
 
           <div className=" ">
-          <div 
-      className="md:hidden mt-4 px-8 xs:px-4 sm:px-8 py-2 sm:py-[10px] bg-[#D9D9D945]" 
-      ref={dropdownRef}
-      onMouseLeave={handleMouseLeave}
-    >
-      <div 
-        className="w-full flex justify-between items-center text-left font-normal rounded-full capitalize text-lg text-blue-shade-100 bg-white px-4 py-2 cursor-pointer"
-        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-        onMouseEnter={handleMouseEnter}
-      >
-        <span>{selectedTab}</span>
-        <ChevronDownIcon
-          className={`w-4 h-4 transition-transform duration-700 ${
-            isDropdownOpen ? 'rotate-180' : ''
-          }`}
-        />
-      </div>
-      <div 
-        className={`w-[calc(100vw-2rem)] mt-1 overflow-hidden transition-all duration-700 ease-in-out ${
-          isDropdownOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
-        }`}
-      >
-        <div className="p-2 border border-white-shade-100 rounded-xl bg-white shadow-md">
-          {tabs.map((tab, index) => (
-            <React.Fragment key={tab.value}>
+            <div
+              className="md:hidden mt-4 px-8 xs:px-4 sm:px-8 py-2 sm:py-[10px] bg-[#D9D9D945]"
+              ref={dropdownRef}
+              onMouseLeave={handleMouseLeave}
+            >
               <div
-                onClick={() => handleTabChange(tab.value)}
-                className="px-3 py-2 rounded-lg transition duration-300 ease-in-out hover:bg-gray-100 capitalize text-base cursor-pointer"
+                className="w-full flex justify-between items-center text-left font-normal rounded-full capitalize text-lg text-blue-shade-100 bg-white px-4 py-2 cursor-pointer"
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                onMouseEnter={handleMouseEnter}
               >
-                {tab.name}
+                <span>{selectedTab}</span>
+                <ChevronDownIcon
+                  className={`w-4 h-4 transition-transform duration-700 ${
+                    isDropdownOpen ? "rotate-180" : ""
+                  }`}
+                />
               </div>
-              {index !== tabs.length - 1 && <hr className="my-1" />}
-            </React.Fragment>
-          ))}
-        </div>
-      </div>
-    </div>
+              <div
+                className={`w-[calc(100vw-2rem)] mt-1 overflow-hidden transition-all duration-700 ease-in-out ${
+                  isDropdownOpen
+                    ? "max-h-[500px] opacity-100"
+                    : "max-h-0 opacity-0"
+                }`}
+              >
+                <div className="p-2 border border-white-shade-100 rounded-xl bg-white shadow-md">
+                  {tabs.map((tab, index) => (
+                    <React.Fragment key={tab.value}>
+                      <div
+                        onClick={() => handleTabChange(tab.value)}
+                        className="px-3 py-2 rounded-lg transition duration-300 ease-in-out hover:bg-gray-100 capitalize text-base cursor-pointer"
+                      >
+                        {tab.name}
+                      </div>
+                      {index !== tabs.length - 1 && <hr className="my-1" />}
+                    </React.Fragment>
+                  ))}
+                </div>
+              </div>
+            </div>
 
-            <div className={`bg-[#D9D9D945] hidden md:flex overflow-x-auto whitespace-nowrap gap-6 xs:gap-8 sm:gap-12 pl-6 xs:pl-8 sm:pl-16 ${style.hideScrollbarColor} ${style.scrollContainter}`}>
-            <button
-              className={`border-b-2 py-3 xs:py-4 px-2 outline-none flex-shrink-0 ${
-                searchParams.get("active") === "info"
-                  ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
-                  : "border-transparent"
-              }`}
-              onClick={() => router.push(path + "?active=info")}
+            <div
+              className={`bg-[#D9D9D945] hidden md:flex overflow-x-auto whitespace-nowrap gap-6 xs:gap-8 sm:gap-12 pl-6 xs:pl-8 sm:pl-16 ${style.hideScrollbarColor} ${style.scrollContainter}`}
             >
-              Info
-            </button>
-            {selfDelegate === true && (
               <button
                 className={`border-b-2 py-3 xs:py-4 px-2 outline-none flex-shrink-0 ${
-                  searchParams.get("active") === "votes"
+                  searchParams.get("active") === "info"
                     ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
                     : "border-transparent"
                 }`}
-                onClick={() => router.push(path + "?active=votes")}
+                onClick={() => router.push(path + "?active=info")}
               >
-                Past Votes
+                Info
               </button>
-            )}
-            <button
-              className={`border-b-2 py-3 xs:py-4 px-2 outline-none flex-shrink-0 ${
-                searchParams.get("active") === "sessions"
-                  ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
-                  : "border-transparent"
-              }`}
-              onClick={() =>
-                router.push(
-                  path +
-                    `?active=sessions&session=${
-                      selfDelegate ? "schedule" : "attending"
-                    }`
-                )
-              }
-            >
-              Sessions
-            </button>
-            <button
-              className={`border-b-2 py-3 xs:py-4 px-2 outline-none flex-shrink-0 ${
-                searchParams.get("active") === "officeHours"
-                  ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
-                  : "border-transparent"
-              }`}
-              onClick={() =>
-                router.push(path + "?active=officeHours&hours=schedule")
-              }
-            >
-              Office Hours
-            </button>
-
-            {selfDelegate === true && (
+              {selfDelegate === true && (
+                <button
+                  className={`border-b-2 py-3 xs:py-4 px-2 outline-none flex-shrink-0 ${
+                    searchParams.get("active") === "votes"
+                      ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
+                      : "border-transparent"
+                  }`}
+                  onClick={() => router.push(path + "?active=votes")}
+                >
+                  Past Votes
+                </button>
+              )}
               <button
                 className={`border-b-2 py-3 xs:py-4 px-2 outline-none flex-shrink-0 ${
-                  searchParams.get("active") === "instant-meet"
+                  searchParams.get("active") === "sessions"
                     ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
                     : "border-transparent"
                 }`}
-                onClick={() => router.push(path + "?active=instant-meet")}
-              >
-                Instant Meet
-              </button>
-            )}
-          </div>
-
-          <div>
-            {searchParams.get("active") === "info" ? (
-              <div className="pt-2 xs:pt-4 sm:pt-6 px-4 md:px-6 lg:px-14">
-              <UserInfo
-                karmaDesc={karmaDesc}
-                description={description}
-                isDelegate={isDelegate}
-                isSelfDelegate={selfDelegate}
-                // descAvailable={descAvailable}
-                onSaveButtonClick={(newDescription?: string) =>
-                  handleSave(newDescription)
+                onClick={() =>
+                  router.push(
+                    path +
+                      `?active=sessions&session=${
+                        selfDelegate ? "schedule" : "attending"
+                      }`
+                  )
                 }
-                isLoading={isLoading}
-                daoName={daoName}
-              />
-              </div>
-            ) : (
-              ""
-            )}
-            {selfDelegate === true && searchParams.get("active") === "votes" ? (
-              <div className="pt-2 xs:pt-4 sm:pt-6 px-4 md:px-6 lg:px-14">
-              <UserVotes daoName={daoName} />
-              </div>
-            ) : (
-              ""
-            )}
-            {searchParams.get("active") === "sessions" ? (
-              // <div className="pt-2 xs:pt-4 sm:pt-6 px-4 md:px-6 lg:px-14">
-              <UserSessions
-                isDelegate={isDelegate}
-                selfDelegate={selfDelegate}
-                daoName={daoName}
-              />
-              // </div>
-            ) : (
-              ""
-            )}
-            {searchParams.get("active") === "officeHours" ? (
-              <div className="pt-2 xs:pt-4 sm:pt-6 px-4 md:px-6 lg:px-14">
-              <UserOfficeHours
-                isDelegate={isDelegate}
-                selfDelegate={selfDelegate}
-                daoName={daoName}
-              />
-              </div>
-            ) : (
-              ""
-            )}
+              >
+                Sessions
+              </button>
+              <button
+                className={`border-b-2 py-3 xs:py-4 px-2 outline-none flex-shrink-0 ${
+                  searchParams.get("active") === "officeHours"
+                    ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
+                    : "border-transparent"
+                }`}
+                onClick={() =>
+                  router.push(path + "?active=officeHours&hours=schedule")
+                }
+              >
+                Office Hours
+              </button>
 
-            {selfDelegate === true &&
-            searchParams.get("active") === "instant-meet" ? (
-              <div className="pt-2 xs:pt-4 sm:pt-6 px-4 md:px-6 lg:px-14">
-              <InstantMeet
-                isDelegate={isDelegate}
-                selfDelegate={selfDelegate}
-                daoName={daoName}
-              />
-              </div>
-            ) : (
-              ""
-            )}
-          </div>
+              {selfDelegate === true && (
+                <button
+                  className={`border-b-2 py-3 xs:py-4 px-2 outline-none flex-shrink-0 ${
+                    searchParams.get("active") === "instant-meet"
+                      ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
+                      : "border-transparent"
+                  }`}
+                  onClick={() => router.push(path + "?active=instant-meet")}
+                >
+                  Instant Meet
+                </button>
+              )}
+            </div>
+
+            <div>
+              {searchParams.get("active") === "info" ? (
+                <div className="pt-2 xs:pt-4 sm:pt-6 px-4 md:px-6 lg:px-14">
+                  <UserInfo
+                    karmaDesc={karmaDesc}
+                    description={description}
+                    isDelegate={isDelegate}
+                    isSelfDelegate={selfDelegate}
+                    // descAvailable={descAvailable}
+                    onSaveButtonClick={(newDescription?: string) =>
+                      handleSave(newDescription)
+                    }
+                    isLoading={isLoading}
+                    daoName={daoName}
+                  />
+                </div>
+              ) : (
+                ""
+              )}
+              {selfDelegate === true &&
+              searchParams.get("active") === "votes" ? (
+                <div className="pt-2 xs:pt-4 sm:pt-6 px-4 md:px-6 lg:px-14">
+                  <UserVotes daoName={daoName} />
+                </div>
+              ) : (
+                ""
+              )}
+              {searchParams.get("active") === "sessions" ? (
+                // <div className="pt-2 xs:pt-4 sm:pt-6 px-4 md:px-6 lg:px-14">
+                <UserSessions
+                  isDelegate={isDelegate}
+                  selfDelegate={selfDelegate}
+                  daoName={daoName}
+                />
+              ) : (
+                // </div>
+                ""
+              )}
+              {searchParams.get("active") === "officeHours" ? (
+                <div className="pt-2 xs:pt-4 sm:pt-6 px-4 md:px-6 lg:px-14">
+                  <UserOfficeHours
+                    isDelegate={isDelegate}
+                    selfDelegate={selfDelegate}
+                    daoName={daoName}
+                  />
+                </div>
+              ) : (
+                ""
+              )}
+
+              {selfDelegate === true &&
+              searchParams.get("active") === "instant-meet" ? (
+                <div className="pt-2 xs:pt-4 sm:pt-6 px-4 md:px-6 lg:px-14">
+                  <InstantMeet
+                    isDelegate={isDelegate}
+                    selfDelegate={selfDelegate}
+                    daoName={daoName}
+                  />
+                </div>
+              ) : (
+                ""
+              )}
+            </div>
           </div>
         </div>
       ) : (
