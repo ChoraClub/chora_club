@@ -12,38 +12,6 @@ import {
 } from "@/utils/NotificationUtils";
 import { imageCIDs } from "@/config/staticDataUtils";
 import { SessionInterface } from "@/types/MeetingTypes";
-import { uploadFile } from "@/actions/uploadFile";
-
-import lighthouse from "@lighthouse-web3/sdk";
-import { NFT_LIGHTHOUSE_BASE_API_KEY } from "@/config/constants";
-import { Buffer } from "buffer";
-
-// const uploadFile = async (arrayBuffer: ArrayBuffer) => {
-//   // console.log("arrayBuffer", arrayBuffer);
-//   try {
-//     const apiKey = NFT_LIGHTHOUSE_BASE_API_KEY || "";
-//     if (!apiKey) {
-//       throw new Error("Lighthouse API key is not set");
-//     }
-
-//     const file = Buffer.from(arrayBuffer);
-
-//     console.log("file:::", file);
-//     const files = new File([file], "image.png", { type: "image/png" });
-
-//     const uploadResponse = await lighthouse.uploadBuffer(file, apiKey);
-
-//     if (!uploadResponse || !uploadResponse.data) {
-//       throw new Error("Upload failed: Invalid response from Lighthouse");
-//     }
-
-//     // console.log("Upload successful:", uploadResponse.data);
-//     return uploadResponse.data;
-//   } catch (error: any) {
-//     console.error("Error uploading to Lighthouse:", error.message);
-//     throw error;
-//   }
-// };
 
 function getRandomElementFromArray(arr: any[]) {
   const randomIndex = Math.floor(Math.random() * arr.length);
@@ -65,31 +33,6 @@ export async function POST(req: NextRequest) {
     thumbnail_image,
     session_type,
   }: SessionInterface = await req.json();
-  let nft_image;
-  try {
-    const myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-    const requestOptions = {
-      method: "GET",
-      headers: myHeaders,
-    };
-    const imageResponse = await fetch(
-      `${BASE_URL}/api/images/og/nft?daoName=${dao_name}&meetingId=${meetingId}`,
-      requestOptions
-    );
-    
-
-    try {
-      const result = await uploadFile(imageResponse);
-      console.log("Upload result:", result);
-      console.log("Hash:", result.Hash);
-      nft_image = `ipfs://` + result.Hash;
-    } catch (error) {
-      console.error("Error in uploading file:", error);
-    }
-  } catch (error) {
-    console.log("Error in generating OG image:::", error);
-  }
 
   try {
     const client = await connectDB();
@@ -112,7 +55,6 @@ export async function POST(req: NextRequest) {
       description,
       thumbnail_image: randomImage,
       session_type,
-      nft_image,
     });
 
     if (result.insertedId) {

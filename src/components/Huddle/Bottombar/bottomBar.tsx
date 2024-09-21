@@ -33,6 +33,8 @@ import {
 import { SessionInterface } from "@/types/MeetingTypes";
 import QuickLinks from "./QuickLinks";
 import { handleCloseMeeting, handleStopRecording } from "../HuddleUtils";
+import { BASE_URL } from "@/config/constants";
+import { uploadFile } from "@/actions/uploadFile";
 
 const BottomBar = ({
   daoName,
@@ -158,6 +160,31 @@ const BottomBar = ({
       setShowLeaveDropDown(false);
     } else if (endMeet === "close") {
       if (role === "host") {
+        let nft_image;
+        try {
+          const myHeaders = new Headers();
+          myHeaders.append("Content-Type", "application/json");
+          const requestOptions = {
+            method: "GET",
+            headers: myHeaders,
+          };
+          const imageResponse = await fetch(
+            `${BASE_URL}/api/images/og/nft?daoName=${daoName}&meetingId=${roomId}`,
+            requestOptions
+          );
+
+          try {
+            const arrayBuffer = await imageResponse.arrayBuffer();
+            const result = await uploadFile(arrayBuffer, daoName, roomId);
+            console.log("Upload result:", result);
+            console.log("Hash:", result.Hash);
+            nft_image = `ipfs://` + result.Hash;
+          } catch (error) {
+            console.error("Error in uploading file:", error);
+          }
+        } catch (error) {
+          console.log("Error in generating OG image:::", error);
+        }
         try {
           const myHeaders = new Headers();
           myHeaders.append("Content-Type", "application/json");
@@ -172,6 +199,7 @@ const BottomBar = ({
               meetingType: meetingCategory,
               recordedStatus: meetingStatus,
               meetingStatus: meetingStatus === true ? "Recorded" : "Finished",
+              nft_image: nft_image,
             }),
           };
 
