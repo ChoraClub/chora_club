@@ -168,7 +168,7 @@ function RewardsMain() {
   };
 
   const fetchReward = async () => {
-    const data = await nft_client.query(REWARD_QUERY, { address: '0x3013bb4e03a7b81106d69c10710eae148c8410e1' }).toPromise();
+    const data = await nft_client.query(REWARD_QUERY, { address: address }).toPromise();
     const response = await fetch(
       "https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd"
     );
