@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/config/connectDB";
 
 export async function PUT(req: NextRequest, res: NextResponse) {
-  const { meetingId, meetingType, recordedStatus, meetingStatus } =
+  const { meetingId, meetingType, recordedStatus, meetingStatus, nft_image } =
     await req.json();
 
   console.log(
@@ -42,6 +42,7 @@ export async function PUT(req: NextRequest, res: NextResponse) {
           $set: {
             isMeetingRecorded: recordedStatus,
             meeting_status: meetingStatus,
+            nft_image: nft_image,
           },
         },
         { returnDocument: "after" }

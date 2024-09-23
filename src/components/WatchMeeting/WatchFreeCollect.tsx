@@ -272,9 +272,13 @@ const WatchFreeCollect = ({
       const jsonBlob = new Blob([JSON.stringify(jsonData)], {
         type: "application/json",
       });
-      const jsonFile = new File([jsonBlob], "metadata.json", {
-        type: "application/json",
-      });
+      const jsonFile = new File(
+        [jsonBlob],
+        `${data.meetingId}-${data.dao_name}-metadata.json`,
+        {
+          type: "application/json",
+        }
+      );
       const jsonUploadResponse = await lighthouse.upload([jsonFile], API_KEY);
       const jsonCid = jsonUploadResponse.data.Hash;
 
@@ -287,7 +291,7 @@ const WatchFreeCollect = ({
       });
       const tokenMetadataJsonFile = new File(
         [tokenMetadataJsonBlob],
-        "metadata.json",
+        `${data.meetingId}-${data.dao_name}-token-metadata.json`,
         {
           type: "application/json",
         }
