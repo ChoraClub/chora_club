@@ -17,7 +17,7 @@ const WalletAndPublicClient = () => {
 
   const { chain } = useAccount();
 
-  console.log("chain: ", chain?.name);
+  // console.log("chain: ", chain?.name);
 
   if (chain?.name === "OP Mainnet") {
     chainName = optimism;
@@ -36,7 +36,7 @@ const WalletAndPublicClient = () => {
     });
     walletClient = createWalletClient({
       chain: chainName,
-      transport: custom(window.ethereum!),
+      transport: custom(window.ethereum),
     });
 
     // Now you can use publicClient and walletClient as needed

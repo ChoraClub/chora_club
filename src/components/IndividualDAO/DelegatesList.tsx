@@ -363,20 +363,20 @@ function DelegatesList({ props }: { props: string }) {
   };
 
   const handleDelegateVotes = async (to: string) => {
-    let address;
-    let address1;
+    // let address;
+    // let address1;
 
-    try {
-      address = await walletClient.getAddresses();
-      address1 = address[0];
-    } catch (error) {
-      console.error("Error getting addresses:", error);
-      toast.error("Please connect your MetaMask wallet!");
-      return;
-    }
+    // try {
+    //   address = await walletClient.getAddresses();
+    //   address1 = address[0];
+    // } catch (error) {
+    //   console.error("Error getting addresses:", error);
+    //   toast.error("Please connect your MetaMask wallet!");
+    //   return;
+    // }
 
-    if (!address1) {
-      toast.error("Please connect your MetaMask wallet!");
+    if (!address) {
+      toast.error("Please connect your wallet!");
       return;
     }
 
@@ -397,13 +397,14 @@ function DelegatesList({ props }: { props: string }) {
       if (walletClient?.chain.name === network) {
         try {
           setDelegatingToAddr(true);
+          console.log("address::::: ", address);
           const delegateTx = await walletClient.writeContract({
             address: chainAddress,
             chain: props === "arbitrum" ? arbitrum : optimism,
             abi: dao_abi.abi,
             functionName: "delegate",
             args: [to],
-            account: address1,
+            account: address,
           });
 
           setDelegatingToAddr(false);
