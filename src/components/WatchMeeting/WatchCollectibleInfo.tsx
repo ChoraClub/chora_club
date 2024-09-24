@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { RxCross2 } from "react-icons/rx";
+import { Holder } from "@/types/LeaderBoardTypes";
 import { UserProfileInterface } from "@/types/UserProfileTypes";
 import {
   DynamicAttendeeInterface,
@@ -15,9 +16,11 @@ interface Meeting extends SessionInterface {
 }
 
 const WatchCollectibleInfo = ({
+  leaderBoardData,
   data,
   collection,
 }: {
+  leaderBoardData:Holder,
   data: Meeting;
   collection: string;
 }) => {
@@ -49,10 +52,10 @@ const WatchCollectibleInfo = ({
           <p className="my-2">Total Collected</p>
         </div>
         <div className="font-normal my-2 text-blue-shade-100">
-          <p className="my-2">2 Weeks ago</p>
-          <p className="my-2">1 day ago</p>
-          <p className="my-2">163(99%)</p>
-          <p className="my-2">164</p>
+          <p className="my-2">{leaderBoardData.firstCollector?.timestamp}</p>
+          <p className="my-2">{leaderBoardData.latestCollector?.timestamp}</p>
+          <p className="my-2">{leaderBoardData?.selectedToken?.holders1155?.length} ( {((leaderBoardData?.selectedToken?.holders1155?.length/leaderBoardData?.maxSupply)*100).toFixed(2)}% )</p>
+          <p className="my-2">{leaderBoardData?.maxSupply}</p>
         </div>
       </div>
     </div>

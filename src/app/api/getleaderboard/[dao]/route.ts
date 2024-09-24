@@ -1,6 +1,24 @@
 import type { NextRequest } from "next/server";
 import { connectDB } from "@/config/connectDB";
-
+import { nft_client } from "@/config/staticDataUtils";
+const GET_CLAIMED_NFTS = `
+  query GetClaimedNFTs($addresses: [String!]!) {
+    token1155Holders(where: {user_in: $addresses}) {
+      user
+      balance
+    }
+  }
+`;
+async function getClaimedNFTs(addresses: string[]): Promise<Record<string, number>> {
+  const result = await nft_client.query(GET_CLAIMED_NFTS, { addresses }).toPromise();
+  if (result.error) {
+    throw new Error(`GraphQL query failed: ${result.error.message}`);
+  }
+  return result.data.token1155Holders.reduce((acc: Record<string, number>, holder: { user: string, balance: string }) => {
+    acc[holder.user.toLowerCase()] = parseInt(holder.balance, 10);
+    return acc;
+  }, {});
+}
 // Function to calculate CC_SCORE
 function calculateCCScore(data: any[]) {
   let MinSessionCount = Infinity,
@@ -153,7 +171,7 @@ export async function GET(req: NextRequest) {
         $project: {
           delegate_address: "$_id",
           sessionCount: 1,
-          ClaimedNFT: 1,
+          // ClaimedNFT: 1,
           totalViews: 1, // Include totalViews in the final projection
           ratingCount: 1,
           averageRating: {
@@ -171,6 +189,16 @@ export async function GET(req: NextRequest) {
     ];
 
     let result = await meetingsCollection.aggregate(pipeline).toArray();
+      // Fetch ClaimedNFT data from subgraph
+      const addresses = result.map(item => item.delegate_address);
+      const claimedNFTs = await getClaimedNFTs(addresses);
+
+       // Merge ClaimedNFT data with the result
+    result = result.map(item => ({
+      ...item,
+      ClaimedNFT: claimedNFTs[item.delegate_address.toLowerCase()] || 0
+    }));
+
     result = calculateCCScore(result);
     // console.log(result);
 

@@ -46,6 +46,7 @@ import ProposalMainVotersSkeletonLoader from "../SkeletonLoader/ProposalMainVote
 import ProposalMainDescriptionSkeletonLoader from "../SkeletonLoader/ProposalMainDescriptionSkeletonLoader";
 import DOMPurify from "dompurify";
 import MobileResponsiveMessage from "../MobileResponsiveMessage/MobileResponsiveMessage";
+import { Transaction } from "ethers";
 
 // Create a client
 const client = createPublicClient({
