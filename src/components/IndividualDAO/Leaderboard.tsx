@@ -14,7 +14,6 @@ import LeaderboardSkeleton from "../SkeletonLoader/LeaderboardSkeletonLoader";
 import first from "@/assets/images/Leaderboard/first.svg";
 import second from "@/assets/images/Leaderboard/second.svg";
 import third from "@/assets/images/Leaderboard/third.svg";
-
 interface DelegateData {
   address: string;
   sessionCount: number;
@@ -256,7 +255,6 @@ function Leaderboard({ props }: { props: string }) {
                         label: "NFTs Claimed",
                         tooltip:
                           "Number of NFTs collected from hosted sessions.",
-                        content: "Coming Soon",
                         align: "left",
                       },
                       {
@@ -295,11 +293,6 @@ function Leaderboard({ props }: { props: string }) {
                         {hoveredTitle === item.label.toLowerCase() && (
                           <div className="absolute top-[-60px] left-1/2 transform -translate-x-1/2 bg-gray-700 text-white text-xs rounded p-2 w-64">
                             {item.tooltip}
-                          </div>
-                        )}
-                        {item.content && (
-                          <div className="mt-1 text-xs text-center bg-yellow-200 text-yellow-800 rounded-md p-1">
-                            {item.content}
                           </div>
                         )}
                       </div>
@@ -363,7 +356,7 @@ function Leaderboard({ props }: { props: string }) {
                       <div className="text-center my-1 w-[100px]">
                         <div
                           className={`${delegate.textColor} font-bold text-lg`}>
-                          -
+                          {delegate.claimedNFT}
                         </div>
                       </div>
                       <div className="text-center mx-3 my-1 w-[110px]">

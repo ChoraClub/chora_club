@@ -16,6 +16,9 @@ import { ethers } from "ethers";
 import lighthouse from "@lighthouse-web3/sdk";
 import { IoArrowUpOutline } from "react-icons/io5";
 import { RxCross2 } from "react-icons/rx";
+import { Holder } from "@/types/LeaderBoardTypes";
+
+// const WatchFreeCollect = ({leaderBoardData}:{leaderBoardData:Holder}) => {
 // import { BasicMintIcons, MinusIcon, PlusIcon } from "@/utils/MintIcons";
 import styles from "./WatchSession.module.css";
 import { NFT_LIGHTHOUSE_BASE_API_KEY } from "@/config/constants";
@@ -49,9 +52,11 @@ const TARGET_CHAIN_ID = 421614;
 const API_KEY = NFT_LIGHTHOUSE_BASE_API_KEY || "";
 
 const WatchFreeCollect = ({
+  leaderBoardData,
   data,
   collection,
 }: {
+  leaderBoardData:Holder,
   data: Meeting;
   collection: string;
 }) => {
@@ -360,7 +365,9 @@ const WatchFreeCollect = ({
             <p className="font-bold text-lg text-white">Free NFT</p>
           </div>
           <div className="px-3 py-1 bg-blue-700 rounded-full transition-transform duration-300 hover:scale-105">
-            <p className="text-blue-100 font-medium text-sm">0 Collected</p>
+            <p className="text-blue-100 font-medium text-sm">
+              {leaderBoardData?.maxSupply} Collected
+            </p>
           </div>
         </div>
 
