@@ -1,11 +1,7 @@
-import RewardsMain from "@/components/ClaimReward/Rewardmain";
+// import RewardsMain from "@/components/ClaimReward/Rewardmain";
 import React from "react";
 function page() {
-  return (
-    <>
-      <RewardsMain/>
-    </>
-  );
+  return <>{/* <RewardsMain /> */}</>;
 }
 
 export default page;
