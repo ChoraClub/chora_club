@@ -31,17 +31,6 @@ const WatchCollectibleInfo = ({
         <p className="font-medium xl:text-base 1.7xl:text-lg text-blue-shade-100">
           Collectibles Info
         </p>
-        {showComingSoon && (
-          <div className="flex items-center bg-yellow-100 border border-yellow-400 rounded-full px-2 ml-4">
-            <p className="text-sm text-yellow-700 mr-2">Coming Soon</p>
-            <button
-              onClick={() => setShowComingSoon(false)}
-              className="text-yellow-700 hover:text-yellow-800"
-            >
-              <RxCross2 size={12} />
-            </button>
-          </div>
-        )}
       </div>
       <div className="w-full h-[0.1px] bg-black-shade-200"></div>
       <div className="flex xl:gap-x-20 gap-x-14 1.7xl:text-sm text-xs">

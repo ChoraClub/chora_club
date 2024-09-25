@@ -13,6 +13,8 @@ import { gql } from "urql";
 import { nft_client } from "@/config/staticDataUtils";
 import NFTTile from "./NFTTile";
 import logo from "@/assets/images/daos/CCLogo2.png";
+import { getRelativeTime } from "../../utils/getRelativeTime";
+import { getTimestampFromBlock } from "../../utils/getTimestampFromBlock";
 import {
   useAccount,
   useChainId,
@@ -54,14 +56,22 @@ const REWARD_QUERY = gql`
 
 const MINTED_NFTS = gql`
   query MyQuery($address: String!) {
-    token1155Holders(where: { user: $address }) {
+    token1155Holders(
+      orderBy: lastUpdatedBlock
+      orderDirection: desc
+      where: { user: $address }
+    ) {
       balance
       user
+      lastUpdatedBlock
       tokenAndContract {
         metadata {
           image
           name
-          animationUrl
+          rawJson
+        }
+        txn {
+          network
         }
         address
       }
@@ -166,28 +176,11 @@ function RewardsMain() {
   const chainId = useChainId();
   const [claimableRewards, setClaimableRewards] = useState<Reward[]>([]);
   const [mintedNFTs, setMintedNFTs] = useState<any[]>([]);
+  const [ethToUsdConversionRate, setEthToUsdConversionRate] = useState(0);
 
   const nonZeroRewards = claimableRewards.filter(
     (reward) => parseFloat(reward.amount) > 0
   );
-
-  const { data: hash, writeContract, isPending, isError } = useWriteContract();
-
-  const { data: accountBalance, isLoading } = useReadContract({
-    abi: protocolRewardsABI,
-    address:
-      protocolRewardsAddress[chainId as keyof typeof protocolRewardsAddress],
-    functionName: "balanceOf",
-    args: [address as Address],
-  });
-
-  const recipient = address;
-  const withdrawAmount = BigInt(accountBalance || 0) / BigInt(2);
-
-  const handleSelectChange = (selectedOption: string) => {
-    // console.log(`Selected chain: ${selectedOption}`);
-    // Add your logic here to handle the change
-  };
 
   const fetchReward = async () => {
     const data = await nft_client
@@ -198,6 +191,7 @@ function RewardsMain() {
     );
     const coingeckoData = await response.json();
     // console.log("here data is ", data, coingeckoData.ethereum.usd);
+    setEthToUsdConversionRate(coingeckoData.ethereum.usd);
     if (data.data.rewardsPerUsers.length < 1) {
       setTotalRewards({ amount: "0.0 ", value: "$0.0" });
       return;
@@ -223,6 +217,7 @@ function RewardsMain() {
         logo: reward.id.includes("op") ? oplogo : arblogo, // Example condition to set logo
       })) || [];
     setClaimableRewards(Rewards);
+    // console.log(claimableRewards);
   };
   useEffect(() => {
     if (address) {
@@ -232,18 +227,73 @@ function RewardsMain() {
   }, [address]);
 
   const fetchNFTs = async () => {
-    const result = await nft_client
-      .query(MINTED_NFTS, { address: address })
-      .toPromise();
-    const nfts =
-      result?.data.token1155Holders?.map((nft: any) => ({
-        id: nft.tokenAndContract.metadata?.name,
-        thumbnail: nft.tokenAndContract.metadata?.image,
-        balance: nft.balance,
-        contract: nft.tokenAndContract.address,
-      })) || [];
-    // console.log("minted nfts", nfts);
-    setMintedNFTs(nfts);
+    try {
+      // Query the NFT data
+      const result = await nft_client
+        .query(MINTED_NFTS, { address: address })
+        .toPromise();
+      // console.log("result", result);
+
+      const nfts = await Promise.all(
+        result?.data.token1155Holders?.map(async (nft: any) => {
+          // Check if tokenAndContract and metadata exist and are not null
+          if (!nft?.tokenAndContract?.metadata?.rawJson) {
+            console.warn("Missing metadata for NFT:", nft);
+            return null; // Skip this NFT if metadata or rawJson is missing
+          }
+
+          const jsondata = JSON.parse(nft.tokenAndContract.metadata.rawJson);
+
+          // Get timestamp from block number
+          const timestamp = await getTimestampFromBlock(nft.lastUpdatedBlock);
+
+          return {
+            id: nft.tokenAndContract.metadata.name || "Unknown",
+            thumbnail: nft.tokenAndContract.metadata.image || "",
+            balance: nft.balance,
+            contract: nft.tokenAndContract.address,
+            network: nft.tokenAndContract.txn.network,
+            // Get the relative time using the fetched timestamp
+            time: getRelativeTime(timestamp),
+            host: jsondata?.attributes?.[0]?.value,
+          };
+        }) || []
+      );
+
+      // Filter out any null results in case of missing data
+      const validNfts = nfts.filter((nft) => nft !== null);
+
+      // Set the processed NFTs into state
+      setMintedNFTs(validNfts);
+    } catch (error) {
+      console.error("Error fetching NFTs:", error);
+    }
+  };
+
+  const { data: hash, writeContract, isPending, isError } = useWriteContract();
+
+  const { data: accountBalance, isLoading } = useReadContract({
+    abi: protocolRewardsABI,
+    address:
+      protocolRewardsAddress[chainId as keyof typeof protocolRewardsAddress],
+    functionName: "balanceOf",
+    args: [address as Address],
+  });
+
+  const recipient = address;
+  const withdrawAmount = BigInt(accountBalance || 0) / BigInt(2);
+
+  // withdraw amount is half of the balance
+  const rewardBalanceInETH: any = Number(
+    formatEther(accountBalance || BigInt(0))
+  ).toFixed(5);
+  const rewardBalanceInUSD: any = (
+    rewardBalanceInETH * ethToUsdConversionRate
+  ).toFixed(2);
+
+  const handleSelectChange = (selectedOption: string) => {
+    // console.log(`Selected chain: ${selectedOption}`);
+    // Add your logic here to handle the change
   };
 
   async function submit() {
@@ -260,6 +310,7 @@ function RewardsMain() {
       args: [recipient!, withdrawAmount],
     });
   }
+
   return (
     <>
       <div className="w-full flex justify-end pt-2 xs:pt-4 sm:pt-6 px-4 md:px-6 lg:px-14">
@@ -312,7 +363,9 @@ function RewardsMain() {
                 <span className="text-2xl font-bold">
                   {totalRewards?.amount} ETH
                 </span>
-                <span className="text-gray-500">({totalRewards?.value})</span>
+                <span className="text-gray-500">
+                  (≈ {totalRewards?.value} USD)
+                </span>
               </div>
             </div>
 
@@ -334,15 +387,17 @@ function RewardsMain() {
                           {reward.platform.slice(-4)}
                         </span>
                       </div>
-                      <div className="flex items-center space-x-4">
+                      <div className="flex items-center space-x-2">
                         <div>
                           <div className="font-semibold">
                             {reward.amount} ETH
                           </div>
                           <div className="text-sm text-gray-500">
-                            {reward.value}
+                            ≈ ${rewardBalanceInUSD} USD
                           </div>
                         </div>
+                      </div>
+                      <div className="flex items-center space-x-2">
                         <button
                           className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-4 py-2 rounded-full hover:from-blue-600 hover:to-purple-700 transition-all duration-300 shadow-md hover:shadow-lg flex items-center space-x-2 group"
                           onClick={submit}
@@ -392,20 +447,23 @@ function RewardsMain() {
             <div className="flex justify-between">
               <h2 className="text-xl font-semibold mb-4">Minted NFTs</h2>
               <CustomDropdown
-                options={["Optimism", "Arbitrum"]}
+                options={["Optimism", "Arbitrum", "arbitrum-sepolia"]}
                 onChange={handleSelectChange}
               />
             </div>
             {mintedNFTs.length > 0 ? (
               <>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 sm:gap-10 py-8 font-poppins">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 sm:gap-10 py-8 font-poppins">
                   {mintedNFTs.map((nft) => (
                     <NFTTile
                       key={nft.id}
                       nft={{
                         id: nft.id,
-                        thumbnail: nft.thumbnail_image, // Ensure correct property
+                        thumbnail: nft.thumbnail, // Ensure correct property
                         contract: nft.contract,
+                        network: nft.network,
+                        time: nft.time,
+                        host: nft.host,
                       }}
                     />
                   ))}
@@ -414,8 +472,8 @@ function RewardsMain() {
             ) : (
               <div className="text-center py-8 text-gray-500">
                 {/* <svg className="w-16 h-16 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg> */}
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg> */}
                 <p>No NFTs minted yet. Start creating your collection!</p>
               </div>
             )}

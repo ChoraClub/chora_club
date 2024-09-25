@@ -210,7 +210,6 @@ const WatchFreeCollect = ({
       });
 
       const txHash = await writeContractAsync(parameters);
-      console.log("txHash of minting:", txHash);
     } catch (error) {
       console.error("Minting failed:", error);
     } finally {
@@ -236,7 +235,6 @@ const WatchFreeCollect = ({
         body: raw,
       });
       const responseData = await response.json();
-      console.log("responseData: ", responseData);
       return responseData;
     } catch (error) {
       console.error("Error submitting contract:", error);
@@ -289,7 +287,6 @@ const WatchFreeCollect = ({
 
       setJsonUri(jsonCid);
       setContractUri(`ipfs://${jsonCid}`);
-      console.log("Form submitted with JSON URI:", jsonCid);
 
       const tokenMetadataJsonBlob = new Blob([JSON.stringify(tokenMetadata)], {
         type: "application/json",
