@@ -8,7 +8,7 @@ import {
   useReadContract,
   useWriteContract,
 } from "wagmi";
-import { Address, formatEther } from "viem";
+import { Address, formatEther, parseEther } from "viem";
 import {
   protocolRewardsABI,
   protocolRewardsAddress,
@@ -16,17 +16,15 @@ import {
 
 function RewardButton() {
   const router = useRouter();
+  const { address } = useAccount();
+  const chainId = useChainId();
   const [showTooltip, setShowTooltip] = useState(false);
   const hoverRef = useRef<HTMLDivElement>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-  // const balance = 0.0;
-  // const ethPrice = 0.0;
-  // const formattedBalance = balance.toFixed(3);
-  // const usdBalance = (balance * ethPrice).toFixed(2);
-  const chainId = useChainId();
-  const { address } = useAccount();
+  const [ethToUsdConversionRate, setEthToUsdConversionRate] = useState(0);
 
-  // read the balance of an account on the ProtocolRewards contract
+  const { data: hash, writeContract, isPending, isError } = useWriteContract();
+
   const { data: accountBalance, isLoading } = useReadContract({
     abi: protocolRewardsABI,
     address:
@@ -35,13 +33,30 @@ function RewardButton() {
     args: [address as Address],
   });
 
-  // account that will receive the withdrawn funds
-  const recipient = address;
-
   // withdraw amount is half of the balance
-  const withdrawAmount = BigInt(accountBalance || 0) / BigInt(2);
+  const rewardBalanceInETH: any = Number(
+    formatEther(accountBalance || BigInt(0))
+  ).toFixed(5);
+  const rewardBalanceInUSD: any = (
+    rewardBalanceInETH * ethToUsdConversionRate
+  ).toFixed(2);
 
-  const { data: hash, writeContract, isPending, isError } = useWriteContract();
+  useEffect(() => {
+    const fetchEthToUsdRate = async () => {
+      try {
+        const response = await fetch(
+          "https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd"
+        );
+        const data = await response.json();
+        setEthToUsdConversionRate(data.ethereum.usd);
+        console.log("data.ethereum.usd", data.ethereum.usd);
+      } catch (error) {
+        console.error("Failed to fetch ETH to USD conversion rate:", error);
+      }
+    };
+
+    fetchEthToUsdRate();
+  }, []);
 
   const handleClick = useCallback(() => {
     router.push("/claim-rewards");
@@ -83,7 +98,7 @@ function RewardButton() {
           ) : (
             <>
               <span className="flex items-center">
-                {formatEther(accountBalance || BigInt(0))} ETH
+                {rewardBalanceInETH} ETH
               </span>
             </>
           )}
@@ -99,30 +114,9 @@ function RewardButton() {
                 Rewards Balance
               </h3>
               <p className="text-2xl font-bold text-blue-600 mb-1">
-                {formatEther(accountBalance || BigInt(0))} ETH
+                {rewardBalanceInETH} ETH
               </p>
-              <p className="text-gray-600 mb-4">≈ ${0} USD</p>
-              {1 > 0 ? (
-                <button className="w-full bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition-colors duration-200 font-semibold">
-                  Claim Rewards
-                </button>
-              ) : (
-                <div>
-                  <p className="font-semibold text-gray-700 mb-2">
-                    Earn rewards by:
-                  </p>
-                  <ul className="list-disc list-inside text-blue-500">
-                    <li>
-                      <Link href="/sessions?active=recordedSessions">
-                        Sharing Sessions
-                      </Link>
-                    </li>
-                    <li>
-                      <Link href="/invite">Referring Creators</Link>
-                    </li>
-                  </ul>
-                </div>
-              )}
+              <p className="text-gray-600 mb-4">≈ ${rewardBalanceInUSD} USD</p>
             </div>
           </div>
         )}
