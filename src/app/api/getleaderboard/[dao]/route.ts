@@ -11,14 +11,22 @@ const GET_CLAIMED_NFTS = `
 `;
 async function getClaimedNFTs(addresses: string[]): Promise<Record<string, number>> {
   const result = await nft_client.query(GET_CLAIMED_NFTS, { addresses }).toPromise();
+  
   if (result.error) {
     throw new Error(`GraphQL query failed: ${result.error.message}`);
   }
+
   return result.data.token1155Holders.reduce((acc: Record<string, number>, holder: { user: string, balance: string }) => {
-    acc[holder.user.toLowerCase()] = parseInt(holder.balance, 10);
+    const user = holder.user.toLowerCase();
+    const balance = parseInt(holder.balance, 10);
+    
+    // If the user already exists in the accumulator, sum the balance, otherwise set it
+    acc[user] = (acc[user] || 0) + balance;
+
     return acc;
   }, {});
 }
+
 // Function to calculate CC_SCORE
 function calculateCCScore(data: any[]) {
   let MinSessionCount = Infinity,

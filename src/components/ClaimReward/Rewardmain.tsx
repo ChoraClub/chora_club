@@ -14,6 +14,8 @@ import { useAccount } from "wagmi";
 import { nft_client } from "@/config/staticDataUtils";
 import NFTTile from "./NFTTile";
 import logo from "@/assets/images/daos/CCLogo2.png";
+import { getRelativeTime } from "../../utils/getRelativeTime";
+import{getTimestampFromBlock} from "../../utils/getTimestampFromBlock"; 
 
 interface Reward {
   platform: string;
@@ -43,15 +45,19 @@ query MyQuery($address: String!) {
 
 const MINTED_NFTS = gql`
 query MyQuery($address: String!) {
-  token1155Holders(where: {user: $address}) {
+  token1155Holders(orderBy: lastUpdatedBlock, orderDirection: desc, where: {user: $address}) {
     balance
     user
+    lastUpdatedBlock
     tokenAndContract {
       metadata {
         image
         name
-        animationUrl
+        rawJson
       }
+      txn {
+          network
+        }
       address
     }
   }
@@ -145,18 +151,9 @@ function CustomDropdown({ options, onChange }: CustomDropdownProps) {
 function RewardsMain() {
   const [showComingSoon, setShowComingSoon] = useState(true);
   const [totalRewards, setTotalRewards] = useState<any>({ amount: "0.0", value: "$0.0" });
-  // const totalRewards = { amount: "0.0 ETH", value: "$0.0" };
   const { address } = useAccount();
   const [claimableRewards, setClaimableRewards] = useState<Reward[]>([]);
-  // let claimableRewards: Reward[] = [
-  //   { platform: "Optimism", amount: "0.0 ETH", value: "$0.0", logo: oplogo },
-  //   { platform: "Arbitrum", amount: "0.0 ETH", value: "$0.0", logo: arblogo },
-  // ];
   const [mintedNFTs, setMintedNFTs] = useState<any[]>([]);
-  // const mintedNFTs: NFT[] = [
-  // { id: 1, thumbnail: "path/to/thumbnail1.jpg" },
-  // { id: 2, thumbnail: "path/to/thumbnail2.jpg" },
-  // ];
 
   const nonZeroRewards = claimableRewards.filter(
     (reward) => parseFloat(reward.amount) > 0
@@ -202,16 +199,47 @@ function RewardsMain() {
 
 
   const fetchNFTs = async () => {
-    const result = await nft_client.query(MINTED_NFTS, { address: address }).toPromise();
-    const nfts = result?.data.token1155Holders?.map((nft: any) => ({
-      id: nft.tokenAndContract.metadata.name,
-      thumbnail: nft.tokenAndContract.metadata.image,
-      balance: nft.balance,
-      contract: nft.tokenAndContract.address
-    })) || [];
-    // console.log("minted nfts", nfts);
-    setMintedNFTs(nfts);
+    try {
+      // Query the NFT data
+      const result = await nft_client.query(MINTED_NFTS, { address: address }).toPromise();
+      // console.log("result", result);
+  
+      const nfts = await Promise.all(
+        result?.data.token1155Holders?.map(async (nft: any) => {
+          // Check if tokenAndContract and metadata exist and are not null
+          if (!nft?.tokenAndContract?.metadata?.rawJson) {
+            console.warn('Missing metadata for NFT:', nft);
+            return null; // Skip this NFT if metadata or rawJson is missing
+          }
+  
+          const jsondata = JSON.parse(nft.tokenAndContract.metadata.rawJson);
+  
+          // Get timestamp from block number
+          const timestamp = await getTimestampFromBlock(nft.lastUpdatedBlock);
+  
+          return {
+            id: nft.tokenAndContract.metadata.name || "Unknown",
+            thumbnail: nft.tokenAndContract.metadata.image || "",
+            balance: nft.balance,
+            contract: nft.tokenAndContract.address,
+            network: nft.tokenAndContract.txn.network,
+            // Get the relative time using the fetched timestamp
+            time: getRelativeTime(timestamp),
+            host: jsondata?.attributes?.[0]?.value,
+          };
+        }) || []
+      );
+  
+      // Filter out any null results in case of missing data
+      const validNfts = nfts.filter(nft => nft !== null);
+  
+      // Set the processed NFTs into state
+      setMintedNFTs(validNfts);
+    } catch (error) {
+      console.error('Error fetching NFTs:', error);
+    }
   };
+  
   return (
     <>
       <div className="w-full flex justify-end pt-2 xs:pt-4 sm:pt-6 px-4 md:px-6 lg:px-14">
@@ -344,20 +372,23 @@ function RewardsMain() {
           <div className="flex justify-between">
             <h2 className="text-xl font-semibold mb-4">Minted NFTs</h2>
             <CustomDropdown
-              options={["Optimism", "Arbitrum"]}
+              options={["Optimism", "Arbitrum","arbitrum-sepolia"]}
               onChange={handleSelectChange}
             />
           </div>
           {mintedNFTs.length > 0 ? (
             <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 sm:gap-10 py-8 font-poppins">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 sm:gap-10 py-8 font-poppins">
                 {mintedNFTs.map(nft => (
                   <NFTTile
                     key={nft.id}
                     nft={{
                       id: nft.id,
-                      thumbnail: nft.thumbnail_image, // Ensure correct property
-                      contract: nft.contract
+                      thumbnail: nft.thumbnail, // Ensure correct property
+                      contract: nft.contract,
+                      network: nft.network,
+                      time: nft.time,
+                      host: nft.host,
                     }}
                   />
                 ))}
