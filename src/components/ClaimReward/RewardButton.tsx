@@ -1,31 +1,66 @@
 "use client";
 import React, { useCallback, useState, useRef, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "next-nprogress-bar";
 import Link from "next/link";
-import { AppProgressBar } from 'next-nprogress-bar';
+import {
+  useAccount,
+  useChainId,
+  useReadContract,
+  useWriteContract,
+} from "wagmi";
+import { Address, formatEther, parseEther } from "viem";
+import {
+  protocolRewardsABI,
+  protocolRewardsAddress,
+} from "chora-protocol-deployments";
 
 function RewardButton() {
+  const router = useRouter();
+  const { address } = useAccount();
+  const chainId = useChainId();
   const [showTooltip, setShowTooltip] = useState(false);
   const hoverRef = useRef<HTMLDivElement>(null);
-  const balance = 0.0;
-  const ethPrice = 0.0;
-  const formattedBalance = balance.toFixed(3);
-  const usdBalance = (balance * ethPrice).toFixed(2);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const router = useRouter();
-  const [isNavigating, setIsNavigating] = useState(false);
+  const [ethToUsdConversionRate, setEthToUsdConversionRate] = useState(0);
 
-  const handleClick = useCallback(() => {
-    setIsNavigating(true);
-    router.push("/claim-rewards");
-  }, [router]);
+  const { data: hash, writeContract, isPending, isError } = useWriteContract();
+
+  const { data: accountBalance, isLoading } = useReadContract({
+    abi: protocolRewardsABI,
+    address:
+      protocolRewardsAddress[chainId as keyof typeof protocolRewardsAddress],
+    functionName: "balanceOf",
+    args: [address as Address],
+  });
+
+  // withdraw amount is half of the balance
+  const rewardBalanceInETH: any = Number(
+    formatEther(accountBalance || BigInt(0))
+  ).toFixed(5);
+  const rewardBalanceInUSD: any = (
+    rewardBalanceInETH * ethToUsdConversionRate
+  ).toFixed(2);
 
   useEffect(() => {
-    if (isNavigating) {
-      // Reset the state when navigation is complete
-      return () => setIsNavigating(false);
-    }
-  }, [isNavigating]);
+    const fetchEthToUsdRate = async () => {
+      try {
+        const response = await fetch(
+          "https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd"
+        );
+        const data = await response.json();
+        setEthToUsdConversionRate(data.ethereum.usd);
+        console.log("data.ethereum.usd", data.ethereum.usd);
+      } catch (error) {
+        console.error("Failed to fetch ETH to USD conversion rate:", error);
+      }
+    };
+
+    fetchEthToUsdRate();
+  }, []);
+
+  const handleClick = useCallback(() => {
+    router.push("/claim-rewards");
+  }, [router]);
 
   useEffect(() => {
     return () => {
@@ -54,7 +89,7 @@ function RewardButton() {
           onMouseLeave={handleMouseLeave}
           className="bg-gradient-to-r from-blue-500 to-purple-600 text-xs sm:text-base text-white px-3 py-1.5 md:px-4 md:py-2 rounded-full hover:from-blue-600 hover:to-purple-700 transition-all duration-300 shadow-md hover:shadow-lg flex items-center space-x-2 cursor-pointer"
         >
-          {balance < 0 ? (
+          {0 < 0 ? (
             <>
               <span className="flex items-center">
                 Rewards <span className="">🎁</span>
@@ -62,7 +97,9 @@ function RewardButton() {
             </>
           ) : (
             <>
-              <span className="flex items-center">{formattedBalance} ETH</span>
+              <span className="flex items-center">
+                {rewardBalanceInETH} ETH
+              </span>
             </>
           )}
         </div>
@@ -77,29 +114,13 @@ function RewardButton() {
                 Rewards Balance
               </h3>
               <p className="text-2xl font-bold text-blue-600 mb-1">
-                {formattedBalance} ETH
+                {rewardBalanceInETH} ETH
               </p>
-              <p className="text-gray-600 mb-4">≈ ${usdBalance} USD</p>
-              {balance > 0 ? (
-                <button className="w-full bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition-colors duration-200 font-semibold">
-                  Claim Rewards
-                </button>
-              ) : (
-                <div>
-                  <p className="font-semibold text-gray-700 mb-2">
-                    Earn rewards by:
-                  </p>
-                  <ul className="list-disc list-inside text-blue-500">
-                    <li><Link href="/sessions?active=recordedSessions">Sharing Sessions</Link></li>
-                    <li><Link href="/invite">Referring Creators</Link></li>
-                  </ul>
-                </div>
-              )}
+              <p className="text-gray-600 mb-4">≈ ${rewardBalanceInUSD} USD</p>
             </div>
           </div>
         )}
       </div>
-      {isNavigating && <AppProgressBar />}
     </>
   );
 }

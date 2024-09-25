@@ -226,33 +226,12 @@ const WatchLeaderBoard = ({
   return (
     <>
       <div className="font-poppins">
-        {/* {showComingSoon && (
-          <div className="flex items-center w-fit bg-yellow-100 border border-yellow-400 rounded-full px-2 ml-4 mb-3 py-1">
-            <p className="text-sm text-yellow-700 mr-2">Coming Soon</p>
-            <button
-              onClick={() => setShowComingSoon(false)}
-              className="text-yellow-700 hover:text-yellow-800"
-            >
-              <RxCross2 size={12} />
-            </button>
-          </div>
-        )} */}
+  
         <div className="flex justify-between items-center mb-5">
           <div className="flex">
             <p className="xl:text-base 1.7xl:text-lg font-medium text-blue-shade-100 ml-5">
               🏆LeaderBoard
             </p>
-            {showComingSoon && (
-              <div className="flex items-center bg-yellow-100 border border-yellow-400 rounded-full px-2 ml-4">
-                <p className="text-sm text-yellow-700 mr-2">Coming Soon</p>
-                <button
-                  onClick={() => setShowComingSoon(false)}
-                  className="text-yellow-700 hover:text-yellow-800"
-                >
-                  <RxCross2 size={12} />
-                </button>
-              </div>
-            )}
           </div>
           <div
             className="text-[10px] text-blue-shade-100 bg-blue-shade-700 rounded py-1 px-2 border border-blue-shade-100 cursor-pointer hover:bg-blue-shade-600"
