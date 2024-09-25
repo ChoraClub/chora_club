@@ -239,8 +239,8 @@ function MainProfile() {
   useEffect(() => {
     console.log("chain name:::: ", chain?.name);
     const checkDelegateStatus = async () => {
-      const addr = await walletClient.getAddresses();
-      const address1 = addr[0];
+      // const addr = await walletClient.getAddresses();
+      // const address1 = addr[0];
       let delegateTxAddr = "";
       const contractAddress = getChainAddress(chain?.name);
       // console.log(walletClient);
@@ -270,9 +270,9 @@ function MainProfile() {
   // Pass the address of whom you want to delegate the voting power to
   const handleDelegateVotes = async (to: string) => {
     try {
-      const addr = await walletClient.getAddresses();
-      const address1 = addr[0];
-      console.log("addrrr", address1);
+      // const addr = await walletClient.getAddresses();
+      // const address1 = addr[0];
+      // console.log("addrrr", address1);
 
       const contractAddress = getChainAddress(chain?.name);
 
@@ -285,7 +285,7 @@ function MainProfile() {
         abi: dao_abi.abi,
         functionName: "delegate",
         args: [to],
-        account: address1,
+        account: address,
       });
 
       console.log(delegateTx);
@@ -492,8 +492,8 @@ function MainProfile() {
 
   const updateFollowerState = async (dbResponse: any) => {
     const userData = dbResponse?.data[0];
-    let address = await walletClient.getAddresses();
-    let address_user = address[0].toLowerCase();
+    // let address = await walletClient.getAddresses();
+    // let address_user = address[0].toLowerCase();
     let currentDaoName = getDaoName(chain?.name);
     // if (chain?.name === "Optimism") {
     //   currentDaoName = "optimism";

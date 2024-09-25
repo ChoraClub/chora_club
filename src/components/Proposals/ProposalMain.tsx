@@ -184,19 +184,19 @@ function ProposalMain({ props }: { props: Props }) {
     voteData: VoteData
   ) => {
     // Handle the vote submission logic here
-    let address;
-    let address1;
+    // let address;
+    // let address1;
 
-    try {
-      address = await walletClient.getAddresses();
-      address1 = address[0];
-    } catch (error) {
-      console.error("Error getting addresses:", error);
-      toast.error("Please connect your MetaMask wallet!");
-      return;
-    }
+    // try {
+    //   address = await walletClient.getAddresses();
+    //   address1 = address[0];
+    // } catch (error) {
+    //   console.error("Error getting addresses:", error);
+    //   toast.error("Please connect your MetaMask wallet!");
+    //   return;
+    // }
 
-    if (!address1) {
+    if (!address) {
       toast.error("Please connect your MetaMask wallet!");
       return;
     }
@@ -227,7 +227,7 @@ function ProposalMain({ props }: { props: Props }) {
                 : op_proposals_abi,
             functionName: "castVoteWithReason",
             args: [proposalId, vote, comment],
-            account: address1,
+            account: address,
           });
           StoreData(voteData);
         } catch (e) {
@@ -246,7 +246,7 @@ function ProposalMain({ props }: { props: Props }) {
                 : op_proposals_abi,
             functionName: "castVote",
             args: [proposalId, vote],
-            account: address1,
+            account: address,
           });
           StoreData(voteData);
         } catch (e) {

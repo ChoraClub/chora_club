@@ -400,10 +400,10 @@ function SpecificDelegate({ props }: { props: Type }) {
         setFollowerCountLoading(false);
 
         // Update follow and notification status
-        const address = await walletClient.getAddresses();
-        const address_user = address[0].toLowerCase();
+        // const address = await walletClient.getAddresses();
+        // const address_user = address[0].toLowerCase();
         const userFollow = daoFollowers.follower.find(
-          (f: any) => f.address.toLowerCase() === address_user
+          (f: any) => f.address.toLowerCase() === address
         );
 
         if (userFollow) {
@@ -433,11 +433,11 @@ function SpecificDelegate({ props }: { props: Type }) {
 
   const handleConfirm = async (action: number) => {
     let delegate_address: string;
-    let follower_address: string;
+    // let follower_address: string;
     let dao: string;
     dao = props.daoDelegates;
-    let address = await walletClient.getAddresses();
-    follower_address = address[0];
+    // let address = await walletClient.getAddresses();
+    // follower_address = address[0];
     delegate_address = props.individualDelegate;
 
     if (action == 1) {
@@ -454,7 +454,7 @@ function SpecificDelegate({ props }: { props: Type }) {
           body: JSON.stringify({
             // Add any necessary data
             delegate_address: delegate_address,
-            follower_address: follower_address,
+            follower_address: address,
             action: action,
             dao: dao,
           }),
@@ -499,7 +499,7 @@ function SpecificDelegate({ props }: { props: Type }) {
             body: JSON.stringify({
               // Add any necessary data
               delegate_address: delegate_address,
-              follower_address: follower_address,
+              follower_address: address,
               action: action,
               dao: dao,
               updatenotification: updatenotification,
@@ -530,18 +530,18 @@ function SpecificDelegate({ props }: { props: Type }) {
     } else if (isFollowing) {
       setUnfollowmodel(true);
     } else {
-      let address = await walletClient.getAddresses();
+      // let address = await walletClient.getAddresses();
       if (address === props.individualDelegate) {
         toast.error("You can't follow your own profile!");
       } else {
         setLoading(true);
         let delegate_address: string;
-        let follower_address: string;
+        let follower_address: any;
         let dao: string;
         // alert(props.daoDelegates);
         dao = props.daoDelegates;
-        let address = await walletClient.getAddresses();
-        follower_address = address[0];
+        // let address = await walletClient.getAddresses();
+        follower_address = address;
         delegate_address = props.individualDelegate;
         try {
           const response = await fetch("/api/delegate-follow/savefollower", {
@@ -583,19 +583,19 @@ function SpecificDelegate({ props }: { props: Type }) {
     }
   };
   const handleDelegateVotes = async (to: string) => {
-    let address;
-    let address1;
+    // let address;
+    // let address1;
 
-    try {
-      address = await walletClient.getAddresses();
-      address1 = address[0];
-    } catch (error) {
-      console.error("Error getting addresses:", error);
-      toast.error("Please connect your MetaMask wallet!");
-      return;
-    }
+    // try {
+    //   address = await walletClient.getAddresses();
+    //   address1 = address[0];
+    // } catch (error) {
+    //   console.error("Error getting addresses:", error);
+    //   toast.error("Please connect your MetaMask wallet!");
+    //   return;
+    // }
 
-    if (!address1) {
+    if (!address) {
       toast.error("Please connect your MetaMask wallet!");
       return;
     }
@@ -629,7 +629,7 @@ function SpecificDelegate({ props }: { props: Type }) {
             abi: dao_abi.abi,
             functionName: "delegate",
             args: [to],
-            account: address1,
+            account: address,
           });
 
           setDelegatingToAddr(false);
