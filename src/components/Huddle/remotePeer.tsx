@@ -56,9 +56,7 @@ const RemotePeer = ({ peerId }: RemotePeerProps) => {
             }`
       )}
     >
-      <div className="absolute left-1/2 -translate-x-1/2 mb-2 text-4xl">
-        {reaction}
-      </div>
+      <div className="absolute left-4 top-4 text-3xl z-10">{reaction}</div>
       {metadata?.isHandRaised && (
         <span className="absolute top-4 right-4 text-4xl text-gray-200 font-medium">
           ✋

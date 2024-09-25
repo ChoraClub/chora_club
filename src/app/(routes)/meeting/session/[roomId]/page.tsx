@@ -466,10 +466,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
         <div className={clsx("flex flex-col h-screen bg-white font-poppins")}>
           <header className="flex items-center justify-between pt-4 px-4">
             <div className="flex items-center py-2 space-x-2">
-              <div className="bg-black p-2 rounded-full">
-                <Image src={logo} alt="image" height={18} width={18} />
-              </div>
-              <div className="text-2xl font-medium tracking-wider">
+              <div className="text-2xl font-semibold tracking-wider">
                 <span className="text-black">Chora</span>
                 <span className="text-blue-shade-100">Club</span>
               </div>

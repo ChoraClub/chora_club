@@ -267,7 +267,13 @@ function RecordedSessionsTile({
                 {formatVideoDuration(videoDurations[index] || 0)}
               </div>
               <div className="absolute top-2 right-2 bg-black rounded-full">
-                <Image src={logo} alt="image" width={24} />
+                <Image
+                  src={logo}
+                  alt="image"
+                  width={100}
+                  height={100}
+                  className="w-7 h-7"
+                />
               </div>
             </div>
             <div className="flex flex-col justify-between">
@@ -288,8 +294,8 @@ function RecordedSessionsTile({
                       <Image
                         src={getDaoLogo(data.dao_name)}
                         alt="image"
-                        width={20}
-                        height={20}
+                        width={100}
+                        height={100}
                         className="rounded-full size-4 sm:size-6"
                       />
                     </div>
@@ -317,8 +323,8 @@ function RecordedSessionsTile({
                             : user1
                         }
                         alt="image"
-                        width={20}
-                        height={20}
+                        width={100}
+                        height={100}
                         className="rounded-full size-4 sm:size-5"
                       />
                     </div>
