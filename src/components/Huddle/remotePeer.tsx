@@ -66,8 +66,7 @@ const RemotePeer = ({ peerId }: RemotePeerProps) => {
         <Camera stream={videoStream} name={metadata?.displayName ?? "guest"} />
       ) : (
         <div className="flex w-24 h-24 rounded-full">
-          {metadata?.avatarUrl &&
-          metadata.avatarUrl !== "/avatars/avatars/0.png" ? (
+          {metadata?.avatarUrl && (
             <div className="bg-pink-50 border border-pink-100 rounded-full w-24 h-24">
               <Image
                 src={metadata?.avatarUrl}
@@ -76,14 +75,6 @@ const RemotePeer = ({ peerId }: RemotePeerProps) => {
                 width={100}
                 height={100}
               />
-            </div>
-          ) : (
-            <div className="flex w-24 h-24 rounded-full text-3xl font-semibold items-center justify-center bg-[#004DFF] text-gray-200">
-              {/* {metadata?.displayName[0]} */}
-              {/* <img src={metadata?.avatarUrl} /> */}
-              {metadata?.displayName
-                ? metadata?.displayName[0]?.toUpperCase()
-                : ""}
             </div>
           )}
         </div>

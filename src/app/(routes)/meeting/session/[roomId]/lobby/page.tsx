@@ -429,13 +429,13 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
           <main className="flex h-screen flex-col items-center justify-center bg-lobby text-slate-100 font-poppins">
             <div className="flex flex-col items-center justify-center gap-4 w-1/3 mt-14">
               <div className="text-center flex items-center justify-center bg-slate-100 w-full rounded-2xl py-28">
-                <div className="relative">
+                <div className="relative border-2 border-gray-600 rounded-full p-1">
                   <Image
                     src={avatarUrl}
                     alt="audio-spaces-img"
                     width={125}
                     height={125}
-                    className="maskAvatar"
+                    className="maskAvatar shadow-md"
                     quality={100}
                     priority
                   />
@@ -446,7 +446,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
                     // autoPlay
                     loop
                   /> */}
-                  <button
+                  {/* <button
                     onClick={() => setIsOpen((prev) => !prev)}
                     type="button"
                     className="text-white absolute bottom-0 right-0 z-10"
@@ -502,7 +502,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
                         })}
                       </div>
                     </div>
-                  </FeatCommon>
+                  </FeatCommon> */}
                 </div>
               </div>
               {isDisconnected ? <ConnectWalletWithENS /> : null}
