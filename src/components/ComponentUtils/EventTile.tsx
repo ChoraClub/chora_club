@@ -143,7 +143,6 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
   };
 
   const confirmSlot = async (data: SessionInterface, status: any) => {
-    console.log("data:::", data);
     const id = data._id;
     const host_address = data.host_address;
     const attendee_address = data.attendees[0].attendee_address;
@@ -204,6 +203,8 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
     } catch (error) {
       // setIsConfirmSlotLoading(false);
       console.error(error);
+    }finally{
+      setStartLoading(false);
     }
   };
 

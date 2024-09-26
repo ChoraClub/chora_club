@@ -275,6 +275,7 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
         // }
       } catch (error) {
         console.log("error:", error);
+        setCreateSessionLoading(false);
       }
     } else {
       toast.error(

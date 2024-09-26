@@ -4,6 +4,8 @@ import styles from "../ComponentUtils/RecordedSessionsTile.module.css";
 import logo from "@/assets/images/daos/CCLogo.png";
 import { RiExternalLinkLine } from "react-icons/ri";
 import Link from "next/link";
+import oplogo from "@/assets/images/daos/op.png";
+import arblogo from "@/assets/images/daos/arbitrum.jpg";
 interface NFTProps {
   nft: {
     id: any;
@@ -17,12 +19,19 @@ interface NFTProps {
 
 function NFTTile({ nft }: NFTProps) {
   const cid = nft.thumbnail.split("ipfs://")[1];
+  const getDaoLogo = (network: string) => {
+    if(network==="optimism"){
+      return oplogo;
+    }else{
+      return arblogo;
+    }
+  };
   return (
     <div className="border border-[#D9D9D9] sm:rounded-3xl ">
       <div className="w-full h-56 sm:rounded-t-3xl bg-black object-cover object-center relative">
         <Image
-          // src={`https://ipfs.io/ipfs/${cid}`}
-          src={`https://gateway.lighthouse.storage/ipfs/${cid}`}
+          src={`https://ipfs.io/ipfs/${cid}`}
+          // src={`https://gateway.lighthouse.storage/ipfs/${cid}`}
           alt={`NFT ${nft.id}`}
           height={800}
           width={1000}
@@ -61,17 +70,23 @@ function NFTTile({ nft }: NFTProps) {
               </Link>
             </span>
           </div>
-          <div className="flex item-center text-xs">
-            <span>{nft.network}</span>
-            <span className="mx-1">•</span>
+          <div className="flex item-center justify-items-center	 text-sm">
+          <Image
+                        src={getDaoLogo(nft.network)}
+                        alt="image"
+                        width={20}
+                        height={20}
+                        className="rounded-full size-3 sm:size-5"
+                      />            
+            <span className="mx-2">•</span>
             <span>{nft.time}</span>
           </div>
-          <div className="text-xs text-gray-500">
+          <div className="text-sm text-gray-500">
             {nft && nft.host ? (
               <>
                 Host :{" "}
                 <Link
-                  href={`/${nft.network}/${nft.host}?active=info`}
+                  href={`/${nft.network=== "arbitrum-sepolia"? "arbitrum": nft.network}/${nft.host}?active=info`}
                   onClick={(event: any) => {
                     event.stopPropagation();
                   }}
