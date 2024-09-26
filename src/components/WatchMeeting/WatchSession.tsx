@@ -35,7 +35,7 @@ interface Attendee extends DynamicAttendeeInterface {
 
 interface Meeting extends SessionInterface {
   attendees: Attendee[];
-  views:any;
+  views: any;
   hostProfileInfo: UserProfileInterface;
 }
 
@@ -172,8 +172,8 @@ function WatchSession({
                         : user
                     }
                     alt="image"
-                    width={20}
-                    height={20}
+                    width={200}
+                    height={200}
                     className="w-5 h-5 rounded-full"
                     priority
                   />
@@ -212,7 +212,9 @@ function WatchSession({
                       <Image
                         src={offChain_link}
                         alt="image"
-                        className="w-6"
+                        height={100}
+                        width={100}
+                        className="w-6 h-6"
                         priority
                         quality={100}
                       />
@@ -250,9 +252,10 @@ function WatchSession({
                       <Image
                         alt="image"
                         src={onChain_link}
-                        className="w-6"
-                        priority
+                        className="w-6 h-6"
                         quality={100}
+                        width={100}
+                        height={100}
                       />
                     </Link>
                   </Tooltip>
@@ -266,15 +269,17 @@ function WatchSession({
                   <Image
                     src={oplogo}
                     alt="image"
-                    width={20}
-                    className="rounded-full"
+                    width={100}
+                    height={100}
+                    className="rounded-full w-5 h-5"
                   />
                 ) : data.dao_name === "arbitrum" ? (
                   <Image
                     src={arblogo}
                     alt="image"
-                    width={20}
-                    className="rounded-full"
+                    width={100}
+                    height={100}
+                    className="rounded-full w-5 h-5"
                   />
                 ) : (
                   ""
@@ -286,14 +291,21 @@ function WatchSession({
             </div>
 
             <div className="flex gap-6">
-            <div className="flex items-center gap-1">
-            <IoMdEye size={20} />
+              <div className="flex items-center gap-1">
+                <IoMdEye size={20} />
                 <div className="text-[#1E1E1E]">
-                {formatViews(data?.views ?? 0)} views
+                  {formatViews(data?.views ?? 0)} views
                 </div>
               </div>
               <div className="flex items-center gap-1">
-                <Image src={time} alt="image" width={20} priority />
+                <Image
+                  src={time}
+                  alt="image"
+                  width={100}
+                  height={100}
+                  priority
+                  className="w-5 h-5"
+                />
                 <div className="text-[#1E1E1E]">
                   {formatTimeAgo(data.slot_time)}
                 </div>
@@ -351,9 +363,9 @@ function WatchSession({
                                 : user
                             }
                             alt="image"
-                            width={18}
-                            height={18}
-                            className="rounded-full"
+                            width={100}
+                            height={100}
+                            className="rounded-full h-5 w-5"
                             priority
                           />
                         </div>
@@ -388,7 +400,9 @@ function WatchSession({
                             <Image
                               src={offChain_link}
                               alt="image"
-                              className="w-6"
+                              height={100}
+                              width={100}
+                              className="w-6 h-6"
                               priority
                               quality={100}
                             />
@@ -423,7 +437,9 @@ function WatchSession({
                             <Image
                               alt="image"
                               src={onChain_link}
-                              className="w-6"
+                              className="w-6 h-6"
+                              width={100}
+                              height={100}
                               priority
                               quality={100}
                             />

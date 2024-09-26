@@ -466,10 +466,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
         <div className={clsx("flex flex-col h-screen bg-white font-poppins")}>
           <header className="flex items-center justify-between pt-4 px-4">
             <div className="flex items-center py-2 space-x-2">
-              <div className="bg-black p-2 rounded-full">
-                <Image src={logo} alt="image" height={18} width={18} />
-              </div>
-              <div className="text-2xl font-medium tracking-wider">
+              <div className="text-2xl font-semibold tracking-wide px-4">
                 <span className="text-black">Chora</span>
                 <span className="text-blue-shade-100">Club</span>
               </div>
@@ -593,8 +590,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
                       </>
                     ) : (
                       <div className="flex w-24 h-24 rounded-full">
-                        {metadata?.avatarUrl &&
-                        metadata.avatarUrl !== "/avatars/avatars/0.png" ? (
+                        {metadata?.avatarUrl && (
                           <div className="bg-pink-50 border border-pink-100 rounded-full w-24 h-24">
                             <Image
                               alt="image"
@@ -603,11 +599,6 @@ export default function Component({ params }: { params: { roomId: string } }) {
                               width={100}
                               height={100}
                             />
-                          </div>
-                        ) : (
-                          <div className="flex w-24 h-24 rounded-full text-3xl font-semibold items-center justify-center bg-[#004DFF] text-gray-200">
-                            {name[0]?.toUpperCase()}
-                            {/* <img src={metadata?.avatarUrl} /> */}
                           </div>
                         )}
                       </div>

@@ -69,7 +69,8 @@ interface StudioState {
 export const useStudioState = create<StudioState>((set) => ({
   name: "",
   setName: (name) => set({ name }),
-  avatarUrl: "/avatars/avatars/0.png",
+  avatarUrl:
+    "https://gateway.lighthouse.storage/ipfs/bafkreifr3lnl4mpiedaxwzibjbszwf7zosptwt5oqpfydwun33a6ujsjau",
   setAvatarUrl: (val: string) => {
     set(() => ({
       avatarUrl: val,

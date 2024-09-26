@@ -125,8 +125,8 @@ function ExploreDAOs() {
                       <Image
                         src={daos.img}
                         alt="Image not found"
-                        width={60}
-                        height={60}
+                        width={300}
+                        height={300}
                         className="rounded-full w-16 h-16 md:w-20 md:h-20"
                         quality={100}
                         loading={`lazy`}

@@ -34,7 +34,6 @@ interface Props {
 }
 
 const EmojiTray: React.FC<Props> = ({ onClick, onClose }) => {
-  // Emoji Data
   const emojis: Reaction[] = [
     "😂",
     "😢",
@@ -55,24 +54,22 @@ const EmojiTray: React.FC<Props> = ({ onClick, onClose }) => {
 
   const { sendData } = useDataMessage();
   const setMyReaction = useStudioState((state) => state.setMyReaction);
-
   const { metadata, updateMetadata } = useLocalPeer<peerMetaData>();
 
   return (
-    <div>
-      <div className="relative z-50">
-        <div className=" border-b border-slate-700 py-3 text-center text-base font-semibold text-gray-800">
-          Reactions
-          <span
-            className="absolute right-2 cursor-pointer"
-            role="presentation"
-            onClick={onClose}
-          >
-            {BasicIcons.close}
-          </span>
-        </div>
+    <div className="bg-white max-w-xs mx-auto">
+      <div className="relative z-50 border-b border-slate-700 py-3 text-center text-base font-semibold text-gray-800">
+        Reactions
+        <span
+          className="absolute right-4 top-3 cursor-pointer text-gray-600 hover:text-gray-900 transition-colors"
+          role="presentation"
+          onClick={onClose}
+        >
+          {BasicIcons.close}
+        </span>
       </div>
-      <div className="px-4 py-3.5">
+
+      <div className="px-6 py-4 space-y-4">
         <button
           type="button"
           onClick={(e) => {
@@ -83,15 +80,16 @@ const EmojiTray: React.FC<Props> = ({ onClick, onClose }) => {
             } as peerMetaData);
           }}
           className={cn(
-            " w-full text-sm border text-gray-700 py-2 rounded-lg font-inter flex items-center justify-center font-medium",
+            "w-full text-sm py-2 rounded-lg flex items-center justify-center font-medium transition-all duration-200",
             metadata?.isHandRaised
-              ? "bg-gray-500 text-gray-100"
-              : "border-gray-500"
+              ? "bg-red-500 text-white hover:bg-red-600"
+              : "bg-blue-500 text-white hover:bg-blue-600"
           )}
         >
           ✋ {metadata?.isHandRaised ? "Lower Hand" : "Raise Hand"}
         </button>
-        <div className="grid grid-cols-5 place-items-center gap-2">
+
+        <div className="grid grid-cols-5 gap-3">
           {emojis.map((emoji) => (
             <span
               key={emoji}
@@ -104,7 +102,7 @@ const EmojiTray: React.FC<Props> = ({ onClick, onClose }) => {
                 setMyReaction(emoji);
               }}
               role="presentation"
-              className="m-1 cursor-pointer p-2 text-lg"
+              className="cursor-pointer text-xl hover:scale-110 transition-transform duration-200 p-2"
             >
               {emoji}
             </span>

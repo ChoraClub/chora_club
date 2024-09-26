@@ -29,7 +29,7 @@ import { IoIosRocket } from "react-icons/io";
 import { FaBusinessTime, FaUser } from "react-icons/fa6";
 import { SiGitbook, SiGoogleclassroom } from "react-icons/si";
 import { PiUsersThreeFill } from "react-icons/pi";
-import {useSidebar} from "../../app/hooks/useSidebar"
+import { useSidebar } from "../../app/hooks/useSidebar";
 import { BiSolidMessageSquareAdd } from "react-icons/bi";
 // import { useMediaQuery } from 'next/media-query';
 
@@ -54,17 +54,16 @@ function Sidebar() {
   const [isLgScreen, setIsLgScreen] = useState(false);
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia('(min-width: 1024px)');
+    const mediaQuery = window.matchMedia("(min-width: 1024px)");
     setIsLgScreen(mediaQuery.matches);
     const handleMediaQueryChange = () => {
       setIsLgScreen(mediaQuery.matches);
     };
-    mediaQuery.addEventListener('change', handleMediaQueryChange);
+    mediaQuery.addEventListener("change", handleMediaQueryChange);
     return () => {
-      mediaQuery.removeEventListener('change', handleMediaQueryChange);
+      mediaQuery.removeEventListener("change", handleMediaQueryChange);
     };
   }, []);
-
 
   const tourSteps = [
     {
@@ -260,7 +259,7 @@ function Sidebar() {
   useEffect(() => {
     // console.log(session, sessionLoading, isConnected);
   }, [session, sessionLoading, isConnected, isPageLoading]);
-  
+
   const closeTour = () => {
     setIsTourOpen(false);
     setHasSeenTour(true);
@@ -309,7 +308,8 @@ function Sidebar() {
               <Image
                 src={logo}
                 alt={"image"}
-                width={40}
+                width={200}
+                height={200}
                 className="xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 logo bg-black rounded-full p-1"
               ></Image>
             </Link>
@@ -445,8 +445,8 @@ function Sidebar() {
                           <Image
                             key={index}
                             src={data[1]}
-                            width={80}
-                            height={80}
+                            width={300}
+                            height={300}
                             alt="image"
                             className={`w-10 h-10 xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 rounded-full cursor-pointer ${
                               styles.icon3d

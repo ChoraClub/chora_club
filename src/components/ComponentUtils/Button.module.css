@@ -4,10 +4,10 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 3px 20px;
+    padding: 3px 0px;
     border-radius: 22px;
     font-weight: 600;
-    font-size: 14px;
+    font-size: 12px;
     text-transform: uppercase;
     letter-spacing: 1px;
     color: #ffffff;

@@ -115,7 +115,7 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
           const responseData = await response.json();
           setLoading(false);
           setShowHostPopup(true);
-          router.push(`/profile/${address}?active=sessions&session=hosted`);
+          // router.push(`/profile/${address}?active=sessions&session=hosted`);
         } else {
           setLoading(false);
           // setData(null);
@@ -192,13 +192,6 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
                   <div className="flex justify-center gap-3">
                     <Button
                       className="bg-blue-shade-200 rounded-full font-semibold px-10 text-white"
-                      onClick={() => setViewMode("preview")}
-                    >
-                      Next
-                    </Button>
-
-                    <Button
-                      className="bg-blue-shade-200 rounded-full font-semibold px-10 text-white"
                       onClick={() =>
                         router.push(
                           `/profile/${address}?active=sessions&session=hosted`
@@ -206,6 +199,12 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
                       }
                     >
                       Back to Profile
+                    </Button>
+                    <Button
+                      className="bg-blue-shade-200 rounded-full font-semibold px-10 text-white"
+                      onClick={() => setViewMode("preview")}
+                    >
+                      Next
                     </Button>
                   </div>
                 </div>
@@ -217,6 +216,16 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
                     sessionDetails={sessionDetails}
                   />
                   <div className="flex justify-center gap-3">
+                    <Button
+                      className="bg-blue-shade-200 rounded-full font-semibold px-10 text-white"
+                      onClick={() =>
+                        router.push(
+                          `/profile/${address}?active=sessions&session=hosted`
+                        )
+                      }
+                    >
+                      Back to Profile
+                    </Button>
                     <Button
                       className="bg-blue-shade-200 text-white font-semibold rounded-full px-10"
                       onClick={() => handleUpdate()}
@@ -232,16 +241,6 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
                       ) : (
                         "Update"
                       )}
-                    </Button>
-                    <Button
-                      className="bg-blue-shade-200 rounded-full font-semibold px-10 text-white"
-                      onClick={() =>
-                        router.push(
-                          `/profile/${address}?active=sessions&session=hosted`
-                        )
-                      }
-                    >
-                      Back to Profile
                     </Button>
                   </div>
                 </div>
