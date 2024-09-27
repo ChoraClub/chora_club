@@ -56,7 +56,7 @@ const WatchFreeCollect = ({
   data,
   collection,
 }: {
-  leaderBoardData:Holder,
+  leaderBoardData: Holder;
   data: Meeting;
   collection: string;
 }) => {
@@ -90,6 +90,8 @@ const WatchFreeCollect = ({
     useState("0 USD");
   const [mintComment, setMintComment] = useState("");
   const [mintReferral, setMintReferral] = useState<string>("");
+  let contractMetadataURI: any;
+  let tokenDataURI: any;
 
   useEffect(() => {
     setMeetingInfo(data);
@@ -252,7 +254,20 @@ const WatchFreeCollect = ({
       const tokenMetadata = {
         name: data.title,
         description: data.description,
+        // image:
+        //   "ipfs://bafybeihoscqwrw7qef3prfkufpm6qpw2wo7gzsxa7sd2gsz7sf22e57nki",
+        // animationUrl:
+        //   "ipfs://bafybeihoscqwrw7qef3prfkufpm6qpw2wo7gzsxa7sd2gsz7sf22e57nki",
+        // content: {
+        //   mime: "image/jpg",
+        //   uri: "ipfs://bafybeihoscqwrw7qef3prfkufpm6qpw2wo7gzsxa7sd2gsz7sf22e57nki",
+        // },
         image: data?.nft_image,
+        animationUrl: data?.nft_image,
+        content: {
+          mime: "image/jpeg",
+          uri: data?.nft_image,
+        },
         attributes: [
           {
             trait_type: "Host",
@@ -287,6 +302,7 @@ const WatchFreeCollect = ({
 
       setJsonUri(jsonCid);
       setContractUri(`ipfs://${jsonCid}`);
+      contractMetadataURI = `ipfs://${jsonCid}`;
 
       const tokenMetadataJsonBlob = new Blob([JSON.stringify(tokenMetadata)], {
         type: "application/json",
@@ -304,6 +320,7 @@ const WatchFreeCollect = ({
       );
       const tokenMetadataJsonCid = tokenMetadataJsonUploadResponse.data.Hash;
       setTokenMetadataUri(`ipfs://${tokenMetadataJsonCid}`);
+      tokenDataURI = `ipfs://${tokenMetadataJsonCid}`;
     } catch (error) {
       console.error("Error uploading to Lighthouse:", error);
       alert("Error uploading data. Please try again.");
@@ -330,9 +347,9 @@ const WatchFreeCollect = ({
         publicClient,
       });
       const { parameters } = await creatorClient.create1155({
-        contract: { name: data.title, uri: contractUri || "" },
+        contract: { name: data.title, uri: contractUri || contractMetadataURI },
         token: {
-          tokenMetadataURI: tokenMetadataURI || "",
+          tokenMetadataURI: tokenMetadataURI || tokenDataURI,
         },
         account: address!,
       });

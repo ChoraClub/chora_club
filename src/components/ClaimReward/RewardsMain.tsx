@@ -390,7 +390,7 @@ function RewardsMain() {
                       <div className="flex items-center space-x-2">
                         <div>
                           <div className="font-semibold">
-                            {reward.amount} ETH
+                            {rewardBalanceInETH} ETH
                           </div>
                           <div className="text-sm text-gray-500">
                             ≈ ${rewardBalanceInUSD} USD

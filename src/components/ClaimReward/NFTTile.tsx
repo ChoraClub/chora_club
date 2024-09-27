@@ -21,15 +21,11 @@ function NFTTile({ nft }: NFTProps) {
     <div className="border border-[#D9D9D9] sm:rounded-3xl ">
       <div className="w-full h-56 sm:rounded-t-3xl bg-black object-cover object-center relative">
         <Image
-          // src={`https://ipfs.io/ipfs/${cid}`}
-          src={`https://gateway.lighthouse.storage/ipfs/${cid}`}
+          src={`https://ipfs.io/ipfs/${cid}`}
+          // src={`https://gateway.lighthouse.storage/ipfs/${cid}`}
           alt={`NFT ${nft.id}`}
           height={800}
           width={1000}
-          // layout="fill"
-          // objectFit="cover"
-          // priority
-          // quality={100}
           className="sm:rounded-t-3xl object-cover w-full h-56"
         />
         <div className="absolute top-2 right-2 bg-black rounded-full">

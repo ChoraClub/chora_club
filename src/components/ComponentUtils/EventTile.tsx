@@ -70,7 +70,8 @@ const createRandomRoom = async () => {
   return roomId;
 };
 
-function EventTile({ tileIndex, data, isEvent }: TileProps) {
+function EventTile({ tileIndex, data: initialData, isEvent }: TileProps) {
+  const [data, setData] = useState(initialData);
   const [isPageLoading, setIsPageLoading] = useState(true);
   const [isConfirmSlotLoading, setIsConfirmSlotLoading] = useState(false);
   const router = useRouter();
@@ -193,17 +194,21 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
       const result = await response.json();
       if (result.success) {
         toast(`You ${status} the booking.`);
+        setData((prevData: any) => ({
+          ...prevData,
+          booking_status: status,
+          meeting_status: meeting_status,
+        }));
         setStartLoading(false);
-        setTimeout(() => {
-          setIsPageLoading(false);
-          setIsConfirmSlotLoading(false);
-          // onClose;
-        }, 4000);
-        console.log("status updated");
+        setIsConfirmSlotLoading(false);
+        onClose();
       }
     } catch (error) {
       // setIsConfirmSlotLoading(false);
       console.error(error);
+    } finally {
+      setStartLoading(false);
+      setIsConfirmSlotLoading(false);
     }
   };
 
@@ -375,7 +380,9 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
           </div>
         </div>
 
-        <div className={`flex flex-col justify-between text-xs sm:py-2 px-4 mb-2`}>
+        <div
+          className={`flex flex-col justify-between text-xs sm:py-2 px-4 mb-2`}
+        >
           {isEvent === "Book" ? (
             data.booking_status === "Approved" ? (
               <div className="flex justify-end items-center gap-2 ">
@@ -478,36 +485,6 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
                   </div>
                 )}
               </div>
-            ) : data.booking_status === "Pending" ? (
-              isConfirmSlotLoading ? (
-                <div className="flex items-center justify-center">
-                  <Oval
-                    visible={true}
-                    height="30"
-                    width="30"
-                    color="#0500FF"
-                    secondaryColor="#cdccff"
-                    ariaLabel="oval-loading"
-                  />
-                </div>
-              ) : (
-                <div className="flex justify-end gap-2">
-                  <Tooltip
-                    content="Approve"
-                    placement="top"
-                    closeDelay={1}
-                    showArrow
-                  >
-                    <span className="cursor-pointer">
-                      <FaCircleCheck
-                        onClick={() => confirmSlot(data, "Approved")}
-                        size={28}
-                        color="#4d7c0f"
-                      />
-                    </span>
-                  </Tooltip>
-                </div>
-              )
             ) : null
           ) : isEvent === "Attending" ? (
             data.booking_status === "Approved" && (

@@ -172,21 +172,6 @@ export async function PUT(
     for (const document of documentsForUserEmail) {
       const emailId = document.emailId;
       if (emailId && emailId !== "" && emailId !== undefined) {
-        // if (booking_status === "Approved") {
-        //   try {
-        //     await sendMail({
-        //       to: emailId,
-        //       name: "Chora Club",
-        //       subject: "Session Booked",
-        //       body: compileBookedSessionTemplate(
-        //         "Your Session has been Approved.",
-        //         "The Session you have booked has been approved by the delegate."
-        //       ),
-        //     });
-        //   } catch (error) {
-        //     console.error("Error sending mail:", error);
-        //   }
-        // } else
         if (booking_status === "Rejected") {
           try {
             await sendMail({
@@ -204,7 +189,7 @@ export async function PUT(
 
     client.close();
     // console.log("MongoDB connection closed");
-
+    console.log("Rejection successful in API");
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (error) {
     console.error("Error updating meeting booking status:", error);
