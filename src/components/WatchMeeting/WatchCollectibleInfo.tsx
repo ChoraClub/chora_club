@@ -20,7 +20,7 @@ const WatchCollectibleInfo = ({
   data,
   collection,
 }: {
-  leaderBoardData:Holder,
+  leaderBoardData: Holder;
   data: Meeting;
   collection: string;
 }) => {
@@ -43,7 +43,20 @@ const WatchCollectibleInfo = ({
         <div className="font-normal my-2 text-blue-shade-100">
           <p className="my-2">{leaderBoardData.firstCollector?.timestamp}</p>
           <p className="my-2">{leaderBoardData.latestCollector?.timestamp}</p>
-          <p className="my-2">{leaderBoardData?.selectedToken?.holders1155?.length} ( {((leaderBoardData?.selectedToken?.holders1155?.length/leaderBoardData?.maxSupply)*100).toFixed(2)}% )</p>
+          <p className="my-2">
+            {leaderBoardData?.selectedToken?.holders1155?.length &&
+            leaderBoardData?.maxSupply ? (
+              <>
+                {leaderBoardData.selectedToken.holders1155.length} (
+                {(
+                  (leaderBoardData.selectedToken.holders1155.length /
+                    leaderBoardData.maxSupply) *
+                  100
+                ).toFixed(2)}
+                %)
+              </>
+            ) : null}
+          </p>
           <p className="my-2">{leaderBoardData?.maxSupply}</p>
         </div>
       </div>

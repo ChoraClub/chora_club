@@ -1083,7 +1083,7 @@ function ProposalMain({ props }: { props: Props }) {
       <h1 className="my-8 mx-24 text-4xl font-semibold text-blue-shade-100 font-poppins">
         Voters
       </h1>
-      <div className="flex mb-6  mx-24">
+      <div className="flex mb-20 mx-24">
         <div className="flex gap-8 items-center w-full">
           <div className="h-[500px] w-[40%] font-poppins px-4 flex items-center justify-center rounded-2xl bg-gray-50 transition-shadow duration-300 ease-in-out shadow-xl">
             {isLoading ? (

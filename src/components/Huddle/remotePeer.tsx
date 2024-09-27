@@ -56,9 +56,7 @@ const RemotePeer = ({ peerId }: RemotePeerProps) => {
             }`
       )}
     >
-      <div className="absolute left-1/2 -translate-x-1/2 mb-2 text-4xl">
-        {reaction}
-      </div>
+      <div className="absolute left-4 top-4 text-3xl z-10">{reaction}</div>
       {metadata?.isHandRaised && (
         <span className="absolute top-4 right-4 text-4xl text-gray-200 font-medium">
           ✋
@@ -68,8 +66,7 @@ const RemotePeer = ({ peerId }: RemotePeerProps) => {
         <Camera stream={videoStream} name={metadata?.displayName ?? "guest"} />
       ) : (
         <div className="flex w-24 h-24 rounded-full">
-          {metadata?.avatarUrl &&
-          metadata.avatarUrl !== "/avatars/avatars/0.png" ? (
+          {metadata?.avatarUrl && (
             <div className="bg-pink-50 border border-pink-100 rounded-full w-24 h-24">
               <Image
                 src={metadata?.avatarUrl}
@@ -78,14 +75,6 @@ const RemotePeer = ({ peerId }: RemotePeerProps) => {
                 width={100}
                 height={100}
               />
-            </div>
-          ) : (
-            <div className="flex w-24 h-24 rounded-full text-3xl font-semibold items-center justify-center bg-[#004DFF] text-gray-200">
-              {/* {metadata?.displayName[0]} */}
-              {/* <img src={metadata?.avatarUrl} /> */}
-              {metadata?.displayName
-                ? metadata?.displayName[0]?.toUpperCase()
-                : ""}
             </div>
           )}
         </div>

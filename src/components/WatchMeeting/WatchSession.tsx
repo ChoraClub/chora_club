@@ -28,6 +28,7 @@ import {
   SessionInterface,
 } from "@/types/MeetingTypes";
 import { UserProfileInterface } from "@/types/UserProfileTypes";
+import { usePathname } from "next/navigation";
 
 interface Attendee extends DynamicAttendeeInterface {
   profileInfo: UserProfileInterface;
@@ -35,7 +36,7 @@ interface Attendee extends DynamicAttendeeInterface {
 
 interface Meeting extends SessionInterface {
   attendees: Attendee[];
-  views:any;
+  views: any;
   hostProfileInfo: UserProfileInterface;
 }
 
@@ -56,6 +57,8 @@ function WatchSession({
   const [ensHostName, setEnsHostName] = useState<any>(null);
   const [shareModal, setShareModal] = useState(false);
   const router = useRouter();
+  const path = usePathname();
+  console.log("path: ", path);
 
   const handleShareClose = () => {
     setShareModal(false);
@@ -172,8 +175,8 @@ function WatchSession({
                         : user
                     }
                     alt="image"
-                    width={20}
-                    height={20}
+                    width={200}
+                    height={200}
                     className="w-5 h-5 rounded-full"
                     priority
                   />
@@ -212,7 +215,9 @@ function WatchSession({
                       <Image
                         src={offChain_link}
                         alt="image"
-                        className="w-6"
+                        height={100}
+                        width={100}
+                        className="w-6 h-6"
                         priority
                         quality={100}
                       />
@@ -250,9 +255,10 @@ function WatchSession({
                       <Image
                         alt="image"
                         src={onChain_link}
-                        className="w-6"
-                        priority
+                        className="w-6 h-6"
                         quality={100}
+                        width={100}
+                        height={100}
                       />
                     </Link>
                   </Tooltip>
@@ -266,15 +272,17 @@ function WatchSession({
                   <Image
                     src={oplogo}
                     alt="image"
-                    width={20}
-                    className="rounded-full"
+                    width={100}
+                    height={100}
+                    className="rounded-full w-5 h-5"
                   />
                 ) : data.dao_name === "arbitrum" ? (
                   <Image
                     src={arblogo}
                     alt="image"
-                    width={20}
-                    className="rounded-full"
+                    width={100}
+                    height={100}
+                    className="rounded-full w-5 h-5"
                   />
                 ) : (
                   ""
@@ -286,36 +294,47 @@ function WatchSession({
             </div>
 
             <div className="flex gap-6">
-            <div className="flex items-center gap-1">
-            <IoMdEye size={20} />
+              <div className="flex items-center gap-1">
+                <IoMdEye size={20} />
                 <div className="text-[#1E1E1E]">
-                {formatViews(data?.views ?? 0)} views
+                  {formatViews(data?.views ?? 0)} views
                 </div>
               </div>
               <div className="flex items-center gap-1">
-                <Image src={time} alt="image" width={20} priority />
+                <Image
+                  src={time}
+                  alt="image"
+                  width={100}
+                  height={100}
+                  priority
+                  className="w-5 h-5"
+                />
                 <div className="text-[#1E1E1E]">
                   {formatTimeAgo(data.slot_time)}
                 </div>
               </div>
-              <div
-                className="flex items-center gap-1 cursor-pointer"
-                onClick={() => setModalOpen(true)}
-              >
-                <div>
-                  <PiFlagFill color="#FF0000" size={20} />
-                </div>
-                <div className="text-[#FF0000]">Report</div>
-              </div>
-              <div
-                className="flex items-center gap-1 cursor-pointer"
-                onClick={() => setShareModal(true)}
-              >
-                <div className="scale-x-[-1]">
-                  <BiSolidShare size={20} />
-                </div>
-                <div className="text-[#1E1E1E]">Share</div>
-              </div>
+              {path.includes("/watch") && (
+                <>
+                  <div
+                    className="flex items-center gap-1 cursor-pointer"
+                    onClick={() => setModalOpen(true)}
+                  >
+                    <div>
+                      <PiFlagFill color="#FF0000" size={20} />
+                    </div>
+                    <div className="text-[#FF0000]">Report</div>
+                  </div>
+                  <div
+                    className="flex items-center gap-1 cursor-pointer"
+                    onClick={() => setShareModal(true)}
+                  >
+                    <div className="scale-x-[-1]">
+                      <BiSolidShare size={20} />
+                    </div>
+                    <div className="text-[#1E1E1E]">Share</div>
+                  </div>
+                </>
+              )}
             </div>
           </div>
           <div>
@@ -351,9 +370,9 @@ function WatchSession({
                                 : user
                             }
                             alt="image"
-                            width={18}
-                            height={18}
-                            className="rounded-full"
+                            width={100}
+                            height={100}
+                            className="rounded-full h-5 w-5"
                             priority
                           />
                         </div>
@@ -388,7 +407,9 @@ function WatchSession({
                             <Image
                               src={offChain_link}
                               alt="image"
-                              className="w-6"
+                              height={100}
+                              width={100}
+                              className="w-6 h-6"
                               priority
                               quality={100}
                             />
@@ -423,7 +444,9 @@ function WatchSession({
                             <Image
                               alt="image"
                               src={onChain_link}
-                              className="w-6"
+                              className="w-6 h-6"
+                              width={100}
+                              height={100}
                               priority
                               quality={100}
                             />

@@ -88,11 +88,11 @@ function SpecificDelegate({ props }: { props: Type }) {
   const [error, setError] = useState(null);
   const [isFollowing, setIsFollowing] = useState(false);
   const [followers, setFollowers] = useState(0);
-  const [followed, isFollowed] = useState(false);
+  // const [followed, isFollowed] = useState(false);
   const [isOpenunfollow, setUnfollowmodel] = useState(false);
-  const [isOpenNotification, setNotificationmodel] = useState(false);
+  // const [isOpenNotification, setNotificationmodel] = useState(false);
   const [notification, isNotification] = useState(false);
-  const [daoname, setDaoName] = useState("");
+  // const [daoname, setDaoName] = useState("");
   const [emailId, setEmailId] = useState<string>();
   const [isEmailVisible, setIsEmailVisible] = useState(false);
 
@@ -403,7 +403,7 @@ function SpecificDelegate({ props }: { props: Type }) {
         // const address = await walletClient.getAddresses();
         // const address_user = address[0].toLowerCase();
         const userFollow = daoFollowers.follower.find(
-          (f: any) => f.address.toLowerCase() === address
+          (f: any) => f.address.toLowerCase() === address?.toLowerCase()
         );
 
         if (userFollow) {
@@ -471,7 +471,7 @@ function SpecificDelegate({ props }: { props: Type }) {
         isNotification(false);
         // setFollowers(followers - 1);
         setFollowers((prev) => prev - 1);
-        isFollowed(false);
+        // isFollowed(false);
         toast.success("You have unfollowed the Delegate.");
       } catch (error) {
         console.error("Error following:", error);
@@ -569,7 +569,7 @@ function SpecificDelegate({ props }: { props: Type }) {
           );
           // setFollowers(followers + 1);
           setFollowers((prev) => prev + 1);
-          setTimeout(() => isFollowed(true), 1000);
+          // setTimeout(() => isFollowed(true), 1000);
           setIsFollowing(true);
           isNotification(true);
 
@@ -767,9 +767,9 @@ function SpecificDelegate({ props }: { props: Type }) {
           <div className="font-poppins">
             {/* {followed && <Confetti recycle={false} numberOfPieces={550} />} */}
             <div className="flex ps-14 py-5 justify-between">
-              <div className="flex">
+              <div className="flex items-center">
                 <div
-                  className="relative object-cover rounded-3xl"
+                  className="relative object-cover rounded-3xl w-40 h-40 "
                   style={{
                     backgroundColor: "#fcfcfc",
                     border: "2px solid #E9E9E9 ",
@@ -789,8 +789,8 @@ function SpecificDelegate({ props }: { props: Type }) {
                                 : ccLogo)
                         }
                         alt="user"
-                        width={256}
-                        height={256}
+                        width={300}
+                        height={300}
                         className={
                           displayImage || delegateInfo?.profilePicture
                             ? "w-40 h-40 rounded-3xl"
