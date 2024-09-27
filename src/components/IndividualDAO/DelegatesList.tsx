@@ -524,9 +524,9 @@ function DelegatesList({ props }: { props: string }) {
                               : delegate.profilePicture
                           }
                           alt="Image not found"
-                          width={80}
-                          height={80}
-                          className="rounded-full"
+                          width={200}
+                          height={200}
+                          className="rounded-full w-20 h-20"
                         ></Image>
 
                         <Image

@@ -28,6 +28,7 @@ import {
   SessionInterface,
 } from "@/types/MeetingTypes";
 import { UserProfileInterface } from "@/types/UserProfileTypes";
+import { usePathname } from "next/navigation";
 
 interface Attendee extends DynamicAttendeeInterface {
   profileInfo: UserProfileInterface;
@@ -56,6 +57,8 @@ function WatchSession({
   const [ensHostName, setEnsHostName] = useState<any>(null);
   const [shareModal, setShareModal] = useState(false);
   const router = useRouter();
+  const path = usePathname();
+  console.log("path: ", path);
 
   const handleShareClose = () => {
     setShareModal(false);
@@ -310,24 +313,28 @@ function WatchSession({
                   {formatTimeAgo(data.slot_time)}
                 </div>
               </div>
-              <div
-                className="flex items-center gap-1 cursor-pointer"
-                onClick={() => setModalOpen(true)}
-              >
-                <div>
-                  <PiFlagFill color="#FF0000" size={20} />
-                </div>
-                <div className="text-[#FF0000]">Report</div>
-              </div>
-              <div
-                className="flex items-center gap-1 cursor-pointer"
-                onClick={() => setShareModal(true)}
-              >
-                <div className="scale-x-[-1]">
-                  <BiSolidShare size={20} />
-                </div>
-                <div className="text-[#1E1E1E]">Share</div>
-              </div>
+              {path.includes("/watch") && (
+                <>
+                  <div
+                    className="flex items-center gap-1 cursor-pointer"
+                    onClick={() => setModalOpen(true)}
+                  >
+                    <div>
+                      <PiFlagFill color="#FF0000" size={20} />
+                    </div>
+                    <div className="text-[#FF0000]">Report</div>
+                  </div>
+                  <div
+                    className="flex items-center gap-1 cursor-pointer"
+                    onClick={() => setShareModal(true)}
+                  >
+                    <div className="scale-x-[-1]">
+                      <BiSolidShare size={20} />
+                    </div>
+                    <div className="text-[#1E1E1E]">Share</div>
+                  </div>
+                </>
+              )}
             </div>
           </div>
           <div>

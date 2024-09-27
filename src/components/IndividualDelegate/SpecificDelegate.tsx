@@ -767,9 +767,9 @@ function SpecificDelegate({ props }: { props: Type }) {
           <div className="font-poppins">
             {/* {followed && <Confetti recycle={false} numberOfPieces={550} />} */}
             <div className="flex ps-14 py-5 justify-between">
-              <div className="flex">
+              <div className="flex items-center">
                 <div
-                  className="relative object-cover rounded-3xl"
+                  className="relative object-cover rounded-3xl w-40 h-40 "
                   style={{
                     backgroundColor: "#fcfcfc",
                     border: "2px solid #E9E9E9 ",
@@ -789,8 +789,8 @@ function SpecificDelegate({ props }: { props: Type }) {
                                 : ccLogo)
                         }
                         alt="user"
-                        width={256}
-                        height={256}
+                        width={300}
+                        height={300}
                         className={
                           displayImage || delegateInfo?.profilePicture
                             ? "w-40 h-40 rounded-3xl"

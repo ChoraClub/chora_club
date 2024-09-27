@@ -25,39 +25,36 @@ function InviteCreators({ userAddress }: { userAddress: any }) {
     setTimeout(() => setCopied(false), 2000); // Reset the copied state after 2 seconds
   };
 
-  const shareOnFarcaster = () => {
-    const url = encodeURIComponent(`${BASE_URL}invite/${userAddress}`);
-    const text = encodeURIComponent(`Join me on Chora Club`);
+  const url = encodeURIComponent(`${BASE_URL}invite/${userAddress}`);
+  const text = encodeURIComponent(`Join me on Chora Club`);
 
+  const shareOnFarcaster = () => {
     const farcasterUrl = `https://warpcast.com/~/compose?text=${text}&embeds%5B%5D=${url}`;
 
     window.open(farcasterUrl, "_blank");
   };
 
   const shareOnTelegram = () => {
-    const url = encodeURIComponent(`${BASE_URL}invite/${userAddress}`);
-    const text = encodeURIComponent(`Join me on Chora Club`);
-
     const telegramUrl = `https://t.me/share/url?text=${text}&url=${url}`;
 
     window.open(telegramUrl, "_blank");
   };
 
   const shareOnTwitter = () => {
-    const url = encodeURIComponent(`${BASE_URL}invite/${userAddress}`);
-    const text = encodeURIComponent(
+    const urlEncoded = encodeURIComponent(`${BASE_URL}invite/${userAddress}`);
+    const textTwitter = encodeURIComponent(
       `Join Chora Club 🚀, where DAO delegates share knowledge and insights in Web3!
 
 If you're a delegate eager to share your knowledge and earn rewards, then join & create impactful sessions. Let's make Web3 accessible to everyone!🌐 
 
 Join Now 👇
-${decodeURIComponent(url)} 
+${decodeURIComponent(urlEncoded)} 
 
 #ChoraClub #Web3`
     );
 
     // Twitter share URL
-    const twitterUrl = `https://twitter.com/intent/tweet?text=${text}`;
+    const twitterUrl = `https://twitter.com/intent/tweet?text=${textTwitter}`;
 
     // Open Twitter share dialog
     window.open(twitterUrl, "_blank");
