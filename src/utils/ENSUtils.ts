@@ -2,11 +2,11 @@ import { isAddress } from "viem";
 import { cache } from "react";
 import { truncateAddress } from "./text";
 import { ethers } from "ethers";
-import { getEnsAvatar } from '@wagmi/core'
-import { getEnsName as ens } from '@wagmi/core'
-import { config } from './config'
-import { normalize } from 'viem/ens'
-import { mainnet } from '@wagmi/core/chains'
+import { getEnsAvatar } from "@wagmi/core";
+import { getEnsName as ens } from "@wagmi/core";
+import { config } from "./config";
+import { normalize } from "viem/ens";
+import { mainnet } from "@wagmi/core/chains";
 
 const provider = new ethers.JsonRpcProvider(
   process.env.NEXT_PUBLIC_ENS_RPC_PROVIDER
@@ -64,13 +64,13 @@ export async function getMetaProfileImage() {}
 
 export async function fetchEnsAvatar(address: any) {
   try {
-    const ensName =await  ens(config, {
+    const ensName = await ens(config, {
       address,
-      chainId: mainnet.id
+      chainId: mainnet.id,
     });
     const avatar = await getEnsAvatar(config, {
       name: normalize(ensName?.toString() || ""),
-      chainId: mainnet.id
+      chainId: mainnet.id,
     });
     return { avatar, ensName };
   } catch (error) {
@@ -81,10 +81,10 @@ export async function fetchEnsAvatar(address: any) {
 
 export async function getEnsName(address: any) {
   try {
-    const ensName =await  ens(config, {
+    const ensName = await ens(config, {
       address,
-      chainId: mainnet.id
-    });    
+      chainId: mainnet.id,
+    });
     console.log("ensName: ", ensName);
     const displayName = address?.slice(0, 4) + "..." + address?.slice(-4);
 

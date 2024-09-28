@@ -521,7 +521,7 @@ function DelegatesList({ props }: { props: string }) {
                                 : props == "arbitrum"
                                 ? ARBLogo
                                 : ""
-                              : delegate.profilePicture
+                              : delegate?.profilePicture
                           }
                           alt="Image not found"
                           width={200}

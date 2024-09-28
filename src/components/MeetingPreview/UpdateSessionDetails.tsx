@@ -121,7 +121,10 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
           // setData(null);
         }
       }
-    } catch (e) {}
+    } catch (e) {
+      console.log("Error:", e);
+      setLoading(true);
+    }
   };
 
   return (

@@ -26,6 +26,8 @@ import {
   protocolRewardsABI,
   protocolRewardsAddress,
 } from "chora-protocol-deployments";
+import { fetchEnsAvatar } from "@/utils/ENSUtils";
+import { truncateAddress } from "@/utils/text";
 
 interface Reward {
   platform: string;
@@ -177,6 +179,7 @@ function RewardsMain() {
   const [claimableRewards, setClaimableRewards] = useState<Reward[]>([]);
   const [mintedNFTs, setMintedNFTs] = useState<any[]>([]);
   const [ethToUsdConversionRate, setEthToUsdConversionRate] = useState(0);
+  const [displayEnsName, setDisplayEnsName] = useState<any>();
 
   const nonZeroRewards = claimableRewards.filter(
     (reward) => parseFloat(reward.amount) > 0
@@ -223,6 +226,15 @@ function RewardsMain() {
     if (address) {
       fetchReward();
       fetchNFTs();
+
+      const fetchEnsName = async () => {
+        const ensName = await fetchEnsAvatar(address);
+        const truncatedAddress = truncateAddress(address);
+        setDisplayEnsName(
+          ensName?.ensName ? ensName.ensName : truncatedAddress
+        );
+      };
+      fetchEnsName();
     }
   }, [address]);
 
@@ -382,10 +394,7 @@ function RewardsMain() {
                         <div className="w-8 h-8 flex items-center justify-center">
                           <Image src={reward.logo} alt="logo" />
                         </div>
-                        <span>
-                          {reward.platform.slice(0, 6)}...
-                          {reward.platform.slice(-4)}
-                        </span>
+                        <span>{displayEnsName}</span>
                       </div>
                       <div className="flex items-center space-x-2">
                         <div>

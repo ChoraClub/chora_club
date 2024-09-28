@@ -131,7 +131,7 @@ export const config = {
     "/api/get-session-data/:path*",
     // "/api/attest-offchain/:path*",
     "/api/get-attendee-individual/:path*",
-    "/api/get-dao-sessions/:path*",
+    // "/api/get-dao-sessions/:path*",
     // "/api/images/og/nft/:path",
   ],
 };

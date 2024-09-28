@@ -408,11 +408,11 @@ function EventTile({ tileIndex, data: initialData, isEvent }: TileProps) {
                         size={32}
                         color="#004DFF"
                         onClick={() => {
-                          // setStartLoading(true);
-                          // router.push(
-                          //   `/meeting/session/${data.meetingId}/lobby`
-                          // );
-                          handleJoinClick();
+                          setStartLoading(true);
+                          router.push(
+                            `/meeting/session/${data.meetingId}/lobby`
+                          );
+                          // handleJoinClick();
                         }}
                       />
                     </span>
@@ -489,9 +489,9 @@ function EventTile({ tileIndex, data: initialData, isEvent }: TileProps) {
             data.booking_status === "Approved" && (
               <div
                 onClick={() => {
-                  // setStartLoading(true);
-                  // router.push(`/meeting/session/${data.meetingId}/lobby`);
-                  handleJoinClick();
+                  setStartLoading(true);
+                  router.push(`/meeting/session/${data.meetingId}/lobby`);
+                  // handleJoinClick();
                 }}
                 className="text-center rounded-full font-bold text-white mt-2 text-xs cursor-pointer"
               >

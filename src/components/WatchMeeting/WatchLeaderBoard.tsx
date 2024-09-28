@@ -20,7 +20,11 @@ import emoji5 from "@/assets/images/watchmeeting/emoji5.svg";
 // Import types
 import { Holder } from "@/types/LeaderBoardTypes";
 import { UserProfileInterface } from "@/types/UserProfileTypes";
-import { DynamicAttendeeInterface, SessionInterface } from "@/types/MeetingTypes";
+import {
+  DynamicAttendeeInterface,
+  SessionInterface,
+} from "@/types/MeetingTypes";
+import { fetchEnsAvatar } from "@/utils/ENSUtils";
 
 // Define interfaces
 interface Attendee extends DynamicAttendeeInterface {
@@ -60,58 +64,96 @@ const WatchLeaderBoard = ({
 
   useEffect(() => {
     if (leaderBoardData) {
-      const top = leaderBoardData.TopTen?.slice(0, 3).map((holder: any, index: number) => ({
-        smallEmoji: [emoji1, emoji2, emoji3][index],
-        text: `Top #${index + 1}`,
-        img: [user1, user2, user3][index],
-        name: holder.user ? `${holder.user.slice(0, 6)}...${holder.user.slice(-4)}` : '',
-        color: ['#4773F0', '#A573E5', '#1FA1FF'][index],
-        bgColor: ['#EAECFF', '#F2E8FF', '#EAF1FF'][index],
-        balance: holder.balance
-      })) || [];
+      const fetchEnsDetails = async () => {
+        const top = await Promise.all(
+          leaderBoardData.TopTen?.slice(0, 3).map(
+            async (holder: any, index: number) => {
+              const ensDetails = await fetchEnsAvatar(holder.user);
+              return {
+                smallEmoji: [emoji1, emoji2, emoji3][index],
+                text: `Top #${index + 1}`,
+                img: ensDetails?.avatar || [user1, user2, user3][index],
+                name:
+                  ensDetails?.ensName ||
+                  `${holder.user.slice(0, 6)}...${holder.user.slice(-4)}`,
+                color: ["#4773F0", "#A573E5", "#1FA1FF"][index],
+                bgColor: ["#EAECFF", "#F2E8FF", "#EAF1FF"][index],
+                balance: holder.balance,
+              };
+            }
+          ) || []
+        );
 
-      const special = [
-        leaderBoardData.firstCollector && {
-          smallEmoji: emoji4,
-          text: 'First Collector',
-          img: user4,
-          name: leaderBoardData.firstCollector.user 
-            ? `${leaderBoardData.firstCollector.user.slice(0, 6)}...${leaderBoardData.firstCollector.user.slice(-4)}`
-            : '',
-          color: '#FF8A00',
-          bgColor: '#FFF4EA',
-          balance: leaderBoardData.firstCollector.balance
-        },
-        leaderBoardData.latestCollector && {
-          smallEmoji: emoji5,
-          text: 'Latest Collector',
-          img: user5,
-          name: leaderBoardData.latestCollector.user 
-            ? `${leaderBoardData.latestCollector.user.slice(0, 6)}...${leaderBoardData.latestCollector.user.slice(-4)}`
-            : '',
-          color: '#FF8A00',
-          bgColor: '#FFF4EA',
-          balance: leaderBoardData.latestCollector.balance
-        }
-      ].filter(Boolean);
+        setTopEntries(top);
 
-      setTopEntries(top);
-      setSpecialEntries(special);
+        const special = await Promise.all([
+          leaderBoardData.firstCollector &&
+            fetchEnsAvatar(leaderBoardData.firstCollector.user),
+          leaderBoardData.latestCollector &&
+            fetchEnsAvatar(leaderBoardData.latestCollector.user),
+        ]);
 
-      // Prepare all entries for the popup
-      const all = [
-        ...(leaderBoardData.TopTen?.map((holder: any, index: number) => ({
-          smallEmoji: [emoji1, emoji2, emoji3, emoji4, emoji5][index % 5],
-          text: index < 3 ? `Top #${index + 1}` : `#${index + 1}`,
-          img: [user1, user2, user3, user4, user5][index % 5],
-          name: holder.user ? `${holder.user.slice(0, 6)}...${holder.user.slice(-4)}` : '',
-          color: ['#4773F0', '#A573E5', '#1FA1FF', '#FF8A00', '#FF8A00'][index % 5],
-          bgColor: ['#EAECFF', '#F2E8FF', '#EAF1FF', '#FFF4EA', '#FFF4EA'][index % 5],
-          balance: holder.balance
-        })) || []),
-        ...special
-      ];
-      setAllEntries(all);
+        const specialEntries = [
+          leaderBoardData.firstCollector && {
+            smallEmoji: emoji4,
+            text: "First Collector",
+            img: special[0]?.avatar || user4,
+            name:
+              special[0]?.ensName ||
+              `${leaderBoardData.firstCollector.user.slice(
+                0,
+                6
+              )}...${leaderBoardData.firstCollector.user.slice(-4)}`,
+            color: "#FF8A00",
+            bgColor: "#FFF4EA",
+            balance: leaderBoardData.firstCollector.balance,
+          },
+          leaderBoardData.latestCollector && {
+            smallEmoji: emoji5,
+            text: "Latest Collector",
+            img: special[1]?.avatar || user5,
+            name:
+              special[1]?.ensName ||
+              `${leaderBoardData.latestCollector.user.slice(
+                0,
+                6
+              )}...${leaderBoardData.latestCollector.user.slice(-4)}`,
+            color: "#FF8A00",
+            bgColor: "#FFF4EA",
+            balance: leaderBoardData.latestCollector.balance,
+          },
+        ].filter(Boolean);
+
+        setSpecialEntries(specialEntries);
+
+        // Prepare all entries for the popup
+        const all = await Promise.all(
+          leaderBoardData.TopTen?.map(async (holder: any, index: number) => {
+            const ensDetails = await fetchEnsAvatar(holder.user);
+            return {
+              smallEmoji: [emoji1, emoji2, emoji3, emoji4, emoji5][index % 5],
+              text: index < 3 ? `Top #${index + 1}` : `#${index + 1}`,
+              img:
+                ensDetails?.avatar ||
+                [user1, user2, user3, user4, user5][index % 5],
+              name:
+                ensDetails?.ensName ||
+                `${holder.user.slice(0, 6)}...${holder.user.slice(-4)}`,
+              color: ["#4773F0", "#A573E5", "#1FA1FF", "#FF8A00", "#FF8A00"][
+                index % 5
+              ],
+              bgColor: ["#EAECFF", "#F2E8FF", "#EAF1FF", "#FFF4EA", "#FFF4EA"][
+                index % 5
+              ],
+              balance: holder.balance,
+            };
+          }) || []
+        );
+
+        setAllEntries([...all, ...specialEntries]);
+      };
+
+      fetchEnsDetails();
     }
   }, [leaderBoardData]);
 
@@ -164,7 +206,7 @@ const WatchLeaderBoard = ({
           color: entry.color,
         }}
       >
-        {entry.balance}x  
+        {entry.balance}x
       </div>
     </div>
   );
@@ -178,14 +220,16 @@ const WatchLeaderBoard = ({
               🏆LeaderBoard
             </p>
           </div>
-          {topEntries.length === 0 && specialEntries.length === 0 ?(<></>):(
+          {topEntries.length === 0 && specialEntries.length === 0 ? (
+            <></>
+          ) : (
             <div
-            className="text-[10px] text-blue-shade-100 bg-blue-shade-700 rounded py-1 px-2 border border-blue-shade-100 cursor-pointer hover:bg-blue-shade-600"
-            onClick={handleViewAll}
-          >
-            View All
-          </div>
-          )}         
+              className="text-[10px] text-blue-shade-100 bg-blue-shade-700 rounded py-1 px-2 border border-blue-shade-100 cursor-pointer hover:bg-blue-shade-600"
+              onClick={handleViewAll}
+            >
+              View All
+            </div>
+          )}
         </div>
         <div className="flex flex-col gap-2">
           {topEntries.length === 0 && specialEntries.length === 0 ? (
