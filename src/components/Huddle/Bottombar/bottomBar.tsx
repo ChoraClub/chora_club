@@ -303,8 +303,8 @@ const BottomBar = ({
               }
             }}
             className={clsx(
-              `bg-blue-shade-100 hover:bg-blue-shade-200 ${
-                (shareStream !== null || isScreenShared) && "bg-blue-shade-100"
+              `bg-gray-500/80 hover:bg-gray-600 ${
+                (shareStream !== null || isScreenShared) && "bg-gray-500/80"
               }`
             )}
           >
@@ -321,8 +321,8 @@ const BottomBar = ({
               });
             }}
             className={clsx(
-              `bg-blue-shade-100 hover:bg-blue-shade-200 ${
-                metadata?.isHandRaised && "bg-blue-shade-100"
+              `bg-gray-500/80 hover:bg-gray-600 ${
+                metadata?.isHandRaised && "bg-gray-500/80"
               }`
             )}
           >

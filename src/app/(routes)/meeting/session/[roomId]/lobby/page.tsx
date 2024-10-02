@@ -35,6 +35,7 @@ import arrow from "@/assets/images/instant-meet/arrow.svg";
 import ConnectWalletWithENS from "@/components/ConnectWallet/ConnectWalletWithENS";
 import { getEnsName } from "@/utils/ENSUtils";
 import { truncateAddress } from "@/utils/text";
+import { useSession } from "next-auth/react";
 
 type lobbyProps = {};
 
@@ -71,6 +72,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
   const [hostJoinedStatus, setHostJoinedStatus] = useState<any>();
   const [attendeeJoinedStatus, setAttendeeJoinedStatus] = useState<any>();
   const [meetingData, setMeetingData] = useState<any>();
+  const { data: session } = useSession();
 
   useEffect(() => {
     console.log("meetingStatus", meetingStatus);
@@ -299,6 +301,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
           setMeetingData(result.data);
           setHostAddress(result.data.host_address);
           setDaoName(result.data.dao_name);
+          // setDaoName("optimism");
           setSessionType(result.data.session_type);
           setHostJoinedStatus(result.data.host_joined_status);
           if (result.data.session_type === "session") {
@@ -425,28 +428,49 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
   return (
     <>
       {isAllowToEnter ? (
-        <div className="h-screen">
-          <main className="flex h-screen flex-col items-center justify-center bg-lobby text-slate-100 font-poppins">
-            <div className="flex flex-col items-center justify-center gap-4 w-1/3 mt-14">
-              <div className="text-center flex items-center justify-center bg-slate-100 w-full rounded-2xl py-28">
-                <div className="relative border-2 border-gray-600 rounded-full p-1">
-                  <Image
-                    src={avatarUrl}
-                    alt="audio-spaces-img"
-                    width={125}
-                    height={125}
-                    className="maskAvatar shadow-md"
-                    quality={100}
-                    priority
-                  />
-                  {/* <video
+        <div
+          className={`h-screen bg-contain bg-center bg-no-repeat rounded-full ${
+            daoName === "optimism"
+              ? "bg-op-logo"
+              : daoName === "arbitrum"
+              ? "bg-arb-logo"
+              : null
+          }`}
+        >
+          <main className="flex h-screen flex-col bg-lobby text-slate-100 font-poppins backdrop-blur-md">
+            <div className="text-4xl font-semibold font-quanty tracking-wide px-10 pt-4">
+              <span className="text-black">Chora</span>
+              <span className="text-blue-shade-100">Club</span>
+            </div>
+            <div className="flex w-full items-center justify-center my-auto">
+              <div className="flex flex-col items-center justify-center gap-4 w-1/3 mt-14">
+                <div
+                  className={`text-center flex items-center justify-center border border-white w-full rounded-2xl py-28 bg-opacity-40 ${
+                    daoName === "optimism"
+                      ? " bg-slate-100"
+                      : daoName === "arbitrum"
+                      ? " bg-slate-400"
+                      : null
+                  } `}
+                >
+                  <div className="relative border-2 border-gray-600 rounded-full p-1">
+                    <Image
+                      src={avatarUrl}
+                      alt="audio-spaces-img"
+                      width={125}
+                      height={125}
+                      className="maskAvatar shadow-md"
+                      quality={100}
+                      priority
+                    />
+                    {/* <video
                     src={avatarUrl}
                     muted
                     className="maskAvatar absolute left-1/2 top-1/2 z-10 h-full w-full -translate-x-1/2 -translate-y-1/2"
                     // autoPlay
                     loop
                   /> */}
-                  {/* <button
+                    {/* <button
                     onClick={() => setIsOpen((prev) => !prev)}
                     type="button"
                     className="text-white absolute bottom-0 right-0 z-10"
@@ -503,23 +527,39 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
                       </div>
                     </div>
                   </FeatCommon> */}
+                  </div>
                 </div>
-              </div>
-              {isDisconnected ? <ConnectWalletWithENS /> : null}
-              <div className="flex items-center w-full flex-col">
-                <div className="flex flex-col justify-center w-full gap-1 text-[#3E3D3D] font-semibold">
-                  ENS Name / Address
-                  <div className="flex w-full items-center rounded-[10px] border px-3 text-slate-300 outline-none border-white-800 backdrop-blur-[400px] focus-within:border-slate-600 gap-">
-                    <div className="mr-2">
-                      <Image
-                        alt="user-icon"
-                        src="/images/user-icon.svg"
-                        className="w-5 h-5"
-                        width={30}
-                        height={30}
-                      />
-                    </div>
-                    {/* <input
+                {isDisconnected && !session ? <ConnectWalletWithENS /> : null}
+                <div className="flex items-center w-full flex-col">
+                  <div
+                    className={`flex flex-col justify-center w-full gap-1 ${
+                      daoName === "optimism"
+                        ? "text-[#e7e7e7]"
+                        : daoName === "arbitrum"
+                        ? "text-[#4f4f4f]"
+                        : ""
+                    }  font-semibold`}
+                  >
+                    ENS Name / Address
+                    <div
+                      className={`flex w-full items-center rounded-[10px] ${
+                        daoName === "optimism"
+                          ? "bg-slate-100"
+                          : daoName === "arbitrum"
+                          ? "bg-slate-400"
+                          : null
+                      } bg-opacity-40 border px-3 text-slate-300 outline-none border-white backdrop-blur-[400px] focus-within:border-slate-600`}
+                    >
+                      <div className="mr-2">
+                        <Image
+                          alt="user-icon"
+                          src="/images/user-icon.svg"
+                          className="w-5 h-5"
+                          width={30}
+                          height={30}
+                        />
+                      </div>
+                      {/* <input
                     value={userDisplayName}
                     onChange={(e) => {
                       setUserDisplayName(e.target.value);
@@ -528,48 +568,59 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
                     placeholder="Enter your name"
                     className="flex-1 bg-transparent py-3 outline-none text-black"
                   /> */}
-                    <div className="flex-1 bg-transparent py-3 outline-none text-[#7C7C7C]">
-                      {isLoading ? (
-                        <div className="flex items-center justify-center top-10">
-                          <Oval
-                            visible={true}
-                            height="20"
-                            width="20"
-                            color="#0500FF"
-                            secondaryColor="#cdccff"
-                            ariaLabel="oval-loading"
-                          />
-                        </div>
-                      ) : (
-                        // profileDetails?.ensName ||
-                        // formattedAddress
-                        name
-                      )}
+                      <div className="flex-1 bg-transparent py-3 outline-none text-[#f0f0f0]">
+                        {isLoading ? (
+                          <div className="flex items-center justify-center top-10">
+                            <Oval
+                              visible={true}
+                              height="20"
+                              width="20"
+                              color="#0500FF"
+                              secondaryColor="#cdccff"
+                              ariaLabel="oval-loading"
+                            />
+                          </div>
+                        ) : (
+                          // profileDetails?.ensName ||
+                          // formattedAddress
+                          name
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-              <div className="flex items-center w-1/2">
-                <button
-                  className={`flex items-center justify-center text-slate-100 font-bold rounded-full p-4 mt-2 w-full ${
-                    isLoading
-                      ? "bg-blue-500"
-                      : "bg-blue-shade-200 transition-transform transform hover:scale-105 duration-300"
-                  }`}
-                  onClick={handleStartSpaces}
-                  disabled={isLoading}
-                >
-                  {isJoining ? "Joining Spaces..." : "Start meeting"}
-                  {!isJoining && (
-                    <Image
-                      alt="narrow-right"
-                      width={30}
-                      height={30}
-                      src={arrow}
-                      className="w-5 h-5 ml-2"
-                    />
-                  )}
-                </button>
+                <div className="flex items-center w-1/2">
+                  <button
+                    className={`flex items-center justify-center w-full py-4 px-6 mt-4
+        text-white font-bold text-lg
+        rounded-full
+        transition-all duration-300 ease-in-out
+        ${
+          isLoading
+            ? "bg-gray-400 cursor-not-allowed"
+            : "bg-gradient-to-r from-blue-600 to-blue-400 hover:from-blue-700 hover:to-blue-500"
+        }
+        transform hover:scale-105 active:scale-95
+        shadow-lg hover:shadow-xl
+        focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50
+      `}
+                    onClick={handleStartSpaces}
+                    disabled={isLoading}
+                  >
+                    <span className="mr-2">
+                      {isJoining ? "Joining Spaces..." : "Start Meeting"}
+                    </span>
+                    {!isJoining && (
+                      <Image
+                        alt="arrow-right"
+                        width={24}
+                        height={24}
+                        src={arrow}
+                        className="w-6 h-6 transition-transform duration-300 group-hover:translate-x-1"
+                      />
+                    )}
+                  </button>
+                </div>
               </div>
             </div>
           </main>

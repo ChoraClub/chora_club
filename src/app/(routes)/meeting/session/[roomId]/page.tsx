@@ -323,6 +323,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
           setMeetingData(result.data);
           setHostAddress(result.data.host_address);
           setDaoName(result.data.dao_name);
+          // setDaoName("optimism");
         }
 
         if (result.success) {
@@ -463,192 +464,199 @@ export default function Component({ params }: { params: { roomId: string } }) {
   return (
     <>
       {isAllowToEnter ? (
-        <div className={clsx("flex flex-col h-screen bg-white font-poppins")}>
-          <header className="flex items-center justify-between pt-4 px-4">
-            <div className="flex items-center py-2 space-x-2">
-              <div className="text-2xl font-semibold tracking-wide px-4">
-                <span className="text-black">Chora</span>
-                <span className="text-blue-shade-100">Club</span>
-              </div>
-            </div>
-            <div className="flex items-center justify-center gap-4">
-              {(isRecording || meetingRecordingStatus) && (
-                <Tooltip
-                  showArrow
-                  content={
-                    <div className="font-poppins">
-                      This meeting is being recorded
-                    </div>
-                  }
-                  placement="left"
-                  className="rounded-md bg-opacity-90 max-w-96"
-                  closeDelay={1}
-                >
-                  <span>
-                    <PiRecordFill color="#c42727" size={22} />
-                  </span>
-                </Tooltip>
-              )}
-
-              <div className="flex space-x-3">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button className="flex gap-2 bg-gray-600/50 text-gray-200 hover:bg-gray-500/50">
-                      {BasicIcons.invite}
-                      Invite
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <div className="flex space-x-2">
-                      <span className="p-2 bg-gray-200 rounded-lg text-black">
-                        {typeof window !== "undefined" &&
-                          `https://${window.location.host}${path}`}
-                      </span>
-                      <Button
-                        className="bg-gray-200 hover:bg-gray-300 text-gray-900"
-                        onClick={() => {
-                          if (typeof window === "undefined") return;
-                          navigator.clipboard.writeText(
-                            `https://${window.location.host}${path}/lobby`
-                          );
-                          setIsCopied(true);
-                          setTimeout(() => {
-                            setIsCopied(false);
-                          }, 3000);
-                        }}
-                      >
-                        {isCopied ? "Copied" : "Copy"}
-                      </Button>
-                    </div>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            </div>
-          </header>
-          <main
-            className={`transition-all ease-in-out flex items-center justify-center flex-1 duration-300 w-full h-[80%] p-2`}
-            style={{
-              backgroundColor: activeBg === "bg-white" ? "white" : undefined,
-              backgroundImage:
-                activeBg === "bg-white" ? undefined : `url(${activeBg})`,
-              backgroundPosition: "center",
-              backgroundSize: "cover",
-              backgroundRepeat: "no-repeat",
-            }}
-          >
-            <div className="flex w-full h-full">
-              {shareStream && (
-                <div className="w-3/4">
-                  <GridContainer className="w-full h-full">
-                    <>
-                      <Video
-                        stream={videoStreamTrack}
-                        name={metadata?.displayName ?? "guest"}
-                      />
-                    </>
-                  </GridContainer>
+        <div
+          className={clsx(
+            `flex flex-col h-screen font-poppins bg-contain bg-center bg-no-repeat ${
+              daoName === "optimism"
+                ? "bg-op-profile"
+                : daoName === "arbitrum"
+                ? "bg-arb-profile"
+                : null
+            }`
+          )}
+        >
+          <div className="backdrop-blur-xl flex flex-col h-screen">
+            <header className="flex items-center justify-between pt-4 px-4">
+              <div className="flex items-center py-2 space-x-2">
+                <div className="text-3xl font-semibold tracking-wide px-4 font-quanty">
+                  <span className="text-black">Chora</span>
+                  <span className="text-blue-shade-100">Club</span>
                 </div>
-              )}
-              {peerIds.map((peerId) => (
-                <RemoteScreenShare key={peerId} peerId={peerId} />
-              ))}
-              <section
-                className={clsx(
-                  "justify-center px-4",
-                  isScreenShared
-                    ? "flex flex-col w-1/4 gap-2"
-                    : "flex flex-wrap gap-3 w-full"
-                )}
-              >
-                {role !== Role.BOT && (
-                  <GridContainer
-                    className={clsx(
-                      isScreenShared
-                        ? "w-full h-full gap-y-2 mx-1"
-                        : `w-[49%] ${
-                            peerIds.length === 2 || peerIds.length === 3
-                              ? "h-[49%]"
-                              : ""
-                          }`
-                    )}
+              </div>
+              <div className="flex items-center justify-center gap-4">
+                {(isRecording || meetingRecordingStatus) && (
+                  <Tooltip
+                    showArrow
+                    content={
+                      <div className="font-poppins">
+                        This meeting is being recorded
+                      </div>
+                    }
+                    placement="left"
+                    className="rounded-md bg-opacity-90 max-w-96"
+                    closeDelay={1}
                   >
-                    <div className="absolute left-4 top-4 text-3xl z-10">
-                      {reaction}
-                    </div>
-                    {metadata?.isHandRaised && (
-                      <span className="absolute top-4 right-4 text-4xl text-gray-200 font-medium">
-                        ✋
-                      </span>
-                    )}
+                    <span>
+                      <PiRecordFill color="#c42727" size={22} />
+                    </span>
+                  </Tooltip>
+                )}
 
-                    {stream ? (
+                <div className="flex space-x-3">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button className="flex gap-2 bg-gray-600/50 text-gray-200 hover:bg-gray-500/50">
+                        {BasicIcons.invite}
+                        Invite
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <div className="flex space-x-2">
+                        <span className="p-2 bg-gray-200 rounded-lg text-black">
+                          {typeof window !== "undefined" &&
+                            `https://${window.location.host}${path}`}
+                        </span>
+                        <Button
+                          className="bg-gray-200 hover:bg-gray-300 text-gray-900"
+                          onClick={() => {
+                            if (typeof window === "undefined") return;
+                            navigator.clipboard.writeText(
+                              `https://${window.location.host}${path}/lobby`
+                            );
+                            setIsCopied(true);
+                            setTimeout(() => {
+                              setIsCopied(false);
+                            }, 3000);
+                          }}
+                        >
+                          {isCopied ? "Copied" : "Copy"}
+                        </Button>
+                      </div>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              </div>
+            </header>
+            <main
+              className={`transition-all ease-in-out flex items-center justify-center flex-1 duration-300 w-full h-[80%] p-2`}
+              style={{
+                backgroundColor: activeBg === "bg-white" ? "white" : undefined,
+                backgroundImage:
+                  activeBg === "bg-white" ? undefined : `url(${activeBg})`,
+                backgroundPosition: "center",
+                backgroundSize: "cover",
+                backgroundRepeat: "no-repeat",
+              }}
+            >
+              <div className="flex w-full h-full">
+                {shareStream && (
+                  <div className="w-3/4">
+                    <GridContainer className="w-full h-full">
                       <>
-                        <Camera
-                          stream={stream}
+                        <Video
+                          stream={videoStreamTrack}
                           name={metadata?.displayName ?? "guest"}
                         />
                       </>
-                    ) : (
-                      <div className="flex w-24 h-24 rounded-full">
-                        {metadata?.avatarUrl && (
-                          <div className="bg-pink-50 border border-pink-100 rounded-full w-24 h-24">
-                            <Image
-                              alt="image"
-                              src={metadata?.avatarUrl}
-                              className="maskAvatar object-contain object-center"
-                              width={100}
-                              height={100}
-                            />
-                          </div>
-                        )}
-                      </div>
-                    )}
-                    <span className="absolute bottom-4 left-4 text-gray-800 font-medium">
-                      {`${metadata?.displayName} (You)`}
-                    </span>
-                    <span className="absolute bottom-4 right-4">
-                      {isAudioOn
-                        ? NestedPeerListIcons.active.mic
-                        : NestedPeerListIcons.inactive.mic}
-                    </span>
-                  </GridContainer>
+                    </GridContainer>
+                  </div>
                 )}
-                {isScreenShared ? (
-                  peerIds
-                    .slice(0, 2)
-                    .map((peerId) => (
+                {peerIds.map((peerId) => (
+                  <RemoteScreenShare key={peerId} peerId={peerId} />
+                ))}
+                <section
+                  className={clsx(
+                    "justify-center px-4",
+                    isScreenShared
+                      ? "flex flex-col w-1/4 gap-2"
+                      : "flex flex-wrap gap-3 w-full"
+                  )}
+                >
+                  {role !== Role.BOT && (
+                    <GridContainer
+                      className={clsx(
+                        isScreenShared
+                          ? "w-full h-full gap-y-2 mx-1"
+                          : `w-[49%] ${
+                              peerIds.length === 2 || peerIds.length === 3
+                                ? "h-[49%]"
+                                : ""
+                            }`
+                      )}
+                    >
+                      <div className="absolute left-4 top-4 text-3xl z-10">
+                        {reaction}
+                      </div>
+                      {metadata?.isHandRaised && (
+                        <span className="absolute top-4 right-4 text-4xl text-gray-200 font-medium">
+                          ✋
+                        </span>
+                      )}
+
+                      {stream ? (
+                        <>
+                          <Camera
+                            stream={stream}
+                            name={metadata?.displayName ?? "guest"}
+                          />
+                        </>
+                      ) : (
+                        <div className="flex w-24 h-24 rounded-full">
+                          {metadata?.avatarUrl && (
+                            <div className="bg-pink-50 border border-pink-100 rounded-full w-24 h-24">
+                              <Image
+                                alt="image"
+                                src={metadata?.avatarUrl}
+                                className="maskAvatar object-contain object-center"
+                                width={100}
+                                height={100}
+                              />
+                            </div>
+                          )}
+                        </div>
+                      )}
+                      <span className="absolute bottom-4 left-4 text-gray-800 font-medium">
+                        {`${metadata?.displayName} (You)`}
+                      </span>
+                      <span className="absolute bottom-4 right-4">
+                        {isAudioOn
+                          ? NestedPeerListIcons.active.mic
+                          : NestedPeerListIcons.inactive.mic}
+                      </span>
+                    </GridContainer>
+                  )}
+                  {isScreenShared ? (
+                    peerIds
+                      .slice(0, 2)
+                      .map((peerId) => (
+                        <RemotePeer key={peerId} peerId={peerId} />
+                      ))
+                  ) : peerIds.length > 3 ? (
+                    <>
+                      {peerIds.slice(0, 2).map((peerId) => (
+                        <RemotePeer key={peerId} peerId={peerId} />
+                      ))}
+                      <ParticipantTile />
+                    </>
+                  ) : (
+                    peerIds.map((peerId) => (
                       <RemotePeer key={peerId} peerId={peerId} />
                     ))
-                ) : peerIds.length > 3 ? (
-                  <>
-                    {peerIds.slice(0, 2).map((peerId) => (
-                      <RemotePeer key={peerId} peerId={peerId} />
-                    ))}
-                    <ParticipantTile />
-                  </>
-                ) : (
-                  peerIds.map((peerId) => (
-                    <RemotePeer key={peerId} peerId={peerId} />
-                  ))
-                )}
-              </section>
-              {/* <MainGridLayout params={params} /> */}
-            </div>
-            {isChatOpen && <ChatBar />}
-            {isParticipantsOpen && <ParticipantsBar />}
-          </main>
-          {/* <ShowCaptions
-        mediaStream={audioStream}
-        name={metadata?.displayName}
-        localPeerId={peerId}
-      /> */}
-          <BottomBar
-            daoName={daoName}
-            hostAddress={hostAddress}
-            meetingStatus={meetingRecordingStatus}
-            meetingData={meetingData}
-            meetingCategory={meetingCategory}
-          />
+                  )}
+                </section>
+                {/* <MainGridLayout params={params} /> */}
+              </div>
+              {isChatOpen && <ChatBar />}
+              {isParticipantsOpen && <ParticipantsBar />}
+            </main>
+            <BottomBar
+              daoName={daoName}
+              hostAddress={hostAddress}
+              meetingStatus={meetingRecordingStatus}
+              meetingData={meetingData}
+              meetingCategory={meetingCategory}
+            />
+          </div>
         </div>
       ) : (
         <>
