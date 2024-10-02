@@ -59,7 +59,6 @@ function DelegatesList({ props }: { props: string }) {
   const searchParams = useSearchParams();
   const [isShowing, setIsShowing] = useState(true);
   const [isSearching, setIsSearching] = useState<boolean>(false);
-  const [lastCursor, setLastCursor] = useState<string | null>(null);
   const [delegateOpen, setDelegateOpen] = useState(false);
   const [delegateDetails, setDelegateDetails] = useState<any>();
   const [loading, setLoading] = useState(false);
@@ -94,15 +93,10 @@ function DelegatesList({ props }: { props: string }) {
     setIsShowing(!KarmaCreditClosed);
   }, []);
 
-  const fetchData = async (lastCursor: string | null) => {
+  const fetchData = async () => {
     try {
       setDataLoading(true);
-      const res = await fetch(
-        // props === "arbitrum"
-        //   ? `/api/get-arbitrum-delegatelist?lastCursor=${lastCursor || ""}`
-        //   :
-        `/api/get-delegate?skip=${skip}&dao=${props}`
-      );
+      const res = await fetch(`/api/get-delegate?skip=${skip}&dao=${props}`);
 
       if (!res.ok) {
         throw new Error(`HTTP error! status: ${res.status}`);
@@ -110,16 +104,6 @@ function DelegatesList({ props }: { props: string }) {
 
       const daoInfo = await res.json();
       let formattedDelegates;
-      // if (props === "arbitrum") {
-      //   formattedDelegates = daoInfo.delegates.nodes.map((delegate: any) => {
-      //     return {
-      //       delegate: delegate.account.address,
-      //       adjustedBalance: delegate.votesCount / 10 ** 18,
-      //       ensName: delegate.account.ens,
-      //       profilePicture: delegate.account.picture,
-      //     };
-      //   });
-      // } else {
       setSkip(daoInfo.nextSkip);
       setHasMore(daoInfo.hasMore);
       formattedDelegates = await Promise.all(
@@ -145,12 +129,9 @@ function DelegatesList({ props }: { props: string }) {
         delegates: [...prevData.delegates, ...formattedDelegates],
       }));
 
-      setLastCursor(daoInfo.delegates?.pageInfo?.lastCursor);
-
       setDataLoading(false);
       cache[props] = {
         delegates: [...(cache[props]?.delegates || []), ...formattedDelegates],
-        lastCursor: daoInfo.delegates?.pageInfo?.lastCursor || null,
       };
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -164,21 +145,20 @@ function DelegatesList({ props }: { props: string }) {
       setDelegateData(cache[props]);
       setCurrentPage(pageCache + 1);
       setTempData(cache[props]);
-      setLastCursor(cache[props].lastCursor || null);
       setPageLoading(false);
       setDataLoading(false);
     } else {
       setDataLoading(true);
-      fetchData(null);
+      fetchData();
       setDataLoading(false);
     }
   }, [props]);
 
-  useEffect(() => {
-    if (currentPage > 0 || lastCursor) {
-      fetchData(lastCursor || "");
-    }
-  }, [currentPage]);
+  // useEffect(() => {
+  //   if (currentPage > 0) {
+  //     fetchData();
+  //   }
+  // }, [currentPage]);
 
   const debounce = (func: (...args: any[]) => void, wait: number) => {
     let timeout: NodeJS.Timeout;
@@ -198,7 +178,8 @@ function DelegatesList({ props }: { props: string }) {
           `/api/search-delegate?address=${query}&dao=${props}`
         );
         const filtered = await res.json();
-        const data = await fetchEnsAvatar(filtered[0].id);
+        console.log("RESULT:::", filtered);
+        const data = await fetchEnsAvatar(filtered[0]?.id);
         if (filtered) {
           const formattedDelegates = {
             delegate: filtered[0].id,
@@ -237,7 +218,7 @@ function DelegatesList({ props }: { props: string }) {
         scrollTop + clientHeight >= scrollHeight - threshold &&
         !isDataLoading
       ) {
-        fetchData(lastCursor || "");
+        fetchData();
       }
     }, 200),
     [fetchData, isDataLoading, hasMore]
@@ -498,7 +479,7 @@ function DelegatesList({ props }: { props: string }) {
           <div>
             <div className="grid min-[475px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-10">
               {delegateData.delegates.map((delegate: any, index: number) => (
-                <>
+                <React.Fragment key={index}>
                   <div
                     onClick={(event) => {
                       router.push(
@@ -642,7 +623,7 @@ function DelegatesList({ props }: { props: string }) {
                       confettiVisible={confettiVisible}
                     />
                   )}
-                </>
+                </React.Fragment>
               ))}
             </div>
 

@@ -14,8 +14,6 @@ import text1 from "@/assets/images/daos/texture1.png";
 import text2 from "@/assets/images/daos/texture2.png";
 import oplogo from "@/assets/images/daos/op.png";
 import arblogo from "@/assets/images/daos/arbitrum.jpg";
-
-// import { getEnsName } from "../ConnectWallet/ENSResolver";
 import logo from "@/assets/images/daos/CCLogo.png";
 import user1 from "@/assets/images/user/user1.svg";
 import { BsPersonVideo3 } from "react-icons/bs";
@@ -134,8 +132,6 @@ function EventTile({ tileIndex, data: initialData, isEvent }: TileProps) {
   const formatWalletAddress = (address: any) => {
     if (typeof address !== "string" || address.length <= 10) return address;
     return address.slice(0, 6) + "..." + address.slice(-4);
-    // const ensName = getEnsName(address.toLowerCase());
-    // return ensName;
   };
 
   const formatSlotTimeToLocal = (slotTime: any) => {

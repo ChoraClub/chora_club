@@ -16,6 +16,8 @@ import RewardButton from "../ClaimReward/RewardButton";
 import { useSearchParams } from "next/navigation";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import Heading from "../ComponentUtils/Heading";
+import { useConnection } from "@/app/hooks/useConnection";
+import { useAccount } from "wagmi";
 
 function ExploreDAOs() {
   const dao_info = Object.keys(dao_details).map((key) => {
@@ -32,16 +34,18 @@ function ExploreDAOs() {
   const [status, setStatus] = useState(true);
   const router = useRouter();
   const [showNotification, setShowNotification] = useState(true);
-  const [isPageLoading, setIsPageLoading] = useState(true);
+  // const [isPageLoading, setIsPageLoading] = useState(true);
   const [isHovered, setIsHovered] = useState(false);
   const [openSearch, setOpenSearch] = useState(false);
   const searchParams = useSearchParams();
   const { openConnectModal } = useConnectModal();
+  const { isConnected, isLoading, isSessionLoading, isPageLoading, isReady } =
+    useConnection();
 
   useEffect(() => {
     const storedStatus = sessionStorage.getItem("notificationStatus");
     setShowNotification(storedStatus !== "closed");
-    setIsPageLoading(false);
+    // setIsPageLoading(false);
   }, []);
 
   const handleCloseNotification = () => {
@@ -182,24 +186,6 @@ function ExploreDAOs() {
           </>
         )}
       </div>
-      {/* {showNotification && !isPageLoading && (
-        <div
-          className={` fixed bottom-10 left-10 sm:left-[10%] sm:right-[10%] md:left-[20%] md:right-[20%] lg:left-[30%] lg:right-[30%] ${
-            status ? "" : "hidden"
-          }`}
-        >
-          <div className="py-2 bg-blue-shade-100 text-white rounded-xl px-4 sm:px-7 relative text-xs sm:text-sm font-poppins font-medium">
-            To ensure optimal user experience, please note that our site is
-            designed to be responsive on desktop devices.
-            <div
-              className="bg-gray-50 hover:bg-gray-100 p-[5px] rounded-full cursor-pointer absolute top-[6px] right-[6px]"
-              onClick={handleCloseNotification}
-            >
-              <ImCross color="#111" size={7} />
-            </div>
-          </div>
-        </div>
-      )} */}
     </div>
   );
 }

@@ -11,7 +11,7 @@ import toast, { Toaster } from "react-hot-toast";
 import user1 from "@/assets/images/user/user1.svg";
 import user2 from "@/assets/images/user/user2.svg";
 import posterImage from "@/assets/images/daos/thumbnail1.png";
-import { getEnsName } from "@/utils/ENSUtils";
+import { fetchEnsName } from "@/utils/ENSUtils";
 import logo from "@/assets/images/daos/CCLogo.png";
 import ClaimButton from "./ClaimButton";
 import EditButton from "./EditButton";
@@ -164,7 +164,7 @@ function RecordedSessionsTile({
     const fetchEnsNames = async () => {
       const ensNamesMap: any = {};
       for (const data of meetingData) {
-        const ensNames = await getEnsName(data.host_address.toLowerCase());
+        const ensNames = await fetchEnsName(data.host_address.toLowerCase());
         const ensName = ensNames?.ensNameOrAddress;
         if (ensName) {
           ensNamesMap[data.host_address] = ensName;
@@ -183,7 +183,7 @@ function RecordedSessionsTile({
     const fetchEnsNames = async () => {
       const ensNamesMap: any = {};
       for (const data of meetingData) {
-        const ensNames = await getEnsName(
+        const ensNames = await fetchEnsName(
           data.attendees[0]?.attendee_address.toLowerCase()
         );
         const ensName = ensNames?.ensNameOrAddress;

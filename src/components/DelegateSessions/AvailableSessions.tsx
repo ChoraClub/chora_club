@@ -15,7 +15,7 @@ import OPLogo from "@/assets/images/daos/op.png";
 import ArbLogo from "@/assets/images/daos/arb.png";
 import "@/components/DelegateSessions/DelegateSessionsMain.module.css";
 import AvailableSessionsSkeletonLoader from "../SkeletonLoader/AvailableSessionsSkeletonLoader";
-import { getEnsName } from "@/utils/ENSUtils";
+import { fetchEnsName } from "@/utils/ENSUtils";
 import onChain_link from "@/assets/images/watchmeeting/onChain_link.png";
 import offChain_link from "@/assets/images/watchmeeting/offChain_link.png";
 import ErrorDisplay from "../ComponentUtils/ErrorDisplay";
@@ -323,7 +323,7 @@ function AvailableSessions() {
       const names = await Promise.all(
         addresses.map(async (address) => {
           try {
-            const ensNames = await getEnsName(address);
+            const ensNames = await fetchEnsName(address);
             const ensName = ensNames?.ensName;
             return { address, ensName };
           } catch (error) {

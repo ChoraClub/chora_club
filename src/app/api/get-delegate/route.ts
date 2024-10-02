@@ -31,7 +31,7 @@ export const GET = async (req: NextRequest) => {
     const dao = searchParams.get("dao");
     const skip = parseInt(searchParams.get("skip") || "0", 0);
     const UNIQUE_DELEGATES_COUNT = 20;
-    const FETCH_SIZE = 1000;
+    const FETCH_SIZE = 100;
     let uniqueDelegates = new Map();
     let hasMore = true;
     let newSkip = skip;

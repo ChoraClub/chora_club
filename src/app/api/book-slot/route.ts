@@ -4,8 +4,6 @@ import { NextResponse, NextRequest } from "next/server";
 import { sendMail, compileBookedSessionTemplate } from "@/libs/mail";
 import { io } from "socket.io-client";
 import { BASE_URL, SOCKET_BASE_URL } from "@/config/constants";
-import { getEnsName } from "@/utils/ENSUtils";
-import { truncateAddress } from "@/utils/text";
 import {
   formatSlotDateAndTime,
   getDisplayNameOrAddr,
