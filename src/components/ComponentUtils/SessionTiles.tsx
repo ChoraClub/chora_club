@@ -15,7 +15,6 @@ import {
 import { useAccount } from "wagmi";
 import styles from "./Tile.module.css";
 import { ethers } from "ethers";
-// import { getEnsName } from "../ConnectWallet/ENSResolver";
 import lighthouse from "@lighthouse-web3/sdk";
 import toast from "react-hot-toast";
 import { FaPencil } from "react-icons/fa6";
@@ -125,8 +124,6 @@ SessionTileProps) {
   const formatWalletAddress = (address: any) => {
     if (typeof address !== "string" || address.length <= 10) return address;
     return address.slice(0, 6) + "..." + address.slice(-4);
-    // const ensName = getEnsName(address.toLowerCase());
-    // return ensName;
   };
   const formatSlotTimeToLocal = (slotTime: any) => {
     const date = new Date(slotTime);

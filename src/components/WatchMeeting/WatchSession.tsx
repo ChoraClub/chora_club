@@ -21,7 +21,7 @@ import ShareMediaModal from "./ShareMediaModal";
 import { BASE_URL } from "@/config/constants";
 import toast, { Toaster } from "react-hot-toast";
 import { Tooltip } from "@nextui-org/react";
-import { getEnsName } from "@/utils/ENSUtils";
+import { fetchEnsName } from "@/utils/ENSUtils";
 import { IoMdEye } from "react-icons/io";
 import {
   DynamicAttendeeInterface,
@@ -86,12 +86,12 @@ function WatchSession({
   };
 
   useEffect(() => {
-    const fetchEnsName = async () => {
-      const name = await getEnsName(data.host_address.toLowerCase());
+    const fetchedEnsName = async () => {
+      const name = await fetchEnsName(data.host_address.toLowerCase());
       setEnsHostName(name?.ensNameOrAddress);
     };
 
-    fetchEnsName();
+    fetchedEnsName();
   }, [data.host_address]);
 
   function formatViews(views: number): string {

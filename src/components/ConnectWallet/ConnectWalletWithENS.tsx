@@ -2,19 +2,18 @@
 import React, { useEffect, useState } from "react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 // import "@rainbow-me/rainbow-button/styles.css";
-import { fetchEnsAvatar, getEnsName } from "@/utils/ENSUtils";
+import { fetchEnsAvatar, fetchEnsName } from "@/utils/ENSUtils";
 import { BiSolidWallet } from "react-icons/bi";
 import { useAccount } from "wagmi";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
-import user from "@/assets/images/user/user2.svg"
+import user from "@/assets/images/user/user2.svg";
 
 function ConnectWalletWithENS() {
   const [displayAddress, setDisplayAddress] = useState<any>();
   const [userProfileImage, setUserProfileImage] = useState<string | null>(null);
   const [ensAvatar, setEnsAvatar] = useState<string | null>(null);
   const { address } = useAccount();
-
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -35,11 +34,15 @@ function ConnectWalletWithENS() {
 
           const res = await fetch(`/api/profile/${address}`, requestOptions);
           const dbResponse = await res.json();
-          console.log("data",dbResponse)
+          console.log("data", dbResponse);
 
           if (dbResponse.data.length > 0) {
             const profileImage = dbResponse.data[0]?.image;
-            setUserProfileImage(profileImage ? `https://gateway.lighthouse.storage/ipfs/${profileImage}` : null);
+            setUserProfileImage(
+              profileImage
+                ? `https://gateway.lighthouse.storage/ipfs/${profileImage}`
+                : null
+            );
           }
 
           const ensData = await fetchEnsAvatar(address);
@@ -56,7 +59,7 @@ function ConnectWalletWithENS() {
   useEffect(() => {
     if (address) {
       (async () => {
-        const displayName = await getEnsName(address);
+        const displayName = await fetchEnsName(address);
         setDisplayAddress(displayName?.ensNameOrAddress);
       })();
     }
@@ -70,10 +73,8 @@ function ConnectWalletWithENS() {
     } else {
       return user;
     }
-    
-
   };
-  
+
   return (
     <ConnectButton.Custom>
       {({
@@ -95,7 +96,7 @@ function ConnectWalletWithENS() {
           (!authenticationStatus || authenticationStatus === "authenticated");
 
         // useEffect(() => {
-        //   const name = getEnsName(account?.address, account?.displayName);
+        //   const name = fetchEnsName(account?.address, account?.displayName);
         //   setDisplayAddress(name);
         // }, []);
         console.log("account: ", account?.address);
@@ -103,7 +104,7 @@ function ConnectWalletWithENS() {
         if (account) {
           (async () => {
             // console.log("account in if: ", account?.address);
-            const displayName = await getEnsName(account?.address);
+            const displayName = await fetchEnsName(account?.address);
             // console.log("display name: ", displayName?.ensNameOrAddress);
             setDisplayAddress(displayName?.ensNameOrAddress);
           })();
@@ -149,95 +150,16 @@ function ConnectWalletWithENS() {
 
               return (
                 <>
-                <div style={{ gap: 8 }} className="hidden lg:flex ml-2">
-                  <button
-                    onClick={openChainModal}
-                    type="button"
-                    className="flex items-center font-bold text-black transition-transform transform hover:scale-105 text-xs md:text-sm"
-                  >
-                    {chain.hasIcon && (
-                      <div
-                        style={{
-                          background: chain.iconBackground,
-                          width: 24,
-                          height: 24,
-                          borderRadius: 999,
-                          overflow: "hidden",
-                          marginRight: 4,
-                        }}
-                      >
-                        {chain.iconUrl && (
-                          <img
-                            alt={chain.name ?? "Chain icon"}
-                            src={chain.iconUrl}
-                            style={{ width: 24, height: 24 }}
-                          />
-                        )}
-                      </div>
-                    )}
-                    {/* {chain.name} */}
-                    <svg
-                      fill="#000000"
-                      height="25px"
-                      width="25px"
-                      version="1.1"
-                      id="Layer_1"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="-168.3 -168.3 666.60 666.60"
-                      transform="rotate(180)"
-                      stroke="#000000"
-                      stroke-width="33.0002"
+                  <div style={{ gap: 8 }} className="hidden lg:flex ml-2">
+                    <button
+                      onClick={openChainModal}
+                      type="button"
+                      className="flex items-center font-bold text-black transition-transform transform hover:scale-105 text-xs md:text-sm"
                     >
-                      <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                      <g
-                        id="SVGRepo_tracerCarrier"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      ></g>
-                      <g id="SVGRepo_iconCarrier">
-                        {" "}
-                        <path
-                          id="XMLID_105_"
-                          d="M324.001,209.25L173.997,96.75c-5.334-4-12.667-4-18,0L6.001,209.25c-6.627,4.971-7.971,14.373-3,21 c2.947,3.93,7.451,6.001,12.012,6.001c3.131,0,6.29-0.978,8.988-3.001L164.998,127.5l141.003,105.75c6.629,4.972,16.03,3.627,21-3 C331.972,223.623,330.628,214.221,324.001,209.25z"
-                        ></path>{" "}
-                      </g>
-                    </svg>
-                  </button>
-
-                  <button
-                    onClick={openAccountModal}
-                    type="button"
-                    // style={{
-                    //   display: "flex",
-                    //   alignItems: "center",
-                    //   color: "black",
-                    //   borderRadius: "12px",
-                    //   borderColor: "white",
-                    //   borderStyle: "solid",
-                    //   backgroundColor: "white",
-                    //   fontWeight: "bold",
-                    //   boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
-                    // }}
-                    className="flex items-center font-bold text-black transition-transform transform hover:scale-105 text-xs sm:text-sm"
-                  >
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        background:
-                          "linear-gradient(0deg, rgba(0, 0, 0, 0.03), rgba(0, 0, 0, 0.06))",
-                        color: "black",
-                        borderRadius: "12px",
-                        paddingLeft: "12px",
-                        paddingRight: "4px",
-                        paddingTop: "6px",
-                        paddingBottom: "6px",
-                        margin: "1px",
-                      }}
-                    >
-                      {account.ensAvatar && (
+                      {chain.hasIcon && (
                         <div
                           style={{
+                            background: chain.iconBackground,
                             width: 24,
                             height: 24,
                             borderRadius: 999,
@@ -245,14 +167,16 @@ function ConnectWalletWithENS() {
                             marginRight: 4,
                           }}
                         >
-                          <img
-                            alt={account.ensAvatar ?? "Chain icon"}
-                            src={account.ensAvatar}
-                            style={{ width: 24, height: 24 }}
-                          />
+                          {chain.iconUrl && (
+                            <img
+                              alt={chain.name ?? "Chain icon"}
+                              src={chain.iconUrl}
+                              style={{ width: 24, height: 24 }}
+                            />
+                          )}
                         </div>
                       )}
-                      {displayAddress}
+                      {/* {chain.name} */}
                       <svg
                         fill="#000000"
                         height="25px"
@@ -279,11 +203,88 @@ function ConnectWalletWithENS() {
                           ></path>{" "}
                         </g>
                       </svg>
-                    </div>
-                  </button>
-                </div>
+                    </button>
 
-                <div className="lg:hidden flex items-center">
+                    <button
+                      onClick={openAccountModal}
+                      type="button"
+                      // style={{
+                      //   display: "flex",
+                      //   alignItems: "center",
+                      //   color: "black",
+                      //   borderRadius: "12px",
+                      //   borderColor: "white",
+                      //   borderStyle: "solid",
+                      //   backgroundColor: "white",
+                      //   fontWeight: "bold",
+                      //   boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
+                      // }}
+                      className="flex items-center font-bold text-black transition-transform transform hover:scale-105 text-xs sm:text-sm"
+                    >
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          background:
+                            "linear-gradient(0deg, rgba(0, 0, 0, 0.03), rgba(0, 0, 0, 0.06))",
+                          color: "black",
+                          borderRadius: "12px",
+                          paddingLeft: "12px",
+                          paddingRight: "4px",
+                          paddingTop: "6px",
+                          paddingBottom: "6px",
+                          margin: "1px",
+                        }}
+                      >
+                        {account.ensAvatar && (
+                          <div
+                            style={{
+                              width: 24,
+                              height: 24,
+                              borderRadius: 999,
+                              overflow: "hidden",
+                              marginRight: 4,
+                            }}
+                          >
+                            <img
+                              alt={account.ensAvatar ?? "Chain icon"}
+                              src={account.ensAvatar}
+                              style={{ width: 24, height: 24 }}
+                            />
+                          </div>
+                        )}
+                        {displayAddress}
+                        <svg
+                          fill="#000000"
+                          height="25px"
+                          width="25px"
+                          version="1.1"
+                          id="Layer_1"
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="-168.3 -168.3 666.60 666.60"
+                          transform="rotate(180)"
+                          stroke="#000000"
+                          stroke-width="33.0002"
+                        >
+                          <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                          <g
+                            id="SVGRepo_tracerCarrier"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          ></g>
+                          <g id="SVGRepo_iconCarrier">
+                            {" "}
+                            <path
+                              id="XMLID_105_"
+                              d="M324.001,209.25L173.997,96.75c-5.334-4-12.667-4-18,0L6.001,209.25c-6.627,4.971-7.971,14.373-3,21 c2.947,3.93,7.451,6.001,12.012,6.001c3.131,0,6.29-0.978,8.988-3.001L164.998,127.5l141.003,105.75c6.629,4.972,16.03,3.627,21-3 C331.972,223.623,330.628,214.221,324.001,209.25z"
+                            ></path>{" "}
+                          </g>
+                        </svg>
+                      </div>
+                    </button>
+                  </div>
+
+                  <div className="lg:hidden flex items-center">
                     {/* <button
                       onClick={openAccountModal}
                       type="button"

@@ -33,7 +33,7 @@ import { RxCross2 } from "react-icons/rx";
 import record from "@/assets/images/instant-meet/record.svg";
 import arrow from "@/assets/images/instant-meet/arrow.svg";
 import ConnectWalletWithENS from "@/components/ConnectWallet/ConnectWalletWithENS";
-import { getEnsName } from "@/utils/ENSUtils";
+import { fetchEnsName } from "@/utils/ENSUtils";
 import { truncateAddress } from "@/utils/text";
 import { useSession } from "next-auth/react";
 
@@ -388,7 +388,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
           }
 
           if (address) {
-            const getName = await getEnsName(address?.toString());
+            const getName = await fetchEnsName(address?.toString());
             const getEnsNameOfAddress = await getName?.ensName;
             console.log("formattedAddress ", getEnsNameOfAddress);
             if (getEnsNameOfAddress) {
