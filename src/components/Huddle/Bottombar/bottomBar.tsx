@@ -32,7 +32,11 @@ import {
 } from "../../ui/dropdown-menu";
 import { SessionInterface } from "@/types/MeetingTypes";
 import QuickLinks from "./QuickLinks";
-import { handleCloseMeeting, handleStopRecording } from "../HuddleUtils";
+import {
+  handleCloseMeeting,
+  handleRecording,
+  handleStopRecording,
+} from "../HuddleUtils";
 import { BASE_URL } from "@/config/constants";
 import { uploadFile } from "@/actions/uploadFile";
 
@@ -149,7 +153,7 @@ const BottomBar = ({
     setIsLoading(true);
 
     if (role === "host" && meetingStatus === true) {
-      await handleStopRecording(roomId, address);
+      await handleStopRecording(roomId, address, setIsRecording);
     }
 
     console.log("s3URL in handleEndCall", s3URL);
@@ -360,6 +364,19 @@ const BottomBar = ({
         </div>
 
         <div className="flex space-x-3">
+          <Button
+            className="flex gap-2 bg-red-500 hover:bg-red-400 text-white text-md font-semibold"
+            onClick={() =>
+              handleRecording(roomId, address, isRecording, setIsRecording)
+            }
+          >
+            {isUploading ? BasicIcons.spin : BasicIcons.record}{" "}
+            {isRecording
+              ? isUploading
+                ? "Recording..."
+                : "Stop Recording"
+              : "Record"}
+          </Button>
           <ButtonWithIcon
             content="Participants"
             onClick={() => setIsParticipantsOpen(!isParticipantsOpen)}

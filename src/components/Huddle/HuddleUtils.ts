@@ -1,9 +1,44 @@
+import { useStudioState } from "@/store/studioState";
 import { SessionInterface } from "@/types/MeetingTypes";
 import toast from "react-hot-toast";
 
+export const startRecording = async (
+  roomId: string | undefined,
+  setIsRecording: (val: boolean | null) => void
+) => {
+  try {
+    console.log("recording started");
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    // if (address) {
+    //   myHeaders.append("x-wallet-address", address);
+    // }
+    const requestOptions = {
+      method: "POST",
+      headers: myHeaders,
+      body: JSON.stringify({
+        roomId: roomId,
+      }),
+    };
+
+    const status = await fetch(`/api/startRecording/${roomId}`, requestOptions);
+    if (!status.ok) {
+      console.error(`Request failed with status: ${status.status}`);
+      toast.error("Failed to start recording");
+      return;
+    }
+    setIsRecording(true); // Assuming this should be true after starting recording
+    toast.success("Recording started");
+  } catch (error) {
+    console.error("Error starting recording:", error);
+    toast.error("Error starting recording");
+  }
+};
+
 export const handleStopRecording = async (
   roomId: string | undefined,
-  address: string | undefined
+  address: string | undefined,
+  setIsRecording: (val: boolean | null) => void
 ) => {
   console.log("stop recording");
   if (!roomId) {
@@ -38,7 +73,7 @@ export const handleStopRecording = async (
     }
 
     if (data.success === true) {
-      // setIsRecording(false);
+      setIsRecording(false);
       toast.success("Recording stopped");
       const success = true;
       return success;
@@ -120,4 +155,50 @@ export const handleCloseMeeting = async (
     console.error("Error handling end call:", error);
   }
   // }
+};
+
+export const handleRecording = async (
+  roomId: string | undefined,
+  address: string | undefined,
+  isRecording: boolean | null,
+  setIsRecording: (val: boolean | null) => void
+) => {
+  // const { isRecording, setIsRecording } = useStudioState();
+
+  if (isRecording) {
+    // const stopRecording = await fetch(`/rec/stopRecording?roomId=${roomId}`);
+    // const res = await stopRecording.json();
+    // if (res) {
+    //   setIsRecording(false);
+    // }
+    handleStopRecording(roomId, address, setIsRecording);
+    let existingValue = sessionStorage.getItem("meetingData");
+    if (existingValue) {
+      let parsedValue = JSON.parse(existingValue);
+      console.log("parsedValue: ", parsedValue);
+      parsedValue.isMeetingRecorded = false;
+
+      // Step 3: Store the updated value back in sessionStorage
+      sessionStorage.setItem("meetingData", JSON.stringify(parsedValue));
+    }
+  } else {
+    // const startRecording = await fetch(`/rec/startRecording?roomId=${roomId}`);
+    // const { msg } = await startRecording.json();
+    // if (msg) {
+    //   setIsRecording(true);
+    // }
+
+    startRecording(roomId, setIsRecording);
+    let existingValue = sessionStorage.getItem("meetingData");
+    if (existingValue) {
+      let parsedValue = JSON.parse(existingValue);
+      console.log("parsedValue: ", parsedValue);
+      if (parsedValue.meetingId === roomId) {
+        parsedValue.isMeetingRecorded = true;
+      }
+
+      // Step 3: Store the updated value back in sessionStorage
+      sessionStorage.setItem("meetingData", JSON.stringify(parsedValue));
+    }
+  }
 };

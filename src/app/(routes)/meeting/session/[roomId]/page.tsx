@@ -48,7 +48,10 @@ import UpdateSessionDetails from "@/components/MeetingPreview/UpdateSessionDetai
 import PopupSlider from "@/components/FeedbackPopup/PopupSlider";
 import MeetingRecordingModal from "@/components/ComponentUtils/MeetingRecordingModal";
 import toast from "react-hot-toast";
-import { handleCloseMeeting } from "@/components/Huddle/HuddleUtils";
+import {
+  handleCloseMeeting,
+  startRecording,
+} from "@/components/Huddle/HuddleUtils";
 
 export default function Component({ params }: { params: { roomId: string } }) {
   const { isVideoOn, enableVideo, disableVideo, stream } = useLocalVideo();
@@ -181,11 +184,14 @@ export default function Component({ params }: { params: { roomId: string } }) {
 
   const handlePopupRedirection = () => {
     if (role === "host") {
-      const storedStatus = localStorage.getItem("meetingData");
+      const storedStatus = sessionStorage.getItem("meetingData");
       if (storedStatus) {
         const parsedStatus = JSON.parse(storedStatus);
         console.log("storedStatus: ", parsedStatus);
-        if (parsedStatus.isMeetingRecorded === true) {
+        if (
+          parsedStatus.meetingId === params.roomId &&
+          parsedStatus.isMeetingRecorded === true
+        ) {
           router.push(
             `/meeting/session/${params.roomId}/update-session-details`
           );
@@ -279,11 +285,13 @@ export default function Component({ params }: { params: { roomId: string } }) {
   }, [audioInputDevice]);
 
   useEffect(() => {
-    const storedStatus = localStorage.getItem("meetingData");
+    const storedStatus = sessionStorage.getItem("meetingData");
     if (storedStatus) {
       const parsedStatus = JSON.parse(storedStatus);
       console.log("storedStatus: ", parsedStatus);
-      setMeetingRecordingStatus(parsedStatus.isMeetingRecorded);
+      if (parsedStatus.meetingId === params.roomId) {
+        setMeetingRecordingStatus(parsedStatus.isMeetingRecorded);
+      }
     }
   }, []);
 
@@ -407,47 +415,14 @@ export default function Component({ params }: { params: { roomId: string } }) {
         meetingId: params.roomId,
         isMeetingRecorded: result,
       };
-      localStorage.setItem("meetingData", JSON.stringify(meetingData));
+      sessionStorage.setItem("meetingData", JSON.stringify(meetingData));
       setShowModal(false);
       setMeetingRecordingStatus(result);
 
       updateRecordingStatus(result);
       if (result) {
-        startRecording();
+        startRecording(params.roomId, setIsRecording);
       }
-    }
-  };
-
-  const startRecording = async () => {
-    try {
-      console.log("recording started");
-      const myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
-      // if (address) {
-      //   myHeaders.append("x-wallet-address", address);
-      // }
-      const requestOptions = {
-        method: "POST",
-        headers: myHeaders,
-        body: JSON.stringify({
-          roomId: params.roomId,
-        }),
-      };
-
-      const status = await fetch(
-        `/api/startRecording/${params.roomId}`,
-        requestOptions
-      );
-      if (!status.ok) {
-        console.error(`Request failed with status: ${status.status}`);
-        toast.error("Failed to start recording");
-        return;
-      }
-      setIsRecording(true); // Assuming this should be true after starting recording
-      toast.success("Recording started");
-    } catch (error) {
-      console.error("Error starting recording:", error);
-      toast.error("Error starting recording");
     }
   };
 
