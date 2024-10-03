@@ -15,15 +15,25 @@ const config: Config = {
         "1.5xl": "1350px",
         "1.7xl": "1450px",
         "1.5lg": "1200px",
-        "1.3lg" : "1100px",
-        "xm": "550px",
-        "xs" : "470px",
-        "2md": "950px"
+        "1.3lg": "1100px",
+        xm: "550px",
+        xs: "470px",
+        "2md": "950px",
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
         "gradient-conic":
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+
+        "op-logo":
+          "linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.6)), url('../assets/images/daos/op.png')",
+        "arb-logo":
+          "linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.6)), url('../assets/images/daos/arb.png')",
+
+        "op-profile":
+          "linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.8)), url('../assets/images/daos/op.png')",
+        "arb-profile":
+          "linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.8)), url('../assets/images/daos/arb.png')",
       },
       colors: {
         "blue-shade-100": "#004DFF",
