@@ -1,7 +1,7 @@
 "use client";
 
 import Image, { StaticImageData } from "next/image";
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import search from "@/assets/images/daos/search.png";
 import OPLogo from "@/assets/images/daos/op.png";
 import ARBLogo from "@/assets/images/daos/arbitrum.jpg";
@@ -72,6 +72,7 @@ function DelegatesList({ props }: { props: string }) {
   const { address } = useAccount();
   const [delegatingToAddr, setDelegatingToAddr] = useState(false);
   const [confettiVisible, setConfettiVisible] = useState(false);
+  const lastDelegateRef = useRef<string | null>(null);
 
   const handleRetry = () => {
     setError(null);
@@ -80,18 +81,6 @@ function DelegatesList({ props }: { props: string }) {
     setTempData({ delegates: [] });
     window.location.reload();
   };
-
-  const handleClose = () => {
-    setIsShowing(false);
-    sessionStorage.setItem("KarmaCreditClosed", JSON.stringify(true));
-  };
-
-  useEffect(() => {
-    const KarmaCreditClosed = JSON.parse(
-      sessionStorage.getItem("KarmaCreditClosed") || "false"
-    );
-    setIsShowing(!KarmaCreditClosed);
-  }, []);
 
   const fetchData = async () => {
     try {
@@ -122,9 +111,19 @@ function DelegatesList({ props }: { props: string }) {
       );
       // }
 
+      const newDelegates = formattedDelegates.filter(
+        (delegate: any) => delegate.delegate !== lastDelegateRef.current
+      );
+
+      if (newDelegates.length > 0) {
+        lastDelegateRef.current =
+          newDelegates[newDelegates.length - 1].delegate;
+      }
+
       setDelegateData((prevData: any) => ({
-        delegates: [...prevData?.delegates, ...formattedDelegates],
+        delegates: [...prevData.delegates, ...newDelegates],
       }));
+
       setTempData((prevData: any) => ({
         delegates: [...prevData.delegates, ...formattedDelegates],
       }));
@@ -154,11 +153,11 @@ function DelegatesList({ props }: { props: string }) {
     }
   }, [props]);
 
-  // useEffect(() => {
-  //   if (currentPage > 0) {
-  //     fetchData();
-  //   }
-  // }, [currentPage]);
+  useEffect(() => {
+    if (currentPage > 0) {
+      fetchData();
+    }
+  }, [currentPage]);
 
   const debounce = (func: (...args: any[]) => void, wait: number) => {
     let timeout: NodeJS.Timeout;
@@ -178,14 +177,13 @@ function DelegatesList({ props }: { props: string }) {
           `/api/search-delegate?address=${query}&dao=${props}`
         );
         const filtered = await res.json();
-        console.log("RESULT:::", filtered);
-        const data = await fetchEnsAvatar(filtered[0]?.id);
+        const data = await fetchEnsAvatar(filtered[0].id);
         if (filtered) {
           const formattedDelegates = {
             delegate: filtered[0].id,
             adjustedBalance: filtered[0].latestBalance / 10 ** 18,
-            profilePicture: data?.avatar,
-            ensName: data?.ensName,
+            profilePicture: data?.avatar || "",
+            ensName: data?.ensName || filtered[0].id,
           };
           setDelegateData({ delegates: [formattedDelegates] });
           setPageLoading(false);
@@ -479,7 +477,7 @@ function DelegatesList({ props }: { props: string }) {
           <div>
             <div className="grid min-[475px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-10">
               {delegateData.delegates.map((delegate: any, index: number) => (
-                <React.Fragment key={index}>
+                <>
                   <div
                     onClick={(event) => {
                       router.push(
@@ -623,7 +621,7 @@ function DelegatesList({ props }: { props: string }) {
                       confettiVisible={confettiVisible}
                     />
                   )}
-                </React.Fragment>
+                </>
               ))}
             </div>
 
