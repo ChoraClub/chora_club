@@ -6,6 +6,7 @@ import UpdateHostedSessionModal from "./UpdateHostedSessionModal";
 import lighthouse from "@lighthouse-web3/sdk";
 import toast from "react-hot-toast";
 import { LIGHTHOUSE_BASE_API_KEY } from "@/config/constants";
+import { useRouter } from "next-nprogress-bar";
 
 interface EditButtonProps {
   sessionData: any;
@@ -25,94 +26,96 @@ const EditButton: React.FC<EditButtonProps> = ({
     description: "",
     image: "",
   });
+  const router = useRouter();
 
   const handleEditModal = () => {
-    setEditOpen(true);
+    // setEditOpen(true);
+    router.push(`/meeting/session/${sessionData.meetingId}/update-session-details`);
   };
 
-  const handleCloseEdit = () => {
-    setEditOpen(false);
-  };
+  // const handleCloseEdit = () => {
+  //   setEditOpen(false);
+  // };
 
-  const handleChange = (e: any) => {
-    const { name, value, files } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: files ? files : value,
-    }));
-  };
+  // const handleChange = (e: any) => {
+  //   const { name, value, files } = e.target;
+  //   setFormData((prevData) => ({
+  //     ...prevData,
+  //     [name]: files ? files : value,
+  //   }));
+  // };
 
-  const handleSave = async () => {
-    // Handle save logic here, such as making an API call
-    setLoading(true);
-    console.log(formData);
-    console.log(sessionData);
-    // Close the modal after saving
-    const progressCallback = async (progressData: any) => {
-      let percentageDone =
-        100 -
-        (
-          ((progressData?.total as any) / progressData?.uploaded) as any
-        )?.toFixed(2);
-      console.log(percentageDone);
-    };
+  // const handleSave = async () => {
+  //   // Handle save logic here, such as making an API call
+  //   setLoading(true);
+  //   console.log(formData);
+  //   console.log(sessionData);
+  //   // Close the modal after saving
+  //   const progressCallback = async (progressData: any) => {
+  //     let percentageDone =
+  //       100 -
+  //       (
+  //         ((progressData?.total as any) / progressData?.uploaded) as any
+  //       )?.toFixed(2);
+  //     console.log(percentageDone);
+  //   };
 
-    const apiKey = LIGHTHOUSE_BASE_API_KEY ? LIGHTHOUSE_BASE_API_KEY : "";
-    try {
-      let imageCid = "";
-      if (formData.image) {
-        const output = await lighthouse.upload(formData.image, apiKey);
-        imageCid = output.data.Hash;
-        console.log("image output: ", output.data.Hash);
-      }
+  //   const apiKey = LIGHTHOUSE_BASE_API_KEY ? LIGHTHOUSE_BASE_API_KEY : "";
+  //   try {
+  //     let imageCid = "";
+  //     if (formData.image) {
+  //       const output = await lighthouse.upload(formData.image, apiKey);
+  //       imageCid = output.data.Hash;
+  //       console.log("image output: ", output.data.Hash);
+  //     }
 
-      const updatedData = {
-        title: formData.title || sessionData.title,
-        description: formData.description || sessionData.description,
-        thumbnail_image: formData.image
-          ? imageCid
-          : sessionData.thumbnail_image,
-      };
+  //     const updatedData = {
+  //       title: formData.title || sessionData.title,
+  //       description: formData.description || sessionData.description,
+  //       thumbnail_image: formData.image
+  //         ? imageCid
+  //         : sessionData.thumbnail_image,
+  //     };
 
-      const myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
-      myHeaders.append("x-wallet-address", sessionData.host_address);
+  //     const myHeaders = new Headers();
+  //     myHeaders.append("Content-Type", "application/json");
+  //     myHeaders.append("x-wallet-address", sessionData.host_address);
 
-      const raw = JSON.stringify({
-        meetingId: sessionData.meetingId,
-        host_address: sessionData.host_address,
-        ...updatedData,
-      });
+  //     const raw = JSON.stringify({
+  //       meetingId: sessionData.meetingId,
+  //       host_address: sessionData.host_address,
+  //       ...updatedData,
+  //     });
 
-      console.log("raw: ", raw);
+  //     console.log("raw: ", raw);
 
-      const requestOptions: any = {
-        method: "PUT",
-        headers: myHeaders,
-        body: raw,
-        redirect: "follow",
-      };
-      const response = await fetch(
-        `/api/update-recorded-session`,
-        requestOptions
-      );
-      if (response) {
-        const responseData = await response.json();
-        console.log("responseData: ", responseData);
-        updateSessionData(updatedData, index);
-        setLoading(false);
-      } else {
-        setLoading(false);
-      }
+  //     const requestOptions: any = {
+  //       method: "PUT",
+  //       headers: myHeaders,
+  //       body: raw,
+  //       redirect: "follow",
+  //     };
+  //     const response = await fetch(
+  //       `/api/update-recorded-session`,
+  //       requestOptions
+  //     );
+  //     if (response) {
+  //       const responseData = await response.json();
+  //       console.log("responseData: ", responseData);
+  //       updateSessionData(updatedData, index);
+  //       setLoading(false);
+  //     } else {
+  //       setLoading(false);
+  //     }
 
-      handleCloseEdit();
-    } catch (e) {
-      console.log("errorrrrrr: ", e);
-      toast.error("Unable to update the data.");
-      setLoading(false);
-      handleCloseEdit();
-    }
-  };
+  //     handleCloseEdit();
+  //   } catch (e) {
+  //     console.log("errorrrrrr: ", e);
+  //     toast.error("Unable to update the data.");
+  //     setLoading(false);
+  //     handleCloseEdit();
+  //   }
+  // };
 
   return (
     <>
@@ -128,7 +131,7 @@ const EditButton: React.FC<EditButtonProps> = ({
         </div>
       </Tooltip>
 
-      {editOpen && (
+      {/* {editOpen && (
         <UpdateHostedSessionModal
           isOpen={editOpen}
           onClose={handleCloseEdit}
@@ -138,7 +141,7 @@ const EditButton: React.FC<EditButtonProps> = ({
           handleChange={handleChange}
           loading={loading}
         />
-      )}
+      )} */}
     </>
   );
 };

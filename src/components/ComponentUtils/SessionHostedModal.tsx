@@ -18,7 +18,7 @@ function SessionHostedModal({ data }: any) {
     };
   }, []);
 
-  const link = `${BASE_URL}/watch/${data.meetingId}`;
+  const link = `${BASE_URL}watch/${data.meetingId}`;
 
   const shareOnTwitter = () => {
     const url = encodeURIComponent(link);
