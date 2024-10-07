@@ -1,5 +1,5 @@
 import Image from "next/image";
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { useRouter } from "next-nprogress-bar";
 import toast from "react-hot-toast";
 import { useConnectModal, useChainModal } from "@rainbow-me/rainbowkit";
@@ -27,8 +27,10 @@ import DelegateInfoCard from "./DelegateInfoCard";
 import { truncateAddress } from "@/utils/text";
 import DelegateListSkeletonLoader from "../SkeletonLoader/DelegateListSkeletonLoader";
 import { ChevronDown } from "lucide-react";
+import debounce from "lodash/debounce";
 
 const DELEGATES_PER_PAGE = 20;
+const DEBOUNCE_DELAY = 500;
 
 function DelegatesList({ props }: { props: string }) {
   const {
@@ -58,8 +60,6 @@ function DelegatesList({ props }: { props: string }) {
   const { publicClient, walletClient } = WalletAndPublicClient();
 
   const fetchDelegates = useCallback(async () => {
-    if (isAPICalling || !hasMore) return;
-
     setIsAPICalling(true);
     try {
       const res = await fetch(
@@ -70,7 +70,6 @@ function DelegatesList({ props }: { props: string }) {
       const data = await res.json();
       const formattedDelegates = await Promise.all(
         data.delegates.map(async (delegate: any) => {
-          // const avatar = await fetchEnsNameAndAvatar(delegate.delegate);
           return {
             ...delegate,
             adjustedBalance: delegate.latestBalance / 10 ** 18,
@@ -93,45 +92,63 @@ function DelegatesList({ props }: { props: string }) {
   }, [skip, props, hasMore, isAPICalling]);
 
   useEffect(() => {
-    fetchDelegates(); // Initial load
-  }, []); // Empty dependency array ensures this only runs once on mount
+    fetchDelegates();
+  }, []);
 
-  const handleSearchChange = async (query: string) => {
-    setSearchQuery(query);
-    if (!query) {
-      setDelegateData([]);
-      setSkip(0);
-      setHasMore(true);
-      fetchDelegates();
-      return;
-    }
+  const debouncedSearch = useMemo(
+    () =>
+      debounce(async (query: string) => {
+        if (!query) {
+          setDelegateData([]);
+          setSkip(0);
+          setHasMore(true);
+          fetchDelegates();
+          return;
+        }
 
-    setIsAPICalling(true);
-    try {
-      const res = await fetch(
-        `/api/search-delegate?address=${query}&dao=${props}`
-      );
-      const filtered = await res.json();
-      if (filtered.length > 0) {
-        // const data = await fetchEnsNameAndAvatar(filtered[0]?.id);
-        const formattedDelegate = {
-          delegate: filtered[0].id,
-          adjustedBalance: filtered[0].latestBalance / 10 ** 18,
-          profilePicture: props === "optimism" ? OPLogo : ARBLogo,
-          ensName: truncateAddress(filtered[0].id),
-        };
-        setDelegateData([formattedDelegate]);
-      } else {
-        setDelegateData([]);
-      }
-      setHasMore(false);
-    } catch (error) {
-      console.error("Error fetching search results:", error);
-      setDelegateData([]);
-    } finally {
-      setIsAPICalling(false);
-    }
-  };
+        setIsAPICalling(true);
+        try {
+          const res = await fetch(
+            `/api/search-delegate?address=${query}&dao=${props}`
+          );
+          const filtered = await res.json();
+          if (filtered.length > 0) {
+            const formattedDelegate = {
+              delegate: filtered[0].id,
+              adjustedBalance: filtered[0].latestBalance / 10 ** 18,
+              profilePicture: props === "optimism" ? OPLogo : ARBLogo,
+              ensName: truncateAddress(filtered[0].id),
+            };
+            setDelegateData([formattedDelegate]);
+          } else {
+            setDelegateData([]);
+          }
+          setHasMore(false);
+        } catch (error) {
+          console.error("Error fetching search results:", error);
+          setDelegateData([]);
+        } finally {
+          setIsAPICalling(false);
+          setSkip(0);
+        }
+      }, DEBOUNCE_DELAY),
+    [props, fetchDelegates]
+  );
+
+  const handleSearchChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const query = event.target.value;
+      setSearchQuery(query);
+      debouncedSearch(query);
+    },
+    [debouncedSearch]
+  );
+
+  // useEffect(() => {
+  //   return () => {
+  //     debouncedSearch.cancel();
+  //   };
+  // }, [debouncedSearch]);
 
   const handleDelegateModal = async (delegateObject: any) => {
     console.log("delegateObject", delegateObject);
@@ -313,49 +330,11 @@ function DelegatesList({ props }: { props: string }) {
             placeholder="Search by Address"
             className="w-full pl-10 pr-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={searchQuery}
-            onChange={(e) => handleSearchChange(e.target.value)}
+            onChange={handleSearchChange}
           />
           <CiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
         </div>
       </div>
-
-      {/* {delegateData.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {delegateData.map((delegate) => (
-            <DelegateInfoCard
-              key={delegate.delegate}
-              delegate={delegate}
-              daoName={props}
-              onCardClick={() =>
-                router.push(`/${props}/${delegate.delegate}?active=info`)
-              }
-              onDelegateClick={handleDelegateModal}
-              formatNumber={formatNumber}
-            />
-          ))}
-        </div>
-      ) : (
-        <div className="text-center py-12">
-          <p className="text-2xl font-semibold mb-4">No delegates found</p>
-          <p className="text-gray-600">
-            {searchQuery
-              ? `No results for "${searchQuery}"`
-              : "Try adjusting your search or filters"}
-          </p>
-        </div>
-      )}
-
-      {hasMore && !searchQuery && !isLoading && (
-        <div className="text-center mt-8">
-          <button
-            className="bg-blue-600 text-white font-medium py-2 px-6 rounded-md hover:bg-blue-700 transition-colors duration-300"
-            onClick={fetchDelegates}
-            disabled={isAPICalling}
-          >
-            {isAPICalling ? "Loading..." : "Load More"}
-          </button>
-        </div>
-      )} */}
 
       {renderContent()}
 
