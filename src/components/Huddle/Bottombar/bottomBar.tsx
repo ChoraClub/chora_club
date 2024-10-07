@@ -32,20 +32,22 @@ import {
 } from "../../ui/dropdown-menu";
 import { SessionInterface } from "@/types/MeetingTypes";
 import QuickLinks from "./QuickLinks";
-import { handleCloseMeeting, handleStopRecording } from "../HuddleUtils";
+import { handleRecording, handleStopRecording } from "../HuddleUtils";
 import { BASE_URL } from "@/config/constants";
 import { uploadFile } from "@/actions/uploadFile";
 
 const BottomBar = ({
   daoName,
   hostAddress,
-  meetingStatus,
+  // meetingStatus,
+  // currentRecordingStatus,
   meetingData,
   meetingCategory,
 }: {
   daoName: string;
   hostAddress: string;
-  meetingStatus: boolean | undefined;
+  // meetingStatus: boolean | undefined;
+  // currentRecordingStatus: boolean | undefined;
   meetingData?: SessionInterface;
   meetingCategory: string;
 }) => {
@@ -148,8 +150,21 @@ const BottomBar = ({
   const handleEndCall = async (endMeet: string) => {
     setIsLoading(true);
 
-    if (role === "host" && meetingStatus === true) {
-      await handleStopRecording(roomId, address);
+    const storedStatus = sessionStorage.getItem("meetingData");
+    let meetingStatus;
+    let currentRecordingStatus;
+
+    if (storedStatus) {
+      const parsedStatus = JSON.parse(storedStatus);
+      console.log("storedStatus: ", parsedStatus);
+      if (parsedStatus.meetingId === params.roomId) {
+        meetingStatus = parsedStatus.isMeetingRecorded;
+        currentRecordingStatus = parsedStatus.recordingStatus;
+      }
+    }
+
+    if (role === "host" && currentRecordingStatus === true) {
+      await handleStopRecording(roomId, address, setIsRecording);
     }
 
     console.log("s3URL in handleEndCall", s3URL);
@@ -360,6 +375,21 @@ const BottomBar = ({
         </div>
 
         <div className="flex space-x-3">
+          {role === "host" && (
+            <Button
+              className="flex gap-2 bg-red-500 hover:bg-red-400 text-white text-md font-semibold"
+              onClick={() =>
+                handleRecording(roomId, address, isRecording, setIsRecording)
+              }
+            >
+              {isUploading ? BasicIcons.spin : BasicIcons.record}{" "}
+              {isRecording
+                ? isUploading
+                  ? "Recording..."
+                  : "Stop Recording"
+                : "Record"}
+            </Button>
+          )}
           <ButtonWithIcon
             content="Participants"
             onClick={() => setIsParticipantsOpen(!isParticipantsOpen)}

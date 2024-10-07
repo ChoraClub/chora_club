@@ -48,7 +48,10 @@ import UpdateSessionDetails from "@/components/MeetingPreview/UpdateSessionDetai
 import PopupSlider from "@/components/FeedbackPopup/PopupSlider";
 import MeetingRecordingModal from "@/components/ComponentUtils/MeetingRecordingModal";
 import toast from "react-hot-toast";
-import { handleCloseMeeting } from "@/components/Huddle/HuddleUtils";
+import {
+  handleCloseMeeting,
+  startRecording,
+} from "@/components/Huddle/HuddleUtils";
 
 export default function Component({ params }: { params: { roomId: string } }) {
   const { isVideoOn, enableVideo, disableVideo, stream } = useLocalVideo();
@@ -101,6 +104,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
   const [showFeedbackPopups, setShowFeedbackPopups] = useState(false);
   const [meetingRecordingStatus, setMeetingRecordingStatus] =
     useState<boolean>();
+  const [currentRecordingState, setCurrentRecordingState] = useState<boolean>();
   const [showModal, setShowModal] = useState(true);
   const [meetingData, setMeetingData] = useState<any>();
   const { sendData } = useDataMessage();
@@ -163,7 +167,6 @@ export default function Component({ params }: { params: { roomId: string } }) {
               params.roomId,
               daoName,
               hostAddress,
-              meetingRecordingStatus,
               meetingData
             );
           }, 10000);
@@ -181,11 +184,14 @@ export default function Component({ params }: { params: { roomId: string } }) {
 
   const handlePopupRedirection = () => {
     if (role === "host") {
-      const storedStatus = localStorage.getItem("meetingData");
+      const storedStatus = sessionStorage.getItem("meetingData");
       if (storedStatus) {
         const parsedStatus = JSON.parse(storedStatus);
         console.log("storedStatus: ", parsedStatus);
-        if (parsedStatus.isMeetingRecorded === true) {
+        if (
+          parsedStatus.meetingId === params.roomId &&
+          parsedStatus.isMeetingRecorded === true
+        ) {
           router.push(
             `/meeting/session/${params.roomId}/update-session-details`
           );
@@ -279,13 +285,16 @@ export default function Component({ params }: { params: { roomId: string } }) {
   }, [audioInputDevice]);
 
   useEffect(() => {
-    const storedStatus = localStorage.getItem("meetingData");
+    const storedStatus = sessionStorage.getItem("meetingData");
     if (storedStatus) {
       const parsedStatus = JSON.parse(storedStatus);
       console.log("storedStatus: ", parsedStatus);
-      setMeetingRecordingStatus(parsedStatus.isMeetingRecorded);
+      if (parsedStatus.meetingId === params.roomId) {
+        setMeetingRecordingStatus(parsedStatus.isMeetingRecorded);
+        setCurrentRecordingState(parsedStatus.recordingStatus);
+      }
     }
-  }, []);
+  }, [sessionStorage]);
 
   const handleModalClose = () => {
     setModalOpen(false);
@@ -406,52 +415,20 @@ export default function Component({ params }: { params: { roomId: string } }) {
       const meetingData = {
         meetingId: params.roomId,
         isMeetingRecorded: result,
+        recordingStatus: result,
       };
-      localStorage.setItem("meetingData", JSON.stringify(meetingData));
+      sessionStorage.setItem("meetingData", JSON.stringify(meetingData));
       setShowModal(false);
       setMeetingRecordingStatus(result);
-
       updateRecordingStatus(result);
       if (result) {
-        startRecording();
+        startRecording(params.roomId, setIsRecording);
       }
-    }
-  };
-
-  const startRecording = async () => {
-    try {
-      console.log("recording started");
-      const myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
-      // if (address) {
-      //   myHeaders.append("x-wallet-address", address);
-      // }
-      const requestOptions = {
-        method: "POST",
-        headers: myHeaders,
-        body: JSON.stringify({
-          roomId: params.roomId,
-        }),
-      };
-
-      const status = await fetch(
-        `/api/startRecording/${params.roomId}`,
-        requestOptions
-      );
-      if (!status.ok) {
-        console.error(`Request failed with status: ${status.status}`);
-        toast.error("Failed to start recording");
-        return;
-      }
-      setIsRecording(true); // Assuming this should be true after starting recording
-      toast.success("Recording started");
-    } catch (error) {
-      console.error("Error starting recording:", error);
-      toast.error("Error starting recording");
     }
   };
 
   useEffect(() => {
+    console.log("isRecording value: ", isRecording);
     if (role === "guest") {
       sendData({
         to: "*",
@@ -459,7 +436,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
         label: "requestRecordingStatus",
       });
     }
-  }, []);
+  }, [isRecording]);
 
   return (
     <>
@@ -539,14 +516,6 @@ export default function Component({ params }: { params: { roomId: string } }) {
             </header>
             <main
               className={`transition-all ease-in-out flex items-center justify-center flex-1 duration-300 w-full h-[80%] p-2`}
-              style={{
-                backgroundColor: activeBg === "bg-white" ? "white" : undefined,
-                backgroundImage:
-                  activeBg === "bg-white" ? undefined : `url(${activeBg})`,
-                backgroundPosition: "center",
-                backgroundSize: "cover",
-                backgroundRepeat: "no-repeat",
-              }}
             >
               <div className="flex w-full h-full">
                 {shareStream && (
@@ -652,7 +621,8 @@ export default function Component({ params }: { params: { roomId: string } }) {
             <BottomBar
               daoName={daoName}
               hostAddress={hostAddress}
-              meetingStatus={meetingRecordingStatus}
+              // meetingStatus={meetingRecordingStatus}
+              // currentRecordingStatus={currentRecordingState}
               meetingData={meetingData}
               meetingCategory={meetingCategory}
             />
