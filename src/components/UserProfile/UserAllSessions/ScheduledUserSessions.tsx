@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, ReactEventHandler } from "react";
 import { DateTime } from "luxon";
-import { useAccount, useNetwork } from "wagmi";
+import { useAccount } from "wagmi";
 import toast, { Toaster } from "react-hot-toast";
 import { Oval } from "react-loader-spinner";
 import { FaChevronDown, FaCircleInfo, FaPlus } from "react-icons/fa6";
@@ -17,7 +17,7 @@ import { TimeInput } from "@nextui-org/react";
 import { Time } from "@internationalized/date";
 import { AbiEncodingLengthMismatchError } from "viem";
 import { all } from "axios";
-import { fetchEnsAvatar } from "@/utils/ENSUtils";
+import { fetchEnsNameAndAvatar } from "@/utils/ENSUtils";
 import { headers } from "next/headers";
 
 interface dataToStore {
@@ -38,7 +38,7 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
   const [endHour, setEndHour] = useState("");
   const [endMinute, setEndMinute] = useState("");
   const [allowedDates, setAllowedDates] = useState<any>([]);
-  const { chain, chains } = useNetwork();
+  const { chain } = useAccount();
   const [utcStartTime, setUtcStartTime] = useState("");
   const [utcEndTime, setUtcEndTime] = useState("");
   const [allData, setAllData] = useState<any>([]);
@@ -158,7 +158,7 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
       );
     }
   };
-  const [EnsName, setDisplayEnsName] = useState<string>();
+  const [displayEnsName, setDisplayEnsName] = useState<any>();
 
   const checkUser = async () => {
     try {
@@ -225,7 +225,7 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
 
   useEffect(() => {
     const fetchEnsName = async () => {
-      const ensName = await fetchEnsAvatar(address ? address : "");
+      const ensName = await fetchEnsNameAndAvatar(address ? address : "");
       if (ensName) {
         setDisplayEnsName(ensName?.ensName);
       } else {
@@ -275,6 +275,7 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
         // }
       } catch (error) {
         console.log("error:", error);
+        setCreateSessionLoading(false);
       }
     } else {
       toast.error(
@@ -335,7 +336,7 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
               // Add any necessary data
               address: address,
               daoName: daoName,
-              ensName: EnsName,
+              ensName: displayEnsName,
             }),
           });
 
@@ -618,10 +619,10 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
 
   return (
     <>
-      <div className="flex flex-col md:flex-row justify-center gap-8 md:gap-10 1.5lg:gap-20 p-4">
+      <div className="flex flex-col md:flex-row justify-center gap-8 md:gap-10 1.5lg:gap-20 sm:p-4">
         {/* First box- left side */}
         <div
-          className={`w-full md:w-auto p-8 bg-white rounded-2xl ${styles.boxshadow} basis-1/2`}
+          className={`w-full md:w-auto p-6 xs:p-8 bg-white rounded-2xl ${styles.boxshadow} basis-1/2`}
         >
           <div className="mb-4">
             <label className="text-gray-700 font-semibold flex items-center">
@@ -677,7 +678,8 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
               {/* <option value={15}>15 minutes</option> */}
               <option value={30}>30 minutes</option>
               <option value={45} disabled>
-                45 minutes (Under development - It will be live soon)
+                {/* 45 minutes (Under development - It will be live soon) */}
+                45 minutes (Under development)
               </option>
             </select>
           </div>
@@ -728,7 +730,7 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
               </Tooltip>
             </label>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 xm:grid-cols-2 md:grid-cols-1 xl:grid-cols-2 gap-4">
               <div>
                 <label className="text-gray-500 mt-2">Start Time</label>
                 <div className="rounded-md flex items-center space-x-2">
@@ -840,7 +842,7 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
                   <h3 className="text-lg font-semibold mb-2">
                     Generated Time Slots:
                   </h3>
-                  <div className="grid grid-cols-4 gap-2 w-full">
+                  <div className="grid grid-cols-3 xs:grid-cols-4 md:grid-cols-3 lg:grid-cols-4  gap-2 w-full">
                     {timeSlots.map((slot, index) => {
                       const slotTime = slot.toLocaleTimeString("en-US", {
                         hour: "numeric",
@@ -956,7 +958,7 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
 
         {/* Second box- right side */}
         <div
-          className={`w-full md:w-auto p-8 bg-white rounded-2xl ${styles.boxshadow} basis-1/2`}
+          className={`w-full md:w-auto p-6 xs:p-8 bg-white rounded-2xl ${styles.boxshadow} basis-1/2`}
         >
           <AvailableUserSessions
             daoName={daoName}

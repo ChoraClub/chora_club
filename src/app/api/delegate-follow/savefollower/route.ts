@@ -69,11 +69,11 @@ export async function PUT(req: NextRequest) {
   try {
     const { delegate_address, follower_address, dao } = await req.json();
 
-    // console.log("Received follower details:", {
-    //   delegate_address,
-    //   follower_address,
-    //   dao,
-    // });
+    console.log("Received follower details:", {
+      delegate_address,
+      follower_address,
+      dao,
+    });
 
     // console.log("Connecting to MongoDB...");
     const client = await connectDB();
@@ -81,13 +81,13 @@ export async function PUT(req: NextRequest) {
 
     const db = client.db();
 
-    const collections = await db
-      .listCollections({ name: "delegate_follow" })
-      .toArray();
+    // const collections = await db
+    //   .listCollections({ name: "delegate_follow" })
+    //   .toArray();
 
-    if (collections.length === 0) {
-      await db.createCollection("delegate_follow");
-    }
+    // if (collections.length === 0) {
+    //   await db.createCollection("delegate_follow");
+    // }
 
     const collection = db.collection("delegate_follow");
 
@@ -201,7 +201,9 @@ export async function PUT(req: NextRequest) {
           const existingFollowingIndex = document.followings[
             existingDaoIndex
           ].following.findIndex(
-            (item: any) => item.follower_address === delegate_address
+            (item: any) =>
+              item.follower_address.toLowerCase() ===
+              delegate_address.toLowerCase()
           );
 
           if (existingFollowingIndex !== -1) {

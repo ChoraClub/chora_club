@@ -1,7 +1,29 @@
 import React, { useState } from "react";
 import { RxCross2 } from "react-icons/rx";
+import { Holder } from "@/types/LeaderBoardTypes";
+import { UserProfileInterface } from "@/types/UserProfileTypes";
+import {
+  DynamicAttendeeInterface,
+  SessionInterface,
+} from "@/types/MeetingTypes";
+interface Attendee extends DynamicAttendeeInterface {
+  profileInfo: UserProfileInterface;
+}
 
-const WatchCollectibleInfo = () => {
+interface Meeting extends SessionInterface {
+  attendees: Attendee[];
+  hostProfileInfo: UserProfileInterface;
+}
+
+const WatchCollectibleInfo = ({
+  leaderBoardData,
+  data,
+  collection,
+}: {
+  leaderBoardData: Holder;
+  data: Meeting;
+  collection: string;
+}) => {
   const [showComingSoon, setShowComingSoon] = useState(true);
   return (
     <div className="rounded-3xl border border-black-shade-200 font-poppins ">
@@ -9,17 +31,6 @@ const WatchCollectibleInfo = () => {
         <p className="font-medium xl:text-base 1.7xl:text-lg text-blue-shade-100">
           Collectibles Info
         </p>
-        {showComingSoon && (
-          <div className="flex items-center bg-yellow-100 border border-yellow-400 rounded-full px-2 ml-4">
-            <p className="text-sm text-yellow-700 mr-2">Coming Soon</p>
-            <button
-              onClick={() => setShowComingSoon(false)}
-              className="text-yellow-700 hover:text-yellow-800"
-            >
-              <RxCross2 size={12} />
-            </button>
-          </div>
-        )}
       </div>
       <div className="w-full h-[0.1px] bg-black-shade-200"></div>
       <div className="flex xl:gap-x-20 gap-x-14 1.7xl:text-sm text-xs">
@@ -30,10 +41,23 @@ const WatchCollectibleInfo = () => {
           <p className="my-2">Total Collected</p>
         </div>
         <div className="font-normal my-2 text-blue-shade-100">
-          <p className="my-2">2 Weeks ago</p>
-          <p className="my-2">1 day ago</p>
-          <p className="my-2">163(99%)</p>
-          <p className="my-2">164</p>
+          <p className="my-2">{leaderBoardData.firstCollector?.timestamp}</p>
+          <p className="my-2">{leaderBoardData.latestCollector?.timestamp}</p>
+          <p className="my-2">
+            {leaderBoardData?.selectedToken?.holders1155?.length &&
+            leaderBoardData?.maxSupply ? (
+              <>
+                {leaderBoardData.selectedToken.holders1155.length} (
+                {(
+                  (leaderBoardData.selectedToken.holders1155.length /
+                    leaderBoardData.maxSupply) *
+                  100
+                ).toFixed(2)}
+                %)
+              </>
+            ) : null}
+          </p>
+          <p className="my-2">{leaderBoardData?.maxSupply}</p>
         </div>
       </div>
     </div>

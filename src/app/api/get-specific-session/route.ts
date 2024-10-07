@@ -1,23 +1,11 @@
 // Import necessary modules and interfaces
 import { connectDB } from "@/config/connectDB";
+import { SessionInterface } from "@/types/MeetingTypes";
 import { NextResponse, NextRequest } from "next/server";
 
 // Define the response body type
-interface Session {
-  booking_status: string;
-  dao_name: string;
-  description: string;
-  host_address: string;
-  joined_status: string;
-  meetingId: string;
-  meeting_status: string;
-  slot_time: string;
-  title: string;
-  user_address: string;
-  _id: string;
-}
 
-export async function POST(req: NextRequest, res: NextResponse<Session[]>) {
+export async function POST(req: NextRequest, res: NextResponse<SessionInterface[]>) {
   try {
     const { dao_name, host_address } = await req.json();
 

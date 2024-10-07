@@ -5,7 +5,7 @@ import UserUpcomingHours from "./UserAllOfficeHrs/UserUpcomingHours";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useRouter } from "next-nprogress-bar";
 import Tile from "../ComponentUtils/Tile";
-import { useNetwork, useAccount } from "wagmi";
+import { useAccount } from "wagmi";
 import text1 from "@/assets/images/daos/texture1.png";
 import { Oval } from "react-loader-spinner";
 import { RxCross2 } from "react-icons/rx";
@@ -37,7 +37,6 @@ function UserOfficeHours({
   const router = useRouter();
   const path = usePathname();
   const searchParams = useSearchParams();
-  const { chain, chains } = useNetwork();
 
   const [sessionDetails, setSessionDetails] = useState([]);
   const [dataLoading, setDataLoading] = useState(true);
@@ -155,12 +154,13 @@ function UserOfficeHours({
           </p>
           <button
             onClick={() => setShowComingSoon(false)}
-            className="text-yellow-700 hover:text-yellow-800 ps-3">
+            className="text-yellow-700 hover:text-yellow-800 ps-3"
+          >
             <RxCross2 size={18} />
           </button>
         </div>
       )}
-      <div className="pt-3 pr-32">
+      <div className="pt-3">
         <div className="flex w-fit gap-14 border-1 border-[#7C7C7C] px-6 rounded-xl text-sm">
           {selfDelegate === true && (
             <button
@@ -171,7 +171,8 @@ function UserOfficeHours({
               }`}
               onClick={() =>
                 router.push(path + "?active=officeHours&hours=schedule")
-              }>
+              }
+            >
               Schedule
             </button>
           )}
@@ -185,7 +186,8 @@ function UserOfficeHours({
               }`}
               onClick={() =>
                 router.push(path + "?active=officeHours&hours=upcoming")
-              }>
+              }
+            >
               Upcoming
             </button>
           )}
@@ -198,7 +200,8 @@ function UserOfficeHours({
               }`}
               onClick={() =>
                 router.push(path + "?active=officeHours&hours=hosted")
-              }>
+              }
+            >
               Hosted
             </button>
           )}
@@ -210,7 +213,8 @@ function UserOfficeHours({
             }`}
             onClick={() =>
               router.push(path + "?active=officeHours&hours=attended")
-            }>
+            }
+          >
             Attended
           </button>
         </div>

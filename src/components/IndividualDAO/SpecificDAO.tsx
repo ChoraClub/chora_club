@@ -14,6 +14,8 @@ import { dao_details } from "@/config/daoDetails";
 import Proposals from "./Proposals";
 import IndividualDaoHeader from "../ComponentUtils/IndividualDaoHeader";
 import AboutDao from "./AboutDao";
+import Leaderboard from "./Leaderboard";
+import MobileResponsiveMessage from "../MobileResponsiveMessage/MobileResponsiveMessage";
 
 const desc = dao_details;
 
@@ -68,7 +70,12 @@ function SpecificDAO({ props }: { props: { daoDelegates: string } }) {
   // };
 
   return (
-    <div className="font-poppins py-6" id="secondSection">
+    <>
+    {/* For Mobile Screen */}
+    <MobileResponsiveMessage/>
+
+    {/* For Desktop Screen  */}
+    <div className="hidden md:block font-poppins py-6" id="secondSection">
       <div className="pr-8 pb-5 pl-16">
         {/* <div className="flex items-center justify-between pe-10">
           <div
@@ -200,6 +207,18 @@ function SpecificDAO({ props }: { props: { daoDelegates: string } }) {
         >
           Office hours
         </button>
+        <button
+          className={`border-b-2 py-4 px-2 ${
+            searchParams.get("active") === "leaderboard"
+              ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
+              : "border-transparent"
+          }`}
+          onClick={() =>
+            router.push(path + "?active=leaderboard")
+          }
+        >
+          Leaderboard
+        </button>
       </div>
 
       <div className="py-6 px-16">
@@ -228,8 +247,14 @@ function SpecificDAO({ props }: { props: { daoDelegates: string } }) {
         ) : (
           ""
         )}
+        {searchParams.get("active") === "leaderboard" ? (
+          <Leaderboard props={props.daoDelegates} />
+        ) : (
+          ""
+        )}
       </div>
     </div>
+    </>
   );
 }
 

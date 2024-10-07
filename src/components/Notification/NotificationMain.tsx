@@ -17,6 +17,9 @@ import { MagnifyingGlass } from "react-loader-spinner";
 import { Session } from "next-auth";
 import toast from "react-hot-toast";
 import { useNotificationStudioState } from "@/store/notificationStudioState";
+import MobileResponsiveMessage from "../MobileResponsiveMessage/MobileResponsiveMessage";
+import Heading from "../ComponentUtils/Heading";
+import NotificationSkeletonLoader from '../SkeletonLoader/NotificationSkeletonLoader';
 
 function NotificationMain() {
   const { data: session } = useSession();
@@ -119,6 +122,7 @@ function NotificationMain() {
           notification_name: message.notification_name,
           notification_type: message.notification_type,
           notification_title: message.notification_title,
+          additionalData: message?.additionalData,
         };
         addNotification(notificationData);
         updateCombinedNotifications();
@@ -219,11 +223,7 @@ function NotificationMain() {
 
   const renderContent = () => {
     if (isPageLoading) {
-      return (
-        <div className="flex justify-center items-center h-64">
-          <p className="text-xl text-gray-500">Loading...</p>
-        </div>
-      );
+      return <NotificationSkeletonLoader />;
     }
 
     if (!canFetch) {
@@ -272,13 +272,15 @@ function NotificationMain() {
   };
 
   return (
-    <div className="font-poppins mb-12">
-      <div className="flex items-center justify-between 1.7xl:pe-10 lg:pe-3 pe-2">
-        <div className="font-semibold text-4xl text-blue-shade-100 pb-8 pt-9 px-16">
-          Notifications
+<>
+{/* For Mobile Screen */}
+<MobileResponsiveMessage/>
+
+{/* For Desktop Screen  */}
+    <div className="hidden md:block font-poppins mb-12">
+        <div className="pt-2 xs:pt-4 sm:pt-6 px-4 md:px-6 lg:px-14">
+          <Heading/>
         </div>
-        <ConnectWalletWithENS />
-      </div>
       <div className="flex bg-[#D9D9D945]">
         <div className="flex gap-12 pl-16">
           <button
@@ -299,7 +301,7 @@ function NotificationMain() {
             }`}
             onClick={() => router.push(path + "?active=sessionBookings")}
           >
-            Session Bookings
+            Meetings
           </button>
           <button
             className={`py-4 px-2 outline-none ${
@@ -329,8 +331,7 @@ function NotificationMain() {
                 ? "text-blue-shade-200 font-semibold border-b-2 border-blue-shade-200"
                 : "border-transparent"
             }`}
-            // onClick={() => router.push(path + "?active=attestations")}
-            onClick={() => toast("Coming Soon 🚀")}
+            onClick={() => router.push(path + "?active=attestations")}
           >
             Attestations
           </button>
@@ -348,6 +349,7 @@ function NotificationMain() {
       </div>
       <div className="flex flex-col pt-7 pl-10 pr-16">{renderContent()}</div>
     </div>
+    </>
   );
 }
 

@@ -16,9 +16,12 @@ import SessionHostedModal from "../ComponentUtils/SessionHostedModal";
 
 function UpdateSessionDetails({ roomId }: { roomId: string }) {
   useEffect(() => {
-    const storedStatus = localStorage.getItem("meetingData");
-    if (storedStatus !== null) {
-      localStorage.removeItem("meetingData");
+    const storedStatus = sessionStorage.getItem("meetingData");
+    if (storedStatus) {
+      const parsedStatus = JSON.parse(storedStatus);
+      if (parsedStatus === roomId) {
+        sessionStorage.removeItem("meetingData");
+      }
     }
   }, []);
 
@@ -121,7 +124,10 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
           // setData(null);
         }
       }
-    } catch (e) {}
+    } catch (e) {
+      console.log("Error:", e);
+      setLoading(true);
+    }
   };
 
   return (
@@ -192,13 +198,6 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
                   <div className="flex justify-center gap-3">
                     <Button
                       className="bg-blue-shade-200 rounded-full font-semibold px-10 text-white"
-                      onClick={() => setViewMode("preview")}
-                    >
-                      Next
-                    </Button>
-
-                    <Button
-                      className="bg-blue-shade-200 rounded-full font-semibold px-10 text-white"
                       onClick={() =>
                         router.push(
                           `/profile/${address}?active=sessions&session=hosted`
@@ -206,6 +205,12 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
                       }
                     >
                       Back to Profile
+                    </Button>
+                    <Button
+                      className="bg-blue-shade-200 rounded-full font-semibold px-10 text-white"
+                      onClick={() => setViewMode("preview")}
+                    >
+                      Next
                     </Button>
                   </div>
                 </div>
@@ -217,6 +222,16 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
                     sessionDetails={sessionDetails}
                   />
                   <div className="flex justify-center gap-3">
+                    <Button
+                      className="bg-blue-shade-200 rounded-full font-semibold px-10 text-white"
+                      onClick={() =>
+                        router.push(
+                          `/profile/${address}?active=sessions&session=hosted`
+                        )
+                      }
+                    >
+                      Back to Profile
+                    </Button>
                     <Button
                       className="bg-blue-shade-200 text-white font-semibold rounded-full px-10"
                       onClick={() => handleUpdate()}
@@ -232,16 +247,6 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
                       ) : (
                         "Update"
                       )}
-                    </Button>
-                    <Button
-                      className="bg-blue-shade-200 rounded-full font-semibold px-10 text-white"
-                      onClick={() =>
-                        router.push(
-                          `/profile/${address}?active=sessions&session=hosted`
-                        )
-                      }
-                    >
-                      Back to Profile
                     </Button>
                   </div>
                 </div>

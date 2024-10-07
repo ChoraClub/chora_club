@@ -1,10 +1,10 @@
 // import React,{useState, useEffect} from 'react'
 // import Tile from '@/components/utils/Tile'
-// import { useNetwork } from 'wagmi';
+// import { useAccount } from 'wagmi';
 // import text1 from "@/assets/images/daos/texture1.png";
 
 // function UserHostedHours() {
-//     const { chain, chains } = useNetwork();
+//     const { chain, chains } = useAccount();
 //     const details = [
 //         {
 //           img: text1,

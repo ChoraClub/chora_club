@@ -10,7 +10,10 @@ import VotedOnOptions from "@/assets/images/votedOnOption.png";
 import { Tooltip as NextUITooltip } from "@nextui-org/react";
 import ProposalVotedLeftSkeletonLoader from "../SkeletonLoader/ProposalVotedLeftSkeletonLoader";
 import ProposalVotedRightSkeletonLoader from "../SkeletonLoader/ProposalVotedRightSkeletonLoader";
-import { useRouter } from "next/navigation";
+import { useRouter } from "next-nprogress-bar";
+import { RiExternalLinkLine } from "react-icons/ri";
+import Link from "next/link";
+
 Chart.register(ArcElement, Tooltip, Legend);
 
 interface Type {
@@ -29,13 +32,16 @@ const arb_client = createClient({
 });
 
 const arbDescription = gql`
-query MyQuery($proposalId: String!) {
-proposalCreateds(where: {proposalId:$proposalId} 
-    orderBy: blockTimestamp
-    orderDirection: desc) {
-  description
-}
-}`
+  query MyQuery($proposalId: String!) {
+    proposalCreateds(
+      where: { proposalId: $proposalId }
+      orderBy: blockTimestamp
+      orderDirection: desc
+    ) {
+      description
+    }
+  }
+`;
 
 const VoterQuery = (first: any, skip: any) => gql`
   query MyQuery($address: String!) {
@@ -117,65 +123,59 @@ export const fetchProposalDescriptions = async (
 ) => {
   let proposalIdsResult: any;
   if (daoName === "optimism") {
-     proposalIdsResult= await op_client.query(VoterQuery(first, skip), {
+    proposalIdsResult = await op_client.query(VoterQuery(first, skip), {
       address: address,
     });
-}
-    else if (daoName === "arbitrum") {
-      proposalIdsResult= await arb_client.query(VoterQuery(first, skip), {
-        address: address,
-      });
+  } else if (daoName === "arbitrum") {
+    proposalIdsResult = await arb_client.query(VoterQuery(first, skip), {
+      address: address,
+    });
+  }
 
-    }
+  const voteCasts = proposalIdsResult.data.voteCasts || [];
+  const voteCastWithParamsCollection =
+    proposalIdsResult.data.voteCastWithParams_collection || [];
 
-    const voteCasts = proposalIdsResult.data.voteCasts || [];
-    const voteCastWithParamsCollection =
-      proposalIdsResult.data.voteCastWithParams_collection || [];
+  // Combine the data
+  const combinedData = [...voteCasts, ...voteCastWithParamsCollection];
 
-    // Combine the data
-    const combinedData = [...voteCasts, ...voteCastWithParamsCollection];
+  // Sort combined data by blockTimestamp in descending order
+  combinedData.sort((a: any, b: any) => b.blockTimestamp - a.blockTimestamp);
 
-    // Sort combined data by blockTimestamp in descending order
-    combinedData.sort((a: any, b: any) => b.blockTimestamp - a.blockTimestamp);
-   
-    const proposalIds = combinedData.map((voteCast: any) => voteCast);
+  const proposalIds = combinedData.map((voteCast: any) => voteCast);
 
-let descriptionsPromises;
-let descriptionsResults:any;
-if(daoName === "optimism"){
-     descriptionsPromises = proposalIds.map((proposalId: any) => {
-      
+  let descriptionsPromises;
+  let descriptionsResults: any;
+  if (daoName === "optimism") {
+    descriptionsPromises = proposalIds.map((proposalId: any) => {
       return op_client
         .query(opDescription, { proposalId: proposalId.proposalId.toString() })
         .toPromise();
     });
-    descriptionsResults = await Promise.all(descriptionsPromises) || [];
-
-  }else if(daoName === "arbitrum"){
+    descriptionsResults = (await Promise.all(descriptionsPromises)) || [];
+  } else if (daoName === "arbitrum") {
     descriptionsPromises = proposalIds.map((proposalId: any) => {
-    
       return arb_client
         .query(arbDescription, { proposalId: proposalId.proposalId.toString() })
         .toPromise();
     });
-    descriptionsResults = await Promise.all(descriptionsPromises) || [];
+    descriptionsResults = (await Promise.all(descriptionsPromises)) || [];
   }
-  
-    const FinalResult = descriptionsResults
-      .flatMap((result:any, index:any) =>
-        Object.values(result.data)
-          .flat()
-          .filter((d: any) => d.description)
-          .map((d: any) => ({
-            proposalId: proposalIds[index],
-            proposal: { description: d.description },
-            support: proposalIds[index].support,
-          }))
-      )
-      .filter((item:any) => item.proposal.description.length > 0);
 
-    return FinalResult;
+  const FinalResult = descriptionsResults
+    .flatMap((result: any, index: any) =>
+      Object.values(result.data)
+        .flat()
+        .filter((d: any) => d.description)
+        .map((d: any) => ({
+          proposalId: proposalIds[index],
+          proposal: { description: d.description },
+          support: proposalIds[index].support,
+        }))
+    )
+    .filter((item: any) => item.proposal.description.length > 0);
 
+  return FinalResult;
 };
 
 export const fetchGraphData = async (daoName: any, pageData: any) => {
@@ -230,7 +230,7 @@ function ProposalVoted({ daoName, address }: any) {
   const [isPageLoading, setIsPageLoading] = useState(true);
   const [openDesc, setOpenDesc] = useState<boolean[]>([]);
   const [supportCounts, setSupportCounts] = useState({ 0: 0, 1: 0, 2: 0 });
-const router = useRouter();
+  const router = useRouter();
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -299,16 +299,31 @@ const router = useRouter();
     ],
   };
 
-  const filterDescription = (description:any) => {
-    return description.replace(/#/g, '').trim();
+  const filterDescription = (description: any) => {
+    return description.replace(/#/g, "").trim();
   };
+
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkIfMobile = () => {
+      if (typeof window !== "undefined") {
+        setIsMobile(window.matchMedia("(max-width: 640px)").matches);
+      }
+    };
+
+    checkIfMobile();
+    window.addEventListener("resize", checkIfMobile);
+
+    return () => window.removeEventListener("resize", checkIfMobile);
+  }, []);
 
   return (
     <>
-      <div className="grid grid-cols-5 pe-5 gap-4 pb-6">
+      <div className="grid grid-cols-2 1.5lg:grid-cols-5 1.5lg:gap-4 pb-6">
         <div
           style={{ boxShadow: "0px 4px 15.1px 0px rgba(0, 0, 0, 0.17)" }}
-          className="col-span-2 space-y-4 p-10 rounded-xl"
+          className="col-span-2 space-y-4 p-10 rounded-xl mb-4 1.5lg:mb-0"
         >
           {isPageLoading ? (
             <ProposalVotedLeftSkeletonLoader />
@@ -335,93 +350,104 @@ const router = useRouter();
             Voted Proposals
           </div>
 
-          <div className={`h-[23rem] overflow-y-auto ${styles.scrollbar}`}>
+          <div
+            className={`h-fit xm:h-[23rem] overflow-y-auto ${styles.scrollbar}`}
+          >
             {isPageLoading ? (
               <ProposalVotedRightSkeletonLoader />
             ) : first && !isPageLoading && pageData.length > 0 ? (
               dataToShow.map((proposal: any, index: number) => (
                 <div
                   key={index}
-                  className={`flex justify-between border border-[#7C7C7C] text-sm px-3 py-2 rounded-lg items-center my-3 `}
+                  className={`flex flex-col xm:flex-row justify-between border border-[#7C7C7C] text-sm px-3 py-2 rounded-lg items-end xm:items-center my-3 `}
                 >
-                  <div className="w-3/4 break-words">
+                  <div className="w-full xm:w-3/5 break-words">
                     <div className={`${openDesc[index] ? "" : styles.desc}`}>
                       {filterDescription(proposal.proposal.description)}
                     </div>
                     <span
                       className="text-xs text-blue-shade-100 underline cursor-pointer"
                       onClick={() => {
-                        router.push(`/${daoName}/proposals/${proposal.proposalId.proposalId}`);
+                        router.push(
+                          `/${daoName}/proposals/${proposal.proposalId.proposalId}`
+                        );
                       }}
                     >
                       view
                     </span>
                   </div>
-                  <div
-                    className={`text-white rounded-full px-3 py-[2px] w-[70px] me-1 text-center flex justify-center align-center ${
-                      proposal.proposalId &&
-                      proposal.proposalId.params &&
-                      proposal.proposalId.params.length > 2
-                        ? "" 
-                        : proposal.support === 1
-                        ? "bg-[#0033A8]"
-                        : proposal.support === 0
-                        ? "bg-[#6B98FF]"
-                        : "bg-[#004DFF]"
-                    }`}
-                  >
-                    <NextUITooltip
-                      content="Voted on options"
-                      isDisabled={
-                        !(
-                          proposal.proposalId &&
-                          proposal.proposalId.params &&
-                          proposal.proposalId.params.length > 2
-                        )
-                      }
+                  <div className="flex items-center ">
+                    <div
+                      className={`text-white rounded-full xm:px-3 py-[2px]  text-xs xs:text-base w-[60px] xs:w-[70px] me-1 text-center flex justify-center align-center ${
+                        proposal.proposalId &&
+                        proposal.proposalId.params &&
+                        proposal.proposalId.params.length > 2
+                          ? ""
+                          : proposal.support === 1
+                          ? "bg-[#0033A8]"
+                          : proposal.support === 0
+                          ? "bg-[#6B98FF]"
+                          : "bg-[#004DFF]"
+                      }`}
                     >
-                      {proposal.proposalId &&
-                      proposal.proposalId.params &&
-                      proposal.proposalId.params.length > 2 ? (
-                        <Image
-                          className="flex justify-center items-center"
-                          src={VotedOnOptions}
-                          alt="Voted on options"
-                        />
-                      ) : proposal.support === 1 ? (
-                        "For"
-                      ) : proposal.support === 0 ? (
-                        "Against"
-                      ) : (
-                        "Abstain"
+                      <NextUITooltip
+                        content="Voted on options"
+                        isDisabled={
+                          !(
+                            proposal.proposalId &&
+                            proposal.proposalId.params &&
+                            proposal.proposalId.params.length > 2
+                          )
+                        }
+                      >
+                        {proposal.proposalId &&
+                        proposal.proposalId.params &&
+                        proposal.proposalId.params.length > 2 ? (
+                          <Image
+                            className="flex justify-center items-center size-6 xs:size-8"
+                            src={VotedOnOptions}
+                            alt="Voted on options"
+                          />
+                        ) : proposal.support === 1 ? (
+                          "For"
+                        ) : proposal.support === 0 ? (
+                          "Against"
+                        ) : (
+                          "Abstain"
+                        )}
+                      </NextUITooltip>
+                    </div>
+                    <NextUITooltip content="Votes">
+                      {proposal.proposalId && (
+                        <div className="text-white  text-xs xs:text-base rounded-full px-3 py-[2px] bg-[#FF0000]">
+                          {formatNumber(proposal.proposalId.weight / 1e18)}
+                        </div>
                       )}
                     </NextUITooltip>
-                  </div>
-                  <NextUITooltip content="Votes">
-                    { proposal.proposalId && (
-                      <div className="text-white rounded-full px-3 py-[2px] bg-[#FF0000]">
-                        {formatNumber(proposal.proposalId.weight / 1e18)}
+                    {proposal.proposalId && (
+                      <div className="px-3 py-[2px] text-base xs:text-xl">
+                        <Link
+                          href={
+                            daoName === "optimism"
+                              ? `https://optimistic.etherscan.io/tx/${proposal.proposalId.transactionHash}`
+                              : `https://arbiscan.io/tx/${proposal.proposalId.transactionHash}`
+                          }
+                          target="_blank"
+                          className="cursor-pointer text-blue-600 hover:text-blue-800 transition-colors duration-200"
+                        >
+                          {/* ↗ */}
+                          <RiExternalLinkLine />
+                        </Link>
                       </div>
                     )}
-                  </NextUITooltip>
-                  { proposal.proposalId && (
-                    <div className="px-3 py-[2px] text-xl">
-                      <a
-                        href={daoName==="optimism"?`https://optimistic.etherscan.io/tx/${proposal.proposalId.transactionHash}`:`https://arbiscan.io/tx/${proposal.proposalId.transactionHash}`}
-                        target="_blank"
-                        className="cursor-pointer"
-                      >
-                        ↗
-                      </a>
-                    </div>
-                  )}
+                  </div>
                 </div>
               ))
             ) : (
               <div className="pt-10 flex items-center flex-col justify-center">
                 <div className="text-5xl">☹️</div>
                 <div className="pt-4 font-semibold text-lg">
-                Oops, no data available!
+                  Oops, no data available!
                 </div>
               </div>
             )}
@@ -442,6 +468,8 @@ const router = useRouter();
                 page={currentPage}
                 onChange={setCurrentPage}
                 showControls
+                siblings={isMobile ? 0 : 1}
+                boundaries={isMobile ? 0 : 1}
               />
             </div>
           )}

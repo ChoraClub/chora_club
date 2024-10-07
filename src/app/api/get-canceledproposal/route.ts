@@ -6,6 +6,10 @@ const client = new Client({
   url: 'https://api.studio.thegraph.com/query/68573/v6_proxy/version/latest',
   exchanges: [cacheExchange, fetchExchange],
 });
+const arb_client = new Client({
+  url:'https://api.studio.thegraph.com/query/68573/arbitrum_proposals/v0.0.4',
+  exchanges: [cacheExchange,fetchExchange],
+});
 
 const GET_CANCELED_PROPOSALS = gql`
   query GetCanceledProposals($first: Int!, $skip: Int!) {
@@ -16,8 +20,14 @@ const GET_CANCELED_PROPOSALS = gql`
   }
 `;
 
-async function fetchAllProposals(first: number, skip: number, accumulatedResults: any[] = []): Promise<any[]> {
-  const result = await client.query(GET_CANCELED_PROPOSALS, { first, skip }).toPromise();
+async function fetchAllProposals(first: number, skip: number, accumulatedResults: any[] = [],dao:any): Promise<any[]> {
+  let result;
+  if(dao === 'arbitrum'){
+     result = await arb_client.query(GET_CANCELED_PROPOSALS, { first, skip }).toPromise();
+  }else{
+
+     result = await client.query(GET_CANCELED_PROPOSALS, { first, skip }).toPromise();
+  }
 
   if (result.error) {
     throw new Error(result.error.message);
@@ -32,15 +42,18 @@ async function fetchAllProposals(first: number, skip: number, accumulatedResults
   }
 
   // Otherwise, continue fetching
-  return fetchAllProposals(first, skip + first, accumulatedResults);
+  return fetchAllProposals(first, skip + first, accumulatedResults,dao);
 }
 
 export async function GET(req: NextRequest) {
+  const { searchParams } = new URL(req.url);
+
+  const dao = searchParams.get('dao');
   try {
     const first = 100; // You can adjust this value based on the API's limit
     const skip = 0;
 
-    const allProposals = await fetchAllProposals(first, skip);
+    const allProposals = await fetchAllProposals(first, skip,[],dao);
 
     return NextResponse.json(allProposals);
   } catch (error) {

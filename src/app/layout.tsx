@@ -6,12 +6,13 @@ import "./globals.css";
 import SidebarMain from "@/components/MainSidebar/SidebarMain";
 import RootProviders from "./providers/root-providers";
 import HuddleContextProvider from "@/context/HuddleContextProvider";
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import FeedbackTile from "@/components/ComponentUtils/FeedbackTile";
 import Script from "next/script";
 import ProgressBarProvider from "@/components/ProgressBarProvider/ProgressBarProvider";
 import MobileResponsiveMessage from "@/components/MobileResponsiveMessage/MobileResponsiveMessage";
-import { GoogleTagManager } from '@next/third-parties/google';
+import { GoogleTagManager } from "@next/third-parties/google";
+import SidebarMainMobile from "@/components/MainSidebar/SidebarMainMobile";
 const poppins = Poppins({
   subsets: ["latin"],
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
@@ -93,7 +94,6 @@ export default function RootLayout({
   }}();`,
           }}
         ></script>
-        
       </head>
       <body className={`${quanty.variable} ${poppins.variable}`}>
         {/* <noscript
@@ -109,33 +109,24 @@ export default function RootLayout({
           }}
         /> */}
         <ProgressBarProvider>
-          <RootProviders>
-            <HuddleContextProvider>
-              <div className="flex">
-                <div className="fixed w-[6%] bg-blue-shade-100 h-screen z-10">
-                  <SidebarMain />
-                </div>
-                <div className="w-[94%] ml-auto">
-                  <FeedbackTile />
-                  <div>{children}</div>
-                </div>
-              </div>
-              {/* <div className="lg:block hidden">
+          <Suspense>
+            <RootProviders>
+              <HuddleContextProvider>
                 <div className="flex">
-                  <div className="fixed w-[6%] bg-blue-shade-100 h-screen ">
+                  <div className="hidden lg:block fixed w-[6%] bg-blue-shade-100 h-screen z-10">
                     <SidebarMain />
                   </div>
-                  <div className="w-full md:w-[94%] ml-auto">
+                  <div className="lg:hidden fixed z-10 w-full bg-white border border-b-0">
+                    <SidebarMainMobile />
+                  </div>
+                  <div className="w-[100%] lg:w-[94%] ml-auto mt-[78px] sm:mt-[64px] lg:mt-0">
                     <FeedbackTile />
                     <div>{children}</div>
                   </div>
                 </div>
-              </div>
-              <div className="lg:hidden w-full h-screen flex items-center justify-center">
-                <MobileResponsiveMessage />
-              </div> */}
-            </HuddleContextProvider>
-          </RootProviders>
+              </HuddleContextProvider>
+            </RootProviders>
+          </Suspense>
         </ProgressBarProvider>
       </body>
       <GoogleTagManager gtmId="GTM-5KX3QH8T" />

@@ -8,7 +8,7 @@ import {
   Tooltip,
 } from "@nextui-org/react";
 import Image from "next/image";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { BsDiscord } from "react-icons/bs";
 import { CgAttachment } from "react-icons/cg";
 import { FaUserEdit } from "react-icons/fa";
@@ -50,6 +50,19 @@ function UpdateProfileModal({
   handleToggle,
   isToggled,
 }: ProfileModalProps) {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkIsMobile = () => {
+      const mediaQuery = window.matchMedia('(max-width: 640px)');
+      setIsMobile(mediaQuery.matches);
+    };
+
+    checkIsMobile(); // Check initially
+    window.addEventListener('resize', checkIsMobile);
+
+    return () => window.removeEventListener('resize', checkIsMobile);
+  }, []);
   return (
     <div onClick={
       onClose
@@ -60,11 +73,11 @@ function UpdateProfileModal({
       }}
         isOpen={isOpen}
         // onOpenChange={onOpenChange}
-        className="font-poppins rounded-3xl "
-        size="2xl"
+        className="font-poppins rounded-3xl max-h-[90vh] overflow-hidden"
+        size={isMobile ? "full" : "2xl"} 
         // style={{ '--modal-size': '672px' }}
         hideCloseButton>
-        <ModalContent>
+        <ModalContent className="flex flex-col h-full">
           <>
             <ModalHeader className="flex justify-between text-2xl font-semibold items-center bg-blue-shade-100 text-white px-8 py-6 ">
               Update your Profile
@@ -74,13 +87,13 @@ function UpdateProfileModal({
                 <IoClose className="font-bold size-4" />
               </button>
             </ModalHeader>
-            <ModalBody className="px-10 pb-4 pt-6">
+            <ModalBody className="px-4 xm:px-10 pb-4 pt-6 overflow-y-auto flex-grow">
               <div className="mb-4">
                 <div className="text-sm font-semibold mb-2">
                   Upload Profile Image:
                 </div>
                 <div className="flex items-center">
-                  <div className="w-24 h-24 bg-gray-100 rounded-md flex items-center justify-center mr-4">
+                  <div className="w-24 h-24 bg-gray-100 rounded-md flex items-center justify-center mr-2 xm:mr-4">
                     {modalData.displayImage ? (
                       <Image
                         src={`https://gateway.lighthouse.storage/ipfs/${modalData.displayImage}`}
@@ -106,11 +119,11 @@ function UpdateProfileModal({
                     )}
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600 mb-2">
+                    <p className="text-xs xs:text-sm text-gray-600 mb-2">
                       Please upload square image, size less than 100KB
                     </p>
                     <div className="flex items-center">
-                      <label className="bg-white  text-blue-shade-100 font-medium text-sm py-3 px-4 rounded-full border cursor-pointer border-blue-shade-100 cursor-point flex gap-2 items-center">
+                      <label className="bg-white  text-blue-shade-100 font-medium text-sm p-2 xs:py-3 xs:px-4 rounded-full border cursor-pointer border-blue-shade-100 cursor-point flex gap-2 items-center">
                         <CgAttachment />
                         <span>Choose File</span>
                         <input
@@ -120,7 +133,7 @@ function UpdateProfileModal({
                           className="hidden"
                         />
                       </label>
-                      <span className="ml-3 text-sm text-gray-600">
+                      <span className="ml-1.5 xs:ml-3 text-xs xs:text-sm text-gray-600">
                         {fileInputRef.current?.files?.[0]?.name ||
                           "No File Chosen"}
                       </span>
@@ -129,7 +142,7 @@ function UpdateProfileModal({
                 </div>
               </div>
 
-              <div className="flex gap-6 ">
+              <div className="flex gap-3 xm:gap-6 flex-col xm:flex-row">
                 <div className="flex flex-col basis-1/2 mt-1.5">
                   <div className="font-semibold text-sm flex px-3 items-center gap-1.5">
                     <FaUserEdit /> Display name:
@@ -175,7 +188,7 @@ function UpdateProfileModal({
                   <input
                     type="email"
                     value={modalData.emailId}
-                    placeholder="xxx@gmail.com"
+                    placeholder="abc@gmail.com"
                     className="border border-[#f2eeee] mt-1 bg-white rounded-lg px-3 py-[10px] text-sm text-[#2e2e2e] font-normal"
                     onChange={(e) =>
                       handleInputChange("emailId", e.target.value)
@@ -184,7 +197,7 @@ function UpdateProfileModal({
                 </div>
               </div>
 
-              <div className="flex gap-6 ">
+              <div className="flex gap-3 xm:gap-6 flex-col xm:flex-row">
                 <div className="flex flex-col basis-1/2 mt-1.5">
                   <div className="text-sm font-semibold flex px-3 items-center gap-1.5">
                     <FaXTwitter />
@@ -217,7 +230,7 @@ function UpdateProfileModal({
                 </div>
               </div>
 
-              <div className="flex gap-6 ">
+              <div className="flex gap-3 xm:gap-6 flex-col xm:flex-row">
                 <div className="flex flex-col basis-1/2 mt-1.5">
                   <div className="text-sm font-semibold flex px-3 items-center gap-1.5">
                     <BsDiscord />

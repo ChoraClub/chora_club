@@ -9,6 +9,7 @@ import SessionTileSkeletonLoader from "../SkeletonLoader/SessionTileSkeletonLoad
 import ErrorDisplay from "../ComponentUtils/ErrorDisplay";
 import { headers } from "next/headers";
 import { useAccount } from "wagmi";
+import { CiSearch } from "react-icons/ci";
 
 interface Session {
   _id: string;
@@ -199,7 +200,7 @@ function OfficeHours({ props }: { props: string }) {
 
   return (
     <div>
-      <div
+      {/* <div
         style={{ background: "rgba(238, 237, 237, 0.36)" }}
         className="flex border-[0.5px] border-black w-1/3 rounded-full my-4 font-poppins"
       >
@@ -214,7 +215,21 @@ function OfficeHours({ props }: { props: string }) {
         <span className="flex items-center bg-black rounded-full px-5 py-2">
           <Image src={search} alt="search" width={20} />
         </span>
-      </div>
+      </div> */}
+      <div
+          className={`flex items-center rounded-full shadow-lg my-4 bg-gray-100 text-black cursor-pointer w-[300px] xs:w-[365px]`}
+        >
+          <CiSearch
+            className={`text-base transition-all duration-700 ease-in-out ml-3`}
+          />
+          <input
+            type="text"
+            placeholder="Search by title and host address"
+            className="w-[100%] pl-2 pr-4 py-1.5 font-poppins md:py-2 text-sm bg-transparent outline-none"
+            value={searchQuery}
+            onChange={(e) => handleSearchChange(e.target.value)}
+          />
+        </div>
 
       <div className="pr-36 pt-3">
         <div className="flex gap-16 border-1 border-[#7C7C7C] pl-6 rounded-xl text-sm">

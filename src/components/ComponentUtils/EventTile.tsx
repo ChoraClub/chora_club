@@ -14,12 +14,10 @@ import text1 from "@/assets/images/daos/texture1.png";
 import text2 from "@/assets/images/daos/texture2.png";
 import oplogo from "@/assets/images/daos/op.png";
 import arblogo from "@/assets/images/daos/arbitrum.jpg";
-
-// import { getEnsName } from "../ConnectWallet/ENSResolver";
 import logo from "@/assets/images/daos/CCLogo.png";
 import user1 from "@/assets/images/user/user1.svg";
 import { BsPersonVideo3 } from "react-icons/bs";
-import { fetchEnsAvatar } from "@/utils/ENSUtils";
+import { fetchEnsNameAndAvatar } from "@/utils/ENSUtils";
 import styles from "./Button.module.css";
 import {
   Modal,
@@ -32,12 +30,7 @@ import {
 } from "@nextui-org/react";
 import { IoCopy } from "react-icons/io5";
 import { useAccount } from "wagmi";
-interface RoomDetails {
-  message: string;
-  data: {
-    roomId: string;
-  };
-}
+import { SessionInterface } from "@/types/MeetingTypes";
 
 type Attendee = {
   attendee_address: string;
@@ -46,21 +39,7 @@ type Attendee = {
 
 interface TileProps {
   tileIndex: number;
-  data: {
-    _id: string;
-    thumbnail_image: string;
-    title: string;
-    meetingId: string;
-    dao_name: string;
-    booking_status: string;
-    meeting_status: string;
-    joined_status: boolean;
-    attendees: Attendee[];
-    host_address: string;
-    slot_time: string;
-    description: string;
-    session_type: string;
-  };
+  data: SessionInterface;
   isEvent: string;
 }
 
@@ -89,7 +68,8 @@ const createRandomRoom = async () => {
   return roomId;
 };
 
-function EventTile({ tileIndex, data, isEvent }: TileProps) {
+function EventTile({ tileIndex, data: initialData, isEvent }: TileProps) {
+  const [data, setData] = useState(initialData);
   const [isPageLoading, setIsPageLoading] = useState(true);
   const [isConfirmSlotLoading, setIsConfirmSlotLoading] = useState(false);
   const router = useRouter();
@@ -102,6 +82,7 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
   const [ensGuestAvatar, setEnsGuestAvatar] = useState("");
   const [loadingEnsData, setLoadingEnsData] = useState(true);
   const { address } = useAccount();
+  // const address = "0xB351a70dD6E5282A8c84edCbCd5A955469b9b032";
 
   const handleCopy = (addr: string) => {
     copy(addr);
@@ -114,7 +95,7 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
         setLoadingEnsData(true);
 
         // Fetch host ENS data
-        const hostEnsData = await fetchEnsAvatar(
+        const hostEnsData = await fetchEnsNameAndAvatar(
           data.host_address.toLowerCase()
         );
         setEnsHostName(
@@ -124,7 +105,7 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
 
         // Fetch guest ENS data if available
         if (data.attendees[0]?.attendee_address) {
-          const guestEnsData = await fetchEnsAvatar(
+          const guestEnsData = await fetchEnsNameAndAvatar(
             data.attendees[0].attendee_address.toLowerCase()
           );
           setEnsGuestName(
@@ -151,8 +132,6 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
   const formatWalletAddress = (address: any) => {
     if (typeof address !== "string" || address.length <= 10) return address;
     return address.slice(0, 6) + "..." + address.slice(-4);
-    // const ensName = getEnsName(address.toLowerCase());
-    // return ensName;
   };
 
   const formatSlotTimeToLocal = (slotTime: any) => {
@@ -160,24 +139,23 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
     return date.toLocaleString();
   };
 
-  const confirmSlot = async (id: any, status: any) => {
-    // console.log("confirm_Slot clicked");
-    // console.log("id:", id);
-    // console.log("status:", status);
+  const confirmSlot = async (data: SessionInterface, status: any) => {
+    const id = data._id;
+    const host_address = data.host_address;
+    const attendee_address = data.attendees[0].attendee_address;
     setStartLoading(true);
     try {
       setIsConfirmSlotLoading(true);
       let roomId = null;
       let meeting_status = null;
-      // if (status === "Approved") {
-      //   roomId = await createRandomRoom();
-      //   meeting_status = "Upcoming";
-      // }
+      let host_joined_status;
+      let attendee_joined_status;
       if (status === "Rejected") {
         meeting_status = "Denied";
+        host_joined_status = "Not Joined";
+        attendee_joined_status = "Not Joined";
       }
 
-      // console.log(meeting_status);
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
       if (address) {
@@ -193,6 +171,10 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
         title: data.title,
         slot_time: data.slot_time,
         dao_name: data.dao_name,
+        attendee_joined_status: attendee_joined_status,
+        host_joined_status: host_joined_status,
+        host_address,
+        attendee_address,
       });
 
       const requestOptions = await {
@@ -207,16 +189,21 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
       const result = await response.json();
       if (result.success) {
         toast(`You ${status} the booking.`);
+        setData((prevData: any) => ({
+          ...prevData,
+          booking_status: status,
+          meeting_status: meeting_status,
+        }));
         setStartLoading(false);
-        setTimeout(() => {
-          setIsPageLoading(false);
-          setIsConfirmSlotLoading(false);
-        }, 4000);
-        console.log("status updated");
+        setIsConfirmSlotLoading(false);
+        onClose();
       }
     } catch (error) {
       // setIsConfirmSlotLoading(false);
       console.error(error);
+    } finally {
+      setStartLoading(false);
+      setIsConfirmSlotLoading(false);
     }
   };
 
@@ -234,21 +221,21 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
       router.push(`/meeting/session/${data.meetingId}/lobby`);
     } else {
       toast.error(
-        "The meeting can only be started 5 minutes before the slot time."
+        "The meeting can only be started 5 minutes before the meeting time."
       );
     }
   };
 
   return (
     <>
-      <div key={tileIndex} className="border border-[#D9D9D9] rounded-3xl">
+      <div key={tileIndex} className="border border-[#D9D9D9] sm:rounded-3xl">
         <div className="w-full h-44 rounded-t-3xl bg-black object-cover object-center relative">
           <Image
             src={`https://gateway.lighthouse.storage/ipfs/${data.thumbnail_image}`}
             alt="image"
             width={176}
             height={176}
-            className="w-full h-44 rounded-t-3xl object-cover"
+            className="w-full h-44 sm:rounded-t-3xl object-cover"
           />
           <div className="absolute top-2 right-2 bg-black rounded-full">
             <Image src={logo} alt="image" width={24} />
@@ -258,7 +245,7 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
         <div className="px-4 pt-2">
           <div className="flex justify-between gap-2">
             <div
-              className={`font-semibold py-1`}
+              className={`text-sm sm:text-base font-semibold py-1`}
               style={{
                 display: "-webkit-box",
                 WebkitBoxOrient: "vertical",
@@ -295,25 +282,25 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
               alt="image"
               width={24}
               height={24}
-              className="w-6 h-6 rounded-full"
+              className="size-4 sm:size-6 rounded-full"
             />
-            <div className="bg-[#F5F5F5] py-1 px-3 rounded-md flex items-center w-fit">
+            <div className="bg-[#F5F5F5] text-sm sm:text-base py-0.5 sm:py-1 px-3 rounded-md flex items-center w-fit">
               {formatSlotTimeToLocal(data.slot_time)}
             </div>
           </div>
 
           <div className="flex flex-col gap-2 text-sm pt-1">
             {data.session_type === "session" ? (
-              <div className="text-[#3E3D3D] flex items-center gap-2">
+              <div className="text-[#3E3D3D] text-xs sm:text-sm flex items-center gap-2">
                 <Image
                   src={ensGuestAvatar || user1}
                   alt="image"
                   width={20}
                   height={20}
-                  className="h-5 w-5 rounded-full object-cover object-center"
+                  className="size-4 sm:size-5 rounded-full object-cover object-center"
                 />
                 <div className="flex items-center">
-                  <span className="font-semibold">Guest: </span> &nbsp;
+                  <span className="font-medium">Guest: </span> &nbsp;
                   {loadingEnsData
                     ? formatWalletAddress(data.attendees[0].attendee_address)
                     : ensGuestName}
@@ -324,7 +311,7 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
                     closeDelay={1}
                     showArrow
                   >
-                    <span className="cursor-pointer text-sm">
+                    <span className="cursor-pointer text-xs sm:text-sm">
                       <IoCopy
                         onClick={(event) => {
                           event.stopPropagation();
@@ -340,16 +327,16 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
                 <span className="font-semibold">Instant Meet</span>{" "}
               </div>
             )}
-            <div className="text-[#3E3D3D] flex items-center gap-2">
+            <div className="text-[#3E3D3D] text-xs sm:text-sm flex items-center gap-2">
               <Image
                 src={ensHostAvatar || user1}
                 alt="image"
                 width={20}
                 height={20}
-                className="h-5 w-5 rounded-full object-cover object-center"
+                className="size-4 sm:size-5 rounded-full object-cover object-center"
               />
               <div className="flex items-center">
-                <span className="font-semibold">Host: </span> &nbsp;
+                <span className="font-medium">Host: </span> &nbsp;
                 {isEvent === "Attending" ? (
                   <Link
                     href={`/${data.dao_name}/${data.host_address}?active=info`}
@@ -374,7 +361,7 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
                   closeDelay={1}
                   showArrow
                 >
-                  <span className="cursor-pointer text-sm">
+                  <span className="cursor-pointer text-xs sm:text-sm">
                     <IoCopy
                       onClick={(event) => {
                         event.stopPropagation();
@@ -388,7 +375,9 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
           </div>
         </div>
 
-        <div className={`flex flex-col justify-between text-xs py-2 px-4 mb-2`}>
+        <div
+          className={`flex flex-col justify-between text-xs sm:py-2 px-4 mb-2`}
+        >
           {isEvent === "Book" ? (
             data.booking_status === "Approved" ? (
               <div className="flex justify-end items-center gap-2 ">
@@ -415,11 +404,11 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
                         size={32}
                         color="#004DFF"
                         onClick={() => {
-                          // setStartLoading(true);
-                          // router.push(
-                          //   `/meeting/session/${data.meetingId}/lobby`
-                          // );
-                          handleJoinClick();
+                          setStartLoading(true);
+                          router.push(
+                            `/meeting/session/${data.meetingId}/lobby`
+                          );
+                          // handleJoinClick();
                         }}
                       />
                     </span>
@@ -470,7 +459,7 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
                           </button>
                           <button
                             className="bg-red-500 text-white px-8 py-3 font-semibold rounded-full"
-                            onClick={() => confirmSlot(data._id, "Rejected")}
+                            onClick={() => confirmSlot(data, "Rejected")}
                           >
                             {startLoading ? (
                               <Oval
@@ -491,44 +480,14 @@ function EventTile({ tileIndex, data, isEvent }: TileProps) {
                   </div>
                 )}
               </div>
-            ) : data.booking_status === "Pending" ? (
-              isConfirmSlotLoading ? (
-                <div className="flex items-center justify-center">
-                  <Oval
-                    visible={true}
-                    height="30"
-                    width="30"
-                    color="#0500FF"
-                    secondaryColor="#cdccff"
-                    ariaLabel="oval-loading"
-                  />
-                </div>
-              ) : (
-                <div className="flex justify-end gap-2">
-                  <Tooltip
-                    content="Approve"
-                    placement="top"
-                    closeDelay={1}
-                    showArrow
-                  >
-                    <span className="cursor-pointer">
-                      <FaCircleCheck
-                        onClick={() => confirmSlot(data._id, "Approved")}
-                        size={28}
-                        color="#4d7c0f"
-                      />
-                    </span>
-                  </Tooltip>
-                </div>
-              )
             ) : null
           ) : isEvent === "Attending" ? (
             data.booking_status === "Approved" && (
               <div
                 onClick={() => {
-                  // setStartLoading(true);
-                  // router.push(`/meeting/session/${data.meetingId}/lobby`);
-                  handleJoinClick();
+                  setStartLoading(true);
+                  router.push(`/meeting/session/${data.meetingId}/lobby`);
+                  // handleJoinClick();
                 }}
                 className="text-center rounded-full font-bold text-white mt-2 text-xs cursor-pointer"
               >

@@ -1,70 +1,20 @@
-import React from "react";
+import React, { useState } from "react";
 import VideoJs from "../ComponentUtils/VideoJs";
 import videojs from "video.js";
+import { v4 as uuidv4 } from "uuid";
+import {
+  DynamicAttendeeInterface,
+  SessionInterface,
+} from "@/types/MeetingTypes";
+import { UserProfileInterface } from "@/types/UserProfileTypes";
 
-interface ProfileInfo {
-  _id: string;
-  address: string;
-  image: string;
-  description: string;
-  daoName: string;
-  isDelegate: boolean;
-  displayName: string;
-  socialHandles: {
-    twitter: string;
-    discord: string;
-    discourse: string;
-    github: string;
-  };
-  emailId: string;
-}
-interface Attendee {
-  attendee_address: string;
-  attendee_uid: string;
-  profileInfo: ProfileInfo;
+interface Attendee extends DynamicAttendeeInterface {
+  profileInfo: UserProfileInterface;
 }
 
-interface HostProfileInfo {
-  _id: string;
-  address: string;
-  image: string;
-  description: string;
-  daoName: string;
-  isDelegate: boolean;
-  displayName: string;
-  socialHandles: {
-    twitter: string;
-    discord: string;
-    discourse: string;
-    github: string;
-  };
-  emailId: string;
-}
-
-interface Meeting {
-  _id: string;
-  slot_time: string;
-  office_hours_slot: string; // Assuming this is a date-time string
-  title: string;
-  description: string;
-  video_uri: string;
-  meetingId: string;
+interface Meeting extends SessionInterface {
   attendees: Attendee[];
-  uid_host: string;
-  dao_name: string;
-  host_address: string;
-  joined_status: string | null;
-  booking_status: string;
-  meeting_status:
-    | "active"
-    | "inactive"
-    | "ongoing"
-    | "Recorded"
-    | "Upcoming"
-    | "Ongoing"; // Assuming meeting status can only be active or inactive
-  session_type: string;
-  hostProfileInfo: HostProfileInfo;
-  thumbnail_image: string;
+  hostProfileInfo: UserProfileInterface;
 }
 
 function WatchSessionVideo({
@@ -114,7 +64,72 @@ function WatchSessionVideo({
     player.on("dispose", () => {
       videojs.log("player will dispose");
     });
+
+    let totalWatchTime = 0;
+    let lastRecordedTime = 0;
+    let hasCalledApi = false;
+    let isPlaying = false;
+
+    player.on("play", function () {
+      isPlaying = true;
+      lastRecordedTime = player.currentTime();
+    });
+
+    player.on("pause", function () {
+      isPlaying = false;
+    });
+
+    player.on("timeupdate", function () {
+      if (isPlaying) {
+        var currentTime = player.currentTime();
+        var timeDiff = currentTime - lastRecordedTime;
+
+        // Handle both forward and backward seeking, and ensure we only count actual playback
+        if (Math.abs(timeDiff) < 1) {
+          totalWatchTime += timeDiff;
+        }
+
+        lastRecordedTime = currentTime;
+
+        if (!hasCalledApi && totalWatchTime >= 15) {
+          hasCalledApi = true;
+          try {
+            CountAsView(data.meetingId);
+            // console.log("API called at total watch time:", totalWatchTime);
+          } catch (error) {
+            console.error("Error calling CountAsView:", error);
+          }
+        }
+      }
+    });
   };
+  async function CountAsView(meetingId: string) {
+    try {
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      let clientToken = localStorage.getItem("clientToken");
+      if (!clientToken) {
+        clientToken = uuidv4();
+        localStorage.setItem("clientToken", clientToken);
+      }
+      const raw = JSON.stringify({
+        meetingId: meetingId,
+        clientToken: clientToken,
+      });
+
+      const requestOptions: any = {
+        method: "PUT",
+        headers: myHeaders,
+        body: raw,
+        redirect: "follow",
+      };
+      const response = await fetch("/api/counting-views", requestOptions);
+      const data = await response.json();
+      // console.log("Response from API", data);
+    } catch (error) {
+      console.error("Error in views:", error);
+    }
+  }
   return (
     <div>
       <div className="rounded-3xl">

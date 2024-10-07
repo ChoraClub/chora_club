@@ -22,7 +22,7 @@ import {
 // import { useRouter } from "next/navigation";
 import { useRouter } from "next-nprogress-bar";
 import { useEffect, useRef, useState } from "react";
-import BottomBar from "@/components/Huddle/bottomBar";
+import BottomBar from "@/components/Huddle/Bottombar/bottomBar";
 import { Button } from "@/components/ui/button";
 import { PeerMetadata } from "@/utils/types";
 import ChatBar from "@/components/Huddle/sidebars/ChatBar/chatbar";
@@ -254,7 +254,13 @@ export default function Component({ params }: { params: { roomId: string } }) {
         name={metadata?.displayName}
         localPeerId={peerId}
       /> */}
-      <BottomBar daoName={daoName} hostAddress="" meetingStatus />
+      <BottomBar
+        daoName={daoName}
+        hostAddress=""
+        // meetingStatus
+        meetingCategory=""
+        // currentRecordingStatus
+      />
     </div>
   );
 }

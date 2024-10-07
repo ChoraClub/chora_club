@@ -8,9 +8,11 @@ import { IoCopy } from "react-icons/io5";
 import { TbMailFilled } from "react-icons/tb";
 import "./WatchSession.module.css";
 import toast, { Toaster } from "react-hot-toast";
-import { FaFacebook } from "react-icons/fa";
+import { FaFacebook, FaTelegram } from "react-icons/fa";
 import { FaXTwitter, FaWhatsapp } from "react-icons/fa6";
 import { RiTwitterXLine } from "react-icons/ri";
+import { useAccount } from "wagmi";
+import { SiFarcaster } from "react-icons/si";
 
 function ShareMediaModal({
   isOpen,
@@ -27,12 +29,13 @@ function ShareMediaModal({
 
   const [link, setLink] = useState("");
   const [copySuccess, setCopySuccess] = useState(false);
+  const { address } = useAccount();
 
   console.log("data::", data);
 
   useEffect(() => {
-    setLink(window.location.href);
-  }, []);
+    setLink(`${window.location.href}${address ? `?referrer=${address}` : ""}`);
+  }, [address]);
 
   useEffect(() => {
     // Lock scrolling when the modal is open
@@ -57,19 +60,32 @@ function ShareMediaModal({
     toast("Coming soon🚀");
   };
 
-  const shareOnTwitter = () => {
-    const url = encodeURIComponent(link);
-    const text = encodeURIComponent(
-      `${data.title} ${decodeURIComponent(
-        url
-      )} via @ChoraClub\n\n#choraclub #session #growth`
-    );
+  const url = encodeURIComponent(link);
 
+  const text = encodeURIComponent(
+    `${data.title} ${decodeURIComponent(
+      url
+    )} via @ChoraClub\n\n#choraclub #session #growth`
+  );
+
+  const shareOnTwitter = () => {
     // Twitter share URL
     const twitterUrl = `https://twitter.com/intent/tweet?text=${text}`;
 
     // Open Twitter share dialog
     window.open(twitterUrl, "_blank");
+  };
+
+  const shareOnFarcaster = () => {
+    const farcasterUrl = `https://warpcast.com/~/compose?text=${text}&embeds%5B%5D=${url}`;
+
+    window.open(farcasterUrl, "_blank");
+  };
+
+  const shareOnTelegram = () => {
+    const telegramUrl = `https://t.me/share/url?text=${text}&url=${url}`;
+
+    window.open(telegramUrl, "_blank");
   };
 
   const handleCopy = async () => {
@@ -102,7 +118,7 @@ function ShareMediaModal({
             Share
           </p>
           <div className="flex gap-4 justify-center items-center my-5">
-            <div
+            {/* <div
               className="bg-green-shade-200 rounded-full size-[72px]  flex justify-center items-center cursor-pointer"
               onClick={shareOnWhatsapp}
             >
@@ -110,19 +126,25 @@ function ShareMediaModal({
             </div>
             <div onClick={shareOnFacebook}>
               <FaFacebook className="text-blue-shade-100 bg-white size-[72px] cursor-pointer" />
-            </div>
+            </div> */}
             <div
               className="bg-black rounded-full size-[72px]  flex justify-center items-center cursor-pointer"
               onClick={shareOnTwitter}
             >
               <RiTwitterXLine className="text-white bg-black size-10 " />
             </div>
-            <div
+            <div onClick={shareOnFarcaster}>
+              <SiFarcaster className="bg-white text-[#8a63d2] rounded-full size-[72px] cursor-pointer" />
+            </div>
+            <div onClick={shareOnTelegram}>
+              <FaTelegram className="text-[#1d98dc] bg-white size-[72px] cursor-pointer" />
+            </div>
+            {/* <div
               className="bg-black-shade-900 rounded-full size-[72px] p-3 flex justify-center items-center cursor-pointer"
               onClick={shareOnMail}
             >
               <TbMailFilled className="text-white size-8" />
-            </div>
+            </div> */}
           </div>
           <div
             className={`bg-black-shade-800 rounded-lg py-2.5 px-3 gap-28 flex justify-between items-center`}

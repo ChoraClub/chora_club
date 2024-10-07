@@ -8,6 +8,7 @@ export interface Notification {
   notification_name: string;
   notification_title: string;
   notification_type: string;
+  additionalData?: any;
 }
 
 export interface NotificationProps {

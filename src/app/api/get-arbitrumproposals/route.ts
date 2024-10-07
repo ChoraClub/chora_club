@@ -4,7 +4,7 @@ export const revalidate = 0;
 
 const client = new Client({
   url: 'https://api.studio.thegraph.com/query/68573/arbitrum_proposals/v0.0.4',
-  exchanges: [cacheExchange, fetchExchange],
+  exchanges: [fetchExchange],
 });
 
 const GET_PROPOSALS = gql`

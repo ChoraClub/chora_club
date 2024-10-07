@@ -23,20 +23,8 @@ import ErrorDisplay from "../ComponentUtils/ErrorDisplay";
 import { useAccount } from "wagmi";
 import { RiErrorWarningLine } from "react-icons/ri";
 import { TimeoutError } from "viem";
-
-interface Session {
-  booking_status: string;
-  dao_name: string;
-  description: string;
-  host_address: string;
-  joined_status: string;
-  meetingId: string;
-  meeting_status: "Upcoming" | "Recorded" | "Denied";
-  slot_time: string;
-  title: string;
-  user_address: string;
-  _id: string;
-}
+import { SessionInterface } from "@/types/MeetingTypes";
+import { CiSearch } from "react-icons/ci";
 
 function DelegatesSession({ props }: { props: string }) {
   const [searchQuery, setSearchQuery] = useState("");
@@ -76,7 +64,7 @@ function DelegatesSession({ props }: { props: string }) {
       const resultData = await result.data;
       console.log("resultData", resultData);
       if (Array.isArray(resultData)) {
-        const filtered: any = resultData.filter((session: Session) => {
+        const filtered: any = resultData.filter((session: SessionInterface) => {
           if (searchParams.get("session") === "upcoming") {
             return session.meeting_status === "Upcoming";
           } else if (searchParams.get("session") === "recorded") {
@@ -150,14 +138,16 @@ function DelegatesSession({ props }: { props: string }) {
         const resultData = await result.data;
 
         if (result.success) {
-          const filtered: any = resultData.filter((session: Session) => {
-            if (searchParams.get("session") === "upcoming") {
-              return session.meeting_status === "Upcoming";
-            } else if (searchParams.get("session") === "recorded") {
-              return session.meeting_status === "Recorded";
+          const filtered: any = resultData.filter(
+            (session: SessionInterface) => {
+              if (searchParams.get("session") === "upcoming") {
+                return session.meeting_status === "Upcoming";
+              } else if (searchParams.get("session") === "recorded") {
+                return session.meeting_status === "Recorded";
+              }
+              return false;
             }
-            return false;
-          });
+          );
           console.log("filtered: ", filtered);
           setSessionDetails(filtered);
           setError(null);
@@ -204,7 +194,7 @@ function DelegatesSession({ props }: { props: string }) {
 
   return (
     <div className="font-poppins">
-      <div
+      {/* <div
         style={{ background: "rgba(238, 237, 237, 0.36)" }}
         className="flex border-[0.5px] border-black w-1/3 rounded-full my-4 font-poppins"
       >
@@ -219,7 +209,21 @@ function DelegatesSession({ props }: { props: string }) {
         <span className="flex items-center bg-black rounded-full px-5 py-2">
           <Image src={search} alt="search" width={20} />
         </span>
-      </div>
+      </div> */}
+      <div
+          className={`flex items-center rounded-full shadow-lg bg-gray-100 text-black cursor-pointer my-4 w-[300px] xs:w-[365px]`}
+        >
+          <CiSearch
+            className={`text-base transition-all duration-700 ease-in-out ml-3`}
+          />
+          <input
+            type="text"
+            placeholder="Search by title and host address"
+            className="w-[100%] pl-2 pr-4 py-1.5 font-poppins md:py-2 text-sm bg-transparent outline-none"
+            value={searchQuery}
+            onChange={(e) => handleSearchChange(e.target.value)}
+          />
+        </div>
 
       <div className=" pt-3">
         <div className="flex w-fit gap-16 border-1 border-[#7C7C7C] px-6 rounded-xl text-sm">

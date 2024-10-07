@@ -26,7 +26,7 @@ export async function POST(req: NextRequest, res: NextApiResponse) {
       {
         $set: {
           video_uri,
-          meeting_status: "Recorded",
+          // meeting_status: "Recorded",
         },
       }
     );
@@ -37,7 +37,7 @@ export async function POST(req: NextRequest, res: NextApiResponse) {
         { status: 404 }
       );
     }
-    // // Call the FastAPI endpoint to process the video URL
+    // Call the FastAPI endpoint to process the video URL
     // const response = await axios.post(`${process.env.DESC_GENERATION_BASE_URL}/analyze`, {
     //   url: video_uri,
     // });

@@ -16,6 +16,10 @@ import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
 import { RxCross2 } from "react-icons/rx";
 import SessionTileSkeletonLoader from "../SkeletonLoader/SessionTileSkeletonLoader";
 import {useAccount} from "wagmi";
+import SidebarMainMobile from "../MainSidebar/SidebarMainMobile";
+import MobileResponsiveMessage from "../MobileResponsiveMessage/MobileResponsiveMessage";
+import Heading from "../ComponentUtils/Heading";
+import { CiSearch } from "react-icons/ci";
 interface Type {
   img: StaticImageData;
   title: string;
@@ -144,10 +148,14 @@ function DaoOfficeHours() {
   };
 
   return (
-    <div className="pt-6 pl-14 pr-6">
-      <div className="flex justify-between pe-10">
-        <div className="font-quanty font-medium text-4xl text-blue-shade-200 pb-4">
-          <Tooltip
+    <>
+    {/* For Mobile Screen */}
+<MobileResponsiveMessage/>
+
+{/* For Desktop Screen  */}
+    <div className="hidden md:block pt-2 xs:pt-4 sm:pt-6 px-4 md:px-6 lg:px-14 ">
+      {/* <div className="flex flex-row justify-between items-center mb-6">
+            <Tooltip
             showArrow
             content={
               <div className="font-poppins">
@@ -159,13 +167,13 @@ function DaoOfficeHours() {
             placement="right"
             className="rounded-md bg-opacity-90 max-w-96"
             closeDelay={1}>
-            <div>Office Hours</div>
-          </Tooltip>
-        </div>
-        <div>
+            <div className="text-blue-shade-200 font-medium text-3xl md:text-4xl font-quanty ">
+              Office Hours
+            </div>
+            </Tooltip>
           <ConnectWalletWithENS />
-        </div>
-      </div>
+        </div> */}
+        <Heading/>
 
       {showComingSoon && (
         <div className="flex items-center w-fit bg-yellow-100 border border-yellow-400 rounded-full px-3 py-1 font-poppins">
@@ -212,7 +220,7 @@ function DaoOfficeHours() {
           </button>
         </div>
 
-        <div
+        {/* <div
           style={{ background: "rgba(238, 237, 237, 0.36)" }}
           className="flex border-[0.5px] border-black w-1/3 rounded-full my-8 font-poppins">
           <input
@@ -225,6 +233,21 @@ function DaoOfficeHours() {
           <span className="flex items-center bg-black rounded-full px-6 py-2">
             <Image src={search} alt="search" width={22} />
           </span>
+        </div> */}
+
+        <div
+          className={`flex items-center my-8 rounded-full shadow-lg bg-gray-100 text-black cursor-pointer w-[300px] xs:w-[365px]`}
+        >
+          <CiSearch
+            className={`text-base transition-all duration-700 ease-in-out ml-3`}
+          />
+          <input
+            type="text"
+            placeholder="Search by title or host address"
+            className="w-[100%] pl-2 pr-4 py-1.5 font-poppins md:py-2 text-sm bg-transparent outline-none"
+            value={searchQuery}
+            onChange={(e) => handleSearchChange(e.target.value)}
+          />
         </div>
 
         <div className="py-5">
@@ -264,6 +287,7 @@ function DaoOfficeHours() {
         </div>
       </div>
     </div>
+    </>
   );
 }
 

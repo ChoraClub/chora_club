@@ -10,25 +10,7 @@ import SessionTile from "../ComponentUtils/SessionTiles";
 import { Oval } from "react-loader-spinner";
 import SessionTileSkeletonLoader from "../SkeletonLoader/SessionTileSkeletonLoader";
 import { useAccount } from "wagmi";
-
-type Attendee = {
-  attendee_address: string;
-  attendee_uid?: string;
-};
-
-interface Session {
-  booking_status: string;
-  dao_name: string;
-  description: string;
-  host_address: string;
-  joined_status: string;
-  meetingId: string;
-  meeting_status: "Upcoming" | "Recorded" | "Denied" | "";
-  slot_time: string;
-  title: string;
-  attendees: Attendee[];
-  _id: string;
-}
+import { SessionInterface } from "@/types/MeetingTypes";
 
 interface Type {
   daoDelegates: string;
@@ -39,7 +21,6 @@ function DelegateSessions({ props }: { props: Type }) {
   const router = useRouter();
   const path = usePathname();
   const searchParams = useSearchParams();
-
   const [dataLoading, setDataLoading] = useState(true);
   const [sessionDetails, setSessionDetails] = useState([]);
   const dao_name = props.daoDelegates;
@@ -76,12 +57,12 @@ function DelegateSessions({ props }: { props: Type }) {
         if (Array.isArray(resultData)) {
           let filteredData: any = resultData;
           if (searchParams.get("session") === "upcoming") {
-            filteredData = resultData.filter((session: Session) => {
+            filteredData = resultData.filter((session: SessionInterface) => {
               return session.meeting_status === "Upcoming";
             });
             setSessionDetails(filteredData);
           } else if (searchParams.get("session") === "hosted") {
-            filteredData = resultData.filter((session: Session) => {
+            filteredData = resultData.filter((session: SessionInterface) => {
               return (
                 session.meeting_status === "Recorded" &&
                 session.host_address.toLowerCase() ===
@@ -90,7 +71,7 @@ function DelegateSessions({ props }: { props: Type }) {
             });
             setSessionDetails(filteredData);
           } else if (searchParams.get("session") === "attended") {
-            filteredData = resultData.filter((session: Session) => {
+            filteredData = resultData.filter((session: SessionInterface) => {
               return (
                 session.meeting_status === "Recorded" &&
                 session.attendees?.some(

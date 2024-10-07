@@ -21,72 +21,24 @@ import ShareMediaModal from "./ShareMediaModal";
 import { BASE_URL } from "@/config/constants";
 import toast, { Toaster } from "react-hot-toast";
 import { Tooltip } from "@nextui-org/react";
-import { getEnsName } from "@/utils/ENSUtils";
+import { fetchEnsName } from "@/utils/ENSUtils";
+import { IoMdEye } from "react-icons/io";
+import {
+  DynamicAttendeeInterface,
+  SessionInterface,
+} from "@/types/MeetingTypes";
+import { UserProfileInterface } from "@/types/UserProfileTypes";
+import { usePathname } from "next/navigation";
+import { formatTimeAgo } from "@/utils/getRelativeTime";
 
-interface ProfileInfo {
-  _id: string;
-  address: string;
-  image: string;
-  description: string;
-  daoName: string;
-  isDelegate: boolean;
-  displayName: string;
-  socialHandles: {
-    twitter: string;
-    discord: string;
-    discourse: string;
-    github: string;
-  };
-  emailId: string;
-}
-interface Attendee {
-  attendee_address: string;
-  attendee_uid: string;
-  profileInfo: ProfileInfo;
-  onchain_attendee_uid?: string;
+interface Attendee extends DynamicAttendeeInterface {
+  profileInfo: UserProfileInterface;
 }
 
-interface HostProfileInfo {
-  _id: string;
-  address: string;
-  image: string;
-  description: string;
-  daoName: string;
-  isDelegate: boolean;
-  displayName: string;
-  socialHandles: {
-    twitter: string;
-    discord: string;
-    discourse: string;
-    github: string;
-  };
-  emailId: string;
-}
-
-interface Meeting {
-  _id: string;
-  slot_time: string;
-  office_hours_slot: string; // Assuming this is a date-time string
-  title: string;
-  description: string;
-  video_uri: string;
-  meetingId: string;
+interface Meeting extends SessionInterface {
   attendees: Attendee[];
-  uid_host: string;
-  dao_name: string;
-  host_address: string;
-  joined_status: string | null;
-  booking_status: string;
-  meeting_status:
-    | "active"
-    | "inactive"
-    | "ongoing"
-    | "Recorded"
-    | "Upcoming"
-    | "Ongoing"; // Assuming meeting status can only be active or inactive
-  session_type: string;
-  hostProfileInfo: HostProfileInfo;
-  onchain_host_uid?: string;
+  views: any;
+  hostProfileInfo: UserProfileInterface;
 }
 
 function WatchSession({
@@ -106,6 +58,8 @@ function WatchSession({
   const [ensHostName, setEnsHostName] = useState<any>(null);
   const [shareModal, setShareModal] = useState(false);
   const router = useRouter();
+  const path = usePathname();
+  console.log("path: ", path);
 
   const handleShareClose = () => {
     setShareModal(false);
@@ -116,33 +70,6 @@ function WatchSession({
       setContentHeight(isExpanded ? contentRef.current.scrollHeight : 0);
     }
   }, [data.description, isExpanded]);
-
-  const formatTimeAgo = (utcTime: string): string => {
-    const parsedTime = new Date(utcTime);
-    const currentTime = new Date();
-    const differenceInSeconds = Math.abs(
-      (currentTime.getTime() - parsedTime.getTime()) / 1000
-    );
-
-    if (differenceInSeconds < 60) {
-      return "Just now";
-    } else if (differenceInSeconds < 3600) {
-      const minutes = Math.round(differenceInSeconds / 60);
-      return `${minutes} minute${minutes === 1 ? "" : "s"} ago`;
-    } else if (differenceInSeconds < 86400) {
-      const hours = Math.round(differenceInSeconds / 3600);
-      return `${hours} hour${hours === 1 ? "" : "s"} ago`;
-    } else if (differenceInSeconds < 604800) {
-      const days = Math.round(differenceInSeconds / 86400);
-      return `${days} day${days === 1 ? "" : "s"} ago`;
-    } else if (differenceInSeconds < 31536000) {
-      const weeks = Math.round(differenceInSeconds / 604800);
-      return `${weeks} week${weeks === 1 ? "" : "s"} ago`;
-    } else {
-      const years = Math.round(differenceInSeconds / 31536000);
-      return `${years} year${years === 1 ? "" : "s"} ago`;
-    }
-  };
 
   const handleModalClose = () => {
     console.log("Popup Closed");
@@ -159,13 +86,39 @@ function WatchSession({
   };
 
   useEffect(() => {
-    const fetchEnsName = async () => {
-      const name = await getEnsName(data.host_address.toLowerCase());
+    const fetchedEnsName = async () => {
+      const name = await fetchEnsName(data.host_address.toLowerCase());
       setEnsHostName(name?.ensNameOrAddress);
     };
 
-    fetchEnsName();
+    fetchedEnsName();
   }, [data.host_address]);
+
+  function formatViews(views: number): string {
+    // Handle negative numbers or NaN
+    if (isNaN(views) || views < 0) {
+      return "0";
+    }
+
+    // For millions (e.g., 1.25M)
+    if (views >= 1000000) {
+      const millionViews = views / 1000000;
+      return (
+        millionViews.toFixed(millionViews >= 10 ? 0 : 1).replace(/\.0$/, "") +
+        "M"
+      );
+    }
+    // For thousands (e.g., 1.2k, 12k)
+    if (views >= 1000) {
+      const thousandViews = views / 1000;
+      return (
+        thousandViews.toFixed(thousandViews >= 10 ? 0 : 1).replace(/\.0$/, "") +
+        "k"
+      );
+    }
+    // For less than 1000 views, return as is
+    return Math.floor(views).toString();
+  }
 
   return (
     <div className="">
@@ -196,8 +149,8 @@ function WatchSession({
                         : user
                     }
                     alt="image"
-                    width={20}
-                    height={20}
+                    width={200}
+                    height={200}
                     className="w-5 h-5 rounded-full"
                     priority
                   />
@@ -218,12 +171,12 @@ function WatchSession({
                     <Link
                       href={
                         data.uid_host
-                        ? data.dao_name === ("optimism" || "Optimism")
-                          ? `https://optimism.easscan.org/offchain/attestation/view/${data.uid_host}`
-                          : data.dao_name === ("arbitrum" || "Arbitrum")
-                          ? `https://arbitrum.easscan.org/offchain/attestation/view/${data.uid_host}`
-                          : ""
-                        : "#"
+                          ? data.dao_name === ("optimism" || "Optimism")
+                            ? `https://optimism.easscan.org/offchain/attestation/view/${data.uid_host}`
+                            : data.dao_name === ("arbitrum" || "Arbitrum")
+                            ? `https://arbitrum.easscan.org/offchain/attestation/view/${data.uid_host}`
+                            : ""
+                          : "#"
                       }
                       onClick={(e) => {
                         if (!data.uid_host) {
@@ -236,7 +189,9 @@ function WatchSession({
                       <Image
                         src={offChain_link}
                         alt="image"
-                        className="w-6"
+                        height={100}
+                        width={100}
+                        className="w-6 h-6"
                         priority
                         quality={100}
                       />
@@ -255,16 +210,16 @@ function WatchSession({
                   >
                     <Link
                       href={
-                        data.onchain_host_uid 
-                        ? data.dao_name === ("optimism" || "Optimism")
-                          ? `https://optimism.easscan.org/attestation/view/${data.onchain_host_uid}`
-                          : data.dao_name === ("arbitrum" || "Arbitrum")
-                          ? `https://arbitrum.easscan.org/attestation/view/${data.onchain_host_uid}`
-                          : ""
-                        : "#"
+                        data.onchain_host_uid
+                          ? data.dao_name === ("optimism" || "Optimism")
+                            ? `https://optimism.easscan.org/attestation/view/${data.onchain_host_uid}`
+                            : data.dao_name === ("arbitrum" || "Arbitrum")
+                            ? `https://arbitrum.easscan.org/attestation/view/${data.onchain_host_uid}`
+                            : ""
+                          : "#"
                       }
                       onClick={(e) => {
-                        if (!data.onchain_host_uid ) {
+                        if (!data.onchain_host_uid) {
                           e.preventDefault();
                           toast.error("Onchain attestation not available");
                         }
@@ -274,9 +229,10 @@ function WatchSession({
                       <Image
                         alt="image"
                         src={onChain_link}
-                        className="w-6"
-                        priority
+                        className="w-6 h-6"
                         quality={100}
+                        width={100}
+                        height={100}
                       />
                     </Link>
                   </Tooltip>
@@ -290,15 +246,17 @@ function WatchSession({
                   <Image
                     src={oplogo}
                     alt="image"
-                    width={20}
-                    className="rounded-full"
+                    width={100}
+                    height={100}
+                    className="rounded-full w-5 h-5"
                   />
                 ) : data.dao_name === "arbitrum" ? (
                   <Image
                     src={arblogo}
                     alt="image"
-                    width={20}
-                    className="rounded-full"
+                    width={100}
+                    height={100}
+                    className="rounded-full w-5 h-5"
                   />
                 ) : (
                   ""
@@ -311,29 +269,46 @@ function WatchSession({
 
             <div className="flex gap-6">
               <div className="flex items-center gap-1">
-                <Image src={time} alt="image" width={20} priority />
+                <IoMdEye size={20} />
+                <div className="text-[#1E1E1E]">
+                  {formatViews(data?.views ?? 0)} views
+                </div>
+              </div>
+              <div className="flex items-center gap-1">
+                <Image
+                  src={time}
+                  alt="image"
+                  width={100}
+                  height={100}
+                  priority
+                  className="w-5 h-5"
+                />
                 <div className="text-[#1E1E1E]">
                   {formatTimeAgo(data.slot_time)}
                 </div>
               </div>
-              <div
-                className="flex items-center gap-1 cursor-pointer"
-                onClick={() => setModalOpen(true)}
-              >
-                <div>
-                  <PiFlagFill color="#FF0000" size={20} />
-                </div>
-                <div className="text-[#FF0000]">Report</div>
-              </div>
-              <div
-                className="flex items-center gap-1 cursor-pointer"
-                onClick={() => setShareModal(true)}
-              >
-                <div className="scale-x-[-1]">
-                  <BiSolidShare size={20} />
-                </div>
-                <div className="text-[#1E1E1E]">Share</div>
-              </div>
+              {path.includes("/watch") && (
+                <>
+                  <div
+                    className="flex items-center gap-1 cursor-pointer"
+                    onClick={() => setModalOpen(true)}
+                  >
+                    <div>
+                      <PiFlagFill color="#FF0000" size={20} />
+                    </div>
+                    <div className="text-[#FF0000]">Report</div>
+                  </div>
+                  <div
+                    className="flex items-center gap-1 cursor-pointer"
+                    onClick={() => setShareModal(true)}
+                  >
+                    <div className="scale-x-[-1]">
+                      <BiSolidShare size={20} />
+                    </div>
+                    <div className="text-[#1E1E1E]">Share</div>
+                  </div>
+                </>
+              )}
             </div>
           </div>
           <div>
@@ -345,8 +320,8 @@ function WatchSession({
               <div
                 className={
                   showPopup
-                  ? "rotate-180 duration-200 ease-in-out"
-                  : "duration-200 ease-in-out"
+                    ? "rotate-180 duration-200 ease-in-out"
+                    : "duration-200 ease-in-out"
                 }
               >
                 <IoMdArrowDropdown color="#4F4F4F" />
@@ -369,9 +344,9 @@ function WatchSession({
                                 : user
                             }
                             alt="image"
-                            width={18}
-                            height={18}
-                            className="rounded-full"
+                            width={100}
+                            height={100}
+                            className="rounded-full h-5 w-5"
                             priority
                           />
                         </div>
@@ -406,7 +381,9 @@ function WatchSession({
                             <Image
                               src={offChain_link}
                               alt="image"
-                              className="w-6"
+                              height={100}
+                              width={100}
+                              className="w-6 h-6"
                               priority
                               quality={100}
                             />
@@ -441,7 +418,9 @@ function WatchSession({
                             <Image
                               alt="image"
                               src={onChain_link}
-                              className="w-6"
+                              className="w-6 h-6"
+                              width={100}
+                              height={100}
                               priority
                               quality={100}
                             />
@@ -472,8 +451,8 @@ function WatchSession({
             <div
               className={`px-6 pt-4 pb-4 rounded-b-3xl bg-white text-[#1E1E1E]`}
             >
-              <>                
-              <div
+              <>
+                <div
                   ref={contentRef}
                   className={`max-h-full transition-max-height duration-500 ease-in-out overflow-hidden ${
                     isExpanded ? "max-h-full" : "max-h-24 line-clamp-3"

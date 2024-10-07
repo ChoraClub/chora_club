@@ -62,12 +62,15 @@ interface StudioState {
   setLayout: (val: 1 | 2) => void;
   isScreenShared: boolean;
   setIsScreenShared: (val: boolean) => void;
+  isRoomClosed: boolean;
+  setIsRoomClosed: (val: boolean) => void;
 }
 
 export const useStudioState = create<StudioState>((set) => ({
   name: "",
   setName: (name) => set({ name }),
-  avatarUrl: "/avatars/avatars/0.png",
+  avatarUrl:
+    "https://gateway.lighthouse.storage/ipfs/bafkreifr3lnl4mpiedaxwzibjbszwf7zosptwt5oqpfydwun33a6ujsjau",
   setAvatarUrl: (val: string) => {
     set(() => ({
       avatarUrl: val,
@@ -159,4 +162,6 @@ export const useStudioState = create<StudioState>((set) => ({
   setLayout: (val: 1 | 2) => set({ layout: val }),
   isScreenShared: false,
   setIsScreenShared: (val: boolean) => set({ isScreenShared: val }),
+  isRoomClosed: false,
+  setIsRoomClosed: (val: boolean) => set({ isRoomClosed: val }),
 }));

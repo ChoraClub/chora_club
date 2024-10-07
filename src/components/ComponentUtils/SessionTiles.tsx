@@ -1,8 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import Image, { StaticImageData } from "next/image";
 import { Oval } from "react-loader-spinner";
-import text2 from "@/assets/images/daos/texture2.png";
-import IndividualSessionTileModal from "./IndividualSessionTileModal";
 import { usePathname } from "next/navigation";
 import { useRouter } from "next-nprogress-bar";
 import {
@@ -14,10 +12,9 @@ import {
   ZERO_BYTES32,
   NO_EXPIRATION,
 } from "@ethereum-attestation-service/eas-sdk";
-import { useNetwork, useAccount } from "wagmi";
+import { useAccount } from "wagmi";
 import styles from "./Tile.module.css";
 import { ethers } from "ethers";
-// import { getEnsName } from "../ConnectWallet/ENSResolver";
 import lighthouse from "@lighthouse-web3/sdk";
 import toast from "react-hot-toast";
 import { FaPencil } from "react-icons/fa6";
@@ -28,6 +25,8 @@ import style from "./SessionTiles.module.css";
 // const { ethers } = require("ethers");
 import copy from "copy-to-clipboard";
 import UpdateHostedSessionModal from "./UpdateHostedSessionModal";
+import { SessionInterface } from "@/types/MeetingTypes";
+import { LIGHTHOUSE_BASE_API_KEY } from "@/config/constants";
 
 type Attendee = {
   attendee_address: string;
@@ -57,22 +56,7 @@ interface AttestationData {
   attestation: string;
 }
 
-interface SessionData {
-  _id: string;
-  img: StaticImageData;
-  title: string;
-  meetingId: string;
-  dao_name: string;
-  booking_status: string;
-  meeting_status: string;
-  joined_status: boolean;
-  attendees: Attendee[];
-  host_address: string;
-  slot_time: string;
-  description: string;
-  session_type: string;
-  uid_host: string;
-  onchain_host_uid: string;
+interface SessionData extends SessionInterface {
   attestations: AttestationData[];
 }
 
@@ -140,8 +124,6 @@ SessionTileProps) {
   const formatWalletAddress = (address: any) => {
     if (typeof address !== "string" || address.length <= 10) return address;
     return address.slice(0, 6) + "..." + address.slice(-4);
-    // const ensName = getEnsName(address.toLowerCase());
-    // return ensName;
   };
   const formatSlotTimeToLocal = (slotTime: any) => {
     const date = new Date(slotTime);
@@ -342,9 +324,7 @@ SessionTileProps) {
       console.log(percentageDone);
     };
 
-    const apiKey = process.env.NEXT_PUBLIC_LIGHTHOUSE_KEY
-      ? process.env.NEXT_PUBLIC_LIGHTHOUSE_KEY
-      : "";
+    const apiKey = LIGHTHOUSE_BASE_API_KEY ? LIGHTHOUSE_BASE_API_KEY : "";
     try {
       let imageCid = "";
       if (formData.image) {
@@ -426,7 +406,8 @@ SessionTileProps) {
                   isEvent === "Recorded"
                     ? () => router.push(`/watch/${data.meetingId}`)
                     : () => null
-                }>
+                }
+              >
                 <div className="flex">
                   <Image
                     src={
@@ -470,10 +451,12 @@ SessionTileProps) {
                             content="Copy"
                             placement="right"
                             closeDelay={1}
-                            showArrow>
+                            showArrow
+                          >
                             <div
                               className="pl-2 pt-[2px] cursor-pointer"
-                              color="#3E3D3D">
+                              color="#3E3D3D"
+                            >
                               <IoCopy
                                 onClick={(e) => {
                                   e.stopPropagation();
@@ -497,10 +480,12 @@ SessionTileProps) {
                           content="Copy"
                           placement="right"
                           closeDelay={1}
-                          showArrow>
+                          showArrow
+                        >
                           <div
                             className="pl-2 pt-[2px] cursor-pointer"
-                            color="#3E3D3D">
+                            color="#3E3D3D"
+                          >
                             <IoCopy
                               onClick={(e) => {
                                 e.stopPropagation();
@@ -527,7 +512,8 @@ SessionTileProps) {
                       onClick={(event) => {
                         event.stopPropagation();
                         toggleDescription(index);
-                      }}>
+                      }}
+                    >
                       {data.description}
                     </div>
                   </div>
@@ -546,7 +532,8 @@ SessionTileProps) {
                             : "Claim Onchain Attestation"
                         }
                         placement="top"
-                        showArrow>
+                        showArrow
+                      >
                         <button
                           className={`${style.button}`}
                           onClick={(e) => {
@@ -564,7 +551,8 @@ SessionTileProps) {
                             !!data.attendees[0].onchain_attendee_uid ||
                             isClaiming[index] ||
                             isClaimed[index]
-                          }>
+                          }
+                        >
                           {isClaiming[index] ? (
                             <div className="flex items-center justify-center px-3">
                               <Oval
@@ -604,7 +592,8 @@ SessionTileProps) {
                       <Tooltip
                         content="Edit Details"
                         placement="right"
-                        showArrow>
+                        showArrow
+                      >
                         <span
                           className="border-[0.5px] border-[#8E8E8E] rounded-full h-fit p-1 cursor-pointer w-6"
                           style={{
@@ -613,7 +602,8 @@ SessionTileProps) {
                           onClick={(e) => {
                             e.stopPropagation();
                             handleEditModal(index);
-                          }}>
+                          }}
+                        >
                           <FaPencil color="#3e3d3d" size={12} />
                         </span>
                       </Tooltip>
@@ -628,7 +618,8 @@ SessionTileProps) {
                           : "Claim Onchain Attestation"
                       }
                       placement="top"
-                      showArrow>
+                      showArrow
+                    >
                       {/* <button
                       className="bg-blue-shade-100 text-white text-sm py-2 px-4 rounded-full font-semibold outline-none flex gap-1 items-center justify-center"
                       onClick={(e) => {
@@ -685,7 +676,8 @@ SessionTileProps) {
                           !!data.onchain_host_uid ||
                           isClaiming[index] ||
                           isClaimed[index]
-                        }>
+                        }
+                      >
                         {isClaiming[index] ? (
                           <div className="flex items-center justify-center px-3">
                             <Oval

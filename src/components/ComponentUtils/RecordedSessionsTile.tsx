@@ -8,23 +8,19 @@ import { Tooltip } from "@nextui-org/react";
 import { IoCopy } from "react-icons/io5";
 import copy from "copy-to-clipboard";
 import toast, { Toaster } from "react-hot-toast";
-import image from "@/assets/images/daos/thumbnail1.png";
 import user1 from "@/assets/images/user/user1.svg";
 import user2 from "@/assets/images/user/user2.svg";
-import user3 from "@/assets/images/user/user3.svg";
-import user4 from "@/assets/images/user/user4.svg";
-import user5 from "@/assets/images/user/user5.svg";
-import user6 from "@/assets/images/user/user6.svg";
-import user7 from "@/assets/images/user/user7.svg";
-import user8 from "@/assets/images/user/user8.svg";
-import user9 from "@/assets/images/user/user9.svg";
 import posterImage from "@/assets/images/daos/thumbnail1.png";
-import { getEnsName } from "@/utils/ENSUtils";
+import { fetchEnsName } from "@/utils/ENSUtils";
 import logo from "@/assets/images/daos/CCLogo.png";
 import ClaimButton from "./ClaimButton";
 import EditButton from "./EditButton";
 import { useAccount } from "wagmi";
 import Link from "next/link";
+import { LuDot } from "react-icons/lu";
+import { BiLinkExternal } from "react-icons/bi";
+import buttonStyles from "./Button.module.css";
+import { formatTimeAgo } from "@/utils/getRelativeTime";
 
 interface meeting {
   meetingData: any;
@@ -54,6 +50,7 @@ function RecordedSessionsTile({
   const [videoDurations, setVideoDurations] = useState<any>({});
   const router = useRouter();
   const { address } = useAccount();
+  // const address = "0xc622420AD9dE8E595694413F24731Dd877eb84E1";
   const [ensHostNames, setEnsHostNames] = useState<any>({});
   const [ensGuestNames, setEnsGuestNames] = useState<any>({});
   const [loadingHostNames, setLoadingHostNames] = useState<boolean>(true);
@@ -64,33 +61,31 @@ function RecordedSessionsTile({
     copy(addr);
     toast("Address Copied");
   };
-
-  const formatTimeAgo = (utcTime: string): string => {
-    const parsedTime = new Date(utcTime);
-    const currentTime = new Date();
-    const differenceInSeconds = Math.abs(
-      (currentTime.getTime() - parsedTime.getTime()) / 1000
-    );
-
-    if (differenceInSeconds < 60) {
-      return "Just now";
-    } else if (differenceInSeconds < 3600) {
-      const minutes = Math.round(differenceInSeconds / 60);
-      return `${minutes} minute${minutes === 1 ? "" : "s"} ago`;
-    } else if (differenceInSeconds < 86400) {
-      const hours = Math.round(differenceInSeconds / 3600);
-      return `${hours} hour${hours === 1 ? "" : "s"} ago`;
-    } else if (differenceInSeconds < 604800) {
-      const days = Math.round(differenceInSeconds / 86400);
-      return `${days} day${days === 1 ? "" : "s"} ago`;
-    } else if (differenceInSeconds < 31536000) {
-      const weeks = Math.round(differenceInSeconds / 604800);
-      return `${weeks} week${weeks === 1 ? "" : "s"} ago`;
-    } else {
-      const years = Math.round(differenceInSeconds / 31536000);
-      return `${years} year${years === 1 ? "" : "s"} ago`;
+  function formatViews(views: number): string {
+    // Handle negative numbers or NaN
+    if (isNaN(views) || views < 0) {
+      return "0";
     }
-  };
+
+    // For millions (e.g., 1.25M)
+    if (views >= 1000000) {
+      const millionViews = views / 1000000;
+      return (
+        millionViews.toFixed(millionViews >= 10 ? 0 : 1).replace(/\.0$/, "") +
+        "M"
+      );
+    }
+    // For thousands (e.g., 1.2k, 12k)
+    if (views >= 1000) {
+      const thousandViews = views / 1000;
+      return (
+        thousandViews.toFixed(thousandViews >= 10 ? 0 : 1).replace(/\.0$/, "") +
+        "k"
+      );
+    }
+    // For less than 1000 views, return as is
+    return Math.floor(views).toString();
+  }
 
   const daoLogos = {
     optimism: oplogo,
@@ -143,7 +138,7 @@ function RecordedSessionsTile({
     const fetchEnsNames = async () => {
       const ensNamesMap: any = {};
       for (const data of meetingData) {
-        const ensNames = await getEnsName(data.host_address.toLowerCase());
+        const ensNames = await fetchEnsName(data.host_address.toLowerCase());
         const ensName = ensNames?.ensNameOrAddress;
         if (ensName) {
           ensNamesMap[data.host_address] = ensName;
@@ -162,7 +157,7 @@ function RecordedSessionsTile({
     const fetchEnsNames = async () => {
       const ensNamesMap: any = {};
       for (const data of meetingData) {
-        const ensNames = await getEnsName(
+        const ensNames = await fetchEnsName(
           data.attendees[0]?.attendee_address.toLowerCase()
         );
         const ensName = ensNames?.ensNameOrAddress;
@@ -190,12 +185,12 @@ function RecordedSessionsTile({
   return (
     <>
       <div
-        className={`grid min-[475px]:grid-cols- md:grid-cols-2 lg:grid-cols-3 ${gridCols} gap-10 py-8 font-poppins`}
+        className={`grid min-[475px]:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 ${gridCols} sm:gap-10 py-8 font-poppins`}
       >
         {meetingData.map((data: any, index: number) => (
           <div
             key={index}
-            className="border border-[#D9D9D9] rounded-3xl cursor-pointer"
+            className="border border-[#D9D9D9] sm:rounded-3xl cursor-pointer"
             onClick={(e) => {
               e.stopPropagation();
               e.preventDefault();
@@ -205,7 +200,7 @@ function RecordedSessionsTile({
             onMouseLeave={() => setHoveredVideo(null)}
           >
             <div
-              className={`w-full h-44 rounded-t-3xl bg-black object-cover object-center relative `}
+              className={`w-full h-44 sm:rounded-t-3xl bg-black object-cover object-center relative `}
             >
               {hoveredVideo === index ? (
                 <div className="relative">
@@ -246,13 +241,19 @@ function RecordedSessionsTile({
                 {formatVideoDuration(videoDurations[index] || 0)}
               </div>
               <div className="absolute top-2 right-2 bg-black rounded-full">
-                <Image src={logo} alt="image" width={24} />
+                <Image
+                  src={logo}
+                  alt="image"
+                  width={100}
+                  height={100}
+                  className="w-7 h-7"
+                />
               </div>
             </div>
             <div className="flex flex-col justify-between">
-              <div className="px-4 py-2">
+              <div className="px-4 pb-2 sm:py-2">
                 <div
-                  className={`font-semibold py-1 ${styles.truncate}`}
+                  className={`text-sm sm:text-base font-semibold py-1 ${styles.truncate}`}
                   style={{
                     display: "-webkit-box",
                     WebkitBoxOrient: "vertical",
@@ -261,25 +262,33 @@ function RecordedSessionsTile({
                 >
                   {updatedSessionDetails[index]?.title || data.title}
                 </div>
-                <div className="flex text-sm gap-3 py-1">
-                  <div className="bg-[#F5F5F5] flex items-center py-1 px-3 rounded-md gap-2">
+                <div className="flex items-center text-sm gap-0.5 sm:gap-1 py-1">
+                  <div className=" flex items-center ">
                     <div>
                       <Image
                         src={getDaoLogo(data.dao_name)}
                         alt="image"
-                        width={20}
-                        height={20}
-                        className="rounded-full"
+                        width={100}
+                        height={100}
+                        className="rounded-full size-4 sm:size-6"
                       />
                     </div>
-                    <div className="capitalize">{data.dao_name}</div>
+                    {/* <div className="capitalize">
+                      
+                    </div> */}
+                    {/* <div className="capitalize hidden sm:flex">{data.dao_name}</div> */}
                   </div>
-                  <div className="bg-[#F5F5F5] py-1 px-3 rounded-md">
+                  <LuDot />
+                  <div className="text-xs sm:text-sm capitalize">
+                    {formatViews(data?.views ?? 0)} views
+                  </div>
+                  <LuDot />
+                  <div className=" text-xs sm:text-sm">
                     {formatTimeAgo(data.slot_time)}
                   </div>
                 </div>
                 <div className="">
-                  <div className="flex items-center gap-2 py-1 ps-3 text-sm">
+                  <div className="flex items-center gap-2 py-1  text-xs sm:text-sm">
                     <div>
                       <Image
                         src={
@@ -288,9 +297,9 @@ function RecordedSessionsTile({
                             : user1
                         }
                         alt="image"
-                        width={20}
-                        height={20}
-                        className="rounded-full"
+                        width={100}
+                        height={100}
+                        className="rounded-full size-4 sm:size-5"
                       />
                     </div>
                     <div>
@@ -316,7 +325,7 @@ function RecordedSessionsTile({
                         closeDelay={1}
                         showArrow
                       >
-                        <span className="cursor-pointer text-sm">
+                        <span className="cursor-pointer text-xs sm:text-sm">
                           <IoCopy
                             onClick={(event) => {
                               event.stopPropagation();
@@ -328,7 +337,7 @@ function RecordedSessionsTile({
                     </div>
                   </div>
                   {data.attendees[0]?.attendee_address ? (
-                    <div className="flex items-center gap-2 py-1 ps-3 text-sm">
+                    <div className="hidden sm:flex items-center gap-2 py-1 text-sm">
                       <div className="">
                         <Image
                           src={
@@ -342,7 +351,7 @@ function RecordedSessionsTile({
                           className="h-5 w-5 rounded-full object-cover object-center"
                         />
                       </div>
-                      <div>
+                      <div className="">
                         <span className="font-medium">Guest: </span>
                         <span>
                           {loadingGuestNames
@@ -354,7 +363,7 @@ function RecordedSessionsTile({
                               ]}
                         </span>
                       </div>
-                      <div>
+                      <div className="">
                         <Tooltip
                           content="Copy"
                           placement="right"
@@ -379,33 +388,106 @@ function RecordedSessionsTile({
               </div>
               <div className="px-4 pb-2 flex justify-center space-x-2">
                 {session === "hosted" && data.uid_host && (
-                  <ClaimButton
-                    meetingId={data.meetingId}
-                    meetingType={data.session_type === "session" ? 2 : 1}
-                    startTime={data.attestations[0]?.startTime}
-                    endTime={data.attestations[0]?.endTime}
-                    dao={data.dao_name}
-                    address={address || ""}
-                    onChainId={
-                      session === "hosted" ? data.onchain_host_uid : ""
-                    }
-                  />
+                  <div className="flex gap-2 w-full">
+                    <Link
+                      href={
+                        data.uid_host
+                          ? data.dao_name === ("optimism" || "Optimism")
+                            ? `https://optimism.easscan.org/offchain/attestation/view/${data.uid_host}`
+                            : data.dao_name === ("arbitrum" || "Arbitrum")
+                            ? `https://arbitrum.easscan.org/offchain/attestation/view/${data.uid_host}`
+                            : ""
+                          : "#"
+                      }
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                      }}
+                      className={`${buttonStyles.button} w-full gap-1`}
+                    >
+                      Offchain{" "}
+                      <BiLinkExternal
+                        size={20}
+                        className="text-white hover:text-blue-600 transition-colors duration-200"
+                        title="Open link in new tab"
+                      />
+                    </Link>
+                    <ClaimButton
+                      meetingId={data.meetingId}
+                      meetingType={data.session_type === "session" ? 2 : 1}
+                      startTime={data.attestations[0]?.startTime}
+                      endTime={data.attestations[0]?.endTime}
+                      dao={data.dao_name}
+                      address={address || ""}
+                      onChainId={
+                        session === "hosted" ? data.onchain_host_uid : ""
+                      }
+                    />
+                  </div>
                 )}
-                {session === "attended" && data.attendees[0]?.attendee_uid && (
-                  <ClaimButton
-                    meetingId={data.meetingId}
-                    meetingType={data.session_type === "session" ? 2 : 1}
-                    startTime={data.attestations[0]?.startTime}
-                    endTime={data.attestations[0]?.endTime}
-                    dao={data.dao_name}
-                    address={address || ""}
-                    onChainId={
-                      session === "attended"
-                        ? data.attendees[0]?.onchain_attendee_uid
-                        : ""
-                    }
-                  />
-                )}
+                {session === "attended" &&
+                  data.attendees.some(
+                    (attendee: any) =>
+                      attendee.attendee_address === address &&
+                      attendee.attendee_uid
+                  ) && (
+                    <div className="flex gap-2 w-full">
+                      {(() => {
+                        const matchingAttendee = data.attendees.find(
+                          (attendee: any) =>
+                            attendee.attendee_address === address
+                        );
+                        const attendeeUid = matchingAttendee?.attendee_uid;
+
+                        let href = "#";
+                        if (attendeeUid) {
+                          if (data.dao_name.toLowerCase() === "optimism") {
+                            href = `https://optimism.easscan.org/offchain/attestation/view/${attendeeUid}`;
+                          } else if (
+                            data.dao_name.toLowerCase() === "arbitrum"
+                          ) {
+                            href = `https://arbitrum.easscan.org/offchain/attestation/view/${attendeeUid}`;
+                          }
+                        }
+
+                        return (
+                          <Link
+                            href={href}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                            }}
+                            className={`${buttonStyles.button} w-full gap-1`}
+                          >
+                            Offchain{" "}
+                            <BiLinkExternal
+                              size={20}
+                              className="text-white hover:text-blue-600 transition-colors duration-200"
+                              title="Open link in new tab"
+                            />
+                          </Link>
+                        );
+                      })()}
+                      <ClaimButton
+                        meetingId={data.meetingId}
+                        meetingType={data.session_type === "session" ? 2 : 1}
+                        startTime={data.attestations[0]?.startTime}
+                        endTime={data.attestations[0]?.endTime}
+                        dao={data.dao_name}
+                        address={address || ""}
+                        onChainId={
+                          session === "attended"
+                            ? data.attendees.find(
+                                (attendee: any) =>
+                                  attendee.attendee_address === address
+                              )?.onchain_attendee_uid
+                            : ""
+                        }
+                      />
+                    </div>
+                  )}
                 {session === "hosted" && (
                   <div
                     className={`flex justify-end ${

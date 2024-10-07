@@ -16,8 +16,8 @@ export async function middleware(request: NextRequest) {
   // const origin = request.nextUrl.origin;
   const origin = normalizeOrigin(request.nextUrl.origin);
 
-  console.log("allowed Origin", allowedOrigins);
-  console.log("Origin from request", origin);
+  // console.log("allowed Origin", allowedOrigins);
+  // console.log("Origin from request", origin);
 
   // if (!allowedOrigins?.includes(origin)) {
   //   return new NextResponse(
@@ -48,7 +48,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  console.log("Upcoming request method:-", request.method);
+  // console.log("Upcoming request method:-", request.method);
 
   const token = await getToken({
     req: request,
@@ -68,9 +68,9 @@ export async function middleware(request: NextRequest) {
   // Extract the user address from the token
   const UserAddress = token.sub;
 
-  console.log("Exracted user address from token:- ", UserAddress);
+  // console.log("Exracted user address from token:- ", UserAddress);
 
-  console.log("Requested Address:", walletAddress);
+  // console.log("Requested Address:", walletAddress);
 
   if (UserAddress !== walletAddress) {
     // If the user's address doesn't match the requested profile address
@@ -113,7 +113,7 @@ export const config = {
     "/api/update-video-uri/:path*",
     // "/api/verify-meeting-id/:path*",
     "/api/get-attest-data/:path*",
-    "/api/get-availability/:path*",
+    // "/api/get-availability/:path*",
     "/api/get-host/:path*",
     "/api/get-meeting/:path*",
     "/api/get-officehours-address/:path*",
@@ -131,6 +131,7 @@ export const config = {
     "/api/get-session-data/:path*",
     // "/api/attest-offchain/:path*",
     "/api/get-attendee-individual/:path*",
-    "/api/get-dao-sessions/:path*",
+    // "/api/get-dao-sessions/:path*",
+    // "/api/images/og/nft/:path",
   ],
 };

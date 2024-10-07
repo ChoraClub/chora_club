@@ -143,6 +143,7 @@ function NotificationIconComponent() {
           notification_name: message.notification_name,
           notification_type: message.notification_type,
           notification_title: message.notification_title,
+          additionalData: message?.additionalData,
         };
         addNotification(notificationData);
         updateCombinedNotifications();
