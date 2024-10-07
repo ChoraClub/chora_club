@@ -11,7 +11,7 @@ import toast, { Toaster } from "react-hot-toast";
 import user1 from "@/assets/images/user/user1.svg";
 import user2 from "@/assets/images/user/user2.svg";
 import posterImage from "@/assets/images/daos/thumbnail1.png";
-import { getEnsName } from "@/utils/ENSUtils";
+import { fetchEnsName } from "@/utils/ENSUtils";
 import logo from "@/assets/images/daos/CCLogo.png";
 import ClaimButton from "./ClaimButton";
 import EditButton from "./EditButton";
@@ -20,6 +20,7 @@ import Link from "next/link";
 import { LuDot } from "react-icons/lu";
 import { BiLinkExternal } from "react-icons/bi";
 import buttonStyles from "./Button.module.css";
+import { formatTimeAgo } from "@/utils/getRelativeTime";
 
 interface meeting {
   meetingData: any;
@@ -86,33 +87,6 @@ function RecordedSessionsTile({
     return Math.floor(views).toString();
   }
 
-  const formatTimeAgo = (utcTime: string): string => {
-    const parsedTime = new Date(utcTime);
-    const currentTime = new Date();
-    const differenceInSeconds = Math.abs(
-      (currentTime.getTime() - parsedTime.getTime()) / 1000
-    );
-
-    if (differenceInSeconds < 60) {
-      return "Just now";
-    } else if (differenceInSeconds < 3600) {
-      const minutes = Math.round(differenceInSeconds / 60);
-      return `${minutes} minute${minutes === 1 ? "" : "s"} ago`;
-    } else if (differenceInSeconds < 86400) {
-      const hours = Math.round(differenceInSeconds / 3600);
-      return `${hours} hour${hours === 1 ? "" : "s"} ago`;
-    } else if (differenceInSeconds < 604800) {
-      const days = Math.round(differenceInSeconds / 86400);
-      return `${days} day${days === 1 ? "" : "s"} ago`;
-    } else if (differenceInSeconds < 31536000) {
-      const weeks = Math.round(differenceInSeconds / 604800);
-      return `${weeks} week${weeks === 1 ? "" : "s"} ago`;
-    } else {
-      const years = Math.round(differenceInSeconds / 31536000);
-      return `${years} year${years === 1 ? "" : "s"} ago`;
-    }
-  };
-
   const daoLogos = {
     optimism: oplogo,
     arbitrum: arblogo,
@@ -164,7 +138,7 @@ function RecordedSessionsTile({
     const fetchEnsNames = async () => {
       const ensNamesMap: any = {};
       for (const data of meetingData) {
-        const ensNames = await getEnsName(data.host_address.toLowerCase());
+        const ensNames = await fetchEnsName(data.host_address.toLowerCase());
         const ensName = ensNames?.ensNameOrAddress;
         if (ensName) {
           ensNamesMap[data.host_address] = ensName;
@@ -183,7 +157,7 @@ function RecordedSessionsTile({
     const fetchEnsNames = async () => {
       const ensNamesMap: any = {};
       for (const data of meetingData) {
-        const ensNames = await getEnsName(
+        const ensNames = await fetchEnsName(
           data.attendees[0]?.attendee_address.toLowerCase()
         );
         const ensName = ensNames?.ensNameOrAddress;

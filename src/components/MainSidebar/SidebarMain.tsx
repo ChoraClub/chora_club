@@ -310,7 +310,7 @@ function Sidebar() {
                 alt={"image"}
                 width={200}
                 height={200}
-                className="xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 logo bg-black rounded-full p-1"
+                className="xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 2.5xl:w-14 2.5xl:h-14 logo bg-black rounded-full p-1 w-10 h-10"
               ></Image>
             </Link>
             <Tooltip

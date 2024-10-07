@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import styles from "../ComponentUtils/RecordedSessionsTile.module.css";
 import logo from "@/assets/images/daos/CCLogo.png";
@@ -6,6 +6,7 @@ import { RiExternalLinkLine } from "react-icons/ri";
 import Link from "next/link";
 import oplogo from "@/assets/images/daos/op.png";
 import arblogo from "@/assets/images/daos/arbitrum.jpg";
+
 interface NFTProps {
   nft: {
     id: any;
@@ -18,25 +19,51 @@ interface NFTProps {
 }
 
 function NFTTile({ nft }: NFTProps) {
-  const cid = nft.thumbnail.split("ipfs://")[1];
+  const [currentSrcIndex, setCurrentSrcIndex] = useState(0);
+  const [imageLoadError, setImageLoadError] = useState(false);
+  console.log(nft);
+  const cid = nft.thumbnail?.split("ipfs://")[1];
+
   const getDaoLogo = (network: string) => {
-    if(network==="optimism"){
+    if (network === "optimism") {
       return oplogo;
-    }else{
+    } else {
       return arblogo;
     }
   };
+
+  const sources = cid
+    ? [
+        `https://ipfs.io/ipfs/${cid}`,
+        `https://gateway.lighthouse.storage/ipfs/${cid}`,
+      ]
+    : [];
+
+  const handleError = () => {
+    if (currentSrcIndex < sources.length - 1) {
+      setCurrentSrcIndex(currentSrcIndex + 1);
+    } else {
+      setImageLoadError(true);
+    }
+  };
+
   return (
     <div className="border border-[#D9D9D9] sm:rounded-3xl ">
       <div className="w-full h-56 sm:rounded-t-3xl bg-black object-cover object-center relative">
-        <Image
-          src={`https://ipfs.io/ipfs/${cid}`}
-          // src={`https://gateway.lighthouse.storage/ipfs/${cid}`}
-          alt={`NFT ${nft.id}`}
-          height={800}
-          width={1000}
-          className="sm:rounded-t-3xl object-cover w-full h-56"
-        />
+        {cid && !imageLoadError ? (
+          <Image
+            src={sources[currentSrcIndex]}
+            alt={`NFT ${nft.id}`}
+            height={800}
+            width={1000}
+            className="sm:rounded-t-3xl object-cover w-full h-56"
+            onError={handleError}
+          />
+        ) : (
+          <div className="w-full h-56 flex items-center justify-center text-white">
+            NFT image not available
+          </div>
+        )}
         <div className="absolute top-2 right-2 bg-black rounded-full">
           <Image src={logo} alt="logo" width={24} height={24} />
         </div>
@@ -67,13 +94,13 @@ function NFTTile({ nft }: NFTProps) {
             </span>
           </div>
           <div className="flex item-center justify-items-center	 text-sm">
-          <Image
-                        src={getDaoLogo(nft.network)}
-                        alt="image"
-                        width={20}
-                        height={20}
-                        className="rounded-full size-3 sm:size-5"
-                      />            
+            <Image
+              src={getDaoLogo(nft.network)}
+              alt="image"
+              width={20}
+              height={20}
+              className="rounded-full size-3 sm:size-5"
+            />
             <span className="mx-2">•</span>
             <span>{nft.time}</span>
           </div>
@@ -82,7 +109,11 @@ function NFTTile({ nft }: NFTProps) {
               <>
                 Host :{" "}
                 <Link
-                  href={`/${nft.network=== "arbitrum-sepolia"? "arbitrum": nft.network}/${nft.host}?active=info`}
+                  href={`/${
+                    nft.network === "arbitrum-sepolia"
+                      ? "arbitrum"
+                      : nft.network
+                  }/${nft.host}?active=info`}
                   onClick={(event: any) => {
                     event.stopPropagation();
                   }}

@@ -17,7 +17,7 @@ import { TimeInput } from "@nextui-org/react";
 import { Time } from "@internationalized/date";
 import { AbiEncodingLengthMismatchError } from "viem";
 import { all } from "axios";
-import { fetchEnsAvatar } from "@/utils/ENSUtils";
+import { fetchEnsNameAndAvatar } from "@/utils/ENSUtils";
 import { headers } from "next/headers";
 
 interface dataToStore {
@@ -225,7 +225,7 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
 
   useEffect(() => {
     const fetchEnsName = async () => {
-      const ensName = await fetchEnsAvatar(address ? address : "");
+      const ensName = await fetchEnsNameAndAvatar(address ? address : "");
       if (ensName) {
         setDisplayEnsName(ensName?.ensName);
       } else {
