@@ -104,6 +104,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
   const [showFeedbackPopups, setShowFeedbackPopups] = useState(false);
   const [meetingRecordingStatus, setMeetingRecordingStatus] =
     useState<boolean>();
+  const [currentRecordingState, setCurrentRecordingState] = useState<boolean>();
   const [showModal, setShowModal] = useState(true);
   const [meetingData, setMeetingData] = useState<any>();
   const { sendData } = useDataMessage();
@@ -166,7 +167,6 @@ export default function Component({ params }: { params: { roomId: string } }) {
               params.roomId,
               daoName,
               hostAddress,
-              meetingRecordingStatus,
               meetingData
             );
           }, 10000);
@@ -291,9 +291,10 @@ export default function Component({ params }: { params: { roomId: string } }) {
       console.log("storedStatus: ", parsedStatus);
       if (parsedStatus.meetingId === params.roomId) {
         setMeetingRecordingStatus(parsedStatus.isMeetingRecorded);
+        setCurrentRecordingState(parsedStatus.recordingStatus);
       }
     }
-  }, []);
+  }, [sessionStorage]);
 
   const handleModalClose = () => {
     setModalOpen(false);
@@ -414,11 +415,11 @@ export default function Component({ params }: { params: { roomId: string } }) {
       const meetingData = {
         meetingId: params.roomId,
         isMeetingRecorded: result,
+        recordingStatus: result,
       };
       sessionStorage.setItem("meetingData", JSON.stringify(meetingData));
       setShowModal(false);
       setMeetingRecordingStatus(result);
-
       updateRecordingStatus(result);
       if (result) {
         startRecording(params.roomId, setIsRecording);
@@ -427,6 +428,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
   };
 
   useEffect(() => {
+    console.log("isRecording value: ", isRecording);
     if (role === "guest") {
       sendData({
         to: "*",
@@ -434,7 +436,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
         label: "requestRecordingStatus",
       });
     }
-  }, []);
+  }, [isRecording]);
 
   return (
     <>
@@ -514,14 +516,6 @@ export default function Component({ params }: { params: { roomId: string } }) {
             </header>
             <main
               className={`transition-all ease-in-out flex items-center justify-center flex-1 duration-300 w-full h-[80%] p-2`}
-              style={{
-                backgroundColor: activeBg === "bg-white" ? "white" : undefined,
-                backgroundImage:
-                  activeBg === "bg-white" ? undefined : `url(${activeBg})`,
-                backgroundPosition: "center",
-                backgroundSize: "cover",
-                backgroundRepeat: "no-repeat",
-              }}
             >
               <div className="flex w-full h-full">
                 {shareStream && (
@@ -627,7 +621,8 @@ export default function Component({ params }: { params: { roomId: string } }) {
             <BottomBar
               daoName={daoName}
               hostAddress={hostAddress}
-              meetingStatus={meetingRecordingStatus}
+              // meetingStatus={meetingRecordingStatus}
+              // currentRecordingStatus={currentRecordingState}
               meetingData={meetingData}
               meetingCategory={meetingCategory}
             />

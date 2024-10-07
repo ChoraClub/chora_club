@@ -27,7 +27,7 @@ export const startRecording = async (
       toast.error("Failed to start recording");
       return;
     }
-    setIsRecording(true); // Assuming this should be true after starting recording
+    setIsRecording(true);
     toast.success("Recording started");
   } catch (error) {
     console.error("Error starting recording:", error);
@@ -90,7 +90,6 @@ export const handleCloseMeeting = async (
   roomId: string | undefined,
   daoName: string,
   hostAddress: string,
-  meetingStatus: boolean | undefined,
   meetingData: SessionInterface | undefined
 ) => {
   // if (role === "host") {
@@ -123,6 +122,17 @@ export const handleCloseMeeting = async (
     const response = await fetch("/api/end-call", requestOptions);
     const result = await response.json();
     console.log("result in end call::", result);
+
+    const storedStatus = sessionStorage.getItem("meetingData");
+    let meetingStatus;
+
+    if (storedStatus) {
+      const parsedStatus = JSON.parse(storedStatus);
+      console.log("storedStatus: ", parsedStatus);
+      if (parsedStatus.meetingId === roomId) {
+        meetingStatus = parsedStatus.isMeetingRecorded;
+      }
+    }
 
     if (meetingStatus === true && result.success) {
       try {
@@ -163,38 +173,28 @@ export const handleRecording = async (
   isRecording: boolean | null,
   setIsRecording: (val: boolean | null) => void
 ) => {
-  // const { isRecording, setIsRecording } = useStudioState();
-
   if (isRecording) {
-    // const stopRecording = await fetch(`/rec/stopRecording?roomId=${roomId}`);
-    // const res = await stopRecording.json();
-    // if (res) {
-    //   setIsRecording(false);
-    // }
     handleStopRecording(roomId, address, setIsRecording);
     let existingValue = sessionStorage.getItem("meetingData");
     if (existingValue) {
       let parsedValue = JSON.parse(existingValue);
       console.log("parsedValue: ", parsedValue);
-      parsedValue.isMeetingRecorded = false;
+      parsedValue.recordingStatus = false;
 
       // Step 3: Store the updated value back in sessionStorage
       sessionStorage.setItem("meetingData", JSON.stringify(parsedValue));
     }
   } else {
-    // const startRecording = await fetch(`/rec/startRecording?roomId=${roomId}`);
-    // const { msg } = await startRecording.json();
-    // if (msg) {
-    //   setIsRecording(true);
-    // }
-
     startRecording(roomId, setIsRecording);
     let existingValue = sessionStorage.getItem("meetingData");
     if (existingValue) {
       let parsedValue = JSON.parse(existingValue);
       console.log("parsedValue: ", parsedValue);
       if (parsedValue.meetingId === roomId) {
-        parsedValue.isMeetingRecorded = true;
+        if (parsedValue.isMeetingRecorded === false) {
+          parsedValue.isMeetingRecorded = true;
+        }
+        parsedValue.recordingStatus = true;
       }
 
       // Step 3: Store the updated value back in sessionStorage
