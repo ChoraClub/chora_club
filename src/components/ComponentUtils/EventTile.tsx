@@ -17,7 +17,7 @@ import arblogo from "@/assets/images/daos/arbitrum.jpg";
 import logo from "@/assets/images/daos/CCLogo.png";
 import user1 from "@/assets/images/user/user1.svg";
 import { BsPersonVideo3 } from "react-icons/bs";
-import { fetchEnsAvatar } from "@/utils/ENSUtils";
+import { fetchEnsNameAndAvatar } from "@/utils/ENSUtils";
 import styles from "./Button.module.css";
 import {
   Modal,
@@ -95,7 +95,7 @@ function EventTile({ tileIndex, data: initialData, isEvent }: TileProps) {
         setLoadingEnsData(true);
 
         // Fetch host ENS data
-        const hostEnsData = await fetchEnsAvatar(
+        const hostEnsData = await fetchEnsNameAndAvatar(
           data.host_address.toLowerCase()
         );
         setEnsHostName(
@@ -105,7 +105,7 @@ function EventTile({ tileIndex, data: initialData, isEvent }: TileProps) {
 
         // Fetch guest ENS data if available
         if (data.attendees[0]?.attendee_address) {
-          const guestEnsData = await fetchEnsAvatar(
+          const guestEnsData = await fetchEnsNameAndAvatar(
             data.attendees[0].attendee_address.toLowerCase()
           );
           setEnsGuestName(

@@ -17,7 +17,7 @@ import {
   protocolRewardsABI,
   protocolRewardsAddress,
 } from "chora-protocol-deployments";
-import { fetchEnsAvatar } from "@/utils/ENSUtils";
+import { fetchEnsNameAndAvatar } from "@/utils/ENSUtils";
 import { truncateAddress } from "@/utils/text";
 import { useConnection } from "@/app/hooks/useConnection";
 import Link from "next/link";
@@ -112,7 +112,7 @@ function TotalRewards() {
       fetchReward();
 
       const fetchEnsName = async () => {
-        const ensName = await fetchEnsAvatar(address);
+        const ensName = await fetchEnsNameAndAvatar(address);
         const truncatedAddress = truncateAddress(address);
         setDisplayEnsName(
           ensName?.ensName ? ensName.ensName : truncatedAddress

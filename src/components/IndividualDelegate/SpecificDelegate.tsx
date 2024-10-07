@@ -50,7 +50,7 @@ import DelegateTileModal from "../ComponentUtils/DelegateTileModal";
 // import { cacheExchange, createClient, fetchExchange, gql } from "urql/core";
 import { set } from "video.js/dist/types/tech/middleware";
 import MainProfileSkeletonLoader from "../SkeletonLoader/MainProfileSkeletonLoader";
-import { fetchEnsAvatar } from "@/utils/ENSUtils";
+import { fetchEnsNameAndAvatar } from "@/utils/ENSUtils";
 import Confetti from "react-confetti";
 import { connected } from "process";
 import { IoMdNotifications } from "react-icons/io";
@@ -749,7 +749,7 @@ function SpecificDelegate({ props }: { props: Type }) {
 
   useEffect(() => {
     const fetchEnsName = async () => {
-      const ensName = await fetchEnsAvatar(props.individualDelegate);
+      const ensName = await fetchEnsNameAndAvatar(props.individualDelegate);
       setDisplayEnsName(ensName?.ensName);
     };
     fetchEnsName();

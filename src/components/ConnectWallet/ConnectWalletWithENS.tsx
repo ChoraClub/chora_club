@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 // import "@rainbow-me/rainbow-button/styles.css";
-import { fetchEnsAvatar, fetchEnsName } from "@/utils/ENSUtils";
+import { fetchEnsNameAndAvatar, fetchEnsName } from "@/utils/ENSUtils";
 import { BiSolidWallet } from "react-icons/bi";
 import { useAccount } from "wagmi";
 import { usePathname } from "next/navigation";
@@ -45,7 +45,7 @@ function ConnectWalletWithENS() {
             );
           }
 
-          const ensData = await fetchEnsAvatar(address);
+          const ensData = await fetchEnsNameAndAvatar(address);
           setEnsAvatar(ensData?.avatar || null);
         } catch (error) {
           console.error("Error fetching user profile:", error);
