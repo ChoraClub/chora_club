@@ -4,7 +4,7 @@ import {
   processAddressOrEnsName,
   resolveENSProfileImage,
   getMetaAddressOrEnsName,
-  fetchEnsAvatar,
+  fetchEnsNameAndAvatar,
 } from "@/utils/ENSUtils";
 import { Metadata } from "next";
 import React, { useEffect } from "react";
@@ -37,9 +37,9 @@ export async function generateMetadata({
     params.individualDelegate
   );
 
-  // const avatar = (await fetchEnsAvatar(params.individualDelegate)) || IMAGE_URL;
+  // const avatar = (await fetchEnsNameAndAvatar(params.individualDelegate)) || IMAGE_URL;
   // const [avatar] = await Promise.all([
-  //   fetchEnsAvatar(params.individualDelegate),
+  //   fetchEnsNameAndAvatar(params.individualDelegate),
   // ]);
   // console.log("avatar...", avatar);
   // const dao_name = params.daoDelegates;
@@ -52,7 +52,7 @@ export async function generateMetadata({
 
   const defaultAvatar = IMAGE_URL; // Provide a default value for avatar
   const [avatar] = await Promise.all([
-    fetchEnsAvatar(params.individualDelegate),
+    fetchEnsNameAndAvatar(params.individualDelegate),
   ]);
   console.log("avatar...", avatar);
   const dao_name = params.daoDelegates;

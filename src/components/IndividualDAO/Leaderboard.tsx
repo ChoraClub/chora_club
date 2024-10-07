@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { fetchEnsAvatar } from "@/utils/ENSUtils";
+import { fetchEnsNameAndAvatar } from "@/utils/ENSUtils";
 import Image from "next/image";
 import user1 from "@/assets/images/user/user5.svg";
 import copy from "copy-to-clipboard";
@@ -116,7 +116,7 @@ function Leaderboard({ props }: { props: string }) {
       const updatedDelegates: DelegateData[] = await Promise.all(
         apiData.map(async (delegate: any, index: number) => {
           try {
-            const delegateAddress = await fetchEnsAvatar(
+            const delegateAddress = await fetchEnsNameAndAvatar(
               delegate.delegate_address
             );
             return {
@@ -219,7 +219,8 @@ function Leaderboard({ props }: { props: string }) {
                 }}
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                 onBlur={() => setIsDropdownOpen(false)}
-                className="appearance-none bg-gray-100 cursor-pointer rounded-lg pl-6 pr-12 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                className="appearance-none bg-gray-100 cursor-pointer rounded-lg pl-6 pr-12 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
                 <option value="Delegates">Chora Club Score</option>
                 <option value="NFTs Claimed">NFTs Claimed</option>
                 <option value="No. of Sessions">No. of Sessions</option>
@@ -229,7 +230,8 @@ function Leaderboard({ props }: { props: string }) {
                 <div
                   className={`transform transition-transform duration-300 ${
                     isDropdownOpen ? "rotate-180" : ""
-                  }`}>
+                  }`}
+                >
                   <FaChevronDown className="h-4 w-4 text-black" />
                 </div>
               </div>
@@ -288,7 +290,8 @@ function Leaderboard({ props }: { props: string }) {
                         onMouseEnter={() =>
                           setHoveredTitle(item.label.toLowerCase())
                         }
-                        onMouseLeave={() => setHoveredTitle("")}>
+                        onMouseLeave={() => setHoveredTitle("")}
+                      >
                         <span>{item.label}</span>
                         {hoveredTitle === item.label.toLowerCase() && (
                           <div className="absolute top-[-60px] left-1/2 transform -translate-x-1/2 bg-gray-700 text-white text-xs rounded p-2 w-64">
@@ -309,7 +312,8 @@ function Leaderboard({ props }: { props: string }) {
                   style={{
                     boxShadow:
                       "rgb(204, 219, 232) 3px 3px 12px 0px inset, rgba(255, 255, 255, 0.5) -3px -3px 6px 1px inset",
-                  }}>
+                  }}
+                >
                   <div className="flex flex-col sm:flex-row justify-between items-center">
                     <div className="flex items-center space-x-5 mb-3 sm:mb-0">
                       <div
@@ -319,7 +323,8 @@ function Leaderboard({ props }: { props: string }) {
                           getRankSymbol(delegate, allDelegatesData) === "#3"
                             ? ""
                             : "text-2xl"
-                        }`}>
+                        }`}
+                      >
                         {getRankSymbol(delegate, allDelegatesData)}
                       </div>
                       <div className="h-[105px] border-[0.1px] border-[#D5D4DF]"></div>
@@ -332,17 +337,20 @@ function Leaderboard({ props }: { props: string }) {
                       />
                       <div className="min-w-[180px] flex justify-start">
                         <div
-                          className={`flex-grow flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-full ${delegate.color} bg-opacity-20`}>
+                          className={`flex-grow flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-full ${delegate.color} bg-opacity-20`}
+                        >
                           <Link
                             href={`/${props}/${delegate.address}?active=info`}
-                            className="font-semibold cursor-pointer hover:underline">
+                            className="font-semibold cursor-pointer hover:underline"
+                          >
                             {delegate.ensName}
                           </Link>
                           <Tooltip
                             content="Copy"
                             placement="right"
                             closeDelay={1}
-                            showArrow>
+                            showArrow
+                          >
                             <span className="cursor-pointer text-xs">
                               <IoCopy
                                 onClick={() => handleCopy(delegate.address)}
@@ -355,19 +363,22 @@ function Leaderboard({ props }: { props: string }) {
                     <div className="flex flex-wrap justify-between w-[660px] mt-2 sm:mt-0">
                       <div className="text-center my-1 w-[100px]">
                         <div
-                          className={`${delegate.textColor} font-bold text-lg`}>
+                          className={`${delegate.textColor} font-bold text-lg`}
+                        >
                           {delegate.claimedNFT}
                         </div>
                       </div>
                       <div className="text-center mx-3 my-1 w-[110px]">
                         <div
-                          className={`${delegate.textColor} font-bold text-lg`}>
+                          className={`${delegate.textColor} font-bold text-lg`}
+                        >
                           {formatViews(delegate.sessionCount)}
                         </div>
                       </div>
                       <div className="text-center mx-3 my-1 w-[110px]">
                         <div
-                          className={`${delegate.textColor} font-bold text-lg`}>
+                          className={`${delegate.textColor} font-bold text-lg`}
+                        >
                           {formatViews(delegate.TotalViews)}
                         </div>
                       </div>
@@ -408,7 +419,8 @@ function Leaderboard({ props }: { props: string }) {
                       </div>
                       <div className="text-center mx-3 my-1 w-[110px]">
                         <div
-                          className={`${delegate.textColor} font-bold text-lg`}>
+                          className={`${delegate.textColor} font-bold text-lg`}
+                        >
                           {delegate.Score}
                         </div>
                       </div>
@@ -420,7 +432,8 @@ function Leaderboard({ props }: { props: string }) {
                 <button
                   onClick={() => handlePageChange(currentPage - 1)}
                   disabled={currentPage === 1}
-                  className="px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-300">
+                  className="px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-300"
+                >
                   Previous
                 </button>
                 <span className="px-4 py-2">
@@ -429,7 +442,8 @@ function Leaderboard({ props }: { props: string }) {
                 <button
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage === totalPages}
-                  className="px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-300">
+                  className="px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-300"
+                >
                   Next
                 </button>
               </div>

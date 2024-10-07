@@ -62,7 +62,7 @@ export async function getMetaAddressOrEnsName(
 
 export async function getMetaProfileImage() {}
 
-export async function fetchEnsAvatar(address: any) {
+export async function fetchEnsNameAndAvatar(address: any) {
   try {
     const ensName = await getEnsName(config, {
       address,
@@ -95,12 +95,27 @@ export async function fetchEnsName(address: any) {
     const displayName = address?.slice(0, 4) + "..." + address?.slice(-4);
 
     const ensNameOrAddress = ensName ? ensName : displayName;
-    // console.log("ensNameOrAddress: ", ensNameOrAddress);
 
     return { ensNameOrAddress, ensName };
   } catch (e) {
     console.log("Error in fetchEnsName ", e);
     const truncatedAddress = truncateAddress(address);
     return { ensNameOrAddress: truncatedAddress, ensName: truncatedAddress };
+  }
+}
+
+export async function getENSName(address: string): Promise<string | null> {
+  // Connect to the Ethereum mainnet
+  const provider = new ethers.JsonRpcProvider(
+    process.env.NEXT_PUBLIC_ENS_RPC_PROVIDER
+  );
+
+  try {
+    // Look up the ENS name
+    const ensName = await provider.lookupAddress(address);
+    return ensName;
+  } catch (error) {
+    console.error("Error fetching ENS name:", error);
+    return null;
   }
 }

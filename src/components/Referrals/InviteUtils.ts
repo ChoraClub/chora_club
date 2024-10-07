@@ -1,5 +1,5 @@
 import { BASE_URL } from "@/config/constants";
-import { fetchEnsAvatar } from "@/utils/ENSUtils";
+import { fetchEnsNameAndAvatar } from "@/utils/ENSUtils";
 import { truncateAddress } from "@/utils/text";
 
 export async function fetchInviteeDetails(userAddress: string) {
@@ -19,7 +19,7 @@ export async function fetchInviteeDetails(userAddress: string) {
   const displayImage = response?.data[0]?.image;
   const displayName = response?.data[0]?.displayName;
 
-  const ensData = await fetchEnsAvatar(userAddress);
+  const ensData = await fetchEnsNameAndAvatar(userAddress);
   const ensName = ensData?.ensName;
   const ensAvatar = ensData?.avatar;
 

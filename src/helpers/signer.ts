@@ -27,7 +27,7 @@ const WalletAndPublicClient = () => {
     chainName = "";
   }
 
-  console.log("chainName in signer: ", chainName);
+  // console.log("chainName in signer: ", chainName);
   if (typeof window !== "undefined" && window.ethereum) {
     // Instantiate public client and wallet client
     publicClient = createPublicClient({

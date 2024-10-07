@@ -48,7 +48,7 @@ export const GET = async (req: NextRequest) => {
           .query(DELEGATE_QUERY, { first: FETCH_SIZE, skip: newSkip })
           .toPromise();
       }
-      const delegateChangeds = data.data.delegates;
+      const delegateChangeds = data?.data?.delegates;
 
       if (delegateChangeds.length < FETCH_SIZE) {
         hasMore = false;

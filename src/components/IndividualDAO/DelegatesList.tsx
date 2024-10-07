@@ -1,32 +1,12 @@
-"use client";
-
-import Image, { StaticImageData } from "next/image";
-import React, { useEffect, useState, useCallback, useRef } from "react";
-import search from "@/assets/images/daos/search.png";
-import OPLogo from "@/assets/images/daos/op.png";
-import ARBLogo from "@/assets/images/daos/arbitrum.jpg";
-import ccLogo from "@/assets/images/daos/CCLogo2.png";
-import { IoCopy } from "react-icons/io5";
-import copy from "copy-to-clipboard";
-import { Button, Dropdown, Pagination, Tooltip } from "@nextui-org/react";
-import { Oval, RotatingLines } from "react-loader-spinner";
-import { usePathname, useSearchParams } from "next/navigation";
+import Image from "next/image";
+import React, { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next-nprogress-bar";
-import toast, { Toaster } from "react-hot-toast";
-import styles from "@/components/IndividualDelegate/DelegateVotes.module.css";
-import { FaArrowUp } from "react-icons/fa6";
+import toast from "react-hot-toast";
 import { useConnectModal, useChainModal } from "@rainbow-me/rainbowkit";
-import dao_abi from "../../artifacts/Dao.sol/GovernanceToken.json";
 import { useAccount } from "wagmi";
 import WalletAndPublicClient from "@/helpers/signer";
 import ErrorDisplay from "../ComponentUtils/ErrorDisplay";
-import {
-  processAddressOrEnsName,
-  resolveENSProfileImage,
-  getMetaAddressOrEnsName,
-  fetchEnsAvatar,
-} from "@/utils/ENSUtils";
-import DelegateListSkeletonLoader from "../SkeletonLoader/DelegateListSkeletonLoader";
+import { fetchEnsNameAndAvatar } from "@/utils/ENSUtils";
 import DelegateTileModal from "../ComponentUtils/DelegateTileModal";
 import {
   arb_client,
@@ -36,626 +16,346 @@ import {
 import { getChainAddress } from "@/utils/chainUtils";
 import { arbitrum, optimism } from "viem/chains";
 import { CiSearch } from "react-icons/ci";
-const cache: any = {
-  optimism: null,
-  arbitrum: null,
-};
-let pageCache: any = null;
+import { IoCopy } from "react-icons/io5";
+import { Tooltip } from "@nextui-org/react";
+import dao_abi from "../../artifacts/Dao.sol/GovernanceToken.json";
+import { useConnection } from "@/app/hooks/useConnection";
+import OPLogo from "@/assets/images/daos/op.png";
+import ARBLogo from "@/assets/images/daos/arbitrum.jpg";
+import ccLogo from "@/assets/images/daos/CCLogo2.png";
+import DelegateInfoCard from "./DelegateInfoCard";
+import { truncateAddress } from "@/utils/text";
+import DelegateListSkeletonLoader from "../SkeletonLoader/DelegateListSkeletonLoader";
+
+const DELEGATES_PER_PAGE = 20;
+
 function DelegatesList({ props }: { props: string }) {
-  const [delegateData, setDelegateData] = useState<any>({ delegates: [] });
-  const { openChainModal } = useChainModal();
-  const network = useAccount().chain;
-  const { publicClient, walletClient } = WalletAndPublicClient();
-  const { openConnectModal } = useConnectModal();
-  const { isConnected } = useAccount();
-  const [tempData, setTempData] = useState<any>({ delegates: [] });
-  const [searchResults, setSearchResults] = useState<any>({ delegates: [] });
+  const {
+    isConnected: isUserConnected,
+    isSessionLoading,
+    isLoading,
+    isPageLoading,
+    isReady,
+  } = useConnection();
+  const [delegateData, setDelegateData] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [currentPage, setCurrentPage] = useState(0);
-  const [isPageLoading, setPageLoading] = useState(true);
-  const [isDataLoading, setDataLoading] = useState(true);
-  const router = useRouter();
-  const path = usePathname();
-  const searchParams = useSearchParams();
-  const [isShowing, setIsShowing] = useState(true);
-  const [isSearching, setIsSearching] = useState<boolean>(false);
-  const [delegateOpen, setDelegateOpen] = useState(false);
-  const [delegateDetails, setDelegateDetails] = useState<any>();
-  const [loading, setLoading] = useState(false);
+  const [isAPICalling, setIsAPICalling] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [same, setSame] = useState(false);
-  const { chain } = useAccount();
-  const [delegateInfo, setDelegateInfo] = useState<any>();
-  const [selectedDelegate, setSelectedDelegate] = useState<any>(null);
   const [skip, setSkip] = useState(0);
   const [hasMore, setHasMore] = useState(true);
-  const { address } = useAccount();
+  const [selectedDelegate, setSelectedDelegate] = useState<any>(null);
+  const [delegateOpen, setDelegateOpen] = useState(false);
+  const [delegateDetails, setDelegateDetails] = useState<any>();
+  const [same, setSame] = useState(false);
   const [delegatingToAddr, setDelegatingToAddr] = useState(false);
   const [confettiVisible, setConfettiVisible] = useState(false);
-  const lastDelegateRef = useRef<string | null>(null);
 
-  const handleRetry = () => {
-    setError(null);
-    setCurrentPage(0);
-    setDelegateData({ delegates: [] });
-    setTempData({ delegates: [] });
-    window.location.reload();
-  };
+  const router = useRouter();
+  const { openChainModal } = useChainModal();
+  const { openConnectModal } = useConnectModal();
+  const { isConnected, address, chain } = useAccount();
+  const { publicClient, walletClient } = WalletAndPublicClient();
 
-  const fetchData = async () => {
+  const fetchDelegates = useCallback(async () => {
+    if (isAPICalling || !hasMore) return;
+
+    setIsAPICalling(true);
     try {
-      setDataLoading(true);
-      const res = await fetch(`/api/get-delegate?skip=${skip}&dao=${props}`);
+      const res = await fetch(
+        `/api/get-delegate?skip=${skip}&dao=${props}&limit=${DELEGATES_PER_PAGE}`
+      );
+      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
 
-      if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status}`);
-      }
-
-      const daoInfo = await res.json();
-      let formattedDelegates;
-      setSkip(daoInfo.nextSkip);
-      setHasMore(daoInfo.hasMore);
-      formattedDelegates = await Promise.all(
-        daoInfo.delegates.map(async (delegate: any) => {
-          // const ensName = await fetchEnsNames(delegate._id);
-          // console.log(ensName);
-          const avatar = await fetchEnsAvatar(delegate.delegate);
+      const data = await res.json();
+      const formattedDelegates = await Promise.all(
+        data.delegates.map(async (delegate: any) => {
+          // const avatar = await fetchEnsNameAndAvatar(delegate.delegate);
           return {
-            delegate: delegate.delegate,
+            ...delegate,
             adjustedBalance: delegate.latestBalance / 10 ** 18,
-            newBalance: delegate.latestBalance,
-            profilePicture: avatar?.avatar,
-            ensName: avatar?.ensName,
+            profilePicture: props === "optimism" ? OPLogo : ARBLogo,
+            ensName: truncateAddress(delegate.delegate),
           };
         })
       );
-      // }
 
-      const newDelegates = formattedDelegates.filter(
-        (delegate: any) => delegate.delegate !== lastDelegateRef.current
-      );
-
-      if (newDelegates.length > 0) {
-        lastDelegateRef.current =
-          newDelegates[newDelegates.length - 1].delegate;
-      }
-
-      setDelegateData((prevData: any) => ({
-        delegates: [...prevData.delegates, ...newDelegates],
-      }));
-
-      setTempData((prevData: any) => ({
-        delegates: [...prevData.delegates, ...formattedDelegates],
-      }));
-
-      setDataLoading(false);
-      cache[props] = {
-        delegates: [...(cache[props]?.delegates || []), ...formattedDelegates],
-      };
+      setDelegateData((prev) => [...prev, ...formattedDelegates]);
+      setSkip(data.nextSkip);
+      setHasMore(data.hasMore);
+      setError(null);
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error("Error fetching delegates:", error);
+      setError("Failed to fetch delegate data. Please try again.");
     } finally {
-      setPageLoading(false);
+      setIsAPICalling(false);
     }
-  };
-  useEffect(() => {
-    if (cache[props]) {
-      // Use cached data if available
-      setDelegateData(cache[props]);
-      setCurrentPage(pageCache + 1);
-      setTempData(cache[props]);
-      setPageLoading(false);
-      setDataLoading(false);
-    } else {
-      setDataLoading(true);
-      fetchData();
-      setDataLoading(false);
-    }
-  }, [props]);
+  }, [skip, props, hasMore, isAPICalling]);
 
   useEffect(() => {
-    if (currentPage > 0) {
-      fetchData();
-    }
-  }, [currentPage]);
+    fetchDelegates(); // Initial load
+  }, []); // Empty dependency array ensures this only runs once on mount
 
-  const debounce = (func: (...args: any[]) => void, wait: number) => {
-    let timeout: NodeJS.Timeout;
-    return (...args: any[]) => {
-      clearTimeout(timeout);
-      timeout = setTimeout(() => func(...args), wait);
-    };
-  };
   const handleSearchChange = async (query: string) => {
-    setPageLoading(true);
-    if (query.length > 0) {
-      setIsSearching(true);
-      window.removeEventListener("scroll", handleScroll);
-
-      try {
-        const res = await fetch(
-          `/api/search-delegate?address=${query}&dao=${props}`
-        );
-        const filtered = await res.json();
-        const data = await fetchEnsAvatar(filtered[0].id);
-        if (filtered) {
-          const formattedDelegates = {
-            delegate: filtered[0].id,
-            adjustedBalance: filtered[0].latestBalance / 10 ** 18,
-            profilePicture: data?.avatar || "",
-            ensName: data?.ensName || filtered[0].id,
-          };
-          setDelegateData({ delegates: [formattedDelegates] });
-          setPageLoading(false);
-        } else {
-          // No results found
-          setDelegateData({ delegates: [] });
-        }
-      } catch (error) {
-        // console.error("Error fetching search results:", error);
-        console.log("No results found");
-        setDelegateData({ delegates: [] });
-        setPageLoading(false);
-      }
-    } else {
-      // console.log("in else");
-      setIsSearching(false);
-      setDelegateData({ ...delegateData, delegates: tempData.delegates });
-      setPageLoading(false);
-      window.addEventListener("scroll", handleScroll);
-    }
-    setPageLoading(false);
-  };
-
-  const handleScroll = useCallback(
-    debounce(() => {
-      const { scrollTop, clientHeight, scrollHeight } =
-        document.documentElement;
-      const threshold = 100;
-      if (
-        scrollTop + clientHeight >= scrollHeight - threshold &&
-        !isDataLoading
-      ) {
-        fetchData();
-      }
-    }, 200),
-    [fetchData, isDataLoading, hasMore]
-  );
-
-  useEffect(() => {
-    window.addEventListener("scroll", handleScroll);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, [isDataLoading, currentPage]);
-
-  useEffect(() => {
-    if (isSearching === false) {
-      window.addEventListener("scroll", handleScroll);
+    setSearchQuery(query);
+    if (!query) {
+      setDelegateData([]); 
+      setSkip(0); 
+      setHasMore(true); 
+      fetchDelegates(); 
+      return;
     }
 
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, [handleScroll]);
-
-  const handleCopy = (addr: string) => {
-    copy(addr);
-    toast("Address Copied");
-  };
-
-  const formatNumber = (number: number) => {
-    if (number >= 1000000) {
-      return (number / 1000000).toFixed(2) + "m";
-    } else if (number >= 1000) {
-      return (number / 1000).toFixed(2) + "k";
-    } else {
-      return 0;
-    }
-  };
-
-  const handleSelectChange = (event: any) => {
-    const selectedValue = event.target.value;
-    if (
-      selectedValue === "Random" ||
-      selectedValue === "Most delegators" ||
-      selectedValue === "Most active"
-    ) {
-      toast("Coming Soon 🚀");
-    }
-  };
-
-  const scrollToSection = (sectionId: string, duration = 1000) => {
-    const section = document.getElementById(sectionId);
-
-    if (section) {
-      const startingY = window.scrollY;
-      const targetY = section.offsetTop - 250;
-      const distance = targetY - startingY;
-      const startTime = performance.now();
-
-      function scrollStep(timestamp: any) {
-        const elapsed = timestamp - startTime;
-
-        window.scrollTo(
-          0,
-          startingY + easeInOutQuad(elapsed, 0, distance, duration)
-        );
-
-        if (elapsed < duration) {
-          requestAnimationFrame(scrollStep);
-        }
+    setIsAPICalling(true);
+    try {
+      const res = await fetch(
+        `/api/search-delegate?address=${query}&dao=${props}`
+      );
+      const filtered = await res.json();
+      if (filtered.length > 0) {
+        // const data = await fetchEnsNameAndAvatar(filtered[0]?.id);
+        const formattedDelegate = {
+          delegate: filtered[0].id,
+          adjustedBalance: filtered[0].latestBalance / 10 ** 18,
+          profilePicture: props === "optimism" ? OPLogo : ARBLogo,
+          ensName: truncateAddress(filtered[0].id),
+        };
+        setDelegateData([formattedDelegate]);
+      } else {
+        setDelegateData([]);
       }
-
-      function easeInOutQuad(t: any, b: any, c: any, d: any) {
-        t /= d / 2;
-        if (t < 1) return (c / 2) * t * t + b;
-        t--;
-        return (-c / 2) * (t * (t - 2) - 1) + b;
-      }
-
-      requestAnimationFrame(scrollStep);
+      setHasMore(false);
+    } catch (error) {
+      console.error("Error fetching search results:", error);
+      setDelegateData([]);
+    } finally {
+      setIsAPICalling(false);
     }
   };
 
   const handleDelegateModal = async (delegateObject: any) => {
+    console.log("delegateObject", delegateObject);
     setSelectedDelegate(delegateObject);
     if (!isConnected) {
-      if (openConnectModal) {
-        openConnectModal();
-      }
-    } else {
-      setDelegateOpen(true);
-      // setLoading(true);
-      try {
-        let data: any;
-        if (props === "optimism") {
-          data = await op_client.query(DELEGATE_CHANGED_QUERY, {
-            delegator: address,
-          });
-        } else {
-          data = await arb_client.query(DELEGATE_CHANGED_QUERY, {
-            delegator: address,
-          });
+      openConnectModal?.();
+      return;
+    }
+
+    setDelegateOpen(true);
+    try {
+      const data = await (props === "optimism" ? op_client : arb_client).query(
+        DELEGATE_CHANGED_QUERY,
+        {
+          delegator: address,
         }
-
-        const delegate = data.data.delegateChangeds[0]?.toDelegate;
-        setSame(
-          delegate.toLowerCase() === delegateObject.delegate.toLowerCase()
-        );
-        setDelegateDetails(delegate);
-        setError(null);
-      } catch (err: any) {
-        console.log(err);
-        // setError(err.message);
-      } finally {
-        // setLoading(false);
-      }
-
-      setDelegateOpen(true);
+      );
+      const delegate = data.data.delegateChangeds[0]?.toDelegate;
+      setSame(
+        delegate?.toLowerCase() === delegateObject.delegate.toLowerCase()
+      );
+      setDelegateDetails(delegate);
+    } catch (err) {
+      console.error(err);
     }
   };
-
-  const handleCloseDelegateModal = () => {
-    setSelectedDelegate(null);
-    setDelegateOpen(false);
-  };
-
   const handleDelegateVotes = async (to: string) => {
-    // let address;
-    // let address1;
-
-    // try {
-    //   address = await walletClient.getAddresses();
-    //   address1 = address[0];
-    // } catch (error) {
-    //   console.error("Error getting addresses:", error);
-    //   toast.error("Please connect your MetaMask wallet!");
-    //   return;
-    // }
-
     if (!address) {
       toast.error("Please connect your wallet!");
       return;
     }
 
     const chainAddress = getChainAddress(chain?.name);
-    console.log("walletClient?.chain:: ", walletClient?.chain);
-    if (walletClient?.chain === "") {
-      toast.error("Please connect your wallet!");
-    } else {
-      let network;
-      if (props === "optimism") {
-        network = "OP Mainnet";
-      } else if (props === "arbitrum") {
-        network = "Arbitrum One";
-      }
+    const network = props === "optimism" ? "OP Mainnet" : "Arbitrum One";
 
-      console.log("network: ", network);
-
-      if (walletClient?.chain.name === network) {
-        try {
-          setDelegatingToAddr(true);
-          console.log("address::::: ", address);
-          const delegateTx = await walletClient.writeContract({
-            address: chainAddress,
-            chain: props === "arbitrum" ? arbitrum : optimism,
-            abi: dao_abi.abi,
-            functionName: "delegate",
-            args: [to],
-            account: address,
-          });
-
-          setDelegatingToAddr(false);
-          setConfettiVisible(true);
-          setTimeout(() => setConfettiVisible(false), 5000);
-          // handleCloseDelegateModal();
-        } catch (error) {
-          setDelegatingToAddr(false);
-          toast.error("Transaction failed");
-          // handleCloseDelegateModal();
-        }
-      } else {
-        toast.error("Please switch to appropriate network to delegate!");
-        if (openChainModal) {
-          openChainModal();
-        }
-      }
+    if (walletClient?.chain.name !== network) {
+      toast.error("Please switch to the appropriate network to delegate!");
+      openChainModal?.();
+      return;
     }
+
+    try {
+      setDelegatingToAddr(true);
+      await walletClient.writeContract({
+        address: chainAddress,
+        chain: props === "arbitrum" ? arbitrum : optimism,
+        abi: dao_abi.abi,
+        functionName: "delegate",
+        args: [to],
+        account: address,
+      });
+
+      setConfettiVisible(true);
+      setTimeout(() => setConfettiVisible(false), 5000);
+      toast.success("Delegation successful!");
+    } catch (error) {
+      console.error("Delegation failed:", error);
+      toast.error("Transaction failed");
+    } finally {
+      setDelegatingToAddr(false);
+    }
+  };
+
+  const formatNumber = (number: number) => {
+    if (number >= 1e6) return `${(number / 1e6).toFixed(2)}m`;
+    if (number >= 1e3) return `${(number / 1e3).toFixed(2)}k`;
+    return number.toFixed(2);
   };
 
   if (error) {
     return (
       <div className="flex justify-center items-center min-h-[400px]">
-        <ErrorDisplay message={error} onRetry={handleRetry} />
+        <ErrorDisplay
+          message={error}
+          onRetry={() => {
+            setDelegateData([]);
+            setSkip(0);
+            setHasMore(true);
+            fetchDelegates();
+          }}
+        />
       </div>
     );
   }
 
-  return (
-    <div>
-      <div className="flex items-center justify-between pe-10">
-        {/* <div
-          style={{ background: "rgba(238, 237, 237, 0.36)" }}
-          className="flex border-[0.5px] border-black w-1/3 rounded-full my-3 font-poppins"
-        >
-          <input
-            type="text"
-            placeholder="Search by Address"
-            style={{ background: "rgba(238, 237, 237, 0.36)" }}
-            className="pl-5 pr-3 rounded-full outline-none w-full"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                handleSearchChange(searchQuery);  // Call the function when Enter is pressed
-              }
-            }}
-          ></input>
-          <span className="flex items-center bg-black rounded-full px-5 py-2">
-            <Image src={search} alt="search" width={20} />
-          </span>
-        </div> */}
-
-        <div
-          className={`flex items-center rounded-full shadow-lg bg-gray-100 text-black cursor-pointer w-[300px] xs:w-[365px] my-3 font-poppins`}
-        >
-          <CiSearch
-            className={`text-base transition-all duration-700 ease-in-out ml-3`}
-          />
-          <input
-            type="text"
-            placeholder="Search by Address"
-            className="w-[100%] pl-2 pr-4 py-1.5 font-poppins md:py-2 text-sm bg-transparent outline-none"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                handleSearchChange(searchQuery); // Call the function when Enter is pressed
-              }
-            }}
-          />
-        </div>
-        <div>
-          <select
-            style={{ background: "rgba(238, 237, 237, 0.36)" }}
-            className="rounded-full py-2 px-4 outline-none cursor-pointer"
-            onChange={handleSelectChange}
-          >
-            <option>Most voting power</option>
-            <option>Random</option>
-            <option>Most delegators</option>
-            <option>Most active</option>
-          </select>
-        </div>
-      </div>
-
-      <div className="py-8 pe-10 font-poppins">
-        {isPageLoading ? (
-          <DelegateListSkeletonLoader />
-        ) : delegateData.delegates.length > 0 ? (
-          <div>
-            <div className="grid min-[475px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-10">
-              {delegateData.delegates.map((delegate: any, index: number) => (
-                <>
-                  <div
-                    onClick={(event) => {
-                      router.push(
-                        `/${props}/${delegate.delegate}?active=info  `
-                      );
-                    }}
-                    key={index}
-                    style={{
-                      boxShadow: "0px 4px 50.8px 0px rgba(0, 0, 0, 0.11)",
-                    }}
-                    className="px-5 py-7 rounded-2xl flex flex-col justify-between cursor-pointer relative"
-                  >
-                    <div>
-                      <div className="flex justify-center relative">
-                        <Image
-                          src={
-                            delegate?.profilePicture == null
-                              ? props == "optimism"
-                                ? OPLogo
-                                : props == "arbitrum"
-                                ? ARBLogo
-                                : ""
-                              : delegate?.profilePicture
-                          }
-                          alt="Image not found"
-                          width={200}
-                          height={200}
-                          className="rounded-full w-20 h-20"
-                        ></Image>
-
-                        <Image
-                          src={ccLogo}
-                          alt="ChoraClub Logo"
-                          className="absolute top-0 right-0"
-                          style={{
-                            width: "35px",
-                            height: "35px",
-                            marginTop: "-20px",
-                            marginRight: "-5px",
-                          }}
-                        />
-                      </div>
-                      <div className="text-center">
-                        <div className="py-3">
-                          <div
-                            className={`font-semibold overflow-hidden ${styles.desc}`}
-                          >
-                            {!delegate?.ensName ? (
-                              <span>
-                                {delegate.delegate?.slice(0, 6) +
-                                  "..." +
-                                  delegate.delegate?.slice(-4)}
-                              </span>
-                            ) : (
-                              <span>
-                                {delegate.ensName ===
-                                "[693c70956042e4295f0c73589e9ac0850b5b7d276a02639b83331ec323549b88].sismo.eth"
-                                  ? "lindajxie.eth"
-                                  : delegate.ensName.length > 15
-                                  ? delegate.ensName.slice(0, 15) + "..."
-                                  : delegate.ensName}
-                              </span>
-                            )}
-                          </div>
-                          <div className="flex justify-center items-center gap-2 pb-2 pt-1">
-                            {delegate.delegate?.slice(0, 6) +
-                              "..." +
-                              delegate.delegate?.slice(-4)}
-                            <Tooltip
-                              content="Copy"
-                              placement="right"
-                              closeDelay={1}
-                              showArrow
-                            >
-                              <span className="cursor-pointer text-sm">
-                                <IoCopy
-                                  onClick={(event) => {
-                                    event.stopPropagation();
-                                    handleCopy(delegate.delegate);
-                                  }}
-                                />
-                              </span>
-                            </Tooltip>
-                          </div>
-                          <div className="text-sm border border-[#D9D9D9] py-2 px-1 rounded-lg w-full">
-                            <span className="text-blue-shade-200 font-semibold">
-                              {formatNumber(delegate.adjustedBalance)}&nbsp;
-                            </span>
-                            delegated tokens
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div>
-                      <div>
-                        <button
-                          className="bg-blue-shade-100 text-white font-poppins w-full rounded-[4px] text-sm py-1 font-medium"
-                          onClick={(event) => {
-                            event.stopPropagation(); // Prevent event propagation to parent container
-                            handleDelegateModal(delegate);
-                          }}
-                        >
-                          Delegate
-                        </button>
-                      </div>
-                    </div>
-                    <div style={{ zIndex: "21474836462" }}></div>
-                  </div>
-                  {delegateOpen && (
-                    <DelegateTileModal
-                      isOpen={delegateOpen}
-                      closeModal={handleCloseDelegateModal}
-                      handleDelegateVotes={() =>
-                        handleDelegateVotes(`${selectedDelegate.delegate}`)
-                      }
-                      fromDelegate={delegateDetails ? delegateDetails : "N/A"}
-                      delegateName={
-                        !selectedDelegate?.ensName
-                          ? selectedDelegate.delegate?.slice(0, 6) +
-                            "..." +
-                            selectedDelegate.delegate?.slice(-4)
-                          : selectedDelegate.ensName ===
-                            "[693c70956042e4295f0c73589e9ac0850b5b7d276a02639b83331ec323549b88].sismo.eth"
-                          ? "lindajxie.eth"
-                          : selectedDelegate.ensName?.length > 15
-                          ? selectedDelegate.ensName?.slice(0, 15) + "..."
-                          : selectedDelegate.ensName
-                      }
-                      displayImage={
-                        selectedDelegate?.profilePicture == null
-                          ? props == "optimism"
-                            ? OPLogo
-                            : props == "arbitrum"
-                            ? ARBLogo
-                            : ""
-                          : selectedDelegate.profilePicture
-                      }
-                      daoName={props}
-                      addressCheck={same}
-                      delegatingToAddr={delegatingToAddr}
-                      confettiVisible={confettiVisible}
-                    />
-                  )}
-                </>
-              ))}
-            </div>
-
-            {isDataLoading && (
-              <div className="flex items-center justify-center my-4">
-                <RotatingLines
-                  visible={true}
-                  width="40"
-                  strokeColor="#0500FF"
-                  ariaLabel="oval-loading"
-                />
-              </div>
-            )}
-          </div>
-        ) : (
-          <div className="flex flex-col justify-center items-center pt-10">
-            <div className="text-5xl">☹️</div>{" "}
-            <div className="pt-4 font-semibold text-lg">
+  const renderContent = () => {
+    if (delegateData.length === 0 && !isLoading && !isAPICalling) {
+      return (
+        <>
+          <div className="text-center py-12">
+            <p className="text-2xl font-semibold mb-4">No delegates found</p>
+            <p className="text-gray-600">
               {searchQuery
-                ? `No results found for "${searchQuery}"`
-                : "Oops, no such result available!"}
-            </div>
+                ? `No results for "${searchQuery}"`
+                : "Try adjusting your search or filters"}
+            </p>
           </div>
-        )}
-      </div>
+        </>
+      );
+    }
 
-      <div className="fixed right-5 bottom-5 cursor-pointer">
-        <div
-          className="bg-blue-shade-100 p-3 rounded-full"
-          onClick={() => scrollToSection("secondSection")}
-        >
-          <FaArrowUp size={25} color="white" />
+    if (delegateData.length > 0) {
+      return (
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {delegateData.map((delegate) => (
+              <DelegateInfoCard
+                key={delegate.delegate}
+                delegate={delegate}
+                daoName={props}
+                onCardClick={() =>
+                  router.push(`/${props}/${delegate.delegate}?active=info`)
+                }
+                onDelegateClick={handleDelegateModal}
+                formatNumber={formatNumber}
+              />
+            ))}
+          </div>
+          {isAPICalling && <DelegateListSkeletonLoader />}
+          {hasMore && !searchQuery && !isLoading && (
+            <>
+              <div className="text-center mt-8">
+                <button
+                  className="bg-blue-600 text-white font-medium py-2 px-6 rounded-md hover:bg-blue-700 transition-colors duration-300"
+                  onClick={fetchDelegates}
+                  disabled={isAPICalling}
+                >
+                  {isAPICalling ? "Loading..." : "Load More"}
+                </button>
+              </div>
+            </>
+          )}
+        </>
+      );
+    }
+
+    if (!isLoading) {
+      return (
+        <>
+          <DelegateListSkeletonLoader />
+        </>
+      );
+    }
+  };
+
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <div className="flex flex-col md:flex-row justify-between items-center mb-8">
+        <div className="relative w-full md:w-96 mb-4 md:mb-0">
+          <input
+            type="text"
+            placeholder="Search by Address"
+            className="w-full pl-10 pr-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            value={searchQuery}
+            onChange={(e) => handleSearchChange(e.target.value)}
+          />
+          <CiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
         </div>
       </div>
+
+      {/* {delegateData.length > 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {delegateData.map((delegate) => (
+            <DelegateInfoCard
+              key={delegate.delegate}
+              delegate={delegate}
+              daoName={props}
+              onCardClick={() =>
+                router.push(`/${props}/${delegate.delegate}?active=info`)
+              }
+              onDelegateClick={handleDelegateModal}
+              formatNumber={formatNumber}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="text-center py-12">
+          <p className="text-2xl font-semibold mb-4">No delegates found</p>
+          <p className="text-gray-600">
+            {searchQuery
+              ? `No results for "${searchQuery}"`
+              : "Try adjusting your search or filters"}
+          </p>
+        </div>
+      )}
+
+      {hasMore && !searchQuery && !isLoading && (
+        <div className="text-center mt-8">
+          <button
+            className="bg-blue-600 text-white font-medium py-2 px-6 rounded-md hover:bg-blue-700 transition-colors duration-300"
+            onClick={fetchDelegates}
+            disabled={isAPICalling}
+          >
+            {isAPICalling ? "Loading..." : "Load More"}
+          </button>
+        </div>
+      )} */}
+
+      {renderContent()}
+
+      {delegateOpen && selectedDelegate && (
+        <DelegateTileModal
+          isOpen={delegateOpen}
+          closeModal={() => setDelegateOpen(false)}
+          handleDelegateVotes={() =>
+            handleDelegateVotes(selectedDelegate.delegate)
+          }
+          fromDelegate={delegateDetails || "N/A"}
+          delegateName={
+            selectedDelegate.ensName ||
+            `${selectedDelegate.delegate.slice(
+              0,
+              6
+            )}...${selectedDelegate.delegate.slice(-4)}`
+          }
+          displayImage={
+            selectedDelegate.profilePicture ||
+            (props === "optimism" ? OPLogo : ARBLogo)
+          }
+          daoName={props}
+          addressCheck={same}
+          delegatingToAddr={delegatingToAddr}
+          confettiVisible={confettiVisible}
+        />
+      )}
     </div>
   );
 }
