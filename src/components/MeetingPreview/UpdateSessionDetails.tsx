@@ -16,9 +16,12 @@ import SessionHostedModal from "../ComponentUtils/SessionHostedModal";
 
 function UpdateSessionDetails({ roomId }: { roomId: string }) {
   useEffect(() => {
-    const storedStatus = localStorage.getItem("meetingData");
-    if (storedStatus !== null) {
-      localStorage.removeItem("meetingData");
+    const storedStatus = sessionStorage.getItem("meetingData");
+    if (storedStatus) {
+      const parsedStatus = JSON.parse(storedStatus);
+      if (parsedStatus === roomId) {
+        sessionStorage.removeItem("meetingData");
+      }
     }
   }, []);
 
