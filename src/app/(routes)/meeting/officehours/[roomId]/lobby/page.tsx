@@ -32,6 +32,7 @@ import { Oval, TailSpin } from "react-loader-spinner";
 import Link from "next/link";
 import ConnectWalletWithENS from "@/components/ConnectWallet/ConnectWalletWithENS";
 import { useStudioState } from "@/store/studioState";
+import { MEETING_URL } from "@/config/constants";
 
 type lobbyProps = {};
 
@@ -160,6 +161,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
   useEffect(() => {
     if (state === "connected") {
       push(`/meeting/officehours/${params.roomId}`);
+      push(`${MEETING_URL}/officehours/${params.roomId}`);
     }
   }, [state]);
 

@@ -27,6 +27,7 @@ import screenImghover from "@/assets/images/instant-meet/screenImghover.svg";
 import chatImg from "@/assets/images/instant-meet/chat.png";
 import chatImghover from "@/assets/images/instant-meet/chatImghover.svg";
 import heroImg from "@/assets/images/instant-meet/instant-meet-hero.svg";
+import { MEETING_URL } from "@/config/constants";
 
 interface instantMeetProps {
   isDelegate: boolean;
@@ -120,7 +121,8 @@ function InstantMeet({ isDelegate, selfDelegate, daoName }: instantMeetProps) {
       if (result.success) {
         // setIsScheduled(true);
         setConfirmSave(false);
-        router.push(`/meeting/session/${roomId}/lobby`);
+        // router.push(`/meeting/session/${roomId}/lobby`);
+        router.push(`${MEETING_URL}/session/${roomId}/lobby`);
         onClose();
       }
     } catch (error) {

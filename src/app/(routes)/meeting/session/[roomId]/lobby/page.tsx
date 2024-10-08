@@ -35,6 +35,7 @@ import arrow from "@/assets/images/instant-meet/arrow.svg";
 import ConnectWalletWithENS from "@/components/ConnectWallet/ConnectWalletWithENS";
 import { getEnsName } from "@/utils/ENSUtils";
 import { truncateAddress } from "@/utils/text";
+import { MEETING_URL } from "@/config/constants";
 
 type lobbyProps = {};
 
@@ -267,7 +268,8 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
 
   useEffect(() => {
     if (state === "connected") {
-      push(`/meeting/session/${params.roomId}`);
+      // push(`/meeting/session/${params.roomId}`);
+      push(`${MEETING_URL}/session/${params.roomId}`);
     }
   }, [state]);
 

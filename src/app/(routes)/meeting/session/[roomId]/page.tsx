@@ -49,6 +49,7 @@ import PopupSlider from "@/components/FeedbackPopup/PopupSlider";
 import MeetingRecordingModal from "@/components/ComponentUtils/MeetingRecordingModal";
 import toast from "react-hot-toast";
 import { handleCloseMeeting } from "@/components/Huddle/HuddleUtils";
+import { MEETING_URL } from "@/config/constants";
 
 export default function Component({ params }: { params: { roomId: string } }) {
   const { isVideoOn, enableVideo, disableVideo, stream } = useLocalVideo();
@@ -169,7 +170,8 @@ export default function Component({ params }: { params: { roomId: string } }) {
           }, 10000);
         }
       } else {
-        router.push(`/meeting/session/${params.roomId}/lobby`);
+        // router.push(`/meeting/session/${params.roomId}/lobby`);
+        router.push(`${MEETING_URL}/session/${params.roomId}/lobby`);
       }
     },
   });
@@ -187,7 +189,8 @@ export default function Component({ params }: { params: { roomId: string } }) {
         console.log("storedStatus: ", parsedStatus);
         if (parsedStatus.isMeetingRecorded === true) {
           router.push(
-            `/meeting/session/${params.roomId}/update-session-details`
+            // `/meeting/session/${params.roomId}/update-session-details`
+            `${MEETING_URL}/session/${params.roomId}/update-session-details`
           );
         } else {
           console.log("Open modal");
@@ -362,7 +365,8 @@ export default function Component({ params }: { params: { roomId: string } }) {
   useEffect(() => {
     if (state === "idle" && isAllowToEnter) {
       console.log(`pushing to /meeting/session/${params.roomId}/lobby`);
-      push(`/meeting/session/${params.roomId}/lobby`);
+      // push(`/meeting/session/${params.roomId}/lobby`);
+      push(`${MEETING_URL}/session/${params.roomId}/lobby`);
       return;
     } else {
       updateMetadata({

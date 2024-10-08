@@ -19,6 +19,7 @@ import {
 import styles from "./Tile.module.css";
 import { usePathname } from "next/navigation";
 import { useRouter } from "next-nprogress-bar";
+import { MEETING_URL } from "@/config/constants";
 
 interface Type {
   img: StaticImageData;
@@ -179,7 +180,8 @@ function Tile({
                 <div className="flex flex-col justify-items-end">
                   <div className="text-center bg-blue-shade-100 rounded-full font-bold text-white py-2 px-3 text-xs cursor-pointer">
                     <a
-                      href={`/meeting/officehours/${data.meetingId}/lobby`}
+                      // href={`/meeting/officehours/${data.meetingId}/lobby`}
+                      href={`${MEETING_URL}/officehours/${data.meetingId}/lobby`}
                       rel="noopener noreferrer"
                       onClick={() => setStartLoading(true)}
                     >

@@ -20,6 +20,7 @@ import { Oval } from "react-loader-spinner";
 import toast, { Toaster } from "react-hot-toast";
 import SessionTileSkeletonLoader from "@/components/SkeletonLoader/SessionTileSkeletonLoader";
 import { headers } from "next/headers";
+import { MEETING_URL } from "@/config/constants";
 
 interface SessionDetail {
   img: any;
@@ -221,7 +222,8 @@ function UserUpcomingHours() {
               className="flex p-5 rounded-[2rem] justify-between"
               style={{
                 boxShadow: "0px 4px 26.7px 0px rgba(0, 0, 0, 0.10)",
-              }}>
+              }}
+            >
               <div className="flex">
                 <Image
                   src={data.img}
@@ -267,7 +269,8 @@ function UserUpcomingHours() {
                       style={{
                         backgroundColor: "rgba(217, 217, 217, 0.42)",
                       }}
-                      onClick={() => null}>
+                      onClick={() => null}
+                    >
                       <FaRegShareFromSquare color="#3e3d3d" size={13} />
                     </span>
                   </Tooltip>
@@ -277,7 +280,8 @@ function UserUpcomingHours() {
                       style={{
                         backgroundColor: "rgba(217, 217, 217, 0.42)",
                       }}
-                      onClick={onOpen}>
+                      onClick={onOpen}
+                    >
                       <FiEdit color="#3e3d3d" size={13} />
                     </span>
                   </Tooltip>
@@ -288,16 +292,19 @@ function UserUpcomingHours() {
                       style={{
                         backgroundColor: "rgba(217, 217, 217, 0.42)",
                       }}
-                      onClick={() => handleDelete(index)}>
+                      onClick={() => handleDelete(index)}
+                    >
                       <RiDeleteBin5Line color="#3e3d3d" size={13} />
                     </span>
                   </Tooltip>
                 </div>
                 <div className="text-center bg-blue-shade-100 rounded-full font-bold text-white py-2 px-3 text-xs cursor-pointer">
                   <a
-                    href={`/meeting/officehours/${data.meetingId}/lobby`}
+                    // href={`/meeting/officehours/${data.meetingId}/lobby`}
+                    href={`${MEETING_URL}/officehours/${data.meetingId}/lobby`}
                     rel="noopener noreferrer"
-                    onClick={() => setStartLoading(true)}>
+                    onClick={() => setStartLoading(true)}
+                  >
                     {startLoading ? (
                       <>
                         <Oval
@@ -319,7 +326,8 @@ function UserUpcomingHours() {
                 isOpen={isOpen}
                 onOpenChange={onOpenChange}
                 className="font-poppins"
-                size="3xl">
+                size="3xl"
+              >
                 <ModalContent>
                   {(onClose) => (
                     <>
@@ -363,7 +371,8 @@ function UserUpcomingHours() {
                           <select
                             value={selectedTime || "Time"}
                             onChange={handleTimeChange}
-                            className="outline-none bg-[#D9D9D945] rounded-md px-2 py-2 text-sm ml-1 w-1/5">
+                            className="outline-none bg-[#D9D9D945] rounded-md px-2 py-2 text-sm ml-1 w-1/5"
+                          >
                             <option disabled>Time</option>
                             {timeOptions.map((time) => (
                               <option key={time} value={time}>

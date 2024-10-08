@@ -33,6 +33,7 @@ import {
 import { IoCopy } from "react-icons/io5";
 import { useAccount } from "wagmi";
 import { SessionInterface } from "@/types/MeetingTypes";
+import { MEETING_URL } from "@/config/constants";
 
 type Attendee = {
   attendee_address: string;
@@ -222,7 +223,8 @@ function EventTile({ tileIndex, data: initialData, isEvent }: TileProps) {
 
     if (timeDifference <= 300000) {
       setStartLoading(true);
-      router.push(`/meeting/session/${data.meetingId}/lobby`);
+      // router.push(`/meeting/session/${data.meetingId}/lobby`);
+      router.push(`${MEETING_URL}/session/${data.meetingId}/lobby`);
     } else {
       toast.error(
         "The meeting can only be started 5 minutes before the meeting time."
@@ -410,7 +412,8 @@ function EventTile({ tileIndex, data: initialData, isEvent }: TileProps) {
                         onClick={() => {
                           setStartLoading(true);
                           router.push(
-                            `/meeting/session/${data.meetingId}/lobby`
+                            // `/meeting/session/${data.meetingId}/lobby`
+                            `${MEETING_URL}/session/${data.meetingId}/lobby`
                           );
                           // handleJoinClick();
                         }}
@@ -490,7 +493,8 @@ function EventTile({ tileIndex, data: initialData, isEvent }: TileProps) {
               <div
                 onClick={() => {
                   setStartLoading(true);
-                  router.push(`/meeting/session/${data.meetingId}/lobby`);
+                  // router.push(`/meeting/session/${data.meetingId}/lobby`);
+                  router.push(`${MEETING_URL}/session/${data.meetingId}/lobby`);
                   // handleJoinClick();
                 }}
                 className="text-center rounded-full font-bold text-white mt-2 text-xs cursor-pointer"
