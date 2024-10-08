@@ -15,7 +15,7 @@ function QuickLinks({ daoName }: { daoName: string }) {
         <DropdownMenuTrigger asChild>
           <Button className="bg-white hover:bg-white">
             <div className="flex gap-2 items-center">
-              <div className="bg-blue-shade-200 p-2 rounded-lg">
+              <div className="bg-gray-600/50 hover:bg-gray-600 p-2 rounded-lg">
                 <PiLinkSimpleBold
                   className="text-white"
                   size={24}

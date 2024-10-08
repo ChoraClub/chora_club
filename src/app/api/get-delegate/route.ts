@@ -31,7 +31,7 @@ export const GET = async (req: NextRequest) => {
     const dao = searchParams.get("dao");
     const skip = parseInt(searchParams.get("skip") || "0", 0);
     const UNIQUE_DELEGATES_COUNT = 20;
-    const FETCH_SIZE = 1000;
+    const FETCH_SIZE = 100;
     let uniqueDelegates = new Map();
     let hasMore = true;
     let newSkip = skip;
@@ -48,7 +48,7 @@ export const GET = async (req: NextRequest) => {
           .query(DELEGATE_QUERY, { first: FETCH_SIZE, skip: newSkip })
           .toPromise();
       }
-      const delegateChangeds = data.data.delegates;
+      const delegateChangeds = data?.data?.delegates;
 
       if (delegateChangeds.length < FETCH_SIZE) {
         hasMore = false;

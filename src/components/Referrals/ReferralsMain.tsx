@@ -4,74 +4,67 @@ import { useSession } from "next-auth/react";
 import React, { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 import InviteCreators from "./InviteCreators";
-import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
-import { TailSpin } from "react-loader-spinner";
-import Image from "next/image";
-import logo from "@/assets/images/daos/CCLogo2.png";
+import { Oval, TailSpin } from "react-loader-spinner";
 import MobileResponsiveMessage from "../MobileResponsiveMessage/MobileResponsiveMessage";
-import RewardButton from "../ClaimReward/RewardButton";
+import ConnectYourWallet from "../ComponentUtils/ConnectYourWallet";
+import { useConnection } from "@/app/hooks/useConnection";
 
 function ReferralsMain() {
-  const { address, isConnected } = useAccount();
-  const { data: session } = useSession();
-  const [pageLoading, setPageLoading] = useState(true);
+  const { address } = useAccount();
+  const { isConnected, isLoading, isSessionLoading, isPageLoading, isReady } =
+    useConnection();
 
-  useEffect(() => {
-    setPageLoading(false);
-  }, [isConnected, session]);
+  const renderContent = () => {
+    if (isPageLoading) {
+      return (
+        <div className="flex items-center justify-center h-screen">
+          <TailSpin
+            visible={true}
+            height="40"
+            width="40"
+            color="#0356fc"
+            ariaLabel="tail-spin-loading"
+            radius="1"
+          />
+          <p className="ml-4 text-black">Loading...</p>
+        </div>
+      );
+    }
+
+    if (isSessionLoading) {
+      return (
+        <div className="flex items-center justify-center h-screen">
+          <Oval
+            visible={true}
+            height="40"
+            width="40"
+            color="#0500FF"
+            secondaryColor="#cdccff"
+            ariaLabel="oval-loading"
+          />
+          <p className="ml-4 text-black">Loading...</p>
+        </div>
+      );
+    }
+
+    if (!isConnected) {
+      return <ConnectYourWallet />;
+    }
+
+    if (isReady) {
+      return <InviteCreators userAddress={address} />;
+    }
+
+    return (
+      <div className="text-black">Something went wrong. Please try again.</div>
+    );
+  };
 
   return (
     <>
-      {/* For Mobile Screen */}
       <MobileResponsiveMessage />
 
-      {/* For Desktop Screen  */}
-      <div className="hidden md:block font-poppins">
-        {/* <div className="w-full flex justify-end pt-2 xs:pt-4 sm:pt-6 px-4 md:px-6 lg:px-14">
-          <div className="flex gap-1 xs:gap-2 items-center">
-            <RewardButton />
-            <ConnectWalletWithENS />
-          </div>
-        </div> */}
-        {!pageLoading ? (
-          isConnected && session !== null ? (
-            <>
-              <InviteCreators userAddress={address} />
-            </>
-          ) : (
-            <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-r from-blue-50 via-blue-100 to-blue-50">
-              <div className="p-10 bg-white rounded-3xl shadow-xl text-center max-w-md transform transition duration-300 hover:scale-105">
-                <div className="flex items-center justify-center mb-5">
-                  <Image src={logo} alt="image" width={100} />
-                </div>
-                <h2 className="font-bold text-3xl text-gray-900 mb-4">
-                  Connect Your Wallet
-                </h2>
-                <p className="text-gray-700 mb-8">
-                  To continue, please connect your wallet to invite your
-                  friends.
-                </p>
-                <div className="flex items-center justify-center">
-                  <ConnectWalletWithENS />
-                </div>
-              </div>
-            </div>
-          )
-        ) : (
-          <div className="flex items-center justify-center h-screen">
-            <TailSpin
-              visible={true}
-              height="80"
-              width="80"
-              color="#FFFFFF"
-              ariaLabel="tail-spin-loading"
-              radius="1"
-              wrapperStyle={{}}
-              wrapperClass=""
-            />
-          </div>
-        )}
-      </div>
+      <div className="hidden md:block font-poppins">{renderContent()}</div>
     </>
   );
 }

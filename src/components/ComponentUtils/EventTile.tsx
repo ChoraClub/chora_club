@@ -14,12 +14,10 @@ import text1 from "@/assets/images/daos/texture1.png";
 import text2 from "@/assets/images/daos/texture2.png";
 import oplogo from "@/assets/images/daos/op.png";
 import arblogo from "@/assets/images/daos/arbitrum.jpg";
-
-// import { getEnsName } from "../ConnectWallet/ENSResolver";
 import logo from "@/assets/images/daos/CCLogo.png";
 import user1 from "@/assets/images/user/user1.svg";
 import { BsPersonVideo3 } from "react-icons/bs";
-import { fetchEnsAvatar } from "@/utils/ENSUtils";
+import { fetchEnsNameAndAvatar } from "@/utils/ENSUtils";
 import styles from "./Button.module.css";
 import {
   Modal,
@@ -98,7 +96,7 @@ function EventTile({ tileIndex, data: initialData, isEvent }: TileProps) {
         setLoadingEnsData(true);
 
         // Fetch host ENS data
-        const hostEnsData = await fetchEnsAvatar(
+        const hostEnsData = await fetchEnsNameAndAvatar(
           data.host_address.toLowerCase()
         );
         setEnsHostName(
@@ -108,7 +106,7 @@ function EventTile({ tileIndex, data: initialData, isEvent }: TileProps) {
 
         // Fetch guest ENS data if available
         if (data.attendees[0]?.attendee_address) {
-          const guestEnsData = await fetchEnsAvatar(
+          const guestEnsData = await fetchEnsNameAndAvatar(
             data.attendees[0].attendee_address.toLowerCase()
           );
           setEnsGuestName(
@@ -135,8 +133,6 @@ function EventTile({ tileIndex, data: initialData, isEvent }: TileProps) {
   const formatWalletAddress = (address: any) => {
     if (typeof address !== "string" || address.length <= 10) return address;
     return address.slice(0, 6) + "..." + address.slice(-4);
-    // const ensName = getEnsName(address.toLowerCase());
-    // return ensName;
   };
 
   const formatSlotTimeToLocal = (slotTime: any) => {

@@ -1,4 +1,4 @@
-import { getEnsName } from "./ENSUtils";
+import { fetchEnsName } from "./ENSUtils";
 import { truncateAddress } from "./text";
 
 export function formatTimestampOrDate(timestamp: string | number) {
@@ -32,7 +32,7 @@ export function formatTimestampOrDate(timestamp: string | number) {
 export async function getDisplayNameOrAddr(userAddress: string) {
   try {
     // Attempt to get the ENS name or address
-    const ensNameOrUserAddress = await getEnsName(userAddress);
+    const ensNameOrUserAddress = await fetchEnsName(userAddress);
 
     // Check if an ENS name is returned
     if (ensNameOrUserAddress?.ensNameOrAddress) {

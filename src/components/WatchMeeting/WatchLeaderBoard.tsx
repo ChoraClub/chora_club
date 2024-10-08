@@ -24,7 +24,7 @@ import {
   DynamicAttendeeInterface,
   SessionInterface,
 } from "@/types/MeetingTypes";
-import { fetchEnsAvatar } from "@/utils/ENSUtils";
+import { fetchEnsNameAndAvatar } from "@/utils/ENSUtils";
 
 // Define interfaces
 interface Attendee extends DynamicAttendeeInterface {
@@ -68,7 +68,7 @@ const WatchLeaderBoard = ({
         const top = await Promise.all(
           leaderBoardData.TopTen?.slice(0, 3).map(
             async (holder: any, index: number) => {
-              const ensDetails = await fetchEnsAvatar(holder.user);
+              const ensDetails = await fetchEnsNameAndAvatar(holder.user);
               return {
                 smallEmoji: [emoji1, emoji2, emoji3][index],
                 text: `Top #${index + 1}`,
@@ -88,9 +88,9 @@ const WatchLeaderBoard = ({
 
         const special = await Promise.all([
           leaderBoardData.firstCollector &&
-            fetchEnsAvatar(leaderBoardData.firstCollector.user),
+            fetchEnsNameAndAvatar(leaderBoardData.firstCollector.user),
           leaderBoardData.latestCollector &&
-            fetchEnsAvatar(leaderBoardData.latestCollector.user),
+            fetchEnsNameAndAvatar(leaderBoardData.latestCollector.user),
         ]);
 
         const specialEntries = [
@@ -129,7 +129,7 @@ const WatchLeaderBoard = ({
         // Prepare all entries for the popup
         const all = await Promise.all(
           leaderBoardData.TopTen?.map(async (holder: any, index: number) => {
-            const ensDetails = await fetchEnsAvatar(holder.user);
+            const ensDetails = await fetchEnsNameAndAvatar(holder.user);
             return {
               smallEmoji: [emoji1, emoji2, emoji3, emoji4, emoji5][index % 5],
               text: index < 3 ? `Top #${index + 1}` : `#${index + 1}`,

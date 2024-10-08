@@ -9,7 +9,7 @@ import { Tooltip } from "@nextui-org/react";
 import copy from "copy-to-clipboard";
 import toast, { Toaster } from "react-hot-toast";
 import { useEffect, useState } from "react";
-import { fetchEnsAvatar } from "@/utils/ENSUtils";
+import { fetchEnsNameAndAvatar } from "@/utils/ENSUtils";
 import style from "./FollowingModal.module.css";
 import oplogo from "@/assets/images/daos/op.png";
 import arbcir from "@/assets/images/daos/arb.png";
@@ -91,7 +91,7 @@ function FollowingModal({
       );
       const names = await Promise.all(
         addresses.map(async (address: any) => {
-          const ensNames = await fetchEnsAvatar(address);
+          const ensNames = await fetchEnsNameAndAvatar(address);
           const ensName = ensNames?.ensName;
 
           return { address, ensName };
@@ -105,13 +105,13 @@ function FollowingModal({
       setEnsNames(ensNameMap);
     };
 
-    const fetchEnsAvatars = async () => {
+    const fetchEnsNameAndAvatars = async () => {
       const addresses = userFollowings.map(
         (user: any) => user.follower_address
       );
       const avatars = await Promise.all(
         addresses.map(async (address: any) => {
-          const ensAvatars = await fetchEnsAvatar(address);
+          const ensAvatars = await fetchEnsNameAndAvatar(address);
           const avatar = ensAvatars?.avatar;
 
           return { address, avatar };
@@ -128,7 +128,7 @@ function FollowingModal({
       fetchEnsNames();
     }
     if (userFollowings.length > 0) {
-      fetchEnsAvatars();
+      fetchEnsNameAndAvatars();
     }
   }, [userFollowings]);
   return (

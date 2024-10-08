@@ -31,9 +31,12 @@ function AttestationModal({
   const { address } = useAccount();
 
   useEffect(() => {
-    const storedStatus = localStorage.getItem("meetingData");
+    const storedStatus = sessionStorage.getItem("meetingData");
     if (storedStatus) {
-      localStorage.removeItem("meetingData");
+      const parsedStatus = JSON.parse(storedStatus);
+      if (parsedStatus.meetingId === meetingId) {
+        sessionStorage.removeItem("meetingData");
+      }
     }
   }, []);
 
