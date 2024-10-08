@@ -5,21 +5,23 @@ import Image, { StaticImageData } from "next/image";
 import search from "@/assets/images/daos/search.png";
 import { useRouter } from "next-nprogress-bar";
 import { ImCross } from "react-icons/im";
-import { FaCirclePlus } from "react-icons/fa6";
-import Link from "next/link";
 import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
 import { dao_details } from "@/config/daoDetails";
-import ExploreDaosSkeletonLoader from "../SkeletonLoader/ExploreDaosSkeletonLoader";
-import { CiSearch } from "react-icons/ci";
 import SidebarMainMobile from "../MainSidebar/SidebarMainMobile";
 import RewardButton from "../ClaimReward/RewardButton";
 import { useSearchParams } from "next/navigation";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
-import Heading from "../ComponentUtils/Heading";
 import { useConnection } from "@/app/hooks/useConnection";
 import { useAccount } from "wagmi";
+import Link from "next/link";
+import { CiSearch } from "react-icons/ci";
+import { FaCirclePlus } from "react-icons/fa6";
+import { motion } from "framer-motion";
+import ExploreDaosSkeletonLoader from "../SkeletonLoader/ExploreDaosSkeletonLoader";
+import Heading from "../ComponentUtils/Heading";
+import PageBackgroundPattern from "@/components/ComponentUtils/PageBackgroundPattern";
 
-function ExploreDAOs() {
+const ExploreDAOs = () => {
   const dao_info = Object.keys(dao_details).map((key) => {
     const dao = dao_details[key];
     return {
@@ -34,7 +36,6 @@ function ExploreDAOs() {
   const [status, setStatus] = useState(true);
   const router = useRouter();
   const [showNotification, setShowNotification] = useState(true);
-  // const [isPageLoading, setIsPageLoading] = useState(true);
   const [isHovered, setIsHovered] = useState(false);
   const [openSearch, setOpenSearch] = useState(false);
   const searchParams = useSearchParams();
@@ -90,104 +91,120 @@ function ExploreDAOs() {
   }, [searchParams]);
 
   return (
-    <div className="pt-2 xs:pt-4 sm:pt-6 px-4 md:px-6 lg:px-14 min-h-screen">
-      <div className="relative">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-200 relative overflow-hidden">
+      <PageBackgroundPattern />
+      <div className="relative container mx-auto px-4 py-8">
         <Heading />
 
-        <div
-          className={`flex items-center rounded-full shadow-lg bg-gray-100 text-black cursor-pointer w-[300px] xs:w-[365px]`}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="mt-8 mb-12 text-center"
         >
-          <CiSearch
-            className={`text-base transition-all duration-700 ease-in-out ml-3`}
-          />
-          <input
-            type="text"
-            placeholder="Search DAOs"
-            className="w-[100%] pl-2 pr-4 py-1.5 font-poppins md:py-2 text-sm bg-transparent outline-none"
-            value={searchQuery}
-            onChange={(e) => handleSearchChange(e.target.value)}
-            onClick={(e) => e.stopPropagation()}
-          />
-        </div>
+          <h2 className="text-3xl font-bold text-gray-800 mb-4">
+            Explore Decentralized Autonomous Organizations
+          </h2>
+          <p className="text-xl text-gray-600">
+            Discover, connect, and engage with innovative DAOs across various
+            domains
+          </p>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+          className="flex justify-center mb-8"
+        >
+          <div className="flex items-center rounded-full shadow-lg bg-white text-black cursor-pointer w-full max-w-md">
+            <CiSearch className="text-xl text-gray-500 ml-4" />
+            <input
+              type="text"
+              placeholder="Search DAOs"
+              className="w-full pl-3 pr-4 py-3 font-poppins text-base bg-transparent outline-none"
+              value={searchQuery}
+              onChange={(e) => handleSearchChange(e.target.value)}
+            />
+          </div>
+        </motion.div>
 
         {isPageLoading ? (
           <ExploreDaosSkeletonLoader />
         ) : (
-          <>
-            <div className="flex flex-wrap justify-center md:justify-normal gap-4 md:gap-6 lg:gap-8 py-8 font-poppins">
-              {daoInfo.length > 0 ? (
-                daoInfo.map((daos: any, index: any) => (
-                  <div
-                    key={daos.name}
-                    style={{
-                      boxShadow: "0px 4px 50.8px 0px rgba(0, 0, 0, 0.11)",
-                    }}
-                    className="w-[calc(100%-2rem)] max-w-[280px]  sm:w-[calc(50%-1rem)] md:w-[calc(33.333%-1rem)] lg:w-[calc(25%-1rem)] 2xl:w-[calc(20%-1rem)] px-4 py-6 rounded-2xl cursor-pointer flex flex-col items-center justify-center transition-transform duration-300 ease-in-out hover:shadow-2xl hover:scale-105"
-                    onClick={() => handleClick(daos.name, daos.img)}
-                  >
-                    <div className="flex justify-center mb-4 transition-transform duration-300 ease-in-out hover:scale-110">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.8 }}
+            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-6 "
+          >
+            {daoInfo.length > 0 ? (
+              daoInfo.map((dao: any) => (
+                <motion.div
+                  key={dao.name}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="bg-white rounded-xl shadow-lg overflow-hidden cursor-pointer"
+                  onClick={() => handleClick(dao.name, dao.img)}
+                >
+                  <div className="p-6">
+                    <div className="flex justify-center mb-4">
                       <Image
-                        src={daos.img}
-                        alt="Image not found"
-                        width={300}
-                        height={300}
-                        className="rounded-full w-16 h-16 md:w-20 md:h-20"
+                        src={dao.img}
+                        alt={dao.name}
+                        width={200}
+                        height={200}
+                        className="rounded-full h-20 w-20"
                         quality={100}
-                        loading={`lazy`}
-                      ></Image>
+                        loading="lazy"
+                      />
                     </div>
-                    <div className="text-center">
-                      <div className="font-semibold capitalize text-sm md:text-base mb-2">
-                        {daos.name}
-                      </div>
-                      <div className="text-xs md:text-sm bg-[#F2F2F2] py-2 px-3 rounded-md ">
-                        {daos.value} Participants
-                      </div>
+                    <h3 className="font-semibold text-lg text-center mb-2 capitalize">
+                      {dao.name}
+                    </h3>
+                    <div className="text-sm text-center bg-gray-100 py-2 px-3 rounded-full">
+                      {dao.value} Participants
                     </div>
                   </div>
-                ))
-              ) : (
-                <div className="w-full text-center text-xl font-semibold">
-                  No such Dao available
-                </div>
-              )}
-              <div
-                onMouseEnter={() => setIsHovered(true)}
-                onMouseLeave={() => setIsHovered(false)}
-                style={{ boxShadow: "0px 4px 50.8px 0px rgba(0, 0, 0, 0.11)" }}
-                className={`w-[calc(100%-2rem)] max-w-[280px] sm:w-[calc(50%-1rem)] md:w-[calc(33.333%-1rem)] lg:w-[calc(25%-1rem)] 2xl:w-[calc(20%-1rem)] px-4 py-6 rounded-2xl cursor-pointer flex items-center justify-center relative transition-all duration-250 ease-in-out h-[188px] md:h-[220px] ${
-                  isHovered ? "border-2 border-gray-600" : ""
-                }`}
+                </motion.div>
+              ))
+            ) : (
+              <div className="col-span-full text-center text-xl font-semibold text-gray-600">
+                No DAOs available for the selected category
+              </div>
+            )}
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onMouseEnter={() => setIsHovered(true)}
+              onMouseLeave={() => setIsHovered(false)}
+              className="bg-white rounded-xl shadow-lg overflow-hidden cursor-pointer flex items-center justify-center h-[220px]"
+            >
+              <Link
+                href="https://app.deform.cc/form/a401a65c-73c0-49cb-8d96-63e36ef36f88"
+                target="_blank"
+                className="w-full h-full flex items-center justify-center relative"
               >
-                <div className="relative w-full h-full flex items-center justify-center">
-                  <FaCirclePlus
-                    size={50}
-                    className={`md:text-[70px]
-                      ${
-                        isHovered
-                          ? "blur-md transition-all duration-250 ease-in-out text-slate-300"
-                          : "block transition-all duration-250 ease-in-out text-slate-300"
-                      }`}
-                  />
-                </div>
-                <Link
-                  href={`https://app.deform.cc/form/a401a65c-73c0-49cb-8d96-63e36ef36f88`}
-                  target="_blank"
-                  className={`absolute inset-0 flex items-center justify-center   ${
-                    isHovered ? "block" : "hidden"
+                <FaCirclePlus
+                  size={50}
+                  className={`text-[#b1b1b1] transition-all duration-200 ${
+                    isHovered ? "opacity-20" : "opacity-100"
+                  }`}
+                />
+                <span
+                  className={`absolute inset-0 flex items-center justify-center text-lg font-semibold text-blue-600 transition-opacity duration-200 ${
+                    isHovered ? "opacity-100" : "opacity-0"
                   }`}
                 >
-                  <span className="text-lg md:text-xl font-semibold text-slate-800 px-2 text-center">
-                    Add your DAO
-                  </span>
-                </Link>
-              </div>
-            </div>
-          </>
+                  Add your DAO
+                </span>
+              </Link>
+            </motion.div>
+          </motion.div>
         )}
       </div>
     </div>
   );
-}
+};
 
 export default ExploreDAOs;

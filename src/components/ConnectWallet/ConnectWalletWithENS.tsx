@@ -186,7 +186,7 @@ function ConnectWalletWithENS() {
                         xmlns="http://www.w3.org/2000/svg"
                         viewBox="-168.3 -168.3 666.60 666.60"
                         transform="rotate(180)"
-                        stroke="#000000"
+                        stroke="#9c9c9c"
                         stroke-width="33.0002"
                       >
                         <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
@@ -234,6 +234,7 @@ function ConnectWalletWithENS() {
                           paddingTop: "6px",
                           paddingBottom: "6px",
                           margin: "1px",
+                          backgroundColor: "#ffffff",
                         }}
                       >
                         {account.ensAvatar && (
