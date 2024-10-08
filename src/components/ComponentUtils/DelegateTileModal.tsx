@@ -132,9 +132,9 @@ function DelegateTileModal({
               addressCheck
                 ? "bg-grey-shade-50 text-grey"
                 : "bg-black text-white hover:bg-blue-shade-100"
-            }`}
+            } ${delegatingToAddr ? "bg-blue-shade-100" : ""}`}
             onClick={handleDelegateVotes}
-            disabled={addressCheck}
+            disabled={addressCheck || delegatingToAddr}
           >
             {addressCheck ? (
               "You cannot delegate to the same address again"
