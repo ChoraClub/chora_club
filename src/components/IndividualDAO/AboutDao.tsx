@@ -1,73 +1,75 @@
 import React from "react";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import {
   FaEnvelope,
   FaGithub,
   FaGlobe,
   FaBalanceScale,
   FaBook,
+  FaDiscord,
 } from "react-icons/fa";
-import about from "../../utils/about_dao.json";
-import { FaBridge, FaDiscord, FaTwitter } from "react-icons/fa6";
+import { FaBridge, FaXTwitter } from "react-icons/fa6";
 import { GoMirror } from "react-icons/go";
 import { SiHiveBlockchain } from "react-icons/si";
+import about from "../../utils/about_dao.json";
 
-function AboutDao({ props }: any) {
+const AboutDao = ({ props }: any) => {
   const text = props === "arbitrum" ? about.arbitrum : about.optimism;
-  const links =
-    props === "arbitrum"
+  const links = [
+    {
+      name: "Website",
+      icon: FaGlobe,
+      href: text.community_and_resources.website,
+      color: "text-blue-500",
+    },
+    {
+      name: "Governance",
+      icon: FaBalanceScale,
+      href: text.community_and_resources.governance,
+      color: "text-purple-600",
+    },
+    {
+      name: "Forum",
+      icon: FaEnvelope,
+      href: text.community_and_resources.forum,
+      color: "text-[#36b0f7]",
+    },
+    {
+      name: "Bridge",
+      icon: FaBridge,
+      href: text.community_and_resources.bridge,
+      color: "text-[#000]",
+    },
+    {
+      name: "Docs",
+      icon: FaBook,
+      href: text.community_and_resources.docs,
+      color: "text-gray-700",
+    },
+    {
+      name: "GitHub",
+      icon: FaGithub,
+      href: text.community_and_resources.github,
+      color: "text-[#000]",
+    },
+    {
+      name: "Discord",
+      icon: FaDiscord,
+      href: text.community_and_resources.discord,
+      color: "text-[#5865F2]",
+    },
+    {
+      name: "Block Explorer",
+      icon: SiHiveBlockchain,
+      href: text.community_and_resources.block_explorer,
+      color: "text-[#000]",
+    },
+    ...(props === "arbitrum"
       ? [
           {
-            name: "Website",
-            icon: FaGlobe,
-            href: text.community_and_resources.website,
-            color: "text-blue-500",
-          },
-          {
-            name: "Governance",
-            icon: FaBalanceScale,
-            href: text.community_and_resources.governance,
-            color: "text-purple-600",
-          },
-          {
-            name: "Forum",
-            icon: FaEnvelope,
-            href: text.community_and_resources.forum,
-            color: "text-[#36b0f7]",
-          },
-          {
-            name: "Bridge",
-            icon: FaBridge,
-            href: text.community_and_resources.bridge,
-            color: "text-[#000]",
-          },
-          {
-            name: "Docs",
-            icon: FaBook,
-            href: text.community_and_resources.docs,
-            color: "text-gray-700",
-          },
-          {
-            name: "GitHub",
-            icon: FaGithub,
-            href: text.community_and_resources.github,
-            color: "text-[#000]",
-          },
-          {
-            name: "Discord",
-            icon: FaDiscord,
-            href: text.community_and_resources.discord,
-            color: "text-[#5865F2]",
-          },
-          {
-            name: "Block Explorer",
-            icon: SiHiveBlockchain,
-            href: text.community_and_resources.block_explorer,
-            color: "text-[#000]",
-          },
-          {
             name: "Twitter",
-            icon: FaTwitter,
+            icon: FaXTwitter,
             href:
               "arbitrum" in text.community_and_resources.twitter
                 ? text.community_and_resources.twitter.arbitrum
@@ -76,7 +78,7 @@ function AboutDao({ props }: any) {
           },
           {
             name: "DAO Twitter",
-            icon: FaTwitter,
+            icon: FaXTwitter,
             href:
               "dao" in text.community_and_resources.twitter
                 ? text.community_and_resources.twitter.dao
@@ -85,36 +87,6 @@ function AboutDao({ props }: any) {
           },
         ]
       : [
-          {
-            name: "Website",
-            icon: FaGlobe,
-            href: text.community_and_resources.website,
-            color: "text-blue-500",
-          },
-          {
-            name: "Governance",
-            icon: FaBalanceScale,
-            href: text.community_and_resources.governance,
-            color: "text-purple-600",
-          },
-          {
-            name: "Forum",
-            icon: FaEnvelope,
-            href: text.community_and_resources.forum,
-            color: "text-[#36b0f7]",
-          },
-          {
-            name: "Bridge",
-            icon: FaBridge,
-            href: text.community_and_resources.bridge,
-            color: "text-[#000]",
-          },
-          {
-            name: "Docs",
-            icon: FaBook,
-            href: text.community_and_resources.docs,
-            color: "text-gray-700",
-          },
           {
             name: "Mirror",
             icon: GoMirror,
@@ -125,26 +97,8 @@ function AboutDao({ props }: any) {
             color: "text-[#000]",
           },
           {
-            name: "GitHub",
-            icon: FaGithub,
-            href: text.community_and_resources.github,
-            color: "text-[#000]",
-          },
-          {
-            name: "Discord",
-            icon: FaDiscord,
-            href: text.community_and_resources.discord,
-            color: "text-[#5865F2]",
-          },
-          {
-            name: "Block Explorer",
-            icon: SiHiveBlockchain,
-            href: text.community_and_resources.block_explorer,
-            color: "text-[#000]",
-          },
-          {
             name: "Twitter",
-            icon: FaTwitter,
+            icon: FaXTwitter,
             href:
               "optimism" in text.community_and_resources.twitter
                 ? text.community_and_resources.twitter.optimism
@@ -153,127 +107,151 @@ function AboutDao({ props }: any) {
           },
           {
             name: "Gov Twitter",
-            icon: FaTwitter,
+            icon: FaXTwitter,
             href:
               "gov" in text.community_and_resources.twitter
                 ? text.community_and_resources.twitter.gov
                 : "",
             color: "text-[#1DA1F2]",
           },
-        ];
+        ]),
+  ];
+
+  const fadeInUp = {
+    initial: { opacity: 0, y: 20 },
+    animate: { opacity: 1, y: 0 },
+    transition: { duration: 0.6 },
+  };
 
   return (
-    <>
-      <div className="container mx-auto px-4 py-8">
-        <h2 className="text-2xl font-semibold mb-4 text-blue-shade-100">
+    <div className="container mx-auto px-4 py-12 bg-gradient-to-b from-gray-50 to-white">
+      <motion.h1
+        className="text-4xl font-bold mb-8 text-center text-blue-600"
+        {...fadeInUp}
+      >
+        About {props === "arbitrum" ? "Arbitrum" : "Optimism"} DAO
+      </motion.h1>
+
+      <motion.section className="mb-16" {...fadeInUp}>
+        <h2 className="text-3xl font-semibold mb-6 text-blue-800">
           Mission and Vision
         </h2>
-        <div className="bg-gray-50 shadow-md rounded-lg p-8 mb-10 ">
-          <div className="mb-4 ms-8">
-            <h2 className="text-lg font-semibold mb-2">Mission:</h2>
-            <ul className="list-disc pl-8 ">
-              <li className=" ">{text.mission_and_vision.mission}</li>
-            </ul>
+        <div className="bg-white shadow-lg rounded-lg p-8">
+          <div className="mb-6">
+            <h3 className="text-xl font-semibold mb-3 text-blue-700">
+              Mission:
+            </h3>
+            <p className="text-gray-700">{text.mission_and_vision.mission}</p>
           </div>
-          <div className="ms-8">
-            <h2 className="text-lg font-semibold mb-2">Vision:</h2>
-            <ul className="list-disc pl-8">
+          <div>
+            <h3 className="text-xl font-semibold mb-3 text-blue-700">
+              Vision:
+            </h3>
+            <ul className="list-disc pl-6 space-y-2">
               {text.mission_and_vision.vision.map((item, index) => (
-                <li key={index} className="mb-1">
+                <li key={index} className="text-gray-700">
                   {item}
                 </li>
               ))}
             </ul>
           </div>
         </div>
-        <div>
-          <h2 className="text-2xl font-semibold mt-5 mb-5 text-blue-shade-100">
-            Technology
-          </h2>
-          <div className="bg-gray-50 shadow-md rounded-lg p-8 mb-10 ps-8">
-            <div className="ms-8">
-              <p className="mb-2">{text.technology.description}</p>
-              <ul className="list-disc pl-8">
-                {props === "arbitrum"
-                  ? (
-                      text.technology.features as {
-                        name: string;
-                        description: string;
-                      }[]
-                    ).map((item, index) => (
-                      <li key={index} className="mb-2">
-                        <p className="font-semibold">{item.name}:</p>
-                        <p>{item.description}</p>
-                      </li>
-                    ))
-                  : (text.technology.features as string[]).map(
-                      (item, index) => (
-                        <li key={index} className="mb-1">
-                          {item}
-                        </li>
-                      )
-                    )}
-              </ul>
-            </div>
-          </div>
-        </div>
-        <div>
-          <h2 className="text-2xl font-semibold mt-5 mb-5 text-blue-shade-100">
-            Governance and DAO Structure
-          </h2>
-          <div className="bg-gray-50 shadow-md rounded-lg p-8 mb-10 ">
-            <div className="ms-8">
-              <p className="mb-2">
-                {text.governance_and_dao_structure.description}
-              </p>
-              <ul className="list-disc pl-8">
-                {props === "arbitrum"
-                  ? (
-                      text.governance_and_dao_structure as {
-                        elements: { name: string; details: string }[];
-                      }
-                    ).elements.map((element, index) => (
-                      <li key={index} className="mb-2">
-                        <p className="font-semibold">{element.name}:</p>
-                        <p>{element.details}</p>
-                      </li>
-                    ))
-                  : (
-                      text.governance_and_dao_structure as {
-                        houses: { name: string; details: string }[];
-                      }
-                    ).houses.map((house, index) => (
-                      <li key={index} className="mb-2">
-                        <p className="font-semibold">{house.name}:</p>
-                        <p> {house.details}</p>
-                      </li>
-                    ))}
-              </ul>
-            </div>
-          </div>
-        </div>
+      </motion.section>
 
-        <h2 className="text-2xl font-semibold mb-8 text-blue-shade-100">
+      <motion.section className="mb-16" {...fadeInUp}>
+        <h2 className="text-3xl font-semibold mb-6 text-blue-800">
+          Technology
+        </h2>
+        <div className="bg-white shadow-lg rounded-lg p-8">
+          <p className="text-gray-700 mb-4">{text.technology.description}</p>
+          <ul className="space-y-4">
+            {props === "arbitrum"
+              ? (
+                  text.technology.features as {
+                    name: string;
+                    description: string;
+                  }[]
+                ).map((item, index) => (
+                  <li key={index} className="border-l-4 border-blue-500 pl-4">
+                    <h4 className="font-semibold text-blue-600">{item.name}</h4>
+                    <p className="text-gray-700">{item.description}</p>
+                  </li>
+                ))
+              : (text.technology.features as string[]).map((item, index) => (
+                  <li key={index} className="flex items-center">
+                    <span className="text-blue-500 mr-2">•</span>
+                    <span className="text-gray-700">{item}</span>
+                  </li>
+                ))}
+          </ul>
+        </div>
+      </motion.section>
+
+      <motion.section className="mb-16" {...fadeInUp}>
+        <h2 className="text-3xl font-semibold mb-6 text-blue-800">
+          Governance and DAO Structure
+        </h2>
+        <div className="bg-white shadow-lg rounded-lg p-8">
+          <p className="text-gray-700 mb-4">
+            {text.governance_and_dao_structure.description}
+          </p>
+          <ul className="space-y-4">
+            {props === "arbitrum"
+              ? (
+                  text.governance_and_dao_structure as {
+                    elements: { name: string; details: string }[];
+                  }
+                ).elements.map((element, index) => (
+                  <li key={index} className="border-l-4 border-purple-500 pl-4">
+                    <h4 className="font-semibold text-purple-600">
+                      {element.name}
+                    </h4>
+                    <p className="text-gray-700">{element.details}</p>
+                  </li>
+                ))
+              : (
+                  text.governance_and_dao_structure as {
+                    houses: { name: string; details: string }[];
+                  }
+                ).houses.map((house, index) => (
+                  <li key={index} className="border-l-4 border-purple-500 pl-4">
+                    <h4 className="font-semibold text-purple-600">
+                      {house.name}
+                    </h4>
+                    <p className="text-gray-700">{house.details}</p>
+                  </li>
+                ))}
+          </ul>
+        </div>
+      </motion.section>
+
+      <motion.section {...fadeInUp}>
+        <h2 className="text-3xl font-semibold mb-6 text-blue-800">
           Community and Resources
         </h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {links.map((link) => (
             <Link
               key={link.name}
-              href={link.href}
+              href={link?.href}
               target="_blank"
               rel="noopener noreferrer"
+              className="block"
             >
-              <div className="bg-gray-50 shadow-md rounded-lg p-4 flex items-center space-x-3 cursor-pointer hover:bg-gray-100 transition duration-300">
-                <link.icon className={`${link.color} text-xl`} />
-                <span className="text-gray-700">{link.name}</span>
-              </div>
+              <motion.div
+                className="bg-white shadow-md rounded-lg p-4 flex items-center space-x-3 cursor-pointer hover:bg-gray-50 transition duration-300"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <link.icon className={`${link.color} text-2xl`} />
+                <span className="text-gray-700 font-medium">{link.name}</span>
+              </motion.div>
             </Link>
           ))}
         </div>
-      </div>
-    </>
+      </motion.section>
+    </div>
   );
-}
+};
 
 export default AboutDao;

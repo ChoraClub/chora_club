@@ -10,6 +10,7 @@ import { useConnection } from "@/app/hooks/useConnection";
 import { motion } from "framer-motion";
 import { FaFire } from "react-icons/fa";
 import Heading from "../ComponentUtils/Heading";
+import { RxCross2 } from "react-icons/rx";
 
 function InviteCreators({ userAddress }: { userAddress: any }) {
   const [copied, setCopied] = useState(false);
@@ -17,6 +18,7 @@ function InviteCreators({ userAddress }: { userAddress: any }) {
   const { isConnected, isLoading, isSessionLoading, isPageLoading, isReady } =
     useConnection();
   const [earnings, setEarnings] = useState(0);
+  const [showComingSoon, setShowComingSoon] = useState(true);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(`${BASE_URL}invite/${userAddress}`);
@@ -179,6 +181,31 @@ function InviteCreators({ userAddress }: { userAddress: any }) {
               <div className="bg-gradient-to-r from-yellow-100 to-orange-100 rounded-lg p-6">
                 <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
                   <FaFire className="text-orange-500 mr-2" /> Your Earnings
+                  {showComingSoon && (
+                    <div className="flex items-center bg-[#ffffff] border border-yellow-400 rounded-full px-2 ml-4 py-1">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5 text-yellow-600"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      <p className="text-sm text-yellow-700 mx-2">
+                        Claiming feature coming soon
+                      </p>
+                      <button
+                        onClick={() => setShowComingSoon(false)}
+                        className="text-yellow-700 hover:text-yellow-800"
+                      >
+                        <RxCross2 size={12} />
+                      </button>
+                    </div>
+                  )}
                 </h3>
                 <div className="flex justify-between items-center">
                   <p className="text-gray-700">
@@ -188,7 +215,7 @@ function InviteCreators({ userAddress }: { userAddress: any }) {
                     {earnings} ETH
                   </p>
                 </div>
-                <button className="mt-4 w-full bg-black text-white py-2 rounded-md hover:bg-gray-800 transition-colors duration-200">
+                <button className="mt-4 w-full bg-black text-white py-2 rounded-md hover:bg-gray-800 transition-colors duration-200 hover:cursor-not-allowed">
                   Claim Rewards
                 </button>
               </div>
