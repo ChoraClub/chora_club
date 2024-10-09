@@ -81,6 +81,8 @@ export default function Component({ params }: { params: { roomId: string } }) {
     avatarUrl,
     isRecording,
     setIsRecording,
+    meetingRecordingStatus,
+    setMeetingRecordingStatus,
   } = useStudioState();
   const videoRef = useRef<HTMLVideoElement>(null);
   const { peerIds } = usePeerIds({
@@ -102,8 +104,8 @@ export default function Component({ params }: { params: { roomId: string } }) {
   const [notAllowedMessage, setNotAllowedMessage] = useState<string>();
   const [videoStreamTrack, setVideoStreamTrack] = useState<any>("");
   const [showFeedbackPopups, setShowFeedbackPopups] = useState(false);
-  const [meetingRecordingStatus, setMeetingRecordingStatus] =
-    useState<boolean>();
+  // const [meetingRecordingStatus, setMeetingRecordingStatus] =
+  //   useState<boolean>();
   const [currentRecordingState, setCurrentRecordingState] = useState<boolean>();
   const [showModal, setShowModal] = useState(true);
   const [meetingData, setMeetingData] = useState<any>();
@@ -294,7 +296,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
         setCurrentRecordingState(parsedStatus.recordingStatus);
       }
     }
-  }, [sessionStorage]);
+  }, [meetingRecordingStatus]);
 
   const handleModalClose = () => {
     setModalOpen(false);
@@ -400,8 +402,9 @@ export default function Component({ params }: { params: { roomId: string } }) {
   //   console.log("recordingStatus: ", recordingStatus);
   // }, [recordingStatus]);
 
-  const updateRecordingStatus = (status: boolean) => {
+  const updateRecordingStatus = (status: any) => {
     setIsRecording(status);
+    setMeetingRecordingStatus(status);
     sendData({
       to: "*",
       payload: JSON.stringify({ isRecording: status }),
@@ -428,7 +431,16 @@ export default function Component({ params }: { params: { roomId: string } }) {
   };
 
   useEffect(() => {
-    console.log("isRecording value: ", isRecording);
+    console.log("isRecording value: ", isRecording, meetingRecordingStatus);
+    // const value = meetingRecordingStatus;
+    let existingValue = sessionStorage.getItem("meetingData");
+    if (existingValue) {
+      let parsedValue = JSON.parse(existingValue);
+      console.log("parsedValue: ", parsedValue);
+      if (parsedValue.recordingStatus) {
+        updateRecordingStatus(parsedValue.recordingStatus);
+      }
+    }
     if (role === "guest") {
       sendData({
         to: "*",
@@ -437,6 +449,20 @@ export default function Component({ params }: { params: { roomId: string } }) {
       });
     }
   }, [isRecording]);
+
+  useEffect(() => {
+    if (role === "guest") {
+      const timer = setTimeout(() => {
+        sendData({
+          to: "*",
+          payload: JSON.stringify({ action: "getRecordingStatus" }),
+          label: "requestRecordingStatus",
+        });
+      }, 2000); // Delay of 2 seconds
+
+      return () => clearTimeout(timer);
+    }
+  }, [role]);
 
   return (
     <>
@@ -692,24 +718,15 @@ export default function Component({ params }: { params: { roomId: string } }) {
         />
       )}
 
-      {role === "guest" && modalOpen && (
+      {(role === "guest" && modalOpen) || (role === "host" && hostModalOpen) ? (
         <AttestationModal
-          isOpen={modalOpen}
+          isOpen={role === "guest" ? modalOpen : hostModalOpen}
           onClose={handleModalClose}
           hostAddress={hostAddress}
           meetingId={params.roomId}
           role={role}
         />
-      )}
-      {role === "host" && hostModalOpen && (
-        <AttestationModal
-          isOpen={hostModalOpen}
-          onClose={handleModalClose}
-          hostAddress={hostAddress}
-          meetingId={params.roomId}
-          role={role}
-        />
-      )}
+      ) : null}
     </>
   );
 }

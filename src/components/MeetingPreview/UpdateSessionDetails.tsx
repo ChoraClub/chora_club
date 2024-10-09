@@ -19,7 +19,7 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
     const storedStatus = sessionStorage.getItem("meetingData");
     if (storedStatus) {
       const parsedStatus = JSON.parse(storedStatus);
-      if (parsedStatus === roomId) {
+      if (parsedStatus.meetingId === roomId) {
         sessionStorage.removeItem("meetingData");
       }
     }
@@ -222,6 +222,12 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
                     sessionDetails={sessionDetails}
                   />
                   <div className="flex justify-center gap-3">
+                    <Button
+                      className="bg-blue-shade-200 rounded-full font-semibold px-10 text-white"
+                      onClick={() => setViewMode("edit")}
+                    >
+                      Continue Editing
+                    </Button>
                     <Button
                       className="bg-blue-shade-200 rounded-full font-semibold px-10 text-white"
                       onClick={() =>

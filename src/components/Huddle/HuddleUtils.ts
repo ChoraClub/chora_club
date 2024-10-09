@@ -1,4 +1,3 @@
-import { useStudioState } from "@/store/studioState";
 import { SessionInterface } from "@/types/MeetingTypes";
 import toast from "react-hot-toast";
 
@@ -171,7 +170,8 @@ export const handleRecording = async (
   roomId: string | undefined,
   address: string | undefined,
   isRecording: boolean | null,
-  setIsRecording: (val: boolean | null) => void
+  setIsRecording: (val: boolean | null) => void,
+  setMeetingRecordingStatus: (val: boolean) => void
 ) => {
   if (isRecording) {
     handleStopRecording(roomId, address, setIsRecording);
@@ -185,6 +185,8 @@ export const handleRecording = async (
       sessionStorage.setItem("meetingData", JSON.stringify(parsedValue));
     }
   } else {
+    setMeetingRecordingStatus(true);
+
     startRecording(roomId, setIsRecording);
     let existingValue = sessionStorage.getItem("meetingData");
     if (existingValue) {

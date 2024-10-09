@@ -36,6 +36,7 @@ import ConnectWalletWithENS from "@/components/ConnectWallet/ConnectWalletWithEN
 import { fetchEnsName } from "@/utils/ENSUtils";
 import { truncateAddress } from "@/utils/text";
 import { useSession } from "next-auth/react";
+import { useConnection } from "@/app/hooks/useConnection";
 
 type lobbyProps = {};
 
@@ -73,6 +74,8 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
   const [attendeeJoinedStatus, setAttendeeJoinedStatus] = useState<any>();
   const [meetingData, setMeetingData] = useState<any>();
   const { data: session } = useSession();
+  const { isConnected, isPageLoading, isSessionLoading, isReady } =
+    useConnection();
 
   useEffect(() => {
     console.log("meetingStatus", meetingStatus);
@@ -529,7 +532,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
                   </FeatCommon> */}
                   </div>
                 </div>
-                {isDisconnected && !session ? <ConnectWalletWithENS /> : null}
+                {!isConnected ? <ConnectWalletWithENS /> : null}
                 <div className="flex items-center w-full flex-col">
                   <div
                     className={`flex flex-col justify-center w-full gap-1 ${
@@ -597,15 +600,16 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
         transition-all duration-300 ease-in-out
         ${
           isLoading
-            ? "bg-gray-400 cursor-not-allowed"
+            ? "bg-gray-400"
             : "bg-gradient-to-r from-blue-600 to-blue-400 hover:from-blue-700 hover:to-blue-500"
         }
+        ${isLoading || isJoining ? "cursor-not-allowed" : "cursor-pointer"}
         transform hover:scale-105 active:scale-95
         shadow-lg hover:shadow-xl
         focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50
       `}
                     onClick={handleStartSpaces}
-                    disabled={isLoading}
+                    disabled={isLoading || isJoining}
                   >
                     <span className="mr-2">
                       {isJoining ? "Joining Spaces..." : "Start Meeting"}

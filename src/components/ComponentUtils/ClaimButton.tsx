@@ -6,7 +6,7 @@ import styles from "./Button.module.css";
 import { ethers } from "ethers";
 import { EAS } from "@ethereum-attestation-service/eas-sdk";
 import toast from "react-hot-toast";
-import confetti from 'canvas-confetti';
+import confetti from "canvas-confetti";
 
 interface ClaimButtonProps {
   meetingId: string;
@@ -16,6 +16,9 @@ interface ClaimButtonProps {
   dao: string;
   address: string;
   onChainId: string | undefined;
+  disabled: boolean;
+  onClaimStart: () => void;
+  onClaimEnd: () => void;
 }
 
 const ClaimButton: React.FC<ClaimButtonProps> = ({
@@ -26,6 +29,9 @@ const ClaimButton: React.FC<ClaimButtonProps> = ({
   dao,
   address,
   onChainId,
+  disabled,
+  onClaimStart,
+  onClaimEnd,
 }) => {
   const [isClaiming, setIsClaiming] = useState(false);
   const [isClaimed, setIsClaimed] = useState(!!onChainId);
@@ -39,22 +45,30 @@ const ClaimButton: React.FC<ClaimButtonProps> = ({
       particleCount: 100,
       spread: 70,
       origin: { y: 0.6 },
-      zIndex: 9999
+      zIndex: 9999,
     });
   };
 
   const handleAttestationOnchain = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (isClaimed || isClaiming) return;
+    if (isClaimed || isClaiming || disabled) return;
 
     setIsClaiming(true);
-    if (
-      typeof window.ethereum === "undefined" ||
-      !window.ethereum.isConnected()
-    ) {
-      console.log("not connected");
-      setIsClaiming(false);
-      return;
+    onClaimStart();
+
+    try {
+      if (
+        typeof window.ethereum === "undefined" ||
+        !window.ethereum.isConnected()
+      ) {
+        console.log("not connected");
+        setIsClaiming(false);
+        onClaimEnd();
+        return;
+      }
+    } catch (e) {
+      toast.error("Connect your wallet");
+      onClaimEnd();
     }
 
     let token = "";
@@ -149,6 +163,7 @@ const ClaimButton: React.FC<ClaimButtonProps> = ({
     } catch (error: any) {
       console.error("Error claim:", error.message);
       toast.error(`Failed to claim on-chain attestation`);
+      onClaimEnd();
     } finally {
       setIsClaiming(false);
     }
@@ -156,45 +171,47 @@ const ClaimButton: React.FC<ClaimButtonProps> = ({
 
   return (
     <>
-    <Tooltip
-      content={
-        isClaiming
-          ? "Claiming Onchain Attestation"
-          : onChainId || isClaimed
-          ? "Received Onchain Attestation"
-          : "Claim Onchain Attestation"
-      }
-      placement="top"
-      showArrow
-    >
-      <button
-        className={`${styles.button} ${
-          !!onChainId || isClaimed ? styles.claimed : ""
-        } w-full `}
-        onClick={handleAttestationOnchain}
-        disabled={!!onChainId || isClaiming || isClaimed}
+      <Tooltip
+        content={
+          isClaiming
+            ? "Claiming Onchain Attestation"
+            : onChainId || isClaimed
+            ? "Received Onchain Attestation"
+            : disabled
+            ? "Claiming in progress for another session"
+            : "Claim Onchain Attestation"
+        }
+        placement="top"
+        showArrow
       >
-        <span className={styles.buttonText}>
-          {isClaiming ? "Claiming..." : isClaimed ? "Claimed" : "Claim"}
-        </span>
-        <span className={styles.iconWrapper}>
-          {isClaiming ? (
-            <Oval
-              visible={true}
-              height="20"
-              width="20"
-              color="#fff"
-              secondaryColor="#cdccff"
-              ariaLabel="oval-loading"
-            />
-          ) : isClaimed ? (
-            <FaCheck className={styles.icon} />
-          ) : (
-            <FaGift className={styles.icon} />
-          )}
-        </span>
-      </button>
-    </Tooltip>
+        <button
+          className={`${styles.button} ${
+            !!onChainId || isClaimed ? styles.claimed : ""
+          } w-full `}
+          onClick={handleAttestationOnchain}
+          disabled={!!onChainId || isClaiming || isClaimed || disabled}
+        >
+          <span className={styles.buttonText}>
+            {isClaiming ? "Claiming..." : isClaimed ? "Claimed" : "Claim"}
+          </span>
+          <span className={styles.iconWrapper}>
+            {isClaiming ? (
+              <Oval
+                visible={true}
+                height="20"
+                width="20"
+                color="#fff"
+                secondaryColor="#cdccff"
+                ariaLabel="oval-loading"
+              />
+            ) : isClaimed ? (
+              <FaCheck className={styles.icon} />
+            ) : (
+              <FaGift className={styles.icon} />
+            )}
+          </span>
+        </button>
+      </Tooltip>
     </>
   );
 };
