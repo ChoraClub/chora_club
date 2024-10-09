@@ -1,28 +1,32 @@
-import React from 'react'
+import React from "react";
+import { motion } from "framer-motion";
 
 const ExploreDaosSkeletonLoader = () => {
   return (
-    <div className="flex flex-wrap justify-center md:justify-normal gap-4 md:gap-6 lg:gap-8 py-8 font-poppins">
-    {Array.from({ length: 3 }).map((_, index) => (
-      <div
-        key={index}
-        className="w-[calc(100%-2rem)] max-w-[280px] sm:w-[calc(50%-1rem)] md:w-[calc(33.333%-1rem)] lg:w-[calc(25%-1rem)] 2xl:w-[calc(20%-1rem)] px-4 py-6 rounded-2xl flex flex-col items-center justify-center animate-pulse bg-white"
-        style={{
-          boxShadow: "0px 4px 50.8px 0px rgba(0, 0, 0, 0.11)",
-        }}
+    <div className="container mx-auto px-4">
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
+        className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-6"
       >
-        <div className="flex justify-center mb-4">
-          <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-gray-200"></div>
-        </div>
-        <div className="flex flex-col items-center">
-          <div className="h-5 w-24 bg-gray-200 rounded mb-2"></div>
-          <div className="h-6 w-32 bg-gray-200 rounded"></div>
-        </div>
-      </div>
-    ))}
-  </div>
-  
-  )
-}
+        {Array.from({ length: 3 }).map((_, index) => (
+          <div
+            key={index}
+            className="bg-white rounded-xl shadow-lg overflow-hidden animate-pulse"
+          >
+            <div className="p-6">
+              <div className="flex justify-center mb-4">
+                <div className="w-20 h-20 rounded-full bg-gray-200"></div>
+              </div>
+              <div className="h-5 w-3/4 bg-gray-200 rounded mx-auto mb-2"></div>
+              <div className="h-6 w-1/2 bg-gray-200 rounded-full mx-auto"></div>
+            </div>
+          </div>
+        ))}
+      </motion.div>
+    </div>
+  );
+};
 
-export default ExploreDaosSkeletonLoader
+export default ExploreDaosSkeletonLoader;
