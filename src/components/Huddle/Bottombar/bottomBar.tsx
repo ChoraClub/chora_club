@@ -81,6 +81,7 @@ const BottomBar = ({
     isUploading,
     isScreenShared,
     setIsScreenShared,
+    setMeetingRecordingStatus,
   } = useStudioState();
   const { startScreenShare, stopScreenShare, shareStream } =
     useLocalScreenShare({
@@ -379,15 +380,17 @@ const BottomBar = ({
             <Button
               className="flex gap-2 bg-red-500 hover:bg-red-400 text-white text-md font-semibold"
               onClick={() =>
-                handleRecording(roomId, address, isRecording, setIsRecording)
+                handleRecording(
+                  roomId,
+                  address,
+                  isRecording,
+                  setIsRecording,
+                  setMeetingRecordingStatus
+                )
               }
             >
               {isUploading ? BasicIcons.spin : BasicIcons.record}{" "}
-              {isRecording
-                ? isUploading
-                  ? "Recording..."
-                  : "Stop Recording"
-                : "Record"}
+              {isRecording ? "Stop Recording" : "Record"}
             </Button>
           )}
           <ButtonWithIcon

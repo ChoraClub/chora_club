@@ -7,6 +7,7 @@ import { useConnection } from "@/app/hooks/useConnection";
 import TotalRewards from "./TotalRewards";
 import MintedNFTs from "./MintedNFTs";
 import { TailSpin, Rings, Triangle } from "react-loader-spinner";
+import Heading from "../ComponentUtils/Heading";
 
 function RewardsMain() {
   const { isConnected, isPageLoading, isSessionLoading, isReady } =
@@ -73,15 +74,12 @@ function RewardsMain() {
       return (
         <>
           <div className="min-h-screen h-fit bg-gradient-to-b from-blue-50 to-blue-100">
-            <div className="w-full flex justify-end pt-2 xs:pt-4 sm:pt-6 px-4 md:px-6 lg:px-14">
-              <div className="flex gap-1 xs:gap-2 items-center">
-                <RewardButton />
-                <ConnectWalletWithENS />
+            <div className="relative container mx-auto px-4 py-8">
+              <Heading />
+              <div className="max-w-6xl mx-auto p-6 space-y-8 font-poppins">
+                <TotalRewards />
+                <MintedNFTs />
               </div>
-            </div>
-            <div className="max-w-6xl mx-auto p-6 space-y-8 font-poppins">
-              <TotalRewards />
-              <MintedNFTs />
             </div>
           </div>
         </>

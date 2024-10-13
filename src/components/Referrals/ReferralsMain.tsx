@@ -8,7 +8,6 @@ import { Oval, TailSpin } from "react-loader-spinner";
 import MobileResponsiveMessage from "../MobileResponsiveMessage/MobileResponsiveMessage";
 import ConnectYourWallet from "../ComponentUtils/ConnectYourWallet";
 import { useConnection } from "@/app/hooks/useConnection";
-
 function ReferralsMain() {
   const { address } = useAccount();
   const { isConnected, isLoading, isSessionLoading, isPageLoading, isReady } =
@@ -63,7 +62,6 @@ function ReferralsMain() {
   return (
     <>
       <MobileResponsiveMessage />
-
       <div className="hidden md:block font-poppins">{renderContent()}</div>
     </>
   );

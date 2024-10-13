@@ -56,6 +56,8 @@ function RecordedSessionsTile({
   const [loadingHostNames, setLoadingHostNames] = useState<boolean>(true);
   const [loadingGuestNames, setLoadingGuestNames] = useState<boolean>(true);
   const [updatedSessionDetails, setUpdatedSessionDetails] = useState<any[]>([]);
+  const [claimInProgress, setClaimInProgress] = useState(false);
+  const [claimingMeetingId, setClaimingMeetingId] = useState(null);
 
   const handleCopy = (addr: string) => {
     copy(addr);
@@ -180,6 +182,16 @@ function RecordedSessionsTile({
       newDetails[index] = updatedData;
       return newDetails;
     });
+  };
+
+  const handleClaimStart = (meetingId: any) => {
+    setClaimInProgress(true);
+    setClaimingMeetingId(meetingId);
+  };
+
+  const handleClaimEnd = () => {
+    setClaimInProgress(false);
+    setClaimingMeetingId(null);
   };
 
   return (
@@ -392,9 +404,9 @@ function RecordedSessionsTile({
                     <Link
                       href={
                         data.uid_host
-                          ? data.dao_name === ("optimism" || "Optimism")
+                          ? data.dao_name.toLowerCase() === "optimism"
                             ? `https://optimism.easscan.org/offchain/attestation/view/${data.uid_host}`
-                            : data.dao_name === ("arbitrum" || "Arbitrum")
+                            : data.dao_name.toLowerCase() === "arbitrum"
                             ? `https://arbitrum.easscan.org/offchain/attestation/view/${data.uid_host}`
                             : ""
                           : "#"
@@ -423,6 +435,11 @@ function RecordedSessionsTile({
                       onChainId={
                         session === "hosted" ? data.onchain_host_uid : ""
                       }
+                      disabled={
+                        claimInProgress && claimingMeetingId !== data.meetingId
+                      }
+                      onClaimStart={() => handleClaimStart(data.meetingId)}
+                      onClaimEnd={handleClaimEnd}
                     />
                   </div>
                 )}
@@ -477,6 +494,12 @@ function RecordedSessionsTile({
                         endTime={data.attestations[0]?.endTime}
                         dao={data.dao_name}
                         address={address || ""}
+                        disabled={
+                          claimInProgress &&
+                          claimingMeetingId !== data.meetingId
+                        }
+                        onClaimStart={() => handleClaimStart(data.meetingId)}
+                        onClaimEnd={handleClaimEnd}
                         onChainId={
                           session === "attended"
                             ? data.attendees.find(
