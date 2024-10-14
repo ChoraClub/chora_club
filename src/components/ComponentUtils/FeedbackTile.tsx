@@ -25,7 +25,7 @@ const FeedbackTile = () => {
   if (!isVisible) return null;
 
   return (
-    <div className="bg-yellow-200 border-b border-yellow-300 bg-opacity-80 hidden lg:flex justify-between items-center px-4 py-2 font-poppins text-sm text-yellow-800 relative z-[100] shadow-sm">
+    <div className="bg-yellow-200 border-b border-yellow-300 bg-opacity-80 hidden lg:flex justify-between items-center px-4 py-2 font-poppins text-sm text-yellow-800 relative z-[1] shadow-sm">
       <span className="flex items-center space-x-2">
         <svg
           xmlns="http://www.w3.org/2000/svg"

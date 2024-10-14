@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { MongoClient, MongoClientOptions } from "mongodb";
 import { connectDB } from "@/config/connectDB";
+
 export const revalidate = 0;
 
 export async function GET(req: NextRequest, res: NextResponse) {
@@ -13,33 +13,24 @@ export async function GET(req: NextRequest, res: NextResponse) {
     const meetingsCollection = db.collection("meetings");
     const delegatesCollection = db.collection("delegates");
 
-    // Fetch all documents from the meetings collection
+    // Parse query parameters
+    const url = new URL(req.url);
+    const page = parseInt(url.searchParams.get("page") || "1");
+    const limit = parseInt(url.searchParams.get("limit") || "20");
+    const offset = (page - 1) * limit;
+
+    // Fetch total count of recorded meetings
+    const totalCount = await meetingsCollection.countDocuments({
+      meeting_status: "Recorded",
+    });
+
+    // Fetch paginated documents from the meetings collection
     const meetings = await meetingsCollection
       .find({ meeting_status: "Recorded" })
       .sort({ slot_time: -1 })
+      // .skip(offset)
+      // .limit(limit)
       .toArray();
-
-    // Iterate through each meeting document
-    // const mergedData = await Promise.all(
-    //   meetings.map(async (session) => {
-    //     // Extract address and dao_name from the meeting
-    //     const { host_address, dao_name, attendees } = session;
-
-    //     // Query delegates collection based on address and dao_name
-    //     const hostInfo = await delegatesCollection.findOne({
-    //       address: host_address,
-    //       // daoName: dao_name,
-    //     });
-
-    //     const guestInfo = await delegatesCollection.findOne({
-    //       address: attendees[0].attendee_address,
-    //       // daoName: dao_name,
-    //     });
-
-    //     // Return merged data
-    //     return { session, hostInfo, guestInfo };
-    //   })
-    // );
 
     const uniqueAddresses = new Set<string>();
     meetings.forEach((meeting) => {
@@ -69,11 +60,17 @@ export async function GET(req: NextRequest, res: NextResponse) {
       return { ...meeting, hostInfo, attendees };
     });
 
-    client.close();
+    await client.close();
 
-    // Return the merged data
+    // Return the merged data with pagination info
     return NextResponse.json(
-      { success: true, data: mergedData },
+      {
+        success: true,
+        data: mergedData,
+        // totalCount,
+        // currentPage: page,
+        // totalPages: Math.ceil(totalCount / limit),
+      },
       { status: 200 }
     );
   } catch (error) {
