@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import oplogo from "@/assets/images/daos/op.png";
 import arblogo from "@/assets/images/daos/arb.png";
 import Image from "next/image";
@@ -65,48 +65,57 @@ function TotalRewards() {
     writeContractAsync,
   } = useWriteContract();
   const [claimingReward, setClaimingReward] = useState<boolean>(false);
+  const [fetchingReward, setFetchingReward] = useState<boolean>(false);
 
   const nonZeroRewards = claimableRewards.filter(
     (reward) => parseFloat(reward.amount) > 0
   );
 
-  const fetchReward = async () => {
-    const data = await nft_client
-      .query(REWARD_QUERY, { address: address })
-      .toPromise();
-    const response = await fetch(
-      "https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd"
-    );
-    const coingeckoData = await response.json();
-    // console.log("here data is ", data, coingeckoData.ethereum.usd);
-    setEthToUsdConversionRate(coingeckoData.ethereum.usd);
-    if (data.data.rewardsPerUsers.length < 1) {
-      setTotalRewards({ amount: "0.0 ", value: "$0.0" });
-      return;
+  const fetchReward = useCallback(async () => {
+    try {
+      setFetchingReward(true);
+      const data = await nft_client
+        .query(REWARD_QUERY, { address: address })
+        .toPromise();
+      const response = await fetch(
+        "https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd"
+      );
+      const coingeckoData = await response.json();
+      // console.log("here data is ", data, coingeckoData.ethereum.usd);
+      setEthToUsdConversionRate(coingeckoData.ethereum.usd);
+      if (data.data.rewardsPerUsers.length < 1) {
+        setTotalRewards({ amount: "0.0 ", value: "$0.0" });
+        return;
+      }
+      const total =
+        data?.data.rewardsPerUsers?.map((reward: any) => ({
+          amount: (reward.amount / 10 ** 18).toFixed(5),
+          value: `$${(
+            (reward.amount * coingeckoData.ethereum.usd) /
+            10 ** 18
+          ).toFixed(2)}`,
+        })) || [];
+      setTotalRewards(total[0]);
+      // console.log("total reward", total)
+      const Rewards =
+        data?.data.rewardsPerUsers?.map((reward: any) => ({
+          platform: reward.id,
+          amount: ((reward.amount - reward.withdrawn) / 10 ** 18).toFixed(5),
+          value: `$${(
+            (reward.amount * coingeckoData.ethereum.usd) /
+            10 ** 18
+          ).toFixed(2)}`,
+          logo: reward.id.includes("op") ? oplogo : arblogo,
+        })) || [];
+      setClaimableRewards(Rewards);
+      // console.log(claimableRewards);
+      setFetchingReward(false);
+    } catch (error) {
+      console.log("Error in fetching rewards:", error);
+      setFetchingReward(false);
     }
-    const total =
-      data?.data.rewardsPerUsers?.map((reward: any) => ({
-        amount: (reward.amount / 10 ** 18).toFixed(5),
-        value: `$${(
-          (reward.amount * coingeckoData.ethereum.usd) /
-          10 ** 18
-        ).toFixed(2)}`,
-      })) || [];
-    setTotalRewards(total[0]);
-    // console.log("total reward", total)
-    const Rewards =
-      data?.data.rewardsPerUsers?.map((reward: any) => ({
-        platform: reward.id, // Use the ID or some other property for platform
-        amount: ((reward.amount - reward.withdrawn) / 10 ** 18).toFixed(5),
-        value: `$${(
-          (reward.amount * coingeckoData.ethereum.usd) /
-          10 ** 18
-        ).toFixed(2)}`,
-        logo: reward.id.includes("op") ? oplogo : arblogo, // Example condition to set logo
-      })) || [];
-    setClaimableRewards(Rewards);
-    // console.log(claimableRewards);
-  };
+  }, [chainId]);
+
   useEffect(() => {
     if (address) {
       fetchReward();
@@ -207,7 +216,12 @@ function TotalRewards() {
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
           <div className="p-6">
             <h2 className="text-2xl font-bold mb-4">Claim Rewards</h2>
-            {nonZeroRewards.length > 0 ? (
+            {fetchingReward ? (
+              <div className="flex flex-col items-center justify-center py-2">
+                <Loader2 className="h-5 w-5 animate-spin text-blue-500 mb-4" />
+                <p className="text-gray-500">Fetching your rewards...</p>
+              </div>
+            ) : nonZeroRewards.length > 0 ? (
               <div className="space-y-4">
                 {nonZeroRewards.map((reward, index) => (
                   <div
@@ -234,14 +248,12 @@ function TotalRewards() {
                     </div>
                     <button
                       onClick={handleClaim}
-                      disabled={claimingReward === true}
+                      disabled={claimingReward}
                       className={`bg-gradient-to-r from-green-400 to-blue-500 hover:from-green-500 hover:to-blue-600 text-white px-4 py-2 rounded-full transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center min-w-[100px] ${
-                        claimingReward === true
-                          ? "opacity-75 cursor-not-allowed"
-                          : ""
+                        claimingReward ? "opacity-75 cursor-not-allowed" : ""
                       }`}
                     >
-                      {claimingReward === true ? (
+                      {claimingReward ? (
                         <Loader2 className="mr-2 h-6 w-6 animate-spin" />
                       ) : (
                         "Claim"
