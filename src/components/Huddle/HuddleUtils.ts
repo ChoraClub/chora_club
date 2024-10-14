@@ -71,8 +71,8 @@ export const handleStopRecording = async (
       return;
     }
 
+    // setIsRecording(false);
     if (data.success === true) {
-      setIsRecording(false);
       toast.success("Recording stopped");
       const success = true;
       return success;
@@ -89,7 +89,8 @@ export const handleCloseMeeting = async (
   roomId: string | undefined,
   daoName: string,
   hostAddress: string,
-  meetingData: SessionInterface | undefined
+  meetingData: SessionInterface | undefined,
+  isRecording: boolean | null
 ) => {
   // if (role === "host") {
   let meetingType;
@@ -122,18 +123,21 @@ export const handleCloseMeeting = async (
     const result = await response.json();
     console.log("result in end call::", result);
 
-    const storedStatus = sessionStorage.getItem("meetingData");
-    let meetingStatus;
+    // const storedStatus = sessionStorage.getItem("meetingData");
+    // let meetingStatus;
 
-    if (storedStatus) {
-      const parsedStatus = JSON.parse(storedStatus);
-      console.log("storedStatus: ", parsedStatus);
-      if (parsedStatus.meetingId === roomId) {
-        meetingStatus = parsedStatus.isMeetingRecorded;
-      }
-    }
+    // if (storedStatus) {
+    //   const parsedStatus = JSON.parse(storedStatus);
+    //   console.log("storedStatus in end call: ", parsedStatus);
+    //   console.log("parsedStatus.meetingId: ", parsedStatus.meetingId);
+    //   console.log("roomId in end call: ", roomId);
+    //   if (parsedStatus.meetingId === roomId) {
+    //     meetingStatus = parsedStatus.isMeetingRecorded;
+    //     console.log("meeting status updated");
+    //   }
+    // }
 
-    if (meetingStatus === true && result.success) {
+    if (isRecording === true && result.success) {
       try {
         toast.success("Giving Attestations");
         const myHeaders = new Headers();
@@ -174,11 +178,12 @@ export const handleRecording = async (
   setMeetingRecordingStatus: (val: boolean) => void
 ) => {
   if (isRecording) {
+    setMeetingRecordingStatus(false);
     handleStopRecording(roomId, address, setIsRecording);
     let existingValue = sessionStorage.getItem("meetingData");
     if (existingValue) {
       let parsedValue = JSON.parse(existingValue);
-      console.log("parsedValue: ", parsedValue);
+      // console.log("parsedValue: ", parsedValue);
       parsedValue.recordingStatus = false;
 
       // Step 3: Store the updated value back in sessionStorage

@@ -81,6 +81,7 @@ const BottomBar = ({
     isUploading,
     isScreenShared,
     setIsScreenShared,
+    meetingRecordingStatus,
     setMeetingRecordingStatus,
   } = useStudioState();
   const { startScreenShare, stopScreenShare, shareStream } =
@@ -151,20 +152,7 @@ const BottomBar = ({
   const handleEndCall = async (endMeet: string) => {
     setIsLoading(true);
 
-    const storedStatus = sessionStorage.getItem("meetingData");
-    let meetingStatus;
-    let currentRecordingStatus;
-
-    if (storedStatus) {
-      const parsedStatus = JSON.parse(storedStatus);
-      console.log("storedStatus: ", parsedStatus);
-      if (parsedStatus.meetingId === params.roomId) {
-        meetingStatus = parsedStatus.isMeetingRecorded;
-        currentRecordingStatus = parsedStatus.recordingStatus;
-      }
-    }
-
-    if (role === "host" && currentRecordingStatus === true) {
+    if (role === "host" && meetingRecordingStatus === true) {
       await handleStopRecording(roomId, address, setIsRecording);
     }
 
@@ -213,8 +201,8 @@ const BottomBar = ({
             body: JSON.stringify({
               meetingId: roomId,
               meetingType: meetingCategory,
-              recordedStatus: meetingStatus,
-              meetingStatus: meetingStatus === true ? "Recorded" : "Finished",
+              recordedStatus: isRecording,
+              meetingStatus: isRecording === true ? "Recorded" : "Finished",
               nft_image: nft_image,
             }),
           };
@@ -390,7 +378,7 @@ const BottomBar = ({
               }
             >
               {isUploading ? BasicIcons.spin : BasicIcons.record}{" "}
-              {isRecording ? "Stop Recording" : "Record"}
+              {meetingRecordingStatus ? "Stop Recording" : "Record"}
             </Button>
           )}
           <ButtonWithIcon

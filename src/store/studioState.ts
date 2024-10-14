@@ -64,7 +64,7 @@ interface StudioState {
   setIsScreenShared: (val: boolean) => void;
   isRoomClosed: boolean;
   setIsRoomClosed: (val: boolean) => void;
-  meetingRecordingStatus: boolean | undefined;
+  meetingRecordingStatus: boolean;
   setMeetingRecordingStatus: (val: boolean) => void;
 }
 
@@ -166,7 +166,7 @@ export const useStudioState = create<StudioState>((set) => ({
   setIsScreenShared: (val: boolean) => set({ isScreenShared: val }),
   isRoomClosed: false,
   setIsRoomClosed: (val: boolean) => set({ isRoomClosed: val }),
-  meetingRecordingStatus: undefined,
+  meetingRecordingStatus: false,
   setMeetingRecordingStatus: (val: boolean) =>
     set({ meetingRecordingStatus: val }),
 }));
