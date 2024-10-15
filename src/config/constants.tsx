@@ -53,6 +53,8 @@ export const ATTESTATION_ARB_URL =
     ? process.env.NEXT_PUBLIC_SEPOLIA_ATTESTATION_URL
     : process.env.NEXT_PUBLIC_ARB_ATTESTATION_URL;
 
+export const MEETING_BASE_URL = process.env.NEXT_PUBLIC_HOSTED_MEETING_APP_URL;
+
 //--------------------------------------------------------------------------------//
 
 // // // // For development testing
