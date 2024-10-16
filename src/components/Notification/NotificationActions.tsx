@@ -9,7 +9,7 @@ import {
 } from "react-icons/bs";
 import { PiVideoFill } from "react-icons/pi";
 import { GiChaingun } from "react-icons/gi";
-import { BASE_URL } from "@/config/constants";
+import { BASE_URL, MEETING_BASE_URL } from "@/config/constants";
 import { useAccount } from "wagmi";
 import { useNotificationStudioState } from "@/store/notificationStudioState";
 
@@ -127,9 +127,13 @@ export const handleRedirection = async (
         `/profile/${data.receiver_address}?active=sessions&session=attending`
       );
     } else if (data.notification_name === "sessionStartedByHost") {
-      router.push(`/meeting/session/${data.additionalData.meetingId}/lobby`);
+      router.push(
+        `${MEETING_BASE_URL}/meeting/session/${data.additionalData.meetingId}/lobby`
+      );
     } else if (data.notification_name === "sessionStartedByGuest") {
-      router.push(`/meeting/session/${data.additionalData.meetingId}/lobby`);
+      router.push(
+        `${MEETING_BASE_URL}/meeting/session/${data.additionalData.meetingId}/lobby`
+      );
     }
   } else if (data.notification_type === "attestation") {
     if (data.additionalData.notification_user_role === "session_hosted") {

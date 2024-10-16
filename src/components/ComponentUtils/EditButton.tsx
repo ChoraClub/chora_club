@@ -5,7 +5,7 @@ import { FaPencil } from "react-icons/fa6";
 import UpdateHostedSessionModal from "./UpdateHostedSessionModal";
 import lighthouse from "@lighthouse-web3/sdk";
 import toast from "react-hot-toast";
-import { LIGHTHOUSE_BASE_API_KEY } from "@/config/constants";
+import { LIGHTHOUSE_BASE_API_KEY, MEETING_BASE_URL } from "@/config/constants";
 import { useRouter } from "next-nprogress-bar";
 
 interface EditButtonProps {
@@ -30,7 +30,7 @@ const EditButton: React.FC<EditButtonProps> = ({
 
   const handleEditModal = () => {
     // setEditOpen(true);
-    router.push(`/meeting/session/${sessionData.meetingId}/update-session-details`);
+    router.push(`${MEETING_BASE_URL}/meeting/session/${sessionData.meetingId}/update-session-details`);
   };
 
   // const handleCloseEdit = () => {

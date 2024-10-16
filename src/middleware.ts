@@ -8,6 +8,8 @@ const allowedOrigins = [
   normalizeOrigin(process.env.NEXT_PUBLIC_LOCAL_BASE_URL!),
   normalizeOrigin(process.env.NEXT_PUBLIC_HOSTED_BASE_URL!),
   normalizeOrigin(process.env.NEXT_PUBLIC_MIDDLEWARE_BASE_URL!),
+  process.env.NEXT_PUBLIC_LOCAL_MEETING_APP_URL,
+  process.env.NEXT_PUBLIC_HOSTED_MEETING_APP_URL,
 ];
 
 export async function middleware(request: NextRequest) {
@@ -16,8 +18,8 @@ export async function middleware(request: NextRequest) {
   // const origin = request.nextUrl.origin;
   const origin = normalizeOrigin(request.nextUrl.origin);
 
-  // console.log("allowed Origin", allowedOrigins);
-  // console.log("Origin from request", origin);
+  console.log("allowed Origin", allowedOrigins);
+  console.log("Origin from request", origin);
 
   // if (!allowedOrigins?.includes(origin)) {
   //   return new NextResponse(
