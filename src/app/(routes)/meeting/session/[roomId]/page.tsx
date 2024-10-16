@@ -52,6 +52,7 @@ import {
   handleCloseMeeting,
   startRecording,
 } from "@/components/Huddle/HuddleUtils";
+import { MEETING_BASE_URL } from "@/config/constants";
 
 export default function Component({ params }: { params: { roomId: string } }) {
   const { isVideoOn, enableVideo, disableVideo, stream } = useLocalVideo();
@@ -173,7 +174,9 @@ export default function Component({ params }: { params: { roomId: string } }) {
           }
           setIsRecording(false);
         } else {
-          router.push(`/meeting/session/${params.roomId}/lobby`);
+          router.push(
+            `${MEETING_BASE_URL}/meeting/session/${params.roomId}/lobby`
+          );
         }
 
         const storedStatus = sessionStorage.getItem("meetingData");
@@ -206,7 +209,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
           parsedStatus.isMeetingRecorded === true
         ) {
           router.push(
-            `/meeting/session/${params.roomId}/update-session-details`
+            `${MEETING_BASE_URL}/meeting/session/${params.roomId}/update-session-details`
           );
         } else {
           console.log("Open modal");
@@ -374,7 +377,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
   useEffect(() => {
     if (state === "idle" && isAllowToEnter) {
       console.log(`pushing to /meeting/session/${params.roomId}/lobby`);
-      push(`/meeting/session/${params.roomId}/lobby`);
+      push(`${MEETING_BASE_URL}/meeting/session/${params.roomId}/lobby`);
       return;
     } else {
       updateMetadata({

@@ -37,6 +37,7 @@ import { fetchEnsName } from "@/utils/ENSUtils";
 import { truncateAddress } from "@/utils/text";
 import { useSession } from "next-auth/react";
 import { useConnection } from "@/app/hooks/useConnection";
+import { MEETING_BASE_URL } from "@/config/constants";
 
 type lobbyProps = {};
 
@@ -272,7 +273,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
 
   useEffect(() => {
     if (state === "connected") {
-      push(`/meeting/session/${params.roomId}`);
+      push(`${MEETING_BASE_URL}/meeting/session/${params.roomId}`);
     }
   }, [state]);
 
