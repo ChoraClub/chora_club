@@ -2,100 +2,86 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 
-const normalizeOrigin = (url: string) => url.replace(/\/$/, "");
+const normalizeOrigin = (url: string) => url?.replace(/\/$/, "");
 
 const allowedOrigins = [
   normalizeOrigin(process.env.NEXT_PUBLIC_LOCAL_BASE_URL!),
   normalizeOrigin(process.env.NEXT_PUBLIC_HOSTED_BASE_URL!),
   normalizeOrigin(process.env.NEXT_PUBLIC_MIDDLEWARE_BASE_URL!),
-  process.env.NEXT_PUBLIC_LOCAL_MEETING_APP_URL,
-  process.env.NEXT_PUBLIC_HOSTED_MEETING_APP_URL,
-];
+  normalizeOrigin(process.env.NEXT_PUBLIC_LOCAL_MEETING_APP_URL!),
+  normalizeOrigin(process.env.NEXT_PUBLIC_HOSTED_MEETING_APP_URL!),
+].filter(Boolean);
+
+const publicApis = ["/api/update-recording-status/:path*", "/api/end-call"];
 
 export async function middleware(request: NextRequest) {
-  // console.log("Request Body :- ", request);
+  const origin = request.headers.get("origin");
 
-  // const origin = request.nextUrl.origin;
-  const origin = normalizeOrigin(request.nextUrl.origin);
+  // Always set CORS headers
+  const response = NextResponse.next();
+  setCorsHeaders(response, origin);
 
-  console.log("allowed Origin", allowedOrigins);
-  console.log("Origin from request", origin);
+  // Handle preflight requests
+  if (request.method === "OPTIONS") {
+    return response;
+  }
 
-  // if (!allowedOrigins?.includes(origin)) {
-  //   return new NextResponse(
-  //     JSON.stringify({ error: "Unknown origin request come Forbidden" }),
-  //     {
-  //       status: 403,
-  //       headers: { "Content-Type": "application/json" },
-  //     }
-  //   );
-  // }
+  // Check if the API is public
+  const isPublicApi = publicApis.some((api: any) =>
+    request.nextUrl.pathname.startsWith(api)
+  );
 
-  if (!allowedOrigins.includes(origin)) {
-    return new NextResponse(
-      JSON.stringify({ error: "Unknown origin request. Forbidden" }),
-      {
+  if (!isPublicApi) {
+    // For non-public APIs, check authentication
+    const token = await getToken({
+      req: request,
+      secret: process.env.NEXTAUTH_SECRET,
+    });
+
+    if (!token) {
+      return new NextResponse(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: {
+          "Content-Type": "application/json",
+          ...response.headers,
+        },
+      });
+    }
+
+    // Additional checks for wallet address if needed
+    const walletAddress = request.headers.get("x-wallet-address");
+    if (walletAddress && token.sub !== walletAddress) {
+      return new NextResponse(JSON.stringify({ error: "Forbidden" }), {
         status: 403,
-        headers: { "Content-Type": "application/json" },
-      }
+        headers: {
+          "Content-Type": "application/json",
+          ...response.headers,
+        },
+      });
+    }
+  }
+
+  return response;
+}
+
+function setCorsHeaders(response: NextResponse, origin: string | null) {
+  if (origin && allowedOrigins.includes(normalizeOrigin(origin))) {
+    response.headers.set("Access-Control-Allow-Origin", origin);
+  } else {
+    response.headers.set(
+      "Access-Control-Allow-Origin",
+      allowedOrigins[0] || "*"
     );
   }
-
-  const walletAddress = request.headers.get("x-wallet-address");
-
-  // console.log("Append headers wallet address:-", walletAddress);
-
-  if (!["POST", "PUT", "DELETE"].includes(request.method)) {
-    // For other methods, allow the request to proceed without additional checks
-    return NextResponse.next();
-  }
-
-  // console.log("Upcoming request method:-", request.method);
-
-  const token = await getToken({
-    req: request,
-    secret: process.env.NEXTAUTH_SECRET,
-  });
-
-  // console.log("Token generated using nextauth:-", token);
-
-  if (!token) {
-    // If there's no token, the user is not authenticated
-    return new NextResponse(JSON.stringify({ error: "Unauthorized" }), {
-      status: 401,
-      headers: { "Content-Type": "application/json" },
-    });
-  }
-
-  // Extract the user address from the token
-  const UserAddress = token.sub;
-
-  // console.log("Exracted user address from token:- ", UserAddress);
-
-  // console.log("Requested Address:", walletAddress);
-
-  if (UserAddress !== walletAddress) {
-    // If the user's address doesn't match the requested profile address
-    console.log(
-      `Forbidden access attempt: By user with address :- ${UserAddress}`
-    );
-    return new NextResponse(JSON.stringify({ error: "Forbidden" }), {
-      status: 403,
-      headers: { "Content-Type": "application/json" },
-    });
-  }
-  //  else {
-  //   console.log(
-  //     `Processed further to calling API to user with wallet address :- ${walletAddress} `
-  //   );
-  //   return new NextResponse(JSON.stringify({ message: "Accepted" }), {
-  //     status: 202,
-  //     headers: { "Content-Type": "application/json" },
-  //   });
-  // }
-
-  // If everything is okay, continue to the API route
-  return NextResponse.next();
+  response.headers.set(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, DELETE, OPTIONS"
+  );
+  response.headers.set(
+    "Access-Control-Allow-Headers",
+    "Content-Type, Authorization, x-wallet-address"
+  );
+  response.headers.set("Access-Control-Allow-Credentials", "true");
 }
 
 // See "Matching Paths" below to learn more
