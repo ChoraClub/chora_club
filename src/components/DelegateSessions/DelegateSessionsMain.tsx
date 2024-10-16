@@ -21,7 +21,7 @@ function DelegateSessionsMain() {
     <>
       <div className="">
         <div className="pt-2 xs:pt-4 sm:pt-6 px-4 md:px-6 lg:px-14">
-          <Heading/>
+          <Heading />
         </div>
 
         <div className="flex md:gap-12 bg-[#D9D9D945] md:pl-6 lg:pl-14 font-poppins">
@@ -44,7 +44,9 @@ function DelegateSessionsMain() {
               className="rounded-md bg-opacity-90 max-w-96"
               closeDelay={1}
             >
-              <div className="text-sm md:text-base whitespace-nowrap">Recorded</div>
+              <div className="text-sm md:text-base whitespace-nowrap">
+                Recorded
+              </div>
             </Tooltip>
           </button>
           <button
@@ -67,26 +69,28 @@ function DelegateSessionsMain() {
               className="rounded-md bg-opacity-90 max-w-96"
               closeDelay={1}
             >
-              <div className="text-sm md:text-base whitespace-nowrap"> Available Delegates</div>
+              <div className="text-sm md:text-base whitespace-nowrap">
+                {" "}
+                Available Delegates
+              </div>
             </Tooltip>
           </button>
         </div>
 
-        
-          {searchParams.get("active") === "recordedSessions" ? (
-            <div className="py-6 sm:px-20 md:px-6 lg:px-14">
+        {searchParams.get("active") === "recordedSessions" ? (
+          <div className="py-6 sm:px-20 md:px-6 lg:px-14">
             <RecordedSessions />
-            </div>
-          ) : (
-            ""
-          )}
-          {searchParams.get("active") === "availableDelegates" ? (
-            <div className="py-6 sm:px-8 md:px-6 lg:px-14 xl:px-14">
+          </div>
+        ) : (
+          ""
+        )}
+        {searchParams.get("active") === "availableDelegates" ? (
+          <div className="py-6 sm:px-8 md:px-6 lg:px-14 xl:px-14">
             <AvailableSessions />
-            </div>
-          ) : (
-            ""
-          )}
+          </div>
+        ) : (
+          ""
+        )}
 
         {/* <div className="mt-1">
           <AvailableSessions />

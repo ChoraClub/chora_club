@@ -93,7 +93,7 @@ const ExploreDAOs = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-200 relative overflow-hidden">
       <PageBackgroundPattern />
-      <div className="relative container mx-auto px-4 py-8">
+      <div className="relative w-full px-4 py-8">
         <Heading />
 
         <motion.div
@@ -136,7 +136,7 @@ const ExploreDAOs = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.8 }}
-            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-6 "
+            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 md:w-[95%] 2md:w-[85%] gap-6 2xl:w-[65%] mx-auto"
           >
             {daoInfo.length > 0 ? (
               daoInfo.map((dao: any) => (

@@ -8,16 +8,19 @@ import { useAccount } from "wagmi";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 import user from "@/assets/images/user/user2.svg";
+import { useConnection } from "@/app/hooks/useConnection";
 
 function ConnectWalletWithENS() {
   const [displayAddress, setDisplayAddress] = useState<any>();
   const [userProfileImage, setUserProfileImage] = useState<string | null>(null);
   const [ensAvatar, setEnsAvatar] = useState<string | null>(null);
   const { address } = useAccount();
+  const { isConnected, isLoading, isSessionLoading, isPageLoading, isReady } =
+    useConnection();
 
   useEffect(() => {
     const fetchUserProfile = async () => {
-      if (address) {
+      if (address && isConnected) {
         try {
           const myHeaders = new Headers();
           myHeaders.append("Content-Type", "application/json");
@@ -54,16 +57,16 @@ function ConnectWalletWithENS() {
     };
 
     fetchUserProfile();
-  }, [address]);
+  }, [address, isConnected]);
 
   useEffect(() => {
-    if (address) {
+    if (address && isConnected) {
       (async () => {
         const displayName = await fetchEnsName(address);
         setDisplayAddress(displayName?.ensNameOrAddress);
       })();
     }
-  }, [address]);
+  }, [address, isConnected]);
 
   const getDisplayImage = () => {
     if (ensAvatar) {

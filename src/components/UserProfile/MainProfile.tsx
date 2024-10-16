@@ -241,26 +241,29 @@ function MainProfile() {
     const checkDelegateStatus = async () => {
       // const addr = await walletClient.getAddresses();
       // const address1 = addr[0];
-      let delegateTxAddr = "";
-      const contractAddress = getChainAddress(chain?.name);
-      // console.log(walletClient);
-      let delegateTx;
-      if (address) {
-        delegateTx = await publicClient.readContract({
-          address: contractAddress,
-          abi: dao_abi.abi,
-          functionName: "delegates",
-          args: [address],
-          // account: address1,
-        });
-        // console.log("Delegate tx", delegateTx);
-        delegateTxAddr = delegateTx;
-      }
+      try {
+        const contractAddress = getChainAddress(chain?.name);
+        // console.log(walletClient);
+        if (address) {
+          const delegateTx = await publicClient.readContract({
+            address: contractAddress,
+            abi: dao_abi.abi,
+            functionName: "delegates",
+            args: [address],
+            // account: address1,
+          });
+          // console.log("Delegate tx", delegateTx);
 
-      if (delegateTxAddr.toLowerCase() === address?.toLowerCase()) {
-        // console.log("Delegate comparison: ", delegateTx, address);
-        setSelfDelegate(true);
-      } else {
+          const delegateTxAddr = delegateTx.toLowerCase();
+
+          if (delegateTxAddr === "0x0000000000000000000000000000000000000000") {
+            setSelfDelegate(false);
+          } else {
+            setSelfDelegate(true);
+          }
+        }
+      } catch (e) {
+        console.log("error in function: ", e);
         setSelfDelegate(false);
       }
     };
@@ -491,7 +494,7 @@ function MainProfile() {
   };
 
   const updateFollowerState = async (dbResponse: any) => {
-    const userData = dbResponse?.data[0];
+    const userData = dbResponse?.data?.[0];
     // let address = await walletClient.getAddresses();
     // let address_user = address[0].toLowerCase();
     let currentDaoName = getDaoName(chain?.name);
@@ -604,11 +607,12 @@ function MainProfile() {
           );
           karmaDetails = await karmaRes.json();
 
-          if (karmaRes.ok) {
-            setKarmaEns(karmaDetails.data.delegate.ensName);
-            setKarmaImage(karmaDetails.data.delegate.profilePicture);
+          if (karmaDetails.length > 0) {
+            setKarmaEns(karmaDetails?.data?.delegate?.ensName);
+            setKarmaImage(karmaDetails?.data?.delegate?.profilePicture);
             setKarmaDesc(
-              karmaDetails.data.delegate.delegatePitch.customFields[1].value
+              karmaDetails?.data?.delegate?.delegatePitch?.customFields[1]
+                ?.value
             );
           }
           setIsDelegate(true);
@@ -1286,13 +1290,13 @@ function MainProfile() {
                     onSaveButtonClick={(newDescription?: string) =>
                       handleSave(newDescription)
                     }
-                    isLoading={isLoading}
                     daoName={daoName}
                   />
                 </div>
               ) : (
                 ""
               )}
+
               {selfDelegate === true &&
               searchParams.get("active") === "votes" ? (
                 <div className="pt-2 xs:pt-4 sm:pt-6 px-4 md:px-6 lg:px-14">
@@ -1301,6 +1305,7 @@ function MainProfile() {
               ) : (
                 ""
               )}
+
               {searchParams.get("active") === "sessions" ? (
                 // <div className="pt-2 xs:pt-4 sm:pt-6 px-4 md:px-6 lg:px-14">
                 <UserSessions
@@ -1312,6 +1317,7 @@ function MainProfile() {
                 // </div>
                 ""
               )}
+
               {searchParams.get("active") === "officeHours" ? (
                 <div className="pt-2 xs:pt-4 sm:pt-6 px-4 md:px-6 lg:px-14">
                   <UserOfficeHours

@@ -9,7 +9,7 @@ import dynamic from "next/dynamic";
 import styled from "styled-components";
 import rehypeSanitize from "rehype-sanitize";
 import { getDaoName } from "@/utils/chainUtils";
-import { ICommand, commands } from '@uiw/react-md-editor';
+import { ICommand, commands } from "@uiw/react-md-editor";
 
 const StyledMDEditorWrapper = styled.div`
   .w-md-editor {
@@ -35,16 +35,16 @@ const StyledMDEditorWrapper = styled.div`
     flex-wrap: wrap;
     justify-content: flex-start;
     padding: 5px;
-}
+  }
 
-.w-md-editor-toolbar li.active,
-.w-md-editor-toolbar li:hover {
-  background-color: #e6e6e6;
-}
+  .w-md-editor-toolbar li.active,
+  .w-md-editor-toolbar li:hover {
+    background-color: #e6e6e6;
+  }
 
-.w-md-editor-toolbar li > button {
-  padding: 4px;
-}
+  .w-md-editor-toolbar li > button {
+    padding: 4px;
+  }
 
   .w-md-editor-toolbar svg {
     width: 18px !important;
@@ -74,38 +74,35 @@ const StyledMDEditorWrapper = styled.div`
   }
 
   @media (max-width: 768px) {
-  
+    .w-md-editor-show-live {
+      flex-direction: column;
+    }
 
-  .w-md-editor-show-live {
-    flex-direction: column;
-  }
+    .w-md-editor-show-live .w-md-editor-input,
+    .w-md-editor-show-live .w-md-editor-preview {
+      width: 50% !important;
+      flex: 1 1 auto !important;
+    }
 
-  .w-md-editor-show-live .w-md-editor-input,
-  .w-md-editor-show-live .w-md-editor-preview {
-    width: 50% !important;
-    flex: 1 1 auto !important;
+    .w-md-editor-show-live .w-md-editor-input {
+      border-bottom: 1px solid #ddd;
+    }
   }
+  @media (max-width: 1070px) {
+    .w-md-editor-toolbar {
+      padding: 2px;
+    }
 
-  .w-md-editor-show-live .w-md-editor-input {
-    border-bottom: 1px solid #ddd;
-  }
-}
-   @media (max-width: 1070px) {
-   .w-md-editor-toolbar {
-    padding: 2px;
-  }
+    .w-md-editor-toolbar li > button {
+      padding: 2px;
+    }
 
-  .w-md-editor-toolbar li > button {
-    padding: 2px;
+    .w-md-editor-toolbar svg {
+      width: 14px !important;
+      height: 14px !important;
+      margin: 0 2px 1px 2px !important;
+    }
   }
-
-  .w-md-editor-toolbar svg {
-    width: 14px !important;
-    height: 14px !important;
-    margin: 0 2px 1px 2px !important;
-  }
-   }
-
 `;
 
 const MDEditor = dynamic(
@@ -114,24 +111,22 @@ const MDEditor = dynamic(
 );
 
 interface userInfoProps {
-  description: string;
-  onSaveButtonClick: (description?: string) => Promise<void>;
-  isLoading: boolean;
-  // descAvailable: boolean;
   karmaDesc: string;
+  description: string;
   isDelegate: boolean;
   isSelfDelegate: boolean;
+  onSaveButtonClick: (description?: string) => Promise<void>;
+  // descAvailable: boolean;
   daoName: string;
 }
 
 function UserInfo({
+  karmaDesc,
   description,
-  onSaveButtonClick,
-  isLoading,
-  // descAvailable,
   isDelegate,
   isSelfDelegate,
-  karmaDesc,
+  onSaveButtonClick,
+  // descAvailable,
   daoName,
 }: userInfoProps) {
   const { address } = useAccount();
@@ -149,7 +144,7 @@ function UserInfo({
   const [isSessionAttendedLoading, setSessionAttendedLoading] = useState(true);
   const [isOfficeHoursHostedLoading, setOfficeHoursHostedLoading] =
     useState(true);
-  const [isOfficeHourseAttendedLoading, setOfficeHoursAttendedLoading] =
+  const [isOfficeHoursAttendedLoading, setOfficeHoursAttendedLoading] =
     useState(true);
   const [sessionHostCount, setSessionHostCount] = useState(0);
   const [sessionAttendCount, setSessionAttendCount] = useState(0);
@@ -161,16 +156,16 @@ function UserInfo({
   const [originalDesc, setOriginalDesc] = useState(description || karmaDesc);
   const [isMobile, setIsMobile] = useState(false);
 
-useEffect(() => {
-  const checkMobile = () => {
-    setIsMobile(window.innerWidth <= 900);
-  };
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 900);
+    };
 
-  checkMobile();
-  window.addEventListener('resize', checkMobile);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
 
-  return () => window.removeEventListener('resize', checkMobile);
-}, []);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -488,7 +483,7 @@ useEffect(() => {
                 {isSessionHostedLoading &&
                 isSessionAttendedLoading &&
                 isOfficeHoursHostedLoading &&
-                isOfficeHourseAttendedLoading ? (
+                isOfficeHoursAttendedLoading ? (
                   <div className="flex items-center justify-center">
                     <RotatingLines
                       visible={true}

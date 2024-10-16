@@ -104,9 +104,6 @@ export default function Component({ params }: { params: { roomId: string } }) {
   const [notAllowedMessage, setNotAllowedMessage] = useState<string>();
   const [videoStreamTrack, setVideoStreamTrack] = useState<any>("");
   const [showFeedbackPopups, setShowFeedbackPopups] = useState(false);
-  // const [meetingRecordingStatus, setMeetingRecordingStatus] =
-  //   useState<boolean>();
-  const [currentRecordingState, setCurrentRecordingState] = useState<boolean>();
   const [showModal, setShowModal] = useState(true);
   const [meetingData, setMeetingData] = useState<any>();
   const { sendData } = useDataMessage();
@@ -124,57 +121,71 @@ export default function Component({ params }: { params: { roomId: string } }) {
 
   const { state } = useRoom({
     onLeave: async ({ reason }) => {
-      if (reason === "CLOSED") {
-        const myHeaders = new Headers();
-        myHeaders.append("Content-Type", "application/json");
-        setIsRecording(null);
+      try {
+        if (reason === "CLOSED") {
+          const myHeaders = new Headers();
+          myHeaders.append("Content-Type", "application/json");
 
-        if (address) {
-          myHeaders.append("x-wallet-address", address);
-        }
+          if (address) {
+            myHeaders.append("x-wallet-address", address);
+          }
 
-        const raw = JSON.stringify({
-          address: address,
-          role: role,
-        });
+          const raw = JSON.stringify({
+            address: address,
+            role: role,
+          });
 
-        const requestOptions: any = {
-          method: "POST",
-          headers: myHeaders,
-          body: raw,
-          redirect: "follow",
-        };
+          const requestOptions: any = {
+            method: "POST",
+            headers: myHeaders,
+            body: raw,
+            redirect: "follow",
+          };
 
-        const response = await fetch(
-          "/api/feedback/get-feedback-status",
-          requestOptions
-        );
+          const response = await fetch(
+            "/api/feedback/get-feedback-status",
+            requestOptions
+          );
 
-        const result = await response.json();
+          const result = await response.json();
 
-        console.log("result: ", result);
+          console.log("result: ", result);
 
-        if (result.data) {
-          setShowFeedbackPopups(false);
-          handlePopupRedirection();
+          if (result.data) {
+            setShowFeedbackPopups(false);
+            handlePopupRedirection();
+          } else {
+            setShowFeedbackPopups(true);
+          }
+
+          if (role === "host") {
+            setTimeout(async () => {
+              await handleCloseMeeting(
+                address,
+                meetingCategory,
+                params.roomId,
+                daoName,
+                hostAddress,
+                meetingData,
+                isRecording
+              );
+            }, 10000);
+          }
+          setIsRecording(false);
         } else {
-          setShowFeedbackPopups(true);
+          router.push(`/meeting/session/${params.roomId}/lobby`);
         }
 
-        if (role === "host") {
-          setTimeout(async () => {
-            await handleCloseMeeting(
-              address,
-              meetingCategory,
-              params.roomId,
-              daoName,
-              hostAddress,
-              meetingData
-            );
-          }, 10000);
+        const storedStatus = sessionStorage.getItem("meetingData");
+        if (storedStatus) {
+          const parsedStatus = JSON.parse(storedStatus);
+          if (parsedStatus.meetingId === params.roomId) {
+            sessionStorage.removeItem("meetingData");
+          }
         }
-      } else {
-        router.push(`/meeting/session/${params.roomId}/lobby`);
+      } catch (e) {
+        setIsRecording(false);
+        console.log("error in closing room: ", e);
       }
     },
   });
@@ -236,6 +247,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
       }
       if (label === "recordingStatus") {
         const status = JSON.parse(payload).isRecording;
+        // console.log("data message: ", status);
         setIsRecording(status);
       }
       if (label === "requestRecordingStatus" && role === "host") {
@@ -285,18 +297,6 @@ export default function Component({ params }: { params: { roomId: string } }) {
       changeAudio();
     }
   }, [audioInputDevice]);
-
-  useEffect(() => {
-    const storedStatus = sessionStorage.getItem("meetingData");
-    if (storedStatus) {
-      const parsedStatus = JSON.parse(storedStatus);
-      console.log("storedStatus: ", parsedStatus);
-      if (parsedStatus.meetingId === params.roomId) {
-        setMeetingRecordingStatus(parsedStatus.isMeetingRecorded);
-        setCurrentRecordingState(parsedStatus.recordingStatus);
-      }
-    }
-  }, [meetingRecordingStatus]);
 
   const handleModalClose = () => {
     setModalOpen(false);
@@ -403,8 +403,8 @@ export default function Component({ params }: { params: { roomId: string } }) {
   // }, [recordingStatus]);
 
   const updateRecordingStatus = (status: any) => {
-    setIsRecording(status);
-    setMeetingRecordingStatus(status);
+    // setIsRecording(status);
+    // setMeetingRecordingStatus(status);
     sendData({
       to: "*",
       payload: JSON.stringify({ isRecording: status }),
@@ -421,7 +421,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
         recordingStatus: result,
       };
       sessionStorage.setItem("meetingData", JSON.stringify(meetingData));
-      setShowModal(false);
+      setIsRecording(result);
       setMeetingRecordingStatus(result);
       updateRecordingStatus(result);
       if (result) {
@@ -431,14 +431,20 @@ export default function Component({ params }: { params: { roomId: string } }) {
   };
 
   useEffect(() => {
-    console.log("isRecording value: ", isRecording, meetingRecordingStatus);
+    console.log("isRecording value: ", isRecording);
     // const value = meetingRecordingStatus;
     let existingValue = sessionStorage.getItem("meetingData");
     if (existingValue) {
       let parsedValue = JSON.parse(existingValue);
       console.log("parsedValue: ", parsedValue);
-      if (parsedValue.recordingStatus) {
-        updateRecordingStatus(parsedValue.recordingStatus);
+      if (parsedValue.meetingId === params.roomId) {
+        console.log("is true");
+        setIsRecording(parsedValue.isMeetingRecorded);
+        setMeetingRecordingStatus(parsedValue.recordingStatus);
+
+        if (parsedValue.recordingStatus) {
+          updateRecordingStatus(parsedValue.recordingStatus);
+        }
       }
     }
     if (role === "guest") {
@@ -448,21 +454,19 @@ export default function Component({ params }: { params: { roomId: string } }) {
         label: "requestRecordingStatus",
       });
     }
-  }, [isRecording]);
+  }, [meetingRecordingStatus]);
 
-  useEffect(() => {
-    if (role === "guest") {
-      const timer = setTimeout(() => {
-        sendData({
-          to: "*",
-          payload: JSON.stringify({ action: "getRecordingStatus" }),
-          label: "requestRecordingStatus",
-        });
-      }, 2000); // Delay of 2 seconds
-
-      return () => clearTimeout(timer);
-    }
-  }, [role]);
+  // useEffect(() => {
+  //   const storedStatus = sessionStorage.getItem("meetingData");
+  //   if (storedStatus) {
+  //     const parsedStatus = JSON.parse(storedStatus);
+  //     console.log("storedStatus: ", parsedStatus);
+  //     if (parsedStatus.meetingId === params.roomId) {
+  //       setIsRecording(parsedStatus.isMeetingRecorded);
+  //       setCurrentRecordingState(parsedStatus.recordingStatus);
+  //     }
+  //   }
+  // }, [isRecording]);
 
   return (
     <>
@@ -711,7 +715,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
         />
       )}
 
-      {role === "host" && meetingRecordingStatus === undefined && (
+      {role === "host" && isRecording !== true && (
         <MeetingRecordingModal
           show={showModal}
           onClose={handleMeetingModalClose}
