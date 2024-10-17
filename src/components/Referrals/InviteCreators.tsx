@@ -21,16 +21,16 @@ function InviteCreators({ userAddress }: { userAddress: any }) {
   const [showComingSoon, setShowComingSoon] = useState(true);
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(`${BASE_URL}invite/${userAddress}`);
+    navigator.clipboard.writeText(`${BASE_URL}/invite/${userAddress}`);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000); // Reset the copied state after 2 seconds
   };
 
-  const url = encodeURIComponent(`${BASE_URL}invite/${userAddress}`);
+  const url = encodeURIComponent(`${BASE_URL}/invite/${userAddress}`);
   const text = encodeURIComponent(`Join me on Chora Club`);
 
   const shareOn = (platform: any) => {
-    const url = encodeURIComponent(`${BASE_URL}invite/${userAddress}`);
+    const url = encodeURIComponent(`${BASE_URL}/invite/${userAddress}`);
     const text = encodeURIComponent(
       `Join me on Chora Club and let's revolutionize Web3 together! 🚀`
     );
@@ -118,7 +118,7 @@ function InviteCreators({ userAddress }: { userAddress: any }) {
                 <div className="flex items-center bg-white rounded-md overflow-hidden">
                   <input
                     type="text"
-                    value={`${BASE_URL}invite/${userAddress}`}
+                    value={`${BASE_URL}/invite/${userAddress}`}
                     readOnly
                     className="flex-grow p-3 text-gray-700 focus:outline-none"
                   />

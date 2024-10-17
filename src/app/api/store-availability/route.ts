@@ -1,6 +1,6 @@
 import { connectDB } from "@/config/connectDB";
+import { compileBookedSessionTemplate, sendMail } from "@/lib/mail";
 import { NextResponse, NextRequest } from "next/server";
-import { sendMail, compileBookedSessionTemplate } from "@/libs/mail";
 
 // Define the request body type
 interface StoreAvailabilityRequestBody {

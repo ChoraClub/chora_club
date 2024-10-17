@@ -1,7 +1,6 @@
 import { connectDB } from "@/config/connectDB";
 import { NextApiRequest, NextApiResponse } from "next";
 import { NextResponse, NextRequest } from "next/server";
-import { sendMail, compileBookedSessionTemplate } from "@/libs/mail";
 import { io } from "socket.io-client";
 import { BASE_URL, SOCKET_BASE_URL } from "@/config/constants";
 import {
@@ -10,6 +9,7 @@ import {
 } from "@/utils/NotificationUtils";
 import { imageCIDs } from "@/config/staticDataUtils";
 import { SessionInterface } from "@/types/MeetingTypes";
+import { compileBookedSessionTemplate, sendMail } from "@/lib/mail";
 
 function getRandomElementFromArray(arr: any[]) {
   const randomIndex = Math.floor(Math.random() * arr.length);

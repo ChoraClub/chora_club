@@ -1,6 +1,4 @@
 import { connectDB } from "@/config/connectDB";
-import { BASE_URL } from "@/config/constants";
-import { NextApiRequest, NextApiResponse } from "next";
 import { NextResponse, NextRequest } from "next/server";
 
 // Define the response body type
@@ -20,11 +18,9 @@ interface OfficeHours {
   meetingId: string;
 }
 
-const baseUrl = BASE_URL;
-
 export async function PUT(
   req: NextRequest,
-  res: NextApiResponse<UpdateOfficeHoursResponse>
+  res: NextResponse<UpdateOfficeHoursResponse>
 ) {
   console.log("calling PUT....");
   const address = req.url.split("update-office-hours/")[1];

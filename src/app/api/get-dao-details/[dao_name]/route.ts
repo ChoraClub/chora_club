@@ -29,10 +29,7 @@ export async function GET(req: NextRequest, context: { params: Params }) {
       { status: 200 }
     );
   } catch (error) {
-    console.error(
-      "Error retrieving data in meeting session data by id:",
-      error
-    );
+    console.error("Error retrieving DAO details by DAO name:", error);
     return NextResponse.json(
       { success: false, error: "Internal Server Error" },
       { status: 500 }

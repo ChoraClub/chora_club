@@ -123,12 +123,15 @@ function InstantMeet({ isDelegate, selfDelegate, daoName }: instantMeetProps) {
         // setIsScheduled(true);
         setConfirmSave(false);
 
-        // redirectionInNewTab(
-        //   `${MEETING_BASE_URL}/meeting/session/${roomId}/lobby`
-        // );
+        redirectionInNewTab(
+          `${MEETING_BASE_URL}/meeting/session/${roomId}/lobby`
+        );
 
-        router.push(`${MEETING_BASE_URL}/meeting/session/${roomId}/lobby`);
+        // router.push(`${MEETING_BASE_URL}/meeting/session/${roomId}/lobby`);
         onClose();
+      }
+      if (result.error) {
+        setConfirmSave(false);
       }
     } catch (error) {
       setConfirmSave(false);
