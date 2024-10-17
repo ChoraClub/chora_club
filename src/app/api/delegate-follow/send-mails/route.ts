@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/config/connectDB";
-import { sendMail, compileDelegateFollowersTemplate } from "@/libs/mail";
+import { compileDelegateFollowersTemplate, sendMail } from "@/lib/mail";
 
 export async function PUT(req: NextRequest) {
   try {

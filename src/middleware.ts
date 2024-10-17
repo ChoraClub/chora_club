@@ -12,67 +12,82 @@ const allowedOrigins = [
   normalizeOrigin(process.env.NEXT_PUBLIC_HOSTED_MEETING_APP_URL!),
 ].filter(Boolean);
 
-const publicApis = ["/api/update-recording-status/:path*", "/api/end-call"];
-
 export async function middleware(request: NextRequest) {
   const origin = request.headers.get("origin");
 
-  // Always set CORS headers
-  const response = NextResponse.next();
-  setCorsHeaders(response, origin);
+  console.log("Allowed Origins:", allowedOrigins);
+  console.log("Origin from request:", origin);
 
-  // Handle preflight requests
-  if (request.method === "OPTIONS") {
-    return response;
-  }
-
-  // Check if the API is public
-  const isPublicApi = publicApis.some((api: any) =>
-    request.nextUrl.pathname.startsWith(api)
-  );
-
-  if (!isPublicApi) {
-    // For non-public APIs, check authentication
-    const token = await getToken({
-      req: request,
-      secret: process.env.NEXTAUTH_SECRET,
-    });
-
-    if (!token) {
-      return new NextResponse(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-        headers: {
-          "Content-Type": "application/json",
-          ...response.headers,
-        },
-      });
-    }
-
-    // Additional checks for wallet address if needed
-    const walletAddress = request.headers.get("x-wallet-address");
-    if (walletAddress && token.sub !== walletAddress) {
-      return new NextResponse(JSON.stringify({ error: "Forbidden" }), {
+  if (origin && !allowedOrigins.includes(normalizeOrigin(origin))) {
+    return new NextResponse(
+      JSON.stringify({ error: "Unknown origin request. Forbidden" }),
+      {
         status: 403,
         headers: {
           "Content-Type": "application/json",
-          ...response.headers,
+          "Access-Control-Allow-Origin": origin,
         },
-      });
-    }
+      }
+    );
   }
 
+  if (request.method === "OPTIONS") {
+    return new NextResponse(null, {
+      status: 200,
+      headers: {
+        "Access-Control-Allow-Origin": origin || "*",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+        "Access-Control-Allow-Headers":
+          "Content-Type, Authorization, x-wallet-address",
+      },
+    });
+  }
+
+  const walletAddress = request.headers.get("x-wallet-address");
+
+  if (!["POST", "PUT", "DELETE"].includes(request.method)) {
+    const response = NextResponse.next();
+    setCorsHeaders(response, origin);
+    return response;
+  }
+
+  // const token = await getToken({
+  //   req: request,
+  //   secret: process.env.NEXTAUTH_SECRET,
+  // });
+  // console.log("token", token);
+  // if (!token) {
+  //   return new NextResponse(JSON.stringify({ error: "Unauthorized" }), {
+  //     status: 401,
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //       "Access-Control-Allow-Origin": origin || "*",
+  //     },
+  //   });
+  // }
+
+  // const UserAddress = token.sub;
+
+  // if (UserAddress !== walletAddress) {
+  //   console.log(
+  //     `Forbidden access attempt: By user with address :- ${UserAddress}`
+  //   );
+  //   return new NextResponse(JSON.stringify({ error: "Forbidden" }), {
+  //     status: 403,
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //       "Access-Control-Allow-Origin": origin || "*",
+  //     },
+  //   });
+  // }
+
+  const response = NextResponse.next();
+  setCorsHeaders(response, origin);
   return response;
 }
 
 function setCorsHeaders(response: NextResponse, origin: string | null) {
-  if (origin && allowedOrigins.includes(normalizeOrigin(origin))) {
-    response.headers.set("Access-Control-Allow-Origin", origin);
-  } else {
-    response.headers.set(
-      "Access-Control-Allow-Origin",
-      allowedOrigins[0] || "*"
-    );
-  }
+  response.headers.set("Access-Control-Allow-Origin", origin || "*");
   response.headers.set(
     "Access-Control-Allow-Methods",
     "GET, POST, PUT, DELETE, OPTIONS"
@@ -81,7 +96,6 @@ function setCorsHeaders(response: NextResponse, origin: string | null) {
     "Access-Control-Allow-Headers",
     "Content-Type, Authorization, x-wallet-address"
   );
-  response.headers.set("Access-Control-Allow-Credentials", "true");
 }
 
 // See "Matching Paths" below to learn more

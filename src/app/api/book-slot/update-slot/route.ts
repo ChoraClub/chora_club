@@ -2,13 +2,13 @@
 import { MongoClient, MongoClientOptions, ObjectId } from "mongodb";
 import { NextResponse, NextRequest } from "next/server";
 import { connectDB } from "@/config/connectDB";
-import { sendMail, compileBookedSessionTemplate } from "@/libs/mail";
 import { SOCKET_BASE_URL } from "@/config/constants";
 import { io } from "socket.io-client";
 import {
   formatSlotDateAndTime,
   getDisplayNameOrAddr,
 } from "@/utils/NotificationUtils";
+import { sendMail } from "@/lib/mail";
 
 interface UpdateBookingStatusResponse {
   success: boolean;

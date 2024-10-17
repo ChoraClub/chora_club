@@ -9,7 +9,7 @@ import {
 } from "react-icons/bs";
 import { PiVideoFill } from "react-icons/pi";
 import { GiChaingun } from "react-icons/gi";
-import { BASE_URL, MEETING_BASE_URL } from "@/config/constants";
+import { MEETING_BASE_URL } from "@/config/constants";
 import { useAccount } from "wagmi";
 import { useNotificationStudioState } from "@/store/notificationStudioState";
 
