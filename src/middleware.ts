@@ -2,14 +2,12 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 
-const normalizeOrigin = (url: string) => url?.replace(/\/$/, "");
-
 const allowedOrigins = [
-  normalizeOrigin(process.env.NEXT_PUBLIC_LOCAL_BASE_URL!),
-  normalizeOrigin(process.env.NEXT_PUBLIC_HOSTED_BASE_URL!),
-  normalizeOrigin(process.env.NEXT_PUBLIC_MIDDLEWARE_BASE_URL!),
-  normalizeOrigin(process.env.NEXT_PUBLIC_LOCAL_MEETING_APP_URL!),
-  normalizeOrigin(process.env.NEXT_PUBLIC_HOSTED_MEETING_APP_URL!),
+  process.env.NEXT_PUBLIC_LOCAL_BASE_URL!,
+  process.env.NEXT_PUBLIC_HOSTED_BASE_URL!,
+  process.env.NEXT_PUBLIC_MIDDLEWARE_BASE_URL!,
+  process.env.NEXT_PUBLIC_LOCAL_MEETING_APP_URL!,
+  process.env.NEXT_PUBLIC_HOSTED_MEETING_APP_URL!,
 ].filter(Boolean);
 
 export async function middleware(request: NextRequest) {
@@ -18,7 +16,7 @@ export async function middleware(request: NextRequest) {
   console.log("Allowed Origins:", allowedOrigins);
   console.log("Origin from request:", origin);
 
-  if (origin && !allowedOrigins.includes(normalizeOrigin(origin))) {
+  if (origin && !allowedOrigins.includes(origin)) {
     return new NextResponse(
       JSON.stringify({ error: "Unknown origin request. Forbidden" }),
       {
@@ -51,35 +49,35 @@ export async function middleware(request: NextRequest) {
     return response;
   }
 
-  // const token = await getToken({
-  //   req: request,
-  //   secret: process.env.NEXTAUTH_SECRET,
-  // });
-  // console.log("token", token);
-  // if (!token) {
-  //   return new NextResponse(JSON.stringify({ error: "Unauthorized" }), {
-  //     status: 401,
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //       "Access-Control-Allow-Origin": origin || "*",
-  //     },
-  //   });
-  // }
+  const token = await getToken({
+    req: request,
+    secret: process.env.NEXTAUTH_SECRET,
+  });
+  console.log("token", token);
+  if (!token) {
+    return new NextResponse(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": origin || "*",
+      },
+    });
+  }
 
-  // const UserAddress = token.sub;
+  const UserAddress = token.sub;
 
-  // if (UserAddress !== walletAddress) {
-  //   console.log(
-  //     `Forbidden access attempt: By user with address :- ${UserAddress}`
-  //   );
-  //   return new NextResponse(JSON.stringify({ error: "Forbidden" }), {
-  //     status: 403,
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //       "Access-Control-Allow-Origin": origin || "*",
-  //     },
-  //   });
-  // }
+  if (UserAddress !== walletAddress) {
+    console.log(
+      `Forbidden access attempt: By user with address :- ${UserAddress}`
+    );
+    return new NextResponse(JSON.stringify({ error: "Forbidden" }), {
+      status: 403,
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": origin || "*",
+      },
+    });
+  }
 
   const response = NextResponse.next();
   setCorsHeaders(response, origin);
