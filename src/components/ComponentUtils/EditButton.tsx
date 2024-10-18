@@ -30,7 +30,9 @@ const EditButton: React.FC<EditButtonProps> = ({
 
   const handleEditModal = () => {
     // setEditOpen(true);
-    router.push(`${MEETING_BASE_URL}/meeting/session/${sessionData.meetingId}/update-session-details`);
+    router.push(
+      `/meeting/session/${sessionData.meetingId}/update-session-details`
+    );
   };
 
   // const handleCloseEdit = () => {
