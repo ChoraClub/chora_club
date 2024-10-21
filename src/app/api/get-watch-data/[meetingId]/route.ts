@@ -6,6 +6,7 @@ type Params = {
 };
 
 export async function GET(req: NextRequest, context: { params: Params }) {
+  console.log("inside get watch data API");
   const meetingId = context.params.meetingId;
   try {
     const client = await connectDB();

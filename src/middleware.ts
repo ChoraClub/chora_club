@@ -11,12 +11,20 @@ const allowedOrigins = [
 ].filter(Boolean);
 
 export async function middleware(request: NextRequest) {
-  const origin = request.headers.get("origin");
+  // console.log("Request in APP Middleware:::", request);
+
+  const origin = request.nextUrl.origin;
+  const apiKey = request.headers.get("x-api-key");
+  const authorizationToken = request.headers.get("Authorization");
+  const walletAddress = request.headers.get("x-wallet-address");
 
   console.log("Allowed Origins:", allowedOrigins);
   console.log("Origin from request:", origin);
+  console.log("apiKey", apiKey);
+  console.log("authorizationToken", authorizationToken);
 
-  if (origin && !allowedOrigins.includes(origin)) {
+  if (!origin || !allowedOrigins.includes(origin)) {
+    console.log("Unknown origin request. Forbidden");
     return new NextResponse(
       JSON.stringify({ error: "Unknown origin request. Forbidden" }),
       {
@@ -24,6 +32,7 @@ export async function middleware(request: NextRequest) {
         headers: {
           "Content-Type": "application/json",
           "Access-Control-Allow-Origin": origin,
+          "Referrer-Policy": "strict-origin",
         },
       }
     );
@@ -37,11 +46,10 @@ export async function middleware(request: NextRequest) {
         "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
         "Access-Control-Allow-Headers":
           "Content-Type, Authorization, x-wallet-address",
+        "Referrer-Policy": "strict-origin",
       },
     });
   }
-
-  const walletAddress = request.headers.get("x-wallet-address");
 
   if (!["POST", "PUT", "DELETE"].includes(request.method)) {
     const response = NextResponse.next();
@@ -49,12 +57,26 @@ export async function middleware(request: NextRequest) {
     return response;
   }
 
+  // if (!apiKey || apiKey !== process.env.NEXT_PUBLIC_TEST_API_KEY!) {
+  // console.log("Invalid API key. Forbidden")
+  //   return new NextResponse(
+  //     JSON.stringify({ error: "Invalid API key. Forbidden" }),
+  //     {
+  //       status: 403,
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //     }
+  //   );
+  // }
+
   const token = await getToken({
     req: request,
     secret: process.env.NEXTAUTH_SECRET,
   });
   console.log("token", token);
   if (!token) {
+    console.log("Unauthorized");
     return new NextResponse(JSON.stringify({ error: "Unauthorized" }), {
       status: 401,
       headers: {
@@ -94,6 +116,7 @@ function setCorsHeaders(response: NextResponse, origin: string | null) {
     "Access-Control-Allow-Headers",
     "Content-Type, Authorization, x-wallet-address"
   );
+  response.headers.set("Referrer-Policy", "strict-origin");
 }
 
 // See "Matching Paths" below to learn more

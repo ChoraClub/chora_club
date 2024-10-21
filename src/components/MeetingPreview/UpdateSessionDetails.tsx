@@ -114,8 +114,10 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
           `/api/update-recorded-session`,
           requestOptions
         );
+        console.log("response::::::", response);
+        const responseData = await response.json();
+        console.log("responseData::::::", responseData);
         if (response) {
-          const responseData = await response.json();
           setLoading(false);
           setShowHostPopup(true);
           // router.push(`/profile/${address}?active=sessions&session=hosted`);
