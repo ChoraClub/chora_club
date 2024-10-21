@@ -17,46 +17,47 @@ const arb_client = new Client({
 const COMBINED_VOTE_QUERY = gql`
   query CombinedVoteQuery(
     $proposalId: String!
-    $skip1: Int!
-    $skip2: Int!
+    $blockNumber: String!
     $first: Int!
   ) {
     voteCastWithParams: voteCastWithParams_collection(
-      where: { proposalId: $proposalId }
+      where: { proposalId: $proposalId, blockNumber_gte: $blockNumber }
       first: $first
-      orderBy: blockTimestamp
-      orderDirection: desc
-      skip: $skip1
+      orderBy: blockNumber
+      orderDirection: asc
     ) {
       voter
       weight
       support
+      blockNumber
       blockTimestamp
       transactionHash
+      id
+      reason
     }
     voteCasts(
-      where: { proposalId: $proposalId }
-      orderBy: blockTimestamp
-      orderDirection: desc
-      skip: $skip2
+      where: { proposalId: $proposalId, blockNumber_gte: $blockNumber }
+      orderBy: blockNumber
+      orderDirection: asc
       first: $first
     ) {
       voter
       weight
       support
+      blockNumber
       blockTimestamp
       transactionHash
+      id
+      reason
     }
   }
 `;
-
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
 
   const proposalId = searchParams.get("proposalId");
-  const skip1 = parseInt(searchParams.get("skip1") || "0", 10);
-  const skip2 = parseInt(searchParams.get("skip2") || "0", 10);
-  const first = parseInt(searchParams.get("first") || "10", 10);
+  const blockNumber = searchParams.get("blockNumber") || "0";
+  const first = parseInt(searchParams.get("first") || "1000", 10);
   const dao = searchParams.get("dao");
 
   if (!proposalId) {
@@ -71,27 +72,15 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  if (isNaN(skip1) || isNaN(skip2) || isNaN(first)) {
-    return NextResponse.json(
-      { error: "Invalid skip1, skip2, or first parameter" },
-      {
-        status: 400,
-        headers: {
-          "Cache-Control": "no-store, max-age=0",
-        },
-      }
-    );
-  }
-
   try {
     let result;
     if (dao === "optimism") {
       result = await client
-        .query(COMBINED_VOTE_QUERY, { proposalId, skip1, skip2, first })
+        .query(COMBINED_VOTE_QUERY, { proposalId, blockNumber, first })
         .toPromise();
     } else {
       result = await arb_client
-        .query(COMBINED_VOTE_QUERY, { proposalId, skip1, skip2, first })
+        .query(COMBINED_VOTE_QUERY, { proposalId, blockNumber, first })
         .toPromise();
     }
 
