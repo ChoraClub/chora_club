@@ -18,6 +18,7 @@ const EditButton: React.FC<EditButtonProps> = ({
   const router = useRouter();
 
   const handleEditModal = () => {
+    // setEditOpen(true);
     router.push(
       `/meeting/session/${sessionData.meetingId}/update-session-details`
     );
