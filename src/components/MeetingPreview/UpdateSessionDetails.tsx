@@ -15,15 +15,15 @@ import { IoClose } from "react-icons/io5";
 import SessionHostedModal from "../ComponentUtils/SessionHostedModal";
 
 function UpdateSessionDetails({ roomId }: { roomId: string }) {
-  useEffect(() => {
-    const storedStatus = sessionStorage.getItem("meetingData");
-    if (storedStatus) {
-      const parsedStatus = JSON.parse(storedStatus);
-      if (parsedStatus.meetingId === roomId) {
-        sessionStorage.removeItem("meetingData");
-      }
-    }
-  }, []);
+  // useEffect(() => {
+  //   const storedStatus = sessionStorage.getItem("meetingData");
+  //   if (storedStatus) {
+  //     const parsedStatus = JSON.parse(storedStatus);
+  //     if (parsedStatus.meetingId === roomId) {
+  //       sessionStorage.removeItem("meetingData");
+  //     }
+  //   }
+  // }, []);
 
   const [sessionDetails, setSessionDetails] = useState({
     title: "",

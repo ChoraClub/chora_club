@@ -87,15 +87,14 @@ function Proposals({ props }: { props: string }) {
   const fetchVotes = useCallback(
     async (proposal: Proposal): Promise<Proposal> => {
       let allVotes: any[] = [];
-      let skip1 = 0;
-      let skip2 = 0;
+      let lastBlockNumber = "0";
       const limit = 1000;
       let hasMore = true;
 
       try {
         while (hasMore) {
           const response = await fetch(
-            `/api/get-voters?proposalId=${proposal.proposalId}&skip1=${skip1}&skip2=${skip2}&first=${limit}&dao=${props}`
+            `/api/get-voters?proposalId=${proposal.proposalId}&blockNumber=${lastBlockNumber}&first=${limit}&dao=${props}`
           );
           const data = await response.json();
 
@@ -108,8 +107,14 @@ function Proposals({ props }: { props: string }) {
             hasMore = false;
           } else {
             allVotes = [...allVotes, ...newVotes];
-            skip1 += data?.voteCastWithParams?.length || 0;
-            skip2 += data?.voteCasts?.length || 0;
+            // Get the latest block number for the next query
+            const blockNumbers = newVotes.map((vote: any) =>
+              // Convert block numbers to numbers for comparison
+              typeof vote.blockNumber === "string"
+                ? parseInt(vote.blockNumber)
+                : vote.blockNumber
+            );
+            lastBlockNumber = Math.max(...blockNumbers).toString();
           }
         }
 
@@ -127,6 +132,7 @@ function Proposals({ props }: { props: string }) {
             s2Weight += weightInEther;
           }
         });
+
         return {
           ...proposal,
           support0Weight: s0Weight,
@@ -142,6 +148,7 @@ function Proposals({ props }: { props: string }) {
     },
     [props]
   );
+
   const fetchProposals = async () => {
     setLoading(true);
     try {
@@ -330,18 +337,24 @@ function Proposals({ props }: { props: string }) {
     if (props === "optimism") {
       let nextPage;
       if (currentCache) {
-        nextPage = Math.ceil(currentCache.updatedProposals.length / proposalsPerPage) + 1;
+        nextPage =
+          Math.ceil(currentCache.updatedProposals.length / proposalsPerPage) +
+          1;
       } else {
         nextPage = currentPage + 1;
       }
       const startIndex = (nextPage - 1) * proposalsPerPage;
       const endIndex = startIndex + proposalsPerPage;
       const newProposals = cache[props].slice(startIndex, endIndex);
-      
+
       // Use a Set to ensure uniqueness based on proposalId
-      const uniqueProposals = new Set([...displayedProposals, ...newProposals].map(p => JSON.stringify(p)));
-      setDisplayedProposals(Array.from(uniqueProposals).map(p => JSON.parse(p)));
-      
+      const uniqueProposals = new Set(
+        [...displayedProposals, ...newProposals].map((p) => JSON.stringify(p))
+      );
+      setDisplayedProposals(
+        Array.from(uniqueProposals).map((p) => JSON.parse(p))
+      );
+
       setCurrentPage(nextPage);
     } else {
       // For Arbitrum
@@ -350,16 +363,29 @@ function Proposals({ props }: { props: string }) {
         currentLength,
         currentLength + proposalsPerPage
       );
-      
+
       // Use a Set to ensure uniqueness based on proposalId
-      const uniqueProposals = new Set([...displayedProposals, ...moreProposals].map(p => JSON.stringify(p)));
-      setDisplayedProposals(Array.from(uniqueProposals).map(p => JSON.parse(p)));
+      const uniqueProposals = new Set(
+        [...displayedProposals, ...moreProposals].map((p) => JSON.stringify(p))
+      );
+      setDisplayedProposals(
+        Array.from(uniqueProposals).map((p) => JSON.parse(p))
+      );
 
       if (currentLength + proposalsPerPage >= cache[props].length) {
         fetchProposals();
       }
     }
-  }, [props, allProposals, currentPage, displayedProposals, currentCache, cache, proposalsPerPage, fetchProposals]);
+  }, [
+    props,
+    allProposals,
+    currentPage,
+    displayedProposals,
+    currentCache,
+    cache,
+    proposalsPerPage,
+    fetchProposals,
+  ]);
 
   const truncateText = (text: string, charLimit: number) => {
     const cleanedText = text.replace(/#/g, "");
