@@ -220,13 +220,13 @@ function WatchComponentMain({ props }: { props: { id: string } }) {
   return (
     <>
       {/* For Mobile Screen */}
-      <MobileResponsiveMessage />
+      {/* <MobileResponsiveMessage /> */}
 
       {/* For Desktop Screen  */}
-      <div className="hidden md:block">
+      {/* <div className="hidden md:block"> */}
         {data ? (
-          <div className=" 1.7xl:ps-14 lg:ps-5 ps-4 xl:ps-10">
-            <div className="flex justify-between items-center pt-6 pb-3 1.7xl:pe-10 lg:pe-3 pe-2">
+          <div className=" px-4 md:px-6 lg:px-8 1.7xl:px-14">
+            <div className="flex justify-between items-center pt-6 pb-3">
               <div className="font-poppins font-medium text-4xl">
                 <span className="text-black">Chora</span>{" "}
                 <span className="text-blue-shade-200">Club</span>
@@ -237,9 +237,9 @@ function WatchComponentMain({ props }: { props: { id: string } }) {
               </div>
             </div>
 
-          <div className="grid grid-cols-3 gap-y-4 gap-x-4 1.7xl:gap-x-6 pt-6 relative 1.7xl:pr-14 pr-4 lg:pr-5 xl-pr-10">
+          <div className="grid grid-cols-1 1.5lg:grid-cols-3 gap-y-4 1.5lg:gap-x-4 1.7xl:gap-x-6 pt-6 relative ">
             {/* Left side */}
-            <div className="col-span-2 space-y-5 font-poppins pb-10 ">
+            <div className="col-span-2 space-y-5 font-poppins 1.5lg:pb-10 ">
               <WatchSessionVideo
                 data={data}
                 collection={collection}
@@ -258,7 +258,7 @@ function WatchComponentMain({ props }: { props: { id: string } }) {
 
             {/* Right side */}
             <div
-              className={`col-span-1  pb-8 ${styles.customScrollbar} gap-y-6 flex flex-col`}
+              className={`col-span-1  pb-8 ${styles.customScrollbar} gap-y-6 flex flex-col 1.5lg:px-0 `}
             >
               {/* <WatchSessionList /> */}
 
@@ -268,18 +268,20 @@ function WatchComponentMain({ props }: { props: { id: string } }) {
               {/* Leader BOARD */}
               <WatchLeaderBoard leaderBoardData={leaderBoardData} data={data} collection={collection} />
 
+              <div className="flex flex-col md:flex-row 1.5lg:flex-col gap-6">
               {/* COLLECTIBLE INFO */}
               <WatchCollectibleInfo leaderBoardData={leaderBoardData} data={data} collection={collection} />
 
               {/* SOCIAL LINKS */}
               <WatchSocialLinks data={data} collection={collection} />
+              </div>
             </div>
           </div>
         </div>
       ) : (
         <WatchComponentSkeletonLoader />
       )}
-      </div>
+      {/* </div> */}
     </>
   );
 }

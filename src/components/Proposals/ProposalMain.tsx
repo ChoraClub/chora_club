@@ -66,9 +66,14 @@ interface ArbitrumVote {
 }
 
 interface VoteCast {
-  voter: string;
   weight: string;
   support: number;
+  blockNumber: string;
+  voter: string;
+  transactionHash: string;
+  blockTimestamp: string;
+  id: string;
+  reason?: string;
 }
 interface Props {
   id: string;
@@ -506,14 +511,13 @@ function ProposalMain({ props }: { props: Props }) {
 
   const fetchVotes = useCallback(async () => {
     let allVotes: VoteCast[] = [];
-    let skip1 = 0;
-    let skip2 = 0;
+    let lastBlockNumber = "0";
     const first = 1000; // Batch size
 
     try {
       while (true) {
         const response = await fetch(
-          `/api/get-voters?proposalId=${props.id}&skip1=${skip1}&skip2=${skip2}&first=${first}&dao=${props.daoDelegates}`
+          `/api/get-voters?proposalId=${props.id}&blockNumber=${lastBlockNumber}&first=${first}&dao=${props.daoDelegates}`
         );
         const data = await response.json();
         const newVoteCastWithParams = data?.voteCastWithParams || [];
@@ -523,18 +527,39 @@ function ProposalMain({ props }: { props: Props }) {
           break;
         }
 
-        allVotes = [...allVotes, ...newVoteCastWithParams, ...newVoteCasts];
-        skip1 += newVoteCastWithParams.length;
-        skip2 += newVoteCasts.length;
+        // Combine new votes
+        const newVotes = [...newVoteCastWithParams, ...newVoteCasts];
+        allVotes = [...allVotes, ...newVotes];
+
+        // Find the highest block number from the new votes
+        const blockNumbers = newVotes.map((vote: VoteCast) =>
+          typeof vote.blockNumber === "string"
+            ? BigInt(vote.blockNumber)
+            : BigInt((vote.blockNumber as string | number).toString())
+        );
+
+        if (blockNumbers.length > 0) {
+          // Convert to BigInt for safe comparison of large numbers
+          const maxBlock = blockNumbers.reduce((a, b) => (a > b ? a : b));
+          // Add 1 to ensure we don't duplicate the last block
+          lastBlockNumber = (maxBlock + BigInt(1)).toString();
+        } else {
+          break;
+        }
       }
+
+      // Sort by weight (descending)
       allVotes.sort((a, b) => {
         const weightA = BigInt(a.weight);
         const weightB = BigInt(b.weight);
         return weightB > weightA ? 1 : -1;
       });
+
+      // Update voter list state
       setVoterList(allVotes);
       setIsLoading(false);
 
+      // Calculate weights
       let s0Weight = 0;
       let s1Weight = 0;
       let s2Weight = 0;
@@ -549,8 +574,11 @@ function ProposalMain({ props }: { props: Props }) {
           s2Weight += weightInEther;
         }
       });
+
+      // Update support weight states
       setSupport0Weight(s0Weight);
       setSupport1Weight(s1Weight);
+
       return {
         support0Weight: s0Weight,
         support1Weight: s1Weight,
@@ -560,9 +588,10 @@ function ProposalMain({ props }: { props: Props }) {
       };
     } catch (err: any) {
       console.error("Error fetching votes:", err);
+      setIsLoading(false);
       throw err;
     }
-  }, []);
+  }, [props.id, props.daoDelegates]);
 
   useEffect(() => {
     fetchVotes();

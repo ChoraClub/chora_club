@@ -172,63 +172,64 @@ const WatchLeaderBoard = ({
   };
 
   const renderLeaderBoardEntry = (entry: LeaderBoardEntry) => (
-    <div className="grid grid-cols-7 py-3 bg-black-shade-300 rounded-xl items-center w-full">
-      <div className="flex items-center ml-4 col-span-3">
+    <div className="grid grid-cols-12 py-2 sm:py-3 bg-black-shade-300 rounded-xl items-center w-full px-2 sm:px-4">
+      <div className="flex items-center col-span-5 sm:col-span-4 lg:col-span-5">
         <Image
           src={entry.smallEmoji}
           alt=""
           width={26}
           height={26}
-          className="xl:mr-2 mr-1"
+          className="w-4 h-4 sm:w-6 sm:h-6 sm:mr-2 mr-1"
         />
         <div
-          className={`font-medium 1.7xl:text-sm text-xs`}
+          className={`font-medium sm:text-sm text-xs truncate`}
           style={{ color: entry.color }}
         >
           {entry.text}
         </div>
       </div>
-      <div className="flex items-center col-span-2 -ml-2">
+      <div className="flex items-center col-span-4 sm:col-span-5 lg:col-span-4">
         <Image
           src={entry.img}
           alt=""
           width={39}
           height={39}
-          className="xl:mr-2 mr-1 ml-3 xl:ml-0"
+          className="w-6 h-6 sm:w-8 sm:h-8 sm:mr-2 mr-1"
         />
-        <p className="font-normal 1.7xl:text-base text-sm">{entry.name}</p>
+        <p className="font-normal sm:text-sm text-xs truncate">{entry.name}</p>
       </div>
       <div
-        className={`border rounded-[9px] font-normal text-[13px] py-1 px-6 w-fit h-fit col-span-2 1.7xl:ml-8 ml-3 flex justify-center items-center`}
+        className={` col-span-3 sm:col-span-3 lg:col-span-3 flex justify-end sm:justify-center`}
         style={{
-          backgroundColor: entry.bgColor,
           borderColor: entry.color,
           color: entry.color,
         }}
       >
-        {entry.balance}x
+        <div className="border rounded-lg text-xs sm:text-sm py-1 px-2 sm:px-4" style={{backgroundColor: entry.bgColor,}}>
+          {entry.balance}x
+        </div>
       </div>
     </div>
   );
 
   return (
     <>
-      <div className="font-poppins">
-        <div className="flex justify-between items-center mb-5">
+      <div className="font-poppins  w-full">
+        <div className="flex justify-between items-center mb-3 sm:mb-5 px-2 sm:px-4">
           <div className="flex">
-            <p className="xl:text-base 1.7xl:text-lg font-medium text-blue-shade-100 ml-5">
-              🏆LeaderBoard
-            </p>
+          <p className="text-sm sm:text-base lg:text-lg font-medium text-blue-shade-100">
+            🏆LeaderBoard
+          </p>
           </div>
           {topEntries.length === 0 && specialEntries.length === 0 ? (
             <></>
           ) : (
-            <div
-              className="text-[10px] text-blue-shade-100 bg-blue-shade-700 rounded py-1 px-2 border border-blue-shade-100 cursor-pointer hover:bg-blue-shade-600"
-              onClick={handleViewAll}
-            >
-              View All
-            </div>
+            <button
+            className="text-[10px] sm:text-xs text-blue-shade-100 bg-blue-shade-700 rounded py-1 px-2 border border-blue-shade-100 hover:bg-blue-shade-600 transition-colors"
+            onClick={handleViewAll}
+          >
+            View All
+          </button>
           )}
         </div>
         <div className="flex flex-col gap-2">
@@ -253,30 +254,36 @@ const WatchLeaderBoard = ({
         </div>
       </div>
 
+      {/* Popup */}
       {showPopup && (
-        <div className="fixed inset-0 flex items-center justify-center z-50 overflow-hidden">
+        <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
           <div
             className="absolute inset-0 backdrop-blur-md"
             onClick={handleClosePopup}
-          ></div>
-          <div className="p-7 border z-50 rounded-2xl w-[35vw] h-[80vh] bg-white flex flex-col gap-3">
-            <div className="flex justify-between ">
-              <p className="text-lg font-medium text-blue-shade-100 ml-5">
+          />
+          <div className="relative bg-white rounded-2xl w-full max-w-[95vw] sm:max-w-[80vw] md:max-w-[60vw] lg:max-w-[50vw] xl:max-w-[35vw] h-[80vh] flex flex-col">
+            {/* Popup Header */}
+            <div className="flex justify-between items-center p-4 sm:p-6">
+              <p className="text-base sm:text-lg font-medium text-blue-shade-100">
                 🏆LeaderBoard
               </p>
-              <div className="bg-black rounded-full size-6 p-px flex justify-center items-center">
-                <IoClose
-                  className="cursor-pointer w-6 h-6 text-white"
-                  onClick={handleClosePopup}
-                />
-              </div>
+              <button
+                className="bg-black rounded-full p-1 flex items-center justify-center"
+                onClick={handleClosePopup}
+              >
+                <IoClose className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
+              </button>
             </div>
-            <div className={`flex-grow overflow-y-auto ${styles.scrollbar}`}>
-              {allEntries.map((entry, index) => (
-                <div key={`all-${index}`} className="mb-2 mr-3">
-                  {renderLeaderBoardEntry(entry)}
-                </div>
-              ))}
+
+            {/* Popup Content */}
+            <div className="flex-grow overflow-y-auto p-2 sm:p-4">
+              <div className="space-y-2">
+                {allEntries.map((entry, index) => (
+                  <div key={`all-${index}`}>
+                    {renderLeaderBoardEntry(entry)}
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>

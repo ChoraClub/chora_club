@@ -373,7 +373,7 @@ const WatchFreeCollect = ({
   return (
     <div className="font-poppins overflow-hidden bg-gradient-to-br p-1 rounded-3xl transition-all duration-300 hover:shadow-lg">
       <div className="bg-white rounded-3xl overflow-hidden">
-        <div className="flex justify-between items-center w-full bg-blue-600 py-4 px-6">
+        <div className="flex justify-between items-center w-full bg-blue-600 py-4 px-6 1.5lg:px-3 1.5xl:px-6">
           <div className="flex items-center space-x-2 animate-fade-in">
             <span className="text-2xl">💎</span>
             <p className="font-bold text-lg text-white">Free NFT</p>
@@ -385,8 +385,8 @@ const WatchFreeCollect = ({
           </div>
         </div>
 
-        <div className="grid grid-cols-2 px-6 py-4 bg-gradient-to-r from-blue-100 to-purple-100">
-          <div className="flex items-center space-x-4">
+        <div className="flex justify-between p-4 1.5xl:px-6 py-4 bg-gradient-to-r from-blue-100 to-purple-100">
+          <div className="flex items-center space-x-2 1.5xl:space-x-4">
             <button
               onClick={() => setNumber((prev) => Math.max(prev - 1, 1))}
               disabled={
@@ -416,7 +416,7 @@ const WatchFreeCollect = ({
           <div className="flex justify-end">
             <button
               onClick={() => setIsOpen((prev) => !prev)}
-              className="text-white bg-gradient-to-r from-purple-500 to-indigo-600 rounded-full py-3 px-6 text-sm font-semibold shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105"
+              className="text-white bg-gradient-to-r from-purple-500 to-indigo-600 rounded-full p-3 0.5xs:py-3 0.5xs:px-6 text-sm font-semibold shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105"
             >
               {isOpen ? "Close Details" : "Collect Now"}
               {isOpen ? (
