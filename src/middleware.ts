@@ -55,7 +55,7 @@ export async function middleware(request: NextRequest) {
     secret: process.env.NEXTAUTH_SECRET,
   });
 
-  // console.log("Token generated using nextauth:-", token);
+  console.log("Token generated using nextauth:-", token);
 
   if (!token) {
     // If there's no token, the user is not authenticated
@@ -68,9 +68,9 @@ export async function middleware(request: NextRequest) {
   // Extract the user address from the token
   const UserAddress = token.sub;
 
-  // console.log("Exracted user address from token:- ", UserAddress);
+  console.log("Exracted user address from token:- ", UserAddress);
 
-  // console.log("Requested Address:", walletAddress);
+  console.log("Requested Address:", walletAddress);
 
   if (UserAddress !== walletAddress) {
     // If the user's address doesn't match the requested profile address

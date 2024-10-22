@@ -26,7 +26,7 @@ import {
   useRoom,
   useLocalPeer,
 } from "@huddle01/react/hooks";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
+// import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { Role } from "@huddle01/server-sdk/auth";
 import { Oval, TailSpin } from "react-loader-spinner";
 import Link from "next/link";

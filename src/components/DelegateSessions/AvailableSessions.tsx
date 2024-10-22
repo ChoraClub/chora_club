@@ -24,7 +24,7 @@ import { useAccount } from "wagmi";
 import { CiSearch } from "react-icons/ci";
 import { FaChevronDown } from "react-icons/fa";
 import { MdOutlineHourglassDisabled } from "react-icons/md";
-import { useConnectModal } from "@rainbow-me/rainbowkit";
+// import { useConnectModal } from "@rainbow-me/rainbowkit";
 
 interface Type {
   ensName: string;
@@ -66,7 +66,7 @@ function AvailableSessions() {
   const [error, setError] = useState<string | null>(null);
   const [initialFetchComplete, setInitialFetchComplete] = useState(false);
   const [showFilterOptions, setShowFilterOptions] = useState(false);
-  const { openConnectModal } = useConnectModal();
+  // const { openConnectModal } = useConnectModal();
 
   const handleBookSession = (daoName: string, userAddress: string) => {
     if (isConnected) {
@@ -74,8 +74,9 @@ function AvailableSessions() {
         `/${daoName}/${userAddress}?active=delegatesSession&session=book`
       );
     } else {
-      if (openConnectModal) {
-        openConnectModal();
+      if (1==1) {
+        // openConnectModal();
+        alert('open connect modal');
       } else {
         console.error("Connect modal is not available");
         alert(

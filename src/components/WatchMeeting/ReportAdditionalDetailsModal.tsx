@@ -1,5 +1,5 @@
 import { ReportRequestBody, VideoReport } from "@/app/api/report-session/route";
-import { useConnectModal } from "@rainbow-me/rainbowkit";
+// import { useConnectModal } from "@rainbow-me/rainbowkit";
 import React, { useState } from "react";
 import { RxCross2 } from "react-icons/rx";
 import { v4 as uuidv4 } from "uuid";
@@ -17,7 +17,7 @@ function ReportAdditionalDetailsModal({
   category: string;
   onClose: () => void;
 }) {
-  const { openConnectModal } = useConnectModal();
+  // const { openConnectModal } = useConnectModal();
   const { address, isConnected } = useAccount();
   const [details, setDetails] = useState("");
   const [isLoading, setIsLoading] = useState<boolean>();
@@ -115,8 +115,9 @@ function ReportAdditionalDetailsModal({
         setIsLoading(false);
       }
     } else {
-      if (openConnectModal) {
-        openConnectModal();
+      if (1==1) {
+        // openConnectModal();
+        alert('connect modal!');
       }
     }
   };

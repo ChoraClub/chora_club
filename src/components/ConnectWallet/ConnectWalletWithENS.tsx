@@ -1,30 +1,60 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
-// import "@rainbow-me/rainbow-button/styles.css";
 import { fetchEnsNameAndAvatar, fetchEnsName } from "@/utils/ENSUtils";
 import { BiSolidWallet } from "react-icons/bi";
-import { useAccount } from "wagmi";
-import { usePathname } from "next/navigation";
 import Image from "next/image";
-import user from "@/assets/images/user/user2.svg";
-import { useConnection } from "@/app/hooks/useConnection";
+import user2 from "@/assets/images/user/user2.svg";
+import { usePrivy, useWallets } from "@privy-io/react-auth";
+import { useAccount, useChainId, useSwitchChain } from "wagmi";
+import { shorten } from "@/utils/helper";
+import { Button } from "@nextui-org/react";
+import OPLogo from "@/assets/images/daos/op.png";
+import ArbLogo from "@/assets/images/daos/arb.png";
+import ChainSwitcherHeader from "./ChainSwitcherHeader";
+
 
 function ConnectWalletWithENS() {
-  const [displayAddress, setDisplayAddress] = useState<any>();
+  const [displayAddress, setDisplayAddress] = useState<string>("");
   const [userProfileImage, setUserProfileImage] = useState<string | null>(null);
   const [ensAvatar, setEnsAvatar] = useState<string | null>(null);
-  const { address } = useAccount();
-  const { isConnected, isLoading, isSessionLoading, isPageLoading, isReady } =
-    useConnection();
+  const [chainIcon, setChainIcon] = useState<string | null>(null);
+  const { address, isConnected, isConnecting, isDisconnected, chain } =
+    useAccount();
+  const chainId = useChainId();
+  const { chains, error: switchNetworkError, switchChain } = useSwitchChain();
+  const [walletAddress2, setWalletAddress] = useState<string | null>(null);
+
+  const { ready, authenticated, login, logout, user } = usePrivy();
+
+  const { wallets } = useWallets();
+  const activeWallet = wallets[0]; // Primary wallet
+  // console.log("Line 26:", address);
+  // console.log("Line 29:", chainId);
+  // console.log('Is authenticated:',authenticated);
+  // console.log("Line number 24:", activeWallet);
+  // const walletAddress = activeWallet?.address;
+  // console.log("Line number 25:", walletAddress);
+
+ 
+  useEffect(() => {
+    // If external wallet (wagmi) is connected, use its address
+    if (isConnected && address) {
+      setWalletAddress(address);  // External wallet address
+    } else if (authenticated && user?.wallet?.address) {
+      // If authenticated with Privy and no external wallet, use embedded wallet address
+      setWalletAddress(user.wallet.address);  // Embedded wallet address
+    }
+  }, [authenticated, user, isConnected, address]);
 
   useEffect(() => {
     const fetchUserProfile = async () => {
-      if (address && isConnected) {
+      if (walletAddress2 && authenticated) {
         try {
+          // Fetch user profile from your API
           const myHeaders = new Headers();
           myHeaders.append("Content-Type", "application/json");
-          myHeaders.append("x-wallet-address", address);
+          myHeaders.append("x-wallet-address", walletAddress2 ? walletAddress2 : "");
+          setDisplayAddress(address ? address : "");
 
           const raw = JSON.stringify({ address: address });
 
@@ -35,9 +65,9 @@ function ConnectWalletWithENS() {
             redirect: "follow",
           };
 
-          const res = await fetch(`/api/profile/${address}`, requestOptions);
+          const res = await fetch(`/api/profile/${walletAddress2}`, requestOptions);
           const dbResponse = await res.json();
-          console.log("data", dbResponse);
+          console.log("line number 48:", dbResponse);
 
           if (dbResponse.data.length > 0) {
             const profileImage = dbResponse.data[0]?.image;
@@ -48,8 +78,15 @@ function ConnectWalletWithENS() {
             );
           }
 
-          const ensData = await fetchEnsNameAndAvatar(address);
+          // Fetch ENS data
+          const ensData = await fetchEnsNameAndAvatar(walletAddress2);
           setEnsAvatar(ensData?.avatar || null);
+
+          // Get ENS name
+          const displayName = await fetchEnsName(walletAddress2);
+          console.log("Line number 64:", displayName);
+          setDisplayAddress(displayName?.ensNameOrAddress || walletAddress2);
+          console.log("Line number 66:", displayAddress);
         } catch (error) {
           console.error("Error fetching user profile:", error);
         }
@@ -57,16 +94,7 @@ function ConnectWalletWithENS() {
     };
 
     fetchUserProfile();
-  }, [address, isConnected]);
-
-  useEffect(() => {
-    if (address && isConnected) {
-      (async () => {
-        const displayName = await fetchEnsName(address);
-        setDisplayAddress(displayName?.ensNameOrAddress);
-      })();
-    }
-  }, [address, isConnected]);
+  }, [walletAddress2, authenticated]);
 
   const getDisplayImage = () => {
     if (ensAvatar) {
@@ -74,264 +102,65 @@ function ConnectWalletWithENS() {
     } else if (userProfileImage) {
       return userProfileImage;
     } else {
-      return user;
+      return user2;
     }
   };
 
+  const handleChainSwitch = async () => {
+    if (activeWallet?.switchChain) {
+      try {
+        // You can customize which chain to switch to
+        await activeWallet.switchChain(1); // Switch to Ethereum mainnet
+      } catch (error) {
+        console.error("Failed to switch chain:", error);
+      }
+    }
+  };
+
+  if (!ready) {
+    return null; // or loading spinner
+  }
+
   return (
-    <ConnectButton.Custom>
-      {({
-        account,
-        chain,
-        openAccountModal,
-        openChainModal,
-        openConnectModal,
-        authenticationStatus,
-        mounted,
-      }) => {
-        // Note: If your app doesn't use authentication, you
-        // can remove all 'authenticationStatus' checks
-        const ready = mounted && authenticationStatus !== "loading";
-        const connected =
-          ready &&
-          account &&
-          chain &&
-          (!authenticationStatus || authenticationStatus === "authenticated");
+    <div className="wallet">
+      {!authenticated && !address ? (
+        <button
+          onClick={login}
+          type="button"
+          className="flex items-center justify-center text-white bg-blue-shade-200 hover:bg-blue-shade-100 border border-white rounded-full p-2 md:px-5 md:py-4 text-xs md:text-sm font-bold transition-transform transform hover:scale-105"
+        >
+          <BiSolidWallet className="block md:hidden size-5" />
+          <span className="hidden md:block">Connect Wallet</span>
+        </button>
+      ) : (
+        <>
+          <ChainSwitcherHeader
+            address={walletAddress2?walletAddress2:''}
+            currentChainId={chain?.id}
+            switchChain={switchChain}
+            disconnect={logout}
+            ensAvatar={ensAvatar}
+          />
 
-        // useEffect(() => {
-        //   const name = fetchEnsName(account?.address, account?.displayName);
-        //   setDisplayAddress(name);
-        // }, []);
-        console.log("account: ", account?.address);
-
-        if (account) {
-          (async () => {
-            // console.log("account in if: ", account?.address);
-            const displayName = await fetchEnsName(account?.address);
-            // console.log("display name: ", displayName?.ensNameOrAddress);
-            setDisplayAddress(displayName?.ensNameOrAddress);
-          })();
-        }
-
-        return (
-          <div
-            {...(!ready && {
-              "aria-hidden": true,
-              style: {
-                opacity: 0,
-                pointerEvents: "none",
-                userSelect: "none",
-              },
-            })}
-            className="wallet"
-          >
-            {(() => {
-              if (!connected) {
-                return (
-                  <button
-                    onClick={openConnectModal}
-                    type="button"
-                    className="flex items-center justify-center text-white bg-blue-shade-200 hover:bg-blue-shade-100 border border-white rounded-full p-2 md:px-5 md:py-4 text-xs md:text-sm font-bold transition-transform transform hover:scale-105"
-                  >
-                    <BiSolidWallet className="block md:hidden size-5" />
-                    <span className="hidden md:block">Connect Wallet</span>
-                  </button>
-                );
-              }
-
-              if (chain.unsupported) {
-                return (
-                  <button
-                    onClick={openChainModal}
-                    type="button"
-                    className="flex items-center text-white bg-red-600 hover:bg-red-700 border border-white rounded-lg px-3 py-2 md:px-4 md:py-[5px] font-bold transition-transform transform hover:scale-105 text-xs md:text-sm"
-                  >
-                    Wrong network
-                  </button>
-                );
-              }
-
-              return (
-                <>
-                  <div style={{ gap: 8 }} className="hidden lg:flex ml-2">
-                    <button
-                      onClick={openChainModal}
-                      type="button"
-                      className="flex items-center font-bold text-black transition-transform transform hover:scale-105 text-xs md:text-sm"
-                    >
-                      {chain.hasIcon && (
-                        <div
-                          style={{
-                            background: chain.iconBackground,
-                            width: 24,
-                            height: 24,
-                            borderRadius: 999,
-                            overflow: "hidden",
-                            marginRight: 4,
-                          }}
-                        >
-                          {chain.iconUrl && (
-                            <img
-                              alt={chain.name ?? "Chain icon"}
-                              src={chain.iconUrl}
-                              style={{ width: 24, height: 24 }}
-                            />
-                          )}
-                        </div>
-                      )}
-                      {/* {chain.name} */}
-                      <svg
-                        fill="#000000"
-                        height="25px"
-                        width="25px"
-                        version="1.1"
-                        id="Layer_1"
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="-168.3 -168.3 666.60 666.60"
-                        transform="rotate(180)"
-                        stroke="#9c9c9c"
-                        stroke-width="33.0002"
-                      >
-                        <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                        <g
-                          id="SVGRepo_tracerCarrier"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        ></g>
-                        <g id="SVGRepo_iconCarrier">
-                          {" "}
-                          <path
-                            id="XMLID_105_"
-                            d="M324.001,209.25L173.997,96.75c-5.334-4-12.667-4-18,0L6.001,209.25c-6.627,4.971-7.971,14.373-3,21 c2.947,3.93,7.451,6.001,12.012,6.001c3.131,0,6.29-0.978,8.988-3.001L164.998,127.5l141.003,105.75c6.629,4.972,16.03,3.627,21-3 C331.972,223.623,330.628,214.221,324.001,209.25z"
-                          ></path>{" "}
-                        </g>
-                      </svg>
-                    </button>
-
-                    <button
-                      onClick={openAccountModal}
-                      type="button"
-                      // style={{
-                      //   display: "flex",
-                      //   alignItems: "center",
-                      //   color: "black",
-                      //   borderRadius: "12px",
-                      //   borderColor: "white",
-                      //   borderStyle: "solid",
-                      //   backgroundColor: "white",
-                      //   fontWeight: "bold",
-                      //   boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
-                      // }}
-                      className="flex items-center font-bold text-black transition-transform transform hover:scale-105 text-xs sm:text-sm"
-                    >
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          background:
-                            "linear-gradient(0deg, rgba(0, 0, 0, 0.03), rgba(0, 0, 0, 0.06))",
-                          color: "black",
-                          borderRadius: "12px",
-                          paddingLeft: "12px",
-                          paddingRight: "4px",
-                          paddingTop: "6px",
-                          paddingBottom: "6px",
-                          margin: "1px",
-                          backgroundColor: "#ffffff",
-                        }}
-                      >
-                        {account.ensAvatar && (
-                          <div
-                            style={{
-                              width: 24,
-                              height: 24,
-                              borderRadius: 999,
-                              overflow: "hidden",
-                              marginRight: 4,
-                            }}
-                          >
-                            <img
-                              alt={account.ensAvatar ?? "Chain icon"}
-                              src={account.ensAvatar}
-                              style={{ width: 24, height: 24 }}
-                            />
-                          </div>
-                        )}
-                        {displayAddress}
-                        <svg
-                          fill="#000000"
-                          height="25px"
-                          width="25px"
-                          version="1.1"
-                          id="Layer_1"
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="-168.3 -168.3 666.60 666.60"
-                          transform="rotate(180)"
-                          stroke="#000000"
-                          stroke-width="33.0002"
-                        >
-                          <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                          <g
-                            id="SVGRepo_tracerCarrier"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                          ></g>
-                          <g id="SVGRepo_iconCarrier">
-                            {" "}
-                            <path
-                              id="XMLID_105_"
-                              d="M324.001,209.25L173.997,96.75c-5.334-4-12.667-4-18,0L6.001,209.25c-6.627,4.971-7.971,14.373-3,21 c2.947,3.93,7.451,6.001,12.012,6.001c3.131,0,6.29-0.978,8.988-3.001L164.998,127.5l141.003,105.75c6.629,4.972,16.03,3.627,21-3 C331.972,223.623,330.628,214.221,324.001,209.25z"
-                            ></path>{" "}
-                          </g>
-                        </svg>
-                      </div>
-                    </button>
-                  </div>
-
-                  <div className="lg:hidden flex items-center">
-                    {/* <button
-                      onClick={openAccountModal}
-                      type="button"
-                      className="flex items-center rounded-full justify-center border-2 border-white font-bold text-black shadow-sm transition-transform transform hover:scale-105 text-xs"
-                    >
-                      {userProfileImage ? (
-                        <Image
-                          src={userProfileImage}
-                          alt="User Profile"
-                          width={30}
-                          height={30}
-                          className="rounded-full mr-2"
-                        />
-                      ) : (
-                        <Image
-                          src={user}
-                          alt="User Profile"
-                          width={30}
-                          height={30}
-                          className="rounded-full mr-2"/>
-                      )}
-                    </button> */}
-                    <button
-                      onClick={openAccountModal}
-                      type="button"
-                      className="flex items-center size-[30px] rounded-full justify-center border-2 border-black font-bold text-black shadow-sm transition-transform transform hover:scale-105 text-xs"
-                    >
-                      <Image
-                        src={getDisplayImage()}
-                        alt="User Avatar"
-                        width={30}
-                        height={30}
-                        className="rounded-full"
-                      />
-                    </button>
-                  </div>
-                </>
-              );
-            })()}
+          {/* Mobile View */}
+          <div className="lg:hidden flex items-center">
+            <button
+              onClick={login}
+              type="button"
+              className="flex items-center size-[30px] rounded-full justify-center border-2 border-black font-bold text-black shadow-sm transition-transform transform hover:scale-105 text-xs"
+            >
+              <Image
+                src={getDisplayImage()}
+                alt="User Avatar"
+                width={30}
+                height={30}
+                className="rounded-full"
+              />
+            </button>
           </div>
-        );
-      }}
-    </ConnectButton.Custom>
+        </>
+      )}
+    </div>
   );
 }
 

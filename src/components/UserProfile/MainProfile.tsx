@@ -26,7 +26,7 @@ import OPLogo from "@/assets/images/daos/op.png";
 import ArbLogo from "@/assets/images/daos/arb.png";
 import ccLogo from "@/assets/images/daos/CCLogo2.png";
 import { Button, useDisclosure } from "@nextui-org/react";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
+// import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useAccount } from "wagmi";
 import WalletAndPublicClient from "@/helpers/signer";
 import dao_abi from "../../artifacts/Dao.sol/GovernanceToken.json";
@@ -35,7 +35,7 @@ import { Oval } from "react-loader-spinner";
 import lighthouse from "@lighthouse-web3/sdk";
 import InstantMeet from "./InstantMeet";
 import { useSession } from "next-auth/react";
-import { useConnectModal } from "@rainbow-me/rainbowkit";
+// import { useConnectModal } from "@rainbow-me/rainbowkit";
 import ConnectWalletWithENS from "../ConnectWallet/ConnectWalletWithENS";
 import MainProfileSkeletonLoader from "../SkeletonLoader/MainProfileSkeletonLoader";
 import { BASE_URL, LIGHTHOUSE_BASE_API_KEY } from "@/config/constants";
@@ -61,7 +61,7 @@ function MainProfile() {
   // const { isConnected, chain } = useAccount();
   // const address = "0xc622420AD9dE8E595694413F24731Dd877eb84E1";
   const { data: session, status } = useSession();
-  const { openConnectModal } = useConnectModal();
+  // const { openConnectModal } = useConnectModal();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const path = usePathname();
@@ -197,8 +197,9 @@ function MainProfile() {
       // console.log("newPath", newPath);
       router.replace(`${newPath}`);
     } else if (!isConnected && !session) {
-      if (openConnectModal) {
-        openConnectModal();
+      if (1==1) {
+        // openConnectModal();
+        alert('connect modal!');
       } else {
         console.error("openConnectModal is not defined");
       }

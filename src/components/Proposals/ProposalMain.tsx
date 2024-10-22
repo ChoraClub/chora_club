@@ -18,7 +18,7 @@ import { LuDot } from "react-icons/lu";
 import chainImg from "@/assets/images/daos/chain.png";
 import user2 from "@/assets/images/user/user2.svg";
 import user5 from "@/assets/images/user/user5.svg";
-import { useConnectModal, useChainModal } from "@rainbow-me/rainbowkit";
+// import { useConnectModal, useChainModal } from "@rainbow-me/rainbowkit";
 import VotingPopup from "./VotingPopup";
 import arb_proposals_abi from "../../artifacts/Dao.sol/arb_proposals_abi.json";
 import op_proposals_abi from "../../artifacts/Dao.sol/op_proposals_abi.json";
@@ -106,7 +106,7 @@ function ProposalMain({ props }: { props: Props }) {
   const network = useAccount().chain;
   const { publicClient, walletClient } = WalletAndPublicClient();
   const { chain } = useAccount();
-  const { openChainModal } = useChainModal();
+  // const { openChainModal } = useChainModal();
   const [isVotingOpen, setIsVotingOpen] = useState(false);
   const { address } = useAccount();
   const contentRef = useRef<HTMLDivElement>(null);
@@ -170,8 +170,9 @@ function ProposalMain({ props }: { props: Props }) {
 
     if (chain !== props.daoDelegates) {
       toast.error("Please switch to appropriate network to delegate!");
-      if (openChainModal) {
-        openChainModal();
+      if (1==1) {
+        // openChainModal();
+        alert('chain modal!');
       }
     } else {
       setIsVotingOpen(true);

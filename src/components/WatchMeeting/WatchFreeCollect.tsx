@@ -10,7 +10,7 @@ import {
   useWriteContract,
   useSwitchChain,
 } from "wagmi";
-import { useConnectModal } from "@rainbow-me/rainbowkit";
+// import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { createCollectorClient, createCreatorClient } from "chora-protocol-sdk";
 import { ethers } from "ethers";
 import lighthouse from "@lighthouse-web3/sdk";
@@ -61,7 +61,7 @@ const WatchFreeCollect = ({
   collection: string;
 }) => {
   const chainId = useChainId();
-  const { openConnectModal } = useConnectModal();
+  // const { openConnectModal } = useConnectModal();
   const { switchChain } = useSwitchChain();
   const publicClient = usePublicClient()!;
   const { address, chain } = useAccount();
@@ -185,7 +185,8 @@ const WatchFreeCollect = ({
   const handleMint = async () => {
     if (!address && !session) {
       toast("Wallet not connected");
-      openConnectModal?.();
+      // openConnectModal?.();
+      alert('connect modal!');
       return;
     }
 
@@ -332,7 +333,8 @@ const WatchFreeCollect = ({
     if (!address && !session) {
       toast("Wallet not connected");
       console.log("Not connected");
-      openConnectModal?.();
+      // openConnectModal?.();
+      alert('connect modal!');
       return;
     }
 

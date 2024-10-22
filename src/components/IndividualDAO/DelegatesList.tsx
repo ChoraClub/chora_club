@@ -2,7 +2,7 @@ import Image from "next/image";
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { useRouter } from "next-nprogress-bar";
 import toast from "react-hot-toast";
-import { useConnectModal, useChainModal } from "@rainbow-me/rainbowkit";
+// import { useConnectModal, useChainModal } from "@rainbow-me/rainbowkit";
 import { useAccount } from "wagmi";
 import WalletAndPublicClient from "@/helpers/signer";
 import ErrorDisplay from "../ComponentUtils/ErrorDisplay";
@@ -54,8 +54,8 @@ function DelegatesList({ props }: { props: string }) {
   const [confettiVisible, setConfettiVisible] = useState(false);
 
   const router = useRouter();
-  const { openChainModal } = useChainModal();
-  const { openConnectModal } = useConnectModal();
+  // const { openChainModal } = useChainModal();
+  // const { openConnectModal } = useConnectModal();
   const { isConnected, address, chain } = useAccount();
   const { publicClient, walletClient } = WalletAndPublicClient();
 
@@ -154,7 +154,8 @@ function DelegatesList({ props }: { props: string }) {
     console.log("delegateObject", delegateObject);
     setSelectedDelegate(delegateObject);
     if (!isConnected) {
-      openConnectModal?.();
+      // openConnectModal?.();
+      alert('handle delegate');
       return;
     }
 
@@ -186,7 +187,8 @@ function DelegatesList({ props }: { props: string }) {
 
     if (walletClient?.chain.name !== network) {
       toast.error("Please switch to the appropriate network to delegate!");
-      openChainModal?.();
+      // openChainModal?.();
+      alert('handle switch!');
       return;
     }
 

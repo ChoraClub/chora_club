@@ -18,7 +18,7 @@ import {
   useDisclosure,
 } from "@nextui-org/react";
 import toast, { Toaster } from "react-hot-toast";
-import { useConnectModal } from "@rainbow-me/rainbowkit";
+// import { useConnectModal } from "@rainbow-me/rainbowkit";
 import SchedulingSuccessModal from "@/components/UserProfile/UserAllSessions/SchedulingSuccessModal";
 import BookingSuccessModal from "./BookingSuccessModal";
 import AddEmailModal from "@/components/ComponentUtils/AddEmailModal";
@@ -37,7 +37,7 @@ const StyledTimePickerContainer = styled.div`
 
 function BookSession({ props }: { props: Type }) {
   const router = useRouter();
-  const { openConnectModal } = useConnectModal();
+  // const { openConnectModal } = useConnectModal();
   // const host_address = "0x3013bb4E03a7B81106D69C10710EaE148C8410E1";
   const daoName = props.daoDelegates;
   const host_address = props.individualDelegate;
@@ -186,8 +186,9 @@ function BookSession({ props }: { props: Type }) {
         onOpen();
       }
     } else {
-      if (openConnectModal) {
-        openConnectModal();
+      if (1==1) {
+        // openConnectModal();
+        alert('connect modal!');
       }
     }
   };

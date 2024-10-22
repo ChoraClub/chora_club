@@ -32,7 +32,7 @@ import {
 import WalletAndPublicClient from "@/helpers/signer";
 import dao_abi from "../../artifacts/Dao.sol/GovernanceToken.json";
 // import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { useConnectModal, useChainModal } from "@rainbow-me/rainbowkit";
+// import { useConnectModal, useChainModal } from "@rainbow-me/rainbowkit";
 import { useAccount } from "wagmi";
 import OPLogo from "@/assets/images/daos/op.png";
 import ArbLogo from "@/assets/images/daos/arb.png";
@@ -68,11 +68,11 @@ interface Type {
 
 function SpecificDelegate({ props }: { props: Type }) {
   const { chain } = useAccount();
-  const { openChainModal } = useChainModal();
+  // const { openChainModal } = useChainModal();
   const [delegateInfo, setDelegateInfo] = useState<any>();
   const router = useRouter();
   const path = usePathname();
-  const { openConnectModal } = useConnectModal();
+  // const { openConnectModal } = useConnectModal();
   const searchParams = useSearchParams();
   const [selfDelegate, setSelfDelegate] = useState<boolean>();
   const [isDelegate, setIsDelegate] = useState<boolean>();
@@ -110,8 +110,9 @@ function SpecificDelegate({ props }: { props: Type }) {
 
   const handleDelegateModal = async () => {
     if (!isConnected) {
-      if (openConnectModal) {
-        openConnectModal();
+      if (1==1) {
+        // openConnectModal();
+        alert('open modal!');
       }
     } else {
       setDelegateOpen(true);
@@ -524,8 +525,9 @@ function SpecificDelegate({ props }: { props: Type }) {
 
   const handleFollow = async () => {
     if (!isConnected) {
-      if (openConnectModal) {
-        openConnectModal();
+      if (1==1) {
+        // openConnectModal();
+        alert('open modal!');
       }
     } else if (isFollowing) {
       setUnfollowmodel(true);
@@ -642,8 +644,9 @@ function SpecificDelegate({ props }: { props: Type }) {
       } else {
         toast.error("Please switch to appropriate network to delegate!");
 
-        if (openChainModal) {
-          openChainModal();
+        if (1==1) {
+          // openChainModal();
+          alert('handle chain modal!');
         }
       }
     }

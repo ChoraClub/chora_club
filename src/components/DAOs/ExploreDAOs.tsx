@@ -10,7 +10,7 @@ import { dao_details } from "@/config/daoDetails";
 import SidebarMainMobile from "../MainSidebar/SidebarMainMobile";
 import RewardButton from "../ClaimReward/RewardButton";
 import { useSearchParams } from "next/navigation";
-import { useConnectModal } from "@rainbow-me/rainbowkit";
+// import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { useConnection } from "@/app/hooks/useConnection";
 import { useAccount } from "wagmi";
 import Link from "next/link";
@@ -39,7 +39,7 @@ const ExploreDAOs = () => {
   const [isHovered, setIsHovered] = useState(false);
   const [openSearch, setOpenSearch] = useState(false);
   const searchParams = useSearchParams();
-  const { openConnectModal } = useConnectModal();
+  // const { openConnectModal } = useConnectModal();
   const { isConnected, isLoading, isSessionLoading, isPageLoading, isReady } =
     useConnection();
 
@@ -85,8 +85,9 @@ const ExploreDAOs = () => {
   }, [openSearch]);
 
   useEffect(() => {
-    if (searchParams.get("referrer") && openConnectModal) {
-      openConnectModal();
+    if (searchParams.get("referrer")) {
+      // openConnectModal();
+      alert('connect modal open');
     }
   }, [searchParams]);
 

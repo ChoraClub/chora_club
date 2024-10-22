@@ -5,7 +5,9 @@ import { SiweMessage } from "siwe";
 import { BASE_URL } from "@/config/constants";
 import jwt from "jsonwebtoken";
 
+
 async function AccountCreate(user: any, token: any, referrer: string | null) {
+  console.log(user);
   try {
     // const referrer = sessionStorage.getItem("referrer");
     const res = await fetch(`${BASE_URL}/api/auth/accountcreate`, {
@@ -62,11 +64,12 @@ export const authOptions: NextAuthOptions = {
           // console.log("referrer: ", referrer);
 
           const nextAuthUrl = new URL(BASE_URL as string);
-          // console.log("credentials", credentials);
-          // console.log("req", req);
-          // console.log("siwe", siwe);
-          // console.log("nextAuthUrl", nextAuthUrl);
-          // console.log("process.env.VERCEL_URL", process.env.VERCEL_URL);
+          console.log("credentials", credentials);
+          console.log("req", req);
+          console.log("NOUNCE AUTH:", req?.body?.csrfToken);
+          console.log("siwe", siwe);
+          console.log("nextAuthUrl", nextAuthUrl);
+          console.log("process.env.VERCEL_URL", process.env.VERCEL_URL);
           const secret = process.env.NEXTAUTH_SECRET;
           const result = await siwe.verify({
             signature: credentials?.signature || "",
@@ -112,6 +115,7 @@ export const authOptions: NextAuthOptions = {
         AccountCreate(token.sub, accessToken, (user as any).referrer);
         token.accessToken = accessToken;
         token.referrer = (user as any).referrer;
+        
       }
       return token;
     },
