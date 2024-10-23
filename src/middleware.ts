@@ -57,49 +57,49 @@ export async function middleware(request: NextRequest) {
     return response;
   }
 
-  // if (!apiKey || apiKey !== process.env.NEXT_PUBLIC_TEST_API_KEY!) {
-  // console.log("Invalid API key. Forbidden")
-  //   return new NextResponse(
-  //     JSON.stringify({ error: "Invalid API key. Forbidden" }),
-  //     {
-  //       status: 403,
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //     }
-  //   );
+  if (!apiKey || apiKey !== process.env.CHORA_CLUB_API_KEY!) {
+    console.log("Invalid API key. Forbidden");
+    return new NextResponse(
+      JSON.stringify({ error: "Invalid API key. Forbidden" }),
+      {
+        status: 403,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+  }
+
+  // const token = await getToken({
+  //   req: request,
+  //   secret: process.env.NEXTAUTH_SECRET,
+  // });
+  // console.log("token", token);
+  // if (!token) {
+  //   console.log("Unauthorized");
+  //   return new NextResponse(JSON.stringify({ error: "Unauthorized" }), {
+  //     status: 401,
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //       "Access-Control-Allow-Origin": origin || "*",
+  //     },
+  //   });
   // }
 
-  const token = await getToken({
-    req: request,
-    secret: process.env.NEXTAUTH_SECRET,
-  });
-  console.log("token", token);
-  if (!token) {
-    console.log("Unauthorized");
-    return new NextResponse(JSON.stringify({ error: "Unauthorized" }), {
-      status: 401,
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": origin || "*",
-      },
-    });
-  }
+  // const UserAddress = token.sub;
 
-  const userAddress = token.sub;
-
-  if (userAddress !== walletAddress) {
-    console.log(
-      `Forbidden access attempt: By user with address :- ${userAddress}`
-    );
-    return new NextResponse(JSON.stringify({ error: "Forbidden" }), {
-      status: 403,
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": origin || "*",
-      },
-    });
-  }
+  // if (UserAddress !== walletAddress) {
+  //   console.log(
+  //     `Forbidden access attempt: By user with address :- ${UserAddress}`
+  //   );
+  //   return new NextResponse(JSON.stringify({ error: "Forbidden" }), {
+  //     status: 403,
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //       "Access-Control-Allow-Origin": origin || "*",
+  //     },
+  //   });
+  // }
 
   const response = NextResponse.next();
   setCorsHeaders(response, origin);

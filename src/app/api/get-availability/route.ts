@@ -131,7 +131,7 @@ export async function POST(req: NextRequest, res: NextResponse<Type[]>) {
   }
 }
 
-export async function DELETE(req: NextRequest, res: NextResponse<Type[]>) {
+export async function PUT(req: NextRequest, res: NextResponse<Type[]>) {
   try {
     const {
       dao_name,
