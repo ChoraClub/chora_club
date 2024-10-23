@@ -189,7 +189,7 @@ function TimeSlotTable({
       });
 
       const requestOptions: any = {
-        method: "DELETE",
+        method: "PUT",
         headers: myHeaders,
         body: raw,
         redirect: "follow",
