@@ -86,11 +86,11 @@ export async function middleware(request: NextRequest) {
     });
   }
 
-  const UserAddress = token.sub;
+  const userAddress = token.sub;
 
-  if (UserAddress !== walletAddress) {
+  if (userAddress !== walletAddress) {
     console.log(
-      `Forbidden access attempt: By user with address :- ${UserAddress}`
+      `Forbidden access attempt: By user with address :- ${userAddress}`
     );
     return new NextResponse(JSON.stringify({ error: "Forbidden" }), {
       status: 403,
