@@ -595,10 +595,10 @@ function AvailableSessions() {
                 style={{
                   boxShadow: "0px 4px 50.8px 0px rgba(0, 0, 0, 0.11)",
                 }}
-                className="rounded-3xl flex flex-col bg-white"
+                className="rounded-3xl flex flex-col bg-white h-full justify-between"
               >
-                <div className="border-b-2 mb-2 sm:mb-4 relative">
-                  <div className="flex xs:items-center py-5 px-5 rounded-tl-3xl rounded-tr-3xl">
+                <div className="border-b-2 sm:border-b-0 mb-2 sm:mb-0 relative">
+                  <div className="flex py-5 px-5 rounded-tl-3xl rounded-tr-3xl">
                     <div
                       className="relative object-cover rounded-3xl border-none xs:border-[2px] border-[#E9E9E9]"
                       // style={{
@@ -679,11 +679,9 @@ function AvailableSessions() {
                       </div>
                       <div>
                         <div
-                          className="text-[#4F4F4F] border-[0.5px] border-[#D9D9D9] rounded-md px-1.5 sm:px-3 py-1 mt-2 sm:mt-4 "
+                          className="text-[#4F4F4F] border-[0.5px] border-[#D9D9D9] rounded-md px-1.5 sm:px-3 py-1 mt-2 sm:mt-4 sm:max-h-[86px] sm:overflow-y-scroll overflow-x-auto"
                           style={{
-                            overflowX: "auto",
-                            overflowY: "hidden",
-                            scrollbarWidth: "none",
+                            scrollbarWidth: "thin",
                             msOverflowStyle: "none",
                           }}
                         >
@@ -771,7 +769,7 @@ function AvailableSessions() {
                   </div>
                 </div>
 
-                <div className="flex items-center px-3 sm:px-5 pb-2 sm:pb-3">
+                <div className="sm:border-t-2 flex items-center sm:pt-4 px-3 sm:px-5 pb-2 sm:pb-3">
                   <Image
                     alt="clockIcn"
                     width={20}
