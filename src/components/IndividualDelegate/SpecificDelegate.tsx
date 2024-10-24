@@ -60,6 +60,7 @@ import { getChainAddress, getDaoName } from "@/utils/chainUtils";
 import { optimism, arbitrum } from "viem/chains";
 import RewardButton from "../ClaimReward/RewardButton";
 import MobileResponsiveMessage from "../MobileResponsiveMessage/MobileResponsiveMessage";
+import { usePrivy } from "@privy-io/react-auth";
 
 interface Type {
   daoDelegates: string;
@@ -107,12 +108,15 @@ function SpecificDelegate({ props }: { props: Type }) {
   const [confettiVisible, setConfettiVisible] = useState(false);
   const network = useAccount().chain;
   const { publicClient, walletClient } = WalletAndPublicClient();
+  const { ready, authenticated, login, logout } = usePrivy();
+
 
   const handleDelegateModal = async () => {
     if (!isConnected) {
-      if (1==1) {
+      if (!authenticated) {
         // openConnectModal();
-        alert('open modal!');
+        // alert('open modal!');
+        login()
       }
     } else {
       setDelegateOpen(true);
@@ -525,9 +529,9 @@ function SpecificDelegate({ props }: { props: Type }) {
 
   const handleFollow = async () => {
     if (!isConnected) {
-      if (1==1) {
+      if (!authenticated) {
         // openConnectModal();
-        alert('open modal!');
+        login()
       }
     } else if (isFollowing) {
       setUnfollowmodel(true);
@@ -644,10 +648,9 @@ function SpecificDelegate({ props }: { props: Type }) {
       } else {
         toast.error("Please switch to appropriate network to delegate!");
 
-        if (1==1) {
-          // openChainModal();
-          alert('handle chain modal!');
-        }
+        // if (openChainModal) {
+        //   // openChainModal();
+        // }
       }
     }
   };

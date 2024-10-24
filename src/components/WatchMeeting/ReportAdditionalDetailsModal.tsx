@@ -5,6 +5,7 @@ import { RxCross2 } from "react-icons/rx";
 import { v4 as uuidv4 } from "uuid";
 import { useAccount } from "wagmi";
 import { Toaster, toast } from "react-hot-toast";
+import { usePrivy } from "@privy-io/react-auth";
 
 function ReportAdditionalDetailsModal({
   data,
@@ -21,6 +22,7 @@ function ReportAdditionalDetailsModal({
   const { address, isConnected } = useAccount();
   const [details, setDetails] = useState("");
   const [isLoading, setIsLoading] = useState<boolean>();
+  const { ready, authenticated, login, logout } = usePrivy();
   const toggleModal = () => {
     onClose();
   };
@@ -115,9 +117,9 @@ function ReportAdditionalDetailsModal({
         setIsLoading(false);
       }
     } else {
-      if (1==1) {
+      if (!authenticated) {
         // openConnectModal();
-        alert('connect modal!');
+        login()
       }
     }
   };

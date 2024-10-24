@@ -44,6 +44,7 @@
   import { SiweMessage } from 'siwe';
   import { getCsrfToken } from "next-auth/react";
   import { useWalletClient } from "wagmi";
+  import { PrivyAuthHandler } from "./PrivyAuthHandler";
 
 
 
@@ -220,15 +221,15 @@
 
   export default function Web3Provider({ children }: Web3ProviderProps) {
   
-    const [referrer, setReferrer] = useState<string | null>(null);
-    const searchParameter = useSearchParams();
-    useEffect(() => {
-      // const storedReferrer = sessionStorage.getItem("referrer");
-      const referrerAddress = searchParameter.get("referrer");
-      setReferrer(referrerAddress);
-    }, [searchParameter]);
+    // const [referrer, setReferrer] = useState<string | null>(null);
+    // const searchParameter = useSearchParams();
+    // useEffect(() => {
+    //   // const storedReferrer = sessionStorage.getItem("referrer");
+    //   const referrerAddress = searchParameter.get("referrer");
+    //   setReferrer(referrerAddress);
+    // }, [searchParameter]);
 
-    console.log("Line number 231:",referrer);
+    // console.log("Line number 231:",referrer);
   
   
     // const getSiweMessageOptions: GetSiweMessageOptions = useCallback(() => {
@@ -237,17 +238,18 @@
     //       referrer ? ` (Referrer: ${referrer})` : ""
     //     }`,
     //   };
-    // }, [referrer]);
+    // }, [referrer]);  
     
 
-    return (
+    return (  
       <PrivyProvider
       appId={process.env.NEXT_PUBLIC_PRIVY_APP_ID as string}
       config={privyConfig}
     >
       <QueryClientProvider client={queryClient}>
+        <PrivyAuthHandler/>
         <SessionProvider>
-          <WagmiProvider config={wagmiConfig} reconnectOnMount={false}>
+          <WagmiProvider config={wagmiConfig} reconnectOnMount={true}>
             {/* <SiweHandler/> */}
             {children}
           </WagmiProvider>

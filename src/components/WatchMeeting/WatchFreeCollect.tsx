@@ -38,6 +38,7 @@ import {
   ChevronUp,
   ChevronDown,
 } from "lucide-react";
+import { usePrivy } from "@privy-io/react-auth";
 
 interface Attendee extends DynamicAttendeeInterface {
   profileInfo: UserProfileInterface;
@@ -62,6 +63,7 @@ const WatchFreeCollect = ({
 }) => {
   const chainId = useChainId();
   // const { openConnectModal } = useConnectModal();
+  const { ready, authenticated, login, logout } = usePrivy();
   const { switchChain } = useSwitchChain();
   const publicClient = usePublicClient()!;
   const { address, chain } = useAccount();
@@ -183,10 +185,10 @@ const WatchFreeCollect = ({
   };
 
   const handleMint = async () => {
-    if (!address && !session) {
+    if (!address && !authenticated) {
       toast("Wallet not connected");
       // openConnectModal?.();
-      alert('connect modal!');
+      login()
       return;
     }
 
@@ -330,11 +332,11 @@ const WatchFreeCollect = ({
   };
 
   const handleFirstMinter = async () => {
-    if (!address && !session) {
+    if (!address && !authenticated) {
       toast("Wallet not connected");
       console.log("Not connected");
       // openConnectModal?.();
-      alert('connect modal!');
+      login()
       return;
     }
 

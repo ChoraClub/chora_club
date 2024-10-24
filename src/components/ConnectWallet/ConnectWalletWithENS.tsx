@@ -4,7 +4,7 @@ import { fetchEnsNameAndAvatar, fetchEnsName } from "@/utils/ENSUtils";
 import { BiSolidWallet } from "react-icons/bi";
 import Image from "next/image";
 import user2 from "@/assets/images/user/user2.svg";
-import { usePrivy, useWallets } from "@privy-io/react-auth";
+import { getAccessToken, usePrivy, useWallets } from "@privy-io/react-auth";
 import { useAccount, useChainId, useSwitchChain } from "wagmi";
 import { shorten } from "@/utils/helper";
 import { Button } from "@nextui-org/react";
@@ -51,8 +51,10 @@ function ConnectWalletWithENS() {
       if (walletAddress2 && authenticated) {
         try {
           // Fetch user profile from your API
+          const token = await getAccessToken();
           const myHeaders = new Headers();
           myHeaders.append("Content-Type", "application/json");
+          myHeaders.append("Authorization", `Bearer ${token}`);
           myHeaders.append("x-wallet-address", walletAddress2 ? walletAddress2 : "");
           setDisplayAddress(address ? address : "");
 
@@ -71,6 +73,7 @@ function ConnectWalletWithENS() {
 
           if (dbResponse.data.length > 0) {
             const profileImage = dbResponse.data[0]?.image;
+            // console.log("78",profileImage)
             setUserProfileImage(
               profileImage
                 ? `https://gateway.lighthouse.storage/ipfs/${profileImage}`
@@ -138,7 +141,7 @@ function ConnectWalletWithENS() {
             address={walletAddress2?walletAddress2:''}
             currentChainId={chain?.id}
             switchChain={switchChain}
-            disconnect={logout}
+            // disconnect={logout}
             ensAvatar={ensAvatar}
           />
 

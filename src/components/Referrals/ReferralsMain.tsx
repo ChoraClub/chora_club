@@ -8,10 +8,12 @@ import { Oval, TailSpin } from "react-loader-spinner";
 import MobileResponsiveMessage from "../MobileResponsiveMessage/MobileResponsiveMessage";
 import ConnectYourWallet from "../ComponentUtils/ConnectYourWallet";
 import { useConnection } from "@/app/hooks/useConnection";
+import { usePrivy } from "@privy-io/react-auth";
 function ReferralsMain() {
   const { address } = useAccount();
   const { isConnected, isLoading, isSessionLoading, isPageLoading, isReady } =
     useConnection();
+    const { ready, authenticated, login, logout, user } = usePrivy();  
 
   const renderContent = () => {
     if (isPageLoading) {
@@ -46,7 +48,7 @@ function ReferralsMain() {
       );
     }
 
-    if (!isConnected) {
+    if (!authenticated) {
       return <ConnectYourWallet />;
     }
 

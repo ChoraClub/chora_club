@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
+import { PrivyClient } from "@privy-io/server-auth";
 
 const normalizeOrigin = (url: string) => url.replace(/\/$/, "");
 
@@ -9,6 +10,11 @@ const allowedOrigins = [
   normalizeOrigin(process.env.NEXT_PUBLIC_HOSTED_BASE_URL!),
   normalizeOrigin(process.env.NEXT_PUBLIC_MIDDLEWARE_BASE_URL!),
 ];
+
+const privyClient = new PrivyClient(
+  process.env.NEXT_PUBLIC_PRIVY_APP_ID!,
+  process.env.NEXT_PUBLIC_PRIVY_SECRET!
+);
 
 export async function middleware(request: NextRequest) {
   // console.log("Request Body :- ", request);
@@ -29,6 +35,42 @@ export async function middleware(request: NextRequest) {
   //   );
   // }
 
+  const authHeader = request.headers.get('authorization');
+  const privyToken = authHeader?.replace('Bearer ', '');
+
+  console.log("Line number 41:",authHeader);
+  console.log("Line number 42:",privyToken);
+
+  
+
+  if (!["POST", "PUT", "DELETE"].includes(request.method)) {
+    // For other methods, allow the request to proceed without additional checks
+    return NextResponse.next();
+  }
+
+  if (!privyToken) {
+    return new NextResponse(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
+  const verifiedUser = await privyClient.verifyAuthToken(privyToken);
+  const verifiedUserId = verifiedUser.userId;
+  console.log(verifiedUserId);
+
+  const userDetails = await privyClient.getUser(verifiedUserId);
+
+    // Check all linked wallets for a match
+    const linkedWallets = userDetails.linkedAccounts.filter(
+      account => account.type === 'wallet'
+    );
+
+    const verifiedWallet = linkedWallets.find(
+      wallet => wallet.address?.toLowerCase() 
+    );
+    
+
   if (!allowedOrigins.includes(origin)) {
     return new NextResponse(
       JSON.stringify({ error: "Unknown origin request. Forbidden" }),
@@ -40,42 +82,42 @@ export async function middleware(request: NextRequest) {
   }
 
   const walletAddress = request.headers.get("x-wallet-address");
+  console.log("Line number 78 front-end wallet:",walletAddress);
+  console.log("Line number 79 token extrac address",verifiedWallet?.address);
+    
 
   // console.log("Append headers wallet address:-", walletAddress);
 
-  if (!["POST", "PUT", "DELETE"].includes(request.method)) {
-    // For other methods, allow the request to proceed without additional checks
-    return NextResponse.next();
-  }
 
-  // console.log("Upcoming request method:-", request.method);
 
-  const token = await getToken({
-    req: request,
-    secret: process.env.NEXTAUTH_SECRET,
-  });
+  // // console.log("Upcoming request method:-", request.method);
 
-  console.log("Token generated using nextauth:-", token);
+  // const token = await getToken({
+  //   req: request,
+  //   secret: process.env.NEXTAUTH_SECRET,
+  // });
 
-  if (!token) {
-    // If there's no token, the user is not authenticated
-    return new NextResponse(JSON.stringify({ error: "Unauthorized" }), {
-      status: 401,
-      headers: { "Content-Type": "application/json" },
-    });
-  }
+  // console.log("Token generated using nextauth:-", token);
+
+  // if (!token) {
+  //   // If there's no token, the user is not authenticated
+  //   return new NextResponse(JSON.stringify({ error: "Unauthorized" }), {
+  //     status: 401,
+  //     headers: { "Content-Type": "application/json" },
+  //   });
+  // }
 
   // Extract the user address from the token
-  const UserAddress = token.sub;
+  // const UserAddress = token.sub;
 
-  console.log("Exracted user address from token:- ", UserAddress);
+  // console.log("Exracted user address from token:- ", UserAddress);
 
-  console.log("Requested Address:", walletAddress);
+  // console.log("Requested Address:", walletAddress);
 
-  if (UserAddress !== walletAddress) {
+  if (verifiedWallet?.address !== walletAddress) {
     // If the user's address doesn't match the requested profile address
     console.log(
-      `Forbidden access attempt: By user with address :- ${UserAddress}`
+      `Forbidden access attempt: By user with address :- ${verifiedWallet?.address}`
     );
     return new NextResponse(JSON.stringify({ error: "Forbidden" }), {
       status: 403,

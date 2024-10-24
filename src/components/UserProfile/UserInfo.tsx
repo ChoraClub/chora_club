@@ -10,6 +10,7 @@ import styled from "styled-components";
 import rehypeSanitize from "rehype-sanitize";
 import { getDaoName } from "@/utils/chainUtils";
 import { ICommand, commands } from "@uiw/react-md-editor";
+import { getAccessToken } from "@privy-io/react-auth";
 
 const StyledMDEditorWrapper = styled.div`
   .w-md-editor {
@@ -276,8 +277,10 @@ function UserInfo({
 
     const sessionAttended = async () => {
       try {
+        const token = await getAccessToken();
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
+        myHeaders.append("Authorization", `Bearer ${token}`);
         if (address) {
           myHeaders.append("x-wallet-address", address);
         }
@@ -311,8 +314,10 @@ function UserInfo({
 
     const officeHoursHosted = async () => {
       try {
+        const token = await getAccessToken();
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
+        myHeaders.append("Authorization", `Bearer ${token}`);
         if (address) {
           myHeaders.append("x-wallet-address", address);
         }
@@ -347,8 +352,10 @@ function UserInfo({
 
     const officeHoursAttended = async () => {
       try {
+        const token = await getAccessToken();
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
+        myHeaders.append("Authorization", `Bearer ${token}`);
         if (address) {
           myHeaders.append("x-wallet-address", address);
         }

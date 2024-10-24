@@ -25,6 +25,7 @@ import AddEmailModal from "@/components/ComponentUtils/AddEmailModal";
 import { RxCross2 } from "react-icons/rx";
 import { MdCancel } from "react-icons/md";
 import { useRouter } from "next-nprogress-bar";
+import { usePrivy } from "@privy-io/react-auth";
 interface Type {
   daoDelegates: string;
   individualDelegate: string;
@@ -71,6 +72,7 @@ function BookSession({ props }: { props: Type }) {
   const [continueAPICalling, setContinueAPICalling] = useState<Boolean>(false);
   const [userRejected, setUserRejected] = useState<Boolean>();
   const [addingEmail, setAddingEmail] = useState<boolean>();
+  const { ready, authenticated, login, logout } = usePrivy();
 
   useEffect(() => {
     if (isOpen) {
@@ -186,9 +188,9 @@ function BookSession({ props }: { props: Type }) {
         onOpen();
       }
     } else {
-      if (1==1) {
+      if (!authenticated) {
         // openConnectModal();
-        alert('connect modal!');
+        login()
       }
     }
   };

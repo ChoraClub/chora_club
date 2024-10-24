@@ -24,6 +24,7 @@ import { useAccount } from "wagmi";
 import { CiSearch } from "react-icons/ci";
 import { FaChevronDown } from "react-icons/fa";
 import { MdOutlineHourglassDisabled } from "react-icons/md";
+import { usePrivy } from "@privy-io/react-auth";
 // import { useConnectModal } from "@rainbow-me/rainbowkit";
 
 interface Type {
@@ -67,6 +68,7 @@ function AvailableSessions() {
   const [initialFetchComplete, setInitialFetchComplete] = useState(false);
   const [showFilterOptions, setShowFilterOptions] = useState(false);
   // const { openConnectModal } = useConnectModal();
+  const { ready, authenticated, login, logout, user } = usePrivy();
 
   const handleBookSession = (daoName: string, userAddress: string) => {
     if (isConnected) {
@@ -74,9 +76,9 @@ function AvailableSessions() {
         `/${daoName}/${userAddress}?active=delegatesSession&session=book`
       );
     } else {
-      if (1==1) {
+      if (!authenticated) {
         // openConnectModal();
-        alert('open connect modal');
+        login()
       } else {
         console.error("Connect modal is not available");
         alert(

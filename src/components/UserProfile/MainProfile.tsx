@@ -55,6 +55,7 @@ import MobileResponsiveMessage from "../MobileResponsiveMessage/MobileResponsive
 import RewardButton from "../ClaimReward/RewardButton";
 import Heading from "../ComponentUtils/Heading";
 import { ChevronDownIcon } from "lucide-react";
+import { getAccessToken, usePrivy } from "@privy-io/react-auth";
 
 function MainProfile() {
   const { isConnected, address, chain } = useAccount();
@@ -84,6 +85,7 @@ function MainProfile() {
   const [isOpentoaster, settoaster] = useState(false);
   const [userFollowings, setUserFollowings] = useState<Following[]>([]);
   const [isModalLoading, setIsModalLoading] = useState(false);
+  const { ready, authenticated, login, logout } = usePrivy();
   // const [dbResponse, setDbResponse] = useState<any>(null);
   const [modalData, setModalData] = useState({
     displayImage: "",
@@ -197,9 +199,9 @@ function MainProfile() {
       // console.log("newPath", newPath);
       router.replace(`${newPath}`);
     } else if (!isConnected && !session) {
-      if (1==1) {
+      if (!authenticated) {
         // openConnectModal();
-        alert('connect modal!');
+        login()
       } else {
         console.error("openConnectModal is not defined");
       }
@@ -577,10 +579,11 @@ function MainProfile() {
         // Fetch data from your backend API to check if the address exists
         // console.log("Fetching from DB");
         // const dbResponse = await axios.get(`/api/profile/${address}`);
-
+        const token = await getAccessToken();
         let dao = getDaoName(chain?.name);
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
+        myHeaders.append("Authorization", `Bearer ${token}`);
         if (address) {
           myHeaders.append("x-wallet-address", address);
         }

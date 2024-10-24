@@ -170,10 +170,9 @@ function ProposalMain({ props }: { props: Props }) {
 
     if (chain !== props.daoDelegates) {
       toast.error("Please switch to appropriate network to delegate!");
-      if (1==1) {
-        // openChainModal();
-        alert('chain modal!');
-      }
+      // if (openChainModal) {
+      //   // openChainModal();
+      // }
     } else {
       setIsVotingOpen(true);
     }

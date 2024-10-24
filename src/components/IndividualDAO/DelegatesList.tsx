@@ -28,6 +28,7 @@ import { truncateAddress } from "@/utils/text";
 import DelegateListSkeletonLoader from "../SkeletonLoader/DelegateListSkeletonLoader";
 import { ChevronDown } from "lucide-react";
 import debounce from "lodash/debounce";
+import { usePrivy } from "@privy-io/react-auth";
 
 const DELEGATES_PER_PAGE = 20;
 const DEBOUNCE_DELAY = 500;
@@ -58,6 +59,7 @@ function DelegatesList({ props }: { props: string }) {
   // const { openConnectModal } = useConnectModal();
   const { isConnected, address, chain } = useAccount();
   const { publicClient, walletClient } = WalletAndPublicClient();
+  const { ready, authenticated, login, logout } = usePrivy();
 
   const fetchDelegates = useCallback(async () => {
     setIsAPICalling(true);
@@ -153,9 +155,8 @@ function DelegatesList({ props }: { props: string }) {
   const handleDelegateModal = async (delegateObject: any) => {
     console.log("delegateObject", delegateObject);
     setSelectedDelegate(delegateObject);
-    if (!isConnected) {
-      // openConnectModal?.();
-      alert('handle delegate');
+    if (!isConnected && !authenticated)  {
+      login()
       return;
     }
 
@@ -188,7 +189,6 @@ function DelegatesList({ props }: { props: string }) {
     if (walletClient?.chain.name !== network) {
       toast.error("Please switch to the appropriate network to delegate!");
       // openChainModal?.();
-      alert('handle switch!');
       return;
     }
 

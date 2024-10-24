@@ -20,6 +20,7 @@ import { motion } from "framer-motion";
 import ExploreDaosSkeletonLoader from "../SkeletonLoader/ExploreDaosSkeletonLoader";
 import Heading from "../ComponentUtils/Heading";
 import PageBackgroundPattern from "@/components/ComponentUtils/PageBackgroundPattern";
+import { usePrivy } from "@privy-io/react-auth";
 
 const ExploreDAOs = () => {
   const dao_info = Object.keys(dao_details).map((key) => {
@@ -42,6 +43,7 @@ const ExploreDAOs = () => {
   // const { openConnectModal } = useConnectModal();
   const { isConnected, isLoading, isSessionLoading, isPageLoading, isReady } =
     useConnection();
+  const { ready, authenticated, login, logout } = usePrivy();
 
   useEffect(() => {
     const storedStatus = sessionStorage.getItem("notificationStatus");
@@ -85,9 +87,9 @@ const ExploreDAOs = () => {
   }, [openSearch]);
 
   useEffect(() => {
-    if (searchParams.get("referrer")) {
+    if (searchParams.get("referrer") && login) {
       // openConnectModal();
-      alert('connect modal open');
+      login()
     }
   }, [searchParams]);
 
