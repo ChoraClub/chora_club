@@ -33,6 +33,8 @@ async function handler(
     const url = `${BASE_URL}/api/${path}${
       searchParams ? `?${searchParams}` : ""
     }`;
+    console.log("url", url);
+    console.log("requestBody", requestBody);
     const response = await fetch(url, {
       method,
       headers: {

@@ -115,6 +115,7 @@ function setCorsHeaders(response: NextResponse, origin: string | null) {
 // See "Matching Paths" below to learn more
 export const config = {
   matcher: [
+    "/api/proxy/:path*",
     "/api/attest-onchain/:path*",
     "/api/book-slot/:path*",
     "/api/delegate-follow/:path*",
