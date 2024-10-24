@@ -88,7 +88,7 @@ function NotificationMain() {
         headers: myHeaders,
         body: raw,
       };
-      const response = await fetch("/api/notifications", requestOptions);
+      const response = await fetchApi("/notifications", requestOptions);
       const result = await response.json();
       if (Array.isArray(result.data)) {
         setNotifications(result.data);
