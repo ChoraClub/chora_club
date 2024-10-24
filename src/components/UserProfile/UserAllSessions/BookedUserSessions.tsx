@@ -11,6 +11,7 @@ import { useAccount } from "wagmi";
 import ErrorDisplay from "@/components/ComponentUtils/ErrorDisplay";
 import RecordedSessionsSkeletonLoader from "@/components/SkeletonLoader/RecordedSessionsSkeletonLoader";
 import { SessionInterface } from "@/types/MeetingTypes";
+import { fetchApi } from "@/utils/api";
 
 function BookedUserSessions({ daoName }: { daoName: string }) {
   const { address } = useAccount();
@@ -43,8 +44,8 @@ function BookedUserSessions({ daoName }: { daoName: string }) {
         // body: raw,
         redirect: "follow",
       };
-      const response = await fetch(
-        `/api/get-meeting/${address}?dao_name=${daoName}`,
+      const response = await fetchApi(
+        `/get-meeting/${address}?dao_name=${daoName}`,
         requestOptions
       );
       const result = await response.json();

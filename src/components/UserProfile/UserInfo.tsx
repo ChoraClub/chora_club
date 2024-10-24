@@ -10,6 +10,7 @@ import styled from "styled-components";
 import rehypeSanitize from "rehype-sanitize";
 import { getDaoName } from "@/utils/chainUtils";
 import { ICommand, commands } from "@uiw/react-md-editor";
+import { fetchApi } from "@/utils/api";
 
 const StyledMDEditorWrapper = styled.div`
   .w-md-editor {
@@ -242,8 +243,8 @@ function UserInfo({
 
     const sessionHosted = async () => {
       try {
-        const response = await fetch(
-          `/api/get-meeting/${address}?dao_name=${dao_name}`,
+        const response = await fetchApi(
+          `/get-meeting/${address}?dao_name=${dao_name}`,
           {
             method: "GET",
             headers: {
@@ -281,7 +282,7 @@ function UserInfo({
         if (address) {
           myHeaders.append("x-wallet-address", address);
         }
-        const response = await fetch(`/api/get-session-data/${address}`, {
+        const response = await fetchApi(`/get-session-data/${address}`, {
           method: "POST",
           headers: myHeaders,
           body: JSON.stringify({
@@ -316,7 +317,7 @@ function UserInfo({
         if (address) {
           myHeaders.append("x-wallet-address", address);
         }
-        const response = await fetch(`/api/get-officehours-address`, {
+        const response = await fetchApi(`/get-officehours-address`, {
           method: "POST",
           headers: myHeaders,
           body: JSON.stringify({
@@ -352,7 +353,7 @@ function UserInfo({
         if (address) {
           myHeaders.append("x-wallet-address", address);
         }
-        const response = await fetch(`/api/get-attendee-individual`, {
+        const response = await fetchApi(`/get-attendee-individual`, {
           method: "POST",
           headers: myHeaders,
           body: JSON.stringify({

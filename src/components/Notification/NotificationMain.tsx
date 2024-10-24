@@ -20,6 +20,7 @@ import { useNotificationStudioState } from "@/store/notificationStudioState";
 import MobileResponsiveMessage from "../MobileResponsiveMessage/MobileResponsiveMessage";
 import Heading from "../ComponentUtils/Heading";
 import NotificationSkeletonLoader from '../SkeletonLoader/NotificationSkeletonLoader';
+import { fetchApi } from "@/utils/api";
 
 function NotificationMain() {
   const { data: session } = useSession();
@@ -188,8 +189,8 @@ function NotificationMain() {
         headers: myHeaders,
         body: raw,
       };
-      const response = await fetch(
-        "/api/notifications/mark-as-read",
+      const response = await fetchApi(
+        "/notifications/mark-as-read",
         requestOptions
       );
       if (response.ok) {

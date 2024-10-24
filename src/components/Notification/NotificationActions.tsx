@@ -12,6 +12,7 @@ import { GiChaingun } from "react-icons/gi";
 import { MEETING_BASE_URL } from "@/config/constants";
 import { useAccount } from "wagmi";
 import { useNotificationStudioState } from "@/store/notificationStudioState";
+import { fetchApi } from "@/utils/api";
 
 export const getBackgroundColor = (data: any) => {
   if (data?.notification_type === "newBooking") {
@@ -89,8 +90,8 @@ export const markAsRead = async (data: any): Promise<void> => {
       headers: myHeaders,
       body: raw,
     };
-    const response = await fetch(
-      "/api/notifications/mark-as-read",
+    const response = await fetchApi(
+      "/notifications/mark-as-read",
       requestOptions
     );
     const result = await response.json();

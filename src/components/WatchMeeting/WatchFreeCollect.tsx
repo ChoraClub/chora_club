@@ -38,6 +38,7 @@ import {
   ChevronUp,
   ChevronDown,
 } from "lucide-react";
+import { fetchApi } from "@/utils/api";
 
 interface Attendee extends DynamicAttendeeInterface {
   profileInfo: UserProfileInterface;
@@ -231,7 +232,7 @@ const WatchFreeCollect = ({
     });
 
     try {
-      const response = await fetch("/api/update-recorded-session", {
+      const response = await fetchApi("/update-recorded-session", {
         method: "PUT",
         headers: myHeaders,
         body: raw,

@@ -115,26 +115,21 @@ function setCorsHeaders(response: NextResponse, origin: string | null) {
 // See "Matching Paths" below to learn more
 export const config = {
   matcher: [
-    "/api/proxy/:path*",
+    "/api/proxy/:path*", 
     "/api/attest-onchain/:path*",
     "/api/book-slot/:path*",
     "/api/delegate-follow/:path*",
     "/api/edit-office-hours/:path*",
-    "/api/end-call/:path*",
-    "/api/update-attestation-uid/:path*",
-    "/api/update-meeting-status/:path*",
-    "/api/update-office-hours/:path*",
-    "/api/update-recorded-session/:path*",
-    "/api/update-recording-status/:path*",
-    "/api/update-session-attendees/:path*",
-    "/api/update-video-uri/:path*",
-    "/api/get-attest-data/:path*",
-    "/api/get-host/:path*",
+    // "/api/end-call/:path*",
+    "/api/get-attendee-individual/:path*",
+    // "/api/get-attest-data/:path*",
+    // "/api/get-host/:path*", 
     "/api/get-meeting/:path*",
     "/api/get-officehours-address/:path*",
+    "/api/get-session-data/:path*",
     "/api/get-sessions/:path*",
     "/api/get-specific-officehours/:path*",
-    "/api/new-token/:path*",
+    // "/api/new-token/:path*",
     "/api/notifications/:path*",
     "/api/office-hours/:path*",
     "/api/profile/:path*",
@@ -143,12 +138,41 @@ export const config = {
     "/api/search-session/:path*",
     "/api/store-availability/:path*",
     "/api/submit-vote/:path*",
-    "/api/get-session-data/:path*",
-    "/api/get-attendee-individual/:path*",
+    "/api/update-attestation-uid/:path*",
+    // "/api/update-meeting-status/:path*",
+    "/api/update-office-hours/:path*",
+    "/api/update-recorded-session/:path*",
+    // "/api/update-recording-status/:path*",
+    // "/api/update-session-attendees/:path*",
+    // "/api/update-video-uri/:path*",
+
     // "/api/attest-offchain/:path*",
     // "/api/get-availability/:path*",
     // "/api/verify-meeting-id/:path*",
     // "/api/get-dao-sessions/:path*",
     // "/api/images/og/nft/:path",
+
+    // "/api/counting-views/:path", **
+    // "/api/get-office-hours/:path", **
+    // "/api/get-specific-session/:path", **
+    // "/api/update-attendee/:path", **
+    
+    // "/api/get-arbitrum-delegatelist/:path", // GET
+    // "/api/get-arbitrum-queue-info/:path", // GET
+    // "/api/get-arbitrumproposals/:path", // GET
+    // "/api/get-arbitrumvoters/:path", // GET
+    // "/api/get-canceledproposal/:path", // GET
+    // "/api/get-dao-details/:path", // GET
+    // "/api/get-delegate/:path", // GET
+    // "/api/get-delegatelist/:path", // GET
+    // "/api/get-proposals/:path", // GET
+    // "/api/get-recorded-meetings/:path", // GET
+    // "/api/get-statement/:path", // GET
+    // "/api/get-vote-detail/:path", // GET  
+    // "/api/get-voters/:path", // GET
+    // "/api/get-watch-data/:path", // GET
+    // "/api/getleaderboard/:path", // GET
+    // "/api/meeting-officehours-data/:path", // GET
+    // "/api/search-delegate/:path", // GET
   ],
 };

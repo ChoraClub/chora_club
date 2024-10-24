@@ -20,6 +20,7 @@ import { Oval } from "react-loader-spinner";
 import toast, { Toaster } from "react-hot-toast";
 import SessionTileSkeletonLoader from "@/components/SkeletonLoader/SessionTileSkeletonLoader";
 import { headers } from "next/headers";
+import { fetchApi } from "@/utils/api";
 
 interface SessionDetail {
   img: any;
@@ -54,7 +55,7 @@ function UserUpcomingHours() {
   };
 
   useEffect(() => {
-    fetch(`/api/update-office-hours/${address}`)
+    fetchApi(`/update-office-hours/${address}`)
       .then((response) => response.json()) // Parse response JSON
       .then((data: any[]) => {
         const mappedData: SessionDetail[] = data.map((item) => ({
@@ -100,7 +101,7 @@ function UserUpcomingHours() {
     updateOfficeHours(updatedFormData)
       .then(() => {
         // Update frontend data
-        fetch(`/api/update-office-hours/${address}`)
+        fetchApi(`/update-office-hours/${address}`)
           .then((response) => response.json())
           .then((data: any[]) => {
             const mappedData: SessionDetail[] = data.map((item) => ({
@@ -150,7 +151,7 @@ function UserUpcomingHours() {
       headers: myHeaders,
       body: raw,
     };
-    return fetch(`/api/edit-office-hours/${address}`, requestOptions)
+    return fetchApi(`/edit-office-hours/${address}`, requestOptions)
       .then((response) => response.text())
       .then((result) => console.log(result))
       .catch((error) => console.log("error", error));
@@ -167,7 +168,7 @@ function UserUpcomingHours() {
       method: "DELETE",
       headers: myHeaders,
     };
-    fetch(`/api/edit-office-hours/${address}`, requestOptions)
+    fetchApi(`/edit-office-hours/${address}`, requestOptions)
       .then((response) => response.text())
       .then((result) => {
         console.log(result);
