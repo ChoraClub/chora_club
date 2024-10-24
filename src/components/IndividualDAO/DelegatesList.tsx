@@ -28,6 +28,7 @@ import { truncateAddress } from "@/utils/text";
 import DelegateListSkeletonLoader from "../SkeletonLoader/DelegateListSkeletonLoader";
 import { ChevronDown } from "lucide-react";
 import debounce from "lodash/debounce";
+import { motion } from "framer-motion";
 
 const DELEGATES_PER_PAGE = 20;
 const DEBOUNCE_DELAY = 500;

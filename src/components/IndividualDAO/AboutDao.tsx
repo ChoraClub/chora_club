@@ -124,9 +124,9 @@ const AboutDao = ({ props }: any) => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-12 bg-gradient-to-b from-gray-50 to-white">
+    <div className="container mx-auto md:px-4 py-12">
       <motion.h1
-        className="text-4xl font-bold mb-8 text-center text-blue-600"
+        className="text-4xl font-bold mb-8 text-center text-blue-shade-200"
         {...fadeInUp}
       >
         About {props === "arbitrum" ? "Arbitrum" : "Optimism"} DAO
@@ -136,7 +136,7 @@ const AboutDao = ({ props }: any) => {
         <h2 className="text-3xl font-semibold mb-6 text-blue-800">
           Mission and Vision
         </h2>
-        <div className="bg-white shadow-lg rounded-lg p-8">
+        <div className="bg-[#D9D9D945] shadow-lg rounded-xl p-5 md:p-8">
           <div className="mb-6">
             <h3 className="text-xl font-semibold mb-3 text-blue-700">
               Mission:
@@ -162,7 +162,7 @@ const AboutDao = ({ props }: any) => {
         <h2 className="text-3xl font-semibold mb-6 text-blue-800">
           Technology
         </h2>
-        <div className="bg-white shadow-lg rounded-lg p-8">
+        <div className="bg-[#D9D9D945] shadow-lg rounded-xl p-5 md:p-8">
           <p className="text-gray-700 mb-4">{text.technology.description}</p>
           <ul className="space-y-4">
             {props === "arbitrum"
@@ -191,7 +191,7 @@ const AboutDao = ({ props }: any) => {
         <h2 className="text-3xl font-semibold mb-6 text-blue-800">
           Governance and DAO Structure
         </h2>
-        <div className="bg-white shadow-lg rounded-lg p-8">
+        <div className="bg-[#D9D9D945] shadow-lg rounded-xl p-5 md:p-8">
           <p className="text-gray-700 mb-4">
             {text.governance_and_dao_structure.description}
           </p>

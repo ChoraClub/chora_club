@@ -1,6 +1,6 @@
 "use client";
 import Image, { StaticImageData } from "next/image";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import DelegatesList from "./DelegatesList";
 import DelegatesSession from "./DelegatesSession";
 import OfficeHours from "./OfficeHours";
@@ -15,7 +15,7 @@ import Proposals from "./Proposals";
 import IndividualDaoHeader from "../ComponentUtils/IndividualDaoHeader";
 import AboutDao from "./AboutDao";
 import Leaderboard from "./Leaderboard";
-import MobileResponsiveMessage from "../MobileResponsiveMessage/MobileResponsiveMessage";
+import { ChevronDownIcon } from "lucide-react";
 
 const desc = dao_details;
 
@@ -23,7 +23,74 @@ function SpecificDAO({ props }: { props: { daoDelegates: string } }) {
   const router = useRouter();
   const path = usePathname();
   // const dao_name = path.slice(1);
-  const searchParams = useSearchParams();
+  const searchParams = useSearchParams(); 
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [selectedTab, setSelectedTab] = useState("About");
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const handleMouseEnter = () => {
+    setIsDropdownOpen(true);
+  };
+
+  const handleMouseLeave = () => {
+    setTimeout(() => {
+      if (!dropdownRef.current?.matches(":hover")) {
+        setIsDropdownOpen(false);
+      }
+    }, 100);
+  };
+
+  const tabs = [
+    { name: "About", value: "about" },
+    { name: "Proposals", value: "proposals" },
+    { name: "Delegates List", value: "delegatesList" },
+    { name: "Delegates Sessions", value: "delegatesSession" },
+    { name: "Office Hours", value: "officeHours" },
+    { name: "Leaderboard", value: "leaderboard" },
+  ];
+
+  const handleTabChange = (tabValue: string) => {
+    console.log(tabValue);
+    const selected = tabs.find((tab) => tab.value === tabValue);
+    console.log(selected);
+    if (selected) {
+      setSelectedTab(selected.name);
+      setIsDropdownOpen(false);
+      // if (tabValue === "about") {
+      //   router.push(path + "?active=about");
+      // } else 
+      if (tabValue === "proposals") {
+        router.push(path + "?active=proposals");
+      } else if (tabValue === "delegatesList") {
+        router.push(path + "?active=delegatesList");
+      } else if (tabValue === "delegatesSession") {
+        router.push(path + "?active=delegatesSession&session=recorded");
+      } else if (tabValue === "officeHours") {
+        router.push(path + "?active=officeHours&hours=ongoing");
+      } else if (tabValue === "leaderboard") {
+        router.push(path + "?active=leaderboard");
+      } 
+      else {
+        router.push(path + `?active=${tabValue}`);
+      }
+    }
+  };
 
   // const logoMapping: any = {
   //   optimism: OPLogo,
@@ -71,79 +138,11 @@ function SpecificDAO({ props }: { props: { daoDelegates: string } }) {
 
   return (
     <>
-    {/* For Mobile Screen */}
-    <MobileResponsiveMessage/>
-
-    {/* For Desktop Screen  */}
-    <div className="hidden md:block font-poppins py-6" id="secondSection">
-      <div className="pr-8 pb-5 pl-16">
-        {/* <div className="flex items-center justify-between pe-10">
-          <div
-            className="relative"
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
-          >
-            <div>
-              <div
-                className="capitalize text-4xl text-blue-shade-100 bg-white-200 outline-none cursor-pointer flex items-center justify-between transition duration-500"
-                // onMouseEnter={handleMouseEnter}
-                // onMouseLeave={handleMouseLeave}
-              >
-                <div className="mr-5 flex items-center">
-                  {selectedOption.label}
-                </div>
-                <svg
-                  className={`w-4 h-4 mr-2 ${
-                    isOpen
-                      ? "transform rotate-180 transition-transform duration-300"
-                      : "transition-transform duration-300"
-                  }`}
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M19 9l-7 7-7-7"
-                  ></path>
-                </svg>
-              </div>
-              {isOpen && (
-                <div
-                  className={`absolute mt-1 p-2 w-72 border border-white-shade-100 rounded-xl bg-white shadow-md ${
-                    isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
-                  }`}
-                  style={{ transition: "opacity 0.3s" }}
-                  onMouseEnter={handleMouseEnter}
-                  onMouseLeave={handleMouseLeave}
-                >
-                  {options.map((option: any, index: number) => (
-                    <div key={index}>
-                      <div
-                        className={`option flex items-center cursor-pointer px-3 py-2 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 capitalize ${
-                          option.label === dao_name ? "text-blue-shade-100" : ""
-                        }`}
-                        onClick={() => selectOption(option)}
-                      >
-                        {option.value}
-                      </div>
-                      {index !== options.length - 1 && <hr />}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div>
-            <ConnectWalletWithENS />
-          </div>
-        </div> */}
+    <div className="font-poppins py-6" id="secondSection">
+      <div className="px-4 md:px-6 lg:px-14 pb-5 ">
 
         <IndividualDaoHeader />
-        <div className="py-5 pr-8">
+        <div className="py-5">
           {props.daoDelegates === "optimism"
             ? desc.optimism.description
             : props.daoDelegates === "arbitrum"
@@ -152,7 +151,47 @@ function SpecificDAO({ props }: { props: { daoDelegates: string } }) {
         </div>
       </div>
 
-      <div className="flex gap-12 bg-[#D9D9D945] pl-16">
+      <div
+              className="lg:hidden mt-4 px-8 xs:px-4 sm:px-8 py-2 sm:py-[10px] bg-[#D9D9D945]"
+              ref={dropdownRef}
+              onMouseLeave={handleMouseLeave}
+            >
+              <div
+                className="w-full flex justify-between items-center text-left font-normal rounded-full capitalize text-lg text-blue-shade-100 bg-white px-4 py-2 cursor-pointer"
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                onMouseEnter={handleMouseEnter}
+              >
+                <span>{selectedTab}</span>
+                <ChevronDownIcon
+                  className={`w-4 h-4 transition-transform duration-700 ${
+                    isDropdownOpen ? "rotate-180" : ""
+                  }`}
+                />
+              </div>
+              <div
+                className={`w-[calc(100vw - 3rem)] mt-1 overflow-hidden transition-all duration-700 ease-in-out ${
+                  isDropdownOpen
+                    ? "max-h-[500px] opacity-100"
+                    : "max-h-0 opacity-0"
+                }`}
+              >
+                <div className="p-2 border border-white-shade-100 rounded-xl bg-white shadow-md">
+                  {tabs.map((tab, index) => (
+                    <React.Fragment key={tab.value}>
+                      <div
+                        onClick={() => handleTabChange(tab.value)}
+                        className="px-3 py-2 rounded-lg transition duration-300 ease-in-out hover:bg-gray-100 capitalize text-base cursor-pointer"
+                      >
+                        {tab.name}
+                      </div>
+                      {index !== tabs.length - 1 && <hr className="my-1" />}
+                    </React.Fragment>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+      <div className="hidden lg:flex gap-12 bg-[#D9D9D945] pl-16">
         <button
           className={`border-b-2 py-4 px-2 ${
             searchParams.get("active") === "about"
@@ -221,7 +260,7 @@ function SpecificDAO({ props }: { props: { daoDelegates: string } }) {
         </button>
       </div>
 
-      <div className="py-6 px-16">
+      <div className="py-6 px-4 md:px-6 lg:px-16">
         {searchParams.get("active") === "delegatesList" ? (
           <DelegatesList props={props.daoDelegates} />
         ) : (

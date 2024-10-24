@@ -128,7 +128,7 @@ const DelegateInfoCard: React.FC<DelegateInfoCardProps> = ({
         </div>
 
         <motion.button
-          className="w-full bg-gradient-to-r from-[#3b82f6] to-[#31316d] text-white font-medium py-3 px-4 rounded-3xl overflow-hidden relative"
+          className="w-full bg-gradient-to-r from-[#3b82f6] to-[#31316d] text-white font-medium py-2 px-4 rounded-3xl overflow-hidden relative"
           whileHover={{ scale: 1.05 }}
           transition={{ duration: 0.2 }}
           onMouseEnter={() => setIsButtonHovered(true)}

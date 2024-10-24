@@ -431,14 +431,14 @@ function Proposals({ props }: { props: string }) {
 
   return (
     <>
-      <div className="mr-[16px] rounded-[2rem] mt-4">
+      <div className="rounded-[2rem] mt-4">
         {displayedProposals.map((proposal: Proposal, index: number) => (
           <div
             key={index}
-            className="flex flex-col md:flex-row p-4 text-lg mb-2 gap-5 bg-gray-100 hover:bg-gray-50 rounded-3xl transition-shadow duration-300 ease-in-out shadow-lg cursor-pointer items-center"
+            className="flex flex-col 1.5md:flex-row p-4 text-lg mb-2 gap-2 1.5md:gap-5 bg-gray-100 hover:bg-gray-50 rounded-3xl transition-shadow duration-300 ease-in-out shadow-lg cursor-pointer 1.5md:items-center"
             onClick={() => handleClick(proposal)}
           >
-            <div className="flex items-center md:w-[60%]">
+            <div className="flex items-center 1.5md:w-[60%]">
               <Image
                 src={dao_details[props as keyof typeof dao_details].logo}
                 alt={`${
@@ -459,13 +459,13 @@ function Proposals({ props }: { props: string }) {
                 </p>
                 <div className="flex gap-1">
                   {/* <Image src={user} alt="" className="size-4" /> */}
-                  <p className="flex text-xs font-normal items-center">
+                  <p className="flex text-[10px] xs:text-xs font-normal items-center">
                     <span className="text-[#004DFF]"> Created at </span>&nbsp;
                     {formatDate(proposal.blockTimestamp)}
                     <span>
                       <LuDot />
                     </span>
-                    <span className="font-bold text-sm text-blue-shade-200">
+                    <span className="font-bold text-xs xs:text-sm text-blue-shade-200">
                       OnChain
                     </span>
                   </p>
@@ -473,7 +473,7 @@ function Proposals({ props }: { props: string }) {
               </div>
             </div>
 
-            <div className="flex flex-wrap justify-between items-center md:w-[40%] mt-4 md:mt-0 gap-2">
+            <div className="flex flex-wrap justify-between items-center 1.5md:w-[40%] mt-2 1.5md:mt-0 gap-2 1.5md:gap-1 2md:gap-2 mx-auto 1.5md:mx-0">
               {/* <Tooltip
                 showArrow
                 content={<div className="font-poppins">OnChain</div>}
@@ -487,7 +487,7 @@ function Proposals({ props }: { props: string }) {
               </Tooltip> */}
               {proposal.votesLoaded ? (
                 <div
-                  className={`rounded-full flex items-center justify-center text-xs h-fit py-0.5 border font-medium w-24 ${
+                  className={`rounded-full flex items-center justify-center text-[10px] xs:text-xs h-fit py-[1px] xs:py-0.5 border font-medium w-[84px] xs:w-24 ${
                     getProposalStatus(proposal) === "SUCCEEDED"
                       ? "bg-green-200 border-green-600 text-green-600"
                       : getProposalStatus(proposal) === "DEFEATED" ||
@@ -506,7 +506,7 @@ function Proposals({ props }: { props: string }) {
 
               {proposal.votesLoaded ? (
                 <div
-                  className={`py-0.5 rounded-md text-sm font-medium border flex justify-center items-center w-32 
+                  className={`py-0.5 rounded-md text-xs xs:text-sm font-medium border flex justify-center items-center w-28 xs:w-32 
                ${
                  canceledProposals?.some(
                    (item) => item.proposalId === proposal.proposalId
@@ -541,7 +541,7 @@ function Proposals({ props }: { props: string }) {
                 <VoteLoader />
               )}
               <div className="flex items-center justify-center w-[15%]">
-                <div className="rounded-full bg-[#f4d3f9] border border-[#77367a] flex text-[#77367a] text-xs h-fit py-0.5 font-medium px-2 ">
+                <div className="rounded-full bg-[#f4d3f9] border border-[#77367a] flex text-[#77367a] text-[10px] xs:text-xs h-fit py-[1px] xs:py-0.5 font-medium px-2 ">
                   {(() => {
                     if (
                       canceledProposals.some(
