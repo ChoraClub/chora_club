@@ -983,6 +983,7 @@ function ProposalMain({ props }: { props: Props }) {
         </div>
       </div>
 
+<div className="hidden md:block">
       <div
         className={`rounded-[1rem] mx-20 md:mx-24 px-4 md:px-12 pb-6 pt-16 transition-shadow duration-300 ease-in-out shadow-xl bg-gray-50 font-poppins relative ${
           isExpanded ? "h-fit" : "h-fit"
@@ -1332,6 +1333,7 @@ function ProposalMain({ props }: { props: Props }) {
             </div>
           )}
         </div>
+      </div>
       </div>
     </>
   );
