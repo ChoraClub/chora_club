@@ -32,6 +32,7 @@ import { IoCopy } from "react-icons/io5";
 import { useAccount } from "wagmi";
 import { SessionInterface } from "@/types/MeetingTypes";
 import { MEETING_BASE_URL } from "@/config/constants";
+import { fetchApi } from "@/utils/api";
 
 type Attendee = {
   attendee_address: string;
@@ -183,8 +184,8 @@ function EventTile({ tileIndex, data: initialData, isEvent }: TileProps) {
         headers: myHeaders,
         body: raw,
       };
-      const response = await fetch(
-        "/api/book-slot/update-slot/",
+      const response = await fetchApi(
+        "/book-slot/update-slot/",
         requestOptions
       );
       const result = await response.json();

@@ -10,6 +10,7 @@ import text1 from "@/assets/images/daos/texture1.png";
 import { Oval } from "react-loader-spinner";
 import { RxCross2 } from "react-icons/rx";
 import SessionTileSkeletonLoader from "../SkeletonLoader/SessionTileSkeletonLoader";
+import { fetchApi } from "@/utils/api";
 
 interface UserOfficeHoursProps {
   isDelegate: boolean | undefined;
@@ -62,8 +63,8 @@ function UserOfficeHours({
           body: raw,
         };
 
-        const response = await fetch(
-          "/api/get-officehours-address",
+        const response = await fetchApi(
+          "/get-officehours-address",
           requestOptions
         );
         const result = await response.json();
@@ -80,8 +81,8 @@ function UserOfficeHours({
           body: rawData,
         };
 
-        const responseData = await fetch(
-          "/api/get-attendee-individual",
+        const responseData = await fetchApi(
+          "/get-attendee-individual",
           requestOption
         );
         const resultData = await responseData.json();

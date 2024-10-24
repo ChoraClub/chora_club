@@ -55,6 +55,7 @@ import MobileResponsiveMessage from "../MobileResponsiveMessage/MobileResponsive
 import RewardButton from "../ClaimReward/RewardButton";
 import Heading from "../ComponentUtils/Heading";
 import { ChevronDownIcon } from "lucide-react";
+import { fetchApi } from "@/utils/api";
 
 function MainProfile() {
   const { isConnected, address, chain } = useAccount();
@@ -326,8 +327,8 @@ function MainProfile() {
       body: raw,
       redirect: "follow",
     };
-    const res = await fetch(
-      `/api/delegate-follow/savefollower`,
+    const res = await fetchApi(
+      `/delegate-follow/savefollower`,
       requestOptions
     );
 
@@ -383,7 +384,7 @@ function MainProfile() {
       }
 
       try {
-        const response = await fetch("/api/delegate-follow/savefollower", {
+        const response = await fetchApi("/delegate-follow/savefollower", {
           method: "PUT",
           headers: myHeaders,
           body: JSON.stringify({
@@ -416,7 +417,7 @@ function MainProfile() {
         if (address) {
           myHeaders.append("x-wallet-address", address);
         }
-        const response = await fetch("/api/delegate-follow/updatefollower", {
+        const response = await fetchApi("/delegate-follow/updatefollower", {
           method: "PUT",
           headers: myHeaders,
           body: JSON.stringify({
@@ -461,7 +462,7 @@ function MainProfile() {
       if (address) {
         myHeaders.append("x-wallet-address", address);
       }
-      const response = await fetch("/api/delegate-follow/updatefollower", {
+      const response = await fetchApi("/delegate-follow/updatefollower", {
         method: "PUT",
         headers: myHeaders,
         body: JSON.stringify({
@@ -553,7 +554,7 @@ function MainProfile() {
         body: raw,
         redirect: "follow",
       };
-      const response = await fetch("/api/profile/emailstatus", requestOptions);
+      const response = await fetchApi("/profile/emailstatus", requestOptions);
 
       if (!response.ok) {
         throw new Error("Failed to toggle");
@@ -595,7 +596,7 @@ function MainProfile() {
           body: raw,
           redirect: "follow",
         };
-        const res = await fetch(`/api/profile/${address}`, requestOptions);
+        const res = await fetchApi(`/profile/${address}`, requestOptions);
 
         const dbResponse = await res.json();
 
@@ -741,7 +742,7 @@ function MainProfile() {
         body: raw,
         redirect: "follow",
       };
-      const res = await fetch(`/api/profile/${address}`, requestOptions);
+      const res = await fetchApi(`/profile/${address}`, requestOptions);
 
       const response = await res.json();
 
@@ -803,7 +804,7 @@ function MainProfile() {
         redirect: "follow",
       };
 
-      const response = await fetch("/api/profile/", requestOptions);
+      const response = await fetchApi("/profile/", requestOptions);
       console.log("Response Add", response);
 
       if (response.status === 200) {

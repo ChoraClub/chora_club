@@ -6,6 +6,7 @@ import Tile from "../ComponentUtils/Tile";
 import { Oval } from "react-loader-spinner";
 import SessionTileSkeletonLoader from "../SkeletonLoader/SessionTileSkeletonLoader";
 import {useAccount} from "wagmi";
+import { fetchApi } from "@/utils/api";
 
 interface Type {
   daoDelegates: string;
@@ -55,8 +56,8 @@ function DelegateOfficeHrs({ props }: { props: Type }) {
           body: raw,
         };
 
-        const response = await fetch(
-          "/api/get-officehours-address",
+        const response = await fetchApi(
+          "/get-officehours-address",
           requestOptions
         );
         const result = await response.json();
@@ -73,8 +74,8 @@ function DelegateOfficeHrs({ props }: { props: Type }) {
           body: rawData,
         };
 
-        const responseData = await fetch(
-          "/api/get-attendee-individual",
+        const responseData = await fetchApi(
+          "/get-attendee-individual",
           requestOption
         );
         const resultData = await responseData.json();

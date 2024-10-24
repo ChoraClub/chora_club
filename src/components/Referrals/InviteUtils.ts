@@ -1,4 +1,5 @@
 import { BASE_URL } from "@/config/constants";
+import { fetchApi } from "@/utils/api";
 import { fetchEnsNameAndAvatar } from "@/utils/ENSUtils";
 import { truncateAddress } from "@/utils/text";
 
@@ -10,8 +11,8 @@ export async function fetchInviteeDetails(userAddress: string) {
     next: { revalidate: 0 },
   };
 
-  const res = await fetch(
-    `${BASE_URL}/api/profile/${userAddress}`,
+  const res = await fetchApi(
+    `/profile/${userAddress}`,
     requestOptions
   );
   const response = await res.json();

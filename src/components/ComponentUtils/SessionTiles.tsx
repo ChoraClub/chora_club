@@ -27,6 +27,7 @@ import copy from "copy-to-clipboard";
 import UpdateHostedSessionModal from "./UpdateHostedSessionModal";
 import { SessionInterface } from "@/types/MeetingTypes";
 import { LIGHTHOUSE_BASE_API_KEY } from "@/config/constants";
+import { fetchApi } from "@/utils/api";
 
 type Attendee = {
   attendee_address: string;
@@ -203,7 +204,7 @@ SessionTileProps) {
 
     try {
       // Make the API call with the provided JSON data
-      const res = await fetch("/api/attest-onchain", requestOptions);
+      const res = await fetchApi("/attest-onchain", requestOptions);
 
       // Check if the request was successful
       if (!res.ok) {
@@ -260,8 +261,8 @@ SessionTileProps) {
             body: raw,
             redirect: "follow",
           };
-          const response = await fetch(
-            `/api/update-attestation-uid`,
+          const response = await fetchApi(
+            `/update-attestation-uid`,
             requestOptions
           );
           const responseData = await response.json();
@@ -363,8 +364,8 @@ SessionTileProps) {
         body: raw,
         redirect: "follow",
       };
-      const response = await fetch(
-        `/api/update-recorded-session`,
+      const response = await fetchApi(
+        `/update-recorded-session`,
         requestOptions
       );
       if (response) {

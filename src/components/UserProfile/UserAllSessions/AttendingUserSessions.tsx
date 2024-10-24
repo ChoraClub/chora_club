@@ -13,6 +13,7 @@ import { Oval } from "react-loader-spinner";
 import SessionTileSkeletonLoader from "@/components/SkeletonLoader/SessionTileSkeletonLoader";
 import ErrorDisplay from "@/components/ComponentUtils/ErrorDisplay";
 import RecordedSessionsSkeletonLoader from "@/components/SkeletonLoader/RecordedSessionsSkeletonLoader";
+import { fetchApi } from "@/utils/api";
 
 function AttendingUserSessions({ daoName }: { daoName: string }) {
   const router = useRouter();
@@ -37,7 +38,7 @@ function AttendingUserSessions({ daoName }: { daoName: string }) {
       if (address) {
         myHeaders.append("x-wallet-address", address);
       }
-      const response = await fetch(`/api/get-session-data/${address}`, {
+      const response = await fetchApi(`/get-session-data/${address}`, {
         method: "POST",
         headers: myHeaders,
         body: JSON.stringify({

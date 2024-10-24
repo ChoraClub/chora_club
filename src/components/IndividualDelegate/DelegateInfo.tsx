@@ -11,6 +11,7 @@ import {
 import styles from "./DelegateInfo.module.css";
 import { marked } from "marked";
 import { useAccount } from "wagmi";
+import { fetchApi } from "@/utils/api";
 
 interface Type {
   daoDelegates: string;
@@ -67,8 +68,8 @@ function DelegateInfo({ props, desc }: { props: Type; desc: string }) {
 
     const sessionHosted = async () => {
       try {
-        const response = await fetch(
-          `/api/get-meeting/${props.individualDelegate}?dao_name=${props.daoDelegates}`,
+        const response = await fetchApi(
+          `/get-meeting/${props.individualDelegate}?dao_name=${props.daoDelegates}`,
           {
             method: "GET",
             headers: {
@@ -104,8 +105,8 @@ function DelegateInfo({ props, desc }: { props: Type; desc: string }) {
         if (address) {
           myHeaders.append("x-wallet-address", address);
         }
-        const response = await fetch(
-          `/api/get-session-data/${props.individualDelegate}`,
+        const response = await fetchApi(
+          `/get-session-data/${props.individualDelegate}`,
           {
             method: "POST",
             headers: myHeaders,
@@ -142,7 +143,7 @@ function DelegateInfo({ props, desc }: { props: Type; desc: string }) {
         if (address) {
           myHeaders.append("x-wallet-address", address);
         }
-        const response = await fetch(`/api/get-officehours-address`, {
+        const response = await fetchApi(`/get-officehours-address`, {
           method: "POST",
           headers: myHeaders,
           body: JSON.stringify({
@@ -179,7 +180,7 @@ function DelegateInfo({ props, desc }: { props: Type; desc: string }) {
         if (address) {
           myHeaders.append("x-wallet-address", address);
         }
-        const response = await fetch(`/api/get-attendee-individual`, {
+        const response = await fetchApi(`/get-attendee-individual`, {
           method: "POST",
           headers: myHeaders,
           body: JSON.stringify({

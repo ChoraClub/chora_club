@@ -10,6 +10,7 @@ import RecordedSessionsSkeletonLoader from "../SkeletonLoader/RecordedSessionsSk
 import ErrorDisplay from "../ComponentUtils/ErrorDisplay";
 import style from "./MainProfile.module.css";
 import { ChevronRight } from 'lucide-react';
+import { fetchApi } from "@/utils/api";
 
 interface UserSessionsProps {
   isDelegate: boolean | undefined;
@@ -75,7 +76,7 @@ function UserSessions({
       if (address) {
         myHeaders.append("x-wallet-address", address);
       }
-      const response = await fetch(`/api/get-sessions`, {
+      const response = await fetchApi(`/get-sessions`, {
         method: "POST",
         headers: myHeaders,
         body: JSON.stringify({

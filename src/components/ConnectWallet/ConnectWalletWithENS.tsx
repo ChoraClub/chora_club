@@ -9,6 +9,7 @@ import { usePathname } from "next/navigation";
 import Image from "next/image";
 import user from "@/assets/images/user/user2.svg";
 import { useConnection } from "@/app/hooks/useConnection";
+import { fetchApi } from "@/utils/api";
 
 function ConnectWalletWithENS() {
   const [displayAddress, setDisplayAddress] = useState<any>();
@@ -35,7 +36,7 @@ function ConnectWalletWithENS() {
             redirect: "follow",
           };
 
-          const res = await fetch(`/api/profile/${address}`, requestOptions);
+          const res = await fetchApi(`/profile/${address}`, requestOptions);
           const dbResponse = await res.json();
           console.log("data", dbResponse);
 

@@ -10,6 +10,7 @@ import ErrorDisplay from "../ComponentUtils/ErrorDisplay";
 import { headers } from "next/headers";
 import { useAccount } from "wagmi";
 import { CiSearch } from "react-icons/ci";
+import { fetchApi } from "@/utils/api";
 
 interface Session {
   _id: string;
@@ -56,8 +57,8 @@ function OfficeHours({ props }: { props: string }) {
         body: raw,
       };
 
-      const response = await fetch(
-        "/api/get-specific-officehours",
+      const response = await fetchApi(
+        "/get-specific-officehours",
         requestOptions
       );
       const result = await response.json();
@@ -132,8 +133,8 @@ function OfficeHours({ props }: { props: string }) {
           body: raw,
           redirect: "follow",
         };
-        const res = await fetch(
-          `/api/search-officehours/${query}`,
+        const res = await fetchApi(
+          `/search-officehours/${query}`,
           requestOptions
         );
         if (!res.ok) {

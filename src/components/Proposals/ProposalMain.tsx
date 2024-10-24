@@ -47,6 +47,7 @@ import ProposalMainDescriptionSkeletonLoader from "../SkeletonLoader/ProposalMai
 import DOMPurify from "dompurify";
 import MobileResponsiveMessage from "../MobileResponsiveMessage/MobileResponsiveMessage";
 import { Transaction } from "ethers";
+import { fetchApi } from "@/utils/api";
 
 // Create a client
 const client = createPublicClient({
@@ -92,6 +93,14 @@ interface Proposal {
   queueEndTime?: number;
 }
 
+interface VoteData {
+  address: string;
+  proposalId: string;
+  choice: string[];
+  votingPower?: number;
+  network: string;
+}
+
 function ProposalMain({ props }: { props: Props }) {
   const router = useRouter();
   const [link, setLink] = useState("");
@@ -118,14 +127,6 @@ function ProposalMain({ props }: { props: Props }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [hasVoted, setHasVoted] = useState(false);
   const chartContainerRef = useRef<HTMLDivElement | null>(null);
-
-  interface VoteData {
-    address: string;
-    proposalId: string;
-    choice: string[];
-    votingPower?: number;
-    network: string;
-  }
 
   const getContractAddress = async (txHash: `0x${string}`) => {
     try {
@@ -154,7 +155,7 @@ function ProposalMain({ props }: { props: Props }) {
       myHeaders.append("x-wallet-address", address);
     }
 
-    const response = await fetch("/api/submit-vote", {
+    const response = await fetchApi("/submit-vote", {
       method: "PUT",
       headers: myHeaders,
       body: JSON.stringify(voteData),

@@ -19,6 +19,7 @@ import { AbiEncodingLengthMismatchError } from "viem";
 import { all } from "axios";
 import { fetchEnsNameAndAvatar } from "@/utils/ENSUtils";
 import { headers } from "next/headers";
+import { fetchApi } from "@/utils/api";
 
 interface dataToStore {
   userAddress: `0x${string}` | undefined | null;
@@ -179,7 +180,7 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
         body: raw,
         redirect: "follow",
       };
-      const response = await fetch(`/api/profile/${address}`, requestOptions);
+      const response = await fetchApi(`/profile/${address}`, requestOptions);
       const result = await response.json();
       console.log("result", result);
       if (Array.isArray(result.data) && result.data.length > 0) {
@@ -312,7 +313,7 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
     try {
       console.log("storing....");
       setCreateSessionLoading(true);
-      const response = await fetch("/api/store-availability", requestOptions);
+      const response = await fetchApi("/store-availability", requestOptions);
       const result = await response.json();
       console.log(result);
       if (result.success) {
@@ -329,7 +330,7 @@ function ScheduledUserSessions({ daoName }: { daoName: string }) {
           if (address) {
             myHeaders.append("x-wallet-address", address);
           }
-          const response = await fetch("/api/delegate-follow/send-mails", {
+          const response = await fetchApi("/delegate-follow/send-mails", {
             method: "PUT",
             headers: myHeaders,
             body: JSON.stringify({

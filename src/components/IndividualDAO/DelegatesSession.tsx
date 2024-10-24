@@ -25,6 +25,7 @@ import { RiErrorWarningLine } from "react-icons/ri";
 import { TimeoutError } from "viem";
 import { SessionInterface } from "@/types/MeetingTypes";
 import { CiSearch } from "react-icons/ci";
+import { fetchApi } from "@/utils/api";
 
 function DelegatesSession({ props }: { props: string }) {
   const [searchQuery, setSearchQuery] = useState("");
@@ -130,7 +131,7 @@ function DelegatesSession({ props }: { props: string }) {
           body: raw,
           redirect: "follow",
         };
-        const res = await fetch(`/api/search-session/${query}`, requestOptions);
+        const res = await fetchApi(`/search-session/${query}`, requestOptions);
         if (!res.ok) {
           throw new Error(`HTTP error! status: ${res.status}`);
         }
